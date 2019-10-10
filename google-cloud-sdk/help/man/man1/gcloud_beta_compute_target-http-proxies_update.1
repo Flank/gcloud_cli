@@ -11,7 +11,7 @@ gcloud beta compute target\-http\-proxies update \- update a target HTTP proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute target\-http\-proxies update\fR \fINAME\fR \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute target\-http\-proxies update\fR \fINAME\fR \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-url\-map\fR\ |\ \fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -47,6 +47,66 @@ services. The URL map must exist and cannot be deleted while referenced by a
 target HTTP proxy.
 
 
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the target HTTP proxy is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the target HTTP proxy to update. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-url\-map\fR
+If set, the url map is global.
+
+.TP 2m
+\fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR
+Region of the url map to operate on. Overrides the default \fBcompute/region\fR
+property value for this command invocation.
+
+
+.RE
 .RE
 .sp
 

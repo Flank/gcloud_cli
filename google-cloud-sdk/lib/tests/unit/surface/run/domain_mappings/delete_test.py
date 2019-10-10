@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.run import base
 
 
-class DomainMappingDeleteTest(base.ServerlessSurfaceBase):
+class DomainMappingDeleteTestBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDomainMappingDelete(self):
     """Delete a domain-mapping."""
@@ -34,3 +38,9 @@ class DomainMappingDeleteTest(base.ServerlessSurfaceBase):
     self.AssertErrContains(
         'Mappings to [www.example.com] now have been deleted.',
         normalize_space=True)
+
+
+class DomainMappingDeleteTestAlpha(DomainMappingDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

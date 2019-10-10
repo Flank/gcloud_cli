@@ -65,8 +65,13 @@ GLOBAL FLAGS
         The Google Cloud Platform project name to use for this invocation. If
         omitted, then the current project is assumed; the current project can
         be listed using gcloud config list --format='text(core.project)' and
-        can be set using gcloud config set project PROJECTID. Overrides the
-        default core/project property value for this command invocation.
+        can be set using gcloud config set project PROJECTID.
+
+        --project and its fallback core/project property play two roles in the
+        invocation. It specifies the project of the resource to operate on. It
+        also specifies the project for API enablement check, quota, and
+        billing. To specify a different project for quota and billing, use
+        --billing-project or billing/quota_project property.
 
      --quiet, -q
         Disable all interactive prompts when running gcloud commands. If input
@@ -77,10 +82,9 @@ GLOBAL FLAGS
         CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
 
      --verbosity=VERBOSITY; default="warning"
-        Override the default verbosity for this command with any of the
-        supported standard verbosity levels: debug, info, warning, error,
-        critical, none. Overrides the default core/verbosity property value for
-        this command invocation.
+        Override the default verbosity for this command. Overrides the default
+        core/verbosity property value for this command invocation. VERBOSITY
+        must be one of: debug, info, warning, error, critical, none.
 
      --version, -v
         Print version information and exit. This flag is only available at the
@@ -122,6 +126,9 @@ GROUPS
      access-context-manager
         (ALPHA) Manage Access Context Manager resources.
 
+     active-directory
+        (ALPHA) Manage Managed Microsoft AD resources.
+
      ai-platform
         (ALPHA) Manage AI Platform jobs and models.
 
@@ -142,6 +149,9 @@ GROUPS
 
      bq
         (ALPHA) Interact with and manage resources in Google BigQuery.
+
+     build-artifacts
+        (ALPHA) Manage Cloud Build Artifacts resources.
 
      builds
         (ALPHA) Create and manage builds for Google Cloud Build.
@@ -165,7 +175,7 @@ GROUPS
         (ALPHA) Manage Cloud Data Catalog resources.
 
      dataflow
-        (ALPHA) Read and manipulate Google Dataflow resources.
+        (ALPHA) Manage Google Cloud Dataflow resources.
 
      dataproc
         (ALPHA) Create and manage Google Cloud Dataproc clusters and jobs.
@@ -182,6 +192,9 @@ GROUPS
 
      dlp
         (ALPHA) Manage sensitive data with Cloud Data Loss Prevention.
+
+     dns
+        (ALPHA) Manage your Cloud DNS managed-zones and record-sets.
 
      domains
         (ALPHA) Manage domains for your Google Cloud projects.
@@ -204,6 +217,9 @@ GROUPS
      functions
         (ALPHA) Manage Google Cloud Functions.
 
+     game
+        (ALPHA) Managed Cloud Game Services.
+
      genomics
         (ALPHA) Manage Genomics resources.
 
@@ -222,6 +238,10 @@ GROUPS
      kms
         (ALPHA) Manage cryptographic keys in the cloud.
 
+     local
+        (ALPHA) Create and manage a local development environment for Cloud
+        Run.
+
      logging
         (ALPHA) Manage Stackdriver Logging.
 
@@ -238,11 +258,17 @@ GROUPS
      organizations
         (ALPHA) Create and manage Google Cloud Platform Organizations.
 
+     policy-troubleshoot
+        (ALPHA) Troubleshoot Google Cloud Platform Policies.
+
      projects
         (ALPHA) Create and manage project access policies.
 
      pubsub
         (ALPHA) Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
+
+     recommender
+        (ALPHA) Manage Cloud recommendations and recommendation rules.
 
      redis
         (ALPHA) Manage Cloud Memorystore Redis resources.
@@ -304,7 +330,6 @@ COMMANDS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

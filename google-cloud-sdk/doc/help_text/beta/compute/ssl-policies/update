@@ -3,7 +3,7 @@ NAME
         SSL policy
 
 SYNOPSIS
-    gcloud beta compute ssl-policies update NAME
+    gcloud beta compute ssl-policies update SSL_POLICY
         [--custom-features=[CUSTOM_FEATURES,...]]
         [--min-tls-version=MIN_TLS_VERSION] [--profile=PROFILE]
         [GCLOUD_WIDE_FLAG ...]
@@ -19,7 +19,7 @@ DESCRIPTION
     balancers and the backends.
 
 POSITIONAL ARGUMENTS
-     NAME
+     SSL_POLICY
         Name of the SSL policy to patch.
 
 FLAGS

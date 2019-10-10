@@ -1,0 +1,114 @@
+title: VPC Access connectors tests
+release_tracks: [BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute networks vpc-access connectors list --region us-central1
+  - stdout: .*CONNECTOR_ID.*$
+- execute:
+  - command: compute networks vpc-access connectors describe do-not-delete --region
+      us-central1
+  - stdout: .*ipCidrRange.*$
+- execute:
+  - command: compute networks vpc-access connectors delete not-there --region us-central1
+  - prompt:
+    - message: |
+        You are about to delete connector [not-there] in [us-central1].
+        Any associated data will be lost.
+    - input: y
+  - error: '1: .*Requested entity was not found.*$'
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+      GA: v1
+
+- execute_command:
+    command: compute networks vpc-access connectors list --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vpcaccess.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/connectors?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '302'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            connectors:
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/do-not-delete
+              network: do-not-delete-redis-test
+              ipCidrRange: 10.8.0.0/28
+              state: READY
+              minThroughput: 200
+              maxThroughput: 1000
+    - expect_stdout:
+        matches: .*CONNECTOR_ID.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute networks vpc-access connectors describe do-not-delete --region
+      us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vpcaccess.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/connectors/do-not-delete?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '244'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/do-not-delete
+            network: do-not-delete-redis-test
+            ipCidrRange: 10.8.0.0/28
+            state: READY
+            minThroughput: 200
+            maxThroughput: 1000
+    - expect_stdout:
+        matches: .*ipCidrRange.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute networks vpc-access connectors delete not-there --region us-central1
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to delete connector [not-there] in [us-central1].
+          Any associated data will be lost.
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://vpcaccess.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-central1/connectors/not-there?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '353'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Requested entity was not found.
+              status: NOT_FOUND
+              details:
+              - '@type': type.googleapis.com/google.rpc.DebugInfo
+                detail: '[ORIGINAL ERROR] generic::not_found: com.google.apps.framework.request.NotFoundException:
+                  The connector is not found.'
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*Requested entity was not found.*

@@ -4,12 +4,13 @@ NAME
 
 SYNOPSIS
     gcloud beta compute networks subnets update NAME
+        [--drain-timeout=DRAIN_TIMEOUT; default="0s"]
         [--logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL]
         [--logging-flow-sampling=LOGGING_FLOW_SAMPLING]
         [--logging-metadata=LOGGING_METADATA] [--region=REGION]
         [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
           | --[no-]enable-private-ip-google-access
-          | --remove-secondary-ranges=PROPERTY=VALUE,[...]]
+          | --remove-secondary-ranges=PROPERTY=VALUE,[...] | --role=ROLE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -20,6 +21,15 @@ POSITIONAL ARGUMENTS
         Name of the subnetwork to update.
 
 FLAGS
+     --drain-timeout=DRAIN_TIMEOUT; default="0s"
+        The time period for draining traffic from Internal HTTP(S) Load
+        Balancer proxies that are assigned addresses in the current ACTIVE
+        subnetwork. For example, 1h, 60m and 3600s each specify a duration of 1
+        hour for draining the traffic. Longer times reduce the number of
+        proxies that are draining traffic at any one time, and so improve the
+        availability of proxies for load balancing. The drain timeout is only
+        applicable when the [--role=ACTIVE] flag is being used.
+
      --logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL
         Can only be specified if VPC flow logging for this subnetwork is
         enabled. Toggles the aggregation interval for collecting flow logs.
@@ -90,6 +100,20 @@ FLAGS
 
             For example, --remove-secondary-ranges range2,range3 removes the
             secondary ranges with names range2 and range3.
+
+         --role=ROLE
+            The role is set to ACTIVE to update a BACKUP reserved address range
+            to be the new ACTIVE address range. Note that the only supported
+            value for this flag is ACTIVE since setting an address range to
+            BACKUP is not supported.
+
+            This field is only valid when updating a reserved IP address range
+            used for the purpose of Internal HTTP(S) Load Balancer.
+
+            ROLE must be (currently only one value is supported):
+
+             ACTIVE
+                The ACTIVE subnet that is currently used.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

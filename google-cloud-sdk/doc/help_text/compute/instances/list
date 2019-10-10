@@ -31,11 +31,7 @@ FLAGS
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
 
      --zones=ZONE,[ZONE,...]
-        (DEPRECATED) If provided, only resources from the given zones are
-        queried.
-
-        Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
-        For example --filter="zone:( europe-west1-b europe-west1-c )".
+        If provided, only resources from the given zones are queried.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

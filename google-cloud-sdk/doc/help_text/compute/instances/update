@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud compute instances update INSTANCE_NAME [--[no-]deletion-protection]
-        [--min-cpu-platform=PLATFORM] [--[no-]shielded-integrity-monitoring]
+        [--[no-]enable-display-device] [--min-cpu-platform=PLATFORM]
+        [--[no-]shielded-integrity-monitoring]
         [--shielded-learn-integrity-policy] [--[no-]shielded-secure-boot]
         [--[no-]shielded-vtpm] [--update-labels=[KEY=VALUE,...]] [--zone=ZONE]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
@@ -36,6 +37,11 @@ FLAGS
      --[no-]deletion-protection
         Enables deletion protection for the instance. Use --deletion-protection
         to enable and --no-deletion-protection to disable.
+
+     --[no-]enable-display-device
+        Enable a display device for instances using a Windows image. Use
+        --enable-display-device to enable and --no-enable-display-device to
+        disable.
 
      --min-cpu-platform=PLATFORM
         When specified, the VM will be scheduled on host with specified CPU
@@ -92,12 +98,13 @@ FLAGS
         numbers.
 
      --zone=ZONE
-        Zone of the instance to update. If not specified, you may be prompted
-        to select a zone. gcloud will attempt to identify the zone by searching
-        for resources in your project. If the zone cannot be determined, you
-        will then be prompted with all Google Cloud Platform zones.
+        Zone of the instance to update. If not specified, the user may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in the user's project. If the zone cannot be
+        determined, the user will then be prompted with all Google Cloud
+        Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,10 @@ class CommandReleaseTracksTest(sdk_test_base.SdkBase, parameterized.TestCase):
         {'release_tracks': ['BETA']}]),
       ([{'release_tracks': ['ALPHA', 'BETA'], 'ALPHA': {'prop': 'val'}}],
        [{'release_tracks': ['ALPHA'], 'prop': 'val'},
+        {'release_tracks': ['BETA']}]),
+      ([{'release_tracks': ['ALPHA', 'BETA'],
+         'child': {'prop': 'val', 'release_tracks': ['ALPHA']}}],
+       [{'release_tracks': ['ALPHA'], 'child': {'prop': 'val'}},
         {'release_tracks': ['BETA']}]),
   ])
   def testSeparateDeclarativeCommandTracks(self, impls, expected):

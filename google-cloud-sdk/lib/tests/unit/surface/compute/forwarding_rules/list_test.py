@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import mock
 def SetUp(test_obj, api_version):
   test_obj.SelectApi(api_version)
   msgs = test_obj.messages
-  prefix = 'https://www.googleapis.com/compute/' + api_version
+  prefix = 'https://compute.googleapis.com/compute/' + api_version
 
   if api_version == 'v1':
     test_obj._forwarding_rules = test_resources.FORWARDING_RULES_V1
@@ -91,8 +91,8 @@ class ForwardingRulesListTest(test_base.BaseTest,
     command = 'compute forwarding-rules list --uri --global'
     return_value = self._global_forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/global/forwardingRules/global-forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/global/forwardingRules/global-forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/global/forwardingRules/global-forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/global/forwardingRules/global-forwarding-rule-2
         """.format(api=self.api))
 
     self.RequestOnlyGlobal(command, return_value, output)
@@ -101,8 +101,8 @@ class ForwardingRulesListTest(test_base.BaseTest,
     command = 'compute forwarding-rules list --uri --regions ""'
     return_value = self._forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
         """.format(api=self.api))
 
     self.RequestAggregate(command, return_value, output)
@@ -111,8 +111,8 @@ class ForwardingRulesListTest(test_base.BaseTest,
     command = 'compute forwarding-rules list --uri --regions region-1'
     return_value = self._forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
         """.format(api=self.api))
 
     self.RequestOneRegion(command, return_value, output)
@@ -121,8 +121,8 @@ class ForwardingRulesListTest(test_base.BaseTest,
     command = 'compute forwarding-rules list --uri --regions region-1,region-2'
     return_value = self._forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
         """.format(api=self.api))
 
     self.RequestTwoRegions(command, return_value, output)
@@ -266,9 +266,9 @@ class ForwardingRulesListBetaTest(ForwardingRulesListTest):
     command = 'compute forwarding-rules list --uri --regions ""'
     return_value = self._forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
         """.format(api=self.api))
 
     self.RequestAggregate(command, return_value, output)
@@ -277,9 +277,9 @@ class ForwardingRulesListBetaTest(ForwardingRulesListTest):
     command = 'compute forwarding-rules list --uri --regions region-1'
     return_value = self._forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
         """.format(api=self.api))
 
     self.RequestOneRegion(command, return_value, output)
@@ -288,9 +288,9 @@ class ForwardingRulesListBetaTest(ForwardingRulesListTest):
     command = 'compute forwarding-rules list --uri --regions region-1,region-2'
     return_value = self._forwarding_rules
     output = ("""\
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
-        https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-2
+        https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-ilb
         """.format(api=self.api))
 
     self.RequestTwoRegions(command, return_value, output)

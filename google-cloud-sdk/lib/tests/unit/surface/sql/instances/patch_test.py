@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -314,6 +314,17 @@ class _BaseInstancePatchTest(object):
         'https://cloud.google.com/sql/docs/postgres/flags - to see if your '
         'instance will be restarted when this patch is submitted.')
 
+  def testUpdateSqlServerDatabaseFlags(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    self._ExpectDatabaseFlagsUpdate(self.GetSqlServerInstance())
+
+    prompt_mock.assert_called_with(
+        'WARNING: This patch modifies database flag values, which may require '
+        'your instance to be restarted. Check the list of supported flags - '
+        'https://cloud.google.com/sql/docs/sqlserver/flags - to see if your '
+        'instance will be restarted when this patch is submitted.')
+
   def _ExpectDatabaseFlagsClear(self, instance):
     diff = {
         'name': 'custom-instance',
@@ -360,6 +371,17 @@ class _BaseInstancePatchTest(object):
         'WARNING: This patch modifies database flag values, which may require '
         'your instance to be restarted. Check the list of supported flags - '
         'https://cloud.google.com/sql/docs/postgres/flags - to see if your '
+        'instance will be restarted when this patch is submitted.')
+
+  def testClearSqlServerDatabaseFlags(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    self._ExpectDatabaseFlagsClear(self.GetSqlServerInstance())
+
+    prompt_mock.assert_called_with(
+        'WARNING: This patch modifies database flag values, which may require '
+        'your instance to be restarted. Check the list of supported flags - '
+        'https://cloud.google.com/sql/docs/sqlserver/flags - to see if your '
         'instance will be restarted when this patch is submitted.')
 
   def testDisableBackup(self):
@@ -673,7 +695,7 @@ class _BaseInstancePatchBetaTest(_BaseInstancePatchTest):
                     authorizedNetworks=[],
                     ipv4Enabled=None,
                     requireSsl=None,
-                    privateNetwork=('https://www.googleapis.com/compute/v1/'
+                    privateNetwork=('https://compute.googleapis.com/compute/v1/'
                                     'projects/fake-project/global/networks/'
                                     'somenetwork'))
         }
@@ -686,7 +708,7 @@ class _BaseInstancePatchBetaTest(_BaseInstancePatchTest):
              '--network=somenetwork --diff')
     self.assertEqual(prompt_mock.call_count, 0)
     self.AssertErrContains(
-        '{"ipConfiguration": {"privateNetwork": "https://www.googleapis.com/'
+        '{"ipConfiguration": {"privateNetwork": "https://compute.googleapis.com/'
         'compute/v1/projects/fake-project/global/networks/somenetwork"}}')
 
 

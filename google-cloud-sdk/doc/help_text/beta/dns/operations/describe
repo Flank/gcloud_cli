@@ -27,11 +27,12 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To describe a managed-zone operation:
 
-        $ gcloud beta dns operations describe 1234 --zone my_zone
+        $ gcloud beta dns operations describe 1234 --zone=my_zone
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns operations describe
+        $ gcloud alpha dns operations describe
 

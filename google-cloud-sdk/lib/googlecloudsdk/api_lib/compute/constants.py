@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,6 +80,10 @@ IMAGE_ALIASES = {
         project='rhel-cloud',
         name_prefix='rhel-7',
         family='rhel-7'),
+    'rhel-8': ImageAlias(
+        project='rhel-cloud',
+        name_prefix='rhel-8',
+        family='rhel-8'),
     'sles-11': ImageAlias(
         project='suse-cloud',
         name_prefix='sles-11',

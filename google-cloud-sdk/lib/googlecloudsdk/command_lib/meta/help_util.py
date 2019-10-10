@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import six
 
 
 # Help documents must not contain any of these invalid brand abbreviations.
-INVALID_BRAND_ABBREVIATIONS = ['GAE', 'GCE', 'GCP', 'GCS', 'GKE']
+INVALID_BRAND_ABBREVIATIONS = ['GAE', 'GCE', 'GCP', 'GCS']
 # Max number of test changes to display.
 TEST_CHANGES_DISPLAY_MAX = 32
 
@@ -67,7 +67,7 @@ def GetDirFilesRecursive(directory):
     A set of all files in directory and its children recursively.
   """
   dirfiles = set()
-  for dirpath, _, files in os.walk(directory):
+  for dirpath, _, files in os.walk(six.text_type(directory)):
     for name in files:
       dirfiles.add(os.path.normpath(os.path.join(dirpath, name)))
   return dirfiles

@@ -76,10 +76,10 @@ to '/tmp/my/pem.file':
 
 .RS 2m
 $ gcloud alpha kms keys versions get\-public\-key 2 \e
-\-\-key frodo \e
-\-\-keyring fellowship \e
-\-\-location us\-east1 \e
-\-\-output\-file /tmp/my/pem.file
+\-\-key=frodo \e
+\-\-keyring=fellowship \e
+\-\-location=us\-east1 \e
+\-\-output\-file=/tmp/my/pem.file
 .RE
 
 
@@ -88,7 +88,11 @@ $ gcloud alpha kms keys versions get\-public\-key 2 \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud kms keys versions get\-public\-key
+$ gcloud beta kms keys versions get\-public\-key
+.RE
 

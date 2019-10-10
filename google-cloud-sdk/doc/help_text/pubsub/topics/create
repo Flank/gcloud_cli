@@ -2,7 +2,13 @@ NAME
     gcloud pubsub topics create - creates one or more Cloud Pub/Sub topics
 
 SYNOPSIS
-    gcloud pubsub topics create TOPIC [TOPIC ...] [GCLOUD_WIDE_FLAG ...]
+    gcloud pubsub topics create TOPIC [TOPIC ...] [--labels=[KEY=VALUE,...]]
+        [--message-storage-policy-allowed-regions=[REGION,...]]
+        [--topic-encryption-key=TOPIC_ENCRYPTION_KEY
+          : --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
+          --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
+          --topic-encryption-key-project=TOPIC_ENCRYPTION_KEY_PROJECT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Creates one or more Cloud Pub/Sub topics.
@@ -17,6 +23,42 @@ POSITIONAL ARGUMENTS
 
        TOPIC [TOPIC ...]
           IDs of the topics or fully qualified identifiers for the topics.
+
+FLAGS
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --message-storage-policy-allowed-regions=[REGION,...]
+        A list of one or more Cloud regions where messages are allowed to be
+        stored at rest.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the topic. The specified Cloud KMS key should have
+     purpose set to "ENCRYPT_DECRYPT". The service account,
+     "service-${CONSUMER_PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com"
+     requires the IAM cryptoKeyEncrypterDecrypter role for the given Cloud KMS
+     key. CONSUMER_PROJECT_NUMBER is the project number of the project that is
+     the parent of the topic being created. The arguments in this group can be
+     used to specify the attributes of this resource.
+
+       --topic-encryption-key=TOPIC_ENCRYPTION_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
+          The Cloud location for the key.
+
+       --topic-encryption-key-project=TOPIC_ENCRYPTION_KEY_PROJECT
+          The Cloud project for the key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,9 +54,9 @@ class DiskTypesDescribeTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             name: pd-standard
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/diskTypes/pd-standard
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/diskTypes/pd-standard
             validDiskSize: 10GB-10TB
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   # TODO(b/117336602) Stop using parameterized for track parameterization.

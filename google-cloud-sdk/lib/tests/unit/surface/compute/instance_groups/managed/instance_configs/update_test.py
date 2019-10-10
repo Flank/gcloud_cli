@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,17 +46,10 @@ class _InstanceGroupManagerInstanceConfigsUpdateTestBase(
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://www.googleapis.com/compute/alpha/'
+    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
     self.project_uri = '{endpoint_uri}projects/fake-project'.format(
         endpoint_uri=self.endpoint_uri)
 
-    metadata_override_1 = (
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry)(
-            key='key-BAR', value='value BAR')
-    metadata_override_2 = (
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry)(
-            key='key-foo', value='value foo')
-    self.metadata_overrides = [metadata_override_1, metadata_override_2]
     self.preserved_state_metadata = [
         self._MakePreservedStateMetadataMapEntry(
             key='key-BAR', value='value BAR'),
@@ -126,7 +119,7 @@ class _InstanceGroupManagerInstanceConfigsUpdateTestBase(
             .NEVER,
         'on-permanent-instance-deletion':
             self.messages.PreservedStatePreservedDisk.AutoDeleteValueValuesEnum
-            .WHEN_NOT_IN_USE,
+            .ON_PERMANENT_INSTANCE_DELETION,
     }
     return self.messages.PreservedState.DisksValue.AdditionalProperty(
         key=device_name,
@@ -144,21 +137,9 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
     _InstanceGroupManagerInstanceConfigsUpdateTestBase):
 
   def SetUp(self):
-    self._disk_override_1 = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='foo',
-        source=(self.project_uri + '/zones/us-central2-a/disks/foo'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_WRITE'),
-    )
     self._preserved_state_disk_1 = self._MakePreservedStateDiskMapEntry(
         'foo', (self.project_uri + '/zones/us-central2-a/disks/foo'),
         'READ_WRITE')
-    self._disk_override_2 = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='baz',
-        source=(self.project_uri + '/zones/us-central2-a/disks/baz'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_ONLY'),
-    )
     self._preserved_state_disk_2 = self._MakePreservedStateDiskMapEntry(
         'baz', (self.project_uri + '/zones/us-central2-a/disks/baz'),
         'READ_ONLY')
@@ -175,20 +156,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
         zone='us-central2-a',
     )
     if return_config:
-      disk_overrides = [
-          self.messages.ManagedInstanceOverrideDiskOverride(
-              deviceName='foo',
-              source=(self.project_uri + '/zones/us-central2-a/disks/foo'),
-              mode=self.messages.ManagedInstanceOverrideDiskOverride
-              .ModeValueValuesEnum('READ_WRITE'),
-          ),
-          self.messages.ManagedInstanceOverrideDiskOverride(
-              deviceName='baz',
-              source=(self.project_uri + '/zones/us-central2-a/disks/baz'),
-              mode=self.messages.ManagedInstanceOverrideDiskOverride
-              .ModeValueValuesEnum('READ_ONLY'),
-          ),
-      ]
       preserved_state_disks = [
           self._MakePreservedStateDiskMapEntry(
               'foo', (self.project_uri + '/zones/us-central2-a/disks/foo'),
@@ -196,12 +163,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
           self._MakePreservedStateDiskMapEntry(
               'baz', (self.project_uri + '/zones/us-central2-a/disks/baz'),
               'READ_ONLY')
-      ]
-      metadata_overrides = [
-          self.messages.ManagedInstanceOverride.MetadataValueListEntry(
-              key='key-BAR', value='value BAR'),
-          self.messages.ManagedInstanceOverride.MetadataValueListEntry(
-              key='key-foo', value='value foo'),
       ]
       preserved_state_metadata = [
           self._MakePreservedStateMetadataMapEntry(
@@ -211,15 +172,7 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
       ]
       items = [
           self.messages.PerInstanceConfig(
-              instance='{project_uri}/zones/us-central2-a/instances/foo'.format(
-                  project_uri=self.project_uri),
               name='foo',
-              override=self.messages.ManagedInstanceOverride(
-                  disks=disk_overrides,
-                  metadata=metadata_overrides,
-                  origin=self.messages.ManagedInstanceOverride
-                  .OriginValueValuesEnum('AUTO_GENERATED'),
-              ),
               preservedState=self.messages.PreservedState(
                   disks=self.messages.PreservedState.DisksValue(
                       additionalProperties=preserved_state_disks
@@ -240,8 +193,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
     )
 
   def _ExpectUpdatePerInstanceConfigs(self,
-                                      disk_overrides,
-                                      metadata_overrides,
                                       preserved_state_disks,
                                       preserved_state_metadata):
     request = (
@@ -252,13 +203,7 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
                 self.messages.InstanceGroupManagersUpdatePerInstanceConfigsReq
             )(perInstanceConfigs=[
                 self.messages.PerInstanceConfig(
-                    instance=('{project_uri}/zones/us-central2-a/instances/foo'
-                              .format(project_uri=self.project_uri)),
                     name='foo',
-                    override=self.messages.ManagedInstanceOverride(
-                        disks=disk_overrides,
-                        metadata=metadata_overrides,
-                    ),
                     preservedState=self.messages.PreservedState(
                         disks=self.messages.PreservedState.DisksValue(
                             additionalProperties=preserved_state_disks
@@ -330,29 +275,18 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
     )
 
   def testSimpleCase(self):
-    disk_override = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='foo',
-        source=(self.project_uri + '/zones/us-central2-a/disks/foo-2'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_ONLY'),
-    )
-    disk_overrides = [disk_override]
+    disk_source = self.project_uri + '/zones/us-central2-a/disks/foo-2'
     preserved_state_disks = [
-        self._MakePreservedStateDiskMapEntry('foo', disk_override.source,
+        self._MakePreservedStateDiskMapEntry('foo', disk_source,
                                              'READ_ONLY',
                                              'on-permanent-instance-deletion')
     ]
-    metadata_override = (
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry)(
-            key='key-BAR', value='new value')
-    metadata_overrides = [metadata_override]
     preserved_state_metadata = [
         self._MakePreservedStateMetadataMapEntry(
             key='key-BAR', value='new value')
     ]
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=disk_overrides, metadata_overrides=metadata_overrides,
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=preserved_state_metadata)
     self._ExpectGetOperation()
@@ -369,15 +303,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
         """.format(project_uri=self.project_uri))
 
   def testUpdateAddNonExistingDisk(self):
-    disk_override_3 = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='qwerty',
-        source=(self.project_uri + '/zones/us-central2-a/disks/abc123'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_WRITE'),
-    )
-    disk_overrides = [
-        self._disk_override_1, self._disk_override_2, disk_override_3
-    ]
     preserved_state_disks = [
         self._preserved_state_disk_1, self._preserved_state_disk_2,
         self._MakePreservedStateDiskMapEntry(
@@ -386,8 +311,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
     ]
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=disk_overrides,
-        metadata_overrides=self.metadata_overrides,
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=self.preserved_state_metadata)
     self._ExpectGetOperation()
@@ -401,15 +324,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
         """.format(project_uri=self.project_uri))
 
   def testUpdateAddDiskOverrideUsingOnlyDeviceName(self):
-    disk_override_3 = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='bar',
-        source=(self.project_uri + '/zones/us-central2-a/disks/bar'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_WRITE'),
-    )
-    disk_overrides = [
-        self._disk_override_1, self._disk_override_2, disk_override_3
-    ]
     preserved_state_disks = [
         self._preserved_state_disk_1, self._preserved_state_disk_2,
         self._MakePreservedStateDiskMapEntry(
@@ -419,8 +333,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
     self._ExpectListPerInstanceConfigs()
     self.ExpectGetInstance()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=disk_overrides,
-        metadata_overrides=self.metadata_overrides,
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=self.preserved_state_metadata)
     self._ExpectGetOperation()
@@ -436,7 +348,6 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
   def testUpdateRemoveAllDiskAndMetadataOverrides(self):
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=[], metadata_overrides=[],
         preserved_state_disks=[], preserved_state_metadata=[])
     self._ExpectGetOperation()
     self._ExpectGetInstanceGroupManager()
@@ -450,21 +361,13 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
         """)
 
   def testUpdateWithForceInstanceUpdate(self):
-    disk_override = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='foo',
-        source=(self.project_uri + '/zones/us-central2-a/disks/foo'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_WRITE'),
-    )
-    disk_overrides = [disk_override]
+    disk_source = self.project_uri + '/zones/us-central2-a/disks/foo'
     preserved_state_disks = [
         self._MakePreservedStateDiskMapEntry(
-            'foo', disk_override.source, 'READ_WRITE')
+            'foo', disk_source, 'READ_WRITE')
     ]
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=disk_overrides,
-        metadata_overrides=self.metadata_overrides,
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=self.preserved_state_metadata)
     self._ExpectGetOperation()
@@ -543,6 +446,18 @@ class InstanceGroupManagerInstanceConfigsUpdateZonalTest(
             --update-stateful-disk device-name=foo
           """)
 
+  def testUnsuccessfulUpdateForRemoveNonExistingStatefulDisk(self):
+    self._ExpectListPerInstanceConfigs()
+    with self.AssertRaisesExceptionMatches(
+        calliope_exceptions.InvalidArgumentException,
+        'The following are invalid stateful disks: `nonexistent`'):
+      self.Run("""
+          compute instance-groups managed instance-configs update group-1
+            --zone us-central2-a
+            --instance foo
+            --remove-stateful-disks nonexistent
+          """)
+
   @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
          'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
          instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_ARG)
@@ -590,20 +505,6 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
         project='fake-project',
         region='us-central2',
     )
-    disk_overrides = [
-        self.messages.ManagedInstanceOverrideDiskOverride(
-            deviceName='foo',
-            source=(self.project_uri + '/zones/us-central2-a/disks/foo'),
-            mode=self.messages.ManagedInstanceOverrideDiskOverride
-            .ModeValueValuesEnum('READ_WRITE'),
-        ),
-        self.messages.ManagedInstanceOverrideDiskOverride(
-            deviceName='baz',
-            source=(self.project_uri + '/zones/us-central2-a/disks/baz'),
-            mode=self.messages.ManagedInstanceOverrideDiskOverride
-            .ModeValueValuesEnum('READ_ONLY'),
-        ),
-    ]
     preserved_state_disks = [
         self._MakePreservedStateDiskMapEntry(
             'foo', (self.project_uri + '/zones/us-central2-a/disks/foo'),
@@ -611,12 +512,6 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
         self._MakePreservedStateDiskMapEntry(
             'baz', (self.project_uri + '/zones/us-central2-a/disks/baz'),
             'READ_ONLY')
-    ]
-    metadata_overrides = [
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry(
-            key='key-BAR', value='value BAR'),
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry(
-            key='key-foo', value='value foo'),
     ]
     preserved_state_metadata = [
         self._MakePreservedStateMetadataMapEntry(
@@ -626,15 +521,7 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
     ]
     items = [
         self.messages.PerInstanceConfig(
-            instance='{project_uri}/zones/us-central2-a/instances/foo'.format(
-                project_uri=self.project_uri),
             name='foo',
-            override=self.messages.ManagedInstanceOverride(
-                disks=disk_overrides,
-                metadata=metadata_overrides,
-                origin=self.messages.ManagedInstanceOverride
-                .OriginValueValuesEnum('AUTO_GENERATED'),
-            ),
             preservedState=self.messages.PreservedState(
                 disks=self.messages.PreservedState.DisksValue(
                     additionalProperties=preserved_state_disks
@@ -653,8 +540,6 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
     )
 
   def _ExpectUpdatePerInstanceConfigs(self,
-                                      disk_overrides,
-                                      metadata_overrides,
                                       preserved_state_disks,
                                       preserved_state_metadata):
     request = (
@@ -665,13 +550,7 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
                 self.messages.RegionInstanceGroupManagerUpdateInstanceConfigReq
             )(perInstanceConfigs=[
                 self.messages.PerInstanceConfig(
-                    instance=('{project_uri}/zones/us-central2-a/instances/foo'
-                              .format(project_uri=self.project_uri)),
                     name='foo',
-                    override=self.messages.ManagedInstanceOverride(
-                        disks=disk_overrides,
-                        metadata=metadata_overrides,
-                    ),
                     preservedState=self.messages.PreservedState(
                         disks=self.messages.PreservedState.DisksValue(
                             additionalProperties=preserved_state_disks
@@ -746,22 +625,12 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
     )
 
   def testSimpleCase(self):
-    disk_override = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='foo',
-        source=(self.project_uri + '/zones/us-central2-a/disks/foo-2'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_ONLY'),
-    )
-    disk_overrides = [disk_override]
+    disk_source = self.project_uri + '/zones/us-central2-a/disks/foo-2'
     preserved_state_disks = [
-        self._MakePreservedStateDiskMapEntry('foo', disk_override.source,
+        self._MakePreservedStateDiskMapEntry('foo', disk_source,
                                              'READ_ONLY',
                                              'on-permanent-instance-deletion')
     ]
-    metadata_override = (
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry)(
-            key='key-BAR', value='new value')
-    metadata_overrides = [metadata_override]
     preserved_state_metadata = [
         self._MakePreservedStateMetadataMapEntry(
             key='key-BAR', value='new value')
@@ -769,8 +638,6 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
     self._ExpectListManagedInstances()
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=disk_overrides,
-        metadata_overrides=metadata_overrides,
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=preserved_state_metadata)
     self._ExpectGetOperation()
@@ -787,22 +654,14 @@ class InstanceGroupManagerInstanceConfigsUpdateRegionalTest(
         """.format(project_uri=self.project_uri))
 
   def testUpdateWithForceInstanceUpdate(self):
-    disk_override = self.messages.ManagedInstanceOverrideDiskOverride(
-        deviceName='foo',
-        source=(self.project_uri + '/zones/us-central2-a/disks/foo'),
-        mode=self.messages.ManagedInstanceOverrideDiskOverride.
-        ModeValueValuesEnum('READ_WRITE'),
-    )
-    disk_overrides = [disk_override]
+    disk_source = self.project_uri + '/zones/us-central2-a/disks/foo'
     preserved_state_disks = [
         self._MakePreservedStateDiskMapEntry(
-            'foo', disk_override.source, 'READ_WRITE')
+            'foo', disk_source, 'READ_WRITE')
     ]
     self._ExpectListManagedInstances()
     self._ExpectListPerInstanceConfigs()
     self._ExpectUpdatePerInstanceConfigs(
-        disk_overrides=disk_overrides,
-        metadata_overrides=self.metadata_overrides,
         preserved_state_disks=preserved_state_disks,
         preserved_state_metadata=self.preserved_state_metadata)
     self._ExpectGetOperation()

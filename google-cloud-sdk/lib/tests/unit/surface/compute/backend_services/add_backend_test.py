@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -104,11 +104,11 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'v1/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'v1/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
@@ -140,15 +140,15 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-1')),
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-2')),
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-3')),
                   ],
@@ -163,7 +163,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'v1/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -188,7 +188,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'v1/projects/my-project/regions/'
                            'us-central1/instanceGroups/my-group')),
             ],
@@ -249,7 +249,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   backends=[
                       messages.Backend(
                           description='Hello, world!',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -305,7 +305,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxUtilization=1.0),
@@ -350,7 +350,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   backends=[
                       messages.Backend(
                           balancingMode=self._rate,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxRate=100),
@@ -386,7 +386,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
 
     backend = messages.Backend(
         balancingMode=self._rate,
-        group=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        group=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                'zones/us-central1-a/{}/my-group'.format(resource_type)))
     if rate_flag_suffix == 'instance':
       backend.maxRatePerInstance = 0.9
@@ -415,7 +415,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'v1/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -473,7 +473,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   backends=[
                       messages.Backend(
                           capacityScaler=0.0,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -496,7 +496,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
     self.Run("""
         compute backend-services add-backend
           {uri}/projects/my-project/global/backendServices/my-backend-service
-          --instance-group https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/my-group
+          --instance-group https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/my-group
           --global
         """.format(uri=self.compute_uri))
 
@@ -516,7 +516,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -539,7 +539,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
     self.Run("""
         compute backend-services add-backend
           {compute_uri}/projects/google.com:my-project/global/backendServices/my-backend-service
-          --instance-group https://www.googleapis.com/compute/v1/projects/google.com:my-project/zones/us-central1-a/instanceGroups/my-group
+          --instance-group https://compute.googleapis.com/compute/v1/projects/google.com:my-project/zones/us-central1-a/instanceGroups/my-group
           --global
         """.format(compute_uri=self.compute_uri))
 
@@ -559,7 +559,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/google.com:my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -622,7 +622,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-1')),
                   ],
@@ -788,7 +788,7 @@ class BackendServiceAddBackendTest(test_base.BaseTest, parameterized.TestCase):
 
     backend = messages.Backend(
         balancingMode=self._connection,
-        group=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        group=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                'zones/us-central1-a/{}/my-group'.format(resource_type)))
     if rate_flag_suffix == 'instance':
       backend.maxConnectionsPerInstance = 5
@@ -1317,7 +1317,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'v1/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],

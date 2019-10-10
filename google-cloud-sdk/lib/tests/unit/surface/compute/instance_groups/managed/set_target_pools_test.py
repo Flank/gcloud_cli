@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,13 +102,6 @@ class InstanceGroupManagersSetTargetPoolsZonalTest(test_base.BaseTest):
         self.zones_list_request,
         [(self.compute.instanceGroupManagers, 'Patch', request)],
     )
-
-  def testClearTargetPools(self):
-    self.Run('compute instance-groups managed set-target-pools group-1 --zone '
-             'central2-a --target-pools ""')
-
-    request = self._GetPatchRequest(target_pools=[])
-    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch', request)])
 
   @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
          'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',

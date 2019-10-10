@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -184,11 +184,15 @@ def AddNetworkTier(parser):
       """)
 
 
-def AddPurpose(parser):
+def AddPurpose(parser, support_shared_loadbalancer_vip):
   """Adds purpose flag."""
+  if support_shared_loadbalancer_vip:
+    choices = ['VPC_PEERING', 'SHARED_LOADBALANCER_VIP', 'GCE_ENDPOINT']
+  else:
+    choices = ['VPC_PEERING', 'GCE_ENDPOINT']
   parser.add_argument(
       '--purpose',
-      choices=['VPC_PEERING', 'GCE_ENDPOINT'],
+      choices=choices,
       type=lambda x: x.upper(),
       help="""\
       The purpose of the address resource. This field is not applicable to

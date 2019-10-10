@@ -30,7 +30,8 @@ FLAGS
         Retrieve the full Job rather than the summary view
 
      --region=REGION_ID
-        The region ID of the job's regional endpoint.
+        The region ID of the job's regional endpoint. Defaults to
+        'us-central1'.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -30,17 +30,18 @@ POSITIONAL ARGUMENTS
 
          Update the Cloud region or regions in which the Workerpool is located.
          To overwrite regions, use --clear-regions followed by --add-regions in
-         the same command. Choices: us-central1, us-west1, us-east1, and
-         us-east4.
+         the same command.
 
            --add-regions=[REGION,...]
-              Add regions, separated by comma.
+              Add regions, separated by comma. REGION must be one of:
+              us-central1, us-east1, us-east4, us-west1.
 
            --clear-regions
               Remove all regions.
 
            --remove-regions=[REGION,...]
-              Remove regions, separated by comma.
+              Remove regions, separated by comma. REGION must be one of:
+              us-central1, us-east1, us-east4, us-west1.
 
          Configuration to be used for creating workers in the WorkerPool:
 
@@ -103,7 +104,6 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

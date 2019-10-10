@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from string import Template
+import string
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -33,19 +33,20 @@ class CreateSignaturePayloadTest(
 ):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.artifact_url = self.GenerateArtifactUrl()
 
   def testGoodUrl(self):
-    sig = binauthz_command_util.MakeSignaturePayload(self.artifact_url)
+    payload_dict = binauthz_command_util.MakeSignaturePayloadDict(
+        self.artifact_url)
     self.RunBinauthz([
         'create-signature-payload',
         '--artifact-url',
         self.artifact_url,
     ])
-    expected_result = Template(
+    expected_result = string.Template(
         textwrap.dedent("""\
       {
         "critical": {
@@ -58,14 +59,13 @@ class CreateSignaturePayloadTest(
           "type": "Google cloud binauthz container signature"
         }
       }
-      """))
-    self.AssertOutputEquals(
-        expected_result.substitute({
-            'docker_reference':
-                sig['critical']['identity']['docker-reference'],
-            'docker_manifest_digest':
-                sig['critical']['image']['docker-manifest-digest']
-        }))
+      """)).substitute(
+          docker_reference=(
+              payload_dict['critical']['identity']['docker-reference']),
+          docker_manifest_digest=(
+              payload_dict['critical']['image']['docker-manifest-digest']),
+      ).encode('utf8')
+    self.AssertOutputBytesEquals(expected_result)
 
   def testBadUrl(self):
     expected_error = ('Invalid digest: sha256:123, must be at least 71 '
@@ -77,6 +77,12 @@ class CreateSignaturePayloadTest(
           '--artifact-url',
           'docker.io/nginblah@sha256:123',
       ])
+
+
+class CreateSignaturePayloadBetaTest(CreateSignaturePayloadTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class CreateSignaturePayloadAlphaTest(CreateSignaturePayloadTest):

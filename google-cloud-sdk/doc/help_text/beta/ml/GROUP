@@ -23,6 +23,9 @@ GROUPS
      speech
         (BETA) Use Google Cloud Speech to get transcripts of audio.
 
+     translate
+        (BETA) Cloud ML Translate command groups.
+
      video
         (BETA) Cloud ML Video-Intelligence command groups.
 

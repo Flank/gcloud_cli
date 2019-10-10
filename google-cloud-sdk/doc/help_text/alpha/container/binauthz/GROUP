@@ -24,8 +24,7 @@ GROUPS
         (ALPHA) Create and manage Google Binary Authorization attestations.
 
      attestors
-        (ALPHA) Create and manage Google Binary Authorization Attestation
-        Authorities.
+        (ALPHA) Create and manage Google Binary Authorization Attestors.
 
      policy
         (ALPHA) Create and manage Google Binary Authorization policy.
@@ -80,7 +79,7 @@ EXAMPLES
     Upload the attestation:
 
         gcloud alpha container binauthz attestations create \
-          --pgp-key-fingerprint=${KEY_FINGERPRINT} \
+          --public-key-id=${KEY_FINGERPRINT} \
           --signature-file=example_signature.pgp \
           --artifact-url="${ARTIFACT_URL}" \
           --attestor=${ATTESTOR_NAME}
@@ -130,9 +129,9 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud container binauthz
         $ gcloud beta container binauthz
 

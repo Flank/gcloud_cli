@@ -59,24 +59,25 @@ To show details about a DNS key resource with ID 3 in a managed zone
 \f5my_zone\fR, run:
 
 .RS 2m
-$ gcloud dns dns\-keys describe \-\-zone my_zone 3
+$ gcloud dns dns\-keys describe \-\-zone=my_zone 3
 .RE
 
 To get the DS record corresponding for the DNSKEY record from the previous
 example, run (the DNSKEY record must be for a key\-signing key):
 
 .RS 2m
-$ gcloud dns dns\-keys describe \-\-zone my_zone 3 \e
-    \-\-format 'value(ds_record())'
+$ gcloud dns dns\-keys describe \-\-zone=my_zone 3 \e
+    \-\-format='value(ds_record())'
 .RE
 
 
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha dns dns\-keys describe
 $ gcloud beta dns dns\-keys describe
 .RE
 

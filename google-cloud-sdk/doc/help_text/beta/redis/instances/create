@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
     gcloud beta redis instances create (INSTANCE : --region=REGION)
         [--alternative-zone=ALTERNATIVE_ZONE] [--async]
-        [--display-name=DISPLAY_NAME] [--labels=KEY=VALUE]
+        [--display-name=DISPLAY_NAME] [--labels=[KEY=VALUE,...]]
         [--network=NETWORK; default="default"] [--redis-config=KEY=VALUE]
         [--redis-version=VERSION] [--reserved-ip-range=RESERVED_IP_RANGE]
         [--size=SIZE; default=1] [--tier=TIER; default="basic"] [--zone=ZONE]
@@ -43,14 +43,19 @@ FLAGS
         a different zone from the one provided through --zone.
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --display-name=DISPLAY_NAME
         A human-readable name for the instance.
 
-     --labels=KEY=VALUE
-        A list of label KEY=VALUE pairs to add.
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --network=NETWORK; default="default"
         The name of the Google Compute Engine network to which the instance

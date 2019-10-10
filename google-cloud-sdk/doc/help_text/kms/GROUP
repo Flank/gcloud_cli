@@ -42,6 +42,12 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     asymmetric-decrypt
+        Decrypt an input file using an asymmetric-encryption key version.
+
+     asymmetric-sign
+        Sign a user input file using an asymmetric-signing key version.
+
      decrypt
         Decrypt a ciphertext file using a Cloud KMS key.
 

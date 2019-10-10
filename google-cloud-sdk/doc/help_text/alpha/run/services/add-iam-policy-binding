@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha run services add-iam-policy-binding
         (SERVICE : --region=REGION) --member=MEMBER --role=ROLE
+        [--platform=PLATFORM]
         [--condition=[KEY=VALUE,...]
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
@@ -27,7 +28,7 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --region=REGION
-          The Cloud Run region
+          The Cloud Run region.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -48,6 +49,21 @@ REQUIRED FLAGS
         Define the role of the member.
 
 OPTIONAL FLAGS
+     --platform=PLATFORM
+        Target platform for running commands. PLATFORM must be one of:
+
+         gke
+            Cloud Run on Google Kubernetes Engine. This platform is not
+            supported by this command.
+
+         kubernetes
+            Use a Knative-compatible kubernetes cluster. This platform is not
+            supported by this command.
+
+         managed
+            Fully managed version of Cloud Run. Use with the --region flag or
+            set the [run/region] property to specify a Cloud Run region.
+
      At most one of these may be specified:
 
        --condition=[KEY=VALUE,...]
@@ -113,9 +129,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
 
         $ gcloud beta run services add-iam-policy-binding
 

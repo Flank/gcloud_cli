@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ class UpdatePull(base.UpdateCommand):
     flags.AddUpdatePullQueueFlags(parser)
 
   def Run(self, args):
-    parsers.CheckUpdateArgsSpecified(args, constants.PULL_QUEUE, is_alpha=True)
+    parsers.CheckUpdateArgsSpecified(args, constants.PULL_QUEUE,
+                                     release_track=self.ReleaseTrack())
     api = GetApiAdapter(self.ReleaseTrack())
     queues_client = api.queues
     queue_ref = parsers.ParseQueue(args.queue, args.location)
@@ -56,9 +57,11 @@ class UpdatePull(base.UpdateCommand):
         constants.PULL_QUEUE,
         api.messages,
         is_update=True,
-        release_track=base.ReleaseTrack.ALPHA)
+        release_track=self.ReleaseTrack())
+    updated_fields = parsers.GetSpecifiedFieldsMask(
+        args, constants.PULL_QUEUE, release_track=self.ReleaseTrack())
     log.warning(constants.QUEUE_MANAGEMENT_WARNING)
     update_response = queues_client.Patch(
-        queue_ref, retry_config=queue_config.retryConfig)
+        queue_ref, updated_fields, retry_config=queue_config.retryConfig)
     log.status.Print('Updated queue [{}].'.format(queue_ref.Name()))
     return update_response

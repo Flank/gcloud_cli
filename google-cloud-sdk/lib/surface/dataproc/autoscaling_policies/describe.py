@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,19 +23,53 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dataproc import flags
 
 
+def _Run(dataproc, args):
+  """Run command."""
+
+  messages = dataproc.messages
+
+  policy_ref = args.CONCEPTS.autoscaling_policy.Parse()
+
+  request = messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
+      name=policy_ref.RelativeName())
+  return dataproc.client.projects_regions_autoscalingPolicies.Get(request)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Describe(base.DescribeCommand):
-  """Describe an autoscaling policy."""
+  """Describe an autoscaling policy.
+
+  ## EXAMPLES
+
+  The following command prints out the autoscaling policy
+  `example-autoscaling-policy`:
+
+    $ {command} example-autoscaling-policy
+  """
+
+  @staticmethod
+  def Args(parser):
+    flags.AddAutoscalingPolicyResourceArg(parser, 'describe', 'v1')
+
+  def Run(self, args):
+    return _Run(dp.Dataproc(self.ReleaseTrack()), args)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+class DescribeBeta(base.DescribeCommand):
+  """Describe an autoscaling policy.
+
+  ## EXAMPLES
+
+  The following command prints out the autoscaling policy
+  `example-autoscaling-policy`:
+
+    $ {command} example-autoscaling-policy
+  """
 
   @staticmethod
   def Args(parser):
     flags.AddAutoscalingPolicyResourceArg(parser, 'describe', 'v1beta2')
 
   def Run(self, args):
-    dataproc = dp.Dataproc(self.ReleaseTrack())
-    messages = dataproc.messages
-
-    policy_ref = args.CONCEPTS.autoscaling_policy.Parse()
-
-    request = messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
-        name=policy_ref.RelativeName())
-    return dataproc.client.projects_regions_autoscalingPolicies.Get(request)
+    return _Run(dp.Dataproc(self.ReleaseTrack()), args)

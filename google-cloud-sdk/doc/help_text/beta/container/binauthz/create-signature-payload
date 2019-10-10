@@ -30,8 +30,9 @@ EXAMPLES
             --artifact-url="gcr.io/example-project/example-image@sha256:abcd"
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud container binauthz create-signature-payload
         $ gcloud alpha container binauthz create-signature-payload
 

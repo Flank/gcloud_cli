@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,15 +49,15 @@ class ListSubscriptions(base.ListCommand):
           To filter results by subscription name
           (ie. only show subscription 'mysubs'), run:
 
-            $ {command} --topic mytopic --filter=subscriptionId:mysubs
+            $ {command} mytopic --filter=subscriptionId:mysubs
 
           To combine multiple filters (with AND or OR), run:
 
-            $ {command} --topic mytopic --filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
+            $ {command} mytopic --filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
 
           To filter subscriptions that match an expression:
 
-            $ {command} --topic mytopic --filter="subscriptionId:subs_*"
+            $ {command} mytopic --filter="subscriptionId:subs_*"
           """,
   }
 

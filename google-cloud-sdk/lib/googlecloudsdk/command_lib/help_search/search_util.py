@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -361,7 +361,7 @@ class SummaryBuilder(object):
       elif isinstance(section, dict):
         line = ', '.join(sorted(section.keys()))
       else:
-        line = str(section)
+        line = six.text_type(section)
     assert line, self._INVALID_LOCATION_MESSAGE.format(DOT.join(location))
     header = _FormatHeader(location[-1])
     if header:

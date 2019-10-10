@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -524,6 +524,27 @@ class Keys(object):
       cmd = KeygenCommand(self.key_file, allow_passphrase=allow_passphrase)
       cmd.Run(self.env)
 
+    if self.env.suite is Suite.PUTTY:
+      # This is to fix an encoding issue with PPK's we generated that was
+      # ignored in versions of PuTTY <=0.70, but became invalid in version 0.71.
+      # Since this only affects the PPK, we don't need to generate a new key; we
+      # can just correct the encoding of the PPK if necessary. We use a sentinel
+      # file in the config dir to check if the encoding is already correct.
+      valid_ppk_sentinel = config.Paths().valid_ppk_sentinel_file
+      if not os.path.exists(valid_ppk_sentinel):
+        if key_files_validity is KeyFileStatus.PRESENT:  # Initial validity
+          cmd = KeygenCommand(
+              self.key_file, allow_passphrase=False, reencode_ppk=True)
+          cmd.Run(self.env)
+        try:
+          files.WriteFileContents(valid_ppk_sentinel, '')
+        except files.Error as e:
+          # It's possible that writing the sentinel file fails, which means
+          # we'll potentially have to re-encode the PPK again the next time an
+          # SSH/SCP command is run. But we shouldn't let this prevent the user
+          # from running their current command.
+          log.debug('Failed to create sentinel file: [{}]'.format(e))
+
 
 class KnownHosts(object):
   """Represents known hosts file, supports read, write and basic key management.
@@ -701,7 +722,7 @@ def _MetadataHasOsloginEnable(metadata):
 
 
 def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
-                              release_track):
+                              expiration_time, release_track):
   """Check instance/project metadata for oslogin and return updated username.
 
   Check to see if OS Login is enabled in metadata and if it is, return
@@ -713,6 +734,10 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
     project: project, The object representing the current project.
     requested_user: str, The default or requested username to connect as.
     public_key: str, The public key of the user connecting.
+    expiration_time: int, Microseconds after epoch when the ssh key should
+      expire. If None, an existing key will not be modified and a new key will
+      not be set to expire.  If not None, an existing key may be modified
+      with the new expiry.
     release_track: release_track, The object representing the release track.
 
   Returns:
@@ -740,14 +765,20 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
     return requested_user, use_oslogin
   user_email = properties.VALUES.core.account.Get()
 
-  # Check to see if public key is already in profile, and import if not.
+  # Check to see if public key is already in profile, import if not, and update
+  # the expiration if it is.
   login_profile = oslogin.GetLoginProfile(user_email, project.name)
   keys = oslogin_utils.GetKeyDictionaryFromProfile(
       user_email, oslogin, profile=login_profile)
   fingerprint = oslogin_utils.FindKeyInKeyList(public_key, keys)
   if not fingerprint:
-    import_response = oslogin.ImportSshPublicKey(user_email, public_key)
+    import_response = oslogin.ImportSshPublicKey(user_email, public_key,
+                                                 expiration_time)
     login_profile = import_response.loginProfile
+  elif expiration_time:
+    oslogin.UpdateSshPublicKey(user_email, fingerprint, keys[fingerprint],
+                               'expirationTimeUsec',
+                               expiration_time=expiration_time)
   use_oslogin = True
 
   # Get the username for the oslogin user. If the username is the same as the
@@ -761,12 +792,13 @@ def CheckForOsloginAndGetUser(instance, project, requested_user, public_key,
     elif pa.primary:
       oslogin_user = pa.username
 
-  log.out.Print('Using OS Login user [{0}] instead of default user [{1}]'
-                .format(oslogin_user, requested_user))
+  log.info('Using OS Login user [{0}] instead of default user [{1}]'.format(
+      oslogin_user, requested_user))
   return oslogin_user, use_oslogin
 
 
-def ParseAndSubstituteSSHFlags(args, remote, ip_address):
+def ParseAndSubstituteSSHFlags(args, remote, instance_address,
+                               internal_address):
   """Obtain extra flags from the command arguments."""
   extra_flags = []
   if args.ssh_flag:
@@ -774,7 +806,8 @@ def ParseAndSubstituteSSHFlags(args, remote, ip_address):
       for flag_part in flag.split():  # We want grouping here
         dereferenced_flag = (
             flag_part.replace('%USER%', remote.user)
-            .replace('%INSTANCE%', ip_address))
+            .replace('%INSTANCE%', instance_address)
+            .replace('%INTERNAL%', internal_address))
         extra_flags.append(dereferenced_flag)
   return extra_flags
 
@@ -972,7 +1005,7 @@ def _BuildIapTunnelProxyCommandArgs(iap_tunnel_args, env):
   # correct as long as the python executable path doesn't contain a doublequote
   # or end with a backslash, which should never happen.
   gcloud_command = [_EscapeProxyCommandArg(x, env) for x in gcloud_command]
-  # track, project, zone, instance, interface, verbosity should only contain
+  # track, project, zone, instance, verbosity should only contain
   # characters that don't need escaping, so don't bother escaping them.
   if iap_tunnel_args.track:
     gcloud_command.append(iap_tunnel_args.track)
@@ -981,8 +1014,7 @@ def _BuildIapTunnelProxyCommandArgs(iap_tunnel_args, env):
       'compute', 'start-iap-tunnel', iap_tunnel_args.instance, port_token,
       '--listen-on-stdin',
       '--project=' + iap_tunnel_args.project,
-      '--zone=' + iap_tunnel_args.zone,
-      '--network-interface=' + iap_tunnel_args.interface])
+      '--zone=' + iap_tunnel_args.zone])
   for arg in iap_tunnel_args.pass_through_args:
     gcloud_command.append(_EscapeProxyCommandArg(arg, env))
 
@@ -1018,12 +1050,16 @@ class KeygenCommand(object):
       - Running in an OpenSSH environment (Linux and Mac)
       - Running in interactive mode (from an actual TTY)
       - Prompts are enabled in gcloud
+    reencode_ppk: bool, If True, reencode the PPK file if it was generated with
+      a bad encoding, instead of generating a new key. This is only valid for
+      PuTTY.
   """
 
-  def __init__(self, identity_file, allow_passphrase=True):
+  def __init__(self, identity_file, allow_passphrase=True, reencode_ppk=False):
     """Construct a suite independent `ssh-keygen` command."""
     self.identity_file = identity_file
     self.allow_passphrase = allow_passphrase
+    self.reencode_ppk = reencode_ppk
 
   def Build(self, env=None):
     """Construct the actual command according to the given environment.
@@ -1048,6 +1084,8 @@ class KeygenCommand(object):
         args.extend(['-N', ''])  # Empty passphrase
       args.extend(['-t', 'rsa', '-f', self.identity_file])
     else:
+      if self.reencode_ppk:
+        args.append('--reencode-ppk')
       args.append(self.identity_file)
 
     return args

@@ -6,28 +6,28 @@ summary:
   - command: compute instance-templates create $$my-template$$ --machine-type n1-standard-1
       --format 'value(name)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+      Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$\].
   - stdout: |
       $$my-template$$
 - execute:
   - command: compute health-checks create tcp $$my-health-check$$ $$global_hc$$ --format
       'value(name)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+      Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
   - stdout: |
       $$my-health-check$$
 - execute:
   - command: compute http-health-checks create $$my-http-health-check$$ --format 'value(name)'
       --port 12345 --request-path /healthz
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+      Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$\].
   - stdout: |
       $$my-http-health-check$$
 - execute:
   - command: compute https-health-checks create $$my-https-health-check$$ --format
       'value(name)' --port 12345 --request-path /healthz
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+      Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$\].
   - stdout: |
       $$my-https-health-check$$
 - execute:
@@ -35,7 +35,7 @@ summary:
       --size 0 --template $$my-template$$ --health-check $$my-health-check$$ --initial-delay
       3m --format 'value(name)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+      Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
   - stdout: |
       $$my-mig$$
 - execute:
@@ -44,7 +44,7 @@ summary:
   - stderr: |
       WARNING: HttpHealthCheck is deprecated. Use --health-check instead.
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+      Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
 - execute:
   - command: compute instance-groups managed update $$my-mig$$ --region us-central1
       --https-health-check $$my-https-health-check$$ --initial-delay 15m --format
@@ -52,49 +52,49 @@ summary:
   - stderr: |
       WARNING: HttpsHealthCheck is deprecated. Use --health-check instead.
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+      Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
 - execute:
   - command: compute instance-groups managed update $$my-mig$$ --region us-central1
       --health-check $$my-health-check$$ --format disable
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+      Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
 - execute:
   - command: compute instance-groups managed update $$my-mig$$ --region us-central1
       --clear-autohealing --format disable
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+      Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
 - execute:
   - command: compute -q instance-groups managed delete $$my-mig$$ --region us-central1
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
   - progress_tracker:
     - message: Deleting Managed Instance Group
     - status: SUCCESS
 - execute:
   - command: compute -q instance-templates delete $$my-template$$
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$\].
 - execute:
   - command: compute -q http-health-checks delete $$my-http-health-check$$
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$\].
 - execute:
   - command: compute -q https-health-checks delete $$my-https-health-check$$
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$\].
 - execute:
   - command: compute -q health-checks delete $$my-health-check$$ $$global_hc$$
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - define_reference:
     reference: global_hc
     track_values:
       ALPHA: --global
-      BETA: ''
+      BETA: --global
       GA: ''
 - define_reference:
     reference: api_version
@@ -110,8 +110,9 @@ actions:
       --format 'value(name)'
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$\].
     - expect_stdout: |
         $$my-template$$
     - expect_exit:
@@ -125,8 +126,9 @@ actions:
       'value(name)'
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
     - expect_stdout: |
         $$my-health-check$$
     - expect_exit:
@@ -140,8 +142,9 @@ actions:
       --port 12345 --request-path /healthz
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$\].
     - expect_stdout: |
         $$my-http-health-check$$
     - expect_exit:
@@ -155,8 +158,9 @@ actions:
       'value(name)' --port 12345 --request-path /healthz
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$\].
     - expect_stdout: |
         $$my-https-health-check$$
     - expect_exit:
@@ -177,34 +181,36 @@ actions:
           body:
             json:
               autoHealingPolicies:
-              - healthCheck: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
+              - healthCheck: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
                 initialDelaySec: 180
-              instanceTemplate: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
+              instanceTemplate: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$
               name: $$my-mig$$
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+              region: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
               targetSize: 0
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '889'
+            Content-Length: '931'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '881545703306999249'
-            name: operation-1548684092596-580851d355ff2-e0ad5997-c0e14d78
+            id: '3541196590690511937'
+            name: operation-1564676781272-58f10b3bc6eb9-ba590b60-85aaba3f
             operationType: compute.instanceGroupManagers.insert
             targetLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$
-            targetId: '8404403599125427665'
-            status: PENDING
+            targetId: '6209112017336183873'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-01-28T06:01:34.306-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1548684092596-580851d355ff2-e0ad5997-c0e14d78
+            insertTime: '2019-08-01T09:26:22.832-07:00'
+            startTime: '2019-08-01T09:26:22.848-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1564676781272-58f10b3bc6eb9-ba590b60-85aaba3f
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -214,14 +220,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2539'
+            Content-Length: '2336'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"LaCDHlmR2UlPJLwOXbkbR0gNFQQ=/B4W7CbZdnQnFfijOhpICq8z13eo="'
+            ETag: '"7Cbs8eG1T9s39PgYotxarndyGOg=/bOV7LF5y7F64RzLezwZ7uZAZAjQ="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -235,7 +241,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: 4EOL3kYrD6E=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: K1Ne6kicuh8=
             currentActions:
               none: 0
               creating: 0
@@ -246,11 +253,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -267,8 +269,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups?alt=json&maxResults=500
@@ -278,17 +278,56 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '13481'
+            Content-Length: '9903'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"u6F_s8hbBenS_5m9fYwVgCed6oQ=/mLDhS1ndixXtBLBNJPxjHa-SAhI="'
+            ETag: '"-bomBNXKIXq-RC41seJKeKfCoc8=/I7i0Nt31pThCthTFgQzIZO-VoL4="'
             status: '200'
           body:
             kind: compute#regionInstanceGroupList
             id: projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups
             items:
             - kind: compute#instanceGroup
-              id: '8404403599125427665'
-              creationTimestamp: '2019-01-28T06:01:34.233-08:00'
+              id: '7784550062103639413'
+              creationTimestamp: '2019-08-01T08:56:10.074-07:00'
+              name: managed-instance-group-auto-healing-20190801-155608-2f83
+              description: "This instance group is controlled by Regional Instance\
+                \ Group Manager 'managed-instance-group-auto-healing-20190801-155608-2f83'.\
+                \ To modify instances in this group, use the Regional Instance Group\
+                \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/managed-instance-group-auto-healing-20190801-155608-2f83
+              size: 0
+              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            - kind: compute#instanceGroup
+              id: '7020267297569682011'
+              creationTimestamp: '2019-08-01T09:00:52.946-07:00'
+              name: managed-instance-group-auto-healing-20190801-160051-lp4b
+              description: "This instance group is controlled by Regional Instance\
+                \ Group Manager 'managed-instance-group-auto-healing-20190801-160051-lp4b'.\
+                \ To modify instances in this group, use the Regional Instance Group\
+                \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/managed-instance-group-auto-healing-20190801-160051-lp4b
+              size: 0
+              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            - kind: compute#instanceGroup
+              id: '1134568703542602888'
+              creationTimestamp: '2019-08-01T09:25:11.917-07:00'
+              name: managed-instance-group-auto-healing-20190801-162510-uh82
+              description: "This instance group is controlled by Regional Instance\
+                \ Group Manager 'managed-instance-group-auto-healing-20190801-162510-uh82'.\
+                \ To modify instances in this group, use the Regional Instance Group\
+                \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              fingerprint: 42WmSpB8rSM=
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/managed-instance-group-auto-healing-20190801-162510-uh82
+              size: 0
+              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            - kind: compute#instanceGroup
+              id: '2000049040828312641'
+              creationTimestamp: '2019-08-01T09:26:22.781-07:00'
               name: $$my-mig$$
               description: "This instance group is controlled by Regional Instance\
                 \ Group Manager '$$my-mig$$'. To modify instances in this group, use\
@@ -299,171 +338,82 @@ actions:
               size: 0
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             - kind: compute#instanceGroup
-              id: '208539304574760828'
-              creationTimestamp: '2019-01-28T05:54:27.562-08:00'
-              name: mig-instance-configs-regional-20190128-135425-wqmx
+              id: '7278921485244084468'
+              creationTimestamp: '2019-08-01T09:06:51.513-07:00'
+              name: mig-instance-configs-regional-20190801-160650-dc9c
               description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-instance-configs-regional-20190128-135425-wqmx'.\
+                \ Group Manager 'mig-instance-configs-regional-20190801-160650-dc9c'.\
                 \ To modify instances in this group, use the Regional Instance Group\
                 \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
               network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
               fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-instance-configs-regional-20190128-135425-wqmx
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-instance-configs-regional-20190801-160650-dc9c
               size: 1
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             - kind: compute#instanceGroup
-              id: '6129649547475072121'
-              creationTimestamp: '2019-01-28T05:58:46.142-08:00'
-              name: mig-instance-configs-regional-20190128-135843-w928
+              id: '7055961980492754143'
+              creationTimestamp: '2019-08-01T09:24:16.035-07:00'
+              name: mig-instance-configs-regional-20190801-162414-dqej
               description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-instance-configs-regional-20190128-135843-w928'.\
+                \ Group Manager 'mig-instance-configs-regional-20190801-162414-dqej'.\
                 \ To modify instances in this group, use the Regional Instance Group\
                 \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
               network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
               fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-instance-configs-regional-20190128-135843-w928
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-instance-configs-regional-20190801-162414-dqej
               size: 0
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             - kind: compute#instanceGroup
-              id: '2169658544870306873'
-              creationTimestamp: '2019-01-28T05:59:51.040-08:00'
-              name: mig-regional-20190128-135949-r7zh
+              id: '4316646484942433358'
+              creationTimestamp: '2019-08-01T09:26:09.473-07:00'
+              name: mig-instance-configs-regional-20190801-162606-nj2p
               description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-regional-20190128-135949-r7zh'. To modify instances\
-                \ in this group, use the Regional Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
+                \ Group Manager 'mig-instance-configs-regional-20190801-162606-nj2p'.\
+                \ To modify instances in this group, use the Regional Instance Group\
+                \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
               network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
               fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-regional-20190128-135949-r7zh
-              size: 2
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '1625807967416923642'
-              creationTimestamp: '2019-01-28T06:00:53.615-08:00'
-              name: mig-regional-20190128-140051-kkxh
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-regional-20190128-140051-kkxh'. To modify instances\
-                \ in this group, use the Regional Instance Group Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-regional-20190128-140051-kkxh
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-instance-configs-regional-20190801-162606-nj2p
               size: 1
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             - kind: compute#instanceGroup
-              id: '5576098013289561534'
-              creationTimestamp: '2019-01-28T05:27:45.952-08:00'
-              name: mig-replacer-regional-20190128-132743-12i4
+              id: '6167198075739615074'
+              creationTimestamp: '2019-08-01T09:21:33.329-07:00'
+              name: mig-replacer-regional-20190801-162131-yc64
               description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-replacer-regional-20190128-132743-12i4'. To modify\
+                \ Group Manager 'mig-replacer-regional-20190801-162131-yc64'. To modify\
                 \ instances in this group, use the Regional Instance Group Manager\
                 \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
               network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
               fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-replacer-regional-20190128-132743-12i4
-              size: 8
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-replacer-regional-20190801-162131-yc64
+              size: 0
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             - kind: compute#instanceGroup
-              id: '8191010648694633577'
-              creationTimestamp: '2019-01-28T05:58:30.312-08:00'
-              name: mig-replacer-regional-20190128-135827-9h18
+              id: '9190310158212705507'
+              creationTimestamp: '2019-08-01T09:23:40.394-07:00'
+              name: mig-restart-switch-regional-20190801-162337-gvnx
               description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-replacer-regional-20190128-135827-9h18'. To modify\
-                \ instances in this group, use the Regional Instance Group Manager\
-                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-replacer-regional-20190128-135827-9h18
-              size: 8
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '7769917310372066755'
-              creationTimestamp: '2019-01-28T06:01:16.560-08:00'
-              name: mig-restart-switch-regional-20190128-140114-j57t
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-restart-switch-regional-20190128-140114-j57t'.\
+                \ Group Manager 'mig-restart-switch-regional-20190801-162337-gvnx'.\
                 \ To modify instances in this group, use the Regional Instance Group\
                 \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
               network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
               fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-restart-switch-regional-20190128-140114-j57t
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-restart-switch-regional-20190801-162337-gvnx
               size: 0
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             - kind: compute#instanceGroup
-              id: '5596931104346126978'
-              creationTimestamp: '2019-01-28T05:32:29.823-08:00'
-              name: mig-stateful-policy-regional-20190128-133228-zy1k
+              id: '1321979202071604302'
+              creationTimestamp: '2019-08-01T09:26:09.913-07:00'
+              name: mig-stateful-policy-regional-20190801-162608-p8pu
               description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-stateful-policy-regional-20190128-133228-zy1k'.\
+                \ Group Manager 'mig-stateful-policy-regional-20190801-162608-p8pu'.\
                 \ To modify instances in this group, use the Regional Instance Group\
                 \ Manager API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
               network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
               fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-stateful-policy-regional-20190128-133228-zy1k
+              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-stateful-policy-regional-20190801-162608-p8pu
               size: 0
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '2626768113137530567'
-              creationTimestamp: '2019-01-28T05:48:24.121-08:00'
-              name: mig-stop-regional-20190128-134822-2pbq
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-stop-regional-20190128-134822-2pbq'. To modify\
-                \ instances in this group, use the Regional Instance Group Manager\
-                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-stop-regional-20190128-134822-2pbq
-              size: 0
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '6467623620668733400'
-              creationTimestamp: '2019-01-28T05:52:55.515-08:00'
-              name: mig-stop-regional-20190128-135253-4jk6
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-stop-regional-20190128-135253-4jk6'. To modify\
-                \ instances in this group, use the Regional Instance Group Manager\
-                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-stop-regional-20190128-135253-4jk6
-              size: 3
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '5024626136628508604'
-              creationTimestamp: '2019-01-28T05:53:23.707-08:00'
-              name: mig-stop-regional-20190128-135321-on91
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-stop-regional-20190128-135321-on91'. To modify\
-                \ instances in this group, use the Regional Instance Group Manager\
-                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-stop-regional-20190128-135321-on91
-              size: 3
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '337373939609286491'
-              creationTimestamp: '2019-01-28T05:55:00.421-08:00'
-              name: mig-updater-regional-20190128-135457-2fbs
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-updater-regional-20190128-135457-2fbs'. To modify\
-                \ instances in this group, use the Regional Instance Group Manager\
-                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-updater-regional-20190128-135457-2fbs
-              size: 6
-              region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            - kind: compute#instanceGroup
-              id: '6334315751425619799'
-              creationTimestamp: '2019-01-28T05:55:04.617-08:00'
-              name: mig-updater-regional-20190128-135502-puoa
-              description: "This instance group is controlled by Regional Instance\
-                \ Group Manager 'mig-updater-regional-20190128-135502-puoa'. To modify\
-                \ instances in this group, use the Regional Instance Group Manager\
-                \ API: https://cloud.google.com/compute/docs/reference/latest/instanceGroupManagers"
-              network: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/networks/default
-              fingerprint: 42WmSpB8rSM=
-              selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/mig-updater-regional-20190128-135502-puoa
-              size: 6
               region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups
     - api_call:
@@ -475,9 +425,9 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '252'
+            Content-Length: '250'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"3y1ST8Y75syVT6G4N3AqFDalPNc=/f80AgYF4l5u5pDFsw4ctjxtMpk4="'
+            ETag: '"gq68fy2i4RJdHtllWMn7bo1P034=/g_joaJerG3Dy17XhD03hh9XxOO8="'
             status: '200'
           body:
             kind: compute#regionAutoscalerList
@@ -492,8 +442,9 @@ actions:
     command: compute instance-groups managed update $$my-mig$$ --region us-central1
       --http-health-check $$my-http-health-check$$ --initial-delay 10m --format disable
     events:
-    - expect_stderr: |
-        WARNING: HttpHealthCheck is deprecated. Use --health-check instead.
+    - expect_stderr:
+        matches: |
+          WARNING: HttpHealthCheck is deprecated. Use --health-check instead.
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -503,14 +454,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2539'
+            Content-Length: '2336'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"4DNug7VyOYABnXJ1jQWuMAPcMTk=/zzd-K6CxD-uc7rvjaEfs_yNCX48="'
+            ETag: '"SF5h8jV_ZCUo_aExpKlcVSjnhGI=/adudO2aE9ly7sGoBPLnslZBh2HQ="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -524,7 +475,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: 4EOL3kYrD6E=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: K1Ne6kicuh8=
             currentActions:
               none: 0
               creating: 0
@@ -535,11 +487,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -556,8 +503,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -566,30 +511,32 @@ actions:
           body:
             json:
               autoHealingPolicies:
-              - healthCheck: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$
+              - healthCheck: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$
                 initialDelaySec: 600
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '858'
+            Content-Length: '900'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '901486553562527159'
-            name: operation-1548684118900-580851ec6c0c0-e4edf045-9c68ea39
+            id: '2509145369987689511'
+            name: operation-1564676806460-58f10b53cc551-c9b24474-b7e4a6ef
             operationType: patch
             targetLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$
-            targetId: '8404403599125427665'
-            status: PENDING
+            targetId: '6209112017336183873'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-01-28T06:02:00.394-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1548684118900-580851ec6c0c0-e4edf045-9c68ea39
+            insertTime: '2019-08-01T09:26:48.071-07:00'
+            startTime: '2019-08-01T09:26:48.091-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1564676806460-58f10b53cc551-c9b24474-b7e4a6ef
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -599,14 +546,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2543'
+            Content-Length: '2340'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"0BgfNygza2z-vlflxPaG0xZaQEo=/IBi8dZlLeT5wMy5j114NSWAgsYg="'
+            ETag: '"43Hhfd0xiaT5F2LiA-YCHuGu9P0=/zsLt14NqXqxlbXxuy_5v4eBt9sU="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -620,7 +567,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: EzaZVnU1T0U=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: 51ilXwYH03k=
             currentActions:
               none: 0
               creating: 0
@@ -631,11 +579,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -652,8 +595,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - expect_exit:
         code: 0
 
@@ -662,8 +603,9 @@ actions:
       --https-health-check $$my-https-health-check$$ --initial-delay 15m --format
       disable
     events:
-    - expect_stderr: |
-        WARNING: HttpsHealthCheck is deprecated. Use --health-check instead.
+    - expect_stderr:
+        matches: |
+          WARNING: HttpsHealthCheck is deprecated. Use --health-check instead.
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -673,14 +615,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2543'
+            Content-Length: '2340'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"9-fXJLzA0IMxxFI5-Tqb8Krlrrw=/mGfBYcpxAzIBSsUiYOV3SVqyqd8="'
+            ETag: '"RGKRv9HoJJ1DajiAYab-_VXnlWc=/SdYaXBYekrw4l5RhsyCNYNVbn9w="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -694,7 +636,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: EzaZVnU1T0U=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: 51ilXwYH03k=
             currentActions:
               none: 0
               creating: 0
@@ -705,11 +648,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -726,8 +664,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -736,30 +672,32 @@ actions:
           body:
             json:
               autoHealingPolicies:
-              - healthCheck: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$
+              - healthCheck: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$
                 initialDelaySec: 900
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '859'
+            Content-Length: '900'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '5996985648448451987'
-            name: operation-1548684154808-5808520eaa7b8-301fec29-fcd642c0
+            id: '4140066699933035568'
+            name: operation-1564676830699-58f10b6aea19b-015899ca-a178ff93
             operationType: patch
             targetLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$
-            targetId: '8404403599125427665'
-            status: PENDING
+            targetId: '6209112017336183873'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-01-28T06:02:36.123-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1548684154808-5808520eaa7b8-301fec29-fcd642c0
+            insertTime: '2019-08-01T09:27:11.992-07:00'
+            startTime: '2019-08-01T09:27:12.008-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1564676830699-58f10b6aea19b-015899ca-a178ff93
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -769,14 +707,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2544'
+            Content-Length: '2341'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"SnxGcZ3EecvH7mRtPHxlz5PXwGM=/qpWfeGtB8eTk4qc0Al-Huc1_SEo="'
+            ETag: '"85Y1mQmraNH6NKTqoin_wWBj6K4=/yfNnh39iCd-o-Lv8Dyy4iQKyfqE="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -790,7 +728,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: OO0rKth_W8I=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: 7cjGBUtmFcg=
             currentActions:
               none: 0
               creating: 0
@@ -801,11 +740,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -822,8 +756,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - expect_exit:
         code: 0
 
@@ -840,14 +772,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2544'
+            Content-Length: '2341'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"LDlNcGAF33bjTSJ2TRSiYayiyQ4=/K_FwxXNRyDHEcusAwCKU3uf_brM="'
+            ETag: '"DTBrAZ9cydOemBUGWuEhSTQOjEs=/mwSk9LFYvddxqye4iR8ssfd1qAU="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -861,7 +793,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: OO0rKth_W8I=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: 7cjGBUtmFcg=
             currentActions:
               none: 0
               creating: 0
@@ -872,11 +805,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -893,8 +821,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -903,30 +829,32 @@ actions:
           body:
             json:
               autoHealingPolicies:
-              - healthCheck: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
+              - healthCheck: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$
                 initialDelaySec: 900    # Initial delay currently set on MIG.
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '859'
+            Content-Length: '900'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '6217977173414950256'
-            name: operation-1548684190427-58085230a2ae0-66857ebf-5efdabe0
+            id: '3319606592096087058'
+            name: operation-1564676860062-58f10b86ea951-dd344dfb-5dfdf853
             operationType: patch
             targetLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$
-            targetId: '8404403599125427665'
-            status: PENDING
+            targetId: '6209112017336183873'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-01-28T06:03:11.915-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1548684190427-58085230a2ae0-66857ebf-5efdabe0
+            insertTime: '2019-08-01T09:27:41.283-07:00'
+            startTime: '2019-08-01T09:27:41.299-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1564676860062-58f10b86ea951-dd344dfb-5dfdf853
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -936,14 +864,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2539'
+            Content-Length: '2336'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"N_jlo7UYuaOD1X9gXqwqqgbsew0=/7T9mGlZkTmwU_t8-lcIFSY-5nKQ="'
+            ETag: '"EXR4VNvyt8TagKPI_S3TJoXbgNw=/JlS-zB2gh3jh5UOW2NH0VHhocMA="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -957,7 +885,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: J4SrCkoVGqI=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: Vppk9-yPyyc=
             currentActions:
               none: 0
               creating: 0
@@ -968,11 +897,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -989,8 +913,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - expect_exit:
         code: 0
 
@@ -1007,14 +929,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2539'
+            Content-Length: '2336'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"l6qWCGc0W0OFj3wK_fbW4kodAxU=/bpP_3Qx3bTk18NgWTXsWBVw1lwg="'
+            ETag: '"AnuTG_eeSsjMR_r8h-0IbsyBKRA=/vlCtqPBszz5fcmiQHSrW6CNQiY0="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -1028,7 +950,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: J4SrCkoVGqI=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: Vppk9-yPyyc=
             currentActions:
               none: 0
               creating: 0
@@ -1039,11 +962,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -1060,8 +978,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -1073,25 +989,27 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '859'
+            Content-Length: '900'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '7692563815499740497'
-            name: operation-1548684220753-5808524d8e621-7434ceb4-16a2298b
+            id: '7049090440841047541'
+            name: operation-1564676889094-58f10ba29ab4f-194be941-c12ede78
             operationType: patch
             targetLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$
-            targetId: '8404403599125427665'
-            status: PENDING
+            targetId: '6209112017336183873'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-01-28T06:03:42.296-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1548684220753-5808524d8e621-7434ceb4-16a2298b
+            insertTime: '2019-08-01T09:28:10.590-07:00'
+            startTime: '2019-08-01T09:28:10.614-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1564676889094-58f10ba29ab4f-194be941-c12ede78
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$?alt=json
@@ -1101,14 +1019,14 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '2298'
+            Content-Length: '2097'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"OVyIIk2qfk-Ugsc3T9IOS6mXk8I=/Qng_ektFJ0tOTah2uxok9waD6q0="'
+            ETag: '"ZNbDwJ64EqBSXO7o3gLiAdUfav4=/4Js0iXJC2V3vRnfqvkHg-Q1ii7k="'
             status: '200'
           body:
             kind: compute#instanceGroupManager
-            id: '8404403599125427665'
-            creationTimestamp: '2019-01-28T06:01:34.198-08:00'
+            id: '6209112017336183873'
+            creationTimestamp: '2019-08-01T09:26:22.742-07:00'
             name: $$my-mig$$
             region: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             distributionPolicy:
@@ -1122,7 +1040,8 @@ actions:
               targetSize:
                 calculated: 0
             instanceGroup: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups/$$my-mig$$
-            fingerprint: z940bsd6euI=
+            baseInstanceName: managed-instance-group-auto-healing-20190801-162621-50
+            fingerprint: qqI-wdORcIk=
             currentActions:
               none: 0
               creating: 0
@@ -1133,11 +1052,6 @@ actions:
               abandoning: 0
               restarting: 0
               refreshing: 0
-            pendingActions:
-              creating: 0
-              deleting: 0
-              recreating: 0
-              restarting: 0
             status:
               isStable: true
             targetSize: 0
@@ -1151,8 +1065,6 @@ actions:
               maxUnavailable:
                 fixed: 3
                 calculated: 3
-              minReadySec: 0
-            serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - expect_exit:
         code: 0
 
@@ -1161,8 +1073,9 @@ actions:
     cleanup_for: my-mig
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$my-mig$$\].
     - expect_progress_tracker:
         message: Deleting Managed Instance Group
         status: SUCCESS
@@ -1174,8 +1087,9 @@ actions:
     cleanup_for: my-template
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$my-template$$\].
     - expect_exit:
         code: 0
 
@@ -1184,8 +1098,9 @@ actions:
     cleanup_for: my-http-health-check
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$my-http-health-check$$\].
     - expect_exit:
         code: 0
 
@@ -1194,8 +1109,9 @@ actions:
     cleanup_for: my-https-health-check
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/httpsHealthChecks/$$my-https-health-check$$\].
     - expect_exit:
         code: 0
 
@@ -1204,7 +1120,8 @@ actions:
     cleanup_for: my-health-check
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$my-health-check$$\].
     - expect_exit:
         code: 0

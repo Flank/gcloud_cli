@@ -71,22 +71,22 @@ one of: \fBpd\-standard\fR, \fBpd\-ssd\fR.
 
 .TP 2m
 \fB\-\-enable\-autorepair\fR
-Enable node autorepair feature for a node\-pool.
+Enable node autorepair feature for a node pool.
 
 .RS 2m
 $ gcloud container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autorepair
 .RE
 
-Node autorepair is enabled by default for node pools using COS as a base image,
-use \-\-no\-enable\-autorepair to disable.
+Node autorepair is enabled by default for node pools using COS or COS_CONTAINERD
+as a base image, use \-\-no\-enable\-autorepair to disable.
 
 See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
 for more info.
 
 .TP 2m
 \fB\-\-enable\-autoupgrade\fR
-Sets autoupgrade feature for a node\-pool.
+Sets autoupgrade feature for a node pool.
 
 .RS 2m
 $ gcloud container node\-pools create node\-pool\-1 \e
@@ -226,7 +226,7 @@ CPU platform selection is available only in selected zones.
 
 .TP 2m
 \fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]
-Applies the given kubernetes labels on all nodes in the new node\-pool. Example:
+Applies the given kubernetes labels on all nodes in the new node pool. Example:
 
 .RS 2m
 $ gcloud container node\-pools create node\-pool\-1 \e
@@ -245,8 +245,8 @@ usage information.
 
 .TP 2m
 \fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]
-Applies the given kubernetes taints on all nodes in the new node\-pool, which
-can be used with tolerations for pod scheduling. Example:
+Applies the given kubernetes taints on all nodes in the new node pool, which can
+be used with tolerations for pod scheduling. Example:
 
 .RS 2m
 $ gcloud container node\-pools create node\-pool\-1 \e
@@ -276,7 +276,7 @@ The number of nodes in the node pool in each of the cluster's zones.
 
 .TP 2m
 \fB\-\-preemptible\fR
-Create nodes using preemptible VM instances in the new nodepool.
+Create nodes using preemptible VM instances in the new node pool.
 
 .RS 2m
 $ gcloud container node\-pools create node\-pool\-1 \e

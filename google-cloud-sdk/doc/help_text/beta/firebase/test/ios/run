@@ -5,11 +5,13 @@ NAME
 SYNOPSIS
     gcloud beta firebase test ios run [ARGSPEC]
         [--device=DIMENSION=VALUE,[...]] [--test=XCTEST_ZIP]
-        [--timeout=TIMEOUT] [--xcode-version=XCODE_VERSION]
-        [--xctestrun-file=XCTESTRUN_FILE] [--async]
-        [--num-flaky-test-attempts=int] [--record-video]
-        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
-        [--results-history-name=RESULTS_HISTORY_NAME] [--filter=EXPRESSION]
+        [--timeout=TIMEOUT] [--type=TYPE] [--xcode-version=XCODE_VERSION]
+        [--xctestrun-file=XCTESTRUN_FILE] [--app=APP] [--async]
+        [--client-details=[KEY=VALUE,...]] [--num-flaky-test-attempts=int]
+        [--record-video] [--results-bucket=RESULTS_BUCKET]
+        [--results-dir=RESULTS_DIR]
+        [--results-history-name=RESULTS_HISTORY_NAME]
+        [--scenario-numbers=int,[int,...]] [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -17,14 +19,20 @@ DESCRIPTION
     (BETA) gcloud beta firebase test ios run invokes and monitors tests in
     Firebase Test Lab for iOS.
 
-    The currently supported iOS test frameworks are XCTest and XCUITest. Other
-    iOS testing frameworks which are built upon XCTest and XCUITest should also
-    work.
+    Two types of iOS tests are currently supported:
+      o xctest: corresponds to the XCTest and XCUITest frameworks. Other iOS
+        testing frameworks which are built upon XCTest and XCUITest should also
+        work. The XCTEST_ZIP test package is a zip file built using Apple's
+        Xcode and supporting tools. For a detailed description of the process
+        to create your XCTEST_ZIP file, see
+        https://firebase.google.com/docs/test-lab/ios/command-line.
+      o game-loop: launches the game app through a custom URL scheme to
+        execute a "demo mode" built into the game app that simulates actions of
+        a real player. This test type can include multiple game loops (also
+        called "scenarios") indicated by positive numbers.
 
-    The XCTEST_ZIP test package is a zip file built using Apple's Xcode and
-    supporting tools. For a detailed description of the process to create your
-    XCTEST_ZIP file, see
-    https://firebase.google.com/docs/test-lab/ios/command-line.
+    The type of test to run can be specified with the --type flag, which
+    defaults to xctest.
 
     All arguments for gcloud beta firebase test ios run may be specified on the
     command line and/or within an argument file. Run $ gcloud topic arg-files
@@ -72,6 +80,9 @@ COMMONLY USED FLAGS
         * --timeout 200s is 200 seconds
         * --timeout 100 is 100 seconds
 
+     --type=TYPE
+        The type of iOS test to run. TYPE must be one of: xctest, game-loop.
+
      --xcode-version=XCODE_VERSION
         The version of Xcode that should be used to run an XCTest. Defaults to
         the latest Xcode version supported in Firebase Test Lab. This Xcode
@@ -88,8 +99,26 @@ COMMONLY USED FLAGS
         URL beginning with gs://.
 
 FLAGS
+     --app=APP
+        The path to the application archive (.ipa file) for game-loop testing.
+        The path may be in the local filesystem or in Google Cloud Storage
+        using gs:// notation. This flag is only valid when --type=game-loop is
+        also set.
+
      --async
         Invoke a test asynchronously without waiting for test results.
+
+     --client-details=[KEY=VALUE,...]
+        Comma-separated, KEY=VALUE map of additional details to attach to the
+        test matrix. Arbitrary KEY=VALUE pairs may be attached to a test matrix
+        to provide additional context about the tests being run. When consuming
+        the test results, such as in Cloud Functions or a CI system, these
+        details can add additional context such as a link to the corresponding
+        pull request.
+
+        Example:
+
+            --client-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull-request
 
      --num-flaky-test-attempts=int
         Specifies the number of times a test execution should be reattempted if
@@ -121,6 +150,13 @@ FLAGS
         default: the bundle ID for the iOS application). All tests which use
         the same history name will have their results grouped together in the
         Firebase console in a time-ordered test history list.
+
+     --scenario-numbers=int,[int,...]
+        A list of game-loop scenario numbers which will be run as part of the
+        test (default: scenario 1). A maximum of 1024 scenarios may be
+        specified in one test matrix, but the maximum number may also be
+        limited by the overall test --timeout setting. This flag is only valid
+        when --type=game-loop is also set.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -178,6 +214,16 @@ EXAMPLES
 
         $ gcloud beta firebase test ios run --test XCTEST_ZIP \
             --xcode-version=9.4.1
+
+    To run an iOS game loop, specify the --type and --app flags:
+
+        $ gcloud beta firebase test ios run --type game-loop --app app.ipa
+
+    To run an iOS game loop with specific scenario(s), use the
+    --scenario-numbers flag:
+
+        $ gcloud beta firebase test ios run --type game-loop --app app.ipa \
+            --scenario-numbers 1,2,3
 
     All test arguments for a given test may alternatively be stored in an
     argument group within a YAML-formatted argument file. The ARG_FILE may

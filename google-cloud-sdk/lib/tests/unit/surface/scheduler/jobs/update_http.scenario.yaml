@@ -1,0 +1,358 @@
+title: Update Http Jobs Test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: test update schedule
+  - command: |
+      scheduler jobs update http my-job --schedule "every friday"
+  - stdout: |
+      httpTarget:
+        body: bXktcGF5bG9hZC0y
+        httpMethod: POST
+        uri: http://www.example.com/endpoint
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every friday
+      timeZone: Etc/UTC
+- execute:
+  - label: test update other valid uri
+  - command: |
+      scheduler jobs update http my-job --uri https://www.example.com:8000/
+      --message-body my-payload-2
+- execute:
+  - label: test update all arguments
+  - command: |
+      scheduler jobs update http my-job --schedule "every thursday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 5 --max-retry-duration 2h --min-backoff 0.2s
+      --max-backoff 10s --uri http://www.example.com/endpoint
+      --max-doublings 2 --http-method gEt
+      --update-headers Header1=Value1
+      --remove-headers Header2
+      --message-body my-payload-2
+      --attempt-deadline 42m
+- execute:
+  - label: test all clear flags
+  - command: |
+      scheduler jobs update http my-job --clear-headers --clear-time-zone --clear-max-retry-attempts --clear-max-retry-duration --clear-min-backoff --clear-max-backoff --clear-max-doublings
+  - stdout: |
+      httpTarget:
+        body: bXktcGF5bG9hZC0y
+        httpMethod: POST
+        uri: http://www.example.com/endpoint
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test update auth token
+  - command: |
+      scheduler jobs update http my-job --oauth-service-account-email "testuser@google.com"
+  - stdout: |
+      httpTarget:
+        body: bXktcGF5bG9hZC0y
+        httpMethod: POST
+        uri: http://www.example.com/endpoint
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test clear auth token
+  - command: |
+      scheduler jobs update http my-job --clear-auth-token
+  - stdout: |
+      httpTarget:
+        body: bXktcGF5bG9hZC0y
+        httpMethod: POST
+        uri: http://www.example.com/endpoint
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every tuesday
+      timeZone: Etc/UTC
+actions:
+- write_file:
+    path: payload_file
+    contents: my-payload-2
+- execute_command:
+    label: test update schedule
+    command: |
+      scheduler jobs update http my-job --schedule "every friday"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations?alt=json&pageSize=2
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=schedule
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              schedule: every friday
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              httpMethod: POST
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every friday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        httpTarget:
+          body: bXktcGF5bG9hZC0y
+          httpMethod: POST
+          uri: http://www.example.com/endpoint
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every friday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update other valid uri
+    command: |
+      scheduler jobs update http my-job --uri https://www.example.com:8000/
+      --message-body my-payload-2
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=httpTarget.body%2ChttpTarget.uri
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              httpTarget:
+                body: bXktcGF5bG9hZC0y
+                httpMethod: POST
+                uri: https://www.example.com:8000/
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+                minBackoffDuration: 5s
+                retryCount: 0
+              timeZone: Etc/UTC
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              httpMethod: POST
+              uri: https://www.example.com:8000/
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 3600s
+              maxDoublings: 16
+              minBackoffDuration: 5s
+              retryCount: 0
+            timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update all arguments
+    command: |
+      scheduler jobs update http my-job --schedule "every thursday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 5 --max-retry-duration 2h --min-backoff 0.2s
+      --max-backoff 10s --uri http://www.example.com/endpoint
+      --max-doublings 2 --http-method gEt
+      --update-headers Header1=Value1
+      --remove-headers Header2
+      --message-body my-payload-2
+      --attempt-deadline 42m
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=attemptDeadline%2Cdescription%2ChttpTarget.body%2ChttpTarget.headers%2ChttpTarget.httpMethod%2ChttpTarget.uri%2CretryConfig.maxBackoffDuration%2CretryConfig.maxDoublings%2CretryConfig.maxRetryDuration%2CretryConfig.minBackoffDuration%2CretryConfig.retryCount%2Cschedule%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: my super cool job
+              httpTarget:
+                body: bXktcGF5bG9hZC0y
+                headers:
+                  Header1: Value1
+                  Header2: null
+                httpMethod: GET
+                uri: http://www.example.com/endpoint
+              attemptDeadline: 2520s
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                maxBackoffDuration: 10s
+                maxDoublings: 2
+                maxRetryDuration: 7200s
+                minBackoffDuration: 0.2s
+                retryCount: 5
+              schedule: every thursday
+              timeZone: America/New_York
+        return_response:
+          headers:
+            status: '200'
+          body:
+            description: my super cool job
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              headers:
+                Header1: Value1
+                Header2: null
+              httpMethod: GET
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 10s
+              maxDoublings: 2
+              maxRetryDuration: 7200s
+              minBackoffDuration: 0.2s
+              retryCount: 5
+            schedule: every thursday
+            timeZone: America/New_York
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test all clear flags
+    command: |
+      scheduler jobs update http my-job --clear-headers --clear-time-zone --clear-max-retry-attempts --clear-max-retry-duration --clear-min-backoff --clear-max-backoff --clear-max-doublings
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=httpTarget.headers%2CretryConfig.maxBackoffDuration%2CretryConfig.maxDoublings%2CretryConfig.maxRetryDuration%2CretryConfig.minBackoffDuration%2CretryConfig.retryCount%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              httpTarget:
+                headers: null
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+                maxRetryDuration: null
+                minBackoffDuration: 5s
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              httpMethod: POST
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        httpTarget:
+          body: bXktcGF5bG9hZC0y
+          httpMethod: POST
+          uri: http://www.example.com/endpoint
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update auth token
+    command: |
+      scheduler jobs update http my-job --oauth-service-account-email "testuser@google.com"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=httpTarget.oauthToken.serviceAccountEmail
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              httpTarget:
+                headers: null
+                oauthToken:
+                  serviceAccountEmail: testuser@google.com
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+                maxRetryDuration: null
+                minBackoffDuration: 5s
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              httpMethod: POST
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        httpTarget:
+          body: bXktcGF5bG9hZC0y
+          httpMethod: POST
+          uri: http://www.example.com/endpoint
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test clear auth token
+    command: |
+      scheduler jobs update http my-job --clear-auth-token
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=httpTarget.oidcToken.serviceAccountEmail%2ChttpTarget.oidcToken.audience%2ChttpTarget.oauthToken.serviceAccountEmail%2ChttpTarget.oauthToken.scope
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              httpTarget:
+                headers: null
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+                maxRetryDuration: null
+                minBackoffDuration: 5s
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+        return_response:
+          headers:
+            status: '200'
+          body:
+            httpTarget:
+              body: bXktcGF5bG9hZC0y
+              httpMethod: POST
+              uri: http://www.example.com/endpoint
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        httpTarget:
+          body: bXktcGF5bG9hZC0y
+          httpMethod: POST
+          uri: http://www.example.com/endpoint
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0

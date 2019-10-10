@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.command_lib.iam import iam_util
 
 
 # The list of pre-defined IAM roles in Spanner.
@@ -46,6 +47,7 @@ def SetPolicy(database_ref, policy):
   """Saves the given policy on the database, overwriting whatever exists."""
   client = apis.GetClientInstance('spanner', 'v1')
   msgs = apis.GetMessagesModule('spanner', 'v1')
+  policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
   req = msgs.SpannerProjectsInstancesDatabasesSetIamPolicyRequest(
       resource=database_ref.RelativeName(),
       setIamPolicyRequest=msgs.SetIamPolicyRequest(policy=policy))
@@ -66,6 +68,10 @@ def GetIamPolicy(database_ref):
   client = apis.GetClientInstance('spanner', 'v1')
   msgs = apis.GetMessagesModule('spanner', 'v1')
   req = msgs.SpannerProjectsInstancesDatabasesGetIamPolicyRequest(
+      getIamPolicyRequest=msgs.GetIamPolicyRequest(
+          options=msgs.GetPolicyOptions(
+              requestedPolicyVersion=
+              iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
       resource=database_ref.RelativeName())
   return client.projects_instances_databases.GetIamPolicy(req)
 

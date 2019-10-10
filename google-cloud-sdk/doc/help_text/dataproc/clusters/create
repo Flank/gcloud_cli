@@ -2,32 +2,42 @@ NAME
     gcloud dataproc clusters create - create a cluster
 
 SYNOPSIS
-    gcloud dataproc clusters create NAME [--no-address] [--async]
+    gcloud dataproc clusters create NAME
+        --autoscaling-policy=AUTOSCALING_POLICY [--no-address] [--async]
         [--bucket=BUCKET]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
+        [--master-accelerator=[type=TYPE,[count=COUNT],...]]
         [--master-boot-disk-size=MASTER_BOOT_DISK_SIZE]
         [--master-boot-disk-type=MASTER_BOOT_DISK_TYPE]
         [--master-machine-type=MASTER_MACHINE_TYPE]
+        [--master-min-cpu-platform=PLATFORM] [--max-idle=MAX_IDLE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--num-master-local-ssds=NUM_MASTER_LOCAL_SSDS]
         [--num-masters=NUM_MASTERS]
         [--num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--optional-components=[COMPONENT,...]]
+        [--preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
         [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
         [--properties=[PREFIX:PROPERTY=VALUE,...]] [--region=REGION]
         [--scopes=SCOPE,[SCOPE,...]] [--service-account=SERVICE_ACCOUNT]
-        [--tags=TAG,[TAG,...]] [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
+        [--tags=TAG,[TAG,...]]
+        [--worker-accelerator=[type=TYPE,[count=COUNT],...]]
+        [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
         [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
-        [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE, -z ZONE]
+        [--worker-machine-type=WORKER_MACHINE_TYPE]
+        [--worker-min-cpu-platform=PLATFORM] [--zone=ZONE, -z ZONE]
+        [--expiration-time=EXPIRATION_TIME | --max-age=MAX_AGE]
         [--gce-pd-kms-key=GCE_PD_KMS_KEY
           : --gce-pd-kms-key-keyring=GCE_PD_KMS_KEY_KEYRING
           --gce-pd-kms-key-location=GCE_PD_KMS_KEY_LOCATION
           --gce-pd-kms-key-project=GCE_PD_KMS_KEY_PROJECT]
         [--image=IMAGE | --image-version=VERSION]
+        [--kerberos-config-file=KERBEROS_CONFIG_FILE
+          | --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI (--kerberos-kms-key=KERBEROS_KMS_KEY : --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT)]
         [--network=NETWORK | --subnet=SUBNET]
         [--single-node | --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
           --num-workers=NUM_WORKERS] [GCLOUD_WIDE_FLAG ...]
@@ -40,6 +50,10 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 FLAGS
+     --autoscaling-policy=AUTOSCALING_POLICY
+        ID of the autoscaling policy or fully qualified identifier for the
+        autoscaling policy.
+
      --no-address
         If provided, the instances in the cluster will not be assigned external
         IP addresses.
@@ -52,8 +66,8 @@ FLAGS
         (https://cloud.google.com/compute/docs/private-google-access).
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --bucket=BUCKET
         The Google Cloud Storage bucket to use by default to stage job
@@ -76,6 +90,19 @@ FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     --master-accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to the master instance(s).
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            The number of pieces of the accelerator to attach to each of the
+            instances. The default value is 1.
+
      --master-boot-disk-size=MASTER_BOOT_DISK_SIZE
         The size of the boot disk. The value must be a whole number followed by
         a size unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB
@@ -89,6 +116,25 @@ FLAGS
      --master-machine-type=MASTER_MACHINE_TYPE
         The type of machine to use for the master. Defaults to
         server-specified.
+
+     --master-min-cpu-platform=PLATFORM
+        When specified, the VM will be scheduled on host with specified CPU
+        architecture or a newer one. To list available CPU platforms in given
+        zone, run:
+
+            $ gcloud compute zones describe ZONE
+
+        CPU platform selection is available only in selected zones; zones that
+        allow CPU platform selection will have an availableCpuPlatforms field
+        that contains the list of available CPU platforms for that zone.
+
+        You can find more information online:
+        https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
+     --max-idle=MAX_IDLE
+        The duration before cluster is auto-deleted after last job completes,
+        such as "2h" or "1d". See $ gcloud topic datetimes for information on
+        duration formats.
 
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Metadata to be made available to the guest operating system running on
@@ -117,6 +163,20 @@ FLAGS
         The following page documents the optional components that can be
         installed:
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
+
+     --preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to the preemptible-worker
+        instance(s).
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            The number of pieces of the accelerator to attach to each of the
+            instances. The default value is 1.
 
      --preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE
         The size of the boot disk. The value must be a whole number followed by
@@ -166,11 +226,8 @@ FLAGS
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
         independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
+        Compute Engine zones inside the region. Overrides the default
+        dataproc/region property value for this command invocation.
 
      --scopes=SCOPE,[SCOPE,...]
         Specifies scopes for the node instances. Multiple SCOPEs can be
@@ -264,6 +321,19 @@ FLAGS
 
             $ gcloud compute instances list --filter='tags:tag1'
 
+     --worker-accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to the worker instance(s).
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            The number of pieces of the accelerator to attach to each of the
+            instances. The default value is 1.
+
      --worker-boot-disk-size=WORKER_BOOT_DISK_SIZE
         The size of the boot disk. The value must be a whole number followed by
         a size unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB
@@ -277,11 +347,37 @@ FLAGS
      --worker-machine-type=WORKER_MACHINE_TYPE
         The type of machine to use for workers. Defaults to server-specified.
 
+     --worker-min-cpu-platform=PLATFORM
+        When specified, the VM will be scheduled on host with specified CPU
+        architecture or a newer one. To list available CPU platforms in given
+        zone, run:
+
+            $ gcloud compute zones describe ZONE
+
+        CPU platform selection is available only in selected zones; zones that
+        allow CPU platform selection will have an availableCpuPlatforms field
+        that contains the list of available CPU platforms for that zone.
+
+        You can find more information online:
+        https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
      --zone=ZONE, -z ZONE
         The compute zone (e.g. us-central1-a) for the cluster. If empty and
         --region is set to a value other than global, the server will pick a
         zone in the region. Overrides the default compute/zone property value
         for this command invocation.
+
+     At most one of these may be specified:
+
+       --expiration-time=EXPIRATION_TIME
+          The time when cluster will be auto-deleted, such as
+          "2017-08-29T18:52:51.142Z." See $ gcloud topic datetimes for
+          information on time formats.
+
+       --max-age=MAX_AGE
+          The lifespan of the cluster before it is auto-deleted, such as "2h"
+          or "1d". See $ gcloud topic datetimes for information on duration
+          formats.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the cluster. The 'Compute Engine Service Agent' service
@@ -312,6 +408,114 @@ FLAGS
        --image-version=VERSION
           The image version to use for the cluster. Defaults to the latest
           version.
+
+     Specifying these flags will enable Kerberos for the cluster. At most one
+     of these may be specified:
+
+       --kerberos-config-file=KERBEROS_CONFIG_FILE
+          Path to a YAML (or JSON) file containing the configuration for
+          Kerberos on the cluster. If you pass - as the value of the flag the
+          file content will be read from stdin.
+
+          The YAML file is formatted as follows:
+
+                # Optional. Flag to indicate whether to Kerberize the cluster.
+                # The default value is true.
+                enable_kerberos: true
+
+                # Required. The Google Cloud Storage URI of a KMS encrypted file
+                # containing the root principal password.
+                root_principal_password_uri: gs://bucket/password.encrypted
+
+                # Required. The URI of the KMS key used to encrypt various
+                # sensitive files.
+                kms_key_uri:
+                  projects/myproject/locations/global/keyRings/mykeyring/cryptoKeys/my-key
+
+                # Configuration of SSL encryption. If specified, all sub-fields
+                # are required. Otherwise, Dataproc will provide a self-signed
+                # certificate and generate the passwords.
+                ssl:
+                  # Optional. The Google Cloud Storage URI of the keystore file.
+                  keystore_uri: gs://bucket/keystore.jks
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the password to the keystore.
+                  keystore_password_uri: gs://bucket/keystore_password.encrypted
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the password to the user provided key.
+                  key_password_uri: gs://bucket/key_password.encrypted
+
+                  # Optional. The Google Cloud Storage URI of the truststore
+                  # file.
+                  truststore_uri: gs://bucket/truststore.jks
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the password to the user provided
+                  # truststore.
+                  truststore_password_uri:
+                    gs://bucket/truststore_password.encrypted
+
+                # Configuration of cross realm trust.
+                cross_realm_trust:
+                  # Optional. The remote realm the Dataproc on-cluster KDC will
+                  # trust, should the user enable cross realm trust.
+                  realm: REMOTE.REALM
+
+                  # Optional. The KDC (IP or hostname) for the remote trusted
+                  # realm in a cross realm trust relationship.
+                  kdc: kdc.remote.realm
+
+                  # Optional. The admin server (IP or hostname) for the remote
+                  # trusted realm in a cross realm trust relationship.
+                  admin_server: admin-server.remote.realm
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the shared password between the on-cluster
+                  # Kerberos realm and the remote trusted realm, in a cross
+                  # realm trust relationship.
+                  shared_password_uri:
+                    gs://bucket/cross-realm.password.encrypted
+
+                # Optional. The Google Cloud Storage URI of a KMS encrypted file
+                # containing the master key of the KDC database.
+                kdc_db_key_uri: gs://bucket/kdc_db_key.encrypted
+
+                # Optional. The lifetime of the ticket granting ticket, in
+                # hours. If not specified, or user specifies 0, then default
+                # value 10 will be used.
+                tgt_lifetime_hours: 1
+
+                # Optional. The name of the Kerberos realm. If not specified,
+                # the uppercased domain name of the cluster will be used.
+                realm: REALM.NAME
+
+       --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI
+          Google Cloud Storage URI of a KMS encrypted file containing the root
+          principal password. Must be a URL beginning with 'gs://'. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       Key resource - The Cloud KMS (Key Management Service) cryptokey that
+       will be used to protect the password. The 'Compute Engine Service Agent'
+       service account must hold permission 'Cloud KMS CryptoKey
+       Encrypter/Decrypter'. The arguments in this group can be used to specify
+       the attributes of this resource. This must be specified.
+
+         --kerberos-kms-key=KERBEROS_KMS_KEY
+            ID of the key or fully qualified identifier for the key. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
+
+         --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING
+            The KMS keyring of the key.
+
+         --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION
+            The Cloud location for the key.
+
+         --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT
+            The Cloud project for the key.
 
      At most one of these may be specified:
 

@@ -3,9 +3,10 @@ NAME
 
 SYNOPSIS
     gcloud beta dataflow jobs run JOB_NAME --gcs-location=GCS_LOCATION
-        [--max-workers=MAX_WORKERS] [--network=NETWORK]
-        [--num-workers=NUM_WORKERS] [--parameters=[PARAMETERS,...]]
-        [--region=REGION_ID] [--service-account-email=SERVICE_ACCOUNT_EMAIL]
+        [--dataflow-kms-key=DATAFLOW_KMS_KEY] [--max-workers=MAX_WORKERS]
+        [--network=NETWORK] [--num-workers=NUM_WORKERS]
+        [--parameters=[PARAMETERS,...]] [--region=REGION_ID]
+        [--service-account-email=SERVICE_ACCOUNT_EMAIL]
         [--staging-location=STAGING_LOCATION] [--subnetwork=SUBNETWORK]
         [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
@@ -23,6 +24,9 @@ REQUIRED FLAGS
         a URL beginning with 'gs://'.)
 
 OPTIONAL FLAGS
+     --dataflow-kms-key=DATAFLOW_KMS_KEY
+        The Cloud KMS key to protect the job resources.
+
      --max-workers=MAX_WORKERS
         The maximum number of workers to run.
 
@@ -37,7 +41,8 @@ OPTIONAL FLAGS
         The parameters to pass to the job.
 
      --region=REGION_ID
-        The region ID of the job's regional endpoint.
+        The region ID of the job's regional endpoint. Defaults to
+        'us-central1'.
 
      --service-account-email=SERVICE_ACCOUNT_EMAIL
         The service account to run the workers as.

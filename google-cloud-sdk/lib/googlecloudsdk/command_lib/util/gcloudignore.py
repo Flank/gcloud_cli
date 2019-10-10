@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ from googlecloudsdk.command_lib.util import glob
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 
 import six
@@ -67,7 +68,7 @@ _ENDS_IN_ODD_NUMBER_SLASHES_RE = r'(?<!\\)\\(\\\\)*$'
 
 
 class InternalParserError(Exception):
-  """An internal error in gcloudignore parsing."""
+  """An internal error in ignore file parsing."""
 
 
 class BadFileError(InternalParserError):
@@ -194,7 +195,7 @@ class FileChooser(object):
 
   def _RaiseOnSymlinkLoop(self, full_path):
     """Raise SymlinkLoopError if the given path is a symlink loop."""
-    if not os.path.islink(full_path):
+    if not os.path.islink(encoding.Encode(full_path, encoding='utf-8')):
       return
 
     # Does it refer to itself somehow?
@@ -228,8 +229,11 @@ class FileChooser(object):
       SymlinkLoopError: if there is a symlink referring to its own containing
       dir or itself.
     """
-    for dirpath, dirnames, filenames in os.walk(
-        upload_directory, followlinks=True):
+    for dirpath, orig_dirnames, filenames in os.walk(
+        six.ensure_str(upload_directory), followlinks=True):
+      dirpath = encoding.Decode(dirpath)
+      dirnames = [encoding.Decode(dirname) for dirname in orig_dirnames]
+      filenames = [encoding.Decode(filename) for filename in filenames]
       if dirpath == upload_directory:
         relpath = ''
       else:
@@ -239,7 +243,7 @@ class FileChooser(object):
         self._RaiseOnSymlinkLoop(os.path.join(dirpath, filename))
         if self.IsIncluded(file_relpath):
           yield file_relpath
-      for dirname in dirnames[:]:  # make a copy since we modify the original
+      for dirname in dirnames:  # make a copy since we modify the original
         file_relpath = os.path.join(relpath, dirname)
         full_path = os.path.join(dirpath, dirname)
         if self.IsIncluded(file_relpath, is_dir=True):
@@ -248,7 +252,7 @@ class FileChooser(object):
             yield file_relpath
         else:
           # Don't bother recursing into skipped directories
-          dirnames.remove(dirname)
+          orig_dirnames.remove(dirname)
 
   @classmethod
   def FromString(cls, text, recurse=0, dirname=None):
@@ -369,11 +373,14 @@ def _GetIgnoreFileContents(default_ignore_file,
 
 def GetFileChooserForDir(
     directory, default_ignore_file=DEFAULT_IGNORE_FILE, write_on_disk=True,
-    gcloud_ignore_creation_predicate=_GitFilesExist, include_gitignore=True):
+    gcloud_ignore_creation_predicate=_GitFilesExist, include_gitignore=True,
+    ignore_file=None):
   """Gets the FileChooser object for the given directory.
 
   In order of preference:
-  - Uses .gcloudignore file in the top-level directory.
+  - If ignore_file is not none, use it to skip files.
+    If the specified file does not exist, raise error.
+  - Use .gcloudignore file in the top-level directory.
   - Evaluates creation predicate to determine whether to generate .gcloudignore.
     include_gitignore determines whether the generated .gcloudignore will
     include the user's .gitignore if one exists. If the directory is not
@@ -394,6 +401,8 @@ def GetFileChooserForDir(
       .gitignore file or .git directory.
     include_gitignore: bool, whether the generated gcloudignore should include
       the user's .gitignore if present.
+    ignore_file: custom ignore_file name.
+              Override .gcloudignore file to customize files to be skipped.
 
   Raises:
     BadIncludedFileError: if a file being included does not exist or is not in
@@ -403,20 +412,24 @@ def GetFileChooserForDir(
     FileChooser: the FileChooser for the directory. If there is no .gcloudignore
     file and it can't be created the returned FileChooser will choose all files.
   """
-  if not properties.VALUES.gcloudignore.enabled.GetBool():
-    log.info('Not using a .gcloudignore file since gcloudignore is globally '
-             'disabled.')
-    return FileChooser([])
-  gcloudignore_path = os.path.join(directory, IGNORE_FILE_NAME)
+
+  if ignore_file:
+    gcloudignore_path = os.path.join(directory, ignore_file)
+  else:
+    if not properties.VALUES.gcloudignore.enabled.GetBool():
+      log.info('Not using a .gcloudignore file since gcloudignore is globally '
+               'disabled.')
+      return FileChooser([])
+    gcloudignore_path = os.path.join(directory, IGNORE_FILE_NAME)
   try:
     chooser = FileChooser.FromFile(gcloudignore_path)
   except BadFileError:
     pass
   else:
-    log.info('Using .gcloudignore file at [{}].'.format(gcloudignore_path))
+    log.info('Using ignore file at [{}].'.format(gcloudignore_path))
     return chooser
   if not gcloud_ignore_creation_predicate(directory):
-    log.info('Not using a .gcloudignore file.')
+    log.info('Not using ignore file.')
     return FileChooser([])
 
   ignore_contents = _GetIgnoreFileContents(default_ignore_file, directory,

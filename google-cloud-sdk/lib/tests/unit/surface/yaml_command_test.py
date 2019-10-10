@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -207,7 +207,7 @@ class Validator(object):
       self._GetFieldFromMessage(error_field.type, f, section)
 
   def ValidateAsyncSection(self):
-    if not self.builder.spec.async:
+    if not self.builder.spec.async_:
       return
 
     try:
@@ -220,7 +220,7 @@ class Validator(object):
 
     self._GetFieldFromMessage(
         self.builder.method.GetEffectiveResponseType(),
-        self.builder.spec.async.response_name_field,
+        self.builder.spec.async_.response_name_field,
         'async.response_name_field')
 
     self._CheckAsyncGetOperation(poller)
@@ -228,16 +228,16 @@ class Validator(object):
     self._CheckResourceExtraction(poller)
 
   def _CheckAsyncGetOperation(self, poller):
-    asynchronous = self.builder.spec.async
+    async_ = self.builder.spec.async_
     method_params = poller.method.request_collection.params
     poller_request_params = poller.method.request_collection.detailed_params
     operation_ref = resources.REGISTRY.Parse(
         'a',
         params={p: 'a' for p in poller_request_params},
-        collection=asynchronous.collection)
+        collection=async_.collection)
     ref_params = list(operation_ref.AsDict().keys())
     for param, ref_param in (
-        six.iteritems(asynchronous.operation_get_method_params)):
+        six.iteritems(async_.operation_get_method_params)):
       if param not in method_params:
         self.E('async.operation_get_method_params',
                'Parameter [{}] does not exist on API method', param)
@@ -247,29 +247,29 @@ class Validator(object):
                'reference', ref_param)
 
   def _CheckAsyncState(self, poller):
-    asynchronous = self.builder.spec.async
+    async_ = self.builder.spec.async_
     op_response = poller.method.GetEffectiveResponseType()
     for section, f in six.iteritems({
-        'async.response_name_field': asynchronous.response_name_field,
-        'async.state.field': asynchronous.state.field,
-        'async.error.field': asynchronous.error.field}):
+        'async.response_name_field': async_.response_name_field,
+        'async.state.field': async_.state.field,
+        'async.error.field': async_.error.field}):
       self._GetFieldFromMessage(op_response, f, section)
 
     # Check that success and error fields are mutually exclusive.
-    if (set(asynchronous.state.success_values) &
-        set(asynchronous.state.error_values)):
+    if (set(async_.state.success_values) &
+        set(async_.state.error_values)):
       self.E('async.state.success_values/error_values',
              'Collections contain overlapping values')
 
   def _CheckResourceExtraction(self, poller):
-    asynchronous = self.builder.spec.async
-    if not asynchronous.extract_resource_result:
+    async_ = self.builder.spec.async_
+    if not async_.extract_resource_result:
       return
 
     try:
       self._GetFieldFromMessage(
           poller._ResourceGetMethod().GetEffectiveResponseType(),
-          asynchronous.result_attribute, 'async.result_attribute')
+          async_.result_attribute, 'async.result_attribute')
     except registry.Error as e:
       self.E('async.resource_get_method', '{}', e)
       return
@@ -393,7 +393,7 @@ class _GlobalDataHolder(object):
   COMMANDS = []
   surface = os.path.dirname(surface.__file__)
   prefix_len = len(surface)
-  for root, dirs, files in os.walk(surface):
+  for root, dirs, files in os.walk(six.text_type(surface)):
     for f in files:
       if f.endswith('.yaml') and f != '__init__.yaml':
         file_path = os.path.join(root, f)

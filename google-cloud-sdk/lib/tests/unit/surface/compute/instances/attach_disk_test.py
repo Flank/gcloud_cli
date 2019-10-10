@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            machineType: https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name: instance-1
             networkInterfaces:
             - accessConfigs:
@@ -108,7 +108,7 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
               preemptible: false
             selfLink: {compute_uri}/projects/my-project/zones/zone-1/instances/instance-1
             status: RUNNING
-            zone: https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1
             """.format(compute_uri=self.compute_uri,
                        api_version=self.api_version)))
 
@@ -128,7 +128,7 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
         textwrap.dedent("""\
             [
               {{
-                "machineType": "https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
+                "machineType": "https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
                 "name": "instance-1",
                 "networkInterfaces": [
                   {{
@@ -147,7 +147,7 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
                 }},
                 "selfLink": "{compute_uri}/projects/my-project/zones/zone-1/instances/instance-1",
                 "status": "RUNNING",
-                "zone": "https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1"
+                "zone": "https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1"
               }}
             ]
             """.format(compute_uri=self.compute_uri,
@@ -168,7 +168,7 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            machineType:                                 https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType:                                 https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name:                                        instance-1
             networkInterfaces[0].accessConfigs[0].natIP: 23.251.133.75
             networkInterfaces[0].networkIP:              10.0.0.1
@@ -177,7 +177,7 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
             scheduling.preemptible:                      False
             selfLink:                                    {compute_uri}/projects/my-project/zones/zone-1/instances/instance-1
             status:                                      RUNNING
-            zone:                                        https://www.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1
+            zone:                                        https://compute.googleapis.com/compute/{api_version}/projects/my-project/zones/zone-1
             """.format(compute_uri=self.compute_uri,
                        api_version=self.api_version)))
 

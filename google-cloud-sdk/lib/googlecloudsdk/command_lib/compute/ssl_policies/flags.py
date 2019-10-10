@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ class SslPoliciesCompleter(compute_completers.ListCommandCompleter):
 def GetSslPolicyArgument(required=True, plural=False):
   """Returns the resource argument object for the SSL policy flag."""
   return compute_flags.ResourceArgument(
+      name='SSL_POLICY',
       resource_name='SSL policy',
       completer=SslPoliciesCompleter,
       plural=plural,

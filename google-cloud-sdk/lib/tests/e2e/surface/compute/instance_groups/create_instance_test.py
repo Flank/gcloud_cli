@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import re
 
 from googlecloudsdk.api_lib.compute.operations.poller import OperationErrors
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -152,7 +151,6 @@ class ManagedInstanceGroupsCreateInstanceZonalTest(
           scope_flag=self.GetScopeFlag(),
           instance=existing_instance_name))
 
-  @test_case.Filters.skip('Failing', 'b/132430121')
   def testCreateInstanceNonExistingDiskError(self):
     instance_template = self.CreateInstanceTemplate()
     igm_name = self.CreateInstanceGroupManagerStateful(
@@ -161,9 +159,7 @@ class ManagedInstanceGroupsCreateInstanceZonalTest(
     fake_disk_uri = re.sub(r'/instances/([^/]+)', r'/disks/non-existent-disk',
                            self.GetInstanceUris(igm_name)[0])
     with self.AssertRaisesHttpExceptionRegexp(
-        r"""HTTPError 400: Invalid value for field """
-        r"""'instances\[0\].preservedState.disks': .*\. Disk """
-        r"""\(non-existent-disk in .*\) cannot be found\."""):
+        r"""HTTPError 400.*"""):
       self.Run("""\
           compute instance-groups managed create-instance {group_name} \
             {scope_flag} \

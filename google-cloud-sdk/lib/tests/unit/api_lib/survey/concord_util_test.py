@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import json
 import os
 
 from googlecloudsdk.api_lib.survey import concord_util
+from googlecloudsdk.command_lib.survey import question
 from googlecloudsdk.command_lib.survey import survey
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core.survey import survey_check
@@ -37,10 +38,14 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
 
   def SetUp(self):
     # prepare test survey
-    self.survey_instances = survey.Survey('TwoQuestionGeneralSurvey')
-    q1, q2 = self.survey_instances.questions
-    q1.AnswerQuestion('1')
-    q2.AnswerQuestion('Love Cloud SDK!')
+    self.survey_instances = survey.GeneralSurvey()
+    for survey_question in self.survey_instances:
+      if isinstance(survey_question, question.SatisfactionQuestion):
+        survey_question.AnswerQuestion('5')
+      elif isinstance(survey_question, question.NPSQuestion):
+        survey_question.AnswerQuestion('10')
+      elif isinstance(survey_question, question.FreeTextQuestion):
+        survey_question.AnswerQuestion('Love Cloud SDK!')
 
     self.mock_client = mock.create_autospec(httplib2.Http)
     self.StartPatch(
@@ -80,7 +85,7 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
         'hats_metadata': {
             'site_id': 'CloudSDK',
             'site_name': 'googlecloudsdk',
-            'survey_id': 'TwoQuestionGeneralSurvey'
+            'survey_id': 'GeneralSurvey'
         },
         'multiple_choice_response': [{
             'question_number': 0,
@@ -90,8 +95,12 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
             'order': [1, 2, 3, 4, 5]
         }],
         'open_text_response': [{
-            'question_number': 1,
+            'question_number': 2,
             'answer_text': 'Love Cloud SDK!'
+        }],
+        'rating_response': [{
+            'question_number': 1,
+            'rating': 10
         }]
     }
     expected_concord_event = {
@@ -120,8 +129,7 @@ class ConcordUtilTest(cli_test_base.CliTestBase):
         'zwieback_cookie': '111',
         'request_time_ms': 100,
         'log_event': expected_log_events
-    },
-                               sort_keys=True)
+    }, sort_keys=True)
 
     self.mock_client.request.assert_called_once_with(
         'https://play.googleapis.com/log',

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,9 +47,9 @@ INSTANCES = [
             ),
         ],
         status=messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-1'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.Instance(
@@ -63,9 +63,9 @@ INSTANCES = [
             ),
         ],
         status=messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-2'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.Instance(
@@ -75,9 +75,9 @@ INSTANCES = [
             messages.NetworkInterface(),
         ],
         status=messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-3'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 ]
 
@@ -107,8 +107,8 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
         """)
     self.AssertErrContains(
         'No host aliases were added to your SSH configs because you do not '
-        'have any instances. Try running this command again after creating '
-        'some instances.')
+        'have any running instances. Try running this command again after '
+        'running some instances.')
 
     self.assertFalse(os.path.exists(self.config_path))
     self.CheckRequests(
@@ -203,8 +203,8 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
         """))
     self.AssertErrContains(
         'No host aliases were added to your SSH configs because you do not '
-        'have any instances. Try running this command again after creating '
-        'some instances.')
+        'have any running instances. Try running this command again after '
+        'running some instances.')
 
     self.CheckRequests(
         [(self.compute_v1.projects,
@@ -249,8 +249,8 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
         """))
     self.AssertErrContains(
         'No host aliases were added to your SSH configs because you do not '
-        'have any instances. Try running this command again after creating '
-        'some instances.')
+        'have any running instances. Try running this command again after '
+        'running some instances.')
     self.CheckRequests(
         [(self.compute_v1.projects,
           'Get',

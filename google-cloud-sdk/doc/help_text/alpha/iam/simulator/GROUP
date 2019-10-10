@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha iam simulator - understand access permission impacts before
+        IAM policy change deployment
+
+SYNOPSIS
+    gcloud alpha iam simulator COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for analyzing access permission impacts before proposed
+    IAM policy changes are deployed.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     replay-recent-access
+        (ALPHA) Determine affected recent access attempts before IAM policy
+        change deployment.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

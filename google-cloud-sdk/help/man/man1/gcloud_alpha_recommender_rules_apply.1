@@ -1,0 +1,80 @@
+
+.TH "GCLOUD_ALPHA_RECOMMENDER_RULES_APPLY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha recommender rules apply \- apply a rule, which will set the specified state on all matching recommendations
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha recommender rules apply\fR \fIRULE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Apply a rule, which will set the specified state on all matching
+recommendations.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Rule resource \- The rule to apply. This represents a Cloud resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [rule] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIRULE\fR
+ID of the rule or fully qualified identifier for the rule.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBrecommender/v1alpha1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/recommender/docs/
+
+
+
+.SH "EXAMPLES"
+
+To apply a rule:
+
+.RS 2m
+$ gcloud alpha recommender rules apply abcd\-1234 \e
+    \-\-project=project\-name
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

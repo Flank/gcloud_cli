@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ for more information.""")
             api_client.SetTrafficSplit, service.id, allocations,
             args.split_by.upper(), args.migrate)
       except operations_util.MiscOperationError as err:
-        errors[service.id] = str(err)
+        errors[service.id] = six.text_type(err)
     if errors:
       printable_errors = {}
       for service, error_msg in errors.items():

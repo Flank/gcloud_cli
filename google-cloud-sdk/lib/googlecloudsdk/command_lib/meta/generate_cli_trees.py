@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1338,7 +1338,7 @@ def LoadAll(directory=None, ignore_out_of_date=False, root=None,
   for directory in directories:
     if not directory or not os.path.exists(directory):
       continue
-    for (dirpath, _, filenames) in os.walk(directory):
+    for (dirpath, _, filenames) in os.walk(six.text_type(directory)):
       for filename in sorted(filenames):  # For stability across runs.
         command, extension = os.path.splitext(filename)
         if extension != '.json':

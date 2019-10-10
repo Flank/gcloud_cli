@@ -5,16 +5,17 @@ skip:
   reason: This is a utility for one-time use. Checked in just to keep records of the cluster creation specifics.
   bug: b/111453274
   locally: true
+  always: true  # used as a tool for cluster creation
 
 actions:
 
 - set_property:
     container/use_client_certificate: true
     container/use_application_default_credentials: true
-    container/new_scopes_behavior: true
 
 - execute_command:
-    command: container clusters create do-not-delete-gke-knative-test-cluster --addons=Istio,CloudRun
+    command: container clusters create do-not-delete-gke-knative-test-cluster
+      --addons=Istio,CloudRun,HttpLoadBalancing
       --machine-type=n1-standard-2 --enable-autoscaling --min-nodes=1 --max-nodes=10
       --cluster-version=latest --scopes=cloud-platform,logging-write,monitoring-write,pubsub
       --enable-stackdriver-kubernetes --zone=us-central1-a -q

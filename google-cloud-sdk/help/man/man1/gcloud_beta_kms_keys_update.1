@@ -11,7 +11,7 @@ gcloud beta kms keys update \- update a key
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta kms keys update\fR \fIKEY\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-primary\-version\fR=\fIPRIMARY_VERSION\fR] [\fB\-\-remove\-rotation\-schedule\fR] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta kms keys update\fR \fIKEY\fR [\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-primary\-version\fR=\fIPRIMARY_VERSION\fR] [\fB\-\-remove\-rotation\-schedule\fR] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,6 +55,19 @@ Name of the key to update.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR
+The default algorithm for the crypto key. See
+https://cloud.google.com/kms/docs/algorithms for guidance on choosing an
+algorithm. \fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
+\fBec\-sign\-p384\-sha384\fR, \fBgoogle\-symmetric\-encryption\fR,
+\fBrsa\-decrypt\-oaep\-2048\-sha256\fR, \fBrsa\-decrypt\-oaep\-3072\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-4096\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha512\fR,
+\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR,
+\fBrsa\-sign\-pss\-2048\-sha256\fR, \fBrsa\-sign\-pss\-3072\-sha256\fR,
+\fBrsa\-sign\-pss\-4096\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha512\fR.
+
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
 Key ring of the key.
@@ -141,10 +154,10 @@ starting at the specified time:
 
 .RS 2m
 $ gcloud beta kms keys update frodo \e
-    \-\-location global \e
-    \-\-keyring fellowship \e
-    \-\-rotation\-period 30d \e
-    \-\-next\-rotation\-time 2017\-10\-12T12:34:56.1234Z
+    \-\-location=global \e
+    \-\-keyring=fellowship \e
+    \-\-rotation\-period=30d \e
+    \-\-next\-rotation\-time=2017\-10\-12T12:34:56.1234Z
 .RE
 
 The following command removes the rotation schedule for the key named
@@ -152,8 +165,8 @@ The following command removes the rotation schedule for the key named
 
 .RS 2m
 $ gcloud beta kms keys update frodo \e
-    \-\-location global \e
-    \-\-keyring fellowship \e
+    \-\-location=global \e
+    \-\-keyring=fellowship \e
     \-\-remove\-rotation\-schedule
 .RE
 
@@ -163,9 +176,9 @@ does not exist at the time, it will be added:
 
 .RS 2m
 $ gcloud beta kms keys update frodo \e
-    \-\-location global \e
-    \-\-keyring fellowship \e
-    \-\-update\-labels k1=v1
+    \-\-location=global \e
+    \-\-keyring=fellowship \e
+    \-\-update\-labels=k1=v1
 .RE
 
 The following command removes labels k1 and k2 from the key named \f5frodo\fR
@@ -173,9 +186,9 @@ within the keyring \f5fellowship\fR and location \f5global\fR:
 
 .RS 2m
 $ gcloud beta kms keys update frodo \e
-    \-\-location global \e
-    \-\-keyring fellowship \e
-    \-\-remove\-labels k1,k2
+    \-\-location=global \e
+    \-\-keyring=fellowship \e
+    \-\-remove\-labels=k1,k2
 .RE
 
 The following command updates the primary version for the key named \f5frodo\fR
@@ -183,9 +196,21 @@ within the keyring \f5fellowship\fR and location \f5global\fR:
 
 .RS 2m
 $ gcloud beta kms keys update frodo \e
-    \-\-location global \e
-    \-\-keyring fellowship \e
-    \-\-primary\-version 1
+    \-\-location=global \e
+    \-\-keyring=fellowship \e
+    \-\-primary\-version=1
+.RE
+
+The following command updates the default algorithm for the key named
+\f5frodo\fR within the keyring \f5fellowship\fR and location \f5global\fR,
+assuming the key originally has purpose 'asymmetric\-encryption' and algorithm
+\'rsa\-decrypt\-oaep\-2048\-sha256':
+
+.RS 2m
+$ gcloud beta kms keys update frodo \e
+    \-\-location=global \e
+    \-\-keyring=fellowship \e
+    \-\-default\-algorithm=rsa\-decrypt\-oaep\-4096\-sha256
 .RE
 
 

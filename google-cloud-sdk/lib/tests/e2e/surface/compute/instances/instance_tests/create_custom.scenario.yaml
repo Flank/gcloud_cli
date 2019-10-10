@@ -1,0 +1,295 @@
+title: instance create custom gen scenario test
+release_tracks:
+- GA
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$instance$$ --custom-vm-type n2 --custom-cpu
+      2 --custom-memory 2048MiB --zone $$zone-to-use$$
+  - stderr: |
+      Created [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$\].
+  - stdout: |
+      $$instance$$
+- execute:
+  - command: compute instances delete $$instance$$ --zone $$zone-to-use$$
+  - prompt:
+    - message: |
+        The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
+         - [$$instance$$] in [$$zone-to-use$$]
+    - input: y
+  - stderr: |
+      Deleted [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$].
+actions:
+- define_reference:
+    reference: compute-uri
+    value: compute.googleapis.com/compute
+- define_reference:
+    reference: zone-to-use
+    value: us-central1-f
+- generate_resource_id:
+    reference: instance
+    prefix: gcloud-compute-instance-custom
+- execute_command:
+    command: compute instances create $$instance$$ --custom-vm-type n2 --custom-cpu
+      2 --custom-memory 2048MiB --zone $$zone-to-use$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '534'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"S8ZJxdz5eXdy5zB0p2VZ_8hBukY=/Qa0M96f_Tj8I2Yq97ND3dkwU3dY="'
+            status: '200'
+          body:
+            kind: compute#zone
+            id: '2004'
+            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
+            name: $$zone-to-use$$
+            description: $$zone-to-use$$
+            status: UP
+            region: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$
+            availableCpuPlatforms:
+            - Intel Cascade Lake
+            - Intel Skylake
+            - Intel Broadwell
+            - Intel Haswell
+            - Intel Ivy Bridge
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/machineTypes/n2-custom-2-2048?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '435'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#machineType
+            id: '8589936640'
+            name: n2-custom-2-2048
+            description: Custom created machine type.
+            guestCpus: 2
+            memoryMb: 2048
+            maximumPersistentDisks: 128
+            maximumPersistentDisksSizeGb: '65536'
+            zone: $$zone-to-use$$
+            selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/machineTypes/n2-custom-2-2048
+            isSharedCpu: false
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - commonInstanceMetadata
+          - quotas
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '497680'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"Ox3JjjYue3AxmwQTJbm2JT8gsNY=/wqIDORDNLkJUitxMv5c7iuwFphs="'
+            status: '200'
+          body:
+            kind: compute#project
+            id: '17966956004057981335'
+            creationTimestamp: '2014-09-30T07:55:22.502-07:00'
+            name: cloud-sdk-integration-testing
+            usageExportLocation:
+              bucketName: cloud-sdk-integration-test-usage
+              reportNamePrefix: ''
+            enabledFeatures:
+            - alpha-api
+            selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing
+            defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
+            xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
+            defaultNetworkTier: PREMIUM
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              canIpForward: false
+              deletionProtection: false
+              disks:
+              - autoDelete: true
+                boot: true
+                initializeParams:
+                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-9
+                mode: READ_WRITE
+                type: PERSISTENT
+              machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/machineTypes/n2-custom-2-2048
+              metadata: {}
+              name: $$instance$$
+              networkInterfaces:
+              - accessConfigs:
+                - name: external-nat
+                  type: ONE_TO_ONE_NAT
+                network: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              scheduling:
+                automaticRestart: true
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '882'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2222140494021176920'
+            name: operation-1569263798312-5933cb341e004-2428b63b-572a248c
+            zone: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$
+            operationType: insert
+            targetLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$
+            targetId: '7613333630376783449'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-09-23T11:36:39.697-07:00'
+            startTime: '2019-09-23T11:36:39.699-07:00'
+            selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/operations/operation-1569263798312-5933cb341e004-2428b63b-572a248c
+        poll_operation: true
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$\].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2641'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"90Gr_wdDLEcO_CK-fkDtW84ir1c=/KOlwL4pSPwrtz2jD1RXKgVR6UV8="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '7613333630376783449'
+            creationTimestamp: '2019-09-23T11:36:39.508-07:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/machineTypes/n2-highcpu-2
+            status: RUNNING
+            zone: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.0.185
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.226.251.195
+                networkTier: PREMIUM
+              fingerprint: AE-tBViZ_-I=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://$$compute-uri$$/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Cascade Lake
+            labelFingerprint: 42WmSpB8rSM=
+            minCpuPlatform: Intel Cascade Lake
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout:
+        matches: .*$$instance$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: instance
+    command: compute instances delete $$instance$$ --zone $$zone-to-use$$
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
+           - [$$instance$$] in [$$zone-to-use$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '882'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2250230464900279888'
+            name: operation-1569263807330-5933cb3cb7a2b-3771304d-0a1032c4
+            zone: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$
+            operationType: delete
+            targetLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$
+            targetId: '7613333630376783449'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-09-23T11:36:47.811-07:00'
+            startTime: '2019-09-23T11:36:47.827-07:00'
+            selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/operations/operation-1569263807330-5933cb3cb7a2b-3771304d-0a1032c4
+        poll_operation: true
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$zone-to-use$$/instances/$$instance$$\].
+    - expect_exit:
+        code: 0

@@ -1,0 +1,280 @@
+title: Basic test of L7ILB forwarding rule.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute networks create $$network-1$$ --format "value(name)"
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network-1$$\].
+  - stdout: |
+      $$network-1$$
+- execute:
+  - command: compute networks subnets create $$subnet-1$$ --purpose INTERNAL_HTTPS_LOAD_BALANCER
+      --role ACTIVE --region $$my-region$$ --network $$network-1$$ --range 10.126.0.0/22
+      --format "value(name)"
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/subnetworks/$$subnet-1$$\].
+  - stdout: |
+      $$subnet-1$$
+- execute:
+  - command: compute health-checks create http $$hc-1$$ --format none --region $$my-region$$
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
+- execute:
+  - command: compute backend-services create $$bs-1$$ --protocol HTTP --health-checks
+      $$hc-1$$ --region $$my-region$$ --health-checks-region $$my-region$$ --load-balancing-scheme
+      INTERNAL_MANAGED
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/backendServices/$$bs-1$$\].
+  - stdout: |
+      NAME                                            BACKENDS  PROTOCOL
+      $$bs-1$$            HTTP
+- execute:
+  - command: compute url-maps create $$um-1$$ --default-service $$bs-1$$ --region
+      $$my-region$$ --format "value(name)"
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/urlMaps/$$um-1$$\].
+  - stdout: |
+      $$um-1$$
+- execute:
+  - command: compute target-http-proxies create $$tp-1$$ --url-map $$um-1$$ --region
+      $$my-region$$ --format "value(name)"
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetHttpProxies/$$tp-1$$\].
+  - stdout: |
+      $$tp-1$$
+- execute:
+  - command: compute forwarding-rules create $$fr-1$$ --target-http-proxy $$tp-1$$
+      --target-http-proxy-region $$my-region$$ --load-balancing-scheme INTERNAL_MANAGED
+      --network $$network-1$$ --ports 80 --region $$my-region$$ --format "value(name)"
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fr-1$$\].
+  - stdout: |
+      $$fr-1$$
+- execute:
+  - command: compute forwarding-rules delete $$fr-1$$ --region $$my-region$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fr-1$$\].
+- execute:
+  - command: compute target-http-proxies delete $$tp-1$$ --region $$my-region$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetHttpProxies/$$tp-1$$\].
+- execute:
+  - command: compute url-maps delete $$um-1$$ --region $$my-region$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/urlMaps/$$um-1$$\].
+- execute:
+  - command: compute backend-services delete $$bs-1$$ --region $$my-region$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/backendServices/$$bs-1$$\].
+- execute:
+  - command: compute health-checks delete $$hc-1$$ --region $$my-region$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
+- execute:
+  - command: compute networks subnets delete $$subnet-1$$ --region $$my-region$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/subnetworks/$$subnet-1$$\].
+- execute:
+  - command: compute networks delete $$network-1$$ --quiet
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network-1$$\].
+actions:
+
+
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: beta
+      ALPHA: alpha
+- define_reference:
+    reference: my-region
+    value: us-central1
+
+
+- generate_resource_id:
+    reference: network-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute networks create $$network-1$$ --format "value(name)"
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network-1$$\].
+    - expect_stdout: |
+        $$network-1$$
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: subnet-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute networks subnets create $$subnet-1$$ --purpose INTERNAL_HTTPS_LOAD_BALANCER
+      --role ACTIVE --region $$my-region$$ --network $$network-1$$ --range 10.126.0.0/22
+      --format "value(name)"
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/subnetworks/$$subnet-1$$\].
+    - expect_stdout: |
+        $$subnet-1$$
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: hc-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute health-checks create http $$hc-1$$ --format none --region $$my-region$$
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
+    - expect_exit:
+        code: 0
+
+
+- generate_resource_id:
+    reference: bs-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute backend-services create $$bs-1$$ --protocol HTTP --health-checks
+      $$hc-1$$ --region $$my-region$$ --health-checks-region $$my-region$$ --load-balancing-scheme
+      INTERNAL_MANAGED
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/backendServices/$$bs-1$$\].
+    - expect_stdout: |
+        NAME                                            BACKENDS  PROTOCOL
+        $$bs-1$$            HTTP
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: um-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute url-maps create $$um-1$$ --default-service $$bs-1$$ --region
+      $$my-region$$ --format "value(name)"
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/urlMaps/$$um-1$$\].
+    - expect_stdout: |
+        $$um-1$$
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: tp-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute target-http-proxies create $$tp-1$$ --url-map $$um-1$$ --region
+      $$my-region$$ --format "value(name)"
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetHttpProxies/$$tp-1$$\].
+    - expect_stdout: |
+        $$tp-1$$
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: fr-1
+    prefix: gcloud-compute-test-l7ilb
+- execute_command:
+    command: compute forwarding-rules create $$fr-1$$ --target-http-proxy $$tp-1$$
+      --target-http-proxy-region $$my-region$$ --load-balancing-scheme INTERNAL_MANAGED
+      --network $$network-1$$ --ports 80 --region $$my-region$$ --format "value(name)"
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fr-1$$\].
+    - expect_stdout: |
+        $$fr-1$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute forwarding-rules delete $$fr-1$$ --region $$my-region$$ --quiet
+    cleanup_for: fr-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fr-1$$\].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute target-http-proxies delete $$tp-1$$ --region $$my-region$$ --quiet
+    cleanup_for: tp-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetHttpProxies/$$tp-1$$\].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute url-maps delete $$um-1$$ --region $$my-region$$ --quiet
+    cleanup_for: um-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/urlMaps/$$um-1$$\].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute backend-services delete $$bs-1$$ --region $$my-region$$ --quiet
+    cleanup_for: bs-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/backendServices/$$bs-1$$\].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute health-checks delete $$hc-1$$ --region $$my-region$$ --quiet
+    cleanup_for: hc-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/healthChecks/$$hc-1$$\].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute networks subnets delete $$subnet-1$$ --region $$my-region$$ --quiet
+    cleanup_for: subnet-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/subnetworks/$$subnet-1$$\].
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: compute networks delete $$network-1$$ --quiet
+    cleanup_for: network-1
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network-1$$\].
+    - expect_exit:
+        code: 0

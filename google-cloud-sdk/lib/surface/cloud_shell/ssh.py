@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from googlecloudsdk.command_lib.cloud_shell import util
 from googlecloudsdk.command_lib.util.ssh import ssh
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+import six
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -78,7 +79,7 @@ class SshAlpha(base.Command):
     connection_info = util.PrepareEnvironment(args)
     command = ssh.SSHCommand(
         remote=ssh.Remote(host=connection_info.host, user=connection_info.user),
-        port=str(connection_info.port),
+        port=six.text_type(connection_info.port),
         identity_file=connection_info.key,
         remote_command=(['DEVSHELL_PROJECT_ID=' + project]
                         if project else []) + command_list,

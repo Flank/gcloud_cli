@@ -11,7 +11,7 @@ gcloud compute copy\-files \- copy files to and from Google Compute Engine virtu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute copy\-files\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute copy\-files\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR\ |\ \fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -136,7 +136,25 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR
+The time when the ssh key will be valid until, such as
+"2017\-08\-29T18:52:51.142Z." This is only valid if the instance is not using OS
+Login. See $ gcloud topic datetimes for information on time formats.
+
+.TP 2m
+\fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR
+The maximum length of time an SSH key is valid for once created and installed,
+e.g. 2m for 2 minutes. See $ gcloud topic datetimes for information on duration
+formats.
+
+
+.RE
 .RE
 .sp
 

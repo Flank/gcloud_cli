@@ -1,5 +1,5 @@
 title: Test parsing IAP IAM resources
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -79,7 +79,10 @@ actions:
           uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web/appengine-fake-project:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -126,7 +129,10 @@ actions:
           uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web/appengine-fake-project/services/app-service:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -175,7 +181,10 @@ actions:
           uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web/appengine-fake-project/services/app-service/versions/app-version:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -222,7 +231,10 @@ actions:
           uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web/compute:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -269,7 +281,10 @@ actions:
           uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web/compute/services/backend-service:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'

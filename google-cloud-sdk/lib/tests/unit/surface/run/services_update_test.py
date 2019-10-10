@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,23 +18,29 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions
 from tests.lib import cli_test_base
 from tests.lib import parameterized
-from tests.lib import sdk_test_base
 from tests.lib.surface.run import base
 
+import mock
 
-class UpdateTest(base.ServerlessSurfaceBase,
-                 cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
-                 parameterized.TestCase):
+
+class UpdateTestBeta(base.ServerlessSurfaceBase, parameterized.TestCase):
   """Tests `services update update` command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.operations.ReleaseService.return_value = None
-    self.operations.GetServiceUrl.return_value = 'info.cern.ch'
-    self.env_mock = self.StartObjectPatch(config_changes, 'EnvVarChanges')
+    self.service = mock.NonCallableMock()
+    self.service.domain = 'info.cern.ch'
+    self.operations.GetService.return_value = self.service
+    self.env_mock = self.StartObjectPatch(
+        config_changes, 'EnvVarLiteralChanges')
 
   def testUpdateEnvVars(self):
     """Tests update of env vars."""
@@ -90,3 +96,10 @@ class UpdateTest(base.ServerlessSurfaceBase,
         'run services update --concurrency default s1')
     self.AssertErrContains('Service [s1] revision [rev.1] is active and '
                            'serving traffic at info.cern.ch')
+
+
+class UpdateTestAlpha(UpdateTestBeta):
+  """Tests `services update update` command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

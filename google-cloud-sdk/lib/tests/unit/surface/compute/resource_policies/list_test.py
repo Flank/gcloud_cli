@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class ListBetaTest(resource_policies_base.TestBase):
         http=self.mock_http(),
         requested_regions=[],
         filter_expr=None,
-        batch_url='https://www.googleapis.com/batch/compute/{}'.format(
+        batch_url='https://compute.googleapis.com/batch/compute/{}'.format(
             self._BATCH_URL_VERSION),
         errors=[])
     self.AssertOutputEquals("""\

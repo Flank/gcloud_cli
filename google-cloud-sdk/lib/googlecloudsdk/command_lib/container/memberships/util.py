@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,3 +32,8 @@ def SetParentCollection(ref, args, request):
   del ref, args
   request.parent = request.parent + '/locations/global'
   return request
+
+
+def SetLocation():
+  """Set default location to global."""
+  return 'global'

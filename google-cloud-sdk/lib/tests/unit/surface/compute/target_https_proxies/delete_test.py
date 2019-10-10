@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,21 +83,21 @@ class TargetHttpsProxiesDeleteTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class TargetHttpsProxiesDeleteAlphaTest(TargetHttpsProxiesDeleteTest):
+class TargetHttpsProxiesDeleteBetaTest(TargetHttpsProxiesDeleteTest):
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'beta'
     self.SelectApi(self._api)
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
   def RunDelete(self, command):
-    self.Run('alpha compute target-https-proxies delete --global ' + command)
+    self.Run('beta compute target-https-proxies delete --global ' + command)
 
   def testWithManyRegionTargetHttpsProxies(self):
     messages = self.messages
     properties.VALUES.core.disable_prompts.Set(True)
-    self.Run("""
-             alpha compute target-https-proxies delete --region us-west-1
+    self.Run(self._api + """
+              compute target-https-proxies delete --region us-west-1
              proxy-1 proxy-2 proxy-3
              """)
 
@@ -116,6 +116,17 @@ class TargetHttpsProxiesDeleteAlphaTest(TargetHttpsProxiesDeleteTest):
                              targetHttpsProxy='proxy-3',
                              project='my-project',
                              region='us-west-1'))],)
+
+
+class TargetHttpsProxiesDeleteAlphaTest(TargetHttpsProxiesDeleteBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
+
+  def RunDelete(self, command):
+    self.Run('alpha compute target-https-proxies delete --global ' + command)
 
 
 if __name__ == '__main__':

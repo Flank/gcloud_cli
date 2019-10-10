@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ import tarfile
 import zipfile
 
 from googlecloudsdk.api_lib.storage import storage_util
-from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import jobs_prep
 from googlecloudsdk.command_lib.ml_engine import uploads
 from googlecloudsdk.core import execution_utils
@@ -36,6 +35,7 @@ from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
 import mock
+import six
 
 
 @contextlib.contextmanager
@@ -54,7 +54,7 @@ def _UnwritableDirectory(path):
     None
   """
   paths = []
-  for dirpath, _, filenames in os.walk(path):
+  for dirpath, _, filenames in os.walk(six.text_type(path)):
     paths.append(dirpath)
     paths.extend([os.path.join(dirpath, filename) for filename in filenames])
   try:
@@ -127,7 +127,7 @@ class BuildPackagesTest(base.MlBetaPlatformTestBase):
     # Some setuptools versions generate one of these; others don't
     optional_files = {'MANIFEST'}
     all_files = []
-    for _, _, filenames in os.walk(self.package_parent):
+    for _, _, filenames in os.walk(six.text_type(self.package_parent)):
       # The generated .pyc files vary a lot. For instance, pytest names them
       # differently.
       all_files.extend(f for f in filenames if not f.endswith('.pyc'))
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 """
 _EXISTING_SETUP_PY = '''\
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -529,13 +529,6 @@ class UploadPythonPackagesTest(base.MlBetaPlatformTestBase):
     self.bucket_ref = storage_util.BucketReference.FromUrl('gs://bucket/')
     self.staging_location = storage_util.ObjectReference.FromBucketRef(
         self.bucket_ref, 'job_name')
-
-  def testUploadPythonPackages_NoPackagesGiven(self):
-    with self.AssertRaisesExceptionMatches(
-        flags.ArgumentError,
-        'If `--package-path` is not specified, at least one Python package '
-        'must be specified via `--packages`.'):
-      jobs_prep.UploadPythonPackages()
 
   def testUploadPythonPackages_UploadRequiredButNoStagingLocationGiven(self):
     packages = [os.path.join('path', 'to', 'package.tar.gz'), 'package2.whl']

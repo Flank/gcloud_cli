@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -138,6 +138,33 @@ class InterconnectsCreateGATest(test_base.BaseTest):
                '--requested-link-count 5 --admin-enabled '
                '--customer-name customer-name')
 
+  def testCreateInterconnect_100G(self):
+    self.ExpectInterconnectRequest(
+        interconnectType=self.messages.Interconnect
+        .InterconnectTypeValueValuesEnum.DEDICATED,
+        linkType=self.messages.Interconnect.LinkTypeValueValuesEnum
+        .LINK_TYPE_ETHERNET_100G_LR,
+        requestedLinkCount=1)
+
+    self.Run('compute interconnects create my-interconnect '
+             '--interconnect-type DEDICATED '
+             '--location my-location --link-type LINK_TYPE_ETHERNET_100G_LR '
+             '--requested-link-count 1 --admin-enabled '
+             '--customer-name customer-name')
+
+    self.CheckInterconnectRequest(
+        interconnectType=self.messages.Interconnect
+        .InterconnectTypeValueValuesEnum.DEDICATED,
+        linkType=self.messages.Interconnect.LinkTypeValueValuesEnum
+        .LINK_TYPE_ETHERNET_100G_LR,
+        requestedLinkCount=1)
+    self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'Please check the provided contact email for further instructions on '
+        'how to activate your Interconnect. See also https://cloud.google.com/'
+        'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
+        'help.')
+
 
 class InterconnectsCreateBetaTest(test_base.BaseTest):
 
@@ -275,33 +302,6 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
     self.AssertOutputEquals('')
     self.AssertErrContains('WARNING: IT_PRIVATE will be deprecated for '
                            'interconnect-type. Please use DEDICATED instead.\n')
-
-  def testCreateInterconnect_100G(self):
-    self.ExpectInterconnectRequest(
-        interconnectType=self.messages.Interconnect
-        .InterconnectTypeValueValuesEnum.DEDICATED,
-        linkType=self.messages.Interconnect.LinkTypeValueValuesEnum
-        .LINK_TYPE_ETHERNET_100G_LR,
-        requestedLinkCount=1)
-
-    self.Run('compute interconnects create my-interconnect '
-             '--interconnect-type DEDICATED '
-             '--location my-location --link-type LINK_TYPE_ETHERNET_100G_LR '
-             '--requested-link-count 1 --admin-enabled '
-             '--customer-name customer-name')
-
-    self.CheckInterconnectRequest(
-        interconnectType=self.messages.Interconnect
-        .InterconnectTypeValueValuesEnum.DEDICATED,
-        linkType=self.messages.Interconnect.LinkTypeValueValuesEnum
-        .LINK_TYPE_ETHERNET_100G_LR,
-        requestedLinkCount=1)
-    self.AssertOutputEquals('')
-    self.AssertErrContains(
-        'Please check the provided contact email for further instructions on '
-        'how to activate your Interconnect. See also https://cloud.google.com/'
-        'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
-        'help.')
 
 
 class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):

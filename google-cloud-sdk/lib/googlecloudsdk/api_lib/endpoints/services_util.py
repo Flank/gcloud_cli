@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import retry
+import six
 
 
 EMAIL_REGEX = re.compile(r'^.+@([^.@][^@]+)$')
@@ -67,10 +68,6 @@ def GetMessagesModule():
 
 def GetClientInstance():
   return apis.GetClientInstance('servicemanagement', 'v1')
-
-
-def GetEndpointsServiceName():
-  return 'endpoints.googleapis.com'
 
 
 def GetServiceManagementServiceName():
@@ -151,7 +148,7 @@ def PushAdvisorChangeTypeToString(change_type):
   messages = GetMessagesModule()
   enums = messages.ConfigChange.ChangeTypeValueValuesEnum
   if change_type in [enums.ADDED, enums.REMOVED, enums.MODIFIED]:
-    return str(change_type).lower()
+    return six.text_type(change_type).lower()
   else:
     return '[unknown]'
 
@@ -428,22 +425,6 @@ def CreateService(service_name, project):
       producerProjectId=project,
   )
   client.services.Create(create_request)
-
-
-def GetByteStringFromFingerprint(fingerprint):
-  """Helper function to create a byte string from a SHA fingerprint.
-
-  Args:
-    fingerprint: The fingerprint to transform in the form of
-                 "12:34:56:78:90:...:EF".
-
-  Returns:
-    The fingerprint converted to a byte string (excluding the colons).
-  """
-  if not ValidateFingerprint(fingerprint):
-    raise exceptions.FingerprintError('Invalid fingerprint')
-  byte_tokens = fingerprint.split(':')
-  return str(bytearray([int(b, 16) for b in byte_tokens]))
 
 
 def ValidateFingerprint(fingerprint):

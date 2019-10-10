@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class LevelsUpdateTestGA(accesscontextmanager.Base):
@@ -40,42 +41,35 @@ class LevelsUpdateTestGA(accesscontextmanager.Base):
     request_type = m.AccesscontextmanagerAccessPoliciesAccessLevelsPatchRequest
     self.client.accessPolicies_accessLevels.Patch.Expect(
         request_type(
-            name=level_name,
-            accessLevel=level,
-            updateMask=update_mask
-        ),
+            name=level_name, accessLevel=level, updateMask=update_mask),
         self.messages.Operation(done=False, name='operations/my-op'))
     self._ExpectGetOperation('operations/my-op')
     get_req_type = m.AccesscontextmanagerAccessPoliciesAccessLevelsGetRequest
     self.client.accessPolicies_accessLevels.Get.Expect(
         get_req_type(
-            name='accessPolicies/{}/accessLevels/{}'.format(policy, level_id)
-        ),
+            name='accessPolicies/{}/accessLevels/{}'.format(policy, level_id)),
         level)
 
   def testUpdate_InvalidSpec(self):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(
-        yaml.FileLoadError,
-        r'Failed to load YAML from [not-found]'):
-      self.Run(
-          'access-context-manager levels update my_level --policy my_policy '
-          '    --basic-level-spec not-found')
+        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
+      self.Run('access-context-manager levels update my_level --policy 123 '
+               '    --basic-level-spec not-found')
 
   def testUpdate_MissingRequired(self):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
-      self.Run(
-          'access-context-manager levels update --policy my_policy')
+      self.Run('access-context-manager levels update --policy 123')
 
   def testUpdate(self):
     self.SetUpForTrack(self.track)
     level = self.messages.AccessLevel(title='My Level')
-    self._ExpectPatch('my_level', level, 'my_policy', 'title')
+    self._ExpectPatch('my_level', level, '123', 'title')
 
     results = self.Run(
-        'access-context-manager levels update my_level --policy my_policy '
+        'access-context-manager levels update my_level --policy 123 '
         '     --title "My Level"')
 
     self.assertEqual(results, level)
@@ -83,16 +77,17 @@ class LevelsUpdateTestGA(accesscontextmanager.Base):
   def testUpdate_AllParams(self):
     self.SetUpForTrack(self.track)
     level = self._MakeBasicLevel(
-        None, title='My Level',
+        None,
+        title='My Level',
         combining_function='OR',
         description='Very long description of my level')
     self._ExpectPatch(
-        'my_level', level, 'my_policy',
+        'my_level', level, '123',
         'basic.combiningFunction,basic.conditions,description,title')
     level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
 
     results = self.Run(
-        'access-context-manager levels update my_level --policy my_policy '
+        'access-context-manager levels update my_level --policy 123 '
         '     --title "My Level"'
         '     --combine-function or '
         '     --description "Very long description of my level" '
@@ -102,7 +97,7 @@ class LevelsUpdateTestGA(accesscontextmanager.Base):
 
   def testUpdate_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
-    policy = 'my_acm_policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     level = self.messages.AccessLevel(title='My Level')
     self._ExpectPatch('my_level', level, policy, 'title')
@@ -111,6 +106,15 @@ class LevelsUpdateTestGA(accesscontextmanager.Base):
         'access-context-manager levels update my_level --title "My Level"')
 
     self.assertEqual(results, level)
+
+  def testUpdate_InvalidPolicyArg(self):
+    self.SetUpForTrack(self.track)
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run(
+          'access-context-manager levels update my_level --title "My Level"'
+          ' --policy accessPolicy/123')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class LevelsUpdateTestBeta(LevelsUpdateTestGA):

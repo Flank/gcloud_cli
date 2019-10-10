@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -112,7 +112,8 @@ class Create(base.CreateCommand):
 
     console_io.PromptContinue(
         'This will tag {} with:\n{}'.format(
-            src_name, '\n'.join(str(dest_name) for dest_name in dest_names)),
+            src_name,
+            '\n'.join(six.text_type(dest_name) for dest_name in dest_names)),
         default=True,
         cancel_on_no=True)
     creds = util.CredentialProvider()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,8 +101,10 @@ class IapIamResource(six.with_metaclass(abc.ABCMeta, object)):
   def _GetIamPolicy(self, resource_ref):
     request = self.messages.IapGetIamPolicyRequest(
         resource=resource_ref.RelativeName(),
-        getIamPolicyRequest=self.messages.GetIamPolicyRequest()
-    )
+        getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+            options=self.messages.GetPolicyOptions(
+                requestedPolicyVersion=
+                iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)))
     return self.service.GetIamPolicy(request)
 
   def GetIamPolicy(self):
@@ -111,6 +113,7 @@ class IapIamResource(six.with_metaclass(abc.ABCMeta, object)):
     return self._GetIamPolicy(resource_ref)
 
   def _SetIamPolicy(self, resource_ref, policy):
+    policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
     request = self.messages.IapSetIamPolicyRequest(
         resource=resource_ref.RelativeName(),
         setIamPolicyRequest=self.messages.SetIamPolicyRequest(policy=policy)

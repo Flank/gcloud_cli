@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import textwrap
 from googlecloudsdk.api_lib.container.binauthz import apis
 from googlecloudsdk.api_lib.container.binauthz import attestors
 from googlecloudsdk.api_lib.container.binauthz import containeranalysis
+from googlecloudsdk.api_lib.container.binauthz import containeranalysis_apis as ca_apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.binauthz import flags
 from googlecloudsdk.command_lib.container.binauthz import util as binauthz_command_util
@@ -79,13 +80,15 @@ class List(base.ListCommand):
 
     attestor_ref = args.CONCEPTS.attestor.Parse()
     api_version = apis.GetApiVersion(self.ReleaseTrack())
-    attestor = attestors.Client(api_version).Get(attestor_ref)
+    client = attestors.Client(api_version)
+    attestor = client.Get(attestor_ref)
     # TODO(b/79709480): Add other types of attestors if/when supported.
     note_ref = resources.REGISTRY.ParseResourceId(
         'containeranalysis.projects.notes',
-        attestor.userOwnedDrydockNote.noteReference, {})
+        client.GetNoteAttr(attestor).noteReference, {})
 
-    client = containeranalysis.Client()
+    client = containeranalysis.Client(ca_apis.GetApiVersion(
+        self.ReleaseTrack()))
     return client.YieldAttestations(
         note_ref=note_ref,
         artifact_url=normalized_artifact_url,

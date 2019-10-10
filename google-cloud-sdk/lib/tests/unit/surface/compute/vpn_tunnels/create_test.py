@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -153,14 +153,17 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
     self.assertEqual(resources[0], created_vpn_tunnel)
 
   def testInvocationWithoutPeerAddressFails(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --peer-address: Must be specified.'):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'When creating Classic VPN tunnels, the peer address '
+        'must be specified.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --shared-secret secret-xyz
             --target-vpn-gateway my-gateway
             --region my-region
             --router my-router
+            --peer-gcp-gateway peer-gateways
           """)
 
   def testInvocationWithoutSharedSecretFails(self):
@@ -187,7 +190,8 @@ class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
 
   def testInvocationWithoutAnyVpnGatewayTypeFails(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --target-vpn-gateway: Must be specified.'):
+        'Exactly one of (--target-vpn-gateway | --target-vpn-gateway-region | '
+        + '--vpn-gateway | --vpn-gateway-region) must be specified.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --region my-region
@@ -285,31 +289,6 @@ class ClassicVpnTunnelsCreateBetaTest(ClassicVpnTunnelsCreateGATest):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
-  def testInvocationWithoutAnyVpnGatewayTypeFails(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--target-vpn-gateway | --target-vpn-gateway-region | '
-        + '--vpn-gateway | --vpn-gateway-region) ' + 'must be specified.'):
-      self.Run("""\
-          compute vpn-tunnels create my-tunnel
-            --region my-region
-            --peer-address 71.72.73.74
-            --shared-secret secret-xyz
-          """)
-
-  def testInvocationWithoutPeerAddressFails(self):
-    with self.AssertRaisesExceptionMatches(
-        exceptions.InvalidArgumentException,
-        'When creating Classic VPN tunnels, the peer address '
-        'must be specified.'):
-      self.Run("""\
-          compute vpn-tunnels create my-tunnel
-            --shared-secret secret-xyz
-            --target-vpn-gateway my-gateway
-            --region my-region
-            --router my-router
-            --peer-gcp-gateway peer-gateways
-          """)
-
 
 class ClassicVpnTunnelsCreateAlphaTest(ClassicVpnTunnelsCreateBetaTest):
 
@@ -317,11 +296,11 @@ class ClassicVpnTunnelsCreateAlphaTest(ClassicVpnTunnelsCreateBetaTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
-class HighAvailabilityVpnTunnelsCreateBetaTest(
+class HighAvailabilityVpnTunnelsCreateGaTest(
     vpn_tunnels_test_base.VpnTunnelsTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSimpleCaseWithPeerGcpGateway(self):
     name = 'my-tunnel'
@@ -552,7 +531,7 @@ class HighAvailabilityVpnTunnelsCreateBetaTest(
 
   def testInvocationWithoutInterfaceFails(self):
     with self.AssertRaisesToolExceptionMatches(
-        'Invalid value for [--interface]: When creating High Availability VPN '
+        'Invalid value for [--interface]: When creating Highly Available VPN '
         'tunnels, the VPN gateway interface must be specified using the '
         '--interface flag.'):
       self.Run("""\
@@ -566,7 +545,7 @@ class HighAvailabilityVpnTunnelsCreateBetaTest(
 
   def testInvocationWithoutRouterFails(self):
     with self.AssertRaisesToolExceptionMatches(
-        'Invalid value for [--router]: When creating High Availability VPN '
+        'Invalid value for [--router]: When creating Highly Available VPN '
         'tunnels, a Cloud Router must be specified using the --router flag.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
@@ -580,7 +559,7 @@ class HighAvailabilityVpnTunnelsCreateBetaTest(
   def testInvocationWithRemoteTrafficSelectorFails(self):
     with self.AssertRaisesToolExceptionMatches(
         'Invalid value for [--remote-traffic-selector]: Cannot specify remote '
-        'traffic selector with High Availability VPN tunnels.'):
+        'traffic selector with Highly Available VPN tunnels.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --region my-region
@@ -595,7 +574,7 @@ class HighAvailabilityVpnTunnelsCreateBetaTest(
   def testInvocationWithLocalTrafficSelectorFails(self):
     with self.AssertRaisesToolExceptionMatches(
         'Invalid value for [--local-traffic-selector]: Cannot specify local '
-        'traffic selector with High Availability VPN tunnels.'):
+        'traffic selector with Highly Available VPN tunnels.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --region my-region
@@ -610,7 +589,7 @@ class HighAvailabilityVpnTunnelsCreateBetaTest(
   def testInvocationWithoutPeerAddressFails(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'When creating High Availability VPN tunnels, either '
+        'When creating Highly Available VPN tunnels, either '
         '--peer-gcp-gateway or --peer-external-gateway must be specified.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
@@ -621,6 +600,13 @@ class HighAvailabilityVpnTunnelsCreateBetaTest(
             --region my-region
             --router my-router
           """)
+
+
+class HighAvailabilityVpnTunnelsCreateBetaTest(
+    HighAvailabilityVpnTunnelsCreateGaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class HighAvailabilityVpnTunnelsCreateAlphaTest(

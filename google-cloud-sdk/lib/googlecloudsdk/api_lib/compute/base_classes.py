@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -287,12 +287,35 @@ class GlobalLister(BaseLister):
 
 def GetGlobalListerHelp(resource):
   """Returns the detailed help dict for a global list command."""
-  detailed_help = {
-      'brief': 'List Google Compute Engine ' + resource,
-      'DESCRIPTION': """\
+  if resource == 'routes':
+    detailed_help = {
+        'brief': 'List non-dynamic Google Compute Engine ' + resource,
+        'DESCRIPTION': """\
+        *{{command}}* displays all custom static, subnet, and peering {0} in
+        VPC networks in a project.
+
+        To list custom dynamic routes learned by Cloud Routers, query the
+        status of the Cloud Router that learned the route using
+        `gcloud compute routers get-status`. For more details, refer
+        to https://cloud.google.com/vpc/docs/using-routes#listingroutes.
+        """.format(resource),
+        'EXAMPLES': """\
+        To list all non-dynamic {0} in a project in table form, run:
+
+            $ {{command}}
+
+       To list the URIs of all non-dynamic {0} in a project, run:
+
+            $ {{command}} --uri
+       """.format(resource)
+    }
+  else:
+    detailed_help = {
+        'brief': 'List Google Compute Engine ' + resource,
+        'DESCRIPTION': """\
 *{{command}}* displays all Google Compute Engine {0} in a project.
 """.format(resource),
-      'EXAMPLES': """\
+        'EXAMPLES': """\
 To list all {0} in a project in table form, run:
 
   $ {{command}}
@@ -301,7 +324,7 @@ To list the URIs of all {0} in a project, run:
 
   $ {{command}} --uri
 """.format(resource)
-  }
+    }
   if resource == 'images':
     detailed_help['EXAMPLES'] += """
 To list the names of {0} older than one year from oldest to newest

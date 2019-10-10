@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,12 @@ from tests.lib import test_case
 from tests.lib.surface.container.memberships import base
 
 
-class DeleteTestAlpha(base.MembershipsTestBase):
-  """gcloud Alpha track using gkehub v1 API."""
+class DeleteTestBeta(base.MembershipsTestBase):
+  """gcloud Beta track using GKE Hub v1 API."""
 
+  # TODO(b/116715821): add more negative tests.
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _ExpectDeleteCalls(self, membership, asynchronous=False):
     # First time still pending.
@@ -46,6 +47,13 @@ class DeleteTestAlpha(base.MembershipsTestBase):
 
     self.WriteInput('y')
     self._RunMembershipCommand(['delete', self.MEMBERSHIP_NAME])
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+  """gcloud Alpha track using GKE Hub v1 API."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

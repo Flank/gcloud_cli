@@ -8,17 +8,21 @@
     api_version: v1
     collection: accesscontextmanager.accessPolicies.servicePerimeters
     modify_request_hooks:
+    - googlecloudsdk.command_lib.accesscontextmanager.policies:ValidateAccessPolicyArg
     - googlecloudsdk.command_lib.accesscontextmanager.perimeters:AddAccessLevelsGA
     - googlecloudsdk.command_lib.util.hooks.request_modifiers:SetFieldFromRelativeName:api_field=servicePerimeter.name
     ALPHA:
       api_version: v1beta
       modify_request_hooks:
+      - googlecloudsdk.command_lib.accesscontextmanager.policies:ValidateAccessPolicyArg
       - googlecloudsdk.command_lib.accesscontextmanager.perimeters:AddImplicitUnrestrictedServiceWildcard
       - googlecloudsdk.command_lib.accesscontextmanager.perimeters:AddAccessLevelsBeta
+      - googlecloudsdk.command_lib.accesscontextmanager.perimeters:AddVpcServiceRestrictionBeta
       - googlecloudsdk.command_lib.util.hooks.request_modifiers:SetFieldFromRelativeName:api_field=servicePerimeter.name
     BETA:
       api_version: v1beta
       modify_request_hooks:
+      - googlecloudsdk.command_lib.accesscontextmanager.policies:ValidateAccessPolicyArg
       - googlecloudsdk.command_lib.accesscontextmanager.perimeters:AddImplicitUnrestrictedServiceWildcard
       - googlecloudsdk.command_lib.accesscontextmanager.perimeters:AddAccessLevelsBeta
       - googlecloudsdk.command_lib.util.hooks.request_modifiers:SetFieldFromRelativeName:api_field=servicePerimeter.name
@@ -85,3 +89,21 @@
           it also belongs to a regular service perimeter). Both restricted and
           unrestricted service lists, as well as access level lists,
           must be empty.
+
+    - group:
+        release_tracks: [ALPHA]
+        params:
+        - api_field: servicePerimeter.status.vpcServiceRestriction.allowedServices
+          arg_name: vpc-allowed-services
+          metavar: VPC_SERVICE
+          required: false
+          help_text: |
+            Comma-separated list of APIs accessible from within the Service
+            Perimeter. Requires vpc-service-restriction be enabled.
+        - api_field: servicePerimeter.status.vpcServiceRestriction.enableRestriction
+          arg_name: enable-vpc-service-restriction
+          required: false
+          type: bool
+          help_text: |
+            Whether to restrict API calls within the perimeter to those in the
+            vpc-allowed-services list.

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class RoutesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
                 network=('v1/projects/my-project/'
                          'network/default'),
                 nextHopPeering=('peering-1'),
-                selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                           'my-project/global/routes/route-5')),
             core_apis.GetMessagesModule('compute', 'v1').Route(
                 destRange='10.10.0.0/16',
@@ -54,7 +54,7 @@ class RoutesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
                 network=('v1/projects/my-project/'
                          'network/default'),
                 nextHopNetwork=('network-1'),
-                selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                           'my-project/global/routes/route-6')),
 
         ]))
@@ -93,12 +93,12 @@ class RoutesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         batch_url=self.batch_url,
         errors=[])
     self.AssertOutputEquals("""\
-https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-1
-https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-2
-https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-3
-https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-4
-https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-5
-https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-6
+https://compute.googleapis.com/compute/v1/projects/my-project/global/routes/route-1
+https://compute.googleapis.com/compute/v1/projects/my-project/global/routes/route-2
+https://compute.googleapis.com/compute/v1/projects/my-project/global/routes/route-3
+https://compute.googleapis.com/compute/v1/projects/my-project/global/routes/route-4
+https://compute.googleapis.com/compute/v1/projects/my-project/global/routes/route-5
+https://compute.googleapis.com/compute/v1/projects/my-project/global/routes/route-6
 """, normalize_space=True)
 
   def testRoutesCompleter(self):

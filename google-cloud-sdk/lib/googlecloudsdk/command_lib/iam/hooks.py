@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from googlecloudsdk.api_lib.iam import util
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions as gcloud_exceptions
 from googlecloudsdk.command_lib.iam import iam_util
+from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import log
 
 
@@ -58,7 +59,7 @@ def _ConditionFileFormatException(filename):
 def ParseConditionFromFile(condition_from_file):
   """Read condition from YAML or JSON file."""
 
-  condition = arg_parsers.BufferedFileInput()(condition_from_file)
+  condition = arg_parsers.FileContents()(condition_from_file)
   condition_dict = iam_util.ParseYamlOrJsonCondition(
       condition, _ConditionFileFormatException(condition_from_file))
   return condition_dict
@@ -99,6 +100,45 @@ def ValidateUpdateFieldMask(ref, unused_args, request):
   return request
 
 
+def UseMaxRequestedPolicyVersion(api_field):
+  """Set requestedPolicyVersion to max supported in GetIamPolicy request."""
+  def Process(ref, args, request):
+    del ref, args  # Unused.
+
+    arg_utils.SetFieldInMessage(
+        request, api_field, iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)
+    return request
+  return Process
+
+
+def AddVersionToUpdateMaskIfNotPresent(update_mask_path):
+  """Add ',version' to update_mask if it is not present."""
+  def Process(ref, args, request):
+    """The implementation of Process for the hook."""
+    del ref, args  # Unused.
+
+    update_mask = arg_utils.GetFieldValueFromMessage(request, update_mask_path)
+    if 'version' not in update_mask:
+      if update_mask is None:
+        update_mask = 'version'
+      else:
+        update_mask += ',version'
+
+    arg_utils.SetFieldInMessage(
+        request, update_mask_path, update_mask)
+    return request
+  return Process
+
+
+def CreateFullServiceAccountNameFromId(account_id):
+  if not account_id.isdigit():
+    raise gcloud_exceptions.InvalidArgumentException(
+        'account_id',
+        'Account unique ID should be a number. Please double check your input and try again.'
+    )
+  return 'projects/-/serviceAccounts/' + account_id
+
+
 def GeneratePublicKeyDataFromFile(path):
   """Generate public key data from a path.
 
@@ -112,7 +152,7 @@ def GeneratePublicKeyDataFromFile(path):
     A public key encoded using the UTF-8 charset.
   """
   try:
-    public_key_data = arg_parsers.BufferedFileInput()(path).strip()
+    public_key_data = arg_parsers.FileContents()(path).strip()
   except arg_parsers.ArgumentTypeError as e:
     raise gcloud_exceptions.InvalidArgumentException(
         'public_key_file',

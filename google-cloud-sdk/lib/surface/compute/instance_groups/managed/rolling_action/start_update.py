@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,11 +113,12 @@ class StartUpdate(base.Command):
                                             client.messages))
     if args.canary_version:
       versions.append(
-          update_instances_utils.ParseVersion(
-              igm_ref.project, '--canary-version', args.canary_version,
-              resources, client.messages))
+          update_instances_utils.ParseVersion(igm_ref.project,
+                                              '--canary-version',
+                                              args.canary_version, resources,
+                                              client.messages))
     managed_instance_groups_utils.ValidateVersions(igm_info, versions,
-                                                   args.force)
+                                                   resources, args.force)
 
     # TODO(b/36049787): Decide what we should do when two versions have the same
     #              instance template (this can happen with canary restart

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,13 +48,13 @@ class ListTest(router_test_base.RouterTestBase):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/{0}/projects/'
+                ('https://compute.googleapis.com/compute/{0}/projects/'
                  'fake-project/regions/us-central1/addresses/address-1').format(
                      self.version),
-                ('https://www.googleapis.com/compute/{0}/projects/'
+                ('https://compute.googleapis.com/compute/{0}/projects/'
                  'fake-project/regions/us-central1/addresses/address-2').format(
                      self.version),
-                ('https://www.googleapis.com/compute/{0}/projects/'
+                ('https://compute.googleapis.com/compute/{0}/projects/'
                  'fake-project/regions/us-central1/addresses/address-3').format(
                      self.version),
             ],

@@ -81,7 +81,7 @@ FLAGS
           is a Windows image.
 
     GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, SECURE_BOOT,
-    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
+    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.

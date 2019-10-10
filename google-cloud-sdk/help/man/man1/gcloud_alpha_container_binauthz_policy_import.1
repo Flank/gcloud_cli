@@ -19,11 +19,11 @@ gcloud alpha container binauthz policy import \- import a Binary Authorization p
 
 \fB(ALPHA)\fR This command accepts a description of the desired policy in the
 form of a YAML\-formatted file. A representation of the current policy can be
-retrieved using the $ gcloud alpha container binauthz policy describe command.
-One method of modifying the policy is to run gcloud alpha container binauthz
-policy export, dump the contents to a file, modify them to reflect the desired
-end\-state, and provide this modifyied file to gcloud alpha container binauthz
-policy import.
+retrieved using the $ gcloud alpha container binauthz policy export command. One
+method of modifying the policy is to run \f5$ gcloud alpha container binauthz
+policy export\fR, dump the contents to a file, modify the policy file to reflect
+the desired new policy, and provide this modified file to \f5$ gcloud alpha
+container binauthz policy import\fR.
 
 
 
@@ -59,15 +59,14 @@ help\fR for details.
 
 
 
-.SH "EXAMPLE"
+.SH "EXAMPLES"
 
-One way of updating the current project's policy is to run:
+To update the current project's policy:
 
 .RS 2m
 $ gcloud alpha container binauthz policy export > my_policy.yaml
 $ edit my_policy.yaml
-$ gcloud alpha container binauthz policy import \e
-  \-\-policy\-file=my_policy.yaml
+$ gcloud alpha container binauthz policy import my_policy.yaml
 .RE
 
 
@@ -76,11 +75,11 @@ $ gcloud alpha container binauthz policy import \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud container binauthz policy import
 $ gcloud beta container binauthz policy import
 .RE
 

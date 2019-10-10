@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
     self.old_int_handler = signal.getsignal(signal.SIGINT)
     self.report_error_mock = self.StartObjectPatch(
         crash_handling, 'ReportError')
-    properties.VALUES.core.allow_py3.Set(True)
 
   def TearDown(self):
     signal.signal(signal.SIGINT, self.old_int_handler)

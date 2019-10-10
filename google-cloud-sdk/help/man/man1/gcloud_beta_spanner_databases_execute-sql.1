@@ -11,7 +11,7 @@ gcloud beta spanner databases execute\-sql \- executes a SQL query against a Clo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta spanner databases execute\-sql\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-sql\fR=\fISQL\fR [\fB\-\-enable\-partitioned\-dml\fR] [\fB\-\-query\-mode\fR=\fIQUERY_MODE\fR;\ default="NORMAL"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta spanner databases execute\-sql\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-sql\fR=\fISQL\fR [\fB\-\-enable\-partitioned\-dml\fR] [\fB\-\-query\-mode\fR=\fIQUERY_MODE\fR;\ default="NORMAL"] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -88,6 +88,11 @@ rows.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR; default="10m"
+Maximum time to wait for the SQL query to complete. See $ gcloud topic datetimes
+for information on duration formats.
 
 
 .RE

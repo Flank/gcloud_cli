@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,17 +69,8 @@ class Import(base.Command):
         help='Path to the MySQL dump file in Google Cloud Storage from which'
         ' the import is made. The URI is in the form gs://bucketName/fileName.'
         ' Compressed gzip files (.gz) are also supported.')
-    parser.add_argument(
-        '--async',
-        action='store_true',
-        help='Do not wait for the operation to complete.')
-    parser.add_argument(
-        '--database',
-        '-d',
-        required=False,
-        help='The database (for example, guestbook) to which the import is'
-        ' made. If not set, it is assumed that the database is specified in'
-        ' the file to be imported.')
+    base.ASYNC_FLAG.AddToParser(parser)
+    flags.AddDatabase(parser, flags.DEFAULT_DATABASE_IMPORT_HELP_TEXT)
 
   def Run(self, args):
     """Imports data into a Cloud SQL instance from Google Cloud Storage.
@@ -125,7 +116,7 @@ class Import(base.Command):
         operation=result_operation.name,
         project=instance_ref.project)
 
-    if args.async:
+    if args.async_:
       return sql_client.operations.Get(
           sql_messages.SqlOperationsGetRequest(
               project=operation_ref.project, operation=operation_ref.operation))

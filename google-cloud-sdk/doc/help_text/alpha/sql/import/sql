@@ -24,13 +24,14 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --database=DATABASE, -d DATABASE
-        Database (for example, guestbook) to which the import is made. If not
-        set, it is assumed that the database is specified in the file to be
-        imported.
+        Database to which the import is made. If not set, it is assumed that
+        the database is specified in the file to be imported. If your SQL dump
+        file includes a database statement, it will override the database set
+        in this flag.
 
      --user=USER
         PostgreSQL user for this import operation.
@@ -52,9 +53,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud sql import sql
         $ gcloud beta sql import sql

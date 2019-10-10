@@ -1,5 +1,5 @@
 title: fhir-stores crud test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -14,7 +14,7 @@ summary:
       name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store
 - execute:
   - command: healthcare fhir-stores update my-store --location us-central1 --dataset
-      my-dataset --pubsub-topic my-topic
+      my-dataset --pubsub-topic projects/fake-project/topics/my-topic
   - stderr: |
       Updated fhirStore [my-store].
   - stdout: |
@@ -22,16 +22,16 @@ summary:
       disableResourceVersioning: false
       enableUpdateCreate: false
       notificationConfig:
-        pubsubTopic: my-topic
+        pubsubTopic: projects/fake-project/topics/my-topic
 - execute:
   - command: healthcare fhir-stores list --location us-central1 --dataset my-dataset
   - stdout: |
       ID          LOCATION     REF_INT  RES_VER  UPDATE_CREATE  TOPIC
-      my-store-1  us-central1  False    False    False          my-topic-1
-      my-store-2  us-central1  False    False    False          my-topic-2
-      my-store-3  us-central1  False    False    False          my-topic-3
-      my-store-4  us-central1  False    False    False          my-topic-4
-      my-store-5  us-central1  False    False    False          my-topic-5
+      my-store-1  us-central1  False    False    False          projects/fake-project/topics/my-topic-1
+      my-store-2  us-central1  False    False    False          projects/fake-project/topics/my-topic-2
+      my-store-3  us-central1  False    False    False          projects/fake-project/topics/my-topic-3
+      my-store-4  us-central1  False    False    False          projects/fake-project/topics/my-topic-4
+      my-store-5  us-central1  False    False    False          projects/fake-project/topics/my-topic-5
 - execute:
   - command: |
       healthcare fhir-stores get-iam-policy my-store --location us-central1 --dataset my-dataset
@@ -46,13 +46,18 @@ summary:
   - stderr: |
       Deleted fhirStore [my-store].
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: healthcare fhir-stores create my-store --location us-central1 --dataset
       my-dataset
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores?alt=json&fhirStoreId=my-store
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores?alt=json&fhirStoreId=my-store
           method: POST
           body: |
             {
@@ -61,7 +66,7 @@ actions:
               "fhirStore" : {
                 "enableUpdateCreate": false,
                 "notificationConfig": {
-                  "pubsubTopic": "my-topic"
+                  "pubsubTopic": "projects/fake-project/topics/my-topic"
                 },
                 "disableReferentialIntegrity": false,
                 "disableResourceVersioning": false
@@ -75,7 +80,7 @@ actions:
               "name": "projects/fake-project/locations/us-central/datasets/my-dataset/fhirStores/my-store",
               "enableUpdateCreate": false,
               "notificationConfig": {
-                "pubsubTopic": "my-topic"
+                "pubsubTopic": "projects/fake-project/topics/my-topic"
               },
               "disableReferentialIntegrity": false,
               "disableResourceVersioning": false
@@ -90,7 +95,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store?alt=json
           method: GET
           body: null
         return_response:
@@ -103,24 +108,24 @@ actions:
         code: 0
 - execute_command:
     command: healthcare fhir-stores update my-store --location us-central1 --dataset
-      my-dataset --pubsub-topic my-topic
+      my-dataset --pubsub-topic projects/fake-project/topics/my-topic
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store?alt=json&updateMask=notificationConfig.pubsubTopic
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store?alt=json&updateMask=notificationConfig.pubsubTopic
           method: PATCH
           body:
             json:
               enableUpdateCreate: false
               notificationConfig:
-                pubsubTopic: my-topic
+                pubsubTopic: projects/fake-project/topics/my-topic
         return_response:
           headers:
             status: '200'
           body:
             enableUpdateCreate: false
             notificationConfig:
-              pubsubTopic: my-topic
+              pubsubTopic: projects/fake-project/topics/my-topic
             disableReferentialIntegrity: false
             disableResourceVersioning: false
     - expect_stderr: "Updated fhirStore [my-store].\n"
@@ -129,7 +134,7 @@ actions:
         disableResourceVersioning: false
         enableUpdateCreate: false
         notificationConfig:
-          pubsubTopic: my-topic
+          pubsubTopic: projects/fake-project/topics/my-topic
 
     - expect_exit:
         code: 0
@@ -138,7 +143,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores?alt=json
           method: GET
           body: null
         return_response:
@@ -149,40 +154,40 @@ actions:
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store-1
               enableUpdateCreate: false
               notificationConfig:
-                pubsubTopic: my-topic-1
+                pubsubTopic: projects/fake-project/topics/my-topic-1
               disableReferentialIntegrity: false
               disableResourceVersioning: false
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store-2
               enableUpdateCreate: false
               notificationConfig:
-                pubsubTopic: my-topic-2
+                pubsubTopic: projects/fake-project/topics/my-topic-2
               disableReferentialIntegrity: false
               disableResourceVersioning: false
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store-3
               enableUpdateCreate: false
               notificationConfig:
-                pubsubTopic: my-topic-3
+                pubsubTopic: projects/fake-project/topics/my-topic-3
               disableReferentialIntegrity: false
               disableResourceVersioning: false
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store-4
               enableUpdateCreate: false
               notificationConfig:
-                pubsubTopic: my-topic-4
+                pubsubTopic: projects/fake-project/topics/my-topic-4
               disableReferentialIntegrity: false
               disableResourceVersioning: false
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store-5
               enableUpdateCreate: false
               notificationConfig:
-                pubsubTopic: my-topic-5
+                pubsubTopic: projects/fake-project/topics/my-topic-5
               disableReferentialIntegrity: false
               disableResourceVersioning: false
     - expect_stdout: |
         ID          LOCATION     REF_INT  RES_VER  UPDATE_CREATE  TOPIC
-        my-store-1  us-central1  False    False    False          my-topic-1
-        my-store-2  us-central1  False    False    False          my-topic-2
-        my-store-3  us-central1  False    False    False          my-topic-3
-        my-store-4  us-central1  False    False    False          my-topic-4
-        my-store-5  us-central1  False    False    False          my-topic-5
+        my-store-1  us-central1  False    False    False          projects/fake-project/topics/my-topic-1
+        my-store-2  us-central1  False    False    False          projects/fake-project/topics/my-topic-2
+        my-store-3  us-central1  False    False    False          projects/fake-project/topics/my-topic-3
+        my-store-4  us-central1  False    False    False          projects/fake-project/topics/my-topic-4
+        my-store-5  us-central1  False    False    False          projects/fake-project/topics/my-topic-5
     - expect_exit:
         code: 0
 - execute_command:
@@ -191,7 +196,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -215,7 +220,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store?alt=json
           method: DELETE
           body: null
         return_response:

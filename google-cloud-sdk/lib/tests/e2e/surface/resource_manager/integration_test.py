@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,29 +28,30 @@ messages = folders.FoldersMessages()
 
 FOLDER_ACTIVE = messages.Folder.LifecycleStateValueValuesEnum.ACTIVE
 
-TEST_ORGANIZATION_ID = '961309089256'
-TEST_TOP_LEVEL_FOLDER_ID = '79536718298'
+
+TEST_ORGANIZATION_ID = '1054311078602'  # cloudsdktest.joonix.net
+TEST_TOP_LEVEL_FOLDER_ID = '1095953820273'  # Resource Manager Test Folder
 TEST_TOP_LEVEL_FOLDER_NAME = 'folders/{0}'.format(TEST_TOP_LEVEL_FOLDER_ID)
 
 TEST_TOP_LEVEL_FOLDER = messages.Folder(
     name=TEST_TOP_LEVEL_FOLDER_NAME,
     parent='organizations/{0}'.format(TEST_ORGANIZATION_ID),
-    displayName='Elysium gCloud Testing',
+    displayName='Resource Manager Test Folder',
     lifecycleState=FOLDER_ACTIVE,
-    createTime='2016-10-21T20:44:47.207Z')
+    createTime='2019-08-30T16:10:52.243Z')
 
 TEST_SUBFOLDER_A = messages.Folder(
-    createTime='2016-10-24T18:36:34.280Z',
+    createTime='2019-08-30T16:26:57.750Z',
     displayName='Folder A',
     lifecycleState=FOLDER_ACTIVE,
-    name='folders/309449917453',
+    name='folders/855977396925',
     parent=TEST_TOP_LEVEL_FOLDER_NAME)
 
 TEST_SUBFOLDER_B = messages.Folder(
-    createTime='2016-10-24T18:36:51.980Z',
+    createTime='2019-08-30T16:27:18.131Z',
     displayName='Folder B',
     lifecycleState=FOLDER_ACTIVE,
-    name='folders/740752656255',
+    name='folders/73239871661',
     parent=TEST_TOP_LEVEL_FOLDER_NAME)
 
 

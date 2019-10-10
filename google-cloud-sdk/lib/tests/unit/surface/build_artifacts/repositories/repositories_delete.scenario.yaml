@@ -1,0 +1,88 @@
+title: build-artifacts repositories delete
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: build-artifacts repositories delete my-repo --project=my-project --async
+  - prompt:
+    - message: You are about to delete repository [my-repo]
+    - input: y
+  - stderr: |
+      Delete request issued for: [my-repo]
+      Check operation [$$operation$$] for status.
+- execute:
+  - command: build-artifacts repositories delete my-repo --project=my-project
+  - prompt:
+    - message: You are about to delete repository [my-repo]
+    - input: y
+  - stderr: |
+      Delete request issued for: [my-repo]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted repository [my-repo].
+actions:
+- execute_command:
+    command: build-artifacts repositories delete my-repo --project=my-project --async
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete repository [my-repo]
+        user_input: y
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://buildartifacts.googleapis.com/v1alpha2/projects/my-project/repositories/my-repo?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Delete request issued for: [my-repo]
+        Check operation [$$operation$$] for status.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: build-artifacts repositories delete my-repo --project=my-project
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete repository [my-repo]
+        user_input: y
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://buildartifacts.googleapis.com/v1alpha2/projects/my-project/repositories/my-repo?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "projects/my-project/operations/e5e345ac-712c-4a5b-be92-fb0c1ffa5c38",
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stderr: |
+        Delete request issued for: [my-repo]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted repository [my-repo].
+    - expect_exit:
+        code: 0

@@ -9,7 +9,7 @@ summary:
     - message: Suspending instance(s) z4
     - status: SUCCESS
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4].
+      Updated [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4].
 actions:
 - execute_command:
     command: compute instances suspend z4 --zone us-east1-b --discard-local-ssd
@@ -17,7 +17,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4/suspend?alt=json&discardLocalSsd=True
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4/suspend?alt=json&discardLocalSsd=True
           method: POST
           headers: {}
           body: null
@@ -31,17 +31,17 @@ actions:
             name: operation-1510689885661-55df6e60027e4-35d3bf81-313121a2
             operationType: suspend
             progress: 0
-            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689885661-55df6e60027e4-35d3bf81-313121a2
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/operations/operation-1510689885661-55df6e60027e4-35d3bf81-313121a2
             status: PENDING
             targetId: '6074391859779007706'
-            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4
-            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b
+            targetLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4
+            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b
     - expect_progress_tracker:
         message: Suspending instance(s) z4
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4?alt=json
           method: GET
           headers: {}
           body: null
@@ -62,14 +62,14 @@ actions:
               interface: SCSI
               kind: compute#attachedDisk
               licenses:
-              - https://www.googleapis.com/compute/alpha/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              - https://compute.googleapis.com/compute/alpha/projects/bct-staging-functional/global/licenses/debian-9-stretch
               mode: READ_WRITE
-              source: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/disks/z4
+              source: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/disks/z4
               type: PERSISTENT
             id: '6074391859779007706'
             kind: compute#instance
             labelFingerprint: 42WmSpB8rSM=
-            machineType: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
             metadata:
               fingerprint: Tewg-kYB2-A=
               kind: compute#metadata
@@ -83,13 +83,13 @@ actions:
               fingerprint: UfmhqKtJ6fg=
               kind: compute#networkInterface
               name: nic0
-              network: https://www.googleapis.com/compute/alpha/projects/fake-project/global/networks/default
+              network: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/networks/default
               networkIP: 10.240.0.124
             scheduling:
               automaticRestart: true
               onHostMaintenance: MIGRATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4
             serviceAccounts:
             - email: 341306109951-compute@developer.gserviceaccount.com
               scopes:
@@ -104,9 +104,9 @@ actions:
             status: SUSPENDED
             tags:
               fingerprint: 42WmSpB8rSM=
-            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b
+            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b
 
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4].
+        Updated [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4].
     - expect_exit:
         code: 0

@@ -11,7 +11,7 @@ gcloud alpha run services get\-iam\-policy \- get the IAM policy for a Cloud Run
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run services get\-iam\-policy\fR (\fISERVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run services get\-iam\-policy\fR (\fISERVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -45,10 +45,41 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Cloud Run region
+The Cloud Run region.
 
 
 .RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-platform\fR=\fIPLATFORM\fR
+Target platform for running commands. \fIPLATFORM\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBgke\fR
+Cloud Run on Google Kubernetes Engine. This platform is not supported by this
+command.
+
+.TP 2m
+\fBkubernetes\fR
+Use a Knative\-compatible kubernetes cluster. This platform is not supported by
+this command.
+
+.TP 2m
+\fBmanaged\fR
+Fully managed version of Cloud Run. Use with the \f5\-\-region\fR flag or set
+the [run/region] property to specify a Cloud Run region.
+
+.RE
+.sp
+
+
+
 .RE
 .sp
 
@@ -120,9 +151,8 @@ $ gcloud alpha run services get\-iam\-policy \-\-region=us\-central1 \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
 
 .RS 2m
 $ gcloud beta run services get\-iam\-policy

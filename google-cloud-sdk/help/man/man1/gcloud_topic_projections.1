@@ -719,6 +719,33 @@ Applies foo() to each item in xyz[] for all items in abc[].
 Remove null values from the resource list.
 
 .TP 2m
+\fBregex\fR(expression, does_match, nomatch="")
+Returns does_match or r itself if r matches expression, nomatch otherwise.
+
+The arguments are:
+
+.RS 2m
+.TP 2m
+\fB\f5expression\fR\fR
+expression to apply to r.
+.RE
+.sp
+.RS 2m
+.TP 2m
+\fB\f5does_match\fR\fR
+If the string matches expression then return \fIdoes_match\fR otherwise return
+the string itself if \fIdoes_match\fR is not defined.
+.RE
+.sp
+.RS 2m
+.TP 2m
+\fB\f5nomatch\fR\fR
+Returns this value if the string does not match expression.
+.RE
+.sp
+
+
+.TP 2m
 \fBresolution\fR(undefined="", transpose=false)
 Formats a human readable XY resolution.
 

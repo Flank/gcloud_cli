@@ -1,31 +1,31 @@
 NAME
-    gcloud beta compute images import - import an image into Google Compute
-        Engine
+    gcloud beta compute images import - import an image into Compute Engine
 
 SYNOPSIS
     gcloud beta compute images import IMAGE_NAME (--data-disk | --os=OS)
         (--source-file=SOURCE_FILE | --source-image=SOURCE_IMAGE) [--async]
-        [--no-guest-environment] [--log-location=LOG_LOCATION]
-        [--network=NETWORK] [--subnet=SUBNET] [--timeout=TIMEOUT; default="2h"]
-        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--family=FAMILY] [--no-guest-environment]
+        [--log-location=LOG_LOCATION] [--network=NETWORK]
+        [--storage-location=STORAGE_LOCATION] [--subnet=SUBNET]
+        [--timeout=TIMEOUT; default="2h"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute images import imports Virtual Disk images, such
-    as VMWare VMDK files and VHD files, into Google Compute Engine.
+    as VMWare VMDK files and VHD files, into Compute Engine.
 
-    Importing images involves 3 steps:
-      o Upload the virtual disk file to Google Cloud Storage.
-      o Import the image to Google Compute Engine.
+    Importing images involves three steps:
+      o Upload the virtual disk file to Cloud Storage.
+      o Import the image to Compute Engine.
       o Translate the image to make a bootable image.
-    This command will perform all three of these steps as necessary, depending
-    on the input arguments specified by the user.
+    This command performs all three of these steps as required, depending on
+    the input arguments specified.
 
     This command uses the --os flag to choose the appropriate translation. You
     can omit the translation step using the --data-disk flag.
 
-    If you exported your disk from Google Compute Engine then you do not need
-    to re-import it. Instead, use the create command to create further images
-    from it.
+    If you exported your disk from Compute Engine then you don't need to
+    re-import it. Instead, use gcloud beta compute images create to create more
+    images from the disk.
 
     Files stored on Cloud Storage and images in Compute Engine incur charges.
     See
@@ -43,18 +43,19 @@ REQUIRED FLAGS
           the disk without making it bootable or installing Google tools on it.
 
        --os=OS
-          Specifies the OS of the image being imported. OS must be one of:
+          Specifies the OS of the disk image being imported. OS must be one of:
           centos-6, centos-7, debian-8, debian-9, rhel-6, rhel-6-byol, rhel-7,
           rhel-7-byol, ubuntu-1404, ubuntu-1604, windows-10-byol,
           windows-2008r2, windows-2008r2-byol, windows-2012, windows-2012-byol,
           windows-2012r2, windows-2012r2-byol, windows-2016, windows-2016-byol,
-          windows-7-byol.
+          windows-2019, windows-2019-byol, windows-7-byol,
+          windows-8-1-x64-byol.
 
      Exactly one of these must be specified:
 
        --source-file=SOURCE_FILE
-          A local file, or the Google Cloud Storage URI of the virtual disk
-          file to import. For example: gs://my-bucket/my-image.vmdk or
+          A local file, or the Cloud Storage URI of the virtual disk file to
+          import. For example: gs://my-bucket/my-image.vmdk or
           ./my-local-image.vmdk
 
        --source-image=SOURCE_IMAGE
@@ -62,22 +63,34 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+     --description=DESCRIPTION
+        Description to set for the imported image.
+
+     --family=FAMILY
+        Family to set for the imported image.
 
      --guest-environment
-        Google Guest Environment will be installed on the image. Enabled by
-        default, use --no-guest-environment to disable.
+        Installs the guest environment on the image. See
+        https://cloud.google.com/compute/docs/images/guest-environment. Enabled
+        by default, use --no-guest-environment to disable.
 
      --log-location=LOG_LOCATION
-        Directory in Google Cloud Storage to hold build logs. If not set,
-        gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
-        created and used.
+        Directory in Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ is created
+        and used.
 
      --network=NETWORK
         Name of the network in your project to use for the image import. The
-        network must have access to Google Cloud Storage. If not specified, the
+        network must have access to Cloud Storage. If not specified, the
         network named default is used.
+
+     --storage-location=STORAGE_LOCATION
+        Cloud Storage location, either regional or multi-regional, where image
+        content is to be stored. If absent, the multi-region location closest
+        to the source is chosen automatically.
 
      --subnet=SUBNET
         Name of the subnetwork in your project to use for the image import. If
@@ -88,9 +101,9 @@ OPTIONAL FLAGS
         is specified.
 
      --timeout=TIMEOUT; default="2h"
-        Maximum time a build can last before it is failed as "TIMEOUT". For
-        example, specifying 2h will fail the process after 2 hours. See $
-        gcloud topic datetimes for information on duration formats.
+        Maximum time a build can last before it fails as "TIMEOUT". For
+        example, specifying 2h fails the process after 2 hours. See $ gcloud
+        topic datetimes for information about duration formats.
 
      --zone=ZONE
         Zone of the image to import. The zone in which to do the work of
@@ -103,6 +116,17 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To import a centos-7 VMDK file, run:
+
+        $ gcloud beta compute images import myimage-name --os=centos-7 \
+            --source-file=mysourcefile
+
+    To import a data disk without operating system, run:
+
+        $ gcloud beta compute images import myimage-name --data-disk \
+            --source-file=mysourcefile
 
 NOTES
     This command is currently in BETA and may change without notice. These

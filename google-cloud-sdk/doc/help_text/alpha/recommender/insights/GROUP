@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha recommender insights - manage insights for Cloud
+        recommendations
+
+SYNOPSIS
+    gcloud alpha recommender insights COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage insights for Cloud recommendations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe an insight.
+
+     list
+        (ALPHA) List insights for a Cloud project.
+
+     mark-accepted
+        (ALPHA) Mark an insight's state as ACCEPTED. Can be applied to insights
+        in ACTIVE or ACCEPTED state.
+
+     mark-active
+        (ALPHA) Mark an insight's state as ACTIVE. Can be applied to insights
+        in DISMISSED state.
+
+     mark-dismissed
+        (ALPHA) Mark an insight's state as DISMISSED. Can be applied to
+        insights in ACTIVE state.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class BackendServicesSetSecurityPolicyTest(test_base.BaseTest):
               backendService='my-backend-service',
               project='my-project',
               securityPolicyReference=messages.SecurityPolicyReference(
-                  securityPolicy='https://www.googleapis.com/compute/alpha/'
+                  securityPolicy='https://compute.googleapis.com/compute/alpha/'
                   'projects/my-project/global/securityPolicies/my-policy')))],
     )
 
@@ -78,7 +78,7 @@ class BackendServicesSetSecurityPolicyTest(test_base.BaseTest):
 
     self.Run("""
         compute backend-services set-security-policy my-backend-service
-          --security-policy https://www.googleapis.com/compute/alpha/projects/my-project/global/securityPolicies/my-policy
+          --security-policy https://compute.googleapis.com/compute/alpha/projects/my-project/global/securityPolicies/my-policy
           --global
         """)
 
@@ -89,7 +89,7 @@ class BackendServicesSetSecurityPolicyTest(test_base.BaseTest):
               backendService='my-backend-service',
               project='my-project',
               securityPolicyReference=messages.SecurityPolicyReference(
-                  securityPolicy='https://www.googleapis.com/compute/alpha/'
+                  securityPolicy='https://compute.googleapis.com/compute/alpha/'
                   'projects/my-project/global/securityPolicies/my-policy')))],
     )
 

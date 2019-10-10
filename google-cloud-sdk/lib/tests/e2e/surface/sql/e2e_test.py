@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
     self.DoTestConnect()
     self.DoTestOperations()
 
-  @sdk_test_base.Filters.RunOnlyInBundle
   def testConnectWithProxy(self):
     self.CreateInstance('db-g1-small')
     self.DoTestConnectWithProxy()
@@ -113,7 +112,7 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
     properties.VALUES.core.disable_prompts.Set(True)
     self.CreateInstance('db-g1-small')
 
-  @test_case.Filters.SkipOnMac('Failing', 'b/132271074')
+  @test_case.Filters.skip('Flaky', 'b/141325243')
   @test_case.Filters.RunOnlyWithEnv('KOKORO_ROOT', 'Needs to be run with ipv4.')
   def testSQLCommands(self):
     self.DoTestConnect()

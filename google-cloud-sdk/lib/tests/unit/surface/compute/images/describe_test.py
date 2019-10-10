@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class ImagesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
         self.GetOutput(),
         textwrap.dedent("""\
             name: image-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
             status: READY
             """))
 

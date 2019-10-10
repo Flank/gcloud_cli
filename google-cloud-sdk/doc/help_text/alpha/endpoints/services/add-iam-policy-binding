@@ -12,6 +12,9 @@ DESCRIPTION
     (ALPHA) Add an IAM policy binding to the IAM policy of a service. One
     binding consists of a member, a role, and an optional condition.
 
+    Note: The 'roles/servicemanagement.serviceConsumer' role can only be added
+    to a member which is a user, group, or service account.
+
 POSITIONAL ARGUMENTS
      Service resource - The service for which to add IAM policy binding to.
      This represents a Cloud resource. This must be specified.
@@ -95,14 +98,6 @@ EXAMPLES
             --member='serviceAccount:test-proj1@example.domain.com' \
             --role='roles/servicemanagement.serviceConsumer'
 
-    To add an IAM policy binding for the role of
-    'roles/servicemanagement.serviceConsumer' for all authenticated users on a
-    service with identifier 'my-service', run:
-
-        $ gcloud alpha endpoints services add-iam-policy-binding \
-            my-service --member='allAuthenticatedUsers' \
-            --role='roles/servicemanagement.serviceConsumer'
-
     To add an IAM policy binding which expires at the end of the year 2018 for
     the role of 'roles/servicemanagement.quotaAdmin' and the user
     'test-user@gmail.com' with service 'my-service', run:
@@ -122,9 +117,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud endpoints services add-iam-policy-binding
         $ gcloud beta endpoints services add-iam-policy-binding

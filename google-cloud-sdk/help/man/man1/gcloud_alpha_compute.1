@@ -66,6 +66,11 @@ help\fR for details.
 \fB(ALPHA)\fR Manage Google Compute Engine commitments.
 
 .TP 2m
+\fBdiagnose\fR
+\fB(ALPHA)\fR Debugging tools for Google Compute Engine virtual machine
+instances.
+
+.TP 2m
 \fBdisk\-types\fR
 \fB(ALPHA)\fR Read Google Compute Engine virtual disk types.
 
@@ -143,12 +148,20 @@ instances.
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine operations.
 
 .TP 2m
+\fBorg\-security\-policies\fR
+\fB(ALPHA)\fR Manage Google Compute Engine organization security policies.
+
+.TP 2m
 \fBos\-config\fR
 \fB(ALPHA)\fR Manage OS Config tasks for Compute Engine VMs.
 
 .TP 2m
 \fBos\-login\fR
 \fB(ALPHA)\fR Create and manipulate Google Compute Engine OS Login resources.
+
+.TP 2m
+\fBpacket\-mirrorings\fR
+\fB(ALPHA)\fR Manage Google Compute Engine packet mirroring resources.
 
 .TP 2m
 \fBproject\-info\fR
@@ -292,7 +305,7 @@ scp.
 
 .TP 2m
 \fBstart\-iap\-tunnel\fR
-\fB(ALPHA)\fR Starts an IAP TCP forwarding tunnel over WebSocket connection.
+\fB(ALPHA)\fR Starts an IAP TCP forwarding tunnel.
 
 
 .RE
@@ -302,9 +315,8 @@ scp.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute

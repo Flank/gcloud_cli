@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,6 +59,8 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
     """Pseudo SetUp method for use with parameterized tests."""
     self.track = track
     self.feature = self.feature_enum.EXPLICIT_CONTENT_DETECTION
+    self.operation_name = ('projects/{}/locations/us-east1/operations/123'
+                           .format(self.Project()))
 
   def testBasicOutputAsync(self, track):
     """Test that command correctly outputs json of operation."""
@@ -66,13 +68,13 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     self.Run('ml video detect-explicit-content gs://bucket/object --async')
     self.AssertOutputEquals(textwrap.dedent("""\
     {
-      "name": "10000"
+      "name": "%s"
     }
-    """))
+    """ % self.operation_name))
 
   def testBasicOutputComplete(self, track):
     """Test that command correctly outputs json of results."""
@@ -80,14 +82,15 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     self.ExpectWaitOperationRequest(
-        operation_id='10000',
+        operation_name=self.operation_name,
         attempts=3,
         results=self._GetResponseJsonExplicitContent(
             ['0.456s', '13.006s', '14.5s']))
     self.Run('ml video detect-explicit-content gs://bucket/object')
-    self.AssertErrContains('Waiting for operation [10000] to complete')
+    self.AssertErrContains('Waiting for operation [{}] to complete'.format(
+        self.operation_name))
     self.AssertOutputContains(textwrap.dedent("""\
     {
       "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse",
@@ -120,12 +123,12 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     result = self.Run(
         'ml video detect-explicit-content gs://bucket/object --async')
     self.assertEqual(
         result, self.messages.GoogleLongrunningOperation(
-            name='10000'))
+            name=self.operation_name))
 
   def testBasicResultComplete(self, track):
     """Test that results return correctly with operation polling."""
@@ -133,9 +136,9 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     self.ExpectWaitOperationRequest(
-        operation_id='10000',
+        operation_name=self.operation_name,
         attempts=3,
         results=self._GetResponseJsonExplicitContent(
             ['0.456s', '13.006s', '14.5s']))
@@ -158,7 +161,7 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
             self.segment_msg(startTimeOffset='0.0s', endTimeOffset='100.0s'),
             self.segment_msg(startTimeOffset='400.0s', endTimeOffset='500.0s')],
         location_id='us-east1',
-        operation_id='123'
+        operation_name=self.operation_name
     )
     result = self.Run('ml video detect-explicit-content gs://bucket/object '
                       '--output-uri gs://bucket/output '
@@ -166,7 +169,7 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
                       '--region us-east1 '
                       '--async')
     self.assertEqual(
-        self.messages.GoogleLongrunningOperation(name='123'),
+        self.messages.GoogleLongrunningOperation(name=self.operation_name),
         result)
 
   def testLocalVideo(self, track):
@@ -177,12 +180,12 @@ class DetectExplicitContentTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_content=b'video content',
-        operation_id='10000'
+        operation_name=self.operation_name
     )
     result = self.Run(
         'ml video detect-explicit-content {} --async'.format(video_path))
     self.assertEqual(
-        self.messages.GoogleLongrunningOperation(name='10000'),
+        self.messages.GoogleLongrunningOperation(name=self.operation_name),
         result)
 
 

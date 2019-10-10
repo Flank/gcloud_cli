@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute network-endpoint-groups list-network-endpoints NAME
-        [--zone=ZONE] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--global | --zone=ZONE] [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
@@ -12,26 +12,31 @@ POSITIONAL ARGUMENTS
         Name of the network endpoint group to operate on.
 
 FLAGS
-     --zone=ZONE
-        Zone of the network endpoint group to operate on. If not specified and
-        the compute/zone property isn't set, you may be prompted to select a
-        zone.
+     At most one of these may be specified:
 
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
+       --global
+          If set, the network endpoint group is global.
 
-            $ gcloud config set compute/zone ZONE
+       --zone=ZONE
+          Zone of the network endpoint group to operate on. If not specified
+          and the compute/zone property isn't set, you may be prompted to
+          select a zone.
 
-        A list of zones can be fetched by running:
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
 
-            $ gcloud compute zones list
+              $ gcloud config set compute/zone ZONE
 
-        To unset the property, run:
+          A list of zones can be fetched by running:
 
-            $ gcloud config unset compute/zone
+              $ gcloud compute zones list
 
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -75,9 +80,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute network-endpoint-groups list-network-endpoints
         $ gcloud beta compute network-endpoint-groups list-network-endpoints

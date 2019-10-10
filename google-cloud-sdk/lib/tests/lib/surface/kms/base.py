@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import copy
-
+import copy  # import: before=mock
 from apitools.base.py.testing import mock
+import enum
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import cli_test_base
@@ -36,12 +36,21 @@ class KmsMockTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
   def SetUp(self):
     self.kms = mock.Client(
         core_apis.GetClientClass('cloudkms', 'v1'),
-        real_client=core_apis.GetClientInstance(
-            'cloudkms', 'v1', no_http=True))
+        real_client=core_apis.GetClientInstance('cloudkms', 'v1', no_http=True))
     self.kms.Mock()
     self.addCleanup(self.kms.Unmock)
     self.messages = core_apis.GetMessagesModule('cloudkms', 'v1')
     self.project_name = ResourceName(project_id=self.Project())
+
+
+class ResourceType(enum.Enum):
+  """Represents the KMS resource types."""
+  PROJECT = 'Project'
+  LOCATION = 'Location'
+  KEY_RING = 'KeyRing'
+  IMPORT_JOB = 'ImportJob'
+  CRYPTO_KEY = 'CryptoKey'
+  CRYPTO_KEY_VERSION = 'CryptoKeyVersion'
 
 
 class ResourceName(object):
@@ -52,21 +61,27 @@ class ResourceName(object):
                location_id=None,
                key_ring_id=None,
                crypto_key_id=None,
+               import_job_id=None,
                version_id=None):
+    # type: (Optional[Text], Optional[Text], Optional[Text], Optional[Text], Optional[Text], Optional[Text])  # pylint: disable=line-too-long
     """Create a ResourceName with whichever path components you want."""
     self.project_id = project_id
     self.location_id = location_id
     self.key_ring_id = key_ring_id
     self.crypto_key_id = crypto_key_id
+    self.import_job_id = import_job_id
     self.version_id = version_id
 
   def Parent(self):
+    # type: () -> ResourceName
     """Returns a ResourceName identifying the parent of this resource."""
     p = copy.copy(self)
     if p.version_id:
       p.version_id = None
     elif p.crypto_key_id:
       p.crypto_key_id = None
+    elif p.import_job_id:
+      p.import_job_id = None
     elif p.key_ring_id:
       p.key_ring_id = None
     elif p.location_id:
@@ -77,53 +92,81 @@ class ResourceName(object):
       raise ValueError('Empty resource has no parent')
     return p
 
-  def Child(self, resource_id):
-    """Returns a ResourceName identifying a child of this resource.
+  def Location(self, location_id):
+    # type: (Text) -> ResourceName
+    """Returns a ResourceName for a Location child of this resource."""
+    if self.GetType() != ResourceType.PROJECT:
+      raise ValueError('The parent of a location must be a project')
+    resource_name = copy.copy(self)
+    resource_name.location_id = location_id
+    return resource_name
 
-    For example, a location is a child of a project; a KeyRing is a child of a
-    location, etc.
+  def KeyRing(self, key_ring_id):
+    # type: (Text) -> ResourceName
+    """Returns a ResourceName for a KeyRing child of this resource."""
+    if self.GetType() != ResourceType.LOCATION:
+      return self.ParsePath(key_ring_id, ResourceType.KEY_RING)
+    resource_name = copy.copy(self)
+    resource_name.key_ring_id = key_ring_id
+    return resource_name
 
-    Args:
-      resource_id: The ID (i.e., the last path component) of the child resource.
+  def ImportJob(self, import_job_id):
+    # type: (Text) -> ResourceName
+    """Returns a ResourceName for an ImportJob child of this resource."""
+    if self.GetType() != ResourceType.KEY_RING:
+      return self.ParsePath(import_job_id, ResourceType.IMPORT_JOB)
+    resource_name = copy.copy(self)
+    resource_name.import_job_id = import_job_id
+    return resource_name
 
-    Returns:
-      A ResourceName identifying a child of this resource.
+  def CryptoKey(self, crypto_key_id):
+    # type: (Text) -> ResourceName
+    """Returns a ResourceName for a CryptoKey child of this resource."""
+    if self.GetType() != ResourceType.KEY_RING:
+      return self.ParsePath(crypto_key_id, ResourceType.CRYPTO_KEY)
+    resource_name = copy.copy(self)
+    resource_name.crypto_key_id = crypto_key_id
+    return resource_name
 
-    Raises:
-      ValueError: If this ResourceName is a CryptoKeyVersion.
-    """
-    c = copy.copy(self)
-    if not c.project_id:
-      c.project_id = resource_id
-    elif not c.location_id:
-      c.location_id = resource_id
-    elif not c.key_ring_id:
-      c.key_ring_id = resource_id
-    elif not c.crypto_key_id:
-      c.crypto_key_id = resource_id
-    elif not c.version_id:
-      c.version_id = resource_id
-    else:
-      raise ValueError('CryptoKeyVersion has no child resource')
-    return c
+  def Version(self, version_id):
+    # type: (Text) -> ResourceName
+    """Returns a ResourceName for a CryptoKeyVersion child."""
+    if self.GetType() != ResourceType.CRYPTO_KEY:
+      return self.ParsePath(version_id, ResourceType.CRYPTO_KEY_VERSION)
+    resource_name = copy.copy(self)
+    resource_name.version_id = version_id
+    return resource_name
 
-  def Descendant(self, path):
-    """A shortcut for repeatedly calling Child.
-
-    r.Descendant('a/b') = r.Child('a').Child('b').
+  def ParsePath(self, path, resource_type):
+    # type: (Text, ResourceType) -> ResourceName
+    """Parses the given path to produce a resource of the request type.
 
     Args:
       path: slash-separated list of IDs to pass to Child().
+      resource_type: the ResourceType represented by the path.  This allows us
+        to distinguish between CryptoKeys and ImportJobs.
 
     Returns:
       The named descendant of this resource.
+
     """
     res = self
     for resource_id in path.split('/'):
-      res = res.Child(resource_id)
+      if res.GetType() == ResourceType.PROJECT:
+        res = res.Location(resource_id)
+      elif res.GetType() == ResourceType.LOCATION:
+        res = res.KeyRing(resource_id)
+      elif res.GetType() == ResourceType.KEY_RING:
+        if resource_type == ResourceType.IMPORT_JOB:
+          res = res.ImportJob(resource_id)
+        else:
+          res = res.CryptoKey(resource_id)
+      elif res.GetType() == ResourceType.CRYPTO_KEY:
+        res = res.Version(resource_id)
     return res
 
   def RelativeName(self):
+    # type: () -> Text
     """Renders this ResourceName as an atomic string.
 
     Returns:
@@ -138,9 +181,29 @@ class ResourceName(object):
       name = '/'.join([name, 'keyRings', self.key_ring_id])
     if self.crypto_key_id:
       name = '/'.join([name, 'cryptoKeys', self.crypto_key_id])
+    if self.import_job_id:
+      name = '/'.join([name, 'importJobs', self.import_job_id])
     if self.version_id:
       name = '/'.join([name, 'cryptoKeyVersions', self.version_id])
     return name
+
+  def GetType(self):
+    # type: () -> ResourceType
+    """Returns the ResourceType of this resource."""
+    if self.version_id:
+      return ResourceType.CRYPTO_KEY_VERSION
+    elif self.crypto_key_id:
+      return ResourceType.CRYPTO_KEY
+    elif self.import_job_id:
+      return ResourceType.IMPORT_JOB
+    elif self.key_ring_id:
+      return ResourceType.KEY_RING
+    elif self.location_id:
+      return ResourceType.LOCATION
+    elif self.project_id:
+      return ResourceType.PROJECT
+    else:
+      raise ValueError('Empty resource has no type')
 
 
 class KmsE2ETestBase(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):

@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed instance\-configs list \- list per
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed instance\-configs list\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed instance\-configs list\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -108,10 +108,6 @@ is ascending. Prefix a field with ``~'' for descending order on that field. This
 flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
-.TP 2m
-\fB\-\-uri\fR
-Print a list of resource URIs instead of the default output.
-
 
 .RE
 .sp
@@ -130,7 +126,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

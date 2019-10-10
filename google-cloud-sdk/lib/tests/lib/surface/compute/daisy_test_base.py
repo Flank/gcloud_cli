@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from apitools.base.py.testing import mock as client_mocker
 
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
@@ -59,12 +60,12 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     self.crm_v1_messages = core_apis.GetMessagesModule(
         'cloudresourcemanager', 'v1')
 
-    self.mocked_servicemanagement_v1 = client_mocker.Client(
-        core_apis.GetClientClass('servicemanagement', 'v1'))
-    self.mocked_servicemanagement_v1.Mock()
-    self.addCleanup(self.mocked_servicemanagement_v1.Unmock)
-    self.servicemanagement_v1_messages = core_apis.GetMessagesModule(
-        'servicemanagement', 'v1')
+    self.mocked_serviceusage_v1 = client_mocker.Client(
+        core_apis.GetClientClass('serviceusage', 'v1'))
+    self.mocked_serviceusage_v1.Mock()
+    self.addCleanup(self.mocked_serviceusage_v1.Unmock)
+    self.serviceusage_v1_messages = core_apis.GetMessagesModule(
+        'serviceusage', 'v1')
 
     make_requests_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.MakeRequests',
@@ -102,14 +103,6 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
               role=role))
 
     self.permissions = self.crm_v1_messages.Policy(bindings=bindings)
-    self.services = self.servicemanagement_v1_messages.ListServicesResponse(
-        services=[
-            self.servicemanagement_v1_messages.ManagedService(
-                serviceName='cloudbuild.googleapis.com'),
-            self.servicemanagement_v1_messages.ManagedService(
-                serviceName='logging.googleapis.com'),
-        ]
-    )
     self.tags = ['gce-daisy']
     self.network = 'my-network'
     self.subnet = 'my-subnet'
@@ -156,23 +149,7 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
                 '[image-export] output\n[import-ovf] output'))
 
     if is_import:
-      self.mocked_servicemanagement_v1.services.List.Expect(
-          self.servicemanagement_v1_messages
-          .ServicemanagementServicesListRequest(
-              consumerId='project:my-project',
-              pageSize=100,
-          ),
-          response=self.services,
-      )
-
-      self.mocked_servicemanagement_v1.services.List.Expect(
-          self.servicemanagement_v1_messages
-          .ServicemanagementServicesListRequest(
-              consumerId='project:my-project',
-              pageSize=100,
-          ),
-          response=self.services,
-      )
+      self._ExpectServiceUsage()
 
     self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
@@ -201,12 +178,32 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         response=self.project,
     )
 
+    get_request = self.crm_v1_messages \
+        .CloudresourcemanagerProjectsGetIamPolicyRequest(
+            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+                options=self.crm_v1_messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+            resource='my-project')
     self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-        ),
+        request=get_request,
         response=permissions or self.permissions,
     )
+
+  def _ExpectServiceUsage(self, build_enabled=True):
+    state_type = self.serviceusage_v1_messages.GoogleApiServiceusageV1Service.StateValueValuesEnum
+    self.mocked_serviceusage_v1.services.Get.Expect(
+        self.serviceusage_v1_messages.ServiceusageServicesGetRequest(
+            name='projects/my-project/services/cloudbuild.googleapis.com',),
+        response=self.serviceusage_v1_messages.GoogleApiServiceusageV1Service(
+            state=state_type.ENABLED
+            if build_enabled else state_type.DISABLED,))
+    if build_enabled:
+      self.mocked_serviceusage_v1.services.Get.Expect(
+          self.serviceusage_v1_messages.ServiceusageServicesGetRequest(
+              name='projects/my-project/services/logging.googleapis.com',),
+          response=self.serviceusage_v1_messages.GoogleApiServiceusageV1Service(
+              state=state_type.ENABLED,))
 
   def PrepareDaisyMocksWithRegionalBucket(self, daisy_step, timeout='7200s',
                                           log_location=None, permissions=None,
@@ -278,8 +275,7 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     if include_zone:
       args.insert(0, '-zone=my-region-c')
 
-    return self.cloudbuild_v1_messages.BuildStep(
-        args=args, name=self.daisy_builder)
+    return self.cloudbuild_v1_messages.BuildStep(args=args, name=self.builder)
 
   @staticmethod
   def GetScratchBucketNameWithRegion():

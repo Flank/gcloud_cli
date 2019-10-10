@@ -45,17 +45,19 @@ EXAMPLES
     plaintext to '/tmp/my/secret.file.dec'.
 
         $ gcloud alpha kms asymmetric-decrypt \
-        --location us-central1 \
-        --keyring hitchhiker \
-        --key dont-panic \
-        --version 3 \
-        --ciphertext-file /tmp/my/secret.file.enc \
-        --plaintext-file /tmp/my/secret.file.dec
+        --location=us-central1 \
+        --keyring=hitchhiker \
+        --key=dont-panic \
+        --version=3 \
+        --ciphertext-file=/tmp/my/secret.file.enc \
+        --plaintext-file=/tmp/my/secret.file.dec
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud kms asymmetric-decrypt
+        $ gcloud beta kms asymmetric-decrypt
 

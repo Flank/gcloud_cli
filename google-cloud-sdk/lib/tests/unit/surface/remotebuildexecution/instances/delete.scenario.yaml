@@ -1,7 +1,6 @@
 title: remote-build-execution instances delete test
 release_tracks: [ALPHA]
 summary:
-
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
@@ -12,7 +11,8 @@ summary:
   - stderr: |
       Delete request issued for: [new_instance]
   - progress_tracker:
-    - message: Waiting for operation [delete_operation_id] to complete
+    - message: Waiting for operation [projects/fake-project/operations/delete_operation_id]
+        to complete
     - status: SUCCESS
   - stderr: |
       Deleted instance [new_instance].
@@ -61,7 +61,8 @@ actions:
             }
 
     - expect_progress_tracker:
-        message: Waiting for operation [delete_operation_id] to complete
+        message: Waiting for operation [projects/fake-project/operations/delete_operation_id]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Deleted instance [new_instance].

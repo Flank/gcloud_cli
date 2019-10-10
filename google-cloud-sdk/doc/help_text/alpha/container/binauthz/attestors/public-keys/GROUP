@@ -93,7 +93,7 @@ EXAMPLES
 
         $ gcloud alpha container binauthz attestors public-keys add \
               --attestor my_attestor \
-              --public-key-file=public_key1.pgp
+              --pgp-public-key-file=public_key1.pgp
 
     To add a subkey to your PGP key:
 
@@ -126,9 +126,9 @@ EXAMPLES
         $ gcloud alpha container binauthz attestors public-keys update \
               ${FINGERPRINT} \
               --attestor=my_attestor \
-              --public-key-file=public_key1_updated.pgp
+              --pgp-public-key-file=public_key1_updated.pgp
 
-    To remove this new key to the attestor:
+    To remove this new key from the attestor:
 
         $ gcloud alpha container binauthz attestors public-keys remove \
               ${FINGERPRINT} \
@@ -137,9 +137,9 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud container binauthz attestors public-keys
         $ gcloud beta container binauthz attestors public-keys
 

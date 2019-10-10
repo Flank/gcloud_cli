@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,27 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/crawlers/{crawlersId}/crawlerRuns/'
               '{crawlerRunsId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_TAXONOMIES = (
+      'projects.taxonomies',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/taxonomies/{taxonomiesId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_TAXONOMIES_CATEGORIES = (
+      'projects.taxonomies.categories',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/taxonomies/{taxonomiesId}/categories/'
+              '{categoriesId}',
       },
       [u'name'],
       True

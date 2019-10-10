@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,31 +33,38 @@ from tests.lib.surface.ml.video import base
     ('GA', calliope_base.ReleaseTrack.GA))
 class DescribeTest(base.MlVideoTestBase):
 
+  def SetUp(self):
+    self.operation_name = ('projects/{}/locations/us-east1/operations/123'
+                           .format(self.Project()))
+
   def testBasicOutput(self, track):
     """Test that command correctly outputs json of operation."""
     self.track = track
-    self.ExpectWaitOperationRequest('123')
-    result = self.Run('ml video operations describe 123')
+    self.ExpectWaitOperationRequest(self.operation_name)
+    result = self.Run('ml video operations describe {}'.format(
+        self.operation_name))
     self.AssertOutputEquals(textwrap.dedent("""\
     {
-      "name": "123"
+      "name": "%s"
     }
-    """))
+    """ % self.operation_name))
     self.assertEqual(result,
-                     self.messages.GoogleLongrunningOperation(name='123'))
+                     self.messages.GoogleLongrunningOperation(
+                         name=self.operation_name))
 
   def testBasicOutputComplete(self, track):
     """Test that command correctly outputs json of results."""
     self.track = track
     self.ExpectWaitOperationRequest(
-        '123',
+        self.operation_name,
         attempts=1,
         results=self._GetResponseJsonForLabels(['mug', 'coffee']))
-    result = self.Run('ml video operations describe 123')
+    result = self.Run('ml video operations describe {}'.format(
+        self.operation_name))
     self.AssertOutputContains(textwrap.dedent("""\
     {
       "done": true,
-      "name": "123",
+      "name": "%s",
       "response": {
         "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse",
         "annotationResults": {
@@ -98,7 +105,7 @@ class DescribeTest(base.MlVideoTestBase):
         }
       }
     }
-    """))
+    """ % self.operation_name))
     results = []
     annotation_results = encoding.MessageToPyValue(
         result)['response']['annotationResults']['segmentLabelAnnotations']
@@ -110,8 +117,8 @@ class DescribeTest(base.MlVideoTestBase):
     """Test when operation contains an error."""
     self.track = track
     error_json = {'code': 400, 'message': 'Error message.'}
-    self.ExpectWaitOperationRequest('123', error_json=error_json)
-    self.Run('ml video operations describe 123')
+    self.ExpectWaitOperationRequest(self.operation_name, error_json=error_json)
+    self.Run('ml video operations describe {}'.format(self.operation_name))
     self.AssertOutputEquals(textwrap.dedent("""\
     {
       "done": true,
@@ -119,9 +126,9 @@ class DescribeTest(base.MlVideoTestBase):
         "code": 400,
         "message": "Error message."
       },
-      "name": "123"
+      "name": "%s"
     }
-    """))
+    """ % self.operation_name))
 
 
 if __name__ == '__main__':

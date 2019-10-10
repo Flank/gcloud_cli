@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ from googlecloudsdk.api_lib.compute.operations import poller
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers
+from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute.instances import flags as instances_flags
 from googlecloudsdk.command_lib.compute.resource_policies import flags as maintenance_flags
 from googlecloudsdk.command_lib.compute.resource_policies import util as maintenance_util
@@ -61,9 +62,9 @@ DETAILED_HELP = {
         """,
     'EXAMPLES': """\
         To create an instance with the latest ``Red Hat Enterprise Linux
-        7'' image available, run:
+        8'' image available, run:
 
-          $ {command} example-instance --image-family rhel-7 --image-project rhel-cloud --zone us-central1-a
+          $ {command} example-instance --image-family=rhel-8 --image-project=rhel-cloud --zone=us-central1-a
         """,
 }
 
@@ -71,17 +72,19 @@ DETAILED_HELP = {
 def _CommonArgs(parser,
                 enable_regional=False,
                 enable_kms=False,
-                enable_snapshots=False,
                 deprecate_maintenance_policy=False,
-                supports_display_device=False,
-                supports_reservation=False,
-                enable_resource_policy=False):
+                enable_resource_policy=False,
+                supports_min_node_cpus=False,
+                snapshot_csek=False,
+                image_csek=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
   instances_flags.AddCreateDiskArgs(parser, enable_kms=enable_kms,
-                                    enable_snapshots=enable_snapshots,
-                                    resource_policy=enable_resource_policy)
+                                    enable_snapshots=True,
+                                    resource_policy=enable_resource_policy,
+                                    source_snapshot_csek=snapshot_csek,
+                                    image_csek=image_csek)
   instances_flags.AddCanIpForwardArgs(parser)
   instances_flags.AddAddressArgs(parser, instances=True)
   instances_flags.AddAcceleratorArgs(parser)
@@ -95,27 +98,32 @@ def _CommonArgs(parser,
       extra_scopes_help='However, if neither `--scopes` nor `--no-scopes` are '
                         'specified and the project has no default service '
                         'account, then the instance will be created with no '
-                        'scopes.')
+                        'scopes. Note that the level of access that a service '
+                        'account has is determined by a combination of access '
+                        'scopes and IAM roles so you must configure both '
+                        'access scopes and IAM roles for the service account '
+                        'to work properly.')
   instances_flags.AddTagsArgs(parser)
   instances_flags.AddCustomMachineTypeArgs(parser)
   instances_flags.AddNetworkArgs(parser)
   instances_flags.AddPrivateNetworkIpArgs(parser)
   instances_flags.AddHostnameArg(parser)
-  instances_flags.AddImageArgs(parser, enable_snapshots=enable_snapshots)
+  instances_flags.AddImageArgs(parser, enable_snapshots=True)
   instances_flags.AddDeletionProtectionFlag(parser)
   instances_flags.AddPublicPtrArgs(parser, instance=True)
   instances_flags.AddNetworkTierArgs(parser, instance=True)
   instances_flags.AddShieldedInstanceConfigArgs(parser)
-  if supports_display_device:
-    instances_flags.AddDisplayDeviceArg(parser)
+  instances_flags.AddDisplayDeviceArg(parser)
 
-  if supports_reservation:
-    instances_flags.AddReservationAffinityGroup(
-        parser,
-        group_text='Specifies the reservation for the instance.',
-        affinity_text='The type of reservation for the instance.')
+  instances_flags.AddReservationAffinityGroup(
+      parser,
+      group_text='Specifies the reservation for the instance.',
+      affinity_text='The type of reservation for the instance.')
 
   sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
+
+  if supports_min_node_cpus:
+    sole_tenancy_flags.AddMinNodeCpusArg(parser)
 
   labels_util.AddCreateLabelsFlags(parser)
 
@@ -141,10 +149,12 @@ class Create(base.CreateCommand):
   _support_kms = True
   _support_nvdimm = False
   _support_public_dns = False
-  _support_snapshots = False
-  _support_display_device = False
-  _support_reservation = False
   _support_disk_resource_policy = False
+  _support_erase_vss = False
+  _support_machine_image_key = False
+  _support_min_node_cpus = False
+  _support_source_snapshot_csek = False
+  _support_image_csek = False
 
   @classmethod
   def Args(cls, parser):
@@ -226,8 +236,10 @@ class Create(base.CreateCommand):
               getattr(args, 'create_disk', []),
               instance_ref,
               enable_kms=self._support_kms,
-              enable_snapshots=self._support_snapshots,
-              resource_policy=self._support_disk_resource_policy))
+              enable_snapshots=True,
+              resource_policy=self._support_disk_resource_policy,
+              enable_source_snapshot_csek=self._support_source_snapshot_csek,
+              enable_image_csek=self._support_image_csek))
       local_nvdimms = []
       if self._support_nvdimm:
         local_nvdimms = instance_utils.CreateLocalNvdimmMessages(
@@ -246,13 +258,10 @@ class Create(base.CreateCommand):
       )
 
       if create_boot_disk:
-        if self._support_snapshots:
-          boot_snapshot_uri = instance_utils.ResolveSnapshotURI(
-              user_project=instance_refs[0].project,
-              snapshot=args.source_snapshot,
-              resource_parser=resource_parser)
-        else:
-          boot_snapshot_uri = None
+        boot_snapshot_uri = instance_utils.ResolveSnapshotURI(
+            user_project=instance_refs[0].project,
+            snapshot=args.source_snapshot,
+            resource_parser=resource_parser)
 
         boot_disk = instance_utils.CreateDefaultBootAttachedDiskMessage(
             compute_client, resource_parser,
@@ -340,7 +349,7 @@ class Create(base.CreateCommand):
           instance_refs=instance_refs)
     else:
       instances_flags.ValidatePublicPtrFlags(args)
-      if self._support_public_dns is True:
+      if self._support_public_dns:
         instances_flags.ValidatePublicDnsFlags(args)
 
       return self._GetNetworkInterfaces(
@@ -362,7 +371,8 @@ class Create(base.CreateCommand):
     skip_defaults = skip_defaults or source_machine_image is not None
 
     scheduling = instance_utils.GetScheduling(
-        args, compute_client, skip_defaults, support_node_affinity=True)
+        args, compute_client, skip_defaults, support_node_affinity=True,
+        support_min_node_cpus=self._support_min_node_cpus)
     tags = instance_utils.GetTags(args, compute_client)
     labels = instance_utils.GetLabels(args, compute_client)
     metadata = instance_utils.GetMetadata(args, compute_client, skip_defaults)
@@ -437,6 +447,10 @@ class Create(base.CreateCommand):
       if shielded_instance_config:
         instance.shieldedInstanceConfig = shielded_instance_config
 
+      if self._support_erase_vss and \
+        args.IsSpecified('erase_windows_vss_signature'):
+        instance.eraseWindowsVssSignature = args.erase_windows_vss_signature
+
       request = compute_client.messages.ComputeInstancesInsertRequest(
           instance=instance,
           project=instance_ref.project,
@@ -447,32 +461,42 @@ class Create(base.CreateCommand):
 
       if source_machine_image:
         request.instance.sourceMachineImage = source_machine_image
+        if args.IsSpecified('source_machine_image_csek_key_file'):
+          key = instance_utils.GetSourceMachineImageKey(
+              args, self.SOURCE_MACHINE_IMAGE, compute_client, holder)
+          request.instance.sourceMachineImageEncryptionKey = key
 
-      if (self._support_display_device and
-          args.IsSpecified('enable_display_device')):
+      if self._support_machine_image_key and \
+          args.IsSpecified('source_machine_image_csek_key_file'):
+        if not args.IsSpecified('source_machine_image'):
+          raise exceptions.RequiredArgumentException(
+              '`--source-machine-image`',
+              '`--source-machine-image-csek-key-file` requires '
+              '`--source-machine-image` to be specified`')
+
+      if args.IsSpecified('enable_display_device'):
         request.instance.displayDevice = compute_client.messages.DisplayDevice(
             enableDisplay=args.enable_display_device)
 
-      if self._support_reservation:
-        request.instance.reservationAffinity = instance_utils.GetReservationAffinity(
-            args, compute_client)
+      request.instance.reservationAffinity = instance_utils.GetReservationAffinity(
+          args, compute_client)
 
       requests.append(
           (compute_client.apitools_client.instances, 'Insert', request))
     return requests
 
   def Run(self, args):
-    instances_flags.ValidateDiskFlags(args, enable_kms=self._support_kms,
-                                      enable_snapshots=self._support_snapshots)
+    instances_flags.ValidateDiskFlags(
+        args, enable_kms=self._support_kms, enable_snapshots=True,
+        enable_source_snapshot_csek=self._support_source_snapshot_csek,
+        enable_image_csek=self._support_image_csek)
     instances_flags.ValidateImageFlags(args)
     instances_flags.ValidateLocalSsdFlags(args)
     instances_flags.ValidateNicFlags(args)
     instances_flags.ValidateServiceAccountAndScopeArgs(args)
     instances_flags.ValidateAcceleratorArgs(args)
     instances_flags.ValidateNetworkTierArgs(args)
-
-    if self._support_reservation:
-      instances_flags.ValidateReservationAffinityGroup(args)
+    instances_flags.ValidateReservationAffinityGroup(args)
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     compute_client = holder.client
@@ -482,8 +506,7 @@ class Create(base.CreateCommand):
 
     requests = self._CreateRequests(
         args, instance_refs, compute_client, resource_parser, holder)
-
-    if not args.async:
+    if not args.async_:
       # TODO(b/63664449): Replace this with poller + progress tracker.
       try:
         # Using legacy MakeRequests (which also does polling) here until
@@ -511,6 +534,9 @@ class Create(base.CreateCommand):
 
     operation_refs = [holder.resources.Parse(r.selfLink) for r in responses]
 
+    log.status.Print('NOTE: The users will be charged for public IPs when VMs '
+                     'are created.')
+
     for instance_ref, operation_ref in zip(instance_refs, operation_refs):
       log.status.Print('Instance creation in progress for [{}]: {}'
                        .format(instance_ref.instance, operation_ref.SelfLink()))
@@ -531,10 +557,12 @@ class CreateBeta(Create):
   _support_kms = True
   _support_nvdimm = False
   _support_public_dns = False
-  _support_snapshots = False
-  _support_display_device = True
-  _support_reservation = True
   _support_disk_resource_policy = True
+  _support_erase_vss = False
+  _support_machine_image_key = False
+  _support_min_node_cpus = False
+  _support_source_snapshot_csek = False
+  _support_image_csek = False
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -547,9 +575,7 @@ class CreateBeta(Create):
         parser,
         enable_regional=True,
         enable_kms=True,
-        supports_display_device=True,
-        supports_reservation=cls._support_reservation,
-        enable_resource_policy=cls._support_disk_resource_policy
+        enable_resource_policy=cls._support_disk_resource_policy,
     )
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
@@ -565,10 +591,12 @@ class CreateAlpha(CreateBeta):
   _support_kms = True
   _support_nvdimm = True
   _support_public_dns = True
-  _support_snapshots = True
-  _support_display_device = True
-  _support_reservation = True
   _support_disk_resource_policy = True
+  _support_erase_vss = True
+  _support_machine_image_key = True
+  _support_min_node_cpus = True
+  _support_source_snapshot_csek = True
+  _support_image_csek = True
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -587,21 +615,24 @@ class CreateAlpha(CreateBeta):
         parser,
         enable_regional=True,
         enable_kms=True,
-        enable_snapshots=True,
         deprecate_maintenance_policy=True,
-        supports_display_device=True,
-        supports_reservation=cls._support_reservation,
-        enable_resource_policy=cls._support_disk_resource_policy)
+        enable_resource_policy=cls._support_disk_resource_policy,
+        supports_min_node_cpus=cls._support_min_node_cpus,
+        snapshot_csek=True,
+        image_csek=True)
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
     CreateAlpha.SOURCE_MACHINE_IMAGE = (
         instances_flags.AddMachineImageArg())
     CreateAlpha.SOURCE_MACHINE_IMAGE.AddArgument(parser)
+    instances_flags.AddSourceMachineImageEncryptionKey(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
     instances_flags.AddPublicDnsArgs(parser, instance=True)
     instances_flags.AddLocalSsdArgsWithSize(parser)
     instances_flags.AddLocalNvdimmArgs(parser)
+    flags.AddEraseVssSignature(parser, 'source snapshots or source machine'
+                                       ' image')
     maintenance_flags.AddResourcePoliciesArgs(parser, 'added to', 'instance')
 
 Create.detailed_help = DETAILED_HELP

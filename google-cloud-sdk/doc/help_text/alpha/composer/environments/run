@@ -34,9 +34,8 @@ POSITIONAL ARGUMENTS
         The Airflow CLI subcommand to run. Available subcommands include:
         backfill, clear, connections, dag_state, delete_dag, kerberos,
         list_dags, list_tasks, pause, pool, render, run, task_failed_deps,
-        task_state, test, trigger_dag, unpause, variables, version, initdb,
-        resetdb, upgradedb (see https://airflow.incubator.apache.org/cli.html
-        for more info.)
+        task_state, test, trigger_dag, unpause, variables, version (see
+        https://airflow.incubator.apache.org/cli.html for more info.)
 
      [-- CMD_ARGS ...]
         Command line arguments to the subcommand.
@@ -67,9 +66,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud composer environments run
         $ gcloud beta composer environments run

@@ -1,0 +1,70 @@
+
+.TH "GCLOUD_CONTAINER_BINAUTHZ_ATTESTORS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container binauthz attestors set\-iam\-policy \- set the IAM policy for an attestor
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container binauthz attestors set\-iam\-policy\fR \fIATTESTOR_NAME\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIATTESTOR_NAME\fR
+The name of the attestor whose IAM policy will be updated.
+
+.TP 2m
+\fIPOLICY_FILE\fR
+The JSON or YAML file containing the IAM policy.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read an IAM policy defined in a JSON file
+\'iam_policy.json' and set it for the attestor \f5my_attestor\fR:
+
+.RS 2m
+$ gcloud container binauthz attestors set\-iam\-policy my_attestor \e
+    iam_policy.json
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors set\-iam\-policy
+$ gcloud beta container binauthz attestors set\-iam\-policy
+.RE
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     self.RunCreate("""
           my-backend-service
           --health-checks my-health-check-1,my-health-check-2
+          --global-health-checks
           --description "My backend service"
         """)
 
@@ -74,6 +75,7 @@ class WithHealthcheckApiTest(CreateTestBase):
     self.RunCreate("""
         my-backend-service --health-checks
         {uri}/projects/my-project/global/healthChecks/my-health-check
+        --global-health-checks
         """.format(uri=self.compute_uri))
 
     self.CheckRequests([(
@@ -97,7 +99,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         '--https-health-checks is not supported.'):
       self.RunCreate("""
           my-backend-service --health-checks foo
-            --http-health-checks bar
+            --http-health-checks bar --global-health-checks
           """)
     self.CheckRequests()
 
@@ -107,7 +109,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         '--https-health-checks is not supported.'):
       self.RunCreate("""
           my-backend-service --health-checks foo
-            --https-health-checks bar
+            --https-health-checks bar --global-health-checks
           """)
     self.CheckRequests()
 
@@ -117,6 +119,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         my-backend-service
           --protocol TCP
           --health-checks my-health-check-1,my-health-check-2
+          --global-health-checks
           --description "My backend service"
         """)
 
@@ -147,6 +150,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         compute backend-services create my-backend-service
           --protocol HTTP
           --health-checks my-health-check-1,my-health-check-2
+          --global-health-checks
           --description "My backend service"
           --load-balancing-scheme internal_self_managed
           --global
@@ -179,6 +183,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         my-backend-service
           --protocol SSL
           --health-checks my-health-check-1,my-health-check-2
+          --global-health-checks
           --description "My backend service"
         """)
 
@@ -209,6 +214,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         my-backend-service
           --protocol SSL
           --health-checks my-health-check
+          --global-health-checks
           --port-name ssl1
         """)
 
@@ -236,6 +242,7 @@ class WithHealthcheckApiTest(CreateTestBase):
         my-backend-service
           --protocol SSL
           --health-checks my-health-check
+          --global-health-checks
           --timeout 1m
         """)
 
@@ -264,6 +271,7 @@ class WithHealthcheckApiTest(CreateTestBase):
           --protocol SSL
           --health-checks
             {uri}/projects/my-project/global/healthChecks/my-health-check-1,{uri}/projects/my-project/global/healthChecks/my-health-check-2
+          --global-health-checks
         """.format(uri=self.compute_uri))
 
     self.CheckRequests(
@@ -289,20 +297,24 @@ class WithHealthcheckApiTest(CreateTestBase):
   def testInternalWithoutRegionFlag(self):
     with self.AssertRaisesToolExceptionRegexp(
         'Must specify --region for internal load balancer.'):
-      self.RunCreate('backend-service-24 '
-                     '--load-balancing-scheme=internal '
-                     '--health-checks=main-hc --protocol=TCP')
+      self.RunCreate(
+          'backend-service-24 '
+          '--load-balancing-scheme=internal '
+          '--health-checks=main-hc --global-health-checks --protocol=TCP')
 
   def testInternalWithAllValidFlags(self):
     messages = self.messages
 
-    self.RunCreate('backend-service-1 '
-                   '--description cheesecake '
-                   '--load-balancing-scheme internal '
-                   '--region alaska '
-                   '--health-checks my-health-check-1 '
-                   '--connection-draining-timeout 120',
-                   use_global=False)
+    self.RunCreate(
+        'backend-service-1 '
+        '--description cheesecake '
+        '--load-balancing-scheme internal '
+        '--region alaska '
+        '--health-checks my-health-check-1 '
+        '--global-health-checks '
+        '--network default '
+        '--connection-draining-timeout 120',
+        use_global=False)
 
     self.CheckRequests([(
         self.compute.regionBackendServices, 'Insert',
@@ -318,6 +330,8 @@ class WithHealthcheckApiTest(CreateTestBase):
                 loadBalancingScheme=(
                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
                     .INTERNAL),
+                network=self.compute_uri +
+                '/projects/my-project/global/networks/default',
                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
                 connectionDraining=messages.ConnectionDraining(
                     drainingTimeoutSec=120),
@@ -335,6 +349,7 @@ class WithHealthcheckApiTest(CreateTestBase):
           --global
           --protocol HTTP2
           --health-checks my-health-check-1,my-health-check-2
+          --global-health-checks
           --description "My backend service"
         """)
 
@@ -363,6 +378,7 @@ class WithHealthcheckApiTest(CreateTestBase):
           my-backend-service
           --global
           --health-checks my-health-check-1,my-health-check-2
+          --global-health-checks
           --description "My backend service"
           --custom-request-header 'Test-Header:'
           --custom-request-header 'Test-Header2: {CLIENT_REGION}'
@@ -870,6 +886,7 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
         ' may only be set when cache-key-include-query-string is enabled.'):
       self.RunCreate("""
           my-backend-service --health-checks my-health-check
+            --global-health-checks
             --no-cache-key-include-query-string
             --cache-key-query-string-whitelist=contentid,language
           """)
@@ -882,6 +899,7 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
         ' may only be set when cache-key-include-query-string is enabled.'):
       self.RunCreate("""
           my-backend-service --health-checks my-health-check
+            --global-health-checks
             --no-cache-key-include-query-string
             --cache-key-query-string-blacklist=campaignid
           """)
@@ -1033,6 +1051,7 @@ class WithFailoverPolicyApiTest(CreateTestBase):
     self._create_service_cmd_line = (
         """compute backend-services create my-backend-service
            --health-checks my-health-check-1
+           --global-health-checks
            --description "My backend service"
            --region us-central1""")
 
@@ -1120,6 +1139,7 @@ class WithLogConfigApiTest(CreateTestBase):
     self._create_service_cmd_line = (
         """compute backend-services create my-backend-service
            --health-checks my-health-check-1
+           --global-health-checks
            --description "My backend service"
            --global""")
 
@@ -1161,34 +1181,12 @@ class WithLogConfigApiTest(CreateTestBase):
     self.CheckResults(
         self.messages.BackendServiceLogConfig(enable=False, sampleRate=0.0))
 
-  def testCannotSpecifyLogConfigForRegionalBackendService(self):
-    self.assertRaisesRegex(
-        exceptions.InvalidArgumentException,
-        '^Invalid value for \\[--region\\]: cannot specify logging options'
-        ' for regional backend services.', self.Run,
-        'compute backend-services create backend-service-1'
-        ' --http-health-checks my-health-check-1'
-        ' --description "My backend service"'
-        ' --region us-central1'
-        ' --enable-logging')
-
-  # INTERNAL_SELF_MANAGED currently only visible in alpha
-  # Uncomment once INTERNAL_SELF_MANAGED is available in beta.
-  # def testInvalidLoadBalancingSchemeWithLogConfig(self):
-  #   self.assertRaisesRegex(
-  #       exceptions.InvalidArgumentException,
-  #       '^Invalid value for \\[--load-balancing-scheme\\]: can only specify '
-  #       '--enable-logging or --logging-sample-rate if the '
-  #       'load balancing scheme is EXTERNAL.', self.Run,
-  #       self._create_service_cmd_line +
-  #       ' --load-balancing-scheme internal_self_managed' +
-  #       ' --enable-logging')
-
   def testInvalidProtocolWithLogConfig(self):
     self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--protocol\\]: can only specify --enable-logging'
-        ' or --logging-sample-rate if the protocol is HTTP/HTTPS.', self.Run,
+        ' or --logging-sample-rate if the protocol is HTTP/HTTPS/HTTP2.',
+        self.Run,
         self._create_service_cmd_line + ' --load-balancing-scheme external' +
         ' --protocol TCP' + ' --enable-logging')
 

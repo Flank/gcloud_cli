@@ -60,18 +60,17 @@ EXAMPLES
     and write the ciphertext to 'path/to/ciphertext'.
 
         $ gcloud alpha kms encrypt \
-            --key frodo \
-            --keyring fellowship \
-            --location global \
-            --plaintext-file path/to/input/plaintext \
-            --ciphertext-file path/to/output/ciphertext
+            --key=frodo \
+            --keyring=fellowship \
+            --location=global \
+            --plaintext-file=path/to/input/plaintext \
+            --ciphertext-file=path/to/output/ciphertext
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud kms encrypt
         $ gcloud beta kms encrypt

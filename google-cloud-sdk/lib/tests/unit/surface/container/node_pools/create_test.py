@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -722,6 +722,30 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
             nodeMetadata=self.messages.WorkloadMetadataConfig.\
                 NodeMetadataValueValuesEnum.UNSPECIFIED))
 
+  def _testNodeLocations(self, flags, locations):
+    pool_kwargs = {
+        'nodePoolLocations': locations
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    # Create node pool expects node pool and returns pending operation.
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    # Get returns expected node pool, populated with other fields by server.
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} {flags} '
+             '--cluster {clusterName}'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 flags=flags,
+                 clusterName=self.CLUSTER_NAME))
+
+  def testNodeLocations(self):
+    self._testNodeLocations(
+        '--node-locations=us-central1-a,us-central1-b',
+        locations=['us-central1-a', 'us-central1-b'])
+
   def testAutoUpgradeDefault(self):
     self._TestAutoUpgradeDefault(expect_default=True)
     self.AssertErrContains(c_util.WARN_AUTOUPGRADE_ENABLED_BY_DEFAULT)
@@ -882,6 +906,166 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         ' --cluster={clusterId}'
         ' --linux-sysctls="net.core.somaxconn=4096,'
         'net.ipv4.tcp_rmem=4096 87380 6291456"'.format(**pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
+  def testEnableSurgeUpgrade(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'upgradeSettings':
+            self._MakeUpgradeSettings(maxSurge=1),
+    }
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
+        ' --cluster={clusterId}'
+        ' --max-surge-upgrade=1'
+        .format(**pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
+  def testEnableSurgeUpgradeWithMaxUnavailable(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'upgradeSettings':
+            self._MakeUpgradeSettings(maxSurge=3, maxUnavailable=2),
+    }
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
+        ' --cluster={clusterId}'
+        ' --max-surge-upgrade=3'
+        ' --max-unavailable-upgrade=2'
+        .format(**pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
+  def testShieldedInstanceConfig(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'shieldedInstanceConfig':
+            self.messages.ShieldedInstanceConfig(
+                enableSecureBoot=True, enableIntegrityMonitoring=False),
+    }
+
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+
+    self.Run('{node_pools_command_base} create {name}'
+             ' --cluster={clusterId}'
+             ' --shielded-secure-boot'
+             ' --no-shielded-integrity-monitoring'.format(
+                 node_pools_command_base=self.node_pools_command_base.format(
+                     self.ZONE),
+                 **pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
+  def testNodeConfigFromFile(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'linuxNodeConfig':
+            self.msgs.LinuxNodeConfig(
+                sysctls=self.msgs.LinuxNodeConfig
+                .SysctlsValue(additionalProperties=[
+                    self.msgs.LinuxNodeConfig.SysctlsValue.AdditionalProperty(
+                        key='net.core.somaxconn', value='2048'),
+                    self.msgs.LinuxNodeConfig.SysctlsValue.AdditionalProperty(
+                        key='net.ipv4.tcp_rmem', value='4096 87380 6291456'),
+                ])),
+        'kubeletConfig':
+            self.msgs.NodeKubeletConfig(
+                cpuManagerPolicy='static',
+                cpuCfsQuota=True,
+                cpuCfsQuotaPeriod='10ms'),
+    }
+
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+
+    node_config = self.Touch(
+        self.temp_path,
+        contents="""
+kubeletConfig:
+  cpuManagerPolicy: static
+  cpuCFSQuota: true
+  cpuCFSQuotaPeriod: 10ms
+linuxConfig:
+  sysctl:
+    net.ipv4.tcp_rmem: '4096 87380 6291456'
+    net.core.somaxconn: '2048'
+        """)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
+        ' --cluster={cluster_id}'
+        ' --node-config={node_config}'.format(
+            name='my-pool',
+            cluster_id=self.CLUSTER_NAME,
+            node_config=node_config))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),

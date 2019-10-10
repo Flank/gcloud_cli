@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import e2e_base
 
 
-class AutoscalingIntegrationTestBeta(e2e_base.DataprocIntegrationTestBase,
-                                     base.DataprocTestBaseBeta):
+class AutoscalingIntegrationTest(e2e_base.DataprocIntegrationTestBase,
+                                 base.DataprocTestBase):
   """Tests for managing autoscaling-policies and managing autoscaling clusters.
 
   See DataprocIntegrationTestBase for requirements of tests that create

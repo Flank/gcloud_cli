@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,17 +111,38 @@ class Survey(object):
   def welcome(self):
     return self._survey_content['welcome']
 
-  def __len__(self):
-    return len(self.questions)
-
-  def __iter__(self):
-    for q in self.questions:
-      yield q
-
   def PrintWelcomeMsg(self):
     log.err.Print(self.welcome)
 
   @classmethod
   def PrintInstruction(cls):
     log.err.Print(cls.INSTRUCTION_MESSAGE)
+
+  def __iter__(self):
+    return iter(self._questions)
+
+
+class GeneralSurvey(Survey):
+  """GeneralSurvey defined in googlecloudsdk/command_lib/survey/contents."""
+
+  SURVEY_NAME = 'GeneralSurvey'
+
+  def __init__(self):
+    super(GeneralSurvey, self).__init__(self.SURVEY_NAME)
+
+  def __iter__(self):
+    yield self.questions[0]  # satisfaction question
+    yield self.questions[1]  # NPS question
+    if self.IsSatisfied() is None or self.IsSatisfied():
+      yield self.questions[2]
+    else:
+      yield self.questions[3]
+
+  def IsSatisfied(self):
+    """Returns if survey respondent is satisfied."""
+    satisfaction_question = self.questions[0]
+    if satisfaction_question.IsAnswered():
+      return satisfaction_question.IsSatisfied()
+    else:
+      return None
 

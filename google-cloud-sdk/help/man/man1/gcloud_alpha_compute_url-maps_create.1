@@ -11,7 +11,7 @@ gcloud alpha compute url\-maps create \- create a URL map
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute url\-maps create\fR \fIURL_MAP_NAME\fR (\fB\-\-default\-backend\-bucket\fR=\fIDEFAULT_BACKEND_BUCKET\fR\ |\ \fB\-\-default\-service\fR=\fIDEFAULT_SERVICE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute url\-maps create\fR \fIURL_MAP\fR (\fB\-\-default\-backend\-bucket\fR=\fIDEFAULT_BACKEND_BUCKET\fR\ |\ \fB\-\-default\-service\fR=\fIDEFAULT_SERVICE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,7 +42,7 @@ add\-host\-rule\fR.
 
 .RS 2m
 .TP 2m
-\fIURL_MAP_NAME\fR
+\fIURL_MAP\fR
 Name of the URL map to create.
 
 
@@ -136,9 +136,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute url\-maps create

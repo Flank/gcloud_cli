@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.command_lib.util.ssh import containers
 from googlecloudsdk.command_lib.util.ssh import ssh
 from googlecloudsdk.core import log
+import six
 
 
 def RunSubprocess(proc_name, command_list):
@@ -46,8 +47,7 @@ def RunSubprocess(proc_name, command_list):
       # Recycling exception type
       raise OSError(proc.stderr.read().strip())
   except OSError as e:
-    error_str = str(e)
-    log.err.Print('Error running %s: %s' % (proc_name, error_str))
+    log.err.Print('Error running %s: %s' % (proc_name, six.text_type(e)))
     command_list_str = ' '.join(command_list)
     log.err.Print('INVOCATION: %s' % command_list_str)
 
@@ -74,7 +74,7 @@ def CallSubprocess(proc_name, command_list, dry_run=False):
     return subprocess.call(command_list)
   except OSError as e:
     log.error('Error running {proc_name}: {error_msg}'.format(
-        proc_name=proc_name, error_msg=str(e)))
+        proc_name=proc_name, error_msg=six.text_type(e)))
     command_list_str = ' '.join(command_list)
     log.err.Print('INVOCATION: %s' % command_list_str)
     raise e
@@ -109,8 +109,9 @@ def RunSSHCommandToInstance(command_list,
   Raises:
     ssh.CommandError: there was an error running a SSH command
   """
-  external_ip_address = ssh_utils.GetExternalIPAddress(instance)
-  remote = ssh.Remote(external_ip_address, user)
+  external_address = ssh_utils.GetExternalIPAddress(instance)
+  internal_address = ssh_utils.GetInternalIpAddress(instance)
+  remote = ssh.Remote(external_address, user)
 
   identity_file = None
   options = None
@@ -118,7 +119,8 @@ def RunSSHCommandToInstance(command_list,
     identity_file = ssh_helper.keys.key_file
     options = ssh_helper.GetConfig(ssh_utils.HostKeyAlias(instance),
                                    args.strict_host_key_checking)
-  extra_flags = ssh.ParseAndSubstituteSSHFlags(args, remote, user)
+  extra_flags = ssh.ParseAndSubstituteSSHFlags(args, remote, external_address,
+                                               internal_address)
   remainder = []
 
   remote_command = containers.GetRemoteCommand(None, command_list)

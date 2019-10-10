@@ -45,13 +45,13 @@ COMMANDS
 EXAMPLES
     To start a transaction, run:
 
-        $ gcloud beta dns record-sets transaction start --zone MANAGED_ZONE
+        $ gcloud beta dns record-sets transaction start --zone=MANAGED_ZONE
 
     To append a record-set addition to the transaction, run:
 
         $ gcloud beta dns record-sets transaction add \
             --name RECORD_SET_NAME --ttl TTL --type TYPE DATA \
-            --zone MANAGED_ZONE
+            --zone=MANAGED_ZONE
 
     To append a record-set removal to the transaction, run:
 
@@ -61,19 +61,20 @@ EXAMPLES
     To look at the details of the transaction, run:
 
         $ gcloud beta dns record-sets transaction describe \
-            --zone MANAGED_ZONE
+            --zone=MANAGED_ZONE
 
     To delete the transaction, run:
 
-        $ gcloud beta dns record-sets transaction abort --zone MANAGED_ZONE
+        $ gcloud beta dns record-sets transaction abort --zone=MANAGED_ZONE
 
     To execute the transaction, run:
 
-        $ gcloud beta dns record-sets transaction execute --zone MANAGED_ZONE
+        $ gcloud beta dns record-sets transaction execute --zone=MANAGED_ZONE
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns record-sets transaction
+        $ gcloud alpha dns record-sets transaction
 

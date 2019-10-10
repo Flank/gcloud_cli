@@ -36,8 +36,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --max-throughput=MAX_THROUGHPUT; default=1000
         Maximum throughput in Mbps. Value must be a multiple of 100 between 200
@@ -77,5 +77,8 @@ EXAMPLES
           --range=10.132.0.0/28
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud compute networks vpc-access connectors create
 

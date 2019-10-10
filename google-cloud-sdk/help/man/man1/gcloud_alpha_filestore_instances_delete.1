@@ -54,7 +54,7 @@ The zone of the instance.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Do not wait for the delete operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
@@ -91,9 +91,8 @@ $ gcloud alpha filestore instances delete NAME \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud filestore instances delete

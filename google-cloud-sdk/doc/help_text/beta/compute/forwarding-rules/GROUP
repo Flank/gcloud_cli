@@ -29,6 +29,12 @@ COMMANDS
      describe
         (BETA) Display detailed information about a forwarding rule.
 
+     export
+        (BETA) Export a forwarding rule.
+
+     import
+        (BETA) Import a forwarding rule.
+
      list
         (BETA) List Google Compute Engine forwarding rules.
 

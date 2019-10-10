@@ -6,7 +6,7 @@ summary:
   - command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
   - stderr: |
       WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$\].
   - stdout: |
       ---
       name:   $$disk$$
@@ -16,14 +16,14 @@ summary:
   - command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
       $$my-zone$$ --format="text(name,status)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
   - stdout: |
       ---
       name:   $$image$$
       status: READY
 - execute:
   - command: compute images import $$import-image$$ --source-image $$image$$ --custom-workflow
-      dummy.wf.json --timeout 10s --quiet
+      dummy.wf.json --timeout 20s --quiet
   - stderr: |-
       .*WARNING: Importing image\. This may take up to 2 hours.*
       .*Created.*
@@ -41,11 +41,11 @@ summary:
 - execute:
   - command: compute images delete $$image$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
 - execute:
   - command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$\].
 actions:
 - define_reference:
     reference: api-version
@@ -89,8 +89,9 @@ actions:
       $$my-zone$$ --format="text(name,status)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
     - expect_stdout: |
         ---
         name:   $$image$$
@@ -99,7 +100,7 @@ actions:
         code: 0
 - execute_command:
     command: compute images import $$import-image$$ --source-image $$image$$ --custom-workflow
-      dummy.wf.json --timeout 10s --quiet
+      dummy.wf.json --timeout 20s --quiet
     validation_only: true
     events:
     - expect_stderr:
@@ -108,8 +109,8 @@ actions:
           .*Created.*
     - expect_stdout:
         matches: |
-          .*\[Daisy\] Running workflow "import-from-image".*
-          .*"translate-disk": open /workflows/image_import/dummy.wf.json: no such file or directory.*
+          .*starting build.*
+          .*ERROR: build step 0 "gcr.io\/compute-image-tools\/gce_vm_image_import:release" failed.*
     - expect_exit:
         code: 1
         message:
@@ -130,8 +131,9 @@ actions:
     cleanup_for: image
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -139,7 +141,8 @@ actions:
     cleanup_for: disk
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$\].
     - expect_exit:
         code: 0

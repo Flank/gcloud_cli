@@ -4,27 +4,32 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: compute/zone us-central1-c
 - execute:
+  - label: Base Case
   - command: |
       compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
       --network my-tf-network
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
 - execute:
+  - label: Create Failed
   - command: |
       compute tpus create mytpu --range 10.20.10.0/29 --version 1.6
       --network my-tf-network
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: FAILURE
   - error: '1: .*Create Failed.*$'
 - execute:
+  - label: With Cust Params
   - command: |
       compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
       --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
@@ -32,7 +37,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -93,7 +99,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -164,7 +171,8 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: FAILURE
     - expect_exit:
         code: 1
@@ -230,7 +238,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].

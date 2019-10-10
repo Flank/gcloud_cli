@@ -93,11 +93,11 @@ the CryptoKey \f5frodo\fR with the KeyRing \f5fellowship\fR and Location
 
 .RS 2m
 $ gcloud alpha kms encrypt \e
-    \-\-key frodo \e
-    \-\-keyring fellowship \e
-    \-\-location global \e
-    \-\-plaintext\-file path/to/input/plaintext \e
-    \-\-ciphertext\-file path/to/output/ciphertext
+    \-\-key=frodo \e
+    \-\-keyring=fellowship \e
+    \-\-location=global \e
+    \-\-plaintext\-file=path/to/input/plaintext \e
+    \-\-ciphertext\-file=path/to/output/ciphertext
 .RE
 
 
@@ -106,9 +106,8 @@ $ gcloud alpha kms encrypt \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud kms encrypt

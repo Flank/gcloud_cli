@@ -42,11 +42,17 @@ GROUPS
      commitments
         Manage Google Compute Engine commitments.
 
+     diagnose
+        Debugging tools for Google Compute Engine virtual machine instances.
+
      disk-types
         Read Google Compute Engine virtual disk types.
 
      disks
         Read and manipulate Google Compute Engine disks.
+
+     external-vpn-gateways
+        Read and manipulate Google Compute Engine External VPN Gateways.
 
      firewall-rules
         List, create, update, and delete Google Compute Engine firewall rules.
@@ -98,6 +104,12 @@ GROUPS
 
      regions
         List Google Compute Engine regions.
+
+     reservations
+        Manage Compute Engine reservations.
+
+     resource-policies
+        Manage Google Compute Engine Resource Policies.
 
      routers
         List, create, and delete Google Compute Engine routers.
@@ -152,6 +164,10 @@ GROUPS
      url-maps
         List, create, and delete URL maps.
 
+     vpn-gateways
+        read and manipulate Google Compute Engine Highly Available VPN
+        Gateways.
+
      vpn-tunnels
         Read and manipulate Google Compute Engine VPN Tunnels.
 
@@ -182,6 +198,9 @@ COMMANDS
 
      ssh
         SSH into a virtual machine instance.
+
+     start-iap-tunnel
+        Starts an IAP TCP forwarding tunnel.
 
 NOTES
     These variants are also available:

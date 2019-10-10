@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,6 +55,6 @@ class Create(base.CreateCommand):
     instance_ref = database_ref.Parent()
     op = databases.Create(instance_ref, args.database,
                           flags.SplitDdlIntoStatements(args.ddl or []))
-    if args.async:
+    if args.async_:
       return op
     return database_operations.Await(op, 'Creating database')

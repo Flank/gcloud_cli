@@ -8,10 +8,10 @@ class BigqueryV2(base_api.BaseApiClient):
   """Generated client library for service bigquery version v2."""
 
   MESSAGES_MODULE = messages
-  BASE_URL = u'https://www.googleapis.com/bigquery/v2/'
+  BASE_URL = u'https://bigquery.googleapis.com/bigquery/v2/'
 
   _PACKAGE = u'bigquery'
-  _SCOPES = [u'https://www.googleapis.com/auth/bigquery', u'https://www.googleapis.com/auth/bigquery.insertdata', u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/cloud-platform.read-only', u'https://www.googleapis.com/auth/devstorage.full_control', u'https://www.googleapis.com/auth/devstorage.read_only', u'https://www.googleapis.com/auth/devstorage.read_write']
+  _SCOPES = [u'https://www.googleapis.com/auth/bigquery', u'https://www.googleapis.com/auth/bigquery.insertdata', u'https://www.googleapis.com/auth/bigquery.readonly', u'https://www.googleapis.com/auth/cloud-platform', u'https://www.googleapis.com/auth/cloud-platform.read-only', u'https://www.googleapis.com/auth/devstorage.full_control', u'https://www.googleapis.com/auth/devstorage.read_only', u'https://www.googleapis.com/auth/devstorage.read_write']
   _VERSION = u'v2'
   _CLIENT_ID = '1042881264118.apps.googleusercontent.com'
   _CLIENT_SECRET = 'x_Tw5K8nnjoRAqULM9PFAC2b'
@@ -351,7 +351,7 @@ class BigqueryV2(base_api.BaseApiClient):
         method_id=u'bigquery.jobs.list',
         ordered_params=[u'projectId'],
         path_params=[u'projectId'],
-        query_params=[u'allUsers', u'maxCreationTime', u'maxResults', u'minCreationTime', u'pageToken', u'projection', u'stateFilter'],
+        query_params=[u'allUsers', u'maxCreationTime', u'maxResults', u'minCreationTime', u'pageToken', u'parentJobId', u'projection', u'stateFilter'],
         relative_path=u'projects/{projectId}/jobs',
         request_field='',
         request_type_name=u'BigqueryJobsListRequest',

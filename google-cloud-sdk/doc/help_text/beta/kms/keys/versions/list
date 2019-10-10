@@ -60,9 +60,9 @@ EXAMPLES
     The following command lists all versions within the key frodo, keyring
     fellowship, and location global:
 
-        $ gcloud beta kms keys versions list --location global \
-            --keyring fellowship \
-            --key frodo
+        $ gcloud beta kms keys versions list --location=global \
+            --keyring=fellowship \
+            --key=frodo
 
 NOTES
     This command is currently in BETA and may change without notice. These

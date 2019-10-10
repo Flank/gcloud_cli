@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute external-vpn-gateways create creates a new
-    External VPN gateway.
+    external VPN gateway.
 
     External VPN gateway is the on-premises VPN gateway or another cloud
     provider's VPN gateway that connects to your Google Cloud VPN gateway. To
@@ -62,12 +62,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To create an external VPN gateway, run:
+
+        $ gcloud alpha compute external-vpn-gateways create \
+          my-external-gateway --interfaces=0=8.9.9.9
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud compute external-vpn-gateways create
         $ gcloud beta compute external-vpn-gateways create
 

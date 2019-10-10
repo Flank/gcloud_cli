@@ -6,7 +6,7 @@ summary:
       compute networks create $$compute-peering-net1$$ --subnet-mode custom --format="value(name)"
       --verbosity none
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
   - stdout: |
       $$compute-peering-net1$$
 - execute:
@@ -14,7 +14,7 @@ summary:
       compute networks subnets create $$compute-peering-sub1$$ --network $$compute-peering-net1$$
       --region us-central1 --range 10.1.0.0/16 --format="text(name, network)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$\].
   - stdout: |
       ---
       name:    $$compute-peering-sub1$$
@@ -24,14 +24,14 @@ summary:
       compute networks create $$compute-peering-net2$$ --subnet-mode custom --format="value(name)"
       --verbosity none
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
   - stdout: |
       $$compute-peering-net2$$
 - execute:
   - command: compute networks subnets create $$compute-peering-sub2$$ --network $$compute-peering-net2$$
       --region us-central1 --range 10.2.0.0/16
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$\].
   - stdout: |
       NAME                                      REGION       NETWORK                                   RANGE
       $$compute-peering-sub2$$  us-central1  $$compute-peering-net2$$  10.2.0.0/16
@@ -41,7 +41,7 @@ summary:
       $$compute-peering-net1$$ --peer-network $$compute-peering-net2$$ --auto-create-routes
       --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
   - stdout: |
       ---
       name:                         $$compute-peering-net1$$
@@ -55,7 +55,7 @@ summary:
       $$compute-peering-net2$$ --peer-network $$compute-peering-net1$$ --auto-create-routes
       --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
   - stdout: |
       ---
       name:                         $$compute-peering-net2$$
@@ -67,7 +67,7 @@ summary:
   - command: compute networks peerings delete $$compute-peering-peer1$$ --network
       $$compute-peering-net1$$
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
 - execute:
   - command: |
       compute networks peerings list --network $$compute-peering-net2$$
@@ -82,29 +82,29 @@ summary:
   - command: compute networks peerings delete $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
 - execute:
   - command: compute networks subnets delete $$compute-peering-sub1$$ --region us-central1
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$\].
 - execute:
   - command: compute networks subnets delete $$compute-peering-sub2$$ --region us-central1
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$\].
 - execute:
   - command: compute networks delete $$compute-peering-net1$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
 - execute:
   - command: compute networks delete $$compute-peering-net2$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: compute-peering-net1
     prefix: compute-peering-net
@@ -129,8 +129,9 @@ actions:
       --verbosity none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
     - expect_stdout: |
         $$compute-peering-net1$$
     - expect_exit:
@@ -141,8 +142,9 @@ actions:
       --region us-central1 --range 10.1.0.0/16 --format="text(name, network)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$\].
     - expect_stdout: |
         ---
         name:    $$compute-peering-sub1$$
@@ -155,8 +157,9 @@ actions:
       --verbosity none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
     - expect_stdout: |
         $$compute-peering-net2$$
     - expect_exit:
@@ -166,8 +169,9 @@ actions:
       --region us-central1 --range 10.2.0.0/16
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$\].
     - expect_stdout: |
         NAME                                      REGION       NETWORK                                   RANGE
         $$compute-peering-sub2$$  us-central1  $$compute-peering-net2$$  10.2.0.0/16
@@ -210,8 +214,9 @@ actions:
             endTime: '2018-11-30T11:16:36.447-08:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1543605396066-57be6a34e4ed1-4b98c1ec-5316d60c
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
@@ -287,8 +292,9 @@ actions:
             insertTime: '2018-11-30T11:16:37.398-08:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1543605396953-57be6a35bd7ab-9f825559-bdffb721
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
@@ -360,8 +366,9 @@ actions:
             insertTime: '2018-11-30T11:16:59.642-08:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1543605419238-57be6a4afe271-3082d93b-6ef16d83
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
@@ -437,8 +444,9 @@ actions:
             endTime: '2018-11-29T13:39:09.115-08:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1543527548746-57bd4833e7912-29d4ca61-381a6f2f
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
@@ -470,8 +478,9 @@ actions:
       --quiet
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$\].
     - expect_exit:
         code: 0
     cleanup_for: compute-peering-sub1
@@ -480,8 +489,9 @@ actions:
       --quiet
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$\].
     - expect_exit:
         code: 0
     cleanup_for: compute-peering-sub2
@@ -489,8 +499,9 @@ actions:
     command: compute networks delete $$compute-peering-net1$$ --quiet
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$\].
     - expect_exit:
         code: 0
     cleanup_for: compute-peering-net1
@@ -498,8 +509,9 @@ actions:
     command: compute networks delete $$compute-peering-net2$$ --quiet
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$\].
     - expect_exit:
         code: 0
     cleanup_for: compute-peering-net2

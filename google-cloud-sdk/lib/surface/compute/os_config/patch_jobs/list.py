@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,10 +19,14 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import list_pager
-from googlecloudsdk.api_lib.compute.os_config import osconfig_utils
+from googlecloudsdk.api_lib.compute.os_config import utils as osconfig_api_utils
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.compute.os_config import utils as osconfig_command_utils
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+
+
+_DEFAULT_LIMIT = 10
 
 
 def _TransformPatchJobDescription(resource):
@@ -39,17 +43,13 @@ def _TransformNumInstances(resource):
 
   instance_details_summary = resource['instanceDetailsSummary']
   num_instances = 0
-  for status in osconfig_utils.INSTANCE_DETAILS_KEY_MAP.keys():
+  for status in osconfig_command_utils.INSTANCE_DETAILS_KEY_MAP.keys():
     num_instances += int(instance_details_summary.get(status, 0))
   return num_instances
 
 
 def _MakeGetUriFunc():
-  """Return a transformation function from a patch job resource to an URI.
-
-  Returns:
-    Function from patch job to its URI.
-  """
+  """Return a transformation function from a patch job resource to an URI."""
 
   def UriFunc(resource):
     ref = resources.REGISTRY.Parse(
@@ -78,6 +78,7 @@ class List(base.ListCommand):
 
   @staticmethod
   def Args(parser):
+    base.LIMIT_FLAG.SetDefault(parser, _DEFAULT_LIMIT)
     parser.display_info.AddFormat("""
           table(
             name.basename(),
@@ -97,12 +98,12 @@ class List(base.ListCommand):
     project = properties.VALUES.core.project.GetOrFail()
 
     release_track = self.ReleaseTrack()
-    client = osconfig_utils.GetClientInstance(release_track)
-    messages = osconfig_utils.GetClientMessages(release_track)
+    client = osconfig_api_utils.GetClientInstance(release_track)
+    messages = osconfig_api_utils.GetClientMessages(release_track)
 
     request = messages.OsconfigProjectsPatchJobsListRequest(
         pageSize=args.page_size,
-        parent=osconfig_utils.GetProjectUriPath(project))
+        parent=osconfig_command_utils.GetProjectUriPath(project))
 
     return list_pager.YieldFromList(
         client.projects_patchJobs,
@@ -110,4 +111,5 @@ class List(base.ListCommand):
         limit=args.limit,
         batch_size=args.page_size,
         field='patchJobs',
-        batch_size_attribute='pageSize')
+        batch_size_attribute='pageSize',
+    )

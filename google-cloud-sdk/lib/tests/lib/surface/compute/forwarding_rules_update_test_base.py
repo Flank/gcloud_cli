@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,9 +34,21 @@ class UpdateTestBase(test_base.BaseTest):
     self.select_network_tier = (
         self.messages.ForwardingRule.NetworkTierValueValuesEnum.SELECT)
 
-  def _SetNextGetResult(self, **kwargs):
+  def _SetNextGetResult(self, labels=None, label_fingerprint=None, **kwargs):
     forwarding_rule_resource = {'name': 'forwarding-rule-1'}
     forwarding_rule_resource.update(kwargs)
+    msg = self.messages.ForwardingRule()
+
+    if labels is not None:
+      labels_value = msg.LabelsValue
+      forwarding_rule_resource['labels'] = labels_value(additionalProperties=[
+          labels_value.AdditionalProperty(key=pair[0], value=pair[1])
+          for pair in labels
+      ])
+
+    if label_fingerprint:
+      forwarding_rule_resource['labelFingerprint'] = label_fingerprint
+
     self.make_requests.side_effect = iter([
         [self.messages.ForwardingRule(**forwarding_rule_resource)],
         [],
@@ -110,6 +122,18 @@ class UpdateTestBase(test_base.BaseTest):
     else:
       patch_request = self._MakePatchRequest(is_global, **kwargs)
       self.CheckRequests([get_request], [patch_request])
+
+  def _CheckSetLabelsRequest(self, is_global, label_fingerprint, labels,
+                             **kwargs):
+    get_request = self._MakeGetRequest(is_global)
+    set_labels_request = self._MakeSetLabelsRequest(is_global,
+                                                    label_fingerprint, labels)
+    self.CheckRequests([get_request], [set_labels_request])
+
+  def _CheckNoUpdateRequest(self, is_global):
+    get_request = self._MakeGetRequest(is_global)
+
+    self.CheckRequests([get_request], [])
 
   def _CheckPatchAndSetLabelsRequest(self, is_global, label_fingerprint, labels,
                                      **kwargs):

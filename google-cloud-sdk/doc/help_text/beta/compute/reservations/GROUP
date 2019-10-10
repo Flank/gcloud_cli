@@ -17,6 +17,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding to a Google Compute Engine reservation.
+
      create
         (BETA) Create a Compute Engine reservation.
 
@@ -26,15 +29,26 @@ COMMANDS
      describe
         (BETA) Show details about a Compute Engine reservation.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Google Compute Engine reservation.
+
      list
         (BETA) List Google Compute Engine reservations.
+
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding from a Google Compute Engine
+        reservation.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a Google Compute Engine reservation.
 
      update
         (BETA) Update a Compute Engine reservation.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute reservations
         $ gcloud alpha compute reservations
 

@@ -102,11 +102,10 @@ $ gcloud beta projects add\-iam\-policy\-binding example\-project\-id\-1 \e
 .RE
 
 To add an IAM policy binding for the role of 'roles/editor' to the service
-account 'test\-proj1@example.domain.com', run:
+account 'test\-proj1@example.domain.com' for the same project, run:
 
 .RS 2m
-$ gcloud beta projects add\-iam\-policy\-binding \e
-    test\-proj1@example.domain.com \e
+$ gcloud beta projects add\-iam\-policy\-binding example\-project\-id\-1 \e
     \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
     \-\-role='roles/editor'
 .RE

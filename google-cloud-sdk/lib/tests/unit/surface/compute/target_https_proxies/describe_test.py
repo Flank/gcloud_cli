@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,14 +61,30 @@ class TargetHttpsProxiesDescribeTest(test_base.BaseTest,
         textwrap.dedent("""\
             description: My first proxy
             name: target-https-proxy-1
-            selfLink: https://www.googleapis.com/compute/{version}/projects/my-project/global/targetHttpsProxies/target-https-proxy-1
+            selfLink: https://compute.googleapis.com/compute/{version}/projects/my-project/global/targetHttpsProxies/target-https-proxy-1
             sslCertificates:
             - {uri}/projects/my-project/global/sslCertificates/ssl-cert-1
             urlMap: {uri}/projects/my-project/global/urlMaps/url-map-1
             """.format(version=self._api, uri=self.compute_uri)))
 
 
-class TargetHttpsProxiesDescribeAlphaTest(TargetHttpsProxiesDescribeTest):
+class TargetHttpsProxiesDescribeBetaTest(TargetHttpsProxiesDescribeTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.targetHttpsProxies
+
+  def RunDescribe(self, command):
+    self.Run('beta compute target-https-proxies describe --global ' + command)
+
+  def LoadSideEffect(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.TARGET_HTTPS_PROXIES_BETA[0]],
+    ])
+
+
+class TargetHttpsProxiesDescribeAlphaTest(TargetHttpsProxiesDescribeBetaTest):
 
   def SetUp(self):
     self._api = 'alpha'
@@ -84,11 +100,122 @@ class TargetHttpsProxiesDescribeAlphaTest(TargetHttpsProxiesDescribeTest):
     ])
 
 
-class RegionTargetHttpsProxiesDescribeTest(test_base.BaseTest,
-                                           completer_test_base.CompleterBase,
-                                           test_case.WithOutputCapture):
+class RegionTargetHttpsProxiesDescribeBetaTest(
+    test_base.BaseTest, completer_test_base.CompleterBase,
+    test_case.WithOutputCapture):
 
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
+
+    self.target_https_proxies = [
+        self.messages.TargetHttpsProxy(
+            name='target-https-proxy-1',
+            sslCertificates=[
+                self.URI_PREFIX + 'global/sslCertificates/my-cert-1'
+            ],
+            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-1',
+            selfLink=(self.URI_PREFIX +
+                      'global/targetHttpsProxies/target-https-proxy-1')),
+        self.messages.TargetHttpsProxy(
+            name='target-https-proxy-2',
+            sslCertificates=[
+                self.URI_PREFIX + 'global/sslCertificates/my-cert-2'
+            ],
+            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-2',
+            selfLink=(self.URI_PREFIX +
+                      'global/targetHttpsProxies/target-https-proxy-2')),
+    ]
+
+    self.region_target_https_proxies = [
+        self.messages.TargetHttpsProxy(
+            name='target-https-proxy-3',
+            sslCertificates=[
+                self.URI_PREFIX + 'regions/region-1/sslCertificates/my-cert-1'
+            ],
+            urlMap=self.URI_PREFIX + 'regions/region-1/urlMaps/url-map-3',
+            selfLink=(self.URI_PREFIX + 'regions/region-1/targetHttpsProxies/'
+                      'target-https-proxy-3'),
+            region='region-1'),
+        self.messages.TargetHttpsProxy(
+            name='target-https-proxy-4',
+            sslCertificates=[
+                self.URI_PREFIX + 'regions/region-2/sslCertificates/my-cert-2'
+            ],
+            urlMap=self.URI_PREFIX + 'regions/region-2/urlMaps/url-map-4',
+            selfLink=(self.URI_PREFIX + 'regions/region-2/targetHttpsProxies/'
+                      'target-https-proxy-4'),
+            region='region-2'),
+    ]
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+
+  def RunDescribe(self, command):
+    self.Run('beta compute target-https-proxies describe --region us-west-1 ' +
+             command)
+
+  def testSimpleCase(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.TARGET_HTTPS_PROXIES_BETA[0]],
+    ])
+
+    self.RunDescribe('target-https-proxy-1')
+
+    self.CheckRequests(
+        [(self._target_https_proxies_api, 'Get',
+          self.messages.ComputeRegionTargetHttpsProxiesGetRequest(
+              project='my-project',
+              region='us-west-1',
+              targetHttpsProxy='target-https-proxy-1'))],)
+
+  def testDescribleCompletion(self):
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(self.target_https_proxies),
+        resource_projector.MakeSerializable(self.region_target_https_proxies)
+    ]
+    self.RunCompleter(
+        flags.TargetHttpsProxiesCompleterAlpha,
+        expected_command=[
+            [
+                'alpha',
+                'compute',
+                'target-https-proxies',
+                'list',
+                '--global',
+                '--uri',
+                '--quiet',
+                '--format=disable',
+            ],
+            [
+                'alpha',
+                'compute',
+                'target-https-proxies',
+                'list',
+                '--filter=region:*',
+                '--uri',
+                '--quiet',
+                '--format=disable',
+            ],
+        ],
+        expected_completions=[
+            'target-https-proxy-1',
+            'target-https-proxy-2',
+            'target-https-proxy-3',
+            'target-https-proxy-4',
+        ],
+        cli=self.cli,
+    )
+
+
+class RegionTargetHttpsProxiesDescribeAlphaTest(
+    RegionTargetHttpsProxiesDescribeBetaTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
 
   def SetUp(self):
     self._api = 'alpha'
@@ -142,58 +269,6 @@ class RegionTargetHttpsProxiesDescribeTest(test_base.BaseTest,
   def RunDescribe(self, command):
     self.Run('alpha compute target-https-proxies describe --region us-west-1 ' +
              command)
-
-  def testSimpleCase(self):
-    self.make_requests.side_effect = iter([
-        [test_resources.TARGET_HTTPS_PROXIES_ALPHA[0]],
-    ])
-
-    self.RunDescribe('target-https-proxy-1')
-
-    self.CheckRequests(
-        [(self._target_https_proxies_api, 'Get',
-          self.messages.ComputeRegionTargetHttpsProxiesGetRequest(
-              project='my-project',
-              region='us-west-1',
-              targetHttpsProxy='target-https-proxy-1'))],)
-
-  def testDescribleCompletion(self):
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(self.target_https_proxies),
-        resource_projector.MakeSerializable(self.region_target_https_proxies)
-    ]
-    self.RunCompleter(
-        flags.TargetHttpsProxiesCompleterAlpha,
-        expected_command=[
-            [
-                'alpha',
-                'compute',
-                'target-https-proxies',
-                'list',
-                '--global',
-                '--uri',
-                '--quiet',
-                '--format=disable',
-            ],
-            [
-                'alpha',
-                'compute',
-                'target-https-proxies',
-                'list',
-                '--filter=region:*',
-                '--uri',
-                '--quiet',
-                '--format=disable',
-            ],
-        ],
-        expected_completions=[
-            'target-https-proxy-1',
-            'target-https-proxy-2',
-            'target-https-proxy-3',
-            'target-https-proxy-4',
-        ],
-        cli=self.cli,
-    )
 
 
 if __name__ == '__main__':

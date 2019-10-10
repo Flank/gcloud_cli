@@ -17,6 +17,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     bak
+        (BETA) Export data from a Cloud SQL instance to a BAK file.
+
      csv
         (BETA) Exports data from a Cloud SQL instance to a CSV file.
 

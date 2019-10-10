@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources as cloud_resources
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import progress_tracker
+from googlecloudsdk.core.util import times
 import six
 from six.moves import range  # pylint: disable=redefined-builtin
 import six.moves.http_client
@@ -67,7 +68,7 @@ NO_AUTOPROVISIONING_LIMITS_ERROR_MSG = """\
 Must specify both --max-cpu and --max-memory to enable autoprovisioning.
 """
 
-ATMOST_ONE_IDENTITY_FOR_AUTOPROVISIONING_ERROR_MSG = """\
+AT_MOST_ONE_IDENTITY_FOR_AUTOPROVISIONING_ERROR_MSG = """\
 At most one of --autoprovisioning-service-account and \
 --autoprovisioning-scopes \
 can be specified"""
@@ -123,6 +124,10 @@ UNKNOWN_WORKLOAD_METADATA_FROM_NODE_ERROR_MSG = """\
 Invalid option '{option}' for '--workload-metadata-from-node' (must be one of 'unspecified', 'secure', 'exposed').
 """
 
+ALLOW_ROUTE_OVERLAP_WITHOUT_EXPLICIT_NETWORK_MODE = """\
+Flag --allow-route-overlap must be used with either --enable-ip-alias or --no-enable-ip-alias.
+"""
+
 ALLOW_ROUTE_OVERLAP_WITHOUT_CLUSTER_CIDR_ERROR_MSG = """\
 Flag --cluster-ipv4-cidr must be fully specified (e.g. `10.96.0.0/14`, but not `/14`) with --allow-route-overlap.
 """
@@ -151,10 +156,6 @@ CLOUDRUN_INGRESS_KUBERNETES_DISABLED_ERROR_MSG = """\
 The CloudRun-on-GKE addon (--addons=CloudRun) requires HTTP Load Balancing to be enabled via the --addons=HttpLoadBalancing flag.
 """
 
-CLOUDRUN_HPA_KUBERNETES_DISABLED_ERROR_MSG = """\
-The CloudRun-on-GKE addon (--addons=CloudRun) requires Horizontal Pod Autoscaling to be enabled via the --addons=HorizontalPodAutoscaling flag.
-"""
-
 DEFAULT_MAX_PODS_PER_NODE_WITHOUT_IP_ALIAS_ERROR_MSG = """\
 Cannot use --default-max-pods-per-node without --enable-ip-alias.
 """
@@ -179,16 +180,16 @@ ENABLE_NETWORK_EGRESS_METERING_ERROR_MSG = """\
 Cannot use --[no-]enable-network-egress-metering without --resource-usage-bigquery-dataset.
 """
 
-SURGE_AND_AUTOSCALING_ERROR_MSG = """\
-Cannot use cluster autoscaling with alpha surge upgrades.
+ENABLE_RESOURCE_CONSUMPTION_METERING_ERROR_MSG = """\
+Cannot use --[no-]enable-resource-consumption-metering without --resource-usage-bigquery-dataset.
 """
 
-SURGE_AND_MAX_UNAVAILABLE_BOTH_ZERO_ERROR_MSG = """\
-Cannot set both --max-unavailable-upgrade and --max-surge-upgrade to 0.
+DISABLE_DEFAULT_SNAT_WITHOUT_IP_ALIAS_ERROR_MSG = """\
+Cannot use --disable-default-snat without --enable-ip-alias.
 """
 
-SURGE_REQUIRED__TO_CHANGE_MAX_UNAVAILABLE_ERROR_MSG = """\
-At present changing --max-unavailable-upgrade requires setting --max-surge-upgrade to at least 1.
+DISABLE_DEFAULT_SNAT_WITHOUT_PRIVATE_NODES_ERROR_MSG = """\
+Cannot use --disable-default-snat without --enable-private-nodes.
 """
 
 MAX_NODES_PER_POOL = 1000
@@ -201,16 +202,21 @@ INGRESS = 'HttpLoadBalancing'
 HPA = 'HorizontalPodAutoscaling'
 DASHBOARD = 'KubernetesDashboard'
 CLOUDRUN = 'CloudRun'
+CONFIGCONNECTOR = 'ConfigConnector'
+GCEPDCSIDRIVER = 'GcePersistentDiskCsiDriver'
 ISTIO = 'Istio'
 NETWORK_POLICY = 'NetworkPolicy'
 NODELOCALDNS = 'NodeLocalDNS'
 RESOURCE_LIMITS = 'resourceLimits'
 SERVICE_ACCOUNT = 'serviceAccount'
 SCOPES = 'scopes'
+AUTOPROVISIONING_LOCATIONS = 'autoprovisioningLocations'
 DEFAULT_ADDONS = [INGRESS, HPA]
-ADDONS_OPTIONS = DEFAULT_ADDONS + [DASHBOARD, ISTIO, NETWORK_POLICY]
-BETA_ADDONS_OPTIONS = ADDONS_OPTIONS + [CLOUDRUN]
-ALPHA_ADDONS_OPTIONS = BETA_ADDONS_OPTIONS + [NODELOCALDNS]
+ADDONS_OPTIONS = DEFAULT_ADDONS + [DASHBOARD, NETWORK_POLICY]
+BETA_ADDONS_OPTIONS = ADDONS_OPTIONS + [ISTIO, CLOUDRUN]
+ALPHA_ADDONS_OPTIONS = BETA_ADDONS_OPTIONS + [
+    NODELOCALDNS, CONFIGCONNECTOR, GCEPDCSIDRIVER
+]
 
 
 def CheckResponse(response):
@@ -247,6 +253,7 @@ def InitAPIAdapter(api_version, adapter):
   Args:
     api_version: the api version we want.
     adapter: the api adapter constructor.
+
   Returns:
     APIAdapter object.
   """
@@ -307,7 +314,7 @@ def ExpandScopeURIs(scopes):
   Args:
     scopes: [str,] list of scope names. Can be short names ('compute-rw') or
     full urls ('https://www.googleapis.com/auth/compute'). See SCOPES in
-    api_lib/container/constants.py & api_lib/compute/constants.py.
+      api_lib/container/constants.py & api_lib/compute/constants.py.
 
   Returns:
     list of str, full urls for recognized scopes.
@@ -341,6 +348,7 @@ class CreateClusterOptions(object):
                cluster_ipv4_cidr=None,
                enable_cloud_logging=None,
                enable_cloud_monitoring=None,
+               enable_stackdriver_kubernetes=None,
                subnetwork=None,
                addons=None,
                istio_config=None,
@@ -401,14 +409,24 @@ class CreateClusterOptions(object):
                enable_vertical_pod_autoscaling=None,
                security_profile=None,
                security_profile_runtime_rules=None,
-               database_encryption=None,
+               database_encryption_key=None,
                metadata=None,
                enable_network_egress_metering=None,
+               enable_resource_consumption_metering=None,
                identity_namespace=None,
                enable_shielded_nodes=None,
                linux_sysctls=None,
                autoprovisioning_service_account=None,
-               autoprovisioning_scopes=None):
+               autoprovisioning_scopes=None,
+               disable_default_snat=None,
+               autoprovisioning_locations=None,
+               shielded_secure_boot=None,
+               shielded_integrity_monitoring=None,
+               node_config=None,
+               maintenance_window_start=None,
+               maintenance_window_end=None,
+               maintenance_window_recurrence=None,
+               enable_cost_management=None):
     self.node_machine_type = node_machine_type
     self.node_source_image = node_source_image
     self.node_disk_size_gb = node_disk_size_gb
@@ -424,6 +442,7 @@ class CreateClusterOptions(object):
     self.cluster_ipv4_cidr = cluster_ipv4_cidr
     self.enable_cloud_logging = enable_cloud_logging
     self.enable_cloud_monitoring = enable_cloud_monitoring
+    self.enable_stackdriver_kubernetes = enable_stackdriver_kubernetes
     self.subnetwork = subnetwork
     self.addons = addons
     self.istio_config = istio_config
@@ -484,14 +503,24 @@ class CreateClusterOptions(object):
     self.enable_vertical_pod_autoscaling = enable_vertical_pod_autoscaling
     self.security_profile = security_profile
     self.security_profile_runtime_rules = security_profile_runtime_rules
-    self.database_encryption = database_encryption
+    self.database_encryption_key = database_encryption_key
     self.metadata = metadata
     self.enable_network_egress_metering = enable_network_egress_metering
+    self.enable_resource_consumption_metering = enable_resource_consumption_metering
     self.identity_namespace = identity_namespace
     self.enable_shielded_nodes = enable_shielded_nodes
     self.linux_sysctls = linux_sysctls
     self.autoprovisioning_service_account = autoprovisioning_service_account
     self.autoprovisioning_scopes = autoprovisioning_scopes
+    self.disable_default_snat = disable_default_snat
+    self.autoprovisioning_locations = autoprovisioning_locations
+    self.shielded_secure_boot = shielded_secure_boot
+    self.shielded_integrity_monitoring = shielded_integrity_monitoring
+    self.node_config = node_config
+    self.maintenance_window_start = maintenance_window_start
+    self.maintenance_window_end = maintenance_window_end
+    self.maintenance_window_recurrence = maintenance_window_recurrence
+    self.enable_cost_management = enable_cost_management
 
 
 class UpdateClusterOptions(object):
@@ -504,6 +533,7 @@ class UpdateClusterOptions(object):
                node_pool=None,
                monitoring_service=None,
                logging_service=None,
+               enable_stackdriver_kubernetes=None,
                disable_addons=None,
                istio_config=None,
                enable_autoscaling=None,
@@ -529,13 +559,22 @@ class UpdateClusterOptions(object):
                disable_workload_identity=None,
                enable_shielded_nodes=None,
                autoprovisioning_service_account=None,
-               autoprovisioning_scopes=None):
+               autoprovisioning_scopes=None,
+               disable_default_snat=None,
+               autoprovisioning_locations=None,
+               resource_usage_bigquery_dataset=None,
+               enable_network_egress_metering=None,
+               enable_resource_consumption_metering=None,
+               database_encryption_key=None,
+               disable_database_encryption=None,
+               enable_cost_management=None):
     self.version = version
     self.update_master = bool(update_master)
     self.update_nodes = bool(update_nodes)
     self.node_pool = node_pool
     self.monitoring_service = monitoring_service
     self.logging_service = logging_service
+    self.enable_stackdriver_kubernetes = enable_stackdriver_kubernetes
     self.disable_addons = disable_addons
     self.istio_config = istio_config
     self.enable_autoscaling = enable_autoscaling
@@ -562,6 +601,15 @@ class UpdateClusterOptions(object):
     self.enable_shielded_nodes = enable_shielded_nodes
     self.autoprovisioning_service_account = autoprovisioning_service_account
     self.autoprovisioning_scopes = autoprovisioning_scopes
+    self.disable_default_snat = disable_default_snat
+    self.autoprovisioning_locations = autoprovisioning_locations
+    self.resource_usage_bigquery_dataset = resource_usage_bigquery_dataset
+    self.enable_network_egress_metering = enable_network_egress_metering
+    self.enable_resource_consumption_metering = (
+        enable_resource_consumption_metering)
+    self.database_encryption_key = database_encryption_key
+    self.disable_database_encryption = disable_database_encryption
+    self.enable_cost_management = enable_cost_management
 
 
 class SetMasterAuthOptions(object):
@@ -616,7 +664,13 @@ class CreateNodePoolOptions(object):
                max_pods_per_node=None,
                sandbox=None,
                metadata=None,
-               linux_sysctls=None):
+               linux_sysctls=None,
+               max_surge_upgrade=None,
+               max_unavailable_upgrade=None,
+               node_locations=None,
+               shielded_secure_boot=None,
+               shielded_integrity_monitoring=None,
+               node_config=None):
     self.machine_type = machine_type
     self.disk_size_gb = disk_size_gb
     self.scopes = scopes
@@ -647,6 +701,12 @@ class CreateNodePoolOptions(object):
     self.sandbox = sandbox
     self.metadata = metadata
     self.linux_sysctls = linux_sysctls
+    self.max_surge_upgrade = max_surge_upgrade
+    self.max_unavailable_upgrade = max_unavailable_upgrade
+    self.node_locations = node_locations
+    self.shielded_secure_boot = shielded_secure_boot
+    self.shielded_integrity_monitoring = shielded_integrity_monitoring
+    self.node_config = node_config
 
 
 class UpdateNodePoolOptions(object):
@@ -659,7 +719,10 @@ class UpdateNodePoolOptions(object):
                max_nodes=None,
                min_nodes=None,
                enable_autoprovisioning=None,
-               workload_metadata_from_node=None):
+               workload_metadata_from_node=None,
+               node_locations=None,
+               max_surge_upgrade=None,
+               max_unavailable_upgrade=None):
     self.enable_autorepair = enable_autorepair
     self.enable_autoupgrade = enable_autoupgrade
     self.enable_autoscaling = enable_autoscaling
@@ -667,10 +730,12 @@ class UpdateNodePoolOptions(object):
     self.min_nodes = min_nodes
     self.enable_autoprovisioning = enable_autoprovisioning
     self.workload_metadata_from_node = workload_metadata_from_node
+    self.node_locations = node_locations
+    self.max_surge_upgrade = max_surge_upgrade
+    self.max_unavailable_upgrade = max_unavailable_upgrade
 
   def IsAutoscalingUpdate(self):
-    return (self.enable_autoscaling is not None or
-            self.max_nodes is not None or
+    return (self.enable_autoscaling is not None or self.max_nodes is not None or
             self.min_nodes is not None or
             self.enable_autoprovisioning is not None)
 
@@ -679,7 +744,10 @@ class UpdateNodePoolOptions(object):
             self.enable_autoupgrade is not None)
 
   def IsUpdateNodePoolRequest(self):
-    return self.workload_metadata_from_node is not None
+    return (self.workload_metadata_from_node is not None or
+            self.node_locations is not None or
+            self.max_surge_upgrade is not None or
+            self.max_unavailable_upgrade is not None)
 
 
 class APIAdapter(object):
@@ -729,6 +797,7 @@ class APIAdapter(object):
 
     Args:
       cluster_ref: cluster Resource to describe.
+
     Returns:
       Cluster message.
     Raises:
@@ -739,9 +808,8 @@ class APIAdapter(object):
     try:
       return self.client.projects_locations_clusters.Get(
           self.messages.ContainerProjectsLocationsClustersGetRequest(
-              name=ProjectLocationCluster(cluster_ref.projectId,
-                                          cluster_ref.zone,
-                                          cluster_ref.clusterId)))
+              name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref
+                                          .zone, cluster_ref.clusterId)))
     except apitools_exceptions.HttpNotFoundError as error:
       api_error = exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
       # Cluster couldn't be found, maybe user got the location wrong?
@@ -755,14 +823,16 @@ class APIAdapter(object):
     Args:
       cluster_ref: cluster Resource to look for others with the same id.
       api_error: current error from original request.
+
     Raises:
       Error: wrong zone error if another similar cluster found, otherwise not
       found error.
     """
-    not_found_error = util.Error(NO_SUCH_CLUSTER_ERROR_MSG.format(
-        error=api_error,
-        name=cluster_ref.clusterId,
-        project=cluster_ref.projectId))
+    not_found_error = util.Error(
+        NO_SUCH_CLUSTER_ERROR_MSG.format(
+            error=api_error,
+            name=cluster_ref.clusterId,
+            project=cluster_ref.projectId))
     try:
       clusters = self.ListClusters(cluster_ref.projectId).clusters
     except apitools_exceptions.HttpForbiddenError as error:
@@ -774,11 +844,12 @@ class APIAdapter(object):
     for cluster in clusters:
       if cluster.name == cluster_ref.clusterId:
         # User likely got zone wrong.
-        raise util.Error(WRONG_ZONE_ERROR_MSG.format(
-            error=api_error,
-            name=cluster_ref.clusterId,
-            wrong_zone=self.Zone(cluster_ref),
-            zone=cluster.zone))
+        raise util.Error(
+            WRONG_ZONE_ERROR_MSG.format(
+                error=api_error,
+                name=cluster_ref.clusterId,
+                wrong_zone=self.Zone(cluster_ref),
+                zone=cluster.zone))
     # Couldn't find a cluster with that name.
     raise not_found_error
 
@@ -789,8 +860,8 @@ class APIAdapter(object):
       for np in cluster.nodePools:
         if np.name == pool_name:
           return np
-      msg = NO_SUCH_NODE_POOL_ERROR_MSG.format(cluster=cluster.name,
-                                               name=pool_name) + os.linesep
+      msg = NO_SUCH_NODE_POOL_ERROR_MSG.format(
+          cluster=cluster.name, name=pool_name) + os.linesep
     elif len(cluster.nodePools) == 1:
       return cluster.nodePools[0]
     # Couldn't find a node pool with that name or a node pool was not specified.
@@ -801,12 +872,14 @@ class APIAdapter(object):
   def GetOperation(self, operation_ref):
     return self.client.projects_locations_operations.Get(
         self.messages.ContainerProjectsLocationsOperationsGetRequest(
-            name=ProjectLocationOperation(operation_ref.projectId,
-                                          operation_ref.zone,
-                                          operation_ref.operationId)))
+            name=ProjectLocationOperation(operation_ref.projectId, operation_ref
+                                          .zone, operation_ref.operationId)))
 
-  def WaitForOperation(self, operation_ref, message,
-                       timeout_s=1200, poll_period_s=5):
+  def WaitForOperation(self,
+                       operation_ref,
+                       message,
+                       timeout_s=1200,
+                       poll_period_s=5):
     """Poll container Operation until its status is done or timeout reached.
 
     Args:
@@ -823,17 +896,16 @@ class APIAdapter(object):
       Error: if the operation times out or finishes with an error.
     """
     detail_message = None
-    with progress_tracker.ProgressTracker(message, autotick=True,
-                                          detail_message_callback=
-                                          lambda: detail_message):
+    with progress_tracker.ProgressTracker(
+        message, autotick=True, detail_message_callback=lambda: detail_message):
       start_time = time.time()
       while timeout_s > (time.time() - start_time):
         try:
           operation = self.GetOperation(operation_ref)
           if self.IsOperationFinished(operation):
             # Success!
-            log.info('Operation %s succeeded after %.3f seconds',
-                     operation, (time.time() - start_time))
+            log.info('Operation %s succeeded after %.3f seconds', operation,
+                     (time.time() - start_time))
             break
           detail_message = operation.detail
         except apitools_exceptions.HttpError as error:
@@ -844,8 +916,7 @@ class APIAdapter(object):
         time.sleep(poll_period_s)
     if not self.IsOperationFinished(operation):
       log.err.Print('Timed out waiting for operation {0}'.format(operation))
-      raise util.Error(
-          'Operation [{0}] is still running'.format(operation))
+      raise util.Error('Operation [{0}] is still running'.format(operation))
     if self.GetOperationError(operation):
       raise util.Error('Operation [{0}] finished with error: {1}'.format(
           operation, self.GetOperationError(operation)))
@@ -872,10 +943,27 @@ class APIAdapter(object):
       cluster.network = options.network
     if options.cluster_ipv4_cidr:
       cluster.clusterIpv4Cidr = options.cluster_ipv4_cidr
-    if not options.enable_cloud_logging:
-      cluster.loggingService = 'none'
-    if not options.enable_cloud_monitoring:
-      cluster.monitoringService = 'none'
+    if options.enable_stackdriver_kubernetes is not None:
+      # When "enable-stackdriver-kubernetes" is specified, either true or false
+      if options.enable_stackdriver_kubernetes:
+        cluster.loggingService = 'logging.googleapis.com/kubernetes'
+        cluster.monitoringService = 'monitoring.googleapis.com/kubernetes'
+      else:
+        cluster.loggingService = 'none'
+        cluster.monitoringService = 'none'
+    # When "enable-stackdriver-kubernetes" is unspecified, checks whether legacy
+    # "enable-cloud-logging" or "enable-cloud-monitoring" flags are specified.
+    else:
+      if options.enable_cloud_logging is not None:
+        if options.enable_cloud_logging:
+          cluster.loggingService = 'logging.googleapis.com'
+        else:
+          cluster.loggingService = 'none'
+      if options.enable_cloud_monitoring is not None:
+        if options.enable_cloud_monitoring:
+          cluster.monitoringService = 'monitoring.googleapis.com'
+        else:
+          cluster.monitoringService = 'none'
     if options.subnetwork:
       cluster.subnetwork = options.subnetwork
     if options.addons:
@@ -883,10 +971,11 @@ class APIAdapter(object):
           disable_ingress=INGRESS not in options.addons,
           disable_hpa=HPA not in options.addons,
           disable_dashboard=DASHBOARD not in options.addons,
-          disable_network_policy=(
-              NETWORK_POLICY not in options.addons),
+          disable_network_policy=(NETWORK_POLICY not in options.addons),
           enable_node_local_dns=(NODELOCALDNS in options.addons),
-          )
+          enable_config_connector=(CONFIGCONNECTOR in options.addons),
+          enable_gcepd_csi_driver=(GCEPDCSIDRIVER in options.addons),
+      )
       cluster.addonsConfig = addons
 
     self.ParseMasterAuthorizedNetworkOptions(options, cluster)
@@ -899,6 +988,17 @@ class APIAdapter(object):
         raise util.Error(DEFAULT_MAX_PODS_PER_NODE_WITHOUT_IP_ALIAS_ERROR_MSG)
       cluster.defaultMaxPodsConstraint = self.messages.MaxPodsConstraint(
           maxPodsPerNode=options.default_max_pods_per_node)
+
+    if options.disable_default_snat:
+      if not options.enable_ip_alias:
+        raise util.Error(DISABLE_DEFAULT_SNAT_WITHOUT_IP_ALIAS_ERROR_MSG)
+      if not options.enable_private_nodes:
+        raise util.Error(DISABLE_DEFAULT_SNAT_WITHOUT_PRIVATE_NODES_ERROR_MSG)
+      if cluster.networkConfig is None:
+        cluster.networkConfig = self.messages.NetworkConfig(
+            disableDefaultSnat=options.disable_default_snat)
+      else:
+        cluster.networkConfig.disableDefaultSnat = options.disable_default_snat
 
     if options.enable_legacy_authorization is not None:
       cluster.legacyAbac = self.messages.LegacyAbac(
@@ -915,11 +1015,19 @@ class APIAdapter(object):
           enabled=options.enable_binauthz)
 
     if options.maintenance_window is not None:
-      policy = self.messages.MaintenancePolicy(
+      cluster.maintenancePolicy = self.messages.MaintenancePolicy(
           window=self.messages.MaintenanceWindow(
               dailyMaintenanceWindow=self.messages.DailyMaintenanceWindow(
                   startTime=options.maintenance_window)))
-      cluster.maintenancePolicy = policy
+    elif options.maintenance_window_start is not None:
+      window_start = options.maintenance_window_start.isoformat()
+      window_end = options.maintenance_window_end.isoformat()
+      cluster.maintenancePolicy = self.messages.MaintenancePolicy(
+          window=self.messages.MaintenanceWindow(
+              recurringWindow=self.messages.RecurringTimeWindow(
+                  window=self.messages.TimeWindow(
+                      startTime=window_start, endTime=window_end),
+                  recurrence=options.maintenance_window_recurrence)))
 
     self.ParseResourceLabels(options, cluster)
 
@@ -931,11 +1039,9 @@ class APIAdapter(object):
       # The presence of the --security_group="foo" flag implies enabled=True.
       cluster.authenticatorGroupsConfig = (
           self.messages.AuthenticatorGroupsConfig(
-              enabled=True,
-              securityGroup=options.security_group))
+              enabled=True, securityGroup=options.security_group))
     if options.enable_shielded_nodes:
-      cluster.shieldedNodes = self.messages.ShieldedNodes(
-          enabled=True)
+      cluster.shieldedNodes = self.messages.ShieldedNodes(enabled=True)
 
     self.ParseIPAliasOptions(options, cluster)
     self.ParseAllowRouteOverlapOptions(options, cluster)
@@ -953,8 +1059,14 @@ class APIAdapter(object):
               bigqueryDestination=bigquery_destination)
       if options.enable_network_egress_metering:
         cluster.resourceUsageExportConfig.enableNetworkEgressMetering = True
+      if options.enable_resource_consumption_metering is not None:
+        cluster.resourceUsageExportConfig.consumptionMeteringConfig = \
+            self.messages.ConsumptionMeteringConfig(
+                enabled=options.enable_resource_consumption_metering)
     elif options.enable_network_egress_metering is not None:
       raise util.Error(ENABLE_NETWORK_EGRESS_METERING_ERROR_MSG)
+    elif options.enable_resource_consumption_metering is not None:
+      raise util.Error(ENABLE_RESOURCE_CONSUMPTION_METERING_ERROR_MSG)
 
     # Only instantiate the masterAuth struct if one or both of `user` or
     # `issue_client_certificate` is configured. Server-side Basic auth default
@@ -1020,6 +1132,11 @@ class APIAdapter(object):
 
     _AddWorkloadMetadataToNodeConfig(node_config, options, self.messages)
     _AddLinuxNodeConfigToNodeConfig(node_config, options, self.messages)
+    _AddShieldedInstanceConfigToNodeConfig(node_config, options, self.messages)
+
+    if options.node_config is not None:
+      util.LoadNodeConfigFromYAML(node_config, options.node_config,
+                                  self.messages)
 
     return node_config
 
@@ -1041,6 +1158,7 @@ class APIAdapter(object):
     Args:
       options: cluster creation options
       node_config: node configuration for nodes in the node pools
+
     Returns:
       List of node pools.
     """
@@ -1084,8 +1202,8 @@ class APIAdapter(object):
       # Accelerator count defaults to 1.
       count = int(options.accelerators.get('count', 1))
       node_config.accelerators = [
-          self.messages.AcceleratorConfig(acceleratorType=type_name,
-                                          acceleratorCount=count)
+          self.messages.AcceleratorConfig(
+              acceleratorType=type_name, acceleratorCount=count)
       ]
 
   def ParseResourceLabels(self, options, cluster):
@@ -1100,17 +1218,18 @@ class APIAdapter(object):
 
   def ParseIPAliasOptions(self, options, cluster):
     """Parses the options for IP Alias."""
-    ip_alias_only_options = [('services-ipv4-cidr', options.services_ipv4_cidr),
-                             ('create-subnetwork', options.create_subnetwork),
-                             ('cluster-secondary-range-name',
-                              options.cluster_secondary_range_name),
-                             ('services-secondary-range-name',
-                              options.services_secondary_range_name)]
+    ip_alias_only_options = [
+        ('services-ipv4-cidr', options.services_ipv4_cidr),
+        ('create-subnetwork', options.create_subnetwork),
+        ('cluster-secondary-range-name', options.cluster_secondary_range_name),
+        ('services-secondary-range-name', options.services_secondary_range_name)
+    ]
     if not options.enable_ip_alias:
       for name, opt in ip_alias_only_options:
         if opt:
-          raise util.Error(PREREQUISITE_OPTION_ERROR_MSG.format(
-              prerequisite='enable-ip-alias', opt=name))
+          raise util.Error(
+              PREREQUISITE_OPTION_ERROR_MSG.format(
+                  prerequisite='enable-ip-alias', opt=name))
 
     if options.subnetwork and options.create_subnetwork is not None:
       raise util.Error(CREATE_SUBNETWORK_WITH_SUBNETWORK_ERROR_MSG)
@@ -1148,6 +1267,8 @@ class APIAdapter(object):
     """Parse the options for allow route overlap."""
     if not options.allow_route_overlap:
       return
+    if options.enable_ip_alias is None:
+      raise util.Error(ALLOW_ROUTE_OVERLAP_WITHOUT_EXPLICIT_NETWORK_MODE)
     # Validate required flags are set.
     if options.cluster_ipv4_cidr is None:
       raise util.Error(ALLOW_ROUTE_OVERLAP_WITHOUT_CLUSTER_CIDR_ERROR_MSG)
@@ -1156,16 +1277,15 @@ class APIAdapter(object):
 
     # Fill in corresponding field.
     if cluster.ipAllocationPolicy is None:
-      policy = self.messages.IPAllocationPolicy(
-          allowRouteOverlap=True)
+      policy = self.messages.IPAllocationPolicy(allowRouteOverlap=True)
       cluster.ipAllocationPolicy = policy
     else:
       cluster.ipAllocationPolicy.allowRouteOverlap = True
 
   def ParsePrivateClusterOptions(self, options, cluster):
     """Parses the options for Private Clusters."""
-    if (options.enable_private_nodes is not None
-        and options.private_cluster is not None):
+    if (options.enable_private_nodes is not None and
+        options.private_cluster is not None):
       raise util.Error(ENABLE_PRIVATE_NODES_WITH_PRIVATE_CLUSTER_ERROR_MSG)
 
     if options.enable_private_nodes is None:
@@ -1221,8 +1341,8 @@ class APIAdapter(object):
 
   def ParseMasterAuthorizedNetworkOptions(self, options, cluster):
     """Parses the options for master authorized networks."""
-    if (options.master_authorized_networks and not
-        options.enable_master_authorized_networks):
+    if (options.master_authorized_networks and
+        not options.enable_master_authorized_networks):
       # Raise error if use --master-authorized-networks without
       # --enable-master-authorized-networks.
       raise util.Error(MISMATCH_AUTHORIZED_NETWORKS_ERROR_MSG)
@@ -1270,12 +1390,15 @@ class APIAdapter(object):
         update.securityProfile = self.messages.SecurityProfile(
             name=options.security_profile)
     elif options.update_master:
-      update = self.messages.ClusterUpdate(
-          desiredMasterVersion=options.version)
+      update = self.messages.ClusterUpdate(desiredMasterVersion=options.version)
       # security_profile may be set in upgrade command
       if options.security_profile is not None:
         update.securityProfile = self.messages.SecurityProfile(
             name=options.security_profile)
+    elif options.enable_stackdriver_kubernetes:
+      update = self.messages.ClusterUpdate()
+      update.desiredLoggingService = 'logging.googleapis.com/kubernetes'
+      update.desiredMonitoringService = 'monitoring.googleapis.com/kubernetes'
     elif options.monitoring_service or options.logging_service:
       update = self.messages.ClusterUpdate()
       if options.monitoring_service:
@@ -1307,13 +1430,14 @@ class APIAdapter(object):
           enabled=options.enable_master_authorized_networks)
       if options.master_authorized_networks:
         for network in options.master_authorized_networks:
-          authorized_networks.cidrBlocks.append(self.messages.CidrBlock(
-              cidrBlock=network))
+          authorized_networks.cidrBlocks.append(
+              self.messages.CidrBlock(cidrBlock=network))
       update = self.messages.ClusterUpdate(
           desiredMasterAuthorizedNetworksConfig=authorized_networks)
     elif options.enable_autoprovisioning is not None or \
          options.autoscaling_profile is not None:
-      autoscaling = self.CreateClusterAutoscalingCommon(cluster_ref, options)
+      autoscaling = self.CreateClusterAutoscalingCommon(cluster_ref, options,
+                                                        True)
       update = self.messages.ClusterUpdate(
           desiredClusterAutoscaling=autoscaling)
     elif options.enable_pod_security_policy is not None:
@@ -1337,10 +1461,16 @@ class APIAdapter(object):
               datasetId=options.resource_usage_bigquery_dataset))
       if options.enable_network_egress_metering:
         export_config.enableNetworkEgressMetering = True
+      if options.enable_resource_consumption_metering is not None:
+        export_config.consumptionMeteringConfig = \
+            self.messages.ConsumptionMeteringConfig(
+                enabled=options.enable_resource_consumption_metering)
       update = self.messages.ClusterUpdate(
           desiredResourceUsageExportConfig=export_config)
     elif options.enable_network_egress_metering is not None:
       raise util.Error(ENABLE_NETWORK_EGRESS_METERING_ERROR_MSG)
+    elif options.enable_resource_consumption_metering is not None:
+      raise util.Error(ENABLE_RESOURCE_CONSUMPTION_METERING_ERROR_MSG)
     elif options.clear_resource_usage_bigquery_dataset is not None:
       export_config = self.messages.ResourceUsageExportConfig()
       update = self.messages.ClusterUpdate(
@@ -1400,8 +1530,7 @@ class APIAdapter(object):
 
     op = self.client.projects_locations_clusters.Update(
         self.messages.UpdateClusterRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             update=update))
     return self.ParseOperation(op.name, cluster_ref.zone)
@@ -1409,8 +1538,7 @@ class APIAdapter(object):
   def SetLoggingService(self, cluster_ref, logging_service):
     op = self.client.projects_locations_clusters.SetLogging(
         self.messages.SetLoggingServiceRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             loggingService=logging_service))
     return self.ParseOperation(op.name, cluster_ref.zone)
@@ -1418,8 +1546,7 @@ class APIAdapter(object):
   def SetLegacyAuthorization(self, cluster_ref, enable_legacy_authorization):
     op = self.client.projects_locations_clusters.SetLegacyAbac(
         self.messages.SetLegacyAbacRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             enabled=bool(enable_legacy_authorization)))
     return self.ParseOperation(op.name, cluster_ref.zone)
@@ -1429,7 +1556,9 @@ class APIAdapter(object):
                     disable_hpa=None,
                     disable_dashboard=None,
                     disable_network_policy=None,
-                    enable_node_local_dns=None):
+                    enable_node_local_dns=None,
+                    enable_config_connector=None,
+                    enable_gcepd_csi_driver=None):
     """Generates an AddonsConfig object given specific parameters.
 
     Args:
@@ -1438,6 +1567,8 @@ class APIAdapter(object):
       disable_dashboard: whether to disable the Kuberntes Dashboard.
       disable_network_policy: whether to disable NetworkPolicy enforcement.
       enable_node_local_dns: whether to enable NodeLocalDNS cache.
+      enable_config_connector: whether to enable ConfigConnector.
+      enable_gcepd_csi_driver: whether to enable GcePersistentDiskCsiDriver.
 
     Returns:
       An AddonsConfig object that contains the options defining what addons to
@@ -1458,8 +1589,14 @@ class APIAdapter(object):
       addons.networkPolicyConfig = self.messages.NetworkPolicyConfig(
           disabled=disable_network_policy)
     if enable_node_local_dns:
-      addons.dnsCacheConfig = self.messages.DnsCacheConfig(
+      addons.dnsCacheConfig = self.messages.DnsCacheConfig(enabled=True)
+    if enable_config_connector:
+      addons.configConnectorConfig = self.messages.ConfigConnectorConfig(
           enabled=True)
+    if enable_gcepd_csi_driver:
+      addons.gcePersistentDiskCsiDriverConfig = self.messages.GcePersistentDiskCsiDriverConfig(
+          enabled=True)
+
     return addons
 
   def _AddLocalSSDVolumeConfigsToNodeConfig(self, node_config, options):
@@ -1506,8 +1643,8 @@ class APIAdapter(object):
       else:
         raise util.Error(
             NODE_TAINT_INCORRECT_EFFECT_ERROR_MSG.format(effect=strs[1]))
-      taints.append(self.messages.NodeTaint(
-          key=key, value=value, effect=effect))
+      taints.append(
+          self.messages.NodeTaint(key=key, value=value, effect=effect))
 
     node_config.taints = taints
 
@@ -1533,11 +1670,12 @@ class APIAdapter(object):
     update = self.messages.MasterAuth(
         username=options.username, password=options.password)
     if options.action == SetMasterAuthOptions.SET_PASSWORD:
-      action = (self.messages.SetMasterAuthRequest.
-                ActionValueValuesEnum.SET_PASSWORD)
+      action = (
+          self.messages.SetMasterAuthRequest.ActionValueValuesEnum.SET_PASSWORD)
     elif options.action == SetMasterAuthOptions.GENERATE_PASSWORD:
-      action = (self.messages.SetMasterAuthRequest.
-                ActionValueValuesEnum.GENERATE_PASSWORD)
+      action = (
+          self.messages.SetMasterAuthRequest.ActionValueValuesEnum
+          .GENERATE_PASSWORD)
     else:  # options.action == SetMasterAuthOptions.SET_USERNAME
       action = (
           self.messages.SetMasterAuthRequest.ActionValueValuesEnum.SET_USERNAME)
@@ -1556,8 +1694,7 @@ class APIAdapter(object):
   def StartIpRotation(self, cluster_ref, rotate_credentials):
     operation = self.client.projects_locations_clusters.StartIpRotation(
         self.messages.StartIPRotationRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             rotateCredentials=rotate_credentials))
     return self.ParseOperation(operation.name, cluster_ref.zone)
@@ -1565,34 +1702,46 @@ class APIAdapter(object):
   def CompleteIpRotation(self, cluster_ref):
     operation = self.client.projects_locations_clusters.CompleteIpRotation(
         self.messages.CompleteIPRotationRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId)))
     return self.ParseOperation(operation.name, cluster_ref.zone)
 
-  def SetMaintenanceWindow(self, cluster_ref, maintenance_window):
-    """Updates maintenance window for a cluster."""
-    policy = self.messages.MaintenancePolicy(
-        window=self.messages.MaintenanceWindow(
-            dailyMaintenanceWindow=self.messages.DailyMaintenanceWindow(
-                startTime=maintenance_window)))
+  def _SendMaintenancePolicyRequest(self, cluster_ref, policy):
+    """Given a policy, sends a SetMaintenancePolicy request and returns the operation."""
     req = self.messages.SetMaintenancePolicyRequest(
         name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                     cluster_ref.clusterId),
         maintenancePolicy=policy)
-    if maintenance_window == 'None':
-      req.maintenancePolicy = None
-
     operation = self.client.projects_locations_clusters.SetMaintenancePolicy(
         req)
-
     return self.ParseOperation(operation.name, cluster_ref.zone)
+
+  def SetDailyMaintenanceWindow(self, cluster_ref, existing_policy,
+                                maintenance_window):
+    """Sets the daily maintenance window for a cluster."""
+    # Special behavior for removing the window. This actually removes the
+    # recurring window too, if set (since anyone using this command if there's
+    # actually a recurring window probably intends that!).
+    if maintenance_window == 'None':
+      daily_window = None
+    else:
+      daily_window = self.messages.DailyMaintenanceWindow(
+          startTime=maintenance_window)
+
+    if existing_policy is None:
+      existing_policy = self.messages.MaintenancePolicy()
+    if existing_policy.window is None:
+      existing_policy.window = self.messages.MaintenanceWindow()
+    existing_policy.window.dailyMaintenanceWindow = daily_window
+
+    return self._SendMaintenancePolicyRequest(cluster_ref, existing_policy)
 
   def DeleteCluster(self, cluster_ref):
     """Delete a running cluster.
 
     Args:
       cluster_ref: cluster Resource to describe
+
     Returns:
       Cluster message.
     Raises:
@@ -1603,9 +1752,8 @@ class APIAdapter(object):
     try:
       operation = self.client.projects_locations_clusters.Delete(
           self.messages.ContainerProjectsLocationsClustersDeleteRequest(
-              name=ProjectLocationCluster(cluster_ref.projectId,
-                                          cluster_ref.zone,
-                                          cluster_ref.clusterId)))
+              name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref
+                                          .zone, cluster_ref.clusterId)))
       return self.ParseOperation(operation.name, cluster_ref.zone)
     except apitools_exceptions.HttpNotFoundError as error:
       api_error = exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
@@ -1657,8 +1805,8 @@ class APIAdapter(object):
       # Accelerator count defaults to 1.
       count = int(options.accelerators.get('count', 1))
       node_config.accelerators = [
-          self.messages.AcceleratorConfig(acceleratorType=type_name,
-                                          acceleratorCount=count)
+          self.messages.AcceleratorConfig(
+              acceleratorType=type_name, acceleratorCount=count)
       ]
 
     _AddMetadataToNodeConfig(node_config, options)
@@ -1673,6 +1821,7 @@ class APIAdapter(object):
 
     _AddWorkloadMetadataToNodeConfig(node_config, options, self.messages)
     _AddLinuxNodeConfigToNodeConfig(node_config, options, self.messages)
+    _AddShieldedInstanceConfigToNodeConfig(node_config, options, self.messages)
 
     if options.sandbox is not None:
       node_config.sandboxConfig = self.messages.SandboxConfig(
@@ -1694,6 +1843,20 @@ class APIAdapter(object):
     if options.max_pods_per_node is not None:
       pool.maxPodsConstraint = self.messages.MaxPodsConstraint(
           maxPodsPerNode=options.max_pods_per_node)
+
+    if (options.max_surge_upgrade is not None or
+        options.max_unavailable_upgrade is not None):
+      pool.upgradeSettings = self.messages.UpgradeSettings()
+      pool.upgradeSettings.maxSurge = options.max_surge_upgrade
+      pool.upgradeSettings.maxUnavailable = options.max_unavailable_upgrade
+
+    if options.node_locations is not None:
+      pool.locations = sorted(options.node_locations)
+
+    if options.node_config is not None:
+      util.LoadNodeConfigFromYAML(node_config, options.node_config,
+                                  self.messages)
+
     return pool
 
   def CreateNodePool(self, node_pool_ref, options):
@@ -1710,8 +1873,8 @@ class APIAdapter(object):
 
   def ListNodePools(self, cluster_ref):
     req = self.messages.ContainerProjectsLocationsClustersNodePoolsListRequest(
-        parent=ProjectLocationCluster(
-            cluster_ref.projectId, cluster_ref.zone, cluster_ref.clusterId))
+        parent=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
+                                      cluster_ref.clusterId))
     return self.client.projects_locations_clusters_nodePools.List(req)
 
   def GetNodePool(self, node_pool_ref):
@@ -1727,6 +1890,7 @@ class APIAdapter(object):
     Args:
       node_pool_ref: node pool Resource to update.
       options: node pool update options
+
     Returns:
       Updated node management configuration.
     """
@@ -1746,6 +1910,7 @@ class APIAdapter(object):
     Args:
       node_pool_ref: node pool Resource to update.
       options: node pool update options
+
     Returns:
       Updated autoscaling configuration for the node pool.
     """
@@ -1771,14 +1936,27 @@ class APIAdapter(object):
       autoscaling.minNodeCount = options.min_nodes
     return autoscaling
 
+  def UpdateUpgradeSettings(self, node_pool_ref, options):
+    """Updates node pool's upgrade setting."""
+    pool = self.GetNodePool(node_pool_ref)
+    upgrade_settings = pool.upgradeSettings
+    if upgrade_settings is None:
+      upgrade_settings = self.messages.UpgradeSettings()
+    if options.max_surge_upgrade is not None:
+      upgrade_settings.maxSurge = options.max_surge_upgrade
+    if options.max_unavailable_upgrade is not None:
+      upgrade_settings.maxUnavailable = options.max_unavailable_upgrade
+    return upgrade_settings
+
   def UpdateNodePool(self, node_pool_ref, options):
     """Updates nodePool on a cluster."""
     node_management = self.UpdateNodePoolNodeManagement(node_pool_ref, options)
     req = (
         self.messages.SetNodePoolManagementRequest(
-            name=ProjectLocationClusterNodePool(
-                node_pool_ref.projectId, node_pool_ref.zone,
-                node_pool_ref.clusterId, node_pool_ref.nodePoolId),
+            name=ProjectLocationClusterNodePool(node_pool_ref.projectId,
+                                                node_pool_ref.zone,
+                                                node_pool_ref.clusterId,
+                                                node_pool_ref.nodePoolId),
             management=node_management))
     operation = (
         self.client.projects_locations_clusters_nodePools.SetManagement(req))
@@ -1807,12 +1985,12 @@ class APIAdapter(object):
     return self.client.projects_locations_operations.Cancel(req)
 
   def IsRunning(self, cluster):
-    return (cluster.status ==
-            self.messages.Cluster.StatusValueValuesEnum.RUNNING)
+    return (
+        cluster.status == self.messages.Cluster.StatusValueValuesEnum.RUNNING)
 
   def IsDegraded(self, cluster):
-    return (cluster.status ==
-            self.messages.Cluster.StatusValueValuesEnum.DEGRADED)
+    return (
+        cluster.status == self.messages.Cluster.StatusValueValuesEnum.DEGRADED)
 
   def GetDegradedWarning(self, cluster):
     if cluster.conditions:
@@ -1833,8 +2011,8 @@ class APIAdapter(object):
     return self.client.projects_locations_operations.List(req)
 
   def IsOperationFinished(self, operation):
-    return (operation.status ==
-            self.messages.Operation.StatusValueValuesEnum.DONE)
+    return (
+        operation.status == self.messages.Operation.StatusValueValuesEnum.DONE)
 
   def GetServerConfig(self, project, location):
     req = self.messages.ContainerProjectsLocationsGetServerConfigRequest(
@@ -1875,6 +2053,7 @@ class APIAdapter(object):
     Args:
       cluster_ref: cluster to update.
       update_labels: labels to set.
+
     Returns:
       Operation ref for label set operation.
     """
@@ -1895,12 +2074,10 @@ class APIAdapter(object):
 
   def UpdateLabels(self, cluster_ref, update_labels):
     """Updates labels for a cluster."""
-    labels, fingerprint = self.UpdateLabelsCommon(
-        cluster_ref, update_labels)
+    labels, fingerprint = self.UpdateLabelsCommon(cluster_ref, update_labels)
     operation = self.client.projects_locations_clusters.SetResourceLabels(
         self.messages.SetLabelsRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             resourceLabels=labels,
             labelFingerprint=fingerprint))
@@ -1912,6 +2089,7 @@ class APIAdapter(object):
     Args:
       cluster_ref: cluster to update.
       remove_labels: labels to remove.
+
     Returns:
       Operation ref for label set operation.
     """
@@ -1948,12 +2126,10 @@ class APIAdapter(object):
 
   def RemoveLabels(self, cluster_ref, remove_labels):
     """Removes labels from a cluster."""
-    labels, fingerprint = self.RemoveLabelsCommon(
-        cluster_ref, remove_labels)
+    labels, fingerprint = self.RemoveLabelsCommon(cluster_ref, remove_labels)
     operation = self.client.projects_locations_clusters.SetResourceLabels(
         self.messages.SetLabelsRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             resourceLabels=labels,
             labelFingerprint=fingerprint))
@@ -1964,6 +2140,141 @@ class APIAdapter(object):
 
   def SetIamPolicy(self, cluster_ref):
     raise NotImplementedError('GetIamPolicy is not overridden')
+
+  def SetRecurringMaintenanceWindow(self, cluster_ref, existing_policy,
+                                    window_start, window_end,
+                                    window_recurrence):
+    """Sets a recurring maintenance window as the maintenance policy for a cluster.
+
+    Args:
+      cluster_ref: The cluster to update.
+      existing_policy: The existing maintenance policy, if any.
+      window_start: Start time of the window as a datetime.datetime.
+      window_end: End time of the window as a datetime.datetime.
+      window_recurrence: RRULE str defining how the window will recur.
+
+    Returns:
+      The operation from this cluster update.
+    """
+    recurring_window = self.messages.MaintenanceWindow(
+        recurringWindow=self.messages.RecurringTimeWindow(
+            window=self.messages.TimeWindow(
+                startTime=window_start.isoformat(),
+                endTime=window_end.isoformat()),
+            recurrence=window_recurrence))
+    if existing_policy is not None:
+      existing_policy.window = recurring_window
+    else:
+      existing_policy = self.messages.MaintenancePolicy(window=recurring_window)
+    return self._SendMaintenancePolicyRequest(cluster_ref, existing_policy)
+
+  def RemoveMaintenanceWindow(self, cluster_ref, existing_policy):
+    """Removes the recurring or daily maintenance policy."""
+    if (existing_policy is None or existing_policy.window is None or
+        (existing_policy.window.dailyMaintenanceWindow is None
+         and existing_policy.window.recurringWindow is None)):
+      raise util.Error(NOTHING_TO_UPDATE_ERROR_MSG)
+    existing_policy.window.dailyMaintenanceWindow = None
+    existing_policy.window.recurringWindow = None
+    return self._SendMaintenancePolicyRequest(cluster_ref, existing_policy)
+
+  def _NormalizeMaintenanceExclusionsForPolicy(self, policy):
+    """Given a maintenance policy (can be None), return a normalized form.
+
+    This makes it easier to add and remove blackouts because the blackouts
+    list will definitely exist.
+
+    Args:
+      policy: The policy to normalize.
+
+    Returns:
+      The modified policy (note: modifies in place, but there might not have
+      even been an existing policy).
+    """
+    empty_excl = self.messages.MaintenanceWindow.MaintenanceExclusionsValue()
+    if policy is None:
+      policy = self.messages.MaintenancePolicy(
+          window=self.messages.MaintenanceWindow(
+              maintenanceExclusions=empty_excl))
+    elif policy.window is None:
+      # Shouldn't happen due to defaulting on the server, but easy enough to
+      # handle.
+      policy.window = self.messages.MaintenanceWindow(
+          maintenanceExclusions=empty_excl)
+    return policy
+
+  def _GetMaintenanceExclusionNames(self, maintenance_policy):
+    """Returns a list of maintenance exclusion names from the policy."""
+    return [
+        p.key for p in
+        maintenance_policy.window.maintenanceExclusions.additionalProperties
+    ]
+
+  def AddMaintenanceExclusion(self, cluster_ref, existing_policy, window_name,
+                              window_start, window_end):
+    """Adds a maintenance exclusion to the cluster's maintenance policy.
+
+    Args:
+      cluster_ref: The cluster to update.
+      existing_policy: The existing maintenance policy, if any.
+      window_name: Unique name for the exclusion. Can be None (will be
+        autogenerated if so).
+      window_start: Start time of the window as a datetime.datetime. Can be
+        None.
+      window_end: End time of the window as a datetime.datetime.
+
+    Returns:
+      Operation from this cluster update.
+
+    Raises:
+      Error if a maintenance exclusion of that name already exists.
+    """
+    existing_policy = self._NormalizeMaintenanceExclusionsForPolicy(
+        existing_policy)
+
+    if window_start is None:
+      window_start = times.Now(times.UTC)
+    if window_name is None:
+      # Collisions from this shouldn't be an issue because this has millisecond
+      # resolution.
+      window_name = 'generated-exclusion-' + times.Now(times.UTC).isoformat()
+
+    if window_name in self._GetMaintenanceExclusionNames(existing_policy):
+      raise util.Error(
+          'A maintenance exclusion named {0} already exists.'.format(
+              window_name))
+
+    # Note: we're using external/python/gcloud_deps/apitools/base/protorpclite
+    # which does *not* handle maps very nicely. We actually have a
+    # MaintenanceExclusionsValue field that has a repeated additionalProperties
+    # field that has key and value fields. See
+    # third_party/apis/container/v1alpha1/container_v1alpha1_messages.py.
+    exclusions = existing_policy.window.maintenanceExclusions
+    window = self.messages.TimeWindow(
+        startTime=window_start.isoformat(), endTime=window_end.isoformat())
+    exclusions.additionalProperties.append(
+        exclusions.AdditionalProperty(key=window_name, value=window))
+    return self._SendMaintenancePolicyRequest(cluster_ref, existing_policy)
+
+  def RemoveMaintenanceExclusion(self, cluster_ref, existing_policy,
+                                 exclusion_name):
+    """Removes a maintenance exclusion from the maintenance policy by name."""
+    existing_policy = self._NormalizeMaintenanceExclusionsForPolicy(
+        existing_policy)
+    existing_exclusions = self._GetMaintenanceExclusionNames(existing_policy)
+    if exclusion_name not in existing_exclusions:
+      message = ('No maintenance exclusion with name {0} exists. Existing '
+                 'exclusions: {1}.').format(exclusion_name,
+                                            ', '.join(existing_exclusions))
+      raise util.Error(message)
+
+    props = []
+    for ex in existing_policy.window.maintenanceExclusions.additionalProperties:
+      if ex.key != exclusion_name:
+        props.append(ex)
+    existing_policy.window.maintenanceExclusions.additionalProperties = props
+
+    return self._SendMaintenancePolicyRequest(cluster_ref, existing_policy)
 
   def ListUsableSubnets(self, project_ref, network_project, filter_arg):
     """List usable subnets for a given project.
@@ -2012,8 +2323,6 @@ class V1Beta1Adapter(V1Adapter):
           raise util.Error(CLOUDRUN_ISTIO_KUBERNETES_DISABLED_ERROR_MSG)
         if INGRESS not in options.addons:
           raise util.Error(CLOUDRUN_INGRESS_KUBERNETES_DISABLED_ERROR_MSG)
-        if HPA not in options.addons:
-          raise util.Error(CLOUDRUN_HPA_KUBERNETES_DISABLED_ERROR_MSG)
         cluster.addonsConfig.cloudRunConfig = self.messages.CloudRunConfig(
             disabled=False)
       # Istio is disabled by default
@@ -2029,21 +2338,17 @@ class V1Beta1Adapter(V1Adapter):
         cluster.addonsConfig.istioConfig = self.messages.IstioConfig(
             disabled=False, auth=istio_auth)
     if options.enable_autoprovisioning is not None:
-      cluster.autoscaling = self.CreateClusterAutoscalingCommon(cluster_ref,
-                                                                options)
-    if options.enable_stackdriver_kubernetes:
-      if options.enable_cloud_logging and options.enable_cloud_monitoring:
-        cluster.loggingService = 'logging.googleapis.com/kubernetes'
-        cluster.monitoringService = 'monitoring.googleapis.com/kubernetes'
-      else:
-        raise util.Error(CLOUD_LOGGING_OR_MONITORING_DISABLED_ERROR_MSG)
-    if options.database_encryption:
+      cluster.autoscaling = self.CreateClusterAutoscalingCommon(
+          cluster_ref, options, False)
+    if options.database_encryption_key:
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
-          keyName=options.database_encryption,
+          keyName=options.database_encryption_key,
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
     if options.identity_namespace is not None:
       cluster.workloadIdentityConfig = self.messages.WorkloadIdentityConfig(
           identityNamespace=options.identity_namespace)
+    _AddReleaseChannelToCluster(cluster, options, self.messages)
+
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
         cluster=cluster)
@@ -2061,6 +2366,18 @@ class V1Beta1Adapter(V1Adapter):
       update = self.messages.ClusterUpdate(
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
               identityNamespace=''))
+
+    if options.database_encryption_key:
+      update = self.messages.ClusterUpdate(
+          desiredDatabaseEncryption=self.messages.DatabaseEncryption(
+              keyName=options.database_encryption_key,
+              state=self.messages.DatabaseEncryption.StateValueValuesEnum
+              .ENCRYPTED))
+    elif options.disable_database_encryption:
+      update = self.messages.ClusterUpdate(
+          desiredDatabaseEncryption=self.messages.DatabaseEncryption(
+              state=self.messages.DatabaseEncryption.StateValueValuesEnum
+              .DECRYPTED))
 
     if options.enable_shielded_nodes is not None:
       update = self.messages.ClusterUpdate(
@@ -2092,20 +2409,22 @@ class V1Beta1Adapter(V1Adapter):
         update.desiredAddonsConfig.cloudRunConfig = (
             self.messages.CloudRunConfig(
                 disabled=options.disable_addons.get(CLOUDRUN)))
+
     op = self.client.projects_locations_clusters.Update(
         self.messages.UpdateClusterRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             update=update))
     return self.ParseOperation(op.name, cluster_ref.zone)
 
-  def CreateClusterAutoscalingCommon(self, _cluster_ref, options):
+  def CreateClusterAutoscalingCommon(self, _cluster_ref, options, for_update):
     """Create cluster's autoscaling configuration.
 
     Args:
       _cluster_ref: Cluster reference.
       options: Either CreateClusterOptions or UpdateClusterOptions.
+      for_update: Is function executed for update operation.
+
     Returns:
       Cluster's autoscaling configuration.
     """
@@ -2119,10 +2438,13 @@ class V1Beta1Adapter(V1Adapter):
       resource_limits = autoprovisioning_options.get(RESOURCE_LIMITS)
       service_account = autoprovisioning_options.get(SERVICE_ACCOUNT)
       scopes = autoprovisioning_options.get(SCOPES)
+      autoprovisioning_locations = \
+          autoprovisioning_options.get(AUTOPROVISIONING_LOCATIONS)
     else:
       resource_limits = self.ResourceLimitsFromFlags(options)
       service_account = options.autoprovisioning_service_account
       scopes = options.autoprovisioning_scopes
+      autoprovisioning_locations = options.autoprovisioning_locations
 
     if options.enable_autoprovisioning is not None:
       autoscaling.enableNodeAutoprovisioning = options.enable_autoprovisioning
@@ -2134,31 +2456,37 @@ class V1Beta1Adapter(V1Adapter):
       autoscaling.autoprovisioningNodePoolDefaults = self.messages \
         .AutoprovisioningNodePoolDefaults(serviceAccount=service_account,
                                           oauthScopes=scopes)
+      if autoprovisioning_locations:
+        autoscaling.autoprovisioningLocations = \
+            sorted(autoprovisioning_locations)
 
-    self.ValidateClusterAutoscaling(autoscaling)
+    self.ValidateClusterAutoscaling(autoscaling, for_update)
     return autoscaling
 
-  def ValidateClusterAutoscaling(self, autoscaling):
+  def ValidateClusterAutoscaling(self, autoscaling, for_update):
     """Validate cluster autoscaling configuration.
 
     Args:
       autoscaling: autoscaling configuration to be validated.
+      for_update: Is function executed for update operation.
+
     Raises:
       Error if the new configuration is invalid.
     """
     if autoscaling.enableNodeAutoprovisioning:
-      cpu_found, mem_found = False, False
-      for limit in autoscaling.resourceLimits:
-        if limit.resourceType == 'cpu':
-          cpu_found = True
-        if limit.resourceType == 'memory':
-          mem_found = True
-      if not cpu_found or not mem_found:
-        raise util.Error(NO_AUTOPROVISIONING_LIMITS_ERROR_MSG)
+      if not for_update or autoscaling.resourceLimits:
+        cpu_found, mem_found = False, False
+        for limit in autoscaling.resourceLimits:
+          if limit.resourceType == 'cpu':
+            cpu_found = True
+          if limit.resourceType == 'memory':
+            mem_found = True
+        if not cpu_found or not mem_found:
+          raise util.Error(NO_AUTOPROVISIONING_LIMITS_ERROR_MSG)
       if autoscaling.autoprovisioningNodePoolDefaults \
         and autoscaling.autoprovisioningNodePoolDefaults.serviceAccount \
         and autoscaling.autoprovisioningNodePoolDefaults.oauthScopes:
-        raise util.Error(ATMOST_ONE_IDENTITY_FOR_AUTOPROVISIONING_ERROR_MSG)
+        raise util.Error(AT_MOST_ONE_IDENTITY_FOR_AUTOPROVISIONING_ERROR_MSG)
     elif autoscaling.resourceLimits:
       raise util.Error(LIMITS_WITHOUT_AUTOPROVISIONING_MSG)
     elif autoscaling.autoprovisioningNodePoolDefaults and \
@@ -2171,20 +2499,23 @@ class V1Beta1Adapter(V1Adapter):
 
     Args:
       options: Either CreateClusterOptions or UpdateClusterOptions.
+
     Returns:
       Cluster's new autoscaling resource limits.
     """
     new_resource_limits = []
     if options.min_cpu is not None or options.max_cpu is not None:
-      new_resource_limits.append(self.messages.ResourceLimit(
-          resourceType='cpu',
-          minimum=options.min_cpu,
-          maximum=options.max_cpu))
+      new_resource_limits.append(
+          self.messages.ResourceLimit(
+              resourceType='cpu',
+              minimum=options.min_cpu,
+              maximum=options.max_cpu))
     if options.min_memory is not None or options.max_memory is not None:
-      new_resource_limits.append(self.messages.ResourceLimit(
-          resourceType='memory',
-          minimum=options.min_memory,
-          maximum=options.max_memory))
+      new_resource_limits.append(
+          self.messages.ResourceLimit(
+              resourceType='memory',
+              minimum=options.min_memory,
+              maximum=options.max_memory))
     if options.max_accelerator is not None:
       accelerator_type = options.max_accelerator.get('type')
       min_count = 0
@@ -2192,17 +2523,17 @@ class V1Beta1Adapter(V1Adapter):
         if options.min_accelerator.get('type') != accelerator_type:
           raise util.Error(MISMATCH_ACCELERATOR_TYPE_LIMITS_ERROR_MSG)
         min_count = options.min_accelerator.get('count', 0)
-      new_resource_limits.append(self.messages.ResourceLimit(
-          resourceType=options.max_accelerator.get('type'),
-          minimum=min_count,
-          maximum=options.max_accelerator.get('count', 0)))
+      new_resource_limits.append(
+          self.messages.ResourceLimit(
+              resourceType=options.max_accelerator.get('type'),
+              minimum=min_count,
+              maximum=options.max_accelerator.get('count', 0)))
     return new_resource_limits
 
   def UpdateNodePoolRequest(self, node_pool_ref, options):
     """Creates an UpdateNodePoolRequest from the provided options.
 
     Arguments:
-
       node_pool_ref: The node pool to act on.
       options: UpdateNodePoolOptions with the user-specified options.
 
@@ -2217,11 +2548,16 @@ class V1Beta1Adapter(V1Adapter):
             node_pool_ref.zone,
             node_pool_ref.clusterId,
             node_pool_ref.nodePoolId,
-        )
-    )
+        ))
 
     if options.workload_metadata_from_node is not None:
       _AddWorkloadMetadataToNodeConfig(update_request, options, self.messages)
+    elif options.node_locations is not None:
+      update_request.locations = sorted(options.node_locations)
+    elif (options.max_surge_upgrade is not None or
+          options.max_unavailable_upgrade is not None):
+      update_request.upgradeSettings = self.UpdateUpgradeSettings(
+          node_pool_ref, options)
 
     return update_request
 
@@ -2240,13 +2576,13 @@ class V1Beta1Adapter(V1Adapter):
       return self.ParseOperation(operation.name, node_pool_ref.zone)
     elif options.IsNodePoolManagementUpdate():
       management = self.UpdateNodePoolNodeManagement(node_pool_ref, options)
-      req = (self.messages.SetNodePoolManagementRequest(
-          name=ProjectLocationClusterNodePool(
-              node_pool_ref.projectId,
-              node_pool_ref.zone,
-              node_pool_ref.clusterId,
-              node_pool_ref.nodePoolId),
-          management=management))
+      req = (
+          self.messages.SetNodePoolManagementRequest(
+              name=ProjectLocationClusterNodePool(node_pool_ref.projectId,
+                                                  node_pool_ref.zone,
+                                                  node_pool_ref.clusterId,
+                                                  node_pool_ref.nodePoolId),
+              management=management))
       operation = (
           self.client.projects_locations_clusters_nodePools.SetManagement(req))
     elif options.IsUpdateNodePoolRequest():
@@ -2265,17 +2601,11 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     cluster = self.CreateClusterCommon(cluster_ref, options)
     if (options.enable_autoprovisioning is not None or
         options.autoscaling_profile is not None):
-      cluster.autoscaling = self.CreateClusterAutoscalingCommon(None,
-                                                                options)
+      cluster.autoscaling = self.CreateClusterAutoscalingCommon(
+          None, options, False)
     if options.local_ssd_volume_configs:
       for pool in cluster.nodePools:
         self._AddLocalSSDVolumeConfigsToNodeConfig(pool.config, options)
-    if options.enable_stackdriver_kubernetes:
-      if options.enable_cloud_logging and options.enable_cloud_monitoring:
-        cluster.loggingService = 'logging.googleapis.com/kubernetes'
-        cluster.monitoringService = 'monitoring.googleapis.com/kubernetes'
-      else:
-        raise util.Error(CLOUD_LOGGING_OR_MONITORING_DISABLED_ERROR_MSG)
     if options.addons:
       # CloudRun is disabled by default.
       if CLOUDRUN in options.addons:
@@ -2285,8 +2615,6 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           raise util.Error(CLOUDRUN_ISTIO_KUBERNETES_DISABLED_ERROR_MSG)
         if INGRESS not in options.addons:
           raise util.Error(CLOUDRUN_INGRESS_KUBERNETES_DISABLED_ERROR_MSG)
-        if HPA not in options.addons:
-          raise util.Error(CLOUDRUN_HPA_KUBERNETES_DISABLED_ERROR_MSG)
         cluster.addonsConfig.cloudRunConfig = self.messages.CloudRunConfig(
             disabled=False)
       # Istio is disabled by default
@@ -2316,9 +2644,9 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       if options.security_profile_runtime_rules is not None:
         cluster.securityProfile.disableRuntimeRules = \
           not options.security_profile_runtime_rules
-    if options.database_encryption:
+    if options.database_encryption_key:
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
-          keyName=options.database_encryption,
+          keyName=options.database_encryption_key,
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
     if options.enable_private_ipv6_access is not None:
       if cluster.networkConfig is None:
@@ -2335,12 +2663,10 @@ class V1Alpha1Adapter(V1Beta1Adapter):
                 opt='enable-peering-route-sharing'))
       cluster.privateClusterConfig.enablePeeringRouteSharing = \
         options.enable_peering_route_sharing
-    if options.release_channel is not None:
-      channels = {
-          'rapid': self.messages.ReleaseChannel.ChannelValueValuesEnum.RAPID,
-      }
-      cluster.releaseChannel = self.messages.ReleaseChannel(
-          channel=channels[options.release_channel])
+    _AddReleaseChannelToCluster(cluster, options, self.messages)
+    if options.enable_cost_management:
+      cluster.costManagementConfig = self.messages.CostManagementConfig(
+          enabled=True)
 
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
@@ -2360,10 +2686,32 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           desiredWorkloadIdentityConfig=self.messages.WorkloadIdentityConfig(
               identityNamespace=''))
 
+    if options.database_encryption_key:
+      update = self.messages.ClusterUpdate(
+          desiredDatabaseEncryption=self.messages.DatabaseEncryption(
+              keyName=options.database_encryption_key,
+              state=self.messages.DatabaseEncryption.StateValueValuesEnum
+              .ENCRYPTED))
+    elif options.disable_database_encryption:
+      update = self.messages.ClusterUpdate(
+          desiredDatabaseEncryption=self.messages.DatabaseEncryption(
+              state=self.messages.DatabaseEncryption.StateValueValuesEnum
+              .DECRYPTED))
+    elif options.enable_cost_management is not None:
+      update = self.messages.ClusterUpdate(
+          desiredCostManagementConfig=self.messages.CostManagementConfig(
+              enabled=options.enable_cost_management))
+
     if options.enable_shielded_nodes is not None:
       update = self.messages.ClusterUpdate(
           desiredShieldedNodes=self.messages.ShieldedNodes(
               enabled=options.enable_shielded_nodes))
+
+    if options.disable_default_snat is not None:
+      disable_default_snat = self.messages.DefaultSnatStatus(
+          disabled=options.disable_default_snat)
+      update = self.messages.ClusterUpdate(
+          desiredDefaultSnatStatus=disable_default_snat)
 
     if not update:
       # if reached here, it's possible:
@@ -2392,10 +2740,10 @@ class V1Alpha1Adapter(V1Beta1Adapter):
                 disabled=options.disable_addons.get(CLOUDRUN)))
     if options.update_nodes and options.concurrent_node_count:
       update.concurrentNodeCount = options.concurrent_node_count
+
     op = self.client.projects_locations_clusters.Update(
         self.messages.UpdateClusterRequest(
-            name=ProjectLocationCluster(cluster_ref.projectId,
-                                        cluster_ref.zone,
+            name=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.zone,
                                         cluster_ref.clusterId),
             update=update))
     return self.ParseOperation(op.name, cluster_ref.zone)
@@ -2416,12 +2764,14 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     operation = self.client.projects_locations_clusters_nodePools.Create(req)
     return self.ParseOperation(operation.name, node_pool_ref.zone)
 
-  def CreateClusterAutoscalingCommon(self, cluster_ref, options):
+  def CreateClusterAutoscalingCommon(self, cluster_ref, options, for_update):
     """Create cluster's autoscaling configuration.
 
     Args:
       cluster_ref: Cluster reference.
       options: Either CreateClusterOptions or UpdateClusterOptions.
+      for_update: Is function executed for update operation.
+
     Returns:
       Cluster's autoscaling configuration.
     """
@@ -2431,7 +2781,8 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     if cluster_ref:
       cluster = self.GetCluster(cluster_ref)
     if cluster and cluster.autoscaling:
-      autoscaling = cluster.autoscaling
+      autoscaling.enableNodeAutoprovisioning = \
+          cluster.autoscaling.enableNodeAutoprovisioning
 
     resource_limits = []
     if options.autoprovisioning_config_file is not None:
@@ -2440,10 +2791,13 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       resource_limits = autoprovisioning_options.get(RESOURCE_LIMITS)
       service_account = autoprovisioning_options.get(SERVICE_ACCOUNT)
       scopes = autoprovisioning_options.get(SCOPES)
+      autoprovisioning_locations = \
+          autoprovisioning_options.get(AUTOPROVISIONING_LOCATIONS)
     else:
       resource_limits = self.ResourceLimitsFromFlags(options)
       service_account = options.autoprovisioning_service_account
       scopes = options.autoprovisioning_scopes
+      autoprovisioning_locations = options.autoprovisioning_locations
 
     if options.enable_autoprovisioning is not None:
       autoscaling.enableNodeAutoprovisioning = options.enable_autoprovisioning
@@ -2456,12 +2810,15 @@ class V1Alpha1Adapter(V1Beta1Adapter):
         .AutoprovisioningNodePoolDefaults(
             serviceAccount=service_account,
             oauthScopes=scopes)
+      if autoprovisioning_locations:
+        autoscaling.autoprovisioningLocations = \
+            sorted(autoprovisioning_locations)
 
     if options.autoscaling_profile is not None:
       autoscaling.autoscalingProfile = \
           self.CreateAutoscalingProfileCommon(options)
 
-    self.ValidateClusterAutoscaling(autoscaling)
+    self.ValidateClusterAutoscaling(autoscaling, for_update)
     return autoscaling
 
   def CreateAutoscalingProfileCommon(self, options):
@@ -2470,7 +2827,7 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           .AutoscalingProfileValueValuesEnum.OPTIMIZE_UTILIZATION
     if options.autoscaling_profile == 'balanced':
       return self.messages.ClusterAutoscaling \
-          .AutoscalingProfileValueValuesEnum.PROFILE_UNSPECIFIED
+          .AutoscalingProfileValueValuesEnum.BALANCED
     raise util.Error(UNKNOWN_AUTOSCALING_PROFILE_MSG \
                        .format(profile=options.autoscaling_profile))
 
@@ -2485,8 +2842,8 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       List of node pools.
     """
     max_nodes_per_pool = options.max_nodes_per_pool or MAX_NODES_PER_POOL
-    num_pools = (
-        options.num_nodes + max_nodes_per_pool - 1) // max_nodes_per_pool
+    num_pools = (options.num_nodes + max_nodes_per_pool -
+                 1) // max_nodes_per_pool
     # pool consistency with server default
     node_pool_name = options.node_pool_name or 'default-pool'
 
@@ -2520,20 +2877,8 @@ class V1Alpha1Adapter(V1Beta1Adapter):
           raise util.Error(MAX_PODS_PER_NODE_WITHOUT_IP_ALIAS_ERROR_MSG)
         pool.maxPodsConstraint = self.messages.MaxPodsConstraint(
             maxPodsPerNode=options.max_pods_per_node)
-      # When both flags are default, don't write UpgradeSettings.
-      # TODO(b/130107095): remove this condition and always create.
-      # UppgradeSettings.
-      if (options.max_surge_upgrade != 0 or
-          options.max_unavailable_upgrade != 1):
-        # TODO(b/130103224): remove this condition.
-        if options.enable_autoscaling:
-          raise util.Error(SURGE_AND_AUTOSCALING_ERROR_MSG)
-        if (options.max_surge_upgrade == 0
-            and options.max_unavailable_upgrade == 0):
-          raise util.Error(SURGE_AND_MAX_UNAVAILABLE_BOTH_ZERO_ERROR_MSG)
-        # TODO(b/130107094): remove this condition.
-        if options.max_surge_upgrade == 0:
-          raise util.Error(SURGE_REQUIRED__TO_CHANGE_MAX_UNAVAILABLE_ERROR_MSG)
+      if (options.max_surge_upgrade is not None or
+          options.max_unavailable_upgrade is not None):
         pool.upgradeSettings = self.messages.UpgradeSettings()
         pool.upgradeSettings.maxSurge = options.max_surge_upgrade
         pool.upgradeSettings.maxUnavailable = options.max_unavailable_upgrade
@@ -2544,14 +2889,14 @@ class V1Alpha1Adapter(V1Beta1Adapter):
   def GetIamPolicy(self, cluster_ref):
     return self.client.projects.GetIamPolicy(
         self.messages.ContainerProjectsGetIamPolicyRequest(
-            resource=ProjectLocationCluster(cluster_ref.projectId, cluster_ref.
-                                            zone, cluster_ref.clusterId)))
+            resource=ProjectLocationCluster(cluster_ref.projectId, cluster_ref
+                                            .zone, cluster_ref.clusterId)))
 
   def SetIamPolicy(self, cluster_ref, policy):
     return self.client.projects.SetIamPolicy(
         self.messages.ContainerProjectsSetIamPolicyRequest(
-            googleIamV1SetIamPolicyRequest=self.messages.
-            GoogleIamV1SetIamPolicyRequest(policy=policy),
+            googleIamV1SetIamPolicyRequest=self.messages
+            .GoogleIamV1SetIamPolicyRequest(policy=policy),
             resource=ProjectLocationCluster(cluster_ref.projectId,
                                             cluster_ref.zone,
                                             cluster_ref.clusterId)))
@@ -2585,16 +2930,16 @@ def _AddWorkloadMetadataToNodeConfig(node_config, options, messages):
     option = options.workload_metadata_from_node
     if option == 'UNSPECIFIED':
       node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
-          nodeMetadata=messages.WorkloadMetadataConfig.
-          NodeMetadataValueValuesEnum.UNSPECIFIED)
+          nodeMetadata=messages.WorkloadMetadataConfig
+          .NodeMetadataValueValuesEnum.UNSPECIFIED)
     elif option == 'SECURE':
       node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
-          nodeMetadata=messages.WorkloadMetadataConfig.
-          NodeMetadataValueValuesEnum.SECURE)
+          nodeMetadata=messages.WorkloadMetadataConfig
+          .NodeMetadataValueValuesEnum.SECURE)
     elif option == 'EXPOSED':
       node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
-          nodeMetadata=messages.WorkloadMetadataConfig.
-          NodeMetadataValueValuesEnum.EXPOSE)
+          nodeMetadata=messages.WorkloadMetadataConfig
+          .NodeMetadataValueValuesEnum.EXPOSE)
     elif option == 'GKE_METADATA_SERVER':
       node_config.workloadMetadataConfig = messages.WorkloadMetadataConfig(
           nodeMetadata=messages.WorkloadMetadataConfig
@@ -2620,6 +2965,31 @@ def _AddLinuxNodeConfigToNodeConfig(node_config, options, messages):
     node_config.linuxNodeConfig.sysctls = linux_sysctls
 
 
+def _AddShieldedInstanceConfigToNodeConfig(node_config, options, messages):
+  """Adds ShieldedInstanceConfig to NodeConfig."""
+  if (options.shielded_secure_boot is not None or
+      options.shielded_integrity_monitoring is not None):
+    node_config.shieldedInstanceConfig = messages.ShieldedInstanceConfig()
+    if options.shielded_secure_boot is not None:
+      node_config.shieldedInstanceConfig.enableSecureBoot = (
+          options.shielded_secure_boot)
+    if options.shielded_integrity_monitoring is not None:
+      node_config.shieldedInstanceConfig.enableIntegrityMonitoring = (
+          options.shielded_integrity_monitoring)
+
+
+def _AddReleaseChannelToCluster(cluster, options, messages):
+  """Adds ReleaseChannel to Cluster."""
+  if options.release_channel is not None:
+    channels = {
+        'rapid': messages.ReleaseChannel.ChannelValueValuesEnum.RAPID,
+        'regular': messages.ReleaseChannel.ChannelValueValuesEnum.REGULAR,
+        'stable': messages.ReleaseChannel.ChannelValueValuesEnum.STABLE,
+    }
+    cluster.releaseChannel = messages.ReleaseChannel(
+        channel=channels[options.release_channel])
+
+
 def ProjectLocation(project, location):
   return 'projects/' + project + '/locations/' + location
 
@@ -2629,8 +2999,8 @@ def ProjectLocationCluster(project, location, cluster):
 
 
 def ProjectLocationClusterNodePool(project, location, cluster, nodepool):
-  return (ProjectLocationCluster(project, location, cluster) +
-          '/nodePools/' + nodepool)
+  return (ProjectLocationCluster(project, location, cluster) + '/nodePools/' +
+          nodepool)
 
 
 def ProjectLocationOperation(project, location, operation):

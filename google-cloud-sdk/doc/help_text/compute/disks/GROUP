@@ -23,6 +23,9 @@ COMMANDS
      add-labels
         Add labels to Google Compute Engine persistent disks.
 
+     add-resource-policies
+        Add resource policies to a Google Compute Engine disk.
+
      create
         Create Google Compute Engine persistent disks.
 
@@ -46,6 +49,9 @@ COMMANDS
 
      remove-labels
         Remove labels from Google Compute Engine persistent disks.
+
+     remove-resource-policies
+        Remove resource policies from a Google Compute Engine disk.
 
      resize
         Resize a disk or disks.

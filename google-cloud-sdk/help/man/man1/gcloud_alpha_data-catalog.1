@@ -11,7 +11,7 @@ gcloud alpha data\-catalog \- manage Cloud Data Catalog resources
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha data\-catalog\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha data\-catalog\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -48,6 +48,31 @@ help\fR for details.
 \fBentries\fR
 \fB(ALPHA)\fR Manage entries in Cloud Data Catalog.
 
+.TP 2m
+\fBentry\-groups\fR
+\fB(ALPHA)\fR Manage entry groups in Cloud Data Catalog.
+
+.TP 2m
+\fBtag\-templates\fR
+\fB(ALPHA)\fR Manage tag templates in Cloud Data Catalog.
+
+.TP 2m
+\fBtags\fR
+\fB(ALPHA)\fR Manage tags in Cloud Data Catalog.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBsearch\fR
+\fB(ALPHA)\fR Search Cloud Data Catalog for resources that match a query.
+
 
 .RE
 .sp
@@ -56,9 +81,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
 
 .RS 2m
 $ gcloud beta data\-catalog

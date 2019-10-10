@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,13 +32,12 @@ import six
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-def _Args(parser, support_global_access, support_traffic_director,
-          support_l7_internal_load_balancing):
+def _Args(parser, support_global_access, support_l7_internal_load_balancing,
+          support_mirroring_collector):
   """Add the flags to create a forwarding rule."""
 
   flags.AddUpdateArgs(
       parser,
-      include_traffic_director=support_traffic_director,
       include_l7_internal_load_balancing=support_l7_internal_load_balancing)
   flags.AddIPProtocols(parser)
   flags.AddDescription(parser)
@@ -48,6 +47,9 @@ def _Args(parser, support_global_access, support_traffic_director,
 
   if support_global_access:
     flags.AddAllowGlobalAccess(parser)
+
+  if support_mirroring_collector:
+    flags.AddIsMirroringCollector(parser)
 
   parser.add_argument(
       '--service-label',
@@ -60,7 +62,6 @@ def _Args(parser, support_global_access, support_traffic_director,
   flags.AddAddressesAndIPVersions(
       parser,
       required=False,
-      include_traffic_director=support_traffic_director,
       include_l7_internal_load_balancing=support_l7_internal_load_balancing)
   forwarding_rule_arg = flags.ForwardingRuleArgument()
   forwarding_rule_arg.AddArgument(parser, operation_type='create')
@@ -69,23 +70,25 @@ def _Args(parser, support_global_access, support_traffic_director,
 
 
 class CreateHelper(object):
-  """Helper class to create a fowarding rule."""
+  """Helper class to create a forwarding rule."""
 
   FORWARDING_RULE_ARG = None
 
-  def __init__(self, holder, support_global_access, support_traffic_director,
-               support_l7_internal_load_balancing):
+  def __init__(self, holder, support_global_access,
+               support_l7_internal_load_balancing,
+               support_mirroring_collector):
     self._holder = holder
     self._support_global_access = support_global_access
-    self._support_traffic_director = support_traffic_director
     self._support_l7_internal_load_balancing = support_l7_internal_load_balancing
+    self._support_mirroring_collector = support_mirroring_collector
 
   @classmethod
-  def Args(cls, parser, support_global_access, support_traffic_director,
-           support_l7_internal_load_balancing):
+  def Args(cls, parser, support_global_access,
+           support_l7_internal_load_balancing,
+           support_mirroring_collector):
     cls.FORWARDING_RULE_ARG = _Args(parser, support_global_access,
-                                    support_traffic_director,
-                                    support_l7_internal_load_balancing)
+                                    support_l7_internal_load_balancing,
+                                    support_mirroring_collector)
 
   def ConstructProtocol(self, messages, args):
     if args.ip_protocol:
@@ -122,10 +125,7 @@ class CreateHelper(object):
     if not port_range:
       raise exceptions.ToolException(
           '[--ports] is required for global forwarding rules.')
-    target_ref = utils.GetGlobalTarget(
-        resources,
-        args,
-        include_traffic_director=self._support_traffic_director)
+    target_ref = utils.GetGlobalTarget(resources, args)
     protocol = self.ConstructProtocol(client.messages, args)
 
     if args.address is None or args.ip_version:
@@ -151,7 +151,6 @@ class CreateHelper(object):
 
     if args.IsSpecified('network'):
       forwarding_rule.network = flags.NetworkArg(
-          self._support_traffic_director,
           self._support_l7_internal_load_balancing).ResolveAsResource(
               args, resources).SelfLink()
 
@@ -195,7 +194,7 @@ class CreateHelper(object):
         target_ref.Collection() == 'compute.targetInstances' and
         args.load_balancing_scheme == 'INTERNAL'):
       forwarding_rule.portRange = (
-          str(args.port_range) if args.port_range else None)
+          six.text_type(args.port_range) if args.port_range else None)
       if target_ref.Collection() == 'compute.regionBackendServices':
         forwarding_rule.backendService = target_ref.SelfLink()
       else:
@@ -204,7 +203,9 @@ class CreateHelper(object):
         forwarding_rule.allPorts = True
       if range_list:
         forwarding_rule.portRange = None
-        forwarding_rule.ports = [str(p) for p in _GetPortList(range_list)]
+        forwarding_rule.ports = [
+            six.text_type(p) for p in _GetPortList(range_list)
+        ]
       if args.subnet is not None:
         if not args.subnet_region:
           args.subnet_region = forwarding_rule_ref.region
@@ -212,13 +213,14 @@ class CreateHelper(object):
             args, resources).SelfLink()
       if args.network is not None:
         forwarding_rule.network = flags.NetworkArg(
-            self._support_traffic_director,
             self._support_l7_internal_load_balancing).ResolveAsResource(
                 args, resources).SelfLink()
     elif ((target_ref.Collection() == 'compute.regionTargetHttpProxies' or
            target_ref.Collection() == 'compute.regionTargetHttpsProxies') and
           args.load_balancing_scheme == 'INTERNAL'):
-      forwarding_rule.ports = [str(p) for p in _GetPortList(range_list)]
+      forwarding_rule.ports = [
+          six.text_type(p) for p in _GetPortList(range_list)
+      ]
       if args.subnet is not None:
         if not args.subnet_region:
           args.subnet_region = forwarding_rule_ref.region
@@ -226,7 +228,6 @@ class CreateHelper(object):
             args, resources).SelfLink()
       if args.network is not None:
         forwarding_rule.network = flags.NetworkArg(
-            self._support_traffic_director,
             self._support_l7_internal_load_balancing).ResolveAsResource(
                 args, resources).SelfLink()
       forwarding_rule.target = target_ref.SelfLink()
@@ -245,7 +246,6 @@ class CreateHelper(object):
             args, resources).SelfLink()
       if args.network is not None:
         forwarding_rule.network = flags.NetworkArg(
-            self._support_traffic_director,
             self._support_l7_internal_load_balancing).ResolveAsResource(
                 args, resources).SelfLink()
       forwarding_rule.target = target_ref.SelfLink()
@@ -258,6 +258,9 @@ class CreateHelper(object):
 
     if self._support_global_access and args.IsSpecified('allow_global_access'):
       forwarding_rule.allowGlobalAccess = args.allow_global_access
+
+    if hasattr(args, 'is_mirroring_collector'):
+      forwarding_rule.isMirroringCollector = args.is_mirroring_collector
 
     request = client.messages.ComputeForwardingRulesInsertRequest(
         forwardingRule=forwarding_rule,
@@ -284,7 +287,6 @@ class CreateHelper(object):
             if forwarding_rule_ref.Collection() == 'compute.forwardingRules':
               args.address_region = forwarding_rule_ref.region
         address_ref = flags.AddressArg(
-            self._support_traffic_director,
             self._support_l7_internal_load_balancing).ResolveAsResource(
                 args, resources, default_scope=scope)
         address = address_ref.SelfLink()
@@ -297,36 +299,36 @@ class Create(base.CreateCommand):
   """Create a forwarding rule to direct network traffic to a load balancer."""
 
   _support_global_access = False
-  _support_traffic_director = False
   _support_l7_internal_load_balancing = False
+  _support_mirroring_collector = False
 
   @classmethod
   def Args(cls, parser):
     CreateHelper.Args(parser, cls._support_global_access,
-                      cls._support_traffic_director,
-                      cls._support_l7_internal_load_balancing)
+                      cls._support_l7_internal_load_balancing,
+                      cls._support_mirroring_collector)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     return CreateHelper(holder, self._support_global_access,
-                        self._support_traffic_director,
-                        self._support_l7_internal_load_balancing).Run(args)
+                        self._support_l7_internal_load_balancing,
+                        self._support_mirroring_collector).Run(args)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
   """Create a forwarding rule to direct network traffic to a load balancer."""
-  _support_global_access = False
-  _support_traffic_director = True
-  _support_l7_internal_load_balancing = False
+  _support_global_access = True
+  _support_l7_internal_load_balancing = True
+  _support_mirroring_collector = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(CreateBeta):
   """Create a forwarding rule to direct network traffic to a load balancer."""
   _support_global_access = True
-  _support_traffic_director = True
   _support_l7_internal_load_balancing = True
+  _support_mirroring_collector = True
 
 
 Create.detailed_help = {
@@ -386,7 +388,7 @@ def _ResolvePortRange(port_range, port_range_list):
                 ' flag.', port_range)
   elif port_range_list:
     port_range = _GetPortRange(port_range_list)
-  return str(port_range) if port_range else None
+  return six.text_type(port_range) if port_range else None
 
 
 def _GetPortList(range_list):

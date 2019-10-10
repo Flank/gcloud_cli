@@ -11,7 +11,7 @@ gcloud alpha kms keys create \- create a new key
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys create\fR \fIKEY\fR \fB\-\-purpose\fR=\fIPURPOSE\fR [\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR;\ default="software"] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys create\fR \fIKEY\fR \fB\-\-purpose\fR=\fIPURPOSE\fR [\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR;\ default="software"] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fB\-\-skip\-initial\-version\-creation\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -34,6 +34,10 @@ of seconds (s), minutes (m), hours (h) or days (d).
 The optional flag \f5protection\-level\fR specifies the protection level of the
 created key. The default is software; use "HSM" to create a hardware\-backed
 key.
+
+The flag \f5\-\-skip\-initial\-version\-creation\fR creates a CryptoKey with no
+version, and no primary. If you import into the CryptoKey, or create a new
+version in that CryptoKey, you must set that first version to primary.
 
 
 
@@ -65,15 +69,16 @@ The "purpose" of the key. \fIPURPOSE\fR must be one of:
 .RS 2m
 .TP 2m
 \fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR
-The default algorithm for the crypto key. \fIDEFAULT_ALGORITHM\fR must be one
-of: \fBec\-sign\-p256\-sha256\fR, \fBec\-sign\-p384\-sha384\fR,
-\fBgoogle\-symmetric\-encryption\fR, \fBrsa\-decrypt\-oaep\-2048\-sha256\fR,
-\fBrsa\-decrypt\-oaep\-3072\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha256\fR,
-\fBrsa\-decrypt\-oaep\-4096\-sha512\fR, \fBrsa\-sign\-pkcs1\-2048\-sha256\fR,
-\fBrsa\-sign\-pkcs1\-3072\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha256\fR,
-\fBrsa\-sign\-pkcs1\-4096\-sha512\fR, \fBrsa\-sign\-pss\-2048\-sha256\fR,
-\fBrsa\-sign\-pss\-3072\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha256\fR,
-\fBrsa\-sign\-pss\-4096\-sha512\fR.
+The default algorithm for the crypto key. See
+https://cloud.google.com/kms/docs/algorithms for guidance on choosing an
+algorithm. \fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
+\fBec\-sign\-p384\-sha384\fR, \fBgoogle\-symmetric\-encryption\fR,
+\fBrsa\-decrypt\-oaep\-2048\-sha256\fR, \fBrsa\-decrypt\-oaep\-3072\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-4096\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha512\fR,
+\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR,
+\fBrsa\-sign\-pss\-2048\-sha256\fR, \fBrsa\-sign\-pss\-3072\-sha256\fR,
+\fBrsa\-sign\-pss\-4096\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha512\fR.
 
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
@@ -107,6 +112,11 @@ Protection level of the key. \fIPROTECTION_LEVEL\fR must be one of:
 Automatic rotation period of the key. See $ gcloud topic datetimes for
 information on duration formats.
 
+.TP 2m
+\fB\-\-skip\-initial\-version\-creation\fR
+Skip creating the first version in a key and setting it as primary during
+creation.
+
 
 .RE
 .sp
@@ -128,9 +138,9 @@ The following command creates a key named \f5frodo\fR within the keyring
 
 .RS 2m
 $ gcloud alpha kms keys create frodo \e
-    \-\-location us\-east1 \e
-    \-\-keyring fellowship \e
-    \-\-purpose encryption
+    \-\-location=us\-east1 \e
+    \-\-keyring=fellowship \e
+    \-\-purpose=encryption
 .RE
 
 The following command creates a key named \f5strider\fR within the keyring
@@ -138,10 +148,10 @@ The following command creates a key named \f5strider\fR within the keyring
 
 .RS 2m
 $ gcloud alpha kms keys create strider \e
-    \-\-location global \-\-keyring rangers \e
-    \-\-purpose encryption \e
-    \-\-rotation\-period 30d \e
-    \-\-next\-rotation\-time 2017\-10\-12T12:34:56.1234Z
+        \-\-location=global \-\-keyring=rangers \e
+        \-\-purpose=encryption \e
+    \-\-rotation\-period=30d \e
+    \-\-next\-rotation\-time=2017\-10\-12T12:34:56.1234Z
 .RE
 
 The following command creates an asymmetric key named \f5samwise\fR with default
@@ -150,10 +160,10 @@ location \f5us\-east1\fR:
 
 .RS 2m
 $ gcloud alpha kms keys create samwise \e
-    \-\-location us\-east1 \e
-    \-\-keyring fellowship \e
-    \-\-purpose asymmetric\-signing \e
-    \-\-default\-algorithm ec\-sign\-p256\-sha256
+    \-\-location=us\-east1 \e
+    \-\-keyring=fellowship \e
+    \-\-purpose=asymmetric\-signing \e
+    \-\-default\-algorithm=ec\-sign\-p256\-sha256
 .RE
 
 
@@ -162,9 +172,8 @@ $ gcloud alpha kms keys create samwise \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud kms keys create

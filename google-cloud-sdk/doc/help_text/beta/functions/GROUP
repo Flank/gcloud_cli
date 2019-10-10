@@ -30,6 +30,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add an IAM policy binding for a Google Cloud Function.
+
      call
         (BETA) Trigger execution of a Google Cloud Function.
 
@@ -42,8 +45,17 @@ COMMANDS
      describe
         (BETA) Display details of a Google Cloud Function.
 
+     get-iam-policy
+        (BETA) Get IAM policy for a Google Cloud Function.
+
      list
         (BETA) List Google Cloud Functions.
+
+     remove-iam-policy-binding
+        (BETA) Removes an IAM policy binding from a Google Cloud Function.
+
+     set-iam-policy
+        (BETA) Sets IAM policy for a Google Cloud Function.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class Suspend(base.SilentCommand):
 
     operation_refs = [holder.resources.Parse(r.selfLink) for r in responses]
 
-    if args.async:
+    if args.async_:
       for operation_ref in operation_refs:
         log.status.Print('Suspend instance in progress for [{}].'.format(
             operation_ref.SelfLink()))

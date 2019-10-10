@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -336,6 +336,28 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':additional-apks.empty',
                                   self.android_args_set)
 
+  # Tests for client-details arg
+
+  def testClientDetails_GoodInput(self):
+    args = arg_file.GetArgsFromArgFile(GOOD_ARGS + ':client-details.good',
+                                       self.android_args_set)
+    self.assertEqual(args['client_details'], {'k1': 'v1', 'k2': 'v2'})
+
+  def testClientDetails_ListInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':client-details.list',
+                                  self.android_args_set)
+
+  def testClientDetails_StringInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':client-details.string',
+                                  self.android_args_set)
+
+  def testClientDetails_IntInput(self):
+    with self.assertRaises(calliope_exceptions.InvalidArgumentException):
+      arg_file.GetArgsFromArgFile(BAD_ARGS + ':client-details.int',
+                                  self.android_args_set)
+
   # Tests for environment-variables arg
 
   def testEnvironmentVariables_GoodInput(self):
@@ -475,7 +497,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
   def testInclude_SimpleCase(self):
     args = arg_file.GetArgsFromArgFile(INCLUDES + ':group3',
                                        self.android_args_set)
-    self.assertEqual(args['async'], True)  # Value from includer
+    self.assertEqual(args['async_'], True)  # Value from includer
     self.assertEqual(args['type'], 'instrumentation')  # Value from includee
     self.assertListEqual(args['locales'], ['de', 'en', 'it'])  # From includer
     self.assertListEqual(args['os_version_ids'], ['21'])  # From includee
@@ -490,7 +512,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     # Check that topmost group value not overridden by indirectly included value
     self.assertEqual(args['type'], 'robo')
     # Check that included groups in a list are processed left-to-right
-    self.assertEqual(args['async'], False)
+    self.assertEqual(args['async_'], False)
     # Check that 2-levels-deep includee doesn't override 1-level-deep includee
     self.assertListEqual(args['locales'], ['de', 'en', 'it'])
     # Check that value from 2-levels-deep includee is used if no overrides

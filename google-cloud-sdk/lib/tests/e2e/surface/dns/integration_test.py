@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,13 +60,13 @@ class ManagedZonesTest(base.DnsTest):
             self.test_zone.name, self.test_zone.dnsName,
             self.test_zone.description))
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{1}].
+Created [https://dns.googleapis.com/dns/v1/projects/{0}/managedZones/{1}].
 """.format(self.Project(), self.test_zone.name))
 
   def TearDown(self):
     self.Run('dns managed-zones delete {0}'.format(self.test_zone.name))
     self.AssertErrContains("""\
-Deleted [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{1}].
+Deleted [https://dns.googleapis.com/dns/v1/projects/{0}/managedZones/{1}].
 """.format(self.Project(), self.test_zone.name))
 
   def testList(self):
@@ -120,7 +120,7 @@ NAME        TYPE  TTL    DATA
         self.test_zone.name, import_file_path))
     self.AssertErrContains("""\
 Imported record-sets from [{1}] into managed-zone [{2}].
-Created [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{2}/changes/1].
+Created [https://dns.googleapis.com/dns/v1/projects/{0}/managedZones/{2}/changes/1].
 """.format(self.Project(), import_file_path, self.test_zone.name))
 
     # Wait for import change to be completed
@@ -175,7 +175,7 @@ Record addition appended to transaction at [transaction.yaml].
         self.test_zone.name))
     self.AssertErrContains("""\
 Executed transaction [transaction.yaml] for managed-zone [{1}].
-Created [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{1}/changes/1].
+Created [https://dns.googleapis.com/dns/v1/projects/{0}/managedZones/{1}/changes/1].
 """.format(self.Project(), self.test_zone.name))
 
     # Wait for transaction change to be completed
@@ -201,7 +201,7 @@ Record removal appended to transaction at [transaction.yaml].
         self.test_zone.name))
     self.AssertErrContains("""\
 Executed transaction [transaction.yaml] for managed-zone [{1}].
-Created [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{1}/changes/2].
+Created [https://dns.googleapis.com/dns/v1/projects/{0}/managedZones/{1}/changes/2].
 """.format(self.Project(), self.test_zone.name))
 
     # Wait for transaction change to be completed

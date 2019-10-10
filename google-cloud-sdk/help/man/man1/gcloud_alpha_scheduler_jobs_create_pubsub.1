@@ -167,8 +167,21 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBcloudscheduler/v1beta1\fR API. The full documentation
-for this API can be found at: https://cloud.google.com/scheduler/
+This command uses the \fBcloudscheduler/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/scheduler/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a job that publishes a messgae with the body
+\'Hello' to the Pub/Sub topic 'cron\-topic' every 3 hours:
+
+.RS 2m
+$ gcloud alpha scheduler jobs create pubsub my\-job \e
+    \-\-schedule="0 */3 * * *"
+  \-\-topic=cron\-topic \-\-message\-body="Hello"
+.RE
 
 
 
@@ -176,11 +189,11 @@ for this API can be found at: https://cloud.google.com/scheduler/
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud scheduler jobs create pubsub
 $ gcloud beta scheduler jobs create pubsub
 .RE
 

@@ -2,7 +2,7 @@ NAME
     gcloud alpha scc assets list - list Cloud Security Command Center assets
 
 SYNOPSIS
-    gcloud alpha scc assets list ORGANIZATION
+    gcloud alpha scc assets list [ORGANIZATION]
         [--compare-duration=COMPARE_DURATION] [--field-mask=FIELD_MASK]
         [--order-by=ORDER_BY] [--page-token=PAGE_TOKEN] [--read-time=READ_TIME]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
@@ -12,10 +12,10 @@ DESCRIPTION
     (ALPHA) List Cloud Security Command Center assets.
 
 POSITIONAL ARGUMENTS
-     Organization resource - The organization to be used for the SCC command.
-     This represents a Cloud resource. This must be specified.
+     Organization resource - The organization to be used for the SCC (Security
+     Command Center) command. This represents a Cloud resource.
 
-       ORGANIZATION
+       [ORGANIZATION]
           ID of the organization or fully qualified identifier for the
           organization.
 
@@ -141,7 +141,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

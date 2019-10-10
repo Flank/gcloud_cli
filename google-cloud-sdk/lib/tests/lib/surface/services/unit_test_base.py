@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -223,23 +223,31 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
 
   def PreSetUp(self):
     self.services_messages = core_apis.GetMessagesModule('serviceusage', 'v1')
+    self.services_v1alpha_messages = core_apis.GetMessagesModule(
+        'serviceusage', 'v1alpha')
 
   def SetUp(self):
     properties.VALUES.core.project.Set(self.PROJECT_NAME)
 
-    # Mock out the service networking API
+    # Mock out the service usage API
     self.mocked_client = mock.Client(
         core_apis.GetClientClass('serviceusage', 'v1'),
         real_client=core_apis.GetClientInstance(
             'serviceusage', 'v1', no_http=True))
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
+    self.mocked_v1alpha_client = mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1alpha'),
+        real_client=core_apis.GetClientInstance(
+            'serviceusage', 'v1alpha', no_http=True))
+    self.mocked_v1alpha_client.Mock()
+    self.addCleanup(self.mocked_v1alpha_client.Unmock)
 
-  def ExpectEnableApiCall(self, operation, error=None):
+  def ExpectEnableApiCall(self, operation, error=None, done=False):
     if error:
       op = None
     else:
-      op = self.services_messages.Operation(name=operation, done=False)
+      op = self.services_messages.Operation(name=operation, done=done)
     self.mocked_client.services.Enable.Expect(
         self.services_messages.ServiceusageServicesEnableRequest(
             name='projects/%s/services/%s' % (self.PROJECT_NAME,
@@ -277,6 +285,14 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
         op,
         exception=error)
 
+  def ExpectGetService(self, service, error=None):
+    self.mocked_client.services.Get.Expect(
+        self.services_messages.ServiceusageServicesGetRequest(
+            name='projects/%s/services/%s' %
+            (self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),),
+        response=service,
+        exception=error)
+
   def ExpectListServicesCall(self, error=None):
     if error:
       resp = None
@@ -307,9 +323,209 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
         op,
         exception=error)
 
-  def _NewServiceConfig(self, project, service):
+  def _NewServiceConfig(self, project, service, enabled=None):
+    state_type = self.services_messages.GoogleApiServiceusageV1Service.StateValueValuesEnum
     return self.services_messages.GoogleApiServiceusageV1Service(
         name='projects/%s/services/%s' % (project, service),
         config=self.services_messages.GoogleApiServiceusageV1ServiceConfig(
             name=service,),
+        state=state_type.ENABLED if enabled else state_type.DISABLED,
     )
+
+  def ExpectGenerateServiceIdentityCall(self, email, unique_id, error=None):
+    if error:
+      op = None
+    else:
+      resp = encoding.DictToMessage({
+          'email': email,
+          'unique_id': unique_id
+      }, self.services_v1alpha_messages.Operation.ResponseValue)
+      op = self.services_v1alpha_messages.Operation(
+          name='opname', done=True, response=resp)
+    self.mocked_v1alpha_client.services.GenerateIdentity.Expect(
+        self.services_v1alpha_messages
+        .ServiceusageServicesGenerateIdentityRequest(
+            parent='projects/%s/services/%s' %
+            (self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),),
+        op,
+        exception=error)
+
+
+class SCMUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
+                      cli_test_base.CliTestBase):
+  """Base class for service consumer management unit tests."""
+
+  DEFAULT_CONSUMER = 'projects/helloworld'
+  DEFAULT_SERVICE = 'example.googleapis.com'
+  _LIMIT_OVERRIDE_RESOURCE = '%s/producerOverrides/%s'
+
+  def SetUp(self):
+    self.services_messages = core_apis.GetMessagesModule(
+        'serviceconsumermanagement', 'v1beta1')
+    self.mocked_client = mock.Client(
+        core_apis.GetClientClass('serviceconsumermanagement', 'v1beta1'),
+        real_client=core_apis.GetClientInstance('serviceconsumermanagement',
+                                                'v1beta1'))
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+    # setup common test resources
+    self.mutate_metric = 'example.googleapis.com/mutate_requests'
+    self.default_metric = 'example.googleapis.com/default_requests'
+    self.mutate_metric_resource_name = 'services/example.googleapis.com/projects/123/quotaMetrics/example.googleapis.com%2Fmutate_requests'
+    self.default_metric_resource_name = 'services/example.googleapis.com/projects/123/quotaMetrics/example.googleapis.com%2Fdefault_requests'
+    self.mutate_limit_name = 'services/example.googleapis.com/projects/123/quotaMetrics/example.googleapis.com%2Fmutate_requests/limits/%2Fmin%2Fproject'
+    self.default_limit_name = 'services/example.googleapis.com/projects/123/quotaMetrics/example.googleapis.com%2Fdefault_requests/limits/%2Fmin%2Fproject'
+    self.unit = '1/min/{project}'
+    self.mutate_quota_metric = self.services_messages.V1Beta1ConsumerQuotaMetric(
+        name=self.mutate_metric_resource_name,
+        displayName='Mutate requests',
+        metric=self.mutate_metric,
+        consumerQuotaLimits=[
+            self.services_messages.V1Beta1ConsumerQuotaLimit(
+                name=self.mutate_limit_name,
+                metric=self.mutate_metric,
+                unit=self.unit,
+                quotaBuckets=[
+                    self.services_messages.V1Beta1QuotaBucket(
+                        effectiveLimit=120,
+                        defaultLimit=120,
+                    ),
+                ],
+            ),
+        ],
+    )
+    self.default_quota_metric = self.services_messages.V1Beta1ConsumerQuotaMetric(
+        name=self.default_metric_resource_name,
+        displayName='Default requests',
+        metric=self.default_metric,
+        consumerQuotaLimits=[
+            self.services_messages.V1Beta1ConsumerQuotaLimit(
+                name=self.default_limit_name,
+                metric=self.default_metric,
+                unit=self.unit,
+                quotaBuckets=[
+                    self.services_messages.V1Beta1QuotaBucket(
+                        effectiveLimit=240,
+                        defaultLimit=120,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+  def ExpectListQuotaMetricsCall(self, metrics):
+    self.mocked_client.services_consumerQuotaMetrics.List.Expect(
+        self.services_messages
+        .ServiceconsumermanagementServicesConsumerQuotaMetricsListRequest(
+            parent='services/%s/%s' %
+            (self.DEFAULT_SERVICE, self.DEFAULT_CONSUMER)),
+        self.services_messages.V1Beta1ListConsumerQuotaMetricsResponse(
+            metrics=metrics),
+    )
+
+  def ExpectCreateQuotaOverrideCall(self,
+                                    limit_resource_name,
+                                    metric,
+                                    unit,
+                                    value,
+                                    operation,
+                                    dimensions=None,
+                                    force=False,
+                                    error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    dt = self.services_messages.V1Beta1QuotaOverride.DimensionsValue
+    dimensions_message = None
+    if dimensions is not None:
+      dimensions_message = dt(
+          additionalProperties=[
+              dt.AdditionalProperty(key=k, value=v) for (k, v) in dimensions
+          ],)
+    request = self.services_messages.ServiceconsumermanagementServicesConsumerQuotaMetricsLimitsProducerOverridesCreateRequest(
+        parent=limit_resource_name,
+        v1Beta1QuotaOverride=self.services_messages.V1Beta1QuotaOverride(
+            name='%s/producerOverrides/kawaii' % limit_resource_name,
+            metric=metric,
+            unit=unit,
+            dimensions=dimensions_message,
+            overrideValue=value,
+        ),
+        force=force,
+    )
+    self.mocked_client.services_consumerQuotaMetrics_limits_producerOverrides.Create.Expect(
+        request, op, exception=error)
+
+  def ExpectUpdateQuotaOverrideCall(self,
+                                    limit_resource_name,
+                                    metric,
+                                    unit,
+                                    override_id,
+                                    value,
+                                    operation,
+                                    dimensions=None,
+                                    force=False,
+                                    error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    dt = self.services_messages.V1Beta1QuotaOverride.DimensionsValue
+    dimensions_message = None
+    if dimensions is not None:
+      dimensions_message = dt(
+          additionalProperties=[
+              dt.AdditionalProperty(key=k, value=v) for (k, v) in dimensions
+          ],)
+    name = self._LIMIT_OVERRIDE_RESOURCE % (limit_resource_name, override_id)
+    request = self.services_messages.ServiceconsumermanagementServicesConsumerQuotaMetricsLimitsProducerOverridesPatchRequest(
+        name=name,
+        v1Beta1QuotaOverride=self.services_messages.V1Beta1QuotaOverride(
+            name=name,
+            metric=metric,
+            unit=unit,
+            dimensions=dimensions_message,
+            overrideValue=value,
+        ),
+        force=force,
+    )
+    self.mocked_client.services_consumerQuotaMetrics_limits_producerOverrides.Patch.Expect(
+        request, op, exception=error)
+
+  def ExpectDeleteQuotaOverrideCall(self,
+                                    limit_resource_name,
+                                    metric,
+                                    unit,
+                                    override_id,
+                                    operation,
+                                    force=False,
+                                    error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    name = self._LIMIT_OVERRIDE_RESOURCE % (limit_resource_name, override_id)
+    request = self.services_messages.ServiceconsumermanagementServicesConsumerQuotaMetricsLimitsProducerOverridesDeleteRequest(
+        name=name,
+        force=force,
+    )
+    self.mocked_client.services_consumerQuotaMetrics_limits_producerOverrides.Delete.Expect(
+        request, op, exception=error)
+
+  def ExpectOperation(self, name, poll_count=2, error=None):
+    for _ in range(poll_count):
+      op = self.services_messages.Operation(name=name, done=False)
+      self.mocked_client.operations.Get.Expect(
+          request=self.services_messages
+          .ServiceconsumermanagementOperationsGetRequest(name=name),
+          response=op)
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=name, done=True)
+    self.mocked_client.operations.Get.Expect(
+        self.services_messages.ServiceconsumermanagementOperationsGetRequest(
+            name=name),
+        op,
+        exception=error)

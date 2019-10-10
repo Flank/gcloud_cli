@@ -29,6 +29,8 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
 
+
+# LINT.IfChange
 SERVICE_ACCOUNT_KEY_FILE_FLAG = '--service-account-key-file'
 DOCKER_CREDENTIAL_FILE_FLAG = '--docker-credential-file'
 
@@ -62,6 +64,12 @@ class RegisterCluster(base.CreateCommand):
           --context=my-cluster-context \
           --manifest-output-file=/tmp/manifest.yaml \
           --service-account-key-file=/tmp/keyfile.json
+  Register a cluster with a specific version of GKE Connect:
+
+      $ {command} my-cluster \
+          --context=my-cluster-context \
+          --service-account-key-file=/tmp/keyfile.json \
+          --version=gkeconnect_20190802_02_00
   """
 
   @classmethod
@@ -98,15 +106,11 @@ class RegisterCluster(base.CreateCommand):
           """),
     )
     parser.add_argument(
-        '--docker-image',
+        '--version',
         type=str,
-        hidden=True,
         help=textwrap.dedent("""\
-            The image to use for the Connect agent, as it would be passed to the
-            `docker pull` command. The user is responsible for ensuring that
-            this image can be pulled from the cluster that is being registered,
-            and is responsible for maintaining and updating the agent image if
-            a private registry is being used.
+        The version of the connect agent to install/upgrade if not using the
+        latest connect version.
           """),
     )
     parser.add_argument(
@@ -120,12 +124,24 @@ class RegisterCluster(base.CreateCommand):
             agent workload.
           """),
     )
+    parser.add_argument(
+        '--docker-registry',
+        type=str,
+        hidden=True,
+        help=textwrap.dedent("""\
+            The registry to pull GKE Connect agent image if not using
+            gcr.io/gkeconnect.
+          """),
+    )
 
   def Run(self, args):
     project = arg_utils.GetFromNamespace(args, '--project', use_defaults=True)
 
     # This incidentally verifies that the kubeconfig and context args are valid.
-    uuid = hub_util.GetClusterUUID(args)
+    kube_client = hub_util.KubernetesClient(args)
+    uuid = hub_util.GetClusterUUID(kube_client)
+
+    self._VerifyClusterExclusivity(kube_client, project, args.context, uuid)
 
     # Read the service account files provided in the arguments early, in order
     # to catch invalid files before performing mutating operations.
@@ -145,17 +161,16 @@ class RegisterCluster(base.CreateCommand):
         raise exceptions.Error('Could not process {}: {}'.format(
             DOCKER_CREDENTIAL_FILE_FLAG, e))
 
+    gke_cluster_self_link = hub_util.GKEClusterSelfLink(args)
+
     # The full resource name of the membership for this registration flow.
     name = 'projects/{}/locations/global/memberships/{}'.format(project, uuid)
-
     # Attempt to create a membership.
     already_exists = False
     try:
-      obj = hub_util.CreateMembership(project, uuid, args.CLUSTER_NAME)
-    except apitools_exceptions.HttpNotFoundError as e:
-      raise exceptions.Error(
-          'Could not access Memberships API. Is your project whitelisted for '
-          'API access? Underlying error: {}'.format(e))
+      hub_util.ApplyMembershipResources(kube_client, project)
+      obj = hub_util.CreateMembership(project, uuid, args.CLUSTER_NAME,
+                                      gke_cluster_self_link)
     except apitools_exceptions.HttpConflictError as e:
       # If the error is not due to the object already existing, re-raise.
       error = core_api_exceptions.HttpErrorPayload(e)
@@ -164,6 +179,12 @@ class RegisterCluster(base.CreateCommand):
 
       # The membership already exists. Check to see if it has the same
       # description (i.e., user-visible cluster name).
+      #
+      # This intentionally does not verify that the gke_cluster_self_link is
+      # equivalent: this check is meant to prevent the user from updating the
+      # Connect agent in a cluster that is different from the one that they
+      # expect, and is not required for the proper functioning of the agent or
+      # the Hub.
       obj = hub_util.GetMembership(name)
       if obj.description != args.CLUSTER_NAME:
         # A membership exists, but does not have the same description. This is
@@ -171,21 +192,19 @@ class RegisterCluster(base.CreateCommand):
         # cluster, or if the user is upgrading and has passed a different
         # cluster name. Treat this as an error: even in the upgrade case,
         # this is useful to prevent the user from upgrading the wrong cluster.
-        prefix = self.ReleaseTrack().prefix
         raise exceptions.Error(
             'There is an existing membership, [{}], that conflicts with [{}]. '
             'Please delete it before continuing:\n\n'
             '  gcloud {}container memberships delete {}'.format(
                 obj.description, args.CLUSTER_NAME,
-                prefix + ' ' if prefix else '', name))
+                hub_util.ReleaseTrackCommandPrefix(self.ReleaseTrack()), name))
 
       # The membership exists and has the same description.
       already_exists = True
       console_io.PromptContinue(
           message='A membership for [{}] already exists. Continuing will '
-          'update the Connect agent deployment to use a new image (if one is '
-          'available), or install the Connect agent if it is not already '
-          'running.'.format(args.CLUSTER_NAME),
+          'reinstall the Connect agent deployment to use a new image (if one '
+          'is available).'.format(args.CLUSTER_NAME),
           cancel_on_no=True)
 
     # A membership exists. Attempt to update the existing agent deployment, or
@@ -193,15 +212,73 @@ class RegisterCluster(base.CreateCommand):
     if already_exists:
       obj = hub_util.GetMembership(name)
       hub_util.DeployConnectAgent(
-          args, service_account_key_data, docker_credential_data, upgrade=True)
+          args, service_account_key_data, docker_credential_data, name)
       return obj
 
     # No membership exists. Attempt to create a new one, and install a new
     # agent.
     try:
       hub_util.DeployConnectAgent(
-          args, service_account_key_data, docker_credential_data, upgrade=False)
+          args, service_account_key_data, docker_credential_data, name)
     except:
       hub_util.DeleteMembership(name)
+      hub_util.DeleteMembershipResources(kube_client)
       raise
     return obj
+
+  def _VerifyClusterExclusivity(self, kube_client, project, context, uuid):
+    """Verifies that the cluster can be registered to the project.
+
+    The ensures cluster exclusivity constraints are not violated as well as
+    ensuring the user is authorized to register the cluster to the project.
+
+    Args:
+      kube_client: A KubernetesClient
+      project: A project ID the user is attempting to register the cluster with.
+      context: The kubernetes cluster context.
+      uuid: The UUID of the kubernetes cluster.
+
+    Raises:
+      exceptions.Error: If exclusivity constraints are violated or the user is
+        not authorized to register to the cluster.
+    """
+    authorized_projects = hub_util.UserAccessibleProjectIDSet()
+    registered_project = hub_util.GetMembershipCROwnerID(kube_client)
+
+    if registered_project:
+      if registered_project not in authorized_projects:
+        raise exceptions.Error(
+            'The cluster is already registered to [{}], which you are not '
+            'authorized to access.'.format(registered_project))
+      elif registered_project != project:
+        raise exceptions.Error(
+            'This cluster is already registered to [{}]. '
+            'Please unregister this cluster before continuing:\n\n'
+            '  gcloud {}container hub unregister-cluster --project {} --context {}'
+            .format(registered_project,
+                    hub_util.ReleaseTrackCommandPrefix(self.ReleaseTrack()),
+                    registered_project, context))
+
+    if project not in authorized_projects:
+      raise exceptions.Error(
+          'The project you are attempting to register with [{}] either '
+          'doesn\'t exist or you are not authorized to access it.'.format(
+              project))
+
+    try:
+      registered_membership_project = hub_util.ProjectForClusterUUID(
+          uuid, [project, registered_project])
+    except apitools_exceptions.HttpNotFoundError as e:
+      raise exceptions.Error(
+          'Could not access Memberships API. Is your project whitelisted for '
+          'API access? Underlying error: {}'.format(e))
+
+    if registered_membership_project and registered_membership_project != project:
+      raise exceptions.Error(
+          'This cluster is already registered to [{}]. '
+          'Please unregister this cluster before continuing:\n\n'
+          '  gcloud {}container hub unregister-cluster --project {} --context {}'
+          .format(registered_membership_project,
+                  hub_util.ReleaseTrackCommandPrefix(self.ReleaseTrack()),
+                  registered_membership_project, context))
+# LINT.ThenChange(../memberships/register.py)

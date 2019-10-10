@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class TargetPoolsSetBackupTest(test_base.BaseTest):
               region='us-central2',
               targetReference=messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/v1/projects/'
+                      'https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/us-central2/targetPools/'
                       'target-pool-2'),
               )))],
@@ -107,8 +107,8 @@ class TargetPoolsSetBackupTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute target-pools set-backup
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
-          --backup-pool https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-2
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
+          --backup-pool https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-2
           --failover-ratio 0.5
         """)
 
@@ -122,7 +122,7 @@ class TargetPoolsSetBackupTest(test_base.BaseTest):
               region='us-central2',
               targetReference=messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/v1/projects/'
+                      'https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/us-central2/targetPools/'
                       'target-pool-2'),
               )))],
@@ -159,7 +159,7 @@ class TargetPoolsSetBackupTest(test_base.BaseTest):
               region='us-central2',
               targetReference=messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/v1/projects/'
+                      'https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/us-central2/targetPools/'
                       'target-pool-2'),
               )))],

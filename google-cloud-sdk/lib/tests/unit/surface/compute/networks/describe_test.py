@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,14 +85,14 @@ class NetworksDescribeTest(test_base.BaseTest,
                 routingConfig=messages.NetworkRoutingConfig(
                     routingMode=(messages.NetworkRoutingConfig.
                                  RoutingModeValueValuesEnum.GLOBAL)),
-                selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                           'my-project/global/networks/network-4'),
                 subnetworks=[],
                 peerings=[
                     messages.NetworkPeering(
                         autoCreateRoutes=True,
                         name='peering-1',
-                        network='https://www.googleapis.com/compute/v1'
+                        network='https://compute.googleapis.com/compute/v1'
                         '/projects/my-project-2/global/networks/network-5',
                         state=messages.NetworkPeering.StateValueValuesEnum.
                         INACTIVE,

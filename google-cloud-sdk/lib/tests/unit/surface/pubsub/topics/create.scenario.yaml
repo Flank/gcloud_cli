@@ -1,5 +1,5 @@
 title: pubsub topics create scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 # set a KMS key on topic creation using full resource path to kms key

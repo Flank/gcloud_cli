@@ -15,6 +15,12 @@ summary:
       Export in progress for root asset [projects/test-project].
       Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834] to check the status of the operation.
 - execute:
+  - command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --output-path-prefix=gs://bucket-name/object-name
+  - stderr: |
+      Export in progress for root asset [projects/test-project].
+      Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834] to check the status of the operation.
+- execute:
   - command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
       --content-type iam-policy --output-path=gs://bucket-name/object-name --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
   - stderr: |
@@ -27,15 +33,38 @@ summary:
       Export in progress for root asset [folders/test-folder].
       Use [gcloud asset operations describe folders/19809800891/operations/ExportAssets/IAM_POLICY/10801893675377458834] to check the status of the operation.
 - execute:
-  - command: asset export --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy
-      --output-path=gs://bucket-name/object-name --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
-  - error: '1: Missing required argument [--organization or --project or --folder]:
-      Should specify the organization, or project, or the folder for root cloud asset.'
+  - command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --content-type org-policy --output-path=gs://bucket-name/object-name --asset-types=cloudresourcemanager.googleapis.com/Project
+  - stderr: |
+      Export in progress for root asset [projects/test-project].
+      Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/ORG_POLICY/10801893675377458834] to check the status of the operation.
 - execute:
-  - command: asset export --organization test-organization --project test-project
-      --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy --output-path=gs://bucket-name/object-name
+  - command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type access-policy --output-path=gs://bucket-name/object-name --asset-types=cloudresourcemanager.googleapis.com/Organization
+  - stderr: |
+      Export in progress for root asset [organizations/test-organization].
+      Use [gcloud asset operations describe organizations/19809800890/operations/ExportAssets/ACCESS_POLICY/10801893675377458834] to check the status of the operation.
+- execute:
+  - command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --content-type resource --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
+      --output-bigquery-force --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
+  - stderr: |
+      Export in progress for root asset [projects/test-project].
+      Use [gcloud asset operations describe None] to check the status of the operation.
+- execute:
+  - command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
+      --output-bigquery-force --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
+  - stderr: |
+      Export in progress for root asset [organizations/test-organization].
+      Use [gcloud asset operations describe None] to check the status of the operation.
+- execute:
+  - command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
       --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
-  - error: '1: arguments not allowed simultaneously: organization, project'
+  - stderr: |
+      Export in progress for root asset [organizations/test-organization].
+      Use [gcloud asset operations describe None] to check the status of the operation.
 actions:
 - execute_command:
     command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
@@ -114,6 +143,46 @@ actions:
                 "outputConfig": {
                   "gcsDestination": {
                     "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [projects/test-project].
+        Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834] to check the status of the operation.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --output-path-prefix=gs://bucket-name/object-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/test-project:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contentType: CONTENT_TYPE_UNSPECIFIED
+              outputConfig:
+                gcsDestination:
+                  uriPrefix: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1.ExportAssetsRequest",
+                "parent": "projects/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "contentType": "CONTENT_TYPE_UNSPECIFIED",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uriPrefix": "gs://bucket-name/object-name"
                   }
                 }
               }
@@ -217,19 +286,183 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: asset export --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy
-      --output-path=gs://bucket-name/object-name --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
+    command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --content-type org-policy --output-path=gs://bucket-name/object-name --asset-types=cloudresourcemanager.googleapis.com/Project
     events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/test-project:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - cloudresourcemanager.googleapis.com/Project
+              contentType: ORG_POLICY
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/19809800890/operations/ExportAssets/ORG_POLICY/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1.ExportAssetsRequest",
+                "parent": "projects/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "assetTypes": [
+                  "cloudresourcemanager.googleapis.com/Project"
+                ],
+                "contentType": "ORG_POLICY",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [projects/test-project].
+        Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/ORG_POLICY/10801893675377458834] to check the status of the operation.
     - expect_exit:
-        code: 1
-        message: 'Missing required argument [--organization or --project or --folder]:
-          Should specify the organization, or project, or the folder for root cloud
-          asset.'
+        code: 0
 - execute_command:
-    command: asset export --organization test-organization --project test-project
-      --snapshot-time 2018-10-05T00:00:00Z --content-type iam-policy --output-path=gs://bucket-name/object-name
+    command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type access-policy --output-path=gs://bucket-name/object-name --asset-types=cloudresourcemanager.googleapis.com/Organization
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - cloudresourcemanager.googleapis.com/Organization
+              contentType: ACCESS_POLICY
+              outputConfig:
+                gcsDestination:
+                  uri: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/19809800890/operations/ExportAssets/ACCESS_POLICY/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1.ExportAssetsRequest",
+                "parent": "organizations/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "assetTypes": [
+                  "cloudresourcemanager.googleapis.com/Organization"
+                ],
+                "contentType": "ACCESS_POLICY",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uri": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [organizations/test-organization].
+        Use [gcloud asset operations describe organizations/19809800890/operations/ExportAssets/ACCESS_POLICY/10801893675377458834] to check the status of the operation.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --content-type resource --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
+      --output-bigquery-force --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/test-project:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - compute.googleapis.com/Disk
+              - compute.googleapis.com/Firewall
+              contentType: RESOURCE
+              outputConfig:
+                bigqueryDestination:
+                  dataset: projects/google.com:test-project/datasets/test_dataset
+                  force: true
+                  table: test_table
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Export in progress for root asset [projects/test-project].
+        Use [gcloud asset operations describe None] to check the status of the operation.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
+      --output-bigquery-force --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - compute.googleapis.com/Disk
+              - compute.googleapis.com/Firewall
+              contentType: IAM_POLICY
+              outputConfig:
+                bigqueryDestination:
+                  dataset: projects/google.com:test-project/datasets/test_dataset
+                  force: true
+                  table: test_table
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Export in progress for root asset [organizations/test-organization].
+        Use [gcloud asset operations describe None] to check the status of the operation.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: asset export --organization test-organization --snapshot-time 2018-10-05T00:00:00Z
+      --content-type iam-policy --bigquery-table='projects/google.com:test-project/datasets/test_dataset/tables/test_table'
       --asset-types=compute.googleapis.com/Disk,compute.googleapis.com/Firewall
     events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              assetTypes:
+              - compute.googleapis.com/Disk
+              - compute.googleapis.com/Firewall
+              contentType: IAM_POLICY
+              outputConfig:
+                bigqueryDestination:
+                  dataset: projects/google.com:test-project/datasets/test_dataset
+                  force: false
+                  table: test_table
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Export in progress for root asset [organizations/test-organization].
+        Use [gcloud asset operations describe None] to check the status of the operation.
     - expect_exit:
-        code: 1
-        message: 'arguments not allowed simultaneously: organization, project'
+        code: 0

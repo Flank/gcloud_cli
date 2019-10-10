@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,6 +67,25 @@ class FakeDateTime(datetime.datetime):
   @classmethod
   def now(cls, _=None):  # pylint: disable=invalid-name
     return datetime.datetime(2014, 1, 2, 3, 4, 5, 6)
+
+
+class UTCtzinfo(datetime.tzinfo):
+
+  def utcoffset(self, _):
+    return datetime.timedelta(0)
+
+  def tzname(self, _):
+    return 'UTC'
+
+  def dst(self, _):
+    return datetime.timedelta(0)
+
+
+class FakeDateTimeWithTimeZone(datetime.datetime):
+
+  @classmethod
+  def now(cls, _=None):  # pylint: disable=invalid-name
+    return datetime.datetime(2014, 1, 2, 3, 4, 5, tzinfo=UTCtzinfo())
 
 
 class ApitoolsClientCache(object):
@@ -256,9 +275,9 @@ class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
 
     self.api = api
     self.resource_api = resource_api or api
-    self.batch_url = ('https://www.googleapis.com/batch/compute/{0}'
+    self.batch_url = ('https://compute.googleapis.com/batch/compute/{0}'
                       .format(self.resource_api))
-    self.compute_uri = ('https://www.googleapis.com/compute/{0}'
+    self.compute_uri = ('https://compute.googleapis.com/compute/{0}'
                         .format(self.resource_api))
 
     # TODO(b/19503581): Refactor test_base.py and test_resources.py s.t.
@@ -287,32 +306,32 @@ class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
     if not api:
       api = self.api
     result = """
-        [ {{ "uri": "https://www.googleapis.com/compute/{api}/\
+        [ {{ "uri": "https://compute.googleapis.com/compute/{api}/\
 projects/my-project/zones/central2-a/disks/hamlet",
              "key": "abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA=",
              "key-type": "raw"}},
-          {{ "uri": "https://www.googleapis.com/compute/{api}/\
+          {{ "uri": "https://compute.googleapis.com/compute/{api}/\
 projects/my-project/zones/central2-a/disks/ophelia",
              "key": "OpheliaOphelia0000000000000000000000000000X=",
              "key-type": "raw"}},
-          {{ "uri": "https://www.googleapis.com/compute/{api}/\
+          {{ "uri": "https://compute.googleapis.com/compute/{api}/\
 projects/my-project/global/images/yorik",
              "key": "aFellowOfInfiniteJestOfMostExcellentFancy00=",
              "key-type": "raw"}},
-          {{ "uri": "https://www.googleapis.com/compute/{api}/\
+          {{ "uri": "https://compute.googleapis.com/compute/{api}/\
 projects/my-project/global/snapshots/laertes",
              "key": "AsAWoodcockToMineOwnSpringet00000000000000X=",
              "key-type": "raw"}}""".format(api=api)
     if include_rsa_encrypted:
       result += """,
-          {{ "uri": "https://www.googleapis.com/compute/{api}/\
+          {{ "uri": "https://compute.googleapis.com/compute/{api}/\
 projects/my-project/zones/central2-a/disks/wrappedkeydisk",
              "key": "{wrapped_key}",
              "key-type": "rsa-encrypted"}}""".format(
                  api=api, wrapped_key=SAMPLE_WRAPPED_CSEK_KEY)
     if machine_image:
       result += """,
-      {{ "uri": "https://www.googleapis.com/compute/{api}/\
+      {{ "uri": "https://compute.googleapis.com/compute/{api}/\
 projects/my-project/global/machineImages/machine-image-1",
                  "key": "aFellowOfInfiniteJestOfMostExcellentFancy01=",
                  "key-type": "raw"}}""".format(api=api)
@@ -366,7 +385,7 @@ projects/my-project/global/machineImages/machine-image-1",
     # Check request against request helper function
     # googlecloudsdk.api_lib.compute.request_helper.MakeRequests.
     required_method_args = set(['requests', 'http', 'batch_url', 'errors'])
-    optional_method_args = set(['progress_tracker'])
+    optional_method_args = set(['progress_tracker', 'followup_overrides'])
 
     for (_, _, expected), (_, actual) in zip(
         expected_calls, self.make_requests.call_args_list):
@@ -607,6 +626,22 @@ class BaseSSHTest(BaseTest):
                     key='enable-oslogin',
                     value='true'),
             ]),
+    )
+
+    self.project_resource_with_guest_attr_enabled = self.v1_messages.Project(
+        commonInstanceMetadata=self.v1_messages.Metadata(
+            items=[
+                self.v1_messages.Metadata.ItemsValueListEntry(
+                    key='a',
+                    value='b'),
+                self.v1_messages.Metadata.ItemsValueListEntry(
+                    key='enable-guest-attributes',
+                    value='true'),
+                self.v1_messages.Metadata.ItemsValueListEntry(
+                    key='sshKeys',
+                    value='me:{0}\n'.format(self.public_key_material)),
+            ]),
+        name='my-project',
     )
 
     self.make_requests.side_effect = iter([

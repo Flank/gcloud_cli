@@ -1,0 +1,192 @@
+title: Cloud API enablement - no second prompt for API enablement
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/should_prompt_to_enable_api True
+- execute:
+  - command: |
+      redis zones list
+  - prompt:
+    - prompt_string: API [redis.googleapis.com] not enabled on project [129284243030].
+        Would you like to enable and retry (this will take a few minutes)?
+    - input: y
+  - stderr: |
+      Enabling service [redis.googleapis.com] on project [129284243030]...
+  - stderr: |
+      Operation "operations/acf.d70ed7dd-a1c7-45e3-8a21-f7b4cd279dac" finished successfully.
+  - error: '1: Retry'
+  - stdout: |
+      ZONE        REGION
+      us-east1-b  us-east1
+      us-east1-c  us-east1
+      us-east1-d  us-east1
+actions:
+- set_property:
+    core/should_prompt_to_enable_api: true
+- execute_command:
+    command: |
+      redis zones list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://redis.googleapis.com/v1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '403'
+          body: |
+            {
+              "error": {
+                "code": 403,
+                "message": "Google Cloud Memorystore for Redis API has not been used in project 129284243030 before or it is disabled. Enable it by visiting https://console.cloud.google.com/apis/api/redis.googleapis.com/overview?project=129284243030 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.",
+                "status": "PERMISSION_DENIED",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.Help",
+                    "links": [
+                      {
+                        "description": "Google Cloud Console API activation",
+                        "url": "https://console.cloud.google.com/apis/api/redis.googleapis.com/overview?project=129284243030"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+    - expect_prompt_continue:
+        prompt_string: API [redis.googleapis.com] not enabled on project [129284243030].
+          Would you like to enable and retry (this will take a few minutes)?
+        user_input: y
+    - expect_stderr: |
+        Enabling service [redis.googleapis.com] on project [129284243030]...
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1/projects/129284243030/services/redis.googleapis.com:enable?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "operations/acf.d70ed7dd-a1c7-45e3-8a21-f7b4cd279dac",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://serviceusage.googleapis.com/v1/operations/acf.d70ed7dd-a1c7-45e3-8a21-f7b4cd279dac?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "operations/acf.d70ed7dd-a1c7-45e3-8a21-f7b4cd279dac",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.api.serviceusage.v1.EnableServiceResponse",
+                "service": {
+                  "name": "projects/129284243030/services/redis.googleapis.com",
+                  "config": {
+                    "name": "redis.googleapis.com",
+                    "title": "Google Cloud Memorystore for Redis API",
+                    "documentation": {
+                      "summary": "Creates and manages Redis instances on the Google Cloud Platform."
+                    },
+                    "quota": {},
+                    "authentication": {},
+                    "legacy": {
+                      "apiV1Name": "redis.googleapis.com",
+                      "devconsole": {
+                        "learnmoreUrl": "https://cloud.google.com/memorystore/docs/redis/",
+                        "requestQuotaUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfxvC6B2y8xhKdU9PbvoxhJO3HVE0zu0P3PkiJFFsCrBsCvMg/viewform"
+                      }
+                    },
+                    "usage": {
+                      "requirements": [
+                        "serviceusage.googleapis.com/tos/cloud"
+                      ]
+                    },
+                    "migration": {},
+                    "features": [
+                      "googleprod.com/service/use-monarch"
+                    ]
+                  },
+                  "state": "ENABLED"
+                }
+              }
+            }
+    - expect_stderr: |
+        Operation "operations/acf.d70ed7dd-a1c7-45e3-8a21-f7b4cd279dac" finished successfully.
+    - api_call:
+        expect_request:
+          uri: https://redis.googleapis.com/v1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '403'
+          body: |
+            {
+              "error": {
+                "code": 403,
+                "message": "Google Cloud Memorystore for Redis API has not been used in project 129284243030 before or it is disabled. Enable it by visiting https://console.cloud.google.com/apis/api/redis.googleapis.com/overview?project=129284243030 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.",
+                "status": "PERMISSION_DENIED",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.Help",
+                    "links": [
+                      {
+                        "description": "Google Cloud Console API activation",
+                        "url": "https://console.cloud.google.com/apis/api/redis.googleapis.com/overview?project=129284243030"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+        repeatable: false
+    - api_call:
+        expect_request:
+          uri: https://redis.googleapis.com/v1/projects/fake-project/locations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "locations": [
+                {
+                  "name": "projects/fake-project/locations/us-east1",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.redis.v1beta1.LocationMetadata",
+                    "availableZones": {
+                      "us-east1-b": {},
+                      "us-east1-c": {},
+                      "us-east1-d": {}
+                    }
+                  },
+                  "locationId": "us-east1"
+                }
+              ]
+            }
+    - expect_stdout: |
+        ZONE        REGION
+        us-east1-b  us-east1
+        us-east1-c  us-east1
+        us-east1-d  us-east1
+    - expect_exit:
+        code: 0

@@ -4,13 +4,14 @@ NAME
 
 SYNOPSIS
     gcloud alpha builds triggers create github
-        (--trigger_config=PATH | [--repo_name=REPO_NAME
-          --repo_owner=REPO_OWNER (--branch_pattern=REGEX | --tag_pattern=REGEX
-          | --comment_control --pull_request_pattern=REGEX)
-          (--build_config=PATH --substitutions=[KEY=VALUE,...]
-          | --dockerfile=DOCKERFILE --dockerfile_dir=DOCKERFILE_DIR;
-          default="/" --dockerfile_image=DOCKERFILE_IMAGE)
-          : --ignored_files=[GLOB,...] --included_files=[GLOB,...]])
+        (--trigger-config=PATH | [--repo-name=REPO_NAME
+          --repo-owner=REPO_OWNER (--branch-pattern=REGEX | --tag-pattern=REGEX
+          | --comment-control --pull-request-pattern=REGEX)
+          (--build-config=PATH --substitutions=[KEY=VALUE,...]
+          | --dockerfile=DOCKERFILE --dockerfile-dir=DOCKERFILE_DIR;
+          default="/" --dockerfile-image=DOCKERFILE_IMAGE)
+          : --description=DESCRIPTION
+          --ignored-files=[GLOB,...] --included-files=[GLOB,...]])
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -19,31 +20,34 @@ DESCRIPTION
 REQUIRED FLAGS
      Exactly one of these must be specified:
 
-       --trigger_config=PATH
-          Path to Build Trigger config file. See
+       --trigger-config=PATH
+          Path to a YAML/JSON file for Build Trigger config. See
           https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers#BuildTrigger
 
        Flag based trigger configuration
 
-         --repo_name=REPO_NAME
+         --repo-name=REPO_NAME
             Name of the GitHub Repository. This flag must be specified if any
             of the other arguments in this group are specified.
 
-         --repo_owner=REPO_OWNER
+         --repo-owner=REPO_OWNER
             Owner of the GitHub Repository. This flag must be specified if any
             of the other arguments in this group are specified.
 
-         --ignored_files=[GLOB,...]
+         --description=DESCRIPTION
+            Build trigger description.
+
+         --ignored-files=[GLOB,...]
             Glob filter. Changes only affecting ignored files won't trigger
             builds.
 
-         --included_files=[GLOB,...]
+         --included-files=[GLOB,...]
             Glob filter. Changes affecting at least one included file will
             trigger builds.
 
          Exactly one of these must be specified:
 
-           --branch_pattern=REGEX
+           --branch-pattern=REGEX
               A regular expression specifying which git branches to match.
 
               This pattern is used as a regex search for any incoming pushes.
@@ -54,7 +58,7 @@ REQUIRED FLAGS
               accepted by RE2 and described at
               https://github.com/google/re2/wiki/Syntax.
 
-           --tag_pattern=REGEX
+           --tag-pattern=REGEX
               A regular expression specifying which git tags to match.
 
               This pattern is used as a regex search for any incoming pushes.
@@ -67,11 +71,11 @@ REQUIRED FLAGS
 
            Pull Request settings
 
-             --comment_control
+             --comment-control
                 Require a repository collaborator owner to comment '/gcbrun' on
                 a pull request before running the build.
 
-             --pull_request_pattern=REGEX
+             --pull-request-pattern=REGEX
                 A regular expression specifying which base git branch to match
                 for pull request events.
 
@@ -88,7 +92,7 @@ REQUIRED FLAGS
 
            Build file configuration flags
 
-             --build_config=PATH
+             --build-config=PATH
                 Path to a YAML or JSON file containing the build configuration
                 in the repository.
 
@@ -125,13 +129,13 @@ REQUIRED FLAGS
 
                 The filename is relative to the Dockerfile directory.
 
-             --dockerfile_dir=DOCKERFILE_DIR; default="/"
+             --dockerfile-dir=DOCKERFILE_DIR; default="/"
                 Location of the directory containing the Dockerfile in the
                 repository.
 
                 The directory will also be used as the Docker build context.
 
-             --dockerfile_image=DOCKERFILE_IMAGE
+             --dockerfile-image=DOCKERFILE_IMAGE
                 Docker image name to build.
 
                 If not specified,
@@ -148,10 +152,26 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To create a push trigger for all branches:
+
+        $ gcloud alpha builds triggers create github \
+            --repo-owner="GoogleCloudPlatform" \
+            --repo-name="cloud-builders" --branch-pattern=".*" \
+            --build-config="cloudbuild.yaml"
+
+    To create a pull request trigger for master:
+
+        $ gcloud alpha builds triggers create github \
+            --repo-owner="GoogleCloudPlatform" \
+            --repo-name="cloud-builders" --pull-request-pattern="^master$" \
+            --build-config="cloudbuild.yaml"
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta builds triggers create github
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class UnmanagedInstanceGroupsListInstancesTest(test_base.BaseTest):
   def testListInstancesByUri(self):
     self.Run("""
         compute instance-groups unmanaged list-instances
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
           --zone central2-a
         """.format(API_VERSION))
     self.AssertOutputEquals(
@@ -80,7 +80,7 @@ class UnmanagedInstanceGroupsListInstancesTest(test_base.BaseTest):
   def testListInstancesWithFilter(self):
     self.Run("""
         compute instance-groups unmanaged list-instances
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
           --zone central2-a
           --regexp ".*inst.*"
         """.format(API_VERSION))
@@ -124,9 +124,9 @@ class UnmanagedInstanceGroupsListInstancesTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
             """.format(API_VERSION)))
 
 if __name__ == '__main__':

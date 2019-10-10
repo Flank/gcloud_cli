@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -350,7 +350,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
     node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
     software_config = SoftwareConfig(
         airflowConfigOverrides=AirflowConfigOverrides(additionalProperties=[
-            AirflowConfigOverrides.AdditionalProperty(key=k, value=v)
+            AirflowConfigOverrides.AdditionalProperty(key=k, value=v)  # pylint:disable=g-complex-comprehension
             for k, v in six.iteritems(collections.OrderedDict([
                 ('a', '1'),
                 ('b', '2'),
@@ -379,7 +379,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
 
     software_config = SoftwareConfig(
         envVariables=SoftwareConfig.EnvVariablesValue(additionalProperties=[
-            SoftwareConfig.EnvVariablesValue.AdditionalProperty(key=k, value=v)
+            SoftwareConfig.EnvVariablesValue.AdditionalProperty(key=k, value=v)   # pylint:disable=g-complex-comprehension
             for k, v in six.iteritems(collections.OrderedDict([
                 ('a', '1'),
                 ('b', '2'),
@@ -559,7 +559,7 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
         config=self.CONFIG,
         response=self.running_op)
 
-    endpoint = 'https://www.googleapis.com/compute/v1/'
+    endpoint = 'https://compute.googleapis.com/compute/v1/'
     actual_op = self.RunEnvironments(
         'create', '--project',
         self.TEST_PROJECT, '--location', self.TEST_LOCATION, '--node-count',
@@ -807,13 +807,8 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
   def testSuccessfulPrivateIpEnvironmentCreation(self):
     self._SetTestMessages()
 
-    # TODO(b/128636528): Remove when API bug is addressed.
-    private_cluster_config = self.messages.PrivateClusterConfig(
-        masterIpv4CidrBlock='172.16.0.0/28')
-
     private_environment_config = self.messages.PrivateEnvironmentConfig(
-        enablePrivateEnvironment=True,
-        privateClusterConfig=private_cluster_config)
+        enablePrivateEnvironment=True)
 
     ip_allocation_policy = self.messages.IPAllocationPolicy(useIpAliases=True)
 

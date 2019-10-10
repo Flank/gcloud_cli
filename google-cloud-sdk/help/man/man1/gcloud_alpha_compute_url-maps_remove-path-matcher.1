@@ -11,7 +11,7 @@ gcloud alpha compute url\-maps remove\-path\-matcher \- remove a path matcher fr
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute url\-maps remove\-path\-matcher\fR \fIURL_MAP_NAME\fR \fB\-\-path\-matcher\-name\fR=\fIPATH_MATCHER_NAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute url\-maps remove\-path\-matcher\fR \fIURL_MAP\fR \fB\-\-path\-matcher\-name\fR=\fIPATH_MATCHER_NAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,7 +27,7 @@ host rules that refer to the path matcher are also removed.
 
 .RS 2m
 .TP 2m
-\fIURL_MAP_NAME\fR
+\fIURL_MAP\fR
 Name of the URL map to operate on.
 
 
@@ -115,9 +115,8 @@ $ gcloud alpha compute url\-maps remove\-path\-matcher MY\-URL\-MAP \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute url\-maps remove\-path\-matcher

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -210,7 +210,7 @@ class InstancesSetSchedulingTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute instances set-scheduling
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/instance-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/instance-1
         """)
 
     self.CheckRequests(
@@ -302,6 +302,24 @@ class InstancesSetSchedulingTestAlpha(test_base.BaseTest):
           self.messages.ComputeInstancesSetSchedulingRequest(
               scheduling=self.messages.Scheduling(
                   onHostMaintenance=self.terminate),
+              instance='instance-1',
+              project='my-project',
+              zone='central2-a'))],
+    )
+
+  def testMinNodeCpusFlag(self):
+    self.Run("""
+        compute instances set-scheduling instance-1
+          --min-node-cpus 10
+          --zone central2-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute_alpha.instances,
+          'SetScheduling',
+          self.messages.ComputeInstancesSetSchedulingRequest(
+              scheduling=self.messages.Scheduling(
+                  minNodeCpus=10),
               instance='instance-1',
               project='my-project',
               zone='central2-a'))],

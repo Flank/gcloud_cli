@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ to learn about all available accelerator types.
       type=arg_parsers.ArgDict(spec={
           'count': int,
           'type': str,
-      }),
+      }, required_keys=['count', 'type']),
       action='append',
       help=help_text)
 

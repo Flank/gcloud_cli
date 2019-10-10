@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_ALPHA_DOMAINS_REGISTRATIONS_AUTHORIZATION\-CODE_GET" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha domains registrations authorization\-code get \- get authorization code of specific registration
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha domains registrations authorization\-code get\fR \fIREGISTRATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Can only be called after 60 days have elapsed since initial
+registration.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Registration resource \- The domain registration to get authorization code for.
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [registration] on the command line with a fully specified
+name; provide the argument [\-\-project] on the command line; set the property
+[core/project]. To set the [location] attribute: provide the argument
+[registration] on the command line with a fully specified name; location is
+always global. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREGISTRATION\fR
+ID of the registration or fully qualified identifier for the registration.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get authorization code of example.com run:
+
+.RS 2m
+$ gcloud alpha domains registrations authorization\-code get \e
+    example.com
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

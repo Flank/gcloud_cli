@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+
 # The gcloud App Engine e2e test service account is specifically IRDB
 # authorized for this domain. See
 # https://g3doc.corp.google.com/apphosting/admin/g3doc/guides/ssl.md for more
@@ -35,29 +36,11 @@ DOMAIN = 'testappeng19.com'
 class DomainTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
   """Test we can get domain mappings for apps."""
 
-  def SetUp(self):
-    # Clean up any bad state.
-    self.DeleteMapping()
-
-  def TearDown(self):
-    # Clean up any bad state.
-    self.DeleteMapping()
-
-  def DeleteMapping(self):
-    self.Run(['--verbosity=debug', 'app', 'domain-mappings', 'delete', DOMAIN])
-
   def ListMappings(self):
     results = self.Run(['--verbosity=debug', 'app', 'domain-mappings', 'list'])
     return [result.id for result in results]
 
-  @test_case.Filters.skip('Failing', 'b/112431513')
-  def testCreateAndDelete(self):
-    list_result = self.ListMappings()
-
-    self.assertNotIn(DOMAIN, list_result)
-
-    self.Run(['--verbosity=debug', 'app', 'domain-mappings', 'create', DOMAIN])
-
+  def testListAndDescribe(self):
     list_result = self.ListMappings()
 
     self.assertIn(DOMAIN, list_result)
@@ -66,12 +49,6 @@ class DomainTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
         ['--verbosity=debug', 'app', 'domain-mappings', 'describe', DOMAIN])
 
     self.assertEqual(get_result.id, DOMAIN)
-
-    self.DeleteMapping()
-
-    list_result = self.ListMappings()
-
-    self.assertNotIn(DOMAIN, list_result)
 
 
 class SslTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):

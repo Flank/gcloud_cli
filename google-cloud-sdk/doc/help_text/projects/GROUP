@@ -41,6 +41,9 @@ COMMANDS
      describe
         Show metadata for a project.
 
+     get-ancestors
+        Get the ancestors for a project.
+
      get-iam-policy
         Get IAM policy for a project.
 

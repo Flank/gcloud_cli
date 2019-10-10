@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,4 +92,4 @@ class Delete(base.DeleteCommand):
 
     operation = client.services.Delete(request)
 
-    return services_util.ProcessOperationResult(operation, args.async)
+    return services_util.ProcessOperationResult(operation, args.async_)

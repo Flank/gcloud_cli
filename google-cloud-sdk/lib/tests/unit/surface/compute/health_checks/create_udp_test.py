@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class HealthChecksCreateUdpTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute health-checks create udp
-          https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
           --request sync
           --response ack
         """)
@@ -390,7 +390,7 @@ class RegionHealthChecksCreateUdpTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute health-checks create udp
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
           --request sync
           --response ack
         """)

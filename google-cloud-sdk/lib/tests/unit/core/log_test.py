@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -500,6 +500,33 @@ X??????? X?????
     current_log_file_verbosity = log.GetLogFileVerbosity()
     self.assertEqual(log_file_verbosity, current_log_file_verbosity)
 
+  def testFileLoggingDisabled(self):
+    # Arrange
+    log.SetVerbosity(logging.INFO)
+    log.SetUserOutputEnabled(True)
+    properties.VALUES.core.disable_file_logging.Set(True)
+
+    # Act
+    log.AddFileLogging(self.logs_dir)
+
+    # Assert
+    log.info('i1')
+    log.file_only_logger.info('f1')
+    log.out.write('o1')
+    log.err.write('e1')
+
+    self.AssertOutputNotContains('i1')
+    self.AssertOutputNotContains('f1')
+    self.AssertOutputContains('o1')
+    self.AssertOutputNotContains('e1')
+
+    self.AssertErrContains('i1')
+    self.AssertErrNotContains('f1')
+    self.AssertErrNotContains('o1')
+    self.AssertErrContains('e1')
+
+    self.assertEqual([], os.listdir(self.logs_dir))
+
   def testGetMaxLogDays(self):
     log_manager_instance = log._LogManager()
     properties.VALUES.core.max_log_days.Set(10)
@@ -696,6 +723,20 @@ class LoggingConfigNoOutCaptureTest(sdk_test_base.WithOutputCapture,
     self.addCleanup(properties.VALUES.core.max_log_days.Set, None)
     log._log_manager._CleanUpLogs(self.logs)
 
+    self.assertFalse(os.path.exists(dir1))
+    self.assertFalse(os.path.exists(files1[0]))
+
+  def testFileLoggingDisabledFilesDeleted(self):
+    dir1, files1 = self._SetUpDir('dir1', 'file1')
+    self.dir_paths[dir1] = True
+    self.file_paths[files1[0]] = True
+    properties.VALUES.core.disable_file_logging.Set(True)
+    properties.VALUES.core.max_log_days.Set(10)
+
+    log.AddFileLogging(self.logs)
+
+    # Retention settings for existing logs are still respected with file logging
+    # disabled.
     self.assertFalse(os.path.exists(dir1))
     self.assertFalse(os.path.exists(files1[0]))
 

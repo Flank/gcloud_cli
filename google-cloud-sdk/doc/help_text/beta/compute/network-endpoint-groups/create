@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute network-endpoint-groups create - creates a Google
+    gcloud beta compute network-endpoint-groups create - create a Google
         Compute Engine network endpoint group
 
 SYNOPSIS

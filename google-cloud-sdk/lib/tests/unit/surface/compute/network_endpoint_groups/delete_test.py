@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,6 +42,27 @@ class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
               networkEndpointGroup='my-neg1',
               project='my-project',
               zone='zone-1'))],)
+    self.AssertErrContains('Deleted network endpoint group [my-neg1]')
+
+
+class AlphaNetworkEndpointGroupsDeleteTest(NetworkEndpointGroupsDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+
+  def testGlobal(self):
+    self.make_requests.side_effect = iter([[
+        self.messages.Operation(
+            operationType='delete',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE)
+    ]])
+    self.WriteInput('y\n')
+    self.Run('compute network-endpoint-groups delete my-neg1 --global')
+    self.CheckRequests(
+        [(self.compute.globalNetworkEndpointGroups, 'Delete',
+          self.messages.ComputeGlobalNetworkEndpointGroupsDeleteRequest(
+              networkEndpointGroup='my-neg1', project='my-project'))],)
     self.AssertErrContains('Deleted network endpoint group [my-neg1]')
 
 

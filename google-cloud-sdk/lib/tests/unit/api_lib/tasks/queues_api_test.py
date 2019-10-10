@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -116,8 +116,14 @@ class PushQueuesTest(test_base.CloudTasksTestBase):
                             app_engine_routing_override=(
                                 app_engine_routing_override))
 
-  def _TestQueueUpdate(self, retry_config=None, rate_limits=None,
-                       app_engine_routing_override=None, update_mask=''):
+  def _TestQueueUpdate(self,
+                       retry_config=None,
+                       rate_limits=None,
+                       app_engine_routing_override=None,
+                       updated_fields=None):
+    if updated_fields is None:
+      updated_fields = []
+    update_mask = ','.join(updated_fields)
     expected_queue = self.messages.Queue(
         name=self.queue_name, retryConfig=retry_config,
         rateLimits=rate_limits,
@@ -127,18 +133,21 @@ class PushQueuesTest(test_base.CloudTasksTestBase):
             name=self.queue_name, queue=expected_queue, updateMask=update_mask),
         expected_queue)
     actual_queue = self.queues_client.Patch(
-        self.queue_ref, retry_config=retry_config, rate_limits=rate_limits,
+        self.queue_ref,
+        updated_fields,
+        retry_config=retry_config,
+        rate_limits=rate_limits,
         app_engine_routing_override=app_engine_routing_override)
     self.assertEqual(actual_queue, expected_queue)
 
   def testPatch_NoOptions(self):
     with self.assertRaises(queues_api.NoFieldsSpecifiedError):
-      self.queues_client.Patch(self.queue_ref)
+      self.queues_client.Patch(self.queue_ref, [])
 
   def testPatch_SomeOptions(self):
     rate_limits = self.messages.RateLimits(
         maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
-    self._TestQueueUpdate(rate_limits=rate_limits, update_mask='rateLimits')
+    self._TestQueueUpdate(rate_limits=rate_limits, updated_fields=['b', 'a'])
 
   def testPatch_AllOptions_AppEngineQueue(self):
     retry_config = self.messages.RetryConfig(
@@ -148,9 +157,10 @@ class PushQueuesTest(test_base.CloudTasksTestBase):
         maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
     app_engine_routing_override = self.messages.AppEngineRouting(service='abc')
     self._TestQueueUpdate(
-        retry_config=retry_config, rate_limits=rate_limits,
+        retry_config=retry_config,
+        rate_limits=rate_limits,
         app_engine_routing_override=app_engine_routing_override,
-        update_mask='retryConfig,rateLimits,appEngineRoutingOverride')
+        updated_fields=['c', 'a', 'b'])
 
   def testDelete(self):
     expected_queue = self.messages.Queue(name=self.queue_name)
@@ -260,8 +270,14 @@ class BetaPushQueuesTest(test_base.CloudTasksTestBase):
                             rate_limits=rate_limits,
                             app_engine_http_queue=app_engine_http_queue)
 
-  def _TestQueueUpdate(self, retry_config=None, rate_limits=None,
-                       app_engine_routing_override=None, update_mask=''):
+  def _TestQueueUpdate(self,
+                       retry_config=None,
+                       rate_limits=None,
+                       app_engine_routing_override=None,
+                       updated_fields=None):
+    if updated_fields is None:
+      updated_fields = []
+    update_mask = ','.join(updated_fields)
     app_engine_http_queue = None
     if app_engine_routing_override is not None:
       app_engine_http_queue = self.messages.AppEngineHttpQueue(
@@ -274,18 +290,21 @@ class BetaPushQueuesTest(test_base.CloudTasksTestBase):
             name=self.queue_name, queue=expected_queue, updateMask=update_mask),
         expected_queue)
     actual_queue = self.queues_client.Patch(
-        self.queue_ref, retry_config=retry_config, rate_limits=rate_limits,
+        self.queue_ref,
+        updated_fields,
+        retry_config=retry_config,
+        rate_limits=rate_limits,
         app_engine_routing_override=app_engine_routing_override)
     self.assertEqual(actual_queue, expected_queue)
 
   def testPatch_NoOptions(self):
     with self.assertRaises(queues_api.NoFieldsSpecifiedError):
-      self.queues_client.Patch(self.queue_ref)
+      self.queues_client.Patch(self.queue_ref, [])
 
   def testPatch_SomeOptions(self):
     rate_limits = self.messages.RateLimits(
         maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
-    self._TestQueueUpdate(rate_limits=rate_limits, update_mask='rateLimits')
+    self._TestQueueUpdate(rate_limits=rate_limits, updated_fields=['a', 'b'])
 
   def testPatch_AllOptions_AppEngineQueue(self):
     retry_config = self.messages.RetryConfig(
@@ -295,10 +314,10 @@ class BetaPushQueuesTest(test_base.CloudTasksTestBase):
         maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
     app_engine_routing_override = self.messages.AppEngineRouting(service='abc')
     self._TestQueueUpdate(
-        retry_config=retry_config, rate_limits=rate_limits,
+        retry_config=retry_config,
+        rate_limits=rate_limits,
         app_engine_routing_override=app_engine_routing_override,
-        update_mask=('retryConfig,rateLimits,'
-                     'appEngineHttpQueue.appEngineRoutingOverride'))
+        updated_fields=['a', 'b', 'd', 'c'])
 
 
 class PullQueuesTest(test_base.CloudTasksAlphaTestBase):
@@ -360,8 +379,14 @@ class PullQueuesTest(test_base.CloudTasksAlphaTestBase):
           pull_target=pull_target,
           app_engine_http_target=app_engine_http_target)
 
-  def _TestQueueUpdate(self, retry_config=None, rate_limits=None,
-                       app_engine_routing_override=None, update_mask=''):
+  def _TestQueueUpdate(self,
+                       retry_config=None,
+                       rate_limits=None,
+                       app_engine_routing_override=None,
+                       updated_fields=None):
+    if updated_fields is None:
+      updated_fields = []
+    update_mask = ','.join(updated_fields)
     app_engine_http_target = None
     if app_engine_routing_override is not None:
       app_engine_http_target = self.messages.AppEngineHttpTarget(
@@ -374,7 +399,10 @@ class PullQueuesTest(test_base.CloudTasksAlphaTestBase):
             name=self.queue_name, queue=expected_queue, updateMask=update_mask),
         expected_queue)
     actual_queue = self.queues_client.Patch(
-        self.queue_ref, retry_config=retry_config, rate_limits=rate_limits,
+        self.queue_ref,
+        updated_fields,
+        retry_config=retry_config,
+        rate_limits=rate_limits,
         app_engine_routing_override=app_engine_routing_override)
     self.assertEqual(actual_queue, expected_queue)
 
@@ -382,7 +410,8 @@ class PullQueuesTest(test_base.CloudTasksAlphaTestBase):
     retry_config = self.messages.RetryConfig(
         maxAttempts=100, unlimitedAttempts=False, maxRetryDuration='0s',
         maxDoublings=0, minBackoff='0s', maxBackoff='0s')
-    self._TestQueueUpdate(retry_config=retry_config, update_mask='retryConfig')
+    self._TestQueueUpdate(
+        retry_config=retry_config, updated_fields=['field1', 'field2'])
 
 
 if __name__ == '__main__':

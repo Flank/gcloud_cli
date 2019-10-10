@@ -5,9 +5,8 @@ summary:
   - command: |
       ml video detect-labels toy.mp4 --format="text(name)" --async
   - stderr: |
-      Check operation [$$operation-id$$] for status.
-  - stdout: |
-      name: $$operation-id$$
+      Check operation [$$operation-name$$] for status.
+  - stdout: .*$$operation-name$$.*$
 actions:
 - load_resource:
     path: tests/unit/command_lib/ml/video/testdata/toy.mp4
@@ -33,20 +32,21 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '45'
+            content-length: '89'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-east1.1841511835263812790
+            name: projects/462803083913/locations/us-east1/operations/11320441627089233720
         expect_response:
           extract_references:
           - field: name
-            reference: operation-id
+            reference: operation-name
           body:
-            json: {}
+            text:
+              is_none: false
     - expect_stderr: |
-        Check operation [$$operation-id$$] for status.
-    - expect_stdout: |
-        name: $$operation-id$$
+        Check operation [$$operation-name$$] for status.
+    - expect_stdout:
+        matches: .*$$operation-name$$.*
     - expect_exit:
         code: 0

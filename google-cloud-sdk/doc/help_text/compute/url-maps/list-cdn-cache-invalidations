@@ -3,8 +3,8 @@ NAME
         invalidations for a URL map
 
 SYNOPSIS
-    gcloud compute url-maps list-cdn-cache-invalidations URLMAP [--limit=LIMIT]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud compute url-maps list-cdn-cache-invalidations URL_MAP
+        [--limit=LIMIT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     List Cloud CDN cache invalidations for a URL map. A cache invalidation
@@ -12,8 +12,8 @@ DESCRIPTION
     invalidations to check which have completed.
 
 POSITIONAL ARGUMENTS
-     URLMAP
-        The name of the URL map.
+     URL_MAP
+        Name of the URL map to describe.
 
 FLAGS
      --limit=LIMIT

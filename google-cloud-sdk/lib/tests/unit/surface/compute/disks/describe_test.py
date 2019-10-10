@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,11 +65,11 @@ class DisksDescribeTestGA(
         self.GetOutput(),
         textwrap.dedent("""\
             name: disk-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/disks/disk-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/disks/disk-1
             sizeGb: '10'
             status: READY
-            type: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/diskTypes/pd-ssd
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            type: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/diskTypes/pd-ssd
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testSimpleCaseRegional(self):
@@ -80,11 +80,11 @@ class DisksDescribeTestGA(
             region='region-1'),
         self.messages.Disk(
             name='disk-1',
-            selfLink=('https://www.googleapis.com/compute/v1/projects/'
+            selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/region-1/disks/disk-1'),
             sizeGb=10,
             status=self.messages.Disk.StatusValueValuesEnum.READY,
-            region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/region-1'))
     )
     self.Run("""
@@ -95,8 +95,8 @@ class DisksDescribeTestGA(
         self.GetOutput(),
         textwrap.dedent("""\
             name: disk-1
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/disks/disk-1
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/disks/disk-1
             sizeGb: '10'
             status: READY
             """))

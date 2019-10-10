@@ -27,17 +27,18 @@ EXAMPLES
     To show details about a DNS key resource with ID 3 in a managed zone
     my_zone, run:
 
-        $ gcloud beta dns dns-keys describe --zone my_zone 3
+        $ gcloud beta dns dns-keys describe --zone=my_zone 3
 
     To get the DS record corresponding for the DNSKEY record from the previous
     example, run (the DNSKEY record must be for a key-signing key):
 
-        $ gcloud beta dns dns-keys describe --zone my_zone 3 \
-            --format 'value(ds_record())'
+        $ gcloud beta dns dns-keys describe --zone=my_zone 3 \
+            --format='value(ds_record())'
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns dns-keys describe
+        $ gcloud alpha dns dns-keys describe
 

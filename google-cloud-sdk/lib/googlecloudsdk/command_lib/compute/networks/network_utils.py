@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -84,6 +84,17 @@ def AddCreateSubnetModeArg(parser):
               AUTO.""")
 
 
+def AddMtuArg(parser):
+  """Adds the --mtu flag."""
+  parser.add_argument(
+      '--mtu',
+      type=int,
+      help="""Maximum transmission unit(MTU) is the size of the largest frame
+              that can be transmitted on this network. Default value is
+              1460 bytes, the maximum is 1600 bytes. The MTU advertised
+              via DHCP to all instances attached to this network.""")
+
+
 def AddCreateBgpRoutingModeArg(parser):
   """Adds the --bgp-routing-mode flag."""
   parser.add_argument(
@@ -136,6 +147,7 @@ def AddUpdateArgsAlpha(parser):
       type=lambda mode: mode.lower(),
       hidden=True,
       help="""The multicast mode for this network.""")
+  AddMtuArg(parser)
 
 
 def CheckRangeLegacyModeOrRaise(args):

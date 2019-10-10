@@ -208,6 +208,16 @@ attribute. For example,
 
 formats the \fBdata\fR field as JSON and the \fBinfo\fR field as a boxed table.
 
+The format attributes are:
+
+.RS 2m
+.TP 2m
+\fBseparator\fR
+Separator string to print between each format. If multiple resources are
+provided, the separator is also printed between each resource.
+
+.RE
+.sp
 .TP 2m
 \fBnone\fR
 Disables formatted output and consumes the resources.
@@ -311,11 +321,14 @@ The format attributes are:
 
 .RS 2m
 .TP 2m
-\fBnull=string\fR
+\fBnull="string"\fR
 Display string instead of \f5null\fR for null/None values.
 .TP 2m
 \fBno\-undefined\fR
 Does not display resource data items with null values.
+.TP 2m
+\fBversion=VERSION\fR
+Prints using the specified YAML version, default 1.2.
 
 .RE
 .RE
@@ -362,7 +375,7 @@ List a nested table of the quotas of a region:
 
 .RS 2m
 $ gcloud compute regions describe us\-central1 \e
-    \-\-format="table(quotas:format="table(metric,limit,usage)")"
+    \-\-format="table(quotas:format='table(metric,limit,usage)')"
 .RE
 
 Print a flattened list of global quotas in CSV format:

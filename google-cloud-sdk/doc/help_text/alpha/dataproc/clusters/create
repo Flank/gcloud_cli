@@ -19,6 +19,7 @@ SYNOPSIS
         [--num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--optional-components=[COMPONENT,...]]
+        [--preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
         [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
         [--properties=[PREFIX:PROPERTY=VALUE,...]] [--region=REGION]
@@ -65,8 +66,8 @@ FLAGS
         (https://cloud.google.com/compute/docs/private-google-access).
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --bucket=BUCKET
         The Google Cloud Storage bucket to use by default to stage job
@@ -125,7 +126,7 @@ FLAGS
         architecture or a newer one. To list available CPU platforms in given
         zone, run:
 
-            $ gcloud beta compute zones describe ZONE
+            $ gcloud compute zones describe ZONE
 
         CPU platform selection is available only in selected zones; zones that
         allow CPU platform selection will have an availableCpuPlatforms field
@@ -166,6 +167,20 @@ FLAGS
         The following page documents the optional components that can be
         installed:
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
+
+     --preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to the preemptible-worker
+        instance(s).
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            The number of pieces of the accelerator to attach to each of the
+            instances. The default value is 1.
 
      --preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE
         The size of the boot disk. The value must be a whole number followed by
@@ -215,11 +230,8 @@ FLAGS
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
         independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
+        Compute Engine zones inside the region. Overrides the default
+        dataproc/region property value for this command invocation.
 
      --scopes=SCOPE,[SCOPE,...]
         Specifies scopes for the node instances. Multiple SCOPEs can be
@@ -316,9 +328,6 @@ FLAGS
      --worker-accelerator=[type=TYPE,[count=COUNT],...]
         Attaches accelerators (e.g. GPUs) to the worker instance(s).
 
-        Note: No accelerators will be attached to preemptible workers, because
-        preemptible VMs do not support accelerators.
-
          type
             The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
             accelerator to attach to the instances. Use 'gcloud compute
@@ -347,7 +356,7 @@ FLAGS
         architecture or a newer one. To list available CPU platforms in given
         zone, run:
 
-            $ gcloud beta compute zones describe ZONE
+            $ gcloud compute zones describe ZONE
 
         CPU platform selection is available only in selected zones; zones that
         allow CPU platform selection will have an availableCpuPlatforms field
@@ -482,6 +491,10 @@ FLAGS
                 # value 10 will be used.
                 tgt_lifetime_hours: 1
 
+                # Optional. The name of the Kerberos realm. If not specified,
+                # the uppercased domain name of the cluster will be used.
+                realm: REALM.NAME
+
        --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI
           Google Cloud Storage URI of a KMS encrypted file containing the root
           principal password. Must be a URL beginning with 'gs://'. This flag
@@ -552,9 +565,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud dataproc clusters create
         $ gcloud beta dataproc clusters create

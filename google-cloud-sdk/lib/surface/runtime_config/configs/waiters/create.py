@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ class Create(base.CreateCommand):
 
     log.CreatedResource(waiter_resource)
 
-    if args.async:
+    if args.async_:
       # In async mode, we return the current waiter representation.
       # The waiter resource exists immediately after creation; the
       # operation resource returned from CreateWaiter only tracks the

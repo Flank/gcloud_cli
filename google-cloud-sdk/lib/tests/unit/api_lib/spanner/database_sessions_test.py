@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -132,6 +132,12 @@ class DatabaseSessionsClientTest(base.SpannerTestBase):
     self.assertEqual(
         database_sessions.ExecuteSql(self.session_ref, 'sql', 'NORMAL'),
         response)
+
+  def testExecuteSqlWithTimeout(self):
+    timeout = 9
+    client = database_sessions._GetClientInstance('compute', 'v1',
+                                                  http_timeout_sec=timeout)
+    self.assertEqual(timeout, client.http.timeout)
 
   def testExecuteSqlWithDml(self):
     response = self.msgs.ResultSet(

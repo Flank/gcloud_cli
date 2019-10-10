@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,14 +61,14 @@ class ListGrantableRolesTest(unit_test_base.BaseTest):
   def testListRolesByURI(self):
     self.client.roles.QueryGrantableRoles.Expect(
         request=self.msgs.QueryGrantableRolesRequest(
-            fullResourceName=('//compute.googleapis.com/projects/dummy_project'
+            fullResourceName=('//compute.googleapis.com/compute/projects/dummy_project'
                               '/zones/us-central1-f/instances/dummy_instance'),
             pageSize=100),
         response=self.roles_response,)
 
     roles_result = self.Run(
         'iam list-grantable-roles '
-        'https://www.googleapis.com/compute/v1/projects/dummy_project'
+        'https://compute.googleapis.com/compute/v1/projects/dummy_project'
         '/zones/us-central1-f/instances/dummy_instance')
     self.assertEqual(roles_result, self.returned_roles)
 

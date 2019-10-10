@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_DNS_MANAGED\-ZONES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dns managed\-zones delete \- delete an empty Cloud DNS managed\-zone
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dns managed\-zones delete\fR \fIZONE_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command deletes an empty Cloud DNS managed\-zone. An empty
+managed\-zone has only SOA and NS record\-sets.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIZONE_NAME\fR
+The name of the empty managed\-zone to be deleted.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an empty managed\-zone, run:
+
+.RS 2m
+$ gcloud alpha dns managed\-zones delete my_zone
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud dns managed\-zones delete
+$ gcloud beta dns managed\-zones delete
+.RE
+

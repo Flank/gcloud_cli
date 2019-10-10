@@ -7,7 +7,9 @@ SYNOPSIS
         (PERIMETER : --policy=POLICY) --resources=[RESOURCES,...] --title=TITLE
         [--access-levels=[LEVEL,...]] [--async] [--description=DESCRIPTION]
         [--perimeter-type=PERIMETER_TYPE; default="regular"]
-        [--restricted-services=[SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
+        [--restricted-services=[SERVICE,...]]
+        [--enable-vpc-service-restriction
+          --vpc-allowed-services=[VPC_SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new service perimeter in a given access policy.
@@ -39,8 +41,8 @@ OPTIONAL FLAGS
         an intra-perimeter request must satisfy to be allowed.
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --description=DESCRIPTION
         Long-form description of service perimeter.
@@ -67,6 +69,14 @@ OPTIONAL FLAGS
         Comma-separated list of services to which the perimeter boundary does
         apply (for example, storage.googleapis.com).
 
+     --enable-vpc-service-restriction
+        Whether to restrict API calls within the perimeter to those in the
+        vpc-allowed-services list.
+
+     --vpc-allowed-services=[VPC_SERVICE,...]
+        Comma-separated list of APIs accessible from within the Service
+        Perimeter. Requires vpc-service-restriction be enabled.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -82,9 +92,8 @@ API REFERENCE
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud access-context-manager perimeters create
         $ gcloud beta access-context-manager perimeters create

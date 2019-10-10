@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import os
+
 from googlecloudsdk.core import log
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.calliope import util
@@ -123,6 +126,23 @@ class LoggingConfigTest(util.Base, sdk_test_base.WithOutputCapture):
     self.assertIn('WARNING message2', self.GetLogFileContents())
     self.assertIn('ERROR message1', self.GetLogFileContents())
     self.assertIn('ERROR message2', self.GetLogFileContents())
+
+  def testFileLoggingDisabled(self):
+    properties.VALUES.core.disable_file_logging.Set(True)
+    cli = self.GetCLI()
+
+    cli.Execute(['loggingcommand'])
+
+    # No logging file gets created.
+    self.assertEqual([], os.listdir(self.logs_dir))
+
+    # Still get console logging.
+    self.AssertOutputContains('INFO message3')
+    self.AssertErrContains('INFO message4')
+    self.AssertErrContains('WARNING: WARNING message1')
+    self.AssertErrContains('WARNING: WARNING message2')
+    self.AssertErrContains('ERROR: ERROR message1')
+    self.AssertErrContains('ERROR: ERROR message2')
 
   def testMultipleFiles(self):
     cli = self.GetCLI()

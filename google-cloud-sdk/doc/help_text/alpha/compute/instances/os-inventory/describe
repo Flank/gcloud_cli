@@ -17,12 +17,13 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --zone=ZONE
-        Zone of the instance to describe. If not specified, you may be prompted
-        to select a zone. gcloud will attempt to identify the zone by searching
-        for resources in your project. If the zone cannot be determined, you
-        will then be prompted with all Google Cloud Platform zones.
+        Zone of the instance to describe. If not specified, the user may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in the user's project. If the zone cannot be
+        determined, the user will then be prompted with all Google Cloud
+        Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE
@@ -45,10 +46,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To see OS inventory of an instance named my-instance, run:
+
+        $ gcloud alpha compute instances os-inventory describe my-instance
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud compute instances os-inventory describe
+        $ gcloud beta compute instances os-inventory describe
 

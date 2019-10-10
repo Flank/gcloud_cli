@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@ class LoggingIntegrationTest(base.LoggingIntegrationTestBase):
 
     self._parents_and_flags = [
         ('projects/{0}'.format(self.Project()), ''),
-        ('organizations/961309089256', '--organization=961309089256'),
-        ('folders/79536718298', '--folder=79536718298')]
+        ('organizations/1054311078602', '--organization=1054311078602'),
+        ('folders/571192892845', '--folder=571192892845')]
 
   def testLogMetrics(self):
     metric_name = next(self._name_generator)

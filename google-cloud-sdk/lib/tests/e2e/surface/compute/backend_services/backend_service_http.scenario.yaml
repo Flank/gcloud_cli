@@ -7,22 +7,22 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instance-groups unmanaged create $$ig$$ --zone us-central1-f
       --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute http-health-checks create $$http-hc$$ --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$\].
 - execute:
   - command: compute backend-services create $$http-bs$$ --protocol HTTP --enable-cdn
       --signed-url-cache-max-age 1234 --http-health-checks $$http-hc$$ --global --format
       'text(name,enableCDN,cdnPolicy.signedUrlCacheMaxAgeSec)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$\].
   - stdout: |
       ---
       cdnPolicy.signedUrlCacheMaxAgeSec: 1234
@@ -32,12 +32,12 @@ summary:
   - command: compute instance-groups unmanaged add-instances $$ig$$ --instances $$instance$$
       --zone us-central1-f
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute backend-services add-backend $$http-bs$$ --instance-group $$ig$$
       --instance-group-zone us-central1-f --balancing-mode RATE --max-rate 100 --global
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$\].
 - execute:
   - command: compute backend-services update-backend $$http-bs$$ --instance-group
       $$ig$$ --instance-group-zone us-central1-f --balancing-mode UTILIZATION --max-utilization
@@ -64,26 +64,24 @@ summary:
 - execute:
   - command: compute backend-services delete $$http-bs$$ --global --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$\].
 - execute:
   - command: compute http-health-checks delete $$http-hc$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$\].
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instance-groups unmanaged delete $$ig$$ --zone us-central1-f
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
-
-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -99,8 +97,9 @@ actions:
     command: compute instances create $$instance$$ --zone us-central1-f --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 
@@ -112,8 +111,9 @@ actions:
       --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -125,8 +125,9 @@ actions:
     command: compute http-health-checks create $$http-hc$$ --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$\].
     - expect_exit:
         code: 0
 
@@ -150,7 +151,7 @@ actions:
                 signedUrlCacheMaxAgeSec: '1234'
               enableCDN: true
               healthChecks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$
+              - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$
               name: $$http-bs$$
               portName: http
               protocol: HTTP
@@ -174,8 +175,9 @@ actions:
             insertTime: '2018-09-25T12:27:16.620-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537903635985-576b717ebf26a-c7fea125-6608b020
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
@@ -232,7 +234,7 @@ actions:
           body:
             json:
               instances:
-              - instance: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+              - instance: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -255,8 +257,9 @@ actions:
             endTime: '2018-09-25T12:27:32.353-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537903648176-576b718a5f780-5cc7b981-9dd40c31
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$?alt=json
@@ -334,7 +337,7 @@ actions:
               affinityCookieTtlSec: 0
               backends:
               - balancingMode: RATE
-                group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+                group: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
                 maxRate: 100
               cdnPolicy:
                 signedUrlCacheMaxAgeSec: '1234'
@@ -372,8 +375,9 @@ actions:
             insertTime: '2018-09-25T12:27:33.572-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537903653174-576b718f23af2-bb3e401e-27c6c456
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
@@ -416,8 +420,6 @@ actions:
               signedUrlCacheMaxAgeSec: '1234'
     - expect_exit:
         code: 0
-
-
 - execute_command:
     command: compute backend-services update-backend $$http-bs$$ --instance-group
       $$ig$$ --instance-group-zone us-central1-f --balancing-mode UTILIZATION --max-utilization
@@ -741,41 +743,39 @@ actions:
             insertTime: '2018-09-25T12:28:16.502-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537903689754-576b71b206591-de92d086-bde51c81
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$\].
     - expect_exit:
         code: 0
-
-
 - execute_command:
     command: compute http-health-checks delete $$http-hc$$ --quiet
     cleanup_for: http-hc
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/httpHealthChecks/$$http-hc$$\].
     - expect_exit:
         code: 0
-
-
 - execute_command:
     command: compute instances delete $$instance$$ --zone us-central1-f --quiet
     cleanup_for: instance
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
-
-
 - execute_command:
     command: compute instance-groups unmanaged delete $$ig$$ --zone us-central1-f
       --quiet
     cleanup_for: ig
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0

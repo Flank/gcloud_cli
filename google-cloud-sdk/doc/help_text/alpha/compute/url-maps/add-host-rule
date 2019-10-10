@@ -3,10 +3,9 @@ NAME
         map hosts to a path matcher
 
 SYNOPSIS
-    gcloud alpha compute url-maps add-host-rule URL_MAP_NAME
-        --hosts=HOST,[HOST,...] --path-matcher-name=PATH_MATCHER_NAME
-        [--description=DESCRIPTION] [--global | --region=REGION]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute url-maps add-host-rule URL_MAP --hosts=HOST,[HOST,...]
+        --path-matcher-name=PATH_MATCHER_NAME [--description=DESCRIPTION]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute url-maps add-host-rule is used to add a
@@ -18,7 +17,7 @@ DESCRIPTION
     url-maps edit can be used to add path matchers.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS
@@ -75,15 +74,14 @@ EXAMPLES
     to the www path matcher, run:
 
         $ gcloud alpha compute url-maps add-host-rule MY-URL-MAP \
-            --hosts '*-foo.example.com,example.com'
-        --path-matcher-name www --global
+            --hosts '*-foo.example.com,example.com' \
+            --path-matcher-name www --global
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute url-maps add-host-rule
         $ gcloud beta compute url-maps add-host-rule

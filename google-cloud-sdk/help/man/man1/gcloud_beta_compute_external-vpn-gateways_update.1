@@ -18,7 +18,7 @@ gcloud beta compute external\-vpn\-gateways update \- update a Google Compute En
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute external\-vpn\-gateways update\fR updates
-labels for a Google Compute Engine External VPN gateway. For example:
+labels for a Google Compute Engine external VPN gateway. For example:
 
 .RS 2m
 $ gcloud beta compute external\-vpn\-gateways update example\-gateway \e
@@ -110,12 +110,25 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To update labels for an external VPN gateway, run:
 
 .RS 2m
+$ gcloud beta compute external\-vpn\-gateways update \e
+  my\-external\-gateway                 \e
+  \-\-update\-labels=k0=value1,k1=value2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute external\-vpn\-gateways update
 $ gcloud alpha compute external\-vpn\-gateways update
 .RE
 

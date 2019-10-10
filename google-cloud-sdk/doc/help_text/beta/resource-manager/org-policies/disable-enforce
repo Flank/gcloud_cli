@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta resource-manager org-policies disable-enforce ORG_POLICY_ID
-        [--folder=FOLDER_ID] [--organization=ORGANIZATION_ID]
-        [GCLOUD_WIDE_FLAG ...]
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Turns off enforcement of a boolean Organization Policy constraint at
@@ -15,12 +15,19 @@ POSITIONAL ARGUMENTS
      ORG_POLICY_ID
         The Org Policy constraint name.
 
-FLAGS
-     --folder=FOLDER_ID
-        Folder ID for Org Policies.
+REQUIRED FLAGS
+     Resource that is associated with the organization policy. Exactly one of
+     these must be specified:
 
-     --organization=ORGANIZATION_ID
-        Organization ID for Org Policies.
+       --folder=FOLDER_ID
+          Folder ID.
+
+       --organization=ORGANIZATION_ID
+          Organization ID.
+
+       --project=PROJECT_ID
+          Project ID. Overrides the default core/project property value for
+          this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

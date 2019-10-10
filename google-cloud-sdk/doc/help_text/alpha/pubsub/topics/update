@@ -1,18 +1,14 @@
 NAME
-    gcloud alpha pubsub topics update - this feature is part of an invite-only
-        release of the Cloud Pub/Sub API
+    gcloud alpha pubsub topics update - updates an existing Cloud Pub/Sub topic
 
 SYNOPSIS
-    gcloud alpha pubsub topics update TOPIC
-        [--recompute-message-storage-policy] [--update-labels=[KEY=VALUE,...]]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha pubsub topics update TOPIC [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--message-storage-policy-allowed-regions=[REGION,...]
+          | --recompute-message-storage-policy] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Updates an existing Cloud Pub/Sub topic. This feature is part of an
-    invitation-only release of the underlying Cloud Pub/Sub API. The command
-    will generate errors unless you have access to this API. This restriction
-    should be relaxed in the near future. Please contact
-    cloud-pubsub@google.com with any questions in the meantime.
+    (ALPHA) Updates an existing Cloud Pub/Sub topic.
 
 POSITIONAL ARGUMENTS
      Topic resource - Name of the topic to update. This represents a Cloud
@@ -26,10 +22,6 @@ POSITIONAL ARGUMENTS
           ID of the topic or fully qualified identifier for the topic.
 
 FLAGS
-     --recompute-message-storage-policy
-        If given, Cloud Pub/Sub will recompute the regions where messages can
-        be stored at rest based on your organization's policies.
-
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
         modified, otherwise a new label is created.
@@ -58,6 +50,17 @@ FLAGS
           List of label keys to remove. If a label does not exist it is
           silently ignored.
 
+     Message storage policy options. At most one of these may be specified:
+
+       --message-storage-policy-allowed-regions=[REGION,...]
+          A list of one or more Cloud regions where messages are allowed to be
+          stored at rest.
+
+       --recompute-message-storage-policy
+          If given, Cloud Pub/Sub will recompute the regions where messages can
+          be stored at rest, based on your organization's "Resource Location
+          Restriction" policy.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -65,10 +68,38 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To update existing labels on a Cloud Pub/Sub topic, run:
+
+        $ gcloud alpha pubsub topics update mytopic \
+          --update-labels=KEY1=VAL1,KEY2=VAL2
+
+    To clear all labels on a Cloud Pub/Sub topic, run:
+
+        $ gcloud alpha pubsub topics update mytopic --clear-labels
+
+    To remove an existing label on a Cloud Pub/Sub topic, run:
+
+        $ gcloud alpha pubsub topics update mytopic --remove-labels=KEY1,KEY2
+
+    To update a Cloud Pub/Sub topic's message storage policy, run:
+
+        $ gcloud alpha pubsub topics update mytopic \
+          --message-storage-policy-allowed-regions=some-cloud-region1,\
+        some-cloud-region2
+
+    To recompute a Cloud Pub/Sub topic's message storage policy based on your
+    organization's "Resource Location Restriction" policy, run:
+
+        $ gcloud alpha pubsub topics update mytopic \
+          --recompute-message-storage-policy
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud pubsub topics update
+        $ gcloud beta pubsub topics update
 

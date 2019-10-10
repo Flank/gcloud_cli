@@ -1,0 +1,131 @@
+title: remote-build-execution worker-pools update test (with clear-labels flag)
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      remote-build-execution worker-pools update labelled_pool --instance=default_instance --clear-labels
+  - stderr: |
+      Request issued for: [labelled_pool]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/operations/create_operation_id]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated workerpool [labelled_pool].
+  - stdout: |
+      done: true
+      name: projects/fake-project/operations/create_operation_id
+      response:
+        '@type': type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool
+        name: projects/fake-project/instances/default_instance/workerpools/labelled_pool
+        state: RUNNING
+        workerConfig:
+          diskSizeGb: '200'
+          diskType: pd-standard
+          machineType: n1-standard-2
+          networkAccess: public
+          reserved: 'false'
+        workerCount: '1'
+actions:
+- execute_command:
+    command: |
+      remote-build-execution worker-pools update labelled_pool --instance=default_instance --clear-labels
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/instances/default_instance/workerpools/labelled_pool?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              updateMask: workerConfig.labels
+              workerPool:
+                workerConfig:
+                  reserved: false
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/operations/create_operation_id"
+            }
+    - expect_stderr: |
+        Request issued for: [labelled_pool]
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/operations/create_operation_id?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/operations/create_operation_id",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
+                "name": "projects/fake-project/instances/default_instance/workerpools/labelled_pool",
+                "workerConfig": {
+                  "machineType": "n1-standard-2",
+                  "diskType": "pd-standard",
+                  "diskSizeGb": "200",
+                  "reserved": "false",
+                  "networkAccess": "public"
+                },
+                "workerCount": "1",
+                "state": "RUNNING"
+              }
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/operations/create_operation_id]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/fake-project/instances/default_instance/workerpools/labelled_pool?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/operations/create_operation_id",
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool",
+                "name": "projects/fake-project/instances/default_instance/workerpools/labelled_pool",
+                "workerConfig": {
+                  "machineType": "n1-standard-2",
+                  "diskType": "pd-standard",
+                  "diskSizeGb": "200",
+                  "reserved": "false",
+                  "networkAccess": "public"
+                },
+                "workerCount": "1",
+                "state": "RUNNING"
+              }
+            }
+    - expect_stderr: |
+        Updated workerpool [labelled_pool].
+    - expect_stdout: |
+        done: true
+        name: projects/fake-project/operations/create_operation_id
+        response:
+          '@type': type.googleapis.com/google.devtools.remotebuildexecution.admin.v1alpha.WorkerPool
+          name: projects/fake-project/instances/default_instance/workerpools/labelled_pool
+          state: RUNNING
+          workerConfig:
+            diskSizeGb: '200'
+            diskType: pd-standard
+            machineType: n1-standard-2
+            networkAccess: public
+            reserved: 'false'
+          workerCount: '1'
+    - expect_exit:
+        code: 0

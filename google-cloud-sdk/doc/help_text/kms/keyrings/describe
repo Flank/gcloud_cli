@@ -27,7 +27,7 @@ EXAMPLES
     The following command returns the metadata for the keyring towers in the
     location us-east1:
 
-        $ gcloud kms keyrings describe towers --location us-east1
+        $ gcloud kms keyrings describe towers --location=us-east1
 
 NOTES
     These variants are also available:

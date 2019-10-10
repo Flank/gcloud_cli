@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -352,7 +352,7 @@ class _BaseDeploy(object):
 
     if config_files:
       push_config_result = services_util.PushMultipleServiceConfigFiles(
-          self.service_name, config_files, args.async,
+          self.service_name, config_files, args.async_,
           validate_only=self.validate_only)
       self.service_config_id = (
           services_util.GetServiceConfigIdFromSubmitConfigSourceResponse(
@@ -390,12 +390,10 @@ class _BaseDeploy(object):
           serviceName=self.service_name,
       )
       rollout_operation = client.services_rollouts.Create(rollout_create)
-      services_util.ProcessOperationResult(rollout_operation, args.async)
+      services_util.ProcessOperationResult(rollout_operation, args.async_)
 
       if was_service_created:
-        self.AttemptToEnableService(
-            services_util.GetEndpointsServiceName(), args.async)
-        self.AttemptToEnableService(self.service_name, args.async)
+        self.AttemptToEnableService(self.service_name, args.async_)
 
     return push_config_result
 

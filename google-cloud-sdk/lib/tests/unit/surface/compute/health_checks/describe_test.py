@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class HealthChecksDescribeTest(test_base.BaseTest,
               proxyHeader: PROXY_V1
               requestPath: /testpath
             name: health-check-http-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-http-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-http-1
             type: HTTP
             """))
 
@@ -85,8 +85,34 @@ class HealthChecksDescribeTest(test_base.BaseTest,
               proxyHeader: PROXY_V1
               requestPath: /
             name: health-check-https
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-https
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-https
             type: HTTPS
+            """))
+
+  def testSimpleCaseHttp2(self):
+    self.make_requests.side_effect = iter([
+        [test_resources.HEALTH_CHECKS[5]],
+    ])
+
+    self.RunDescribe('my-health-check')
+
+    self.CheckRequests(
+        [(self.compute.healthChecks,
+          'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check',
+              project='my-project'))],
+    )
+    self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
+            http2HealthCheck:
+              host: www.example.com
+              port: 443
+              portName: happy-http2-port
+              proxyHeader: PROXY_V1
+              requestPath: /
+            name: health-check-http2
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-http2
+            type: HTTP2
             """))
 
   def testSimpleCaseTcp(self):
@@ -103,7 +129,7 @@ class HealthChecksDescribeTest(test_base.BaseTest,
     )
     self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
             name: health-check-tcp
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-tcp
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-tcp
             tcpHealthCheck:
               port: 80
               portName: happy-tcp-port
@@ -127,7 +153,7 @@ class HealthChecksDescribeTest(test_base.BaseTest,
     )
     self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
             name: health-check-ssl
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-ssl
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-ssl
             sslHealthCheck:
               port: 443
               portName: happy-ssl-port
@@ -151,6 +177,7 @@ class HealthChecksDescribeTest(test_base.BaseTest,
             'health-check-http-2',
             'health-check-tcp',
             'health-check-ssl',
+            'health-check-http2',
         ])
 
 
@@ -168,7 +195,7 @@ class HealthChecksDescribeHttp2Test(test_base.BaseTest,
     ])
 
     self.Run("""
-        compute health-checks describe my-health-check
+        compute health-checks describe my-health-check --global
         """)
 
     health_check = self.compute_beta.healthChecks
@@ -187,19 +214,19 @@ class HealthChecksDescribeHttp2Test(test_base.BaseTest,
               proxyHeader: NONE
               requestPath: /
             name: health-check-http2
-            selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/healthChecks/health-check-http2
+            selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/global/healthChecks/health-check-http2
             type: HTTP2
             """))
 
 
-class RegionHealthChecksDescribeTest(test_base.BaseTest,
-                                     completer_test_base.CompleterBase,
-                                     test_case.WithOutputCapture):
+class RegionHealthChecksDescribeBetaTest(test_base.BaseTest,
+                                         completer_test_base.CompleterBase,
+                                         test_case.WithOutputCapture):
 
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
     list_json_patcher = mock.patch(
@@ -287,7 +314,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
               proxyHeader: PROXY_V1
               requestPath: /testpath
             name: health-check-http-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-http-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-http-1
             type: HTTP
             """))
 
@@ -313,7 +340,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
               proxyHeader: PROXY_V1
               requestPath: /
             name: health-check-https
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-https
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-https
             type: HTTPS
             """))
 
@@ -339,7 +366,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
               proxyHeader: NONE
               requestPath: /
             name: health-check-http2
-            selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/healthChecks/health-check-http2
+            selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/global/healthChecks/health-check-http2
             type: HTTP2
             """))
 
@@ -359,7 +386,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             name: health-check-tcp
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-tcp
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-tcp
             tcpHealthCheck:
               port: 80
               portName: happy-tcp-port
@@ -385,7 +412,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             name: health-check-ssl
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-ssl
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/health-check-ssl
             sslHealthCheck:
               port: 443
               portName: happy-ssl-port
@@ -407,6 +434,7 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
         'health-check-http-2',
         'health-check-tcp',
         'health-check-ssl',
+        'health-check-http2',
     ])
 
   def testHealthChecksCompleterRegional(self):
@@ -446,6 +474,15 @@ class RegionHealthChecksDescribeTest(test_base.BaseTest,
         ],
         cli=self.cli,
     )
+
+
+class RegionHealthChecksDescribeAlphaTest(RegionHealthChecksDescribeBetaTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
 
 if __name__ == '__main__':

@@ -2,17 +2,14 @@ NAME
     gcloud alpha compute url-maps import - import a URL map
 
 SYNOPSIS
-    gcloud alpha compute url-maps import URL_MAP_NAME [--source=SOURCE]
+    gcloud alpha compute url-maps import URL_MAP [--source=SOURCE]
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) If the specified URL map already exists, it will be overwritten.
-    Otherwise, a new URL map will be created. To edit a URL map you can export
-    the URL map to a file, edit its configuration, and then import the new
-    configuration.
+    (ALPHA) Imports a URL map's configuration to a file.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to import.
 
 FLAGS
@@ -55,10 +52,16 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    A URL map can be imported by running:
+
+        $ gcloud alpha compute url-maps import NAME --source=<path-to-file>
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute url-maps import
 

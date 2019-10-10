@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,9 +59,9 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
             """))
 
   def testWithGlobalFlag(self):
@@ -83,7 +83,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
             """))
 
   def testWithNoArgumentRegionsFlag(self):
@@ -123,7 +123,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
             """))
 
   def testWithManyArgumentRegionsFlag(self):
@@ -151,7 +151,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
             """))
 
   def testWithNoArgumentZonesFlag(self):
@@ -196,7 +196,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
             """))
 
   def testWithManyArgumentZonesFlag(self):
@@ -224,7 +224,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
             """))
 
   def testNameRegexes(self):
@@ -251,9 +251,9 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
             """))
 
   def testTabularOutput(self):
@@ -298,7 +298,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
             """))
 
   def testRegionsAndGlobal(self):
@@ -340,10 +340,10 @@ class OperationsListTest(test_base.BaseTest):
                 operationType='insert',
                 insertTime='2014-09-04T09:55:33.679-07:00',
                 selfLink=(
-                    'https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'global/operations/operation-2'),
                 targetLink=(
-                    'https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'resource/resource-2')),
             messages.Operation(
                 name='operation-2',
@@ -351,10 +351,10 @@ class OperationsListTest(test_base.BaseTest):
                 operationType='insert',
                 insertTime='2014-09-04T09:55:33.679-07:00',
                 selfLink=(
-                    'https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'global/operations/operation-3'),
                 targetLink=(
-                    'https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'resource/resource-3')),
         ])
     ]
@@ -378,7 +378,7 @@ class OperationsListTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/operations/operation-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/operations/operation-2
             """))
 
 

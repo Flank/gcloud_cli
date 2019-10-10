@@ -6,13 +6,13 @@ summary:
 - execute:
   - command: compute health-checks create tcp $$hc$$ --global --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
 - execute:
   - command: compute backend-services create $$bs$$ --region us-central1 --health-checks
       $$hc$$ --global-health-checks --load-balancing-scheme INTERNAL --protocol TCP
       --format 'text(name,loadBalancingScheme,failoverPolicy)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       loadBalancingScheme: INTERNAL
@@ -22,7 +22,7 @@ summary:
       --drop-traffic-if-unhealthy --failover-ratio 0.5 --region us-central1 --format
       'text(name,loadBalancingScheme,failoverPolicy)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Updated \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       failoverPolicy.disableConnectionDrainOnFailover: True
@@ -38,7 +38,7 @@ summary:
          - [$$bs$$] in [us-central1]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
 - execute:
   - command: compute health-checks delete $$hc$$ --global
   - prompt:
@@ -47,13 +47,13 @@ summary:
          - [$$hc$$]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
 
 
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 
 - generate_resource_id:
     reference: hc
@@ -62,8 +62,9 @@ actions:
     command: compute health-checks create tcp $$hc$$ --global --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
     - expect_exit:
         code: 0
 
@@ -77,8 +78,9 @@ actions:
       --format 'text(name,loadBalancingScheme,failoverPolicy)'
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - expect_stdout: |
         ---
         loadBalancingScheme: INTERNAL
@@ -163,8 +165,9 @@ actions:
             region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -218,8 +221,9 @@ actions:
           The following region backend services will be deleted:
            - [$$bs$$] in [us-central1]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - expect_exit:
         code: 0
 
@@ -234,7 +238,8 @@ actions:
           The following health checks will be deleted:
            - [$$hc$$]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
     - expect_exit:
         code: 0

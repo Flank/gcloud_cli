@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta run services set-iam-policy (SERVICE : --region=REGION)
-        POLICY_FILE [GCLOUD_WIDE_FLAG ...]
+        POLICY_FILE [--platform=PLATFORM] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) This command replaces the existing IAM policy for a service, given a
@@ -29,7 +29,7 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --region=REGION
-          The Cloud Run region
+          The Cloud Run region.
 
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.
@@ -37,6 +37,18 @@ POSITIONAL ARGUMENTS
         The output of the get-iam-policy command is a valid file, as is any
         JSON or YAML file conforming to the structure of a Policy
         (https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+FLAGS
+     --platform=PLATFORM
+        Target platform for running commands. PLATFORM must be one of:
+
+         gke
+            Cloud Run on Google Kubernetes Engine. This platform is not
+            supported by this command.
+
+         managed
+            Fully managed version of Cloud Run. Use with the --region flag or
+            set the [run/region] property to specify a Cloud Run region.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

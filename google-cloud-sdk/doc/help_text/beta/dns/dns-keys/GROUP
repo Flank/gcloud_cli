@@ -30,8 +30,9 @@ COMMANDS
         (BETA) List DNS key resources.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns dns-keys
+        $ gcloud alpha dns dns-keys
 

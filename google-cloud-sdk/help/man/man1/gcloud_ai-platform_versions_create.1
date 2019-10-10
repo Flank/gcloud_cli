@@ -51,8 +51,7 @@ Name of the model.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-config\fR=\fICONFIG\fR
@@ -91,8 +90,8 @@ The description of the version.
 .TP 2m
 \fB\-\-framework\fR=\fIFRAMEWORK\fR
 The ML framework used to train this version of the model. If not specified,
-defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
-\fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
+defaults to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
+\fBtensorflow\fR, \fBxgboost\fR.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -119,8 +118,8 @@ In the latter case the files will be uploaded to Google Cloud Storage and a
 .TP 2m
 \fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
 Version of Python used when creating the version. If not set, the default
-version is 2.7. Python 3.5 is available when \f5runtime_version\fR is set to 1.4
-and above. Python 2.7 works with all supported runtime versions.
+version is 2.7. Python 3.5 is available when \f5\-\-runtime\-version\fR is set
+to 1.4 and above. Python 2.7 works with all supported runtime versions.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR

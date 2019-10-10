@@ -11,7 +11,7 @@ gcloud alpha pubsub topics create \- creates one or more Cloud Pub/Sub topics
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha pubsub topics create\fR \fITOPIC\fR [\fITOPIC\fR\ ...] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-topic\-encryption\-key\fR=\fITOPIC_ENCRYPTION_KEY\fR\ :\ \fB\-\-topic\-encryption\-key\-keyring\fR=\fITOPIC_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-topic\-encryption\-key\-location\fR=\fITOPIC_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-topic\-encryption\-key\-project\fR=\fITOPIC_ENCRYPTION_KEY_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha pubsub topics create\fR \fITOPIC\fR [\fITOPIC\fR\ ...] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-message\-storage\-policy\-allowed\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-topic\-encryption\-key\fR=\fITOPIC_ENCRYPTION_KEY\fR\ :\ \fB\-\-topic\-encryption\-key\-keyring\fR=\fITOPIC_ENCRYPTION_KEY_KEYRING\fR\ \fB\-\-topic\-encryption\-key\-location\fR=\fITOPIC_ENCRYPTION_KEY_LOCATION\fR\ \fB\-\-topic\-encryption\-key\-project\fR=\fITOPIC_ENCRYPTION_KEY_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,12 +56,17 @@ only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
 .TP 2m
+\fB\-\-message\-storage\-policy\-allowed\-regions\fR=[\fIREGION\fR,...]
+A list of one or more Cloud regions where messages are allowed to be stored at
+rest.
+
+.TP 2m
 
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
-used to protect the topic. The specified CloudKMS key should have purpose set to
-"ENCRYPT_DECRYPT". The service account,
+used to protect the topic. The specified Cloud KMS key should have purpose set
+to "ENCRYPT_DECRYPT". The service account,
 "service\-${CONSUMER_PROJECT_NUMBER}@gcp\-sa\-pubsub.iam.gserviceaccount.com"
-requires the IAM cryptoKeyEncrypterDecrypter role for the given CloudKMS key.
+requires the IAM cryptoKeyEncrypterDecrypter role for the given Cloud KMS key.
 CONSUMER_PROJECT_NUMBER is the project number of the project that is the parent
 of the topic being created. The arguments in this group can be used to specify
 the attributes of this resource.
@@ -114,9 +119,8 @@ $ gcloud alpha pubsub topics create mytopic
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud pubsub topics create

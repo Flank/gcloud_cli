@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from googlecloudsdk.command_lib.compute.sole_tenancy.node_templates import flags
+import six
 
 
 def _ParseNodeAffinityLabels(affinity_labels, messages):
@@ -28,8 +29,7 @@ def _ParseNodeAffinityLabels(affinity_labels, messages):
       affinity_labels, affinity_labels_class, sort_items=True)
 
 
-def CreateNodeTemplate(node_template_ref, args, messages,
-                       enable_server_binding):
+def CreateNodeTemplate(node_template_ref, args, messages, enable_disk=False):
   """Creates a Node Template message from args."""
   node_affinity_labels = None
   if args.node_affinity_labels:
@@ -39,7 +39,7 @@ def CreateNodeTemplate(node_template_ref, args, messages,
   node_type_flexbility = None
   if args.IsSpecified('node_requirements'):
     node_type_flexbility = messages.NodeTemplateNodeTypeFlexibility(
-        cpus=str(args.node_requirements.get('vCPU', 'any')),
+        cpus=six.text_type(args.node_requirements.get('vCPU', 'any')),
         # local SSD is unique because the user may omit the local SSD constraint
         # entirely to include the possibility of node types with no local SSD.
         # "any" corresponds to "greater than zero".
@@ -53,10 +53,17 @@ def CreateNodeTemplate(node_template_ref, args, messages,
       nodeType=args.node_type,
       nodeTypeFlexibility=node_type_flexbility)
 
-  if enable_server_binding:
-    server_binding_flag = flags.GetServerBindingMapperFlag(messages)
-    server_binding = messages.ServerBinding(
-        type=server_binding_flag.GetEnumForChoice(args.server_binding))
-    node_template.serverBinding = server_binding
+  if enable_disk:
+    if args.IsSpecified('disk'):
+      local_disk = messages.LocalDisk(
+          diskCount=args.disk.get('count'),
+          diskSizeGb=args.disk.get('size'),
+          diskType=args.disk.get('type'))
+      node_template.disks = [local_disk]
+
+  server_binding_flag = flags.GetServerBindingMapperFlag(messages)
+  server_binding = messages.ServerBinding(
+      type=server_binding_flag.GetEnumForChoice(args.server_binding))
+  node_template.serverBinding = server_binding
 
   return node_template

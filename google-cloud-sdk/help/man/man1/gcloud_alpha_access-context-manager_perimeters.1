@@ -57,8 +57,16 @@ help\fR for details.
 \fB(ALPHA)\fR List service perimeters.
 
 .TP 2m
+\fBreplace\-all\fR
+\fB(ALPHA)\fR Replace all existing service perimeters.
+
+.TP 2m
 \fBupdate\fR
 \fB(ALPHA)\fR Update an existing access zone.
+
+.TP 2m
+\fBupdate\-dry\-run\-config\fR
+\fB(ALPHA)\fR Update the dry\-run config for an existing Service Perimeter.
 
 
 .RE
@@ -68,9 +76,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud access\-context\-manager perimeters

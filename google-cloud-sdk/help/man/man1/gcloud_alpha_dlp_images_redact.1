@@ -38,32 +38,35 @@ SVG, or BMP.
 .RS 2m
 .TP 2m
 \fB\-\-include\-quote\fR
-If True, the server will attempt to filter out profanities, replacing all but
-the initial character in each filtered word with asterisks, e.g. "f**\fB".
+If True, a contextual quote from the data that triggered a finding is included
+in the response. Even if the content is not text, it may be converted to a
+textual representation in the response. For example, given the input value 'My
+phone number is (415) 555\-0890' and a search for the infoType PHONE_NUMBER, the
+contextual quote would be '(415) 555\-0890.'
 
 .TP 2m
-\fR\-\-info\-types\fB=[\fIINFOTYPE\fR,...]
+\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
 Which infoTypes to scan input for. The values must correspond to infoType values
 found in documentation. For more information about valid infoTypes, see
 infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
 
 .TP 2m
-\fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
+\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR; default="possible"
 Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
-be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB, \fRvery\-likely\fB,
-\fRvery\-unlikely\fB.
+be one of: \fBlikely\fR, \fBpossible\fR, \fBunlikely\fR, \fBvery\-likely\fR,
+\fBvery\-unlikely\fR.
 
 .TP 2m
-\fR\-\-output\-file\fB=\fIOUTPUT_FILE\fR
+\fB\-\-output\-file\fR=\fIOUTPUT_FILE\fR
 Path to the file to write redacted contents to.
 
 .TP 2m
-\fR\-\-redact\-all\-text\fB
+\fB\-\-redact\-all\-text\fR
 If specified, all text info in the image will be removed, whether it is detected
 as sensitive or not.
 
 .TP 2m
-\fR\-\-redact\-color\fB=\fIREDACT_COLOR\fR
+\fB\-\-redact\-color\fR=\fIREDACT_COLOR\fR
 The color to use when redacting content from an image. If not specified, the
 default value is black. Colors should be specified as a string of \f5r,g,b\fR
 float values in the interval [0,1] representing the amount of red, green, and
@@ -71,7 +74,6 @@ blue in the color, respectively. For example, \f5black = 0,0,0\fR, \f5red =
 1.0,0,0\fR, \f5white = 1.0,1.0,1.0\fR, and so on.
 
 
-\fR
 .RE
 .sp
 
@@ -109,7 +111,6 @@ $ gcloud alpha dlp images redact my\-image.jpg \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ class QueuesTest(e2e_base.WithServiceAuth):
   def testLocationsListAndDescribe(self):
     self.Run('beta tasks locations list')
     self.AssertOutputContains('us-central1')
+    self.ClearOutput()
     self.Run('beta tasks locations describe us-central1')
     self.AssertOutputContains('locationId: us-central1')
 

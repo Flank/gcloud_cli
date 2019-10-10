@@ -48,7 +48,8 @@ FLAGS
 
      --purpose=PURPOSE
         The purpose of the address resource. This field is not applicable to
-        external addresses. PURPOSE must be one of: VPC_PEERING, GCE_ENDPOINT.
+        external addresses. PURPOSE must be one of: VPC_PEERING,
+        SHARED_LOADBALANCER_VIP, GCE_ENDPOINT.
 
      --subnet=SUBNET
         If specified, the subnet name in which the address(es) should be
@@ -123,19 +124,25 @@ EXAMPLES
         $ gcloud beta compute addresses create SUBNET-ADDRESS-1 \
             --region us-central1 --subnet default
 
+    To reserve an IP address that can be used by multiple internal load
+    balancers from the subnet 'default' in the 'us-central1' region, run:
+
+        $ gcloud beta compute addresses create SHARED-ADDRESS-1 \
+            --region us-central1 --subnet default \
+            --purpose SHARED_LOADBALANCER_VIP
+
     To reserve an IP range 10.110.0.0/16 from the network 'default' for
     VPC_PEERING, run:
 
         $ gcloud beta compute addresses create IP-RANGE-1 --global \
-            --addresses 10.110.0.0 --prefix-length 16
-        --purpose VPC_PEERING --network default
+            --addresses 10.110.0.0 --prefix-length 16 \
+            --purpose VPC_PEERING --network default
 
     To reserve any IP range with prefix length 16 from the network 'default'
     for VPC_PEERING, run:
 
         $ gcloud beta compute addresses create IP-RANGE-1 --global \
-            --prefix-length 16 --purpose VPC_PEERING
-        --network default
+            --prefix-length 16 --purpose VPC_PEERING --network default
 
 NOTES
     This command is currently in BETA and may change without notice. These

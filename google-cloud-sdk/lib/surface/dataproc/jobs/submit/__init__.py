@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,10 +62,7 @@ class Submit(base.Group):
     parser.add_argument(
         '--id', hidden=True, help='THIS ARGUMENT NEEDS HELP TEXT.')
 
-    parser.add_argument(
-        '--async',
-        action='store_true',
-        help='Does not wait for the job to run.')
+    base.ASYNC_FLAG.AddToParser(parser)
 
     parser.add_argument(
         '--bucket',

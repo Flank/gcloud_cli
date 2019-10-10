@@ -3,7 +3,7 @@ NAME
         snapshot
 
 SYNOPSIS
-    gcloud alpha filestore snapshots describe (SNAPSHOT : --region=REGION)
+    gcloud alpha filestore snapshots describe SNAPSHOT --region=REGION
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,21 +16,13 @@ DESCRIPTION
         snapshot.
 
 POSITIONAL ARGUMENTS
-     Snapshot resource - Arguments and flags that specify the Cloud Filestore
-     snapshot you want to describe. The arguments in this group can be used to
-     specify the attributes of this resource. (NOTE) Some attributes are not
-     given arguments in this group but can be set in other ways. To set the
-     [project] attribute: provide the argument [snapshot] on the command line
-     with a fully specified name; provide the argument [--project] on the
-     command line; set the property [core/project]. This must be specified.
+     SNAPSHOT
+        Arguments and flags that specify the Filestore snapshot you want to
+        create.
 
-       SNAPSHOT
-          ID of the snapshot or fully qualified identifier for the snapshot.
-          This positional must be specified if any of the other arguments in
-          this group are specified.
-
-       --region=REGION
-          The region of the Filestore snapshot.
+REQUIRED FLAGS
+     --region=REGION
+        Region (e.g. us-central1) for the snapshot.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -45,15 +37,15 @@ API REFERENCE
 
 EXAMPLES
     To display all data associated with a snapshot of the name 'my-snapshot' in
-    the default region, run:
+    the region us-central1:
 
-        $ gcloud alpha filestore snapshots describe my-snapshot
+        $ gcloud alpha filestore snapshots describe my-snapshot \
+            --region=us-central1
 
 NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
 

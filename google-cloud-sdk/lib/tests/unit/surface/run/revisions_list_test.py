@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +19,15 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import revision
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.run import base
 from six.moves import range
 
 
-class RevisionsListTest(base.ServerlessSurfaceBase):
+class RevisionsListTestBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.revisions = [
@@ -38,9 +42,14 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
       r.labels['serving.knative.dev/service'] = 'foo'
       r.labels['serving.knative.dev/configuration'] = 'foo'
       r.annotations[revision.AUTHOR_ANNOTATION] = 'some{}@google.com'.format(i)
-      r.status.conditions = [self.serverless_messages.RevisionCondition(
-          type='Ready',
-          status='Unknown' if i%2 else 'True')]
+      r.status.conditions = [
+          self.serverless_messages.RevisionCondition(
+              type='Ready',
+              status='Unknown' if i%2 else 'True'),
+          self.serverless_messages.RevisionCondition(
+              type='Active',
+              status='Unknown' if i%2 else 'True')
+      ]
 
     self.operations.ListRevisions.return_value = self.revisions
     self._MockConnectionContext()
@@ -53,9 +62,9 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
                                                           None)
     self.assertEqual(out, self.revisions)
     self.AssertOutputEquals(
-        """REVISION SERVICE AUTHOR CREATED
-        + revision0 foo some0@google.com 2018-01-01 00:00:00 UTC
-        . revision1 foo some1@google.com 2018-01-01 00:10:00 UTC
+        """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
         """, normalize_space=True)
 
   def testServiceArg(self):
@@ -66,9 +75,9 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
                                                           'foo')
     self.assertEqual(out, self.revisions)
     self.AssertOutputEquals(
-        """REVISION SERVICE AUTHOR CREATED
-        + revision0 foo some0@google.com 2018-01-01 00:00:00 UTC
-        . revision1 foo some1@google.com 2018-01-01 00:10:00 UTC
+        """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
         """, normalize_space=True)
 
   def testNoArgUri(self):
@@ -82,3 +91,9 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
         https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/revision1
         """,
         normalize_space=True)
+
+
+class RevisionsListTestAlpha(RevisionsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

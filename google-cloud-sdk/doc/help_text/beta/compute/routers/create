@@ -36,8 +36,8 @@ OPTIONAL FLAGS
         https://tools.ietf.org/html/rfc6996, for example --asn=64512.
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --description=DESCRIPTION
         An optional description of this router.

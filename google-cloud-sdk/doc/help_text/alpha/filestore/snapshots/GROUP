@@ -27,12 +27,19 @@ COMMANDS
      list
         (ALPHA) List Cloud Filestore snapshots.
 
+     update
+        (ALPHA) Update a Cloud Filestore snapshot.
+
 EXAMPLES
-    To create an snapshot with the name 'my-snapshot', run:
+    To create a snapshot with the name 'my-snapshot', run:
 
         $ gcloud alpha filestore snapshots create my-snapshot
 
-    To delete an snapshot with the name 'my-snapshot', run:
+    To create a local snapshot with the name 'my-snapshot', run:
+
+        $ gcloud alpha filestore snapshots create my-snapshot --local
+
+    To delete a snapshot with the name 'my-snapshot', run:
 
         $ gcloud alpha filestore snapshots delete my-snapshot
 
@@ -54,7 +61,6 @@ NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
 

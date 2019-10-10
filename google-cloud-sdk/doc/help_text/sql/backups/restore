@@ -18,7 +18,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Do not wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --backup-instance=BACKUP_INSTANCE
         The ID of the instance that the backup was taken from.

@@ -25,7 +25,8 @@ EXAMPLES
         $ gcloud dns managed-zones delete my_zone
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns managed-zones delete
         $ gcloud beta dns managed-zones delete
 

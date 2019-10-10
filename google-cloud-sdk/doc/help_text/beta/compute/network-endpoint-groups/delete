@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute network-endpoint-groups delete - deletes a Google
+    gcloud beta compute network-endpoint-groups delete - delete a Google
         Compute Engine network endpoint group
 
 SYNOPSIS

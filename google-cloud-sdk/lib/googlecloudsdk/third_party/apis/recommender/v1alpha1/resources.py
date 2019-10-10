@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,11 +55,14 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS_RECOMMENDERS_RECOMMENDATIONS = (
       'projects.locations.recommenders.recommendations',
-      'projects/{projectsId}/locations/{locationsId}/recommenders/'
-      '{recommendersId}/recommendations/{recommendationsId}',
-      {},
-      [u'projectsId', u'locationsId', u'recommendersId', u'recommendationsId'],
-      False
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/recommenders/'
+              '{recommendersId}/recommendations/{recommendationsId}',
+      },
+      [u'name'],
+      True
   )
   PROJECTS_RULES = (
       'projects.rules',

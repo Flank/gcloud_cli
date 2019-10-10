@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -207,6 +207,7 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+    self.command = 'tasks queues create'
 
   def testCreate_NoOptions(self):
     expected_queue = self.messages.Queue(
@@ -217,7 +218,7 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues create my-queue')
+    actual_queue = self.Run(self.command + ' my-queue')
 
     self.assertEqual(actual_queue, expected_queue)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
@@ -233,19 +234,22 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
                                               maxDoublings=4, minBackoff='1s',
                                               maxBackoff='10s'),
         rateLimits=self.messages.RateLimits(
-            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10),
+        stackdriverLoggingConfig=self.messages.StackdriverLoggingConfig(
+            samplingRatio=0.1))
     self.queues_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues create my-queue '
+    actual_queue = self.Run(self.command + ' my-queue '
                             '--max-attempts=10 --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
                             '--max-dispatches-per-second=100 '
                             '--max-concurrent-dispatches=10 '
-                            '--routing-override=service:abc')
+                            '--routing-override=service:abc '
+                            '--log-sampling-ratio=0.1')
 
     self.assertEqual(actual_queue, expected_queue)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
@@ -268,7 +272,7 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues create my-queue '
+    actual_queue = self.Run(self.command + ' my-queue '
                             '--max-attempts=unlimited --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
@@ -278,6 +282,13 @@ class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
 
     self.assertEqual(actual_queue, expected_queue)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+
+class CreateAppEngineQueueTestBetaDeprecated(CreateAppEngineQueueTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.command = 'tasks queues create-app-engine-queue'
 
 
 if __name__ == '__main__':

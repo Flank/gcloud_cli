@@ -11,7 +11,7 @@ gcloud alpha ml\-engine jobs submit training \- submit an AI Platform training j
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud alpha ml\-engine jobs submit training\fR \fIJOB\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-module\-name\fR=\fIMODULE_NAME\fR] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-tpu\-tf\-version\fR=\fITPU_TF_VERSION\fR] [\fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fB\-\-parameter\-server\-count\fR=\fIPARAMETER_SERVER_COUNT\fR\ \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR\ \fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -160,7 +160,7 @@ to each server (COUNT).
 .TP 2m
 \fBtype\fR
 The type of the accelerator. Choices are
-nvidia\-tesla\-k80,nvidia\-tesla\-p100,nvidia\-tesla\-p4,nvidia\-tesla\-t4,nvidia\-tesla\-v100,tpu\-v2
+nvidia\-tesla\-k80,nvidia\-tesla\-p100,nvidia\-tesla\-p4,nvidia\-tesla\-t4,nvidia\-tesla\-v100,tpu\-v2,tpu\-v3
 
 .TP 2m
 \fBcount\fR
@@ -172,14 +172,14 @@ greater than 0.
 .TP 2m
 \fB\-\-master\-image\-uri\fR=\fIMASTER_IMAGE_URI\fR
 Docker image to run on each master worker. This image must be in Google
-Container Registry. Only one of \f5master\-image\-uri\fR and
-\f5runtimeVersion\fR must be specified.
+Container Registry. Only one of \f5\-\-master\-image\-uri\fR and
+\f5\-\-runtime\-version\fR must be specified.
 
 .TP 2m
 \fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR
 Specifies the type of virtual machine to use for training job's master worker.
 
-You must set this value when \f5scaleTier\fR is set to \f5CUSTOM\fR.
+You must set this value when \f5\-\-scale\-tier\fR is set to \f5CUSTOM\fR.
 
 .TP 2m
 \fB\-\-module\-name\fR=\fIMODULE_NAME\fR
@@ -198,7 +198,7 @@ will use a simple built\-in one.
 Path to Python archives used for training. These can be local paths (absolute or
 relative), in which case they will be uploaded to the Cloud Storage bucket given
 by \f5\-\-staging\-bucket\fR, or Cloud Storage URLs
-(\f5gs://bucket\-name/path/to/package.tar.gz\fR).
+('gs://bucket\-name/path/to/package.tar.gz').
 
 .TP 2m
 \fB\-\-parameter\-server\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
@@ -211,7 +211,7 @@ to each server (COUNT).
 .TP 2m
 \fBtype\fR
 The type of the accelerator. Choices are
-nvidia\-tesla\-k80,nvidia\-tesla\-p100,nvidia\-tesla\-p4,nvidia\-tesla\-t4,nvidia\-tesla\-v100,tpu\-v2
+nvidia\-tesla\-k80,nvidia\-tesla\-p100,nvidia\-tesla\-p4,nvidia\-tesla\-t4,nvidia\-tesla\-v100,tpu\-v2,tpu\-v3
 
 .TP 2m
 \fBcount\fR
@@ -223,13 +223,13 @@ greater than 0.
 .TP 2m
 \fB\-\-parameter\-server\-image\-uri\fR=\fIPARAMETER_SERVER_IMAGE_URI\fR
 Docker image to run on each parameter server. This image must be in Google
-Container Registry. If not specified, the value of \f5master\-image\-uri\fR is
-used.
+Container Registry. If not specified, the value of \f5\-\-master\-image\-uri\fR
+is used.
 
 .TP 2m
 \fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
 Version of Python used during training. If not set, the default version is 2.7.
-Python 3.5 is available when \f5runtime_version\fR is set to 1.4 and above.
+Python 3.5 is available when \f5\-\-runtime\-version\fR is set to 1.4 and above.
 Python 2.7 works with all supported runtime versions.
 
 .TP 2m
@@ -327,6 +327,11 @@ Required only if a file upload is necessary (that is, other flags include local
 paths) and no other flags implicitly specify an upload path.
 
 .TP 2m
+\fB\-\-tpu\-tf\-version\fR=\fITPU_TF_VERSION\fR
+Runtime version of TensorFlow used by the container. This field must be
+specified if a custom container on the TPU worker is being used.
+
+.TP 2m
 \fB\-\-worker\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
 Hardware accelerator config for the worker nodes. Must specify both the
 accelerator type (TYPE) for each server and the number of accelerators to attach
@@ -337,7 +342,7 @@ to each server (COUNT).
 .TP 2m
 \fBtype\fR
 The type of the accelerator. Choices are
-nvidia\-tesla\-k80,nvidia\-tesla\-p100,nvidia\-tesla\-p4,nvidia\-tesla\-t4,nvidia\-tesla\-v100,tpu\-v2
+nvidia\-tesla\-k80,nvidia\-tesla\-p100,nvidia\-tesla\-p4,nvidia\-tesla\-t4,nvidia\-tesla\-v100,tpu\-v2,tpu\-v3
 
 .TP 2m
 \fBcount\fR
@@ -349,7 +354,7 @@ greater than 0.
 .TP 2m
 \fB\-\-worker\-image\-uri\fR=\fIWORKER_IMAGE_URI\fR
 Docker image to run on each worker node. This image must be in Google Container
-Registry. If not specified, the value of \f5master\-image\-uri\fR is used.
+Registry. If not specified, the value of \f5\-\-master\-image\-uri\fR is used.
 
 .TP 2m
 
@@ -387,7 +392,7 @@ specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-parameter\-server\-machine\-type\fR=\fIPARAMETER_SERVER_MACHINE_TYPE\fR
-Type of virtual machine to use for training job'sparameter servers. This flag
+Type of virtual machine to use for training job's parameter servers. This flag
 must be specified if any of the other arguments in this group are specified
 machine to use for training job's parameter servers. This flag must be specified
 if any of the other arguments in this group are specified.
@@ -428,9 +433,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud ml\-engine jobs submit training

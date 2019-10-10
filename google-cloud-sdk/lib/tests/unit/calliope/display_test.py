@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -265,7 +265,7 @@ class _MockArgs(object):
                format=None, limit=None, page_size=None, simple_format=None,
                sort_by=None, uri=None):
     self._command = command
-    self.async = is_async
+    self.async_ = is_async
     self.filter = filter
     self.flatten = flatten if flatten is None else flatten.split(',')
     self.format = format
@@ -682,8 +682,8 @@ Print(table(good,async)).
     self.assertEqual(len(self.print_resource), 3)
     self.assertEqual(sorted(self.print_resource[0]),
                      sorted(_MOCK_RESOURCE[0]))
-    self.assertTrue(isinstance(self.print_resource[1],
-                               resource_printer_base.PageMarker))
+    self.assertIsInstance(self.print_resource[1],
+                          resource_printer_base.PageMarker)
     self.assertEqual(sorted(self.print_resource[2]),
                      sorted(_MOCK_RESOURCE[1]))
 
@@ -1424,9 +1424,7 @@ URI(xyz)
     """_unserializable should not be serialized."""
     expected = []
     actual = [(type(x).__name__, x.serializable) for x in self.cli.Execute([
-        'sdk',
-        'trial-serialization',
-        '--filter=_unserializable>=4',
+        'sdk', 'trial-serialization', '--filter=_unserializable>=4',
     ])]
     self.assertEqual(expected, actual)
 
@@ -1434,9 +1432,7 @@ URI(xyz)
     """serializable should be serialized."""
     expected = [('Resource', i) for i in range(4, 9)]
     actual = [(type(x).__name__, x.serializable) for x in self.cli.Execute([
-        'sdk',
-        'trial-serialization',
-        '--filter=serializable>=4',
+        'sdk', 'trial-serialization', '--filter=serializable>=4',
     ])]
     self.assertEqual(expected, actual)
 
@@ -1507,6 +1503,26 @@ A B
 0 STOPPED
 1 RUNNING
 ? ?
+"""
+    self.AssertOutputEquals(expected, normalize_space=True)
+
+  def testCliNumericSort(self):
+    self.cli.Execute(['sdk', 'numeric', '--sort-by=A'])
+    expected = """\
+A
+1
+2
+11
+"""
+    self.AssertOutputEquals(expected, normalize_space=True)
+
+  def testCliNumericSortReverse(self):
+    self.cli.Execute(['sdk', 'numeric', '--sort-by=~A'])
+    expected = """\
+A
+11
+2
+1
 """
     self.AssertOutputEquals(expected, normalize_space=True)
 

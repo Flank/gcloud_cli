@@ -14,6 +14,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+GROUPS
+    GROUP is one of the following:
+
+     tables
+        (BETA) Query Cloud Bigtable tables.
+
 COMMANDS
     COMMAND is one of the following:
 

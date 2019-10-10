@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ job4    job4_name  Batch  2013-09-06 17:54:10  Running  test4
 job5    job5_name  Batch  2013-09-06 17:54:10  Running  test5
 """)
 
-  def testListFiltering(self):
+  def testListFilteringName(self):
     jobs = [self.SampleJob(job_id='job%d' % n) for n in range(1, 6)]
     jobs.extend(
         [self.SampleJob(job_id='job_selected%d' % n) for n in range(1, 6)])
@@ -185,6 +185,46 @@ job_selected2  job_selected2_name  Batch  2013-09-06 17:54:10  Done   us-central
 job_selected3  job_selected3_name  Batch  2013-09-06 17:54:10  Done   us-central1
 job_selected4  job_selected4_name  Batch  2013-09-06 17:54:10  Done   us-central1
 job_selected5  job_selected5_name  Batch  2013-09-06 17:54:10  Done   us-central1
+""")
+
+  def testListFilteringState(self):
+    status_enum = (base.MESSAGE_MODULE.Job.CurrentStateValueValuesEnum)
+    jobs = [self.SampleJob(job_id='job%d' % n) for n in range(1, 6)]
+    jobs.extend([
+        self.SampleJob(
+            job_id='job_running%d' % n,
+            job_status=status_enum.JOB_STATE_RUNNING) for n in range(1, 6)
+    ])
+    self.MockAggregatedListJobs(jobs, page_size=5)
+
+    self.Run('beta dataflow jobs list --filter="state=Running" --limit=5')
+    self.AssertOutputEquals("""\
+JOB_ID        NAME               TYPE   CREATION_TIME        STATE    REGION
+job_running1  job_running1_name  Batch  2013-09-06 17:54:10  Running  us-central1
+job_running2  job_running2_name  Batch  2013-09-06 17:54:10  Running  us-central1
+job_running3  job_running3_name  Batch  2013-09-06 17:54:10  Running  us-central1
+job_running4  job_running4_name  Batch  2013-09-06 17:54:10  Running  us-central1
+job_running5  job_running5_name  Batch  2013-09-06 17:54:10  Running  us-central1
+""")
+
+  def testListFilteringType(self):
+    type_enum = (base.MESSAGE_MODULE.Job.TypeValueValuesEnum)
+    jobs = [self.SampleJob(job_id='job%d' % n) for n in range(1, 6)]
+    jobs.extend([
+        self.SampleJob(
+            job_id='job_streaming%d' % n, job_type=type_enum.JOB_TYPE_STREAMING)
+        for n in range(1, 6)
+    ])
+    self.MockAggregatedListJobs(jobs, page_size=5)
+
+    self.Run('beta dataflow jobs list --filter="type=Streaming" --limit=5')
+    self.AssertOutputEquals("""\
+JOB_ID          NAME                 TYPE       CREATION_TIME        STATE  REGION
+job_streaming1  job_streaming1_name  Streaming  2013-09-06 17:54:10  Done   us-central1
+job_streaming2  job_streaming2_name  Streaming  2013-09-06 17:54:10  Done   us-central1
+job_streaming3  job_streaming3_name  Streaming  2013-09-06 17:54:10  Done   us-central1
+job_streaming4  job_streaming4_name  Streaming  2013-09-06 17:54:10  Done   us-central1
+job_streaming5  job_streaming5_name  Streaming  2013-09-06 17:54:10  Done   us-central1
 """)
 
   def testRegionalListAll(self):

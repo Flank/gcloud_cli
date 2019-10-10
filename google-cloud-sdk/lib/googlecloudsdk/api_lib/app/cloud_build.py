@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- #
 
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ def GetServiceTimeoutString(timeout_property_str):
   if timeout_property_str is None:
     return None
   build_timeout_secs = GetServiceTimeoutSeconds(timeout_property_str)
-  return str(build_timeout_secs) + 's'
+  return six.text_type(build_timeout_secs) + 's'
 
 
 class InvalidBuildError(ValueError):

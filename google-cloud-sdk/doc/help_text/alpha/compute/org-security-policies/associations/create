@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha compute org-security-policies associations create - create a
+        new association between a security policy and an organization or folder
+        resource
+
+SYNOPSIS
+    gcloud alpha compute org-security-policies associations create
+        --security-policy=SECURITY_POLICY
+        (--folder=FOLDER | --organization=ORGANIZATION) [--name=NAME]
+        [--replace-association-on-target] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute org-security-policies associations create is
+    used to create organization security policy associations. An organization
+    security policy is a set of rules that controls access to various
+    resources.
+
+REQUIRED FLAGS
+     --security-policy=SECURITY_POLICY
+        Security policy ID of the association.
+
+     Exactly one of these must be specified:
+
+       --folder=FOLDER
+          ID of the folder with which the association is created.
+
+       --organization=ORGANIZATION
+          ID of the organization with which the association is created.
+
+OPTIONAL FLAGS
+     --name=NAME
+        Name to identify this association. If unspecified, the name will be set
+        to "organization-{ORGANIZATION_ID}" or "folder-{FOLDER_ID}".
+
+     --replace-association-on-target
+        By default, if you attempt to insert an association to an organization
+        or folder resource that is already associated with a security policy
+        the method will fail. If this is set, the existing association will be
+        deleted at the same time that the new association is created.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

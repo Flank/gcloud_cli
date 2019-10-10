@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ from tests.lib.surface.container.binauthz import base
 
 class RemoveTest(
     sdk_test_base.WithTempCWD,
-    base.WithMockBetaBinauthz,
+    base.WithMockGaBinauthz,
     base.BinauthzTestBase,
 ):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.ascii_armored_key = textwrap.dedent("""
@@ -52,25 +52,42 @@ class RemoveTest(
     self.name = 'bar'
     proj = self.Project()
     self.fingerprint = 'new_key'
-    self.attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, self.name),
-        updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, self.name),
-            publicKeys=[
-                self.messages.AttestorPublicKey(
-                    asciiArmoredPgpPublicKey=self.ascii_armored_key,
-                    comment=None,
-                    id=self.fingerprint),
-            ],
-        ))
+    try:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, self.name),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey=self.ascii_armored_key,
+                      comment=None,
+                      id=self.fingerprint),
+              ],
+          ))
+    except AttributeError:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, self.name),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey=self.ascii_armored_key,
+                      comment=None,
+                      id=self.fingerprint),
+              ],
+          ))
 
     self.updated_attestor = copy.deepcopy(self.attestor)
-    self.updated_attestor.userOwnedDrydockNote.publicKeys = []
+    try:
+      self.updated_attestor.userOwnedGrafeasNote.publicKeys = []
+    except AttributeError:
+      self.updated_attestor.userOwnedDrydockNote.publicKeys = []
     self.updated_attestor.updateTime = (
         times.FormatDateTime(datetime.datetime.utcnow()))
 
-    self.req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+    self.req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=self.attestor.name)
 
   def testSuccess_KeyId(self):
@@ -87,7 +104,11 @@ class RemoveTest(
     self.assertIsNone(response)
 
   def testSuccess_MultipleMatches(self):
-    self.attestor.userOwnedDrydockNote.publicKeys.append(
+    try:
+      note = self.attestor.userOwnedGrafeasNote
+    except AttributeError:
+      note = self.attestor.userOwnedDrydockNote
+    note.publicKeys.append(
         self.messages.AttestorPublicKey(
             asciiArmoredPgpPublicKey=self.ascii_armored_key,
             comment=None,
@@ -116,8 +137,11 @@ class RemoveTest(
               fingerprint='not_a_real_id', name=self.name))
 
   def testUnknownPubKey(self):
-    pub_key = self.attestor.userOwnedDrydockNote.publicKeys[0]
-    pub_key.asciiArmoredPgpPublicKey = 'foo'
+    try:
+      note = self.attestor.userOwnedGrafeasNote
+    except AttributeError:
+      note = self.attestor.userOwnedDrydockNote
+    note.publicKeys[0].asciiArmoredPgpPublicKey = 'foo'
     self.mock_client.projects_attestors.Get.Expect(
         self.req, response=self.attestor)
 
@@ -136,6 +160,15 @@ class RemoveTest(
           'attestors public-keys remove {fingerprint} '
           '--attestor={name}'.format(
               fingerprint='not_a_real_id', name=self.name))
+
+
+class RemoveBetaTest(
+    base.WithMockBetaBinauthz,
+    RemoveTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class RemoveAlphaTest(

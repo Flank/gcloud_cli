@@ -41,17 +41,18 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To see the list of all DNS key resources for a managed zone my_zone, run:
 
-        $ gcloud beta dns dns-keys list --zone my_zone
+        $ gcloud beta dns dns-keys list --zone=my_zone
 
     To see the DS records for every key-signing DnsKey in a managed zone, run:
 
-        $ gcloud beta dns dns-keys list --zone my_zone 3 \
-            --format 'value(ds_record())'               \
-            --filter 'type=keySigning'
+        $ gcloud beta dns dns-keys list --zone=my_zone 3 \
+            --format='value(ds_record())'               \
+            --filter='type=keySigning'
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns dns-keys list
+        $ gcloud alpha dns dns-keys list
 

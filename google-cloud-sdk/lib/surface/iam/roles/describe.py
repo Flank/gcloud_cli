@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class Describe(base.DescribeCommand):
 
   @staticmethod
   def Args(parser):
-    flags.GetOrgFlag('describe').AddToParser(parser)
+    flags.AddParentFlags(parser, 'describe', required=False)
     flags.GetRoleFlag('describe').AddToParser(parser)
 
   def Run(self, args):

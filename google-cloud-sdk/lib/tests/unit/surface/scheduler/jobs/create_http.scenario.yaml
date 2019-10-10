@@ -1,5 +1,5 @@
 title: Create Http Jobs Test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -34,7 +34,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -49,7 +49,7 @@ actions:
                 cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -93,7 +93,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -139,7 +139,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -191,7 +191,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -259,7 +259,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -317,7 +317,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:

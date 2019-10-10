@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,7 +79,8 @@ class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
   def RunScenario(self, spec_path, track, execution_mode, update_modes,
                   debug=False):
     full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
-    spec_data = yaml.load_path(full_spec_path, round_trip=True)
+    spec_data = yaml.load_path(
+        full_spec_path, round_trip=True, version=yaml.VERSION_1_2)
     validator = schema.Validator(spec_data)
     try:
       validator.Validate()

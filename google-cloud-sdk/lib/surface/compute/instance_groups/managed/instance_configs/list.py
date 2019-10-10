@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,8 +42,7 @@ class List(base.ListCommand):
         parser, operation_type='list instance configs for')
 
     parser.display_info.AddFormat('yaml')
-    parser.display_info.AddUriFunc(
-        instance_groups_utils.UriFuncForListInstanceRelatedObjects)
+    base.URI_FLAG.RemoveFromParser(parser)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())

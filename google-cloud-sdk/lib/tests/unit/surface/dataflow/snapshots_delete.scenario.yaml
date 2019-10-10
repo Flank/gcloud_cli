@@ -1,0 +1,28 @@
+title: cloud dataflow snapshot delete test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      dataflow snapshots delete foo --region us-central1
+  - stdout: |
+      {}
+actions:
+- execute_command:
+    command: |
+      dataflow snapshots delete foo --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dataflow.googleapis.com/v1b3/projects/fake-project/locations/us-central1/snapshots/foo?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

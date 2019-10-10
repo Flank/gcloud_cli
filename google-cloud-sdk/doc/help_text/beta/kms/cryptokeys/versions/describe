@@ -39,8 +39,8 @@ EXAMPLES
     The following command returns metadata for version 2 within CryptoKey frodo
     within the KeyRing fellowship in the location us-east1:
 
-        $ gcloud beta kms cryptokeys versions describe 2 --cryptokey frodo \
-            --keyring fellowship --location us-east1
+        $ gcloud beta kms cryptokeys versions describe 2 --cryptokey=frodo \
+            --keyring=fellowship --location=us-east1
 
 NOTES
     This command is an internal implementation detail and may change or

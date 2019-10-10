@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ class TargetHttpProxiesDeleteTest(test_base.BaseTest,
 
     def Transform(self, *args, **kwargs):  # pylint: disable=unused-argument
       url_map = self.uri_list.pop() if self.uri_list else 'ERROR'
-      return ('https://www.googleapis.com/compute/v1/projects/my-project'
+      return ('https://compute.googleapis.com/compute/v1/projects/my-project'
               '/global/targetHttpProxies/{0}').format(url_map)
 
   def testDeleteCompletion(self):
@@ -113,6 +113,17 @@ class TargetHttpProxiesDeleteTest(test_base.BaseTest,
         'target-http-proxy-3',
     ]
     self.RunCompletion('compute target-http-proxies delete t', uri_list)
+
+
+class TargetHttpProxiesDeleteBetaTest(TargetHttpProxiesDeleteTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_beta.targetHttpProxies
+
+  def RunDelete(self, command):
+    self.Run('beta compute target-http-proxies delete --global ' + command)
 
 
 class TargetHttpProxiesDeleteAlphaTest(TargetHttpProxiesDeleteTest):

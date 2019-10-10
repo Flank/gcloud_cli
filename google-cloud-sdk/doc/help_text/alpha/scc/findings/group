@@ -3,7 +3,7 @@ NAME
         findings and groups them by their specified properties
 
 SYNOPSIS
-    gcloud alpha scc findings group ORGANIZATION
+    gcloud alpha scc findings group [ORGANIZATION]
         [--compare-duration=COMPARE_DURATION] [--filter=FILTER]
         [--group-by=GROUP_BY] [--page-size=PAGE_SIZE] [--page-token=PAGE_TOKEN]
         [--read-time=READ_TIME] [--source=SOURCE; default="-"]
@@ -14,9 +14,9 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      Organization resource - Refers to the organization whose findings should
-     be grouped by. This represents a Cloud resource. This must be specified.
+     be grouped by. This represents a Cloud resource.
 
-       ORGANIZATION
+       [ORGANIZATION]
           ID of the organization or fully qualified identifier for the
           organization.
 
@@ -137,7 +137,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

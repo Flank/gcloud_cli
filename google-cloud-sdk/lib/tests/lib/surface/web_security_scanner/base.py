@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,6 +72,10 @@ class WebSecurityScannerScanConfigsBase(WebSecurityScannerBase):
             self.messages.ScanConfig.UserAgentValueValuesEnum.CHROME_ANDROID,
         'safari_iphone':
             self.messages.ScanConfig.UserAgentValueValuesEnum.SAFARI_IPHONE,
+    }
+    self.risk_level = {
+        'low': self.messages.ScanConfig.RiskLevelValueValuesEnum.LOW,
+        'normal': self.messages.ScanConfig.RiskLevelValueValuesEnum.NORMAL,
     }
 
   def makeScanConfigs(self, size=10):

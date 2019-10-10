@@ -45,16 +45,16 @@ FLAGS
 
      --[no-]assign-ip
         Assign an IPv4 external address to this instance. This setting is
-        enabled by default. To create an instance which only has a private IP,
-        use --no-assign-ip and specify a private network. Use --assign-ip to
-        enable and --no-assign-ip to disable.
+        enabled by default when creating a new instance, but can be disabled to
+        use private IP connectivity. Use --assign-ip to enable and
+        --no-assign-ip to disable.
 
      --async
-        Do not wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --availability-type=AVAILABILITY_TYPE
-        Specifies level of availability. Only applies to PostgreSQL instances.
-        AVAILABILITY_TYPE must be one of:
+        Specifies level of availability. AVAILABILITY_TYPE must be one of:
 
          regional
             Provides high availability and is recommended for production
@@ -153,7 +153,8 @@ FLAGS
 
      --storage-size=STORAGE_SIZE
         Amount of storage allocated to the instance. Must be an integer number
-        of GB between 10GB and 10230GB inclusive. The default is 10GB.
+        of GB. The default is 10GB. Information on storage limits can be found
+        here: https://cloud.google.com/sql/docs/quotas#storage_limits
 
      --tier=TIER, -t TIER
         The tier for this instance. For Second Generation instances, TIER is

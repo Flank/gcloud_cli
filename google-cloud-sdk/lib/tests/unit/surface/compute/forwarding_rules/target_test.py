@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class GlobalForwardingRulesSetTargetTest(test_base.BaseTest):
               project='my-project',
               targetReference=self.messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/global/targetHttpProxies/'
                       'target-http-proxy-1').format(api=self.api),
               )))],
@@ -131,7 +131,7 @@ class RegionalForwardingRulesSetTargetTest(test_base.BaseTest):
               region='us-central2',
               targetReference=self.messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/regions/us-central2/targetPools/'
                       'target-pool-1').format(api=self.api),
               )))],
@@ -154,7 +154,7 @@ class RegionalForwardingRulesSetTargetTest(test_base.BaseTest):
               region='us-central2',
               targetReference=self.messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central2-a/targetInstances/'
                       'target-instance-1').format(api=self.api),
               )))],
@@ -206,7 +206,7 @@ class RegionalForwardingRulesSetTargetTest(test_base.BaseTest):
               region='us-central2',
               targetReference=self.messages.TargetReference(
                   target=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central2-a/targetInstances/'
                       'target-instance-1').format(api=self.api),
               )))],
@@ -222,11 +222,11 @@ class RegionalForwardingRulesSetTargetTest(test_base.BaseTest):
     self.AssertErrContains('us-central2-b')
 
 
-class ForwardingRulesSetTargetTestAlpha(test_base.BaseTest):
+class ForwardingRulesSetTargetTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testBackendService(self):
     messages = self.messages
@@ -265,7 +265,7 @@ class ForwardingRulesSetTargetTestAlpha(test_base.BaseTest):
               project='my-project',
               region='us-central1',
               targetReference=self.messages.TargetReference(
-                  target=('https://www.googleapis.com/compute/{api}/projects/'
+                  target=('https://compute.googleapis.com/compute/{api}/projects/'
                           'my-project/global/targetHttpProxies/'
                           'target-http-proxy-1').format(api=self.api),)))],)
     self.AssertOutputEquals('')
@@ -285,7 +285,7 @@ class ForwardingRulesSetTargetTestAlpha(test_base.BaseTest):
               project='my-project',
               region='us-central1',
               targetReference=self.messages.TargetReference(
-                  target=('https://www.googleapis.com/compute/{api}/projects/'
+                  target=('https://compute.googleapis.com/compute/{api}/projects/'
                           'my-project/global/targetHttpsProxies/'
                           'target-https-proxy-1').format(api=self.api),)))],)
     self.AssertOutputEquals('')
@@ -305,7 +305,7 @@ class ForwardingRulesSetTargetTestAlpha(test_base.BaseTest):
               project='my-project',
               region='us-central1',
               targetReference=self.messages.TargetReference(
-                  target=('https://www.googleapis.com/compute/{api}/projects/'
+                  target=('https://compute.googleapis.com/compute/{api}/projects/'
                           'my-project/global/targetSslProxies/'
                           'target-ssl-proxy-1').format(api=self.api),)))],)
     self.AssertOutputEquals('')
@@ -325,11 +325,18 @@ class ForwardingRulesSetTargetTestAlpha(test_base.BaseTest):
               project='my-project',
               region='us-central1',
               targetReference=self.messages.TargetReference(
-                  target=('https://www.googleapis.com/compute/{api}/projects/'
+                  target=('https://compute.googleapis.com/compute/{api}/projects/'
                           'my-project/global/targetTcpProxies/'
                           'target-tcp-proxy-1').format(api=self.api),)))],)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
+
+
+class ForwardingRulesSetTargetTestAlpha(ForwardingRulesSetTargetTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

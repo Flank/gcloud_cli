@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class BackendServicesWithHealthcheckApiEditTest(test_base.BaseEditTest):
         ---
         protocol: HTTPS
         healthChecks:
-        - https://www.googleapis.com/compute/beta/projects/my-project/global/healthChecks/generic-health-check
+        - https://compute.googleapis.com/compute/beta/projects/my-project/global/healthChecks/generic-health-check
         """)])
 
     self.make_requests.side_effect = iter([
@@ -59,7 +59,7 @@ class BackendServicesWithHealthcheckApiEditTest(test_base.BaseEditTest):
         ---
         protocol: HTTPS
         healthChecks:
-        - https://www.googleapis.com/compute/beta/projects/my-project/global/healthChecks/generic-health-check
+        - https://compute.googleapis.com/compute/beta/projects/my-project/global/healthChecks/generic-health-check
         """)])
 
     yaml_contents = (edit_util.YAML_FILE_CONTENTS_HEADER +
@@ -74,7 +74,7 @@ class BackendServicesWithHealthcheckApiEditTest(test_base.BaseEditTest):
 
     updated_service = messages.BackendService(
         healthChecks=[
-            ('https://www.googleapis.com/compute/beta/projects/my-project/'
+            ('https://compute.googleapis.com/compute/beta/projects/my-project/'
              'global/healthChecks/generic-health-check')
         ],
         name='my-backend-service',

@@ -1,5 +1,5 @@
 title: dicom-stores crud test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -11,26 +11,26 @@ summary:
   - command: healthcare dicom-stores describe my-store --location us-central1 --dataset
       my-dataset
   - stdout: |
-      name: projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store
 - execute:
   - command: |
       healthcare dicom-stores update my-store --location us-central1 --dataset my-dataset
-      --pubsub-topic my-topic
+      --pubsub-topic projects/fake-project/topics/my-topic
   - stderr: |
       Updated dicomStore [my-store].
   - stdout: |
-      name: projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store
       notificationConfig:
-        pubsubTopic: my-topic
+        pubsubTopic: projects/fake-project/topics/my-topic
 - execute:
   - command: healthcare dicom-stores list --location us-central1 --dataset my-dataset
   - stdout: |
       ID          LOCATION     TOPIC
-      my-store-1  us-central1  my-topic-1
-      my-store-2  us-central1  my-topic-2
-      my-store-3  us-central1  my-topic-3
-      my-store-4  us-central1  my-topic-4
-      my-store-5  us-central1  my-topic-5
+      my-store-1  us-central1  projects/fake-project/topics/my-topic-1
+      my-store-2  us-central1  projects/fake-project/topics/my-topic-2
+      my-store-3  us-central1  projects/fake-project/topics/my-topic-3
+      my-store-4  us-central1  projects/fake-project/topics/my-topic-4
+      my-store-5  us-central1  projects/fake-project/topics/my-topic-5
 - execute:
   - command: |
       healthcare dicom-stores get-iam-policy my-store --location us-central1 --dataset my-dataset
@@ -45,13 +45,18 @@ summary:
   - stderr: |
       Deleted dicomStore [my-store].
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: healthcare dicom-stores create my-store --location us-central1 --dataset
       my-dataset
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores?alt=json&dicomStoreId=my-store
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores?alt=json&dicomStoreId=my-store
           method: POST
           headers: {}
           body: null
@@ -60,7 +65,7 @@ actions:
             status: '200'
           body: |
             {
-              "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store"
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store"
             }
     - expect_stderr: |
         Created dicomStore [my-store].
@@ -72,7 +77,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
           method: GET
           headers: {}
           body: null
@@ -81,42 +86,42 @@ actions:
             status: '200'
           body: |
             {
-              "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store"
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store"
             }
     - expect_stdout: |
-        name: projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store
     - expect_exit:
         code: 0
 - execute_command:
     command: |
       healthcare dicom-stores update my-store --location us-central1 --dataset my-dataset
-      --pubsub-topic my-topic
+      --pubsub-topic projects/fake-project/topics/my-topic
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json&updateMask=notificationConfig.pubsubTopic
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json&updateMask=notificationConfig.pubsubTopic
           method: PATCH
           headers: {}
           body:
             json:
               notificationConfig:
-                pubsubTopic: my-topic
+                pubsubTopic: projects/fake-project/topics/my-topic
         return_response:
           headers:
             status: '200'
           body: |
             {
-              "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store",
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store",
               "notificationConfig": {
-                "pubsubTopic": "my-topic"
+                "pubsubTopic": "projects/fake-project/topics/my-topic"
               }
             }
     - expect_stderr: |
         Updated dicomStore [my-store].
     - expect_stdout: |
-        name: projects/cloudsdktest/locations/us-central1/datasets/my-dataset/dicomStores/my-store
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store
         notificationConfig:
-          pubsubTopic: my-topic
+          pubsubTopic: projects/fake-project/topics/my-topic
     - expect_exit:
         code: 0
 - execute_command:
@@ -124,7 +129,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores?alt=json
           method: GET
           body: null
         return_response:
@@ -134,26 +139,26 @@ actions:
             dicomStores:
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store-1
               notificationConfig:
-                pubsubTopic: my-topic-1
+                pubsubTopic: projects/fake-project/topics/my-topic-1
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store-2
               notificationConfig:
-                pubsubTopic: my-topic-2
+                pubsubTopic: projects/fake-project/topics/my-topic-2
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store-3
               notificationConfig:
-                pubsubTopic: my-topic-3
+                pubsubTopic: projects/fake-project/topics/my-topic-3
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store-4
               notificationConfig:
-                pubsubTopic: my-topic-4
+                pubsubTopic: projects/fake-project/topics/my-topic-4
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store-5
               notificationConfig:
-                pubsubTopic: my-topic-5
+                pubsubTopic: projects/fake-project/topics/my-topic-5
     - expect_stdout: |
         ID          LOCATION     TOPIC
-        my-store-1  us-central1  my-topic-1
-        my-store-2  us-central1  my-topic-2
-        my-store-3  us-central1  my-topic-3
-        my-store-4  us-central1  my-topic-4
-        my-store-5  us-central1  my-topic-5
+        my-store-1  us-central1  projects/fake-project/topics/my-topic-1
+        my-store-2  us-central1  projects/fake-project/topics/my-topic-2
+        my-store-3  us-central1  projects/fake-project/topics/my-topic-3
+        my-store-4  us-central1  projects/fake-project/topics/my-topic-4
+        my-store-5  us-central1  projects/fake-project/topics/my-topic-5
     - expect_exit:
         code: 0
 - execute_command:
@@ -162,7 +167,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -186,7 +191,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
           method: DELETE
           headers: {}
           body: null

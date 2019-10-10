@@ -144,6 +144,13 @@ DESCRIPTION
 
         formats the data field as JSON and the info field as a boxed table.
 
+        The format attributes are:
+
+         separator
+            Separator string to print between each format. If multiple
+            resources are provided, the separator is also printed between each
+            resource.
+
      none
         Disables formatted output and consumes the resources.
 
@@ -219,10 +226,12 @@ DESCRIPTION
 
         The format attributes are:
 
-         null=string
+         null="string"
             Display string instead of null for null/None values.
          no-undefined
             Does not display resource data items with null values.
+         version=VERSION
+            Prints using the specified YAML version, default 1.2.
 
     All formats have these attributes:
 
@@ -252,7 +261,7 @@ EXAMPLES
     List a nested table of the quotas of a region:
 
         $ gcloud compute regions describe us-central1 \
-            --format="table(quotas:format="table(metric,limit,usage)")"
+            --format="table(quotas:format='table(metric,limit,usage)')"
 
     Print a flattened list of global quotas in CSV format:
 

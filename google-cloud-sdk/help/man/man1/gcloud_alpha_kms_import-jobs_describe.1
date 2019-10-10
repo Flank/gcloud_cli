@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_ALPHA_KMS_IMPORT\-JOBS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha kms import\-jobs describe \- get metadata for a given import job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha kms import\-jobs describe\fR \fIIMPORT_JOB\fR [\fB\-\-attestation\-file\fR=\fIATTESTATION_FILE\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Returns metadata for the given import job.
+
+The optional flag \f5\-\-attestation\-file\fR specifies file to write the
+attestation into. The attestation enables the user to verify the integrity and
+provenance of the key. See https://cloud.google.com/kms/docs/attest\-key for
+more information about attestations.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMPORT_JOB\fR
+Name of the import job to describe.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-attestation\-file\fR=\fIATTESTATION_FILE\fR
+Path to the output attestation file.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the import job.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the import job.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command returns metadata for import job 'strider' within the
+keyring 'fellowship' in the location 'us\-central1':
+
+.RS 2m
+$ gcloud alpha kms import\-jobs describe strider \e
+    \-\-keyring=fellowship \-\-location=us\-central1
+.RE
+
+For import jobs with protection level \f5HSM\fR, use the
+\f5\-\-attestation\-file\fR flag to save the attestation to a local file.
+
+.RS 2m
+$ gcloud alpha kms import\-jobs describe strider \e
+    \-\-keyring=fellowship \-\-location=us\-central1 \e
+    \-\-attestation\-file=path/to/attestation.dat
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta kms import\-jobs describe
+.RE
+

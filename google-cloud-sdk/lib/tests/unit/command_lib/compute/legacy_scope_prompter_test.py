@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ class EquivalenceTest(test_base.BaseTest):
     args = self._ParseArgs([resource_arg], ['fish'])
     resource_ref = resource_arg.ResolveAsResource(args, self.registry)
     self.assertEqual(
-        'https://www.googleapis.com/compute/v1/projects/atlantic/global/'
+        'https://compute.googleapis.com/compute/v1/projects/atlantic/global/'
         'backendServices/fish', resource_ref.SelfLink())
 
     prompter_ref = self.MakeCommand().CreateGlobalReference(
@@ -136,7 +136,7 @@ class EquivalenceTest(test_base.BaseTest):
     resource_ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
     self.assertEqual(
-        'https://www.googleapis.com/compute/v1/projects/atlantic/'
+        'https://compute.googleapis.com/compute/v1/projects/atlantic/'
         'regions/north-sea-1/forwardingRules/fish', resource_ref.SelfLink())
 
     command = self.MakeCommand(resource_type='forwardingRules')
@@ -159,7 +159,7 @@ class EquivalenceTest(test_base.BaseTest):
     resource_ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.ZONE)
     self.assertEqual(
-        'https://www.googleapis.com/compute/v1/projects/atlantic'
+        'https://compute.googleapis.com/compute/v1/projects/atlantic'
         '/zones/skagerrak/operations/viking',
         resource_ref.SelfLink())
 
@@ -198,7 +198,7 @@ class EquivalenceTest(test_base.BaseTest):
     self.ClearErr()
     for operation_name, resource_ref in zip(operation_names, resource_refs):
       self.assertEqual(
-          'https://www.googleapis.com/compute/v1/projects/atlantic'
+          'https://compute.googleapis.com/compute/v1/projects/atlantic'
           '/zones/{0}/operations/{1}'.format(zone, operation_name),
           resource_ref.SelfLink())
 

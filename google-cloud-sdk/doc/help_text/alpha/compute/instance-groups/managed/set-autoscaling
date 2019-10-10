@@ -15,7 +15,10 @@ SYNOPSIS
           [topic=TOPIC]]
         [--queue-scaling-single-worker-throughput=QUEUE_SCALING_SINGLE_WORKER_THROUGHPUT]
         [--remove-stackdriver-metric=METRIC] [--scale-based-on-cpu]
-        [--scale-based-on-load-balancing] [--stackdriver-metric-filter=FILTER]
+        [--scale-based-on-load-balancing]
+        [--scale-down-control=[max-scaled-down-replicas=MAX-SCALED-DOWN-REPLICAS],
+          [max-scaled-down-replicas-percent=MAX-SCALED-DOWN-REPLICAS-PERCENT],
+          [time-window=TIME-WINDOW]] [--stackdriver-metric-filter=FILTER]
         [--stackdriver-metric-single-instance-assignment=ASSIGNMENT]
         [--stackdriver-metric-utilization-target=TARGET]
         [--stackdriver-metric-utilization-target-type=TARGET_TYPE]
@@ -128,6 +131,30 @@ FLAGS
      --scale-based-on-load-balancing
         Use autoscaling based on load balancing utilization.
 
+     --scale-down-control=[max-scaled-down-replicas=MAX-SCALED-DOWN-REPLICAS],[max-scaled-down-replicas-percent=MAX-SCALED-DOWN-REPLICAS-PERCENT],[time-window=TIME-WINDOW]
+        Configuration that allows slower scale down so that even if Autoscaler
+        recommends an abrupt scale down of a managed instance group, it will be
+        throttled as specified by the parameters.
+
+         max-scaled-down-replicas
+            Maximum allowed number of VMs that can be deducted from the peak
+            recommendation during the window. Possibly all these VMs can be
+            deleted at once so user service needs to be prepared to lose that
+            many VMs in one step. Mutually exclusive with
+            'max-scaled-down-replicas-percent'.
+
+         max-scaled-down-replicas-percent
+            Maximum allowed percent of VMs that can be deducted from the peak
+            recommendation during the window. Possibly all these VMs can be
+            deleted at once so user service needs to be prepared to lose that
+            many VMs in one step. Mutually exclusive with
+            'max-scaled-down-replicas'.
+
+         time-window
+            How long back autoscaling should look when computing
+            recommendations to include directives regarding slower scale down.
+            Measured in seconds.
+
      --stackdriver-metric-filter=FILTER
         Expression for filtering samples used to autoscale, see
         https://cloud.google.com/monitoring/api/v3/filters.
@@ -204,9 +231,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instance-groups managed set-autoscaling
         $ gcloud beta compute instance-groups managed set-autoscaling

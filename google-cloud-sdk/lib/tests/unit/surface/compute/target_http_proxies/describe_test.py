@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ class TargetHttpProxiesDescribeTest(test_base.BaseTest,
         textwrap.dedent("""\
             description: My first proxy
             name: target-http-proxy-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/targetHttpProxies/target-http-proxy-1
-            urlMap: https://www.googleapis.com/compute/v1/projects/my-project/global/urlMaps/url-map-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/targetHttpProxies/target-http-proxy-1
+            urlMap: https://compute.googleapis.com/compute/v1/projects/my-project/global/urlMaps/url-map-1
             """))
 
   def testDesribeCompletion(self):
@@ -73,7 +73,18 @@ class TargetHttpProxiesDescribeTest(test_base.BaseTest,
     self.RunCompletion('compute target-http-proxies describe t', uri_list)
 
 
-class TargetHttpProxiesDescribeAlphaTest(TargetHttpProxiesDescribeTest):
+class TargetHttpProxiesDescribeBetaTest(TargetHttpProxiesDescribeTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_beta.targetHttpProxies
+
+  def RunDelete(self, command):
+    self.Run('beta compute target-http-proxies describe --global ' + command)
+
+
+class TargetHttpProxiesDescribeAlphaTest(TargetHttpProxiesDescribeBetaTest):
 
   def SetUp(self):
     self._api = 'alpha'
@@ -84,16 +95,16 @@ class TargetHttpProxiesDescribeAlphaTest(TargetHttpProxiesDescribeTest):
     self.Run('alpha compute target-http-proxies describe --global ' + command)
 
 
-class RegionTargetHttpProxiesDescribeTest(test_base.BaseTest,
-                                          completer_test_base.CompleterBase,
-                                          test_case.WithOutputCapture):
+class RegionTargetHttpProxiesDescribeBetaTest(test_base.BaseTest,
+                                              completer_test_base.CompleterBase,
+                                              test_case.WithOutputCapture):
 
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'beta'
     self.SelectApi(self._api)
-    self._target_http_proxies_api = self.compute_alpha.regionTargetHttpProxies
+    self._target_http_proxies_api = self.compute_beta.regionTargetHttpProxies
 
     self.target_http_proxies = [
         self.messages.TargetHttpProxy(
@@ -127,7 +138,7 @@ class RegionTargetHttpProxiesDescribeTest(test_base.BaseTest,
     self.list_json = list_json_patcher.start()
 
   def RunDelete(self, command):
-    self.Run('alpha compute target-http-proxies describe --region us-west-1 ' +
+    self.Run('beta compute target-http-proxies describe --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -180,6 +191,52 @@ class RegionTargetHttpProxiesDescribeTest(test_base.BaseTest,
         ],
         cli=self.cli,
     )
+
+
+class RegionTargetHttpProxiesDescribeAlphaTest(
+    RegionTargetHttpProxiesDescribeBetaTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_alpha.regionTargetHttpProxies
+
+    self.target_http_proxies = [
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-1',
+            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-1',
+            selfLink=(self.URI_PREFIX +
+                      'global/targetHttpProxies/target-http-proxy-1')),
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-2',
+            urlMap=self.URI_PREFIX + 'global/urlMaps/url-map-2',
+            selfLink=(self.URI_PREFIX +
+                      'global/targetHttpProxies/target-http-proxy-2')),
+    ]
+    self.region_target_http_proxies = [
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-3',
+            urlMap=self.URI_PREFIX + 'regions/region-1/urlMaps/url-map-3',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/targetHttpProxies/target-http-proxy-3'),
+            region='region-1'),
+        self.messages.TargetHttpProxy(
+            name='target-http-proxy-4',
+            urlMap=self.URI_PREFIX + 'regions/region-2/urlMaps/url-map-4',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-2/targetHttpProxies/target-http-proxy-4'),
+            region='region-2'),
+    ]
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+
+  def RunDelete(self, command):
+    self.Run('alpha compute target-http-proxies describe --region us-west-1 ' +
+             command)
 
 
 if __name__ == '__main__':

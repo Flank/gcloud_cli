@@ -1,0 +1,37 @@
+NAME
+    gcloud beta builds triggers import - import a build trigger
+
+SYNOPSIS
+    gcloud beta builds triggers import --source=PATH [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Import a build trigger.
+
+REQUIRED FLAGS
+     --source=PATH
+        File path where trigger should be imported from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To import a trigger from a file:        $ cat > trigger.yaml <<EOF
+        name: my-trigger
+        github:
+          owner: GoogleCloudPlatform
+          name: cloud-builders
+          push:
+            branch: .*
+        EOF
+        $ gcloud beta builds triggers import --source=trigger.yaml
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha builds triggers import
+

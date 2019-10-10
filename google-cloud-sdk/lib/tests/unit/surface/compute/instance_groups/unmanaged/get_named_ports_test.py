@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class UnmanagedInstanceGroupsGetNamedPortsTest(test_base.BaseTest):
   def testGetPortsForGroupByUri(self):
     self.Run("""
         compute instance-groups unmanaged get-named-ports
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
         """.format(API_VERSION))
     self.CheckRequests(
         [(self.compute.instanceGroups,

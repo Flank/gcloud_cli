@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta container node-pools update NAME
-        (--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+        (--node-locations=ZONE,[ZONE,...]
+          | --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
           | --enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
           | --enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -20,12 +21,24 @@ POSITIONAL ARGUMENTS
 REQUIRED FLAGS
      Exactly one of these must be specified:
 
+       --node-locations=ZONE,[ZONE,...]
+          Set of zones in which the node pool's nodes should be located.
+          Changing the locations for a node pool will result in nodes being
+          either created or removed from the node pool, depending on whether
+          locations are being added or removed.
+
+          Multiple locations can be specified, separated by commas. For
+          example:
+
+              $ gcloud beta container node-pools update node-pool-1 \
+                  --node-locations=us-central1-a,us-central1-b
+
        --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-          Type of metadata server available to pods running in the nodepool.
+          Type of metadata server available to pods running in the node pool.
           WORKLOAD_METADATA_FROM_NODE must be one of:
 
            EXPOSED
-              Pods running in this nodepool have access to the node's
+              Pods running in this node pool have access to the node's
               underlying Compute Engine Metadata Server.
            GKE_METADATA_SERVER
               Run the Kubernetes Engine Metadata Server on this node. The
@@ -70,7 +83,7 @@ REQUIRED FLAGS
        Node management
 
          --enable-autorepair
-            Enable node autorepair feature for a node-pool.
+            Enable node autorepair feature for a node pool.
 
                 $ gcloud beta container node-pools update node-pool-1 \
                     --cluster=example-cluster --enable-autorepair
@@ -80,7 +93,7 @@ REQUIRED FLAGS
             for more info.
 
          --enable-autoupgrade
-            Sets autoupgrade feature for a node-pool.
+            Sets autoupgrade feature for a node pool.
 
                 $ gcloud beta container node-pools update node-pool-1 \
                     --cluster=example-cluster --enable-autoupgrade

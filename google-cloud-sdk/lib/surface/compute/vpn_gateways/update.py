@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ from googlecloudsdk.command_lib.util.args import labels_util
 _VPN_GATEWAY_ARG = flags.GetVpnGatewayArgument()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
   r"""Update a Google Compute Engine Highly Available VPN gateway.
 
@@ -52,6 +53,15 @@ class Update(base.UpdateCommand):
     $ {parent_command} describe example-gateway --format='default(labels)'
 
   """
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To update labels for a VPN gateway, run:
+
+              $ {command} my-gateway --region=us-central1 \
+                --update-labels=k0=value1,k1=value2"""
+  }
 
   @classmethod
   def Args(cls, parser):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_NoArgs(self):
     """Test basic case of running app browse opens correct page."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app browse')
     self.launch_browser_mock.assert_called_with(True)
     self.assertEqual(self.open_mock.call_args_list, [
@@ -57,6 +58,7 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_NoLaunchBrowser(self):
     """Test when the user does not want to open the browser."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app browse --no-launch-browser')
     self.open_mock.assert_not_called()
     self.launch_browser_mock.assert_called_with(False)
@@ -65,6 +67,7 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_SpecifyVersionNoService(self):
     """Test running app browse with specific version opens correct page."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app browse -v v1')
     self.assertEqual(self.open_mock.call_args_list, [
         mock.call('https://v1-dot-{0}.appspot.com'.format(self.Project())),
@@ -72,6 +75,7 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_SpecifyServiceNoVersion(self):
     """Test running app browse with specific service opens correct page."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app browse -s service1')
     self.assertEqual(
         self.open_mock.call_args_list,
@@ -80,6 +84,7 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_SpecifyServiceAndVersion(self):
     """Test running app browse with specific service and version."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app browse --service service1 --version v2')
     self.assertEqual(self.open_mock.call_args_list, [
         mock.call('https://v2-dot-service1-dot-{0}.appspot.com'.format(
@@ -132,12 +137,25 @@ class BrowseTest(api_test_util.ApiTestBase):
         'CLOUD_SHELL': 'true',
         'DEVSHELL_CLIENT_PORT': '1000',
     })
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app browse --service service1 --version v2')
     self.assertEqual(self.open_mock.call_args_list, [
         mock.call('https://v2-dot-service1-dot-{0}.appspot.com'.format(
             self.Project())),
     ])
     self.AssertErrNotContains('Opening [')
+
+  def testBrowse_NonDefaultHostname(self):
+    """Test running app browse with a non-appspot.com hostname works."""
+    self.ExpectGetApplicationRequest(
+        self.Project(), hostname='fake-project.a.b.c.d.com')
+    self.Run('app browse --service service1 --version v2')
+    self.launch_browser_mock.assert_called_with(True)
+    self.assertEqual(self.open_mock.call_args_list, [
+        mock.call('https://v2-dot-service1-dot-{0}.a.b.c.d.com'.format(
+            self.Project())),
+    ])
+    self.AssertErrContains('Opening [')
 
 
 if __name__ == '__main__':

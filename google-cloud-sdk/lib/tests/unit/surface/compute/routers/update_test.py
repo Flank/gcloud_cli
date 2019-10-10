@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ class UpdateTestGA(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for router [my-router] '
-        '[https://www.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
@@ -216,13 +216,6 @@ class UpdateTestBeta(UpdateTestGA):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
 
-
-class UpdateTestAlpha(UpdateTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-
   def testUpdateKeepaliveInterval(self):
     self.SelectApi(self.track, self.api_version)
 
@@ -243,6 +236,13 @@ class UpdateTestAlpha(UpdateTestBeta):
         """)
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
+
+
+class UpdateTestAlpha(UpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

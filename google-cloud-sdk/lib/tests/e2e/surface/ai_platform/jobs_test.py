@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ from tests.lib import test_case
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')
-class MlJobsTests(e2e_base.WithServiceAuth):
+class MlJobsTests(e2e_base.WithServiceAuth, parameterized.TestCase):
   """e2e tests for ai-platform jobs command group."""
 
   MODEL_ID = 'do_not_delete_model'
@@ -38,14 +38,11 @@ class MlJobsTests(e2e_base.WithServiceAuth):
   BUCKET_REF = storage_util.BucketReference.FromUrl(
       'gs://cloud-sdk-integration-testing-ml')
 
-  def RunTracked(self, command):
-    return self.Run(command)
-
   @contextlib.contextmanager
-  def SubmitJob(self, type_, job_id, arguments):
+  def SubmitJob(self, type_, job_id, arguments, module_name):
     try:
-      self.RunTracked('ml-engine jobs submit {} {} {}'.format(type_, job_id,
-                                                              arguments))
+      self.Run('{} jobs submit {} {} {}'.format(module_name, type_, job_id,
+                                                arguments))
       yield
     finally:
       storage_client = storage_api.StorageClient()
@@ -67,12 +64,12 @@ class MlJobsTests(e2e_base.WithServiceAuth):
          '    --module-name trainer.task '
          '    --packages {package} '
          '    --async').format(bucket_url=self.BUCKET_REF.ToUrl(),
-                               package=package)):
+                               package=package), module_name):
       # Cancel immediately so we don't do any real work
-      self.RunTracked('{} jobs cancel '.format(module_name) + job_id)
+      self.Run('{} jobs cancel '.format(module_name) + job_id)
       # Check that the job was created
       self.ClearOutput()
-      self.RunTracked('{} jobs describe '.format(module_name) + job_id)
+      self.Run('{} jobs describe '.format(module_name) + job_id)
       self.AssertOutputContains('jobId: ' + job_id)
 
   def testJobsSubmitPrediction(self, module_name):
@@ -106,59 +103,52 @@ class MlJobsTests(e2e_base.WithServiceAuth):
              job_id=job_id,
              bucket_url=self.BUCKET_REF.ToUrl(),
              model_id=self.MODEL_ID,
-             version_id=self.VERSION_ID)):
+             version_id=self.VERSION_ID), module_name):
       # Cancel immediately so we don't do any real work
-      self.RunTracked('{} jobs cancel '.format(module_name) + job_id)
+      self.Run('{} jobs cancel '.format(module_name) + job_id)
       # Check that the job was created
       self.ClearOutput()
-      self.RunTracked('{} jobs describe '.format(module_name) + job_id)
+      self.Run('{} jobs describe '.format(module_name) + job_id)
       self.AssertOutputContains('jobId: ' + job_id)
 
-
-class MlJobsTestsBeta(MlJobsTests, parameterized.TestCase):
-
-  @contextlib.contextmanager
-  def SubmitJobBeta(self, type_, job_id, arguments, module_name):
-    try:
-      self.RunTracked('beta {} jobs submit {} {} {}'.format(
-          module_name, type_, job_id, arguments))
-      yield
-    finally:
-      storage_client = storage_api.StorageClient()
-      for obj in storage_client.ListBucket(self.BUCKET_REF):
-        if obj.name.startswith(job_id + '/'):
-          storage_client.DeleteObject(
-              storage_util.ObjectReference.FromMessage(obj))
-
-  def PreSetup(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
   def testJobsSubmitTrainingCustomServer(self, module_name):
     job_id = next(e2e_utils.GetResourceNameGenerator(prefix='ml_job',
                                                      delimiter='_'))
     package = self.Resource('tests', 'e2e', 'surface', 'ai_platform',
                             'testdata', 'trainer-0.0.0.tar.gz')
 
-    with self.SubmitJobBeta('training', job_id,
-                            ('    --staging-bucket {bucket_url} '
-                             '    --region us-central1 '
-                             '    --runtime-version 1.12 '
-                             '    --scale-tier CUSTOM  '
-                             '    --master-machine-type n1-standard-16 '
-                             '    --worker-machine-type n1-standard-16'
-                             '    --worker-count 2'
-                             '    --module-name trainer.task '
-                             '    --packages {package} '
-                             '    --async').format(
-                                 bucket_url=self.BUCKET_REF.ToUrl(),
-                                 package=package), module_name):
+    with self.SubmitJob('training', job_id,
+                        ('    --staging-bucket {bucket_url} '
+                         '    --region us-central1 '
+                         '    --runtime-version 1.12 '
+                         '    --scale-tier CUSTOM  '
+                         '    --master-machine-type n1-standard-16 '
+                         '    --worker-machine-type n1-standard-16'
+                         '    --worker-count 2'
+                         '    --module-name trainer.task '
+                         '    --packages {package} '
+                         '    --async').format(
+                             bucket_url=self.BUCKET_REF.ToUrl(),
+                             package=package), module_name):
       # Cancel immediately so we don't do any real work
-      self.RunTracked('beta {} jobs cancel '.format(module_name) + job_id)
+      self.Run('{} jobs cancel '.format(module_name) + job_id)
       # Check that the job was created
       self.ClearOutput()
-      self.RunTracked('beta {} jobs describe '.format(module_name) + job_id)
+      self.Run('{} jobs describe '.format(module_name) + job_id)
       self.AssertOutputContains('jobId: ' + job_id)
+
+
+@parameterized.parameters('ml-engine', 'ai-platform')
+class MlJobsTestsBeta(MlJobsTests, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class MlJobsTestsAlpha(MlJobsTestsBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,13 +30,14 @@ from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.command_lib.run import config_changes
-from googlecloudsdk.command_lib.run import deployable as deployable_pkg
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import serverless_operations
-from googlecloudsdk.command_lib.run import source_ref
 from googlecloudsdk.command_lib.run import stages
+from googlecloudsdk.command_lib.util.args import labels_util
+from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.console import progress_tracker
+from googlecloudsdk.core.resource import resource_lex
 from googlecloudsdk.core.util import retry
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -71,7 +72,7 @@ _FAKE_APP_ENGINE_JSON = {
 
 
 _Cond = collections.namedtuple(
-    '_Cond', ['type', 'status', 'message', 'reason'])
+    '_Cond', ['type', 'status', 'message', 'reason', 'severity'])
 
 
 class _FakeResource(object):
@@ -117,14 +118,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Condition two goes from Unknown to True, along with Ready
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', ''),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'Unknown', 'Not yet', ''),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'True', None, None),
+            _Cond('Ready', 'True', None, None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker)
@@ -148,14 +149,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Condition two goes from Unknown to False, along with Ready
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', ''),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'Unknown', 'Not yet', ''),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'False', 'Oops.', ''),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'False', 'Oops.', ''),
+            _Cond('Ready', 'False', 'Oops.', '', None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'False', 'Oops.', '', None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker)
@@ -180,18 +181,18 @@ class ConditionPollerTest(test_case.TestCase):
     # Make sure condition two doesn't Start until condition One is marked True
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', ''),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'Unknown', 'Not yet', ''),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'True', None, None),
+            _Cond('Ready', 'True', None, None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker,
-        dependencies={'two': {'one'}, 'one': set()})
+        dependencies={'two': {'one'}})
     tracker.StartStage.assert_called_once_with('one')
     tracker.CompleteStage.assert_not_called()
     self._ResetMockTracker(tracker)
@@ -203,6 +204,40 @@ class ConditionPollerTest(test_case.TestCase):
     tracker.CompleteStage.assert_called_once_with('two', None)
     tracker.UpdateHeaderMessage.assert_any_call('Done.')
 
+  def testTwoConditionsSuccessWithDepsOutOfOrder(self):
+    """Test when one stage is dependent on another to start.
+
+    In this case, test that the stages are all still tracked correctly even
+    if they are completed outside of the dependency ordering.
+    """
+    tracker = _MakeMockTracker(['one', 'two'])
+    # Make sure condition two doesn't Start until condition one is marked True
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet', '', None),
+            _Cond('one', 'Unknown', 'Not yet', '', None),
+            _Cond('two', 'True', None, None, None),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'True', None, None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker,
+        dependencies={'two': {'one'}})
+    tracker.StartStage.assert_called_once_with('one')
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.StartStage.assert_called_once_with('two')
+    tracker.CompleteStage.assert_any_call('one', None)
+    tracker.CompleteStage.assert_any_call('two', None)
+    tracker.UpdateHeaderMessage.assert_any_call('Done.')
+
   def testDontStartTilUnblockedPrevTrue(self):
     """One stage dependent on another to start, and True before that happens."""
     tracker = _MakeMockTracker(['one', 'two'])
@@ -211,19 +246,19 @@ class ConditionPollerTest(test_case.TestCase):
     # Because of the dependencies, two should not Start until the second poll.
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet', ''),
-            _Cond('one', 'Unknown', 'Not yet', ''),
-            _Cond('two', 'True', None, None),
+            _Cond('Ready', 'Unknown', 'Not yet', '', None),
+            _Cond('one', 'Unknown', 'Not yet', '', None),
+            _Cond('two', 'True', None, None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet.', None),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'Unknown', 'Working.', None),
+            _Cond('Ready', 'Unknown', 'Not yet.', None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'Unknown', 'Working.', None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'True', None, None),
+            _Cond('Ready', 'True', None, None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker, dependencies={
@@ -251,14 +286,14 @@ class ConditionPollerTest(test_case.TestCase):
     # Ready spends the first round at Unknown while both conditions are True.
     self.conditions_series = iter([
         condition.Conditions([
-            _Cond('Ready', 'Unknown', 'Not yet.', None),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'True', None, None),
+            _Cond('Ready', 'Unknown', 'Not yet.', None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
         ], ready_condition='Ready'),
         condition.Conditions([
-            _Cond('Ready', 'True', None, None),
-            _Cond('one', 'True', None, None),
-            _Cond('two', 'True', None, None),
+            _Cond('Ready', 'True', None, None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
         self._ResourceGetter, tracker)
@@ -274,6 +309,90 @@ class ConditionPollerTest(test_case.TestCase):
     self._ResetMockTracker(tracker)
     poller.Poll(None)
     tracker.UpdateHeaderMessage.assert_called_once_with('Done.')
+
+  def testStagesNotBlockedByCompletedStages(self):
+    """Test when one stage is dependent on another to start.
+
+    In this case, test that the dependent stage is started immediately if the
+    stage its waiting on is already complete where initializing the poller.
+    """
+    tracker = _MakeMockTracker(['one', 'two'])
+    # Condition one completes early, outside the poller
+    tracker.CompleteStage('one')
+    self._ResetMockTracker(tracker)
+    # Make sure condition two starts immediately
+    self.conditions_series = iter([
+        condition.Conditions([
+            _Cond('Ready', 'Unknown', 'Not yet', '', None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'Unknown', 'Not yet', '', None),
+        ], ready_condition='Ready'),
+        condition.Conditions([
+            _Cond('Ready', 'True', None, None, None),
+            _Cond('one', 'True', None, None, None),
+            _Cond('two', 'True', None, None, None),
+        ], ready_condition='Ready')])
+    poller = serverless_operations.ConditionPoller(
+        self._ResourceGetter, tracker,
+        dependencies={'two': {'one'}})
+    tracker.StartStage.assert_called_once_with('two')
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_not_called()
+    self._ResetMockTracker(tracker)
+    poller.Poll(None)
+    tracker.CompleteStage.assert_any_call('two', None)
+    tracker.UpdateHeaderMessage.assert_any_call('Done.')
+
+
+class ServiceConditionPollerGetIfProbablyNewerTest(base.ServerlessBase):
+  """Tests for ServiceConditionPoller's GetIfProbablyNewer."""
+
+  _tracker = _MakeMockTracker(['one', 'two'])
+
+  def _NewService(self, last_transition_time):
+    metadata = self.serverless_messages.ObjectMeta()
+    conditions = [self.serverless_messages.ServiceCondition(
+        lastTransitionTime=last_transition_time, status='True', type=u'Ready')]
+    status = self.serverless_messages.ServiceStatus(conditions=conditions)
+    serv = self.serverless_messages.Service(
+        apiVersion='1', metadata=metadata, status=status)
+    return service.Service(serv, self.serverless_messages)
+
+  def testServiceNotFound(self):
+    getter = lambda: None
+    with unittest_mock.patch.object(
+        stages, 'ServiceDependencies', side_effect=None):
+      poller = serverless_operations.ServiceConditionPoller(
+          getter, self._tracker, None)
+      self.assertIsNone(poller.GetConditions())
+
+  def testNotChanged(self):
+    orig = self._NewService('2019-07-23T20:10:11Z')
+    getter = lambda: orig
+    poller = serverless_operations.ServiceConditionPoller(
+        getter, self._tracker, dependencies=None, serv=orig)
+    self.assertIsNone(poller.GetConditions())
+
+  def testChanged(self):
+    orig = self._NewService('2019-07-23T20:10:11Z')
+    changed = self._NewService('2019-07-23T20:10:12Z')
+    getter = lambda: changed
+    poller = serverless_operations.ServiceConditionPoller(
+        getter, self._tracker, dependencies=None, serv=orig)
+    self.assertEqual(changed.conditions, poller.GetConditions())
+
+  def testSixSeconds(self):
+    orig = self._NewService('2019-07-23T20:10:11Z')
+    getter = lambda: orig
+    with unittest_mock.patch.object(
+        serverless_operations.ServiceConditionPoller,
+        'HaveFiveSecondsPassed', side_effect=[True]):
+
+      poller = serverless_operations.ServiceConditionPoller(
+          getter, self._tracker, serv=orig)
+      self.assertEqual(orig.conditions, poller.GetConditions())
 
 
 class ServerlessConfigurationWaitTest(base.ServerlessBase):
@@ -369,19 +488,23 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def SetUp(self):
     # Mock enabling services
-    self.enable_mock = self.StartObjectPatch(enable_api,
-                                             'EnableServiceIfDisabled')
+    self.enable_mock = self.StartObjectPatch(enable_api, 'EnableService')
     self.nonce = 'itsthenoncelol'
     self.StartObjectPatch(serverless_operations,
                           '_Nonce', return_value=self.nonce)
     self.serverless_client.WaitForCondition = unittest_mock.Mock()
     dummy_config = configuration.Configuration.New(self.mock_serverless_client,
                                                    self.Project())
-    self.is_source_branch = hasattr(dummy_config.Message().spec, 'build')
-
     self.fake_image = 'gcr.io/my-image'
-    fake_source_ref = unittest_mock.Mock(source_path=self.fake_image)
-    self.fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    self.fake_deployable = config_changes.ImageChange(self.fake_image)
+    self.old_gcloud_version = config.CLOUD_SDK_VERSION
+    config.CLOUD_SDK_VERSION = 'test_version'
+    self.poller = self.StartObjectPatch(
+        serverless_operations, 'ServiceConditionPoller')
+    self.poller.GetConditions.return_value = condition.Conditions([])
+
+  def TearDown(self):
+    config.CLOUD_SDK_VERSION = self.old_gcloud_version
 
   def _ExpectRevisionsList(self, serv_name):
     """List call for two revisions against the Serverless API."""
@@ -447,7 +570,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     delete_response = self.serverless_client.DeleteService(
         self._ServiceRef('s1'))
 
-    self.assertEquals(delete_response, None)
+    self.assertIsNone(delete_response)
 
   def testDeleteServiceNotFound(self):
     """Test the delete services api call with a non-existent service name."""
@@ -483,7 +606,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
     delete_response = self.serverless_client.DeleteRevision(revision_ref)
 
-    self.assertEquals(delete_response, None)
+    self.assertEqual(delete_response, None)
 
   def testDeleteRevisionNotFound(self):
     """Test the delete revision api call with a non-existent revision name."""
@@ -499,9 +622,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def testReleaseServiceFresh(self):
     """Test the release flow for a new service."""
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'gcr.io/fakething'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    fake_deployable = config_changes.ImageChange('gcr.io/fakething')
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
@@ -511,11 +632,9 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self._ServiceRef('foo'),
         [fake_deployable])
 
-  def testReleaseServiceAllowUnauthenticated(self):
+  def testReleaseServiceAllowUnauthenticatedNew(self):
     """Test the release flow for a new service with unauthenticated access."""
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'gcr.io/fakething'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    fake_deployable = config_changes.ImageChange('gcr.io/fakething')
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
@@ -530,11 +649,25 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         [fake_deployable],
         allow_unauthenticated=True)
 
+  def testReleaseServiceAllowUnauthenticatedRemoval(self):
+    """Test the release flow for removing unauthenticated access from a service."""
+    fake_deployable = config_changes.ImageChange('gcr.io/fakething')
+    self._ExpectCreate(
+        image='gcr.io/fakething',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+    self._ExpectGetIamPolicy('foo', bindings=[self.serverless_messages.Binding(
+        members=['allUsers'], role='roles/run.invoker')])
+    self._ExpectSetIamPolicy(service='foo', bindings=[])
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'),
+        [fake_deployable],
+        allow_unauthenticated=False)
+
   def testReleaseServiceAllowUnauthenticatedSetIamFail(self):
     """Test the release flow for a new service with unauthenticated access."""
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'gcr.io/fakething'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    fake_deployable = config_changes.ImageChange('gcr.io/fakething')
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
@@ -557,12 +690,12 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
           tracker=tracker,
           allow_unauthenticated=True)
     self.AssertErrContains('"status": "WARNING"')
-    self.assertTrue(stages.SERVICE_IAM_POLICY_SET in
-                    tracker._completed_with_warnings_stages)
+    self.assertIn(
+        stages.SERVICE_IAM_POLICY_SET, tracker._completed_with_warnings_stages)
 
   def testReleaseServiceNotFound(self):
     """Test the flow for a configuration update on a nonexistent service."""
-    env_changes = config_changes.EnvVarChanges(
+    env_changes = config_changes.EnvVarLiteralChanges(
         env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
                                                     ('key2', 'value2')]))
     # Expect that it does not exist.
@@ -579,73 +712,69 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def testReleaseServicePrivateEndpointNew(self):
     """Test the flow for releasing a new service with private endpoint."""
+    endpoint_change = config_changes.EndpointVisibilityChange(True)
     self._ExpectCreate(
         image=self.fake_image,
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
-        labels={
-            service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
+        revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [self.fake_deployable], private_endpoint=True)
+        self._ServiceRef('foo'), [self.fake_deployable, endpoint_change])
 
   def testReleaseServicePublicEndpointNew(self):
     """Test the flow for releasing a new service with public endpoint."""
+    endpoint_change = config_changes.EndpointVisibilityChange(False)
     self._ExpectCreate(
         image=self.fake_image,
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
 
     self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [self.fake_deployable], private_endpoint=False)
+        self._ServiceRef('foo'), [self.fake_deployable, endpoint_change])
 
   def testReleaseServicePublicEndpoint(self):
     """Test the flow for updating a service from private to public."""
+    endpoint_change = config_changes.EndpointVisibilityChange(False)
     self._ExpectExisting(
-        image='gcr.io/my-image',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
-        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+        image='gcr.io/oldthing',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
+        revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self._ExpectUpdate(
-        image='gcr.io/my-image',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [self.fake_deployable], private_endpoint=False)
+        self._ServiceRef('foo'), [endpoint_change])
 
-  def testReleaseServiceVisibilityUnchangedPrivate(self):
-    """Test the flow for leaving private visibility unchanged."""
-    self._ExpectExisting(
-        image='gcr.io/my-image',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
-        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
-
-    self._ExpectUpdate(
-        image='gcr.io/my-image',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
-        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
-
-    self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [self.fake_deployable])
-
-  def testReleaseServiceVisibilityUnchangedPublic(self):
-    """Test the flow for leaving public visibility unchanged."""
+  def testReleaseServicePrivateEndpoint(self):
+    """Test the flow for updating a service from public to private."""
+    endpoint_change = config_changes.EndpointVisibilityChange(True)
     self._ExpectExisting(
         image='gcr.io/my-image',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
 
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
     self._ExpectUpdate(
-        image='gcr.io/my-image',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
+        revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [self.fake_deployable])
+        self._ServiceRef('foo'), [endpoint_change])
 
   def testUpdateNoNonce(self):
     """Test the flow for update when configuration has no nonce."""
@@ -653,9 +782,9 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         image='gcr.io/oldthing',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        revision_labels={serverless_operations.NONCE_LABEL: None},
+        revision_labels={revision.NONCE_LABEL: None},
         latestCreatedRevisionName='last_revision.1',
-        env_vars={'key1': 'value1'})
+        **{'template.env_vars.literals': {'key1': 'value1'}})
 
     self._ExpectBaseRevision(
         polls=0,
@@ -669,11 +798,11 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         image='gcr.io/newthing@sha256:abcdef',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        env_vars=collections.OrderedDict(
-            [('key1', 'value1.2'), ('key2', 'value2')]),
-        latestCreatedRevisionName='last_revision.1')
+        latestCreatedRevisionName='last_revision.1',
+        **{'template.env_vars.literals': collections.OrderedDict(
+            [('key1', 'value1.2'), ('key2', 'value2')])})
 
-    env_changes = config_changes.EnvVarChanges(
+    env_changes = config_changes.EnvVarLiteralChanges(
         env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
                                                     ('key2', 'value2')]))
     self.serverless_client.ReleaseService(
@@ -687,7 +816,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         latestCreatedRevisionName='last_revision.1',
-        env_vars={'key1': 'value1'})
+        **{'template.env_vars.literals': {'key1': 'value1'}})
 
     self._ExpectBaseRevision(
         polls=0,
@@ -701,11 +830,11 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         image='gcr.io/newthing@sha256:abcdef',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        env_vars=collections.OrderedDict(
-            [('key1', 'value1.2'), ('key2', 'value2')]),
-        latestCreatedRevisionName='last_revision.1')
+        latestCreatedRevisionName='last_revision.1',
+        **{'template.env_vars.literals': collections.OrderedDict(
+            [('key1', 'value1.2'), ('key2', 'value2')])})
 
-    env_changes = config_changes.EnvVarChanges(
+    env_changes = config_changes.EnvVarLiteralChanges(
         env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
                                                     ('key2', 'value2')]))
 
@@ -732,7 +861,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         image='gcr.io/oldthing',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        env_vars={'key1': 'value1'})
+        **{'template.env_vars.literals': {'key1': 'value1'}})
     self._ExpectBaseRevision(
         polls=base_revision_polls,
         results=base_revision_results,
@@ -746,10 +875,10 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         image='gcr.io/newthing@sha256:abcdef',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        env_vars=collections.OrderedDict(
-            [('key1', 'value1.2'), ('key2', 'value2')]))
+        **{'template.env_vars.literals': collections.OrderedDict(
+            [('key1', 'value1.2'), ('key2', 'value2')])})
 
-    env_changes = config_changes.EnvVarChanges(
+    env_changes = config_changes.EnvVarLiteralChanges(
         env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
                                                     ('key2', 'value2')]))
     self.serverless_client.ReleaseService(
@@ -765,8 +894,8 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     """
     self._ExpectExisting(
         image='gcr.io/oldthing',
-        env_vars=collections.OrderedDict([
-            ('key-to-delete', 'value1'), ('key-to-preserve', 'value1')]))
+        **{'template.env_vars.literals': collections.OrderedDict([
+            ('key-to-delete', 'value1'), ('key-to-preserve', 'value1')])})
     self._ExpectBaseRevision(
         name='foo.1',
         image='gcr.io/oldthing',
@@ -777,57 +906,54 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         image='gcr.io/newthing@sha256:abcdef',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        env_vars=collections.OrderedDict([('key-to-preserve', 'value1')]))
+        **{'template.env_vars.literals': collections.OrderedDict(
+            [('key-to-preserve', 'value1')])})
 
-    env_changes = config_changes.EnvVarChanges(
+    env_changes = config_changes.EnvVarLiteralChanges(
         env_vars_to_remove=['key-to-delete', 'dummy-key-should-be-ignored'])
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'),
         [env_changes])
 
-  def testDetect(self):
-    """Adjust this test once build templates are real on the server."""
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if not self.is_source_branch:
-      return
-    s_ref = source_ref.SourceRef(source_ref.SourceRef.SourceType.DIRECTORY,
-                                 'foo/bar')
-    dep = self.serverless_client.Detect(self.namespace, s_ref)
-    self.assertEqual(dep.build_template.name, 'nodejs_8_9_4')
-    self.assertEqual(dep.deployment_type, 'app')
+  def testReleaseServiceAddRevisionName(self):
+    self._ExpectExisting(
+        image='gcr.io/oldthing')
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    self._ExpectUpdate(**{
+        'template.name': 'foo-v2',
+        'image': 'gcr.io/newthing@sha256:abcdef',
+        'annotations': {
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'}
+    })
+    revision_name_changes = config_changes.RevisionNameChanges('v2')
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'),
+        [revision_name_changes])
 
-  def testDetectContainer(self):
-    """Make sure detection can tell when we have a container."""
-    i_ref = source_ref.SourceRef(source_ref.SourceRef.SourceType.IMAGE,
-                                 'gcr.io/foo/baz:bar')
-    dep = self.serverless_client.Detect(self.namespace, i_ref)
-    self.assertEqual(dep.deployment_type, 'container')
-
-  def testDetectFunction(self):
-    """Adjust this test once build templates are real on the server."""
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if not self.is_source_branch:
-      return
-    s_ref = source_ref.SourceRef(source_ref.SourceRef.SourceType.DIRECTORY,
-                                 'foo/bar')
-    dep = self.serverless_client.Detect(self.namespace, s_ref,
-                                        function_entrypoint='thing')
-    self.assertEqual(dep.build_template.name, 'nodejs_8_9_4')
-    self.assertEqual(dep.deployment_type, 'function')
-
-  def testDetectContainerRaises(self):
-    """A container deployable cannot take a runtime or entrypoint."""
-    i_ref = source_ref.SourceRef(source_ref.SourceRef.SourceType.IMAGE,
-                                 'gcr.io/adsf/asdfafdw:asfd')
-    with self.assertRaises(serverless_exceptions.UnknownDeployableError):
-      self.serverless_client.Detect(self.namespace, i_ref,
-                                    function_entrypoint='helloworld')
+  def testReleaseServiceRemovesRevisionName(self):
+    """If no revision name is specified, the field should be cleared."""
+    self._ExpectExisting(**{
+        'template.name': 'foo-v1',
+        'image': 'gcr.io/oldthing'
+    })
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    self._ExpectUpdate(**{
+        'template.name': None,
+        'image': 'gcr.io/newthing@sha256:abcdef',
+        'annotations': {
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'}
+    })
+    self.serverless_client.ReleaseService(self._ServiceRef('foo'), [])
 
   def testReleaseServiceBadImage(self):
     """Test the delete services api call with a non-existent service name."""
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'badimage'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    fake_deployable = config_changes.ImageChange('badimage')
     self._ExpectExisting(image='gcr.io/oldthing')
     self._ExpectUpdate(
         exception=http_error.MakeDetailedHttpError(
@@ -856,9 +982,6 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def testReleaseServiceExisting(self):
     """Test the release flow when the service already exists."""
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'gcr.io/newthing'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
 
     self._ExpectExisting(
         image='gcr.io/oldthing',
@@ -870,87 +993,26 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/newthing'})
 
     self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [fake_deployable])
+        self._ServiceRef('foo'),
+        [config_changes.ImageChange('gcr.io/newthing')])
 
-  def testReleaseImageExistingApp(self):
+  def testReleaseServiceNewApi(self):
     """Test the release flow when the service already exists."""
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if not self.is_source_branch:
-      return
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'gcr.io/newthing'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
 
     self._ExpectExisting(
+        new_api=True,
         image='gcr.io/oldthing',
-        source_manifest='foobar',
-        build_template_name='blug',
-        build_template_arguments={'_IMAGE': 'gcr.io/oldthing'})
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectUpdate(
+        new_api=True,
         image='gcr.io/newthing',
         annotations={
             configuration.USER_IMAGE_ANNOTATION: 'gcr.io/newthing'})
 
     self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'), [fake_deployable])
-
-  def testReleaseAppServiceFresh(self):
-    """Test the release flow for a new service which is an app."""
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if not self.is_source_branch:
-      return
-    from googlecloudsdk.command_lib.run import source_deployable  # pylint: disable=g-import-not-at-top
-    fake_manifest_ref = unittest_mock.Mock()
-    fake_manifest_ref.url = 'fake-manifest-url'
-    fake_build_template = unittest_mock.Mock()
-    fake_build_template.name = 'fake-build-template'
-    fake_build_template.namespace = 'build-templates'
-
-    fake_deployable = source_deployable.ServerlessApp(
-        'fake_source_ref', fake_build_template)
-    fake_deployable.manifest_ref = fake_manifest_ref
-
-    self._ExpectCreate(
-        source_manifest='fake-manifest-url',
-        build_template_name='fake-build-template',
-        build_template_arguments={'_IMAGE': 'gcr.io/fake-project/foo:1'},
-        image='gcr.io/fake-project/foo:1',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fake-project/foo:1'})
-
-    self.serverless_client.ReleaseService(
         self._ServiceRef('foo'),
-        [fake_deployable])
-
-  def testReleaseFunctionServiceFresh(self):
-    """Test the release flow for a new service which is a function."""
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if not self.is_source_branch:
-      return
-    from googlecloudsdk.command_lib.run import source_deployable  # pylint: disable=g-import-not-at-top
-    fake_manifest_ref = unittest_mock.Mock()
-    fake_manifest_ref.url = 'fake-manifest-url'
-    fake_build_template = unittest_mock.Mock()
-    fake_build_template.name = 'fake-build-template'
-    fake_build_template.namespace = 'build-templates'
-
-    fake_deployable = source_deployable.ServerlessFunction(
-        'fake_source_ref', fake_build_template, 'entrypoint')
-    fake_deployable.manifest_ref = fake_manifest_ref
-
-    self._ExpectCreate(
-        source_manifest='fake-manifest-url',
-        build_template_name='fake-build-template',
-        build_template_arguments=collections.OrderedDict(
-            [('_IMAGE', 'gcr.io/fake-project/foo:1'),
-             ('_ENTRY_POINT', 'entrypoint')]),
-        image='gcr.io/fake-project/foo:1',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fake-project/foo:1'})
-
-    self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'),
-        [fake_deployable])
+        [config_changes.ImageChange('gcr.io/newthing')])
 
   def testListDomainMappings(self):
     """Test the list domainmappings api call."""
@@ -1006,9 +1068,67 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self.mock_serverless_client.namespaces_domainmappings.Get.Expect(
         get_request,
         response=gotten_domain_mapping.Message())
-    records = self.serverless_client.CreateDomainMapping(
+    mapping = self.serverless_client.CreateDomainMapping(
         self._DomainmappingRef('foo'), 'myapp')
-    self.assertEqual(records[0].rrdata, '216.239.32.21')
+    self.assertEqual(mapping.records[0].rrdata, '216.239.32.21')
+
+  def testUpdateLabels(self):
+    """Test updating labels on an existing service."""
+    label_changes = config_changes.LabelChanges(
+        labels_util.Diff(additions={'key2': 'value2'}))
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        labels=collections.OrderedDict([('key1', 'value1')]),
+        revision_labels=collections.OrderedDict([('key1', 'value1')]))
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        labels=collections.OrderedDict([('key1', 'value1'),
+                                        ('key2', 'value2')]),
+        revision_labels=collections.OrderedDict([('key1', 'value1'),
+                                                 ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [label_changes])
+
+  def testReleaseServiceMalformedLabel(self):
+    """Test release services api call with a bad label key."""
+    fake_label_changes = config_changes.LabelChanges(
+        labels_util.Diff(additions={'_BAD/LABEL_': 'somevalue'}))
+    self._ExpectExisting(image='gcr.io/oldthing')
+    self._ExpectBaseRevision(
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    self._ExpectUpdate(
+        exception=http_error.MakeDetailedHttpError(
+            400,
+            url='https://dummy_url.com/',
+            content={
+                'error': {
+                    'code': 400,
+                    'message': 'The request has errors.',
+                    'status': 'INVALID_ARGUMENT',
+                    'details': [{
+                        '@type': 'type.googleapis.com/google.rpc.BadRequest',
+                        'fieldViolations': [{
+                            'field': 'label',
+                            'description': 'standin error string',
+                        }]}]}}),
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        labels={'_BAD/LABEL_': 'somevalue'},
+        revision_labels={'_BAD/LABEL_': 'somevalue'})
+
+    with self.assertRaisesRegexp(
+        serverless_exceptions.MalformedLabelError,
+        '^standin error string$'):
+      self.serverless_client.ReleaseService(
+          self._ServiceRef('foo'), [fake_label_changes])
 
   def testDeleteDomainMappings(self):
     """Test the delete domainmappings api call."""
@@ -1023,24 +1143,62 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
     self.assertEqual(delete_response, None)
 
-  def _MakeService(self, **kwargs):
+  def _MakeService(self, new_api=False, **kwargs):
+    """Set specified attributes of the service.
+
+    If the given attribute does not exist on the root service, it will be
+    applied to service's metadata, template, or status if the attribute is found
+    to exist there.
+
+    You can manually apply the attribute to somewhere other than the root
+    service with dot notation in your key. For example, to modify the 'name'
+    attribute of the service's template, pass 'template.name' as the key.
+
+    Args:
+      new_api: bool, True if service uses the new api
+      **kwargs: named attributes and their values
+
+    Returns:
+      The created service.Service
+    """
     new_service = service.Service.New(
         self.mock_serverless_client, self.namespace.namespacesId)
+    if new_api:
+      new_service.spec.template = (
+          new_service.spec.runLatest.configuration.revisionTemplate)
+      new_service.spec.runLatest = None
     new_service.name = 'foo'
-    new_conf = new_service.configuration
-    new_conf.revision_labels[serverless_operations.NONCE_LABEL] = self.nonce
+    new_service.annotations[
+        serverless_operations._CLIENT_NAME_ANNOTATION] = 'gcloud'
+    new_service.annotations[
+        serverless_operations._CLIENT_VERSION_ANNOTATION] = 'test_version'
     for k, v in kwargs.items():
-      obj = new_conf
-      if hasattr(new_service.metadata, k):
-        obj = new_service  # k is a metadata attribute, not a spec attribute
-      elif hasattr(new_service.status, k):
-        obj = new_service.status  # k is a status attribute not a spec attribute
+      obj = new_service
+      parsed_key = resource_lex.Lexer(k).Key()
+      key = parsed_key[0]
+      if len(parsed_key) > 1:
+        while len(parsed_key) > 1:
+          obj = getattr(obj, parsed_key[0])
+          key = parsed_key[1]
+          parsed_key = parsed_key[1:]
+      else:
+        if hasattr(new_service, key):
+          pass
+        elif hasattr(new_service.metadata, key):
+          obj = new_service.metadata  # key is a metadata attribute
+        elif hasattr(new_service.template, key):
+          obj = new_service.template  # key is a template attribute
+        elif hasattr(new_service.status, key):
+          obj = new_service.status  # key is a status attribute
       if isinstance(v, dict):
-        dict_like = getattr(obj, k)
+        dict_like = getattr(obj, key)
         for kk, vv in v.items():
           dict_like[kk] = vv
       else:
-        setattr(obj, k, v)
+        setattr(obj, key, v)
+    if revision.NONCE_LABEL not in new_service.template.labels:
+      new_service.template.labels[
+          revision.NONCE_LABEL] = self.nonce
     return new_service
 
   def _MakeRevision(self, **kwargs):
@@ -1094,7 +1252,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
       else:
         done = _SeekAndModify(rev.Message(), k, v)
         assert done, 'Failed to set field {}'.format(k)
-    rev.labels[serverless_operations.NONCE_LABEL] = self.nonce
+    rev.labels[revision.NONCE_LABEL] = self.nonce
     return rev
 
   def _ExpectCreate(self, **kwargs):
@@ -1160,7 +1318,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
           (self.serverless_messages.
            RunNamespacesRevisionsListRequest(
                parent=self.namespace.RelativeName(),
-               labelSelector='{} = {}'.format(serverless_operations.NONCE_LABEL,
+               labelSelector='{} = {}'.format(revision.NONCE_LABEL,
                                               self.nonce))),
           response=(
               self.serverless_messages.ListRevisionsResponse(
@@ -1172,17 +1330,6 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
            RunNamespacesRevisionsGetRequest(
                name=self._RevisionRef(rev.name).RelativeName())),
           response=rev.Message())
-
-
-class UploadSourceTest(base.ServerlessBase):
-  """Tests upload source calls."""
-
-  def testUpload(self):
-
-    fake_source_ref = unittest_mock.Mock()
-    fake_source_ref.source_path = 'gcr.io/newthing'
-    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
-    self.serverless_client.Upload(fake_deployable)
 
 
 if __name__ == '__main__':

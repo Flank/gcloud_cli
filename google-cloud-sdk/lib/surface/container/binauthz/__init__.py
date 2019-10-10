@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(
+    base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class Binauthz(base.Group):
   r"""Manage attestations for Binary Authorization on Google Cloud Platform.
 
@@ -84,7 +85,7 @@ class Binauthz(base.Group):
 
         ```sh
         {command} attestations create \
-          --pgp-key-fingerprint=${KEY_FINGERPRINT} \
+          --public-key-id=${KEY_FINGERPRINT} \
           --signature-file=example_signature.pgp \
           --artifact-url="${ARTIFACT_URL}" \
           --attestor=${ATTESTOR_NAME}

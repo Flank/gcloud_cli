@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,10 +59,10 @@ client [kubectl]. To install, run
   $ gcloud components install kubectl
 """
 
+# Subcommand list can still be executed, but will be marked/handled as
+# deprecated until removed.
 SUBCOMMAND_DEPRECATION = [
-    'initdb',
-    'resetdb',
-    'upgradedb',
+    # No subcommands currently in a deprecated state.
 ]
 
 SUBCOMMAND_WHITELIST = [

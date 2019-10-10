@@ -38,6 +38,9 @@ COMMANDS
      describe
         (BETA) Show metadata for a project.
 
+     get-ancestors
+        (BETA) Get the ancestors for a project.
+
      get-iam-policy
         (BETA) Get IAM policy for a project.
 

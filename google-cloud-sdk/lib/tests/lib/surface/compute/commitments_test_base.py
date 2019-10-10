@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class TestBase(compute_test_base.BaseTest):
         plan=self.messages.Commitment.PlanValueValuesEnum.TWELVE_MONTH,
         resources=resources)
 
-    if self.api_version == 'alpha':
+    if self.api_version == 'alpha' or self.api_version == 'beta':
       commitment.type = self.messages.Commitment.TypeValueValuesEnum.GENERAL_PURPOSE
 
     if reservations:

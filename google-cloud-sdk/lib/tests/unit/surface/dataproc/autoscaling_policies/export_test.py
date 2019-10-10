@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import unit_base
 
 
-class AutoscalingPoliciesExportUnitTestBeta(unit_base.DataprocUnitTestBase):
+class AutoscalingPoliciesExportUnitTest(unit_base.DataprocUnitTestBase):
   """Tests for dataproc autoscaling-policies export."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testExportAutoscalingPolicies(self):
     mocked_response = self.MakeAutoscalingPolicy('fake-project', 'global',
@@ -113,11 +113,16 @@ class AutoscalingPoliciesExportUnitTestBeta(unit_base.DataprocUnitTestBase):
     self.AssertMessagesEqual(expected_policy, exported_message)
 
 
-class AutoscalingPoliciesExportUnitTestAlpha(
-    AutoscalingPoliciesExportUnitTestBeta):
+class AutoscalingPoliciesExportUnitTestAlpha(AutoscalingPoliciesExportUnitTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class AutoscalingPoliciesExportUnitTestBeta(AutoscalingPoliciesExportUnitTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

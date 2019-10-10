@@ -26,6 +26,9 @@ GROUPS
      instances
         (BETA) Manage Cloud Bigtable instances.
 
+     operations
+        (BETA) Manage Cloud Bigtable operations.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

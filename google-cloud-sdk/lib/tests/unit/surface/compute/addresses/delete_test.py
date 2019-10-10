@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -78,9 +78,9 @@ class AddressesDeleteTest(test_base.BaseTest):
     properties.VALUES.core.disable_prompts.Set(True)
     self.Run("""
       compute addresses delete
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
         address-2
-        --region https://www.googleapis.com/compute/v1/projects/my-project/regions/region-2
+        --region https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-2
       """)
 
     self.CheckRequests(
@@ -213,7 +213,7 @@ class GlobalAddressesDeleteTest(test_base.BaseTest):
   def testMultipleAddressSupport(self):
     self.Run("""\
       compute addresses delete
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/address-1
         address-2
         --global
       """)
@@ -240,7 +240,7 @@ class GlobalAddressesDeleteTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""\
       compute addresses delete
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/address-1
       """)
 
     self.CheckRequests(

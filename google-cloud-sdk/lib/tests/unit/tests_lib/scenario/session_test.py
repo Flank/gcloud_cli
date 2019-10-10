@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -865,7 +865,7 @@ class SessionUpdateTests(_SessionTestsBase):
   'events':
    - 'expect_stdout': 'foo'
     """
-    data = yaml.load(data_string, round_trip=True)
+    data = yaml.load(data_string, round_trip=True, version=yaml.VERSION_1_2)
     ce = schema.CommandExecutionAction.FromData(data)
     with self.Execute(ce, update_modes=[updates.Mode.RESULT,
                                         updates.Mode.UX,

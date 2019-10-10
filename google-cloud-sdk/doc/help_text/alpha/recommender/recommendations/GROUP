@@ -21,6 +21,9 @@ COMMANDS
      create-rule
         (ALPHA) Create a Rule from the recommendation.
 
+     describe
+        (ALPHA) Describe a recommendation for a Cloud project.
+
      list
         (ALPHA) Lists recommendations for a Cloud project.
 
@@ -29,11 +32,12 @@ COMMANDS
         on a recommendation in DISMISSED state.
 
      mark-claimed
-        (ALPHA) Mark the Recommendation State as Claimed. Users can use this
-        method to. indicate to the Recommender API that they are starting to
-        apply the recommendation themselves. This stops the recommendation
-        content from being updated. mark-claimed can be applied to
-        recommendations in CLAIMED, or ACTIVE state.
+        (ALPHA) Mark the Recommendation State as CLAIMED. Can only be performed
+        on recommendations in CLAIMED or ACTIVE state.
+
+     mark-dismissed
+        (ALPHA) Mark the Recommendation State as DISMISSED. Can only be
+        performed on recommendations in ACTIVE state.
 
      mark-failed
         (ALPHA) Mark a recommendation's state as FAILED. mark-failed can be
@@ -46,10 +50,10 @@ COMMANDS
         state.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta recommender recommendations
 

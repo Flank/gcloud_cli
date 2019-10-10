@@ -3,16 +3,13 @@ NAME
         public key on an Attestor
 
 SYNOPSIS
-    gcloud beta container binauthz attestors public-keys update
-        PUBLIC_KEY_FINGERPRINT --attestor=ATTESTOR [--comment=COMMENT]
-        [--public-key-file=PUBLIC_KEY_FILE] [GCLOUD_WIDE_FLAG ...]
-
-DESCRIPTION
-    (BETA) Update a public key on an Attestor.
+    gcloud beta container binauthz attestors public-keys update PUBLIC_KEY_ID
+        --attestor=ATTESTOR [--comment=COMMENT]
+        [--pgp-public-key-file=PGP_PUBLIC_KEY_FILE] [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
-     PUBLIC_KEY_FINGERPRINT
-        The fingerprint of the public key to update.
+     PUBLIC_KEY_ID
+        The ID of the public key to update.
 
 REQUIRED FLAGS
      Attestor resource - The attestor on which the public key should be
@@ -29,8 +26,8 @@ OPTIONAL FLAGS
      --comment=COMMENT
         The comment describing the public key.
 
-     --public-key-file=PUBLIC_KEY_FILE
-        The path to the file containing the new ASCII-armored PGP public key.
+     --pgp-public-key-file=PGP_PUBLIC_KEY_FILE
+        The path to a file containing the updated ASCII-armored PGP public key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -39,9 +36,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To update a PGP public key on an existing Attestor my_attestor:
 
+        $ gcloud beta container binauthz attestors public-keys update \
+            0638AADD940361EA2D7F14C58C124F0E663DA097 \
+            --attestor=my_attestor \
+            --pgp-public-key-file=my_key.pub
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud container binauthz attestors public-keys update
         $ gcloud alpha container binauthz attestors public-keys update
 

@@ -1,0 +1,56 @@
+NAME
+    gcloud alpha build-artifacts print-settings - print snippets to add to
+        native tools settings files
+
+SYNOPSIS
+    gcloud alpha build-artifacts print-settings COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The snippets provides credentials placeholder and configurations to
+    allow native tools to interact with Cloud Build Artifacts repositories.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     gradle
+        (ALPHA) Print a snippet to add a repository to the Gradle build.gradle
+        file.
+
+     maven
+        (ALPHA) Print a snippet to add a Maven repository to the pom.xml file.
+
+     npm
+        (ALPHA) Print credential settings to add to the .npmrc file.
+
+EXAMPLES
+    To print a snippet to add a repository to the Gradle build.gradle file for
+    repository my-repo in the current project, run:
+
+        $ gcloud alpha build-artifacts print-settings gradle \
+          --repository=my-repo
+
+    To print a snippet to add to the Maven pom.xml file for repository my-repo
+    in the current project, run:
+
+        $ gcloud alpha build-artifacts print-settings maven \
+          --repository=my-repo
+
+    To print a snippet to add to the npm .npmrc file for repository my-repo in
+    the current project, run:
+
+        $ gcloud alpha build-artifacts print-settings npm \
+          --repository=my-repo
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

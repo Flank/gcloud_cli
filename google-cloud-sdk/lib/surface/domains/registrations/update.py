@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class Update(base.UpdateCommand):
     resource_args.AddRegistrationResourceArg(parser, 'to update')
     flags.AddRegistrationSettingsFlagsToParser(parser)
     flags.AddValidateOnlyFlagToParser(parser, 'update')
-    flags.AddAsyncFlagToParser(parser, 'update')
+    flags.AddAsyncFlagToParser(parser)
     labels_util.AddUpdateLabelsFlags(parser)
 
   def Run(self, args):
@@ -82,7 +82,7 @@ class Update(base.UpdateCommand):
       # TODO(b/110077203): Log something sensible.
       return
 
-    if args.async:
+    if args.async_:
       # TODO(b/110077203): Log something sensible.
       return response
 

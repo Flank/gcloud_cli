@@ -46,7 +46,7 @@ COMMANDS
         (BETA) Get the IAM policy for a Google Compute Engine image.
 
      import
-        (BETA) Import an image into Google Compute Engine.
+        (BETA) Import an image into Compute Engine.
 
      list
         (BETA) List Google Compute Engine images.

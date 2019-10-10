@@ -4,9 +4,10 @@ NAME
 SYNOPSIS
     gcloud dns managed-zones create ZONE_NAME --description=DESCRIPTION
         --dns-name=DNS_NAME [--denial-of-existence=DENIAL_OF_EXISTENCE]
-        [--dnssec-state=DNSSEC_STATE] [--ksk-algorithm=KSK_ALGORITHM]
-        [--ksk-key-length=KSK_KEY_LENGTH] [--labels=[KEY=VALUE,...]]
-        [--networks=[NETWORK,...]] [--visibility=VISIBILITY; default="public"]
+        [--dnssec-state=DNSSEC_STATE] [--forwarding-targets=[IP_ADDRESSES,...]]
+        [--ksk-algorithm=KSK_ALGORITHM] [--ksk-key-length=KSK_KEY_LENGTH]
+        [--labels=[KEY=VALUE,...]] [--networks=[NETWORK,...]]
+        [--visibility=VISIBILITY; default="public"]
         [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -38,6 +39,12 @@ OPTIONAL FLAGS
             Enable DNSSEC for the managed zone.
          transfer
             Enable DNSSEC and allow transferring a signed zone in or out.
+
+     --forwarding-targets=[IP_ADDRESSES,...]
+        List of IPv4 addresses of target name servers that the zone will
+        forward queries to. Ignored for public visibility. Non-RFC1918
+        addresses will forward to the target through the Internet. RFC1918
+        addresses will forward through the VPC.
 
      --ksk-algorithm=KSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the key-signing key.
@@ -87,7 +94,8 @@ EXAMPLES
             --description "My zone!"
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns managed-zones create
         $ gcloud beta dns managed-zones create
 

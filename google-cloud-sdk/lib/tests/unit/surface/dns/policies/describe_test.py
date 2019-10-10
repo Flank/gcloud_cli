@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,16 +22,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.dns import base
-from tests.lib.surface.dns import util_beta
+from tests.lib.surface.dns import util
 
 
-class DescribeTest(base.DnsMockBetaTest):
+class DescribeTest(base.DnsMockTest):
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def testDescribe(self):
-    expected_output = util_beta.GetPolicies(networks=[], num=1).pop()
+    expected_output = util.GetPolicies(networks=[], num=1).pop()
     describe_req = self.messages.DnsPoliciesGetRequest(
         project=self.Project(), policy='mypolicy0')
     self.client.policies.Get.Expect(

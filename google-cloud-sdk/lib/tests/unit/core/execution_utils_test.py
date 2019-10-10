@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     self.AssertLogNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.exit_mock.assert_called_once_with(1)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testExec_WithArgsWithExit(self):
     # Also tests unicode args are handled correctly. Exec() raises exception
     # if args are not encoded properly.

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,11 +61,19 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
         name=sub_ref.RelativeName(),
         topic=topic_ref.RelativeName(),
         ackDeadlineSeconds=20,
-        labels=labels
-    )
+        enableMessageOrdering=True,
+        deadLetterPolicy=self.msgs.DeadLetterPolicy(
+            deadLetterTopic='topic2', maxDeliveryAttempts=5),
+        labels=labels)
     self.subscriptions_service.Create.Expect(subscription, subscription)
-    result = self.subscriptions_client.Create(sub_ref, topic_ref, 20,
-                                              labels=labels)
+    result = self.subscriptions_client.Create(
+        sub_ref,
+        topic_ref,
+        20,
+        labels=labels,
+        enable_message_ordering=True,
+        dead_letter_topic='topic2',
+        max_delivery_attempts=5)
     self.assertEqual(result, subscription)
 
   def testDelete(self):
@@ -175,22 +183,27 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
         pushConfig=push_config,
         retainAckedMessages=True,
         labels=labels,
-        messageRetentionDuration='30s')
+        messageRetentionDuration='30s',
+        deadLetterPolicy=self.msgs.DeadLetterPolicy(
+            deadLetterTopic='topic3', maxDeliveryAttempts=100))
     self.subscriptions_service.Patch.Expect(
         self.msgs.PubsubProjectsSubscriptionsPatchRequest(
             updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
                 subscription=subscription,
                 updateMask=('ackDeadlineSeconds,pushConfig,'
                             'retainAckedMessages,messageRetentionDuration,'
-                            'labels')),
-            name=sub_ref.RelativeName()),
-        subscription)
-    result = self.subscriptions_client.Patch(sub_ref,
-                                             ack_deadline=20,
-                                             push_config=push_config,
-                                             retain_acked_messages=True,
-                                             message_retention_duration='30s',
-                                             labels=labels)
+                            'labels,'
+                            'deadLetterPolicy')),
+            name=sub_ref.RelativeName()), subscription)
+    result = self.subscriptions_client.Patch(
+        sub_ref,
+        ack_deadline=20,
+        push_config=push_config,
+        retain_acked_messages=True,
+        message_retention_duration='30s',
+        dead_letter_topic='topic3',
+        max_delivery_attempts=100,
+        labels=labels)
     self.assertEqual(result, subscription)
 
   def testPatch_MessageRetentionDefault(self):
@@ -210,6 +223,21 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
         sub_ref,
         ack_deadline=20,
         message_retention_duration='default')
+    self.assertEqual(result, subscription)
+
+  def testPatch_ClearDeadLetterPolicy(self):
+    sub_ref = util.ParseSubscription('sub1', self.Project())
+    args = MockArgs()
+    args.push_endpoint = 'endpoint'
+    subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(), deadLetterPolicy=None)
+    self.subscriptions_service.Patch.Expect(
+        self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+            updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+                subscription=subscription, updateMask=('deadLetterPolicy')),
+            name=sub_ref.RelativeName()), subscription)
+    result = self.subscriptions_client.Patch(
+        sub_ref, clear_dead_letter_policy=True)
     self.assertEqual(result, subscription)
 
 

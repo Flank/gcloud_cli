@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class ConnectorsDeleteTestBeta(base.VpcAccessUnitTestBase):
+class ConnectorsDeleteTestGa(base.VpcAccessUnitTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def testConnectorsDelete(self):
     self._ExpectDelete()
@@ -58,7 +58,7 @@ class ConnectorsDeleteTestBeta(base.VpcAccessUnitTestBase):
     self.AssertErrContains('Delete request issued for: [{}]'
                            .format(self.connector_id))
     self.AssertErrContains('Check operation [{}] for status.'
-                           .format(self.operation_id))
+                           .format(self.operation_relative_name))
 
   def testConnectorsDelete_UsingRelativeConnectorName(self):
     self._ExpectDelete()
@@ -91,7 +91,14 @@ class ConnectorsDeleteTestBeta(base.VpcAccessUnitTestBase):
         response=operation)
 
 
-class ConnectorsDeleteTestAlpha(ConnectorsDeleteTestBeta):
+class ConnectorsDeleteTestBeta(ConnectorsDeleteTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
+
+
+class ConnectorsDeleteTestAlpha(ConnectorsDeleteTestGa):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

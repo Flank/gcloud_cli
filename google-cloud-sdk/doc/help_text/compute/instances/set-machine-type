@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud compute instances set-machine-type INSTANCE_NAME
         [--machine-type=MACHINE_TYPE] [--zone=ZONE]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
-          : --custom-extensions] [GCLOUD_WIDE_FLAG ...]
+          : --custom-extensions --custom-vm-type=CUSTOM_VM_TYPE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute instances set-machine-type allows you to change the machine
@@ -37,13 +38,13 @@ FLAGS
         Either this flag, --custom-cpu, or --custom-memory must be specified.
 
      --zone=ZONE
-        Zone of the instance to operate on. If not specified, you may be
+        Zone of the instance to operate on. If not specified, the user may be
         prompted to select a zone. gcloud will attempt to identify the zone by
-        searching for resources in your project. If the zone cannot be
-        determined, you will then be prompted with all Google Cloud Platform
-        zones.
+        searching for resources in the user's project. If the zone cannot be
+        determined, the user will then be prompted with all Google Cloud
+        Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE
@@ -74,6 +75,13 @@ FLAGS
 
        --custom-extensions
           Use the extended custom machine type.
+
+       --custom-vm-type=CUSTOM_VM_TYPE
+          Specifies VM type. n1 - VMs with CPU platforms Skylake and older, n2
+          - VMs with CPU platform Cascade Lake. n2 offers flexible sizing from
+          2 to 80 vCPUs, and 1 to 640GBs of memory. It also features a number
+          of performance enhancements including exposing a more accurate NUMA
+          topology to the guest OS. The default is n1.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

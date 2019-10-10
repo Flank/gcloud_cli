@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -309,7 +309,7 @@ required: [request, help_text, arguments]
 properties:
 
   # Determines whether the command is visible in help text or not.
-  is_hidden: {type: boolean}
+  hidden: {type: boolean}
 
   # Determines which release tracks this command implementation will apply to.
   release_tracks:
@@ -497,6 +497,9 @@ properties:
       api_version: {type: string}
       # The API method to call to get the operation ('get' by default).
       method: {type: string}
+      # The message to print when the request is issued. The default depends on
+      # the command type.
+      request_issued_message: {type: string}
       # The field in the operation message that corresponds to the operation's
       # full name ('name' by default). Not used by Wait commands.
       response_name_field: {type: string}
@@ -635,6 +638,13 @@ properties:
       params:
         type: array
         items: {$ref: "#/definitions/argument"}
+      labels:
+        type: object
+        additionalProperties: false
+        description: Handles resource labels for resource create/update (go/api-label)
+        required: [api_field]
+        properties:
+          api_field: {type: string}
 
   # Information about how to collect input from the user.
   input:
@@ -653,7 +663,8 @@ properties:
     properties:
       # Corresponds to the default output format setting on the command.
       format: {type: string}
-
+      # Corresponds to the default output flatten setting on the command.
+      flatten: {type: array}
 
   # Additional information for handling the IAM Commands.
   iam:
@@ -674,6 +685,10 @@ properties:
       # The indicator for IAM condition. If True, the command can accept condition
       # as part of a IAM policy binding. Default is False.
       enable_condition: {type: boolean}
+      # Override policy version. Default is None.
+      policy_version: {type: number}
+      # Path to the policy_version field for APIs that use non-standard mapping.
+      get_iam_policy_version_path: {type: string}
 
   # Additional information for handling the update commands.
   update:

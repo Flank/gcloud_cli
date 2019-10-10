@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +18,20 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.services import services_util
+from googlecloudsdk.api_lib.services import serviceusage
 from tests.lib.surface.services import unit_test_base
 
 
-class ServicesUtilTest(unit_test_base.SV1UnitTestBase):
-  """Unit tests for services_util module."""
-  # All tests were removed from this module because they tested functionality
-  # removed from services_util. However, it would probably be a good idea
-  # to add tests for the process operation result stuff.
-  # from googlecloudsdk.api_lib.services import services_util
+class WaitOperationTest(unit_test_base.SUUnitTestBase):
+  """Unit tests for WaitOperation."""
 
+  def testWaitOperation(self):
+    """Test WaitOperation returns operation when successful."""
+    op_name = 'operations/abc.0000000000'
+    want = self.services_messages.Operation(name=op_name, done=True)
+    self.ExpectOperation(op_name, 3)
+
+    got = services_util.WaitOperation(op_name, serviceusage.GetOperation)
+
+    self.assertEqual(got, want)

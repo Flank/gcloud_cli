@@ -2,7 +2,7 @@ NAME
     gcloud compute networks update - update a Google Compute Engine network
 
 SYNOPSIS
-    gcloud compute networks update NAME
+    gcloud compute networks update NAME [--async]
         [--bgp-routing-mode=MODE | --switch-to-custom-subnet-mode]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -15,6 +15,10 @@ POSITIONAL ARGUMENTS
         Name of the network to operate on.
 
 FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
      At most one of these may be specified:
 
        --bgp-routing-mode=MODE

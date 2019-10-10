@@ -53,7 +53,8 @@ summary:
         value: d
 - execute:
   - command: ml vision product-search products update my-product --location=us-east1
-      --remove-product-labels=a=b,c=d --add-product-labels=a=d,g=f --description=new-des --display-name=new-display-name
+      --remove-product-labels=a=b,c=d --add-product-labels=a=d,g=f --description=new-des
+      --display-name=new-display-name
   - stderr: |
       Updated product [my-product].
   - stdout: |
@@ -290,7 +291,8 @@ actions:
         code: 0
 - execute_command:
     command: ml vision product-search products update my-product --location=us-east1
-      --remove-product-labels=a=b,c=d --add-product-labels=a=d,g=f --description=new-des --display-name=new-display-name
+      --remove-product-labels=a=b,c=d --add-product-labels=a=d,g=f --description=new-des
+      --display-name=new-display-name
     events:
     - api_call:
         expect_request:

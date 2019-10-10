@@ -7,13 +7,25 @@ summary:
       filestore snapshots create snap --instance inst --instance-zone us-central1-c --file-share
           fs --region us-east1
   - stderr: |
-      Create request issued for: [snap]
+      Create request issued
   - progress_tracker:
-    - message: Waiting for operation [operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc]
+    - message: Waiting for operation [projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc]
         to complete
     - status: SUCCESS
   - stderr: |
-      Created snapshot [snap].
+      Created snapshot.
+- execute:
+  - command: |
+      filestore snapshots create snap --instance inst --instance-zone us-central1-c --file-share
+          fs --local
+  - stderr: |
+      Create request issued
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created snapshot.
 actions:
 - execute_command:
     command: |
@@ -47,7 +59,7 @@ actions:
             }
 
     - expect_stderr: |
-        Create request issued for: [snap]
+        Create request issued
     - api_call:
         expect_request:
           uri: https://file.googleapis.com/v1p1alpha1/projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc?alt=json
@@ -82,20 +94,91 @@ actions:
 
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc]
+        message: Waiting for operation [projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550805714653-5827317bcd024-08a6d1ed-cadb37dc]
           to complete
         status: SUCCESS
+    - expect_stderr: |
+        Created snapshot.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      filestore snapshots create snap --instance inst --instance-zone us-central1-c --file-share
+          fs --local
+    events:
     - api_call:
         expect_request:
-          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-east1/snapshots/snap?alt=json
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-c/snapshots?alt=json&snapshotId=snap
+          method: POST
+          headers: {}
+          body:
+            json:
+              sourceFileShare: fs
+              sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst
+              local: true
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1-c/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-06T21:42:28.645947585Z",
+                "target": "projects/fake-project/locations/us-central1-c/snapshots/snap",
+                "verb": "create",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+
+    - expect_stderr: |
+        Create request issued
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-c/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             status: '200'
-          body: null
+          body: |
+            {
+            "name": "projects/fake-project/locations/us-central1-c/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605",
+            "metadata": {
+              "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+              "createTime": "2019-06-06T21:42:28.645947585Z",
+              "endTime": "2019-06-06T21:43:51.483007971Z",
+              "target": "projects/fake-project/locations/us-central1-c/snapshots/snap",
+              "verb": "create",
+              "cancelRequested": false,
+              "apiVersion": "v1p1alpha1"
+            },
+            "done": true,
+            "response": {
+              "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+              "name": "projects/fake-project/locations/us-central1-c/snapshots/snap",
+              "description": "my new snapshot",
+              "state": "READY",
+              "createTime": "2019-06-06T21:42:28.607941384Z",
+              "capacityGb": "1024",
+              "storageBytes": "1024000000000",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/test",
+              "sourceFileShare": "my_vol",
+              "local": true,
+              "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/operation-1559857348545-58aae97290b73-d174d104-c9bb8605]
+          to complete
+        status: SUCCESS
     - expect_stderr: |
-        Created snapshot [snap].
+        Created snapshot.
     - expect_exit:
         code: 0

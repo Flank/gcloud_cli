@@ -29,6 +29,9 @@ COMMANDS
      create-app-engine-task
         (BETA) Create and add a task that targets App Engine.
 
+     create-http-task
+        (BETA) Create and add a task that targets a HTTP endpoint.
+
      delete
         (BETA) Delete a task from a queue.
 

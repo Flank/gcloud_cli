@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -134,6 +134,8 @@ class UpdateBeta(Update):
 
     flags.AddWorkloadMetadataFromNodeFlag(group)
 
+    flags.AddNodePoolLocationsFlag(group)
+
   def ParseUpdateNodePoolOptions(self, args):
     ops = api_adapter.UpdateNodePoolOptions(
         enable_autorepair=args.enable_autorepair,
@@ -142,7 +144,8 @@ class UpdateBeta(Update):
         max_nodes=args.max_nodes,
         min_nodes=args.min_nodes,
         enable_autoprovisioning=args.enable_autoprovisioning,
-        workload_metadata_from_node=args.workload_metadata_from_node)
+        workload_metadata_from_node=args.workload_metadata_from_node,
+        node_locations=args.node_locations)
     return ops
 
 
@@ -162,7 +165,13 @@ class UpdateAlpha(Update):
     autoscaling_group = flags.AddClusterAutoscalingFlags(group, hidden=False)
     flags.AddNodePoolAutoprovisioningFlag(autoscaling_group, hidden=True)
 
+    surge_upgrade_group = group.add_argument_group('Upgrade settings')
+    flags.AddSurgeUpgradeFlag(surge_upgrade_group, for_node_pool=True)
+    flags.AddMaxUnavailableUpgradeFlag(surge_upgrade_group, for_node_pool=True)
+
     flags.AddWorkloadMetadataFromNodeFlag(group)
+
+    flags.AddNodePoolLocationsFlag(group)
 
   def ParseUpdateNodePoolOptions(self, args):
     ops = api_adapter.UpdateNodePoolOptions(
@@ -172,7 +181,10 @@ class UpdateAlpha(Update):
         max_nodes=args.max_nodes,
         min_nodes=args.min_nodes,
         enable_autoprovisioning=args.enable_autoprovisioning,
-        workload_metadata_from_node=args.workload_metadata_from_node)
+        workload_metadata_from_node=args.workload_metadata_from_node,
+        node_locations=args.node_locations,
+        max_surge_upgrade=args.max_surge_upgrade,
+        max_unavailable_upgrade=args.max_unavailable_upgrade)
     return ops
 
 

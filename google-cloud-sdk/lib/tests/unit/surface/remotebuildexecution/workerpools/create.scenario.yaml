@@ -8,12 +8,11 @@ summary:
   - stderr: |
       Create request issued for: [new_pool]
   - progress_tracker:
-    - message: Waiting for operation [create_operation_id]
+    - message: Waiting for operation [projects/fake-project/operations/create_operation_id]
         to complete
     - status: SUCCESS
   - stderr: |
       Created workerpool [new_pool].
-
 actions:
 - execute_command:
     command: |
@@ -62,7 +61,8 @@ actions:
                 "workerConfig": {
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
-                  "diskSizeGb": "200"
+                  "diskSizeGb": "200",
+                  "networkAccess": "public"
                 },
                 "workerCount": "4",
                 "state": "RUNNING"
@@ -70,7 +70,7 @@ actions:
             }
 
     - expect_progress_tracker:
-        message: Waiting for operation [create_operation_id]
+        message: Waiting for operation [projects/fake-project/operations/create_operation_id]
           to complete
         status: SUCCESS
     - api_call:
@@ -88,7 +88,8 @@ actions:
               "workerConfig": {
                 "machineType": "n1-standard-2",
                 "diskType": "pd-standard",
-                "diskSizeGb": "200"
+                "diskSizeGb": "200",
+                "networkAccess": "public"
               },
               "workerCount": "4",
               "state": "RUNNING"

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,9 +50,9 @@ INSTANCE = MESSAGES.Instance(
             ],),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=("https://www.googleapis.com/compute/v1/projects/my-project/"
+    selfLink=("https://compute.googleapis.com/compute/v1/projects/my-project/"
               "zones/zone-1/instances/instance-1"),
-    zone=("https://www.googleapis.com/compute/v1/projects/my-project/"
+    zone=("https://compute.googleapis.com/compute/v1/projects/my-project/"
           "zones/zone-1"))
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,5 +58,5 @@ class WaitAlpha(base.Command):
     Returns:
       If successful, the response from the operations.Get API call.
     """
-    op = serviceusage.WaitOperation(args.operation)
+    op = services_util.WaitOperation(args.operation, serviceusage.GetOperation)
     services_util.PrintOperation(op)

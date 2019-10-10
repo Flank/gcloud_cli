@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,8 +26,10 @@ import threading
 import traceback
 
 from googlecloudsdk.api_lib.compute import iap_tunnel_websocket_utils as utils
+from googlecloudsdk.core import context_aware
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
+import six
 
 import websocket
 
@@ -49,7 +51,8 @@ class WebSocketSendError(exceptions.Error):
 class IapTunnelWebSocketHelper(object):
   """Helper class for common operations on websocket and related metadata."""
 
-  def __init__(self, url, headers, ignore_certs, proxy_info, on_data, on_close):
+  def __init__(
+      self, url, headers, ignore_certs, proxy_info, on_data, on_close):
     self._on_data = on_data
     self._on_close = on_close
     self._proxy_info = proxy_info
@@ -61,6 +64,13 @@ class IapTunnelWebSocketHelper(object):
     if ignore_certs:
       self._sslopt['cert_reqs'] = ssl.CERT_NONE
       self._sslopt['check_hostname'] = False
+
+    caa_config = context_aware.Config()
+    if caa_config.use_client_certificate:
+      cert_path = caa_config.client_cert_path
+      log.debug('Using client certificate %s', cert_path)
+      self._sslopt['certfile'] = cert_path
+      self._sslopt['password'] = caa_config.client_cert_password
 
     # Disable most of random logging in websocket library itself
     logging.getLogger('websocket').setLevel(logging.CRITICAL)
@@ -116,13 +126,17 @@ class IapTunnelWebSocketHelper(object):
 
   def SendClose(self):
     """Send WebSocket Close message if possible."""
-    if self._websocket.sock:
+    # Save self._websocket.sock, because some other thread could set it to None
+    # while this function is executing.
+    sock = self._websocket.sock
+    if sock:
       log.debug('CLOSE')
       try:
-        self._websocket.sock.send_close()
+        sock.send_close()
       except (EnvironmentError,
               websocket.WebSocketConnectionClosedException) as e:
-        log.info('Unable to send WebSocket Close message [%s].', str(e))
+        log.info('Unable to send WebSocket Close message [%s].',
+                 six.text_type(e))
         self.Close()
       except:  # pylint: disable=bare-except
         log.info('Error during WebSocket send of Close message.', exc_info=True)
@@ -168,7 +182,7 @@ class IapTunnelWebSocketHelper(object):
                                           opcode)
       self._on_data(binary_data)
     except EnvironmentError as e:
-      log.info('Error [%s] while sending to client.', str(e))
+      log.info('Error [%s] while sending to client.', six.text_type(e))
       self.Close()
       raise
     except:  # pylint: disable=bare-except
@@ -183,7 +197,7 @@ class IapTunnelWebSocketHelper(object):
       log.info('Error during WebSocket processing:\n' +
                ''.join(traceback.format_exception_only(type(exception_obj),
                                                        exception_obj)))
-      self._error_msg = str(exception_obj)
+      self._error_msg = six.text_type(exception_obj)
 
   def _ReceiveFromWebSocket(self):
     """Receive data from WebSocket connection."""
@@ -202,5 +216,18 @@ class IapTunnelWebSocketHelper(object):
         self._websocket.run_forever(origin=TUNNEL_CLOUDPROXY_ORIGIN,
                                     sslopt=self._sslopt)
     except:  # pylint: disable=bare-except
-      log.info('Error while receiving from WebSocket.', exc_info=True)
-    self.Close()
+      try:
+        log.info('Error while receiving from WebSocket.', exc_info=True)
+      except:
+        # This is a daemon thread, so it could be running while the interpreter
+        # is exiting, so logging could fail. At that point the only thing to do
+        # is ignore the exception. Ideally we would make this a non-daemon
+        # thread.
+        pass
+    try:
+      self.Close()
+    except:  # pylint: disable=bare-except
+      try:
+        log.info('Error while closing in receiving thread.', exc_info=True)
+      except:
+        pass

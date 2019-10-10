@@ -42,6 +42,10 @@ FLAGS
             5 Gbit/s
          10g
             10 Gbit/s
+         20g
+            20 Gbit/s
+         50g
+            50 Gbit/s
 
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.

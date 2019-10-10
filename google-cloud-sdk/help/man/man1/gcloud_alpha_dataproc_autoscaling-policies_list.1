@@ -15,12 +15,6 @@ gcloud alpha dataproc autoscaling\-policies list \- list autoscaling policies
 
 
 
-.SH "DESCRIPTION"
-
-\fB(ALPHA)\fR List autoscaling policies.
-
-
-
 .SH "FLAGS"
 
 .RS 2m
@@ -28,11 +22,8 @@ gcloud alpha dataproc autoscaling\-policies list \- list autoscaling policies
 \fB\-\-region\fR=\fIREGION\fR
 Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
 independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. The default value of \f5global\fR is a special
-multi\-region namespace which is capable of deploying instances into all Compute
-Engine zones globally, and is disjoint from other Cloud Dataproc regions.
-Overrides the default \fBdataproc/region\fR property value for this command
-invocation.
+Engine zones inside the region. Overrides the default \fBdataproc/region\fR
+property value for this command invocation.
 
 
 .RE
@@ -87,15 +78,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+The following command lists all autoscaling policies in the project:
+
+.RS 2m
+$ gcloud alpha dataproc autoscaling\-policies list
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud dataproc autoscaling\-policies list
 $ gcloud beta dataproc autoscaling\-policies list
 .RE
 

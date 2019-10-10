@@ -1,5 +1,5 @@
 title: Jobs Describe Test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -13,7 +13,7 @@ summary:
       timeZone: utc
       userUpdateTime: '2017-01-01T00:00:00Z'
 - execute:
-  - command: scheduler jobs describe http://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job
+  - command: scheduler jobs describe http://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job
   - stdout: |
       httpTarget:
         uri: http://www.example.com/endpoint
@@ -39,7 +39,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -54,7 +54,7 @@ actions:
                 cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
           method: GET
           headers: {}
           body: null
@@ -81,11 +81,11 @@ actions:
         code: 0
 - execute_command:
     label: test describe uri
-    command: scheduler jobs describe http://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job
+    command: scheduler jobs describe http://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
           method: GET
           headers: {}
           body: null
@@ -116,7 +116,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json
           method: GET
           headers: {}
           body: null

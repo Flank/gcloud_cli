@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -722,6 +722,45 @@ class DisksCreateTestAlpha(DisksCreateTestBeta):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
 
+  def testCreateDiskEraseVss(self):
+    self.Run("""
+        compute disks create hamlet --zone central2-a \
+        --erase-windows-vss-signature
+    """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.disks,
+          'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='hamlet',
+                  sizeGb=500,
+                  eraseWindowsVssSignature=True
+              ),
+              project='my-project',
+              zone='central2-a'))])
+
+  def testCreateDiskSourceDisk(self):
+    self.Run("""
+        compute disks create testdisk --zone central2-a
+         --source-disk source --source-disk-zone central2-b
+    """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.disks,
+          'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='testdisk',
+                  sourceDisk=self.compute_uri +
+                  '/projects/my-project/zones/'
+                  'central2-b/disks/source'
+              ),
+              project='my-project',
+              zone='central2-a'))])
+
 
 class DisksCreateTestWithCsekKeys(test_base.BaseTest):
 
@@ -1313,8 +1352,8 @@ class RegionalDisksCreateTestGA(test_base.BaseTest):
     ])
     self.Run("""
         compute disks create
-        https://www.googleapis.com/compute/{version}/projects/project-1/regions/central2/disks/disk-1
-        https://www.googleapis.com/compute/{version}/projects/project-2/regions/central2/disks/disk-1
+        https://compute.googleapis.com/compute/{version}/projects/project-1/regions/central2/disks/disk-1
+        https://compute.googleapis.com/compute/{version}/projects/project-2/regions/central2/disks/disk-1
         --region central2
         --replica-zones central2-b,central2-c
         """.format(version=self.api_version))
@@ -1733,7 +1772,7 @@ class DisksCreateWithLicensesTest(test_base.BaseTest):
 
   def testSingleLicense(self):
     licenses = [
-        'https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+        'https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
         'global/licenses/rhel-6-server'
     ]
     self.Run("""
@@ -1753,11 +1792,11 @@ class DisksCreateWithLicensesTest(test_base.BaseTest):
 
   def testMultipleLicenses(self):
     licenses = [
-        'https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+        'https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
         'global/licenses/rhel-6-server',
-        'https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+        'https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
         'global/licenses/rhel-7-server',
-        'https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+        'https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
         'global/licenses/rhel-8-server',
     ]
     self.Run("""
@@ -1801,7 +1840,7 @@ class DisksCreateTestWithResourcePoliciesBeta(disks_test_base.TestBase):
                   name='disk-with-backup',
                   sizeGb=500,
                   resourcePolicies=[
-                      'https://www.googleapis.com/compute/{0}/projects/'
+                      'https://compute.googleapis.com/compute/{0}/projects/'
                       '{1}/regions/central2/resourcePolicies/my-policy'.format(
                           self.api_version, self.Project())
                   ]),
@@ -1822,10 +1861,10 @@ class DisksCreateTestWithResourcePoliciesBeta(disks_test_base.TestBase):
                   name='disk-with-backup',
                   sizeGb=500,
                   resourcePolicies=[
-                      'https://www.googleapis.com/compute/{0}/projects/'
+                      'https://compute.googleapis.com/compute/{0}/projects/'
                       '{1}/regions/central2/resourcePolicies/pol1'.format(
                           self.api_version, self.Project()),
-                      'https://www.googleapis.com/compute/{0}/projects/'
+                      'https://compute.googleapis.com/compute/{0}/projects/'
                       '{1}/regions/central2/resourcePolicies/pol2'.format(
                           self.api_version, self.Project())
                   ]),
@@ -1854,7 +1893,7 @@ class DisksCreateTestWithResourcePoliciesBeta(disks_test_base.TestBase):
                  name='disk-1',
                  sizeGb=500,
                  resourcePolicies=[
-                     'https://www.googleapis.com/compute/{}/projects/'
+                     'https://compute.googleapis.com/compute/{}/projects/'
                      'my-project/regions/central2/resourcePolicies/pol1'.format(
                          self.api_version)
                  ],

@@ -26,14 +26,12 @@ gcloud alpha compute instances set\-iam\-policy \- set IAM policy for a Google C
 .RS 2m
 .TP 2m
 
-Instance resource \- Instance resource \- The instance to set the IAM policy of.
-The arguments in this group can be used to specify the attributes of this
-resource. The arguments in this group can be used to specify the attributes of
-this resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: provide the argument
-[instance] on the command line with a fully specified name; set the property
-[core/project]; provide the argument [\-\-project] on the command line. This
-must be specified.
+Instance resource \- The instance to set the IAM policy of. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [instance] on the command
+line with a fully specified name; set the property [core/project]; provide the
+argument [\-\-project] on the command line. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -95,9 +93,8 @@ role and member types.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute instances set\-iam\-policy

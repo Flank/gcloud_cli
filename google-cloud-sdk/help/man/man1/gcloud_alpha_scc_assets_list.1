@@ -11,7 +11,7 @@ gcloud alpha scc assets list \- list Cloud Security Command Center assets
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scc assets list\fR \fIORGANIZATION\fR [\fB\-\-compare\-duration\fR=\fICOMPARE_DURATION\fR] [\fB\-\-field\-mask\fR=\fIFIELD_MASK\fR] [\fB\-\-order\-by\fR=\fIORDER_BY\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-read\-time\fR=\fIREAD_TIME\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scc assets list\fR [\fIORGANIZATION\fR] [\fB\-\-compare\-duration\fR=\fICOMPARE_DURATION\fR] [\fB\-\-field\-mask\fR=\fIFIELD_MASK\fR] [\fB\-\-order\-by\fR=\fIORDER_BY\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-read\-time\fR=\fIREAD_TIME\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,12 +26,12 @@ gcloud alpha scc assets list \- list Cloud Security Command Center assets
 .RS 2m
 .TP 2m
 
-Organization resource \- The organization to be used for the SCC command. This
-represents a Cloud resource. This must be specified.
+Organization resource \- The organization to be used for the SCC (Security
+Command Center) command. This represents a Cloud resource.
 
 .RS 2m
 .TP 2m
-\fIORGANIZATION\fR
+[\fIORGANIZATION\fR]
 ID of the organization or fully qualified identifier for the organization.
 
 
@@ -206,7 +206,6 @@ $ gcloud alpha scc assets list 123456 \-\-compare\-duration 86400s
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

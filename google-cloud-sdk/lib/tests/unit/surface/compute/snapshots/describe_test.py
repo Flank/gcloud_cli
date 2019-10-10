@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ class SnapshotsDescribeTest(test_base.BaseTest,
         textwrap.dedent("""\
             diskSizeGb: '10'
             name: snapshot-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/disks/disk-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
+            sourceDisk: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/disks/disk-1
             status: READY
             """))
 

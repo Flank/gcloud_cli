@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,8 +101,8 @@ class SubnetsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         beta compute networks subnets list --uri
         """)
     self.AssertOutputEquals("""\
-https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet1
-https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet2
+https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet1
+https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet2
 """,
                             normalize_space=True)
 
@@ -111,7 +111,7 @@ https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/su
         beta compute networks subnets list --filter network:my-network --uri
         """)
     self.AssertOutputEquals("""\
-https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet1
+https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet1
 """,
                             normalize_space=True)
 
@@ -120,7 +120,7 @@ https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/su
         beta compute networks subnets list --network my-network --uri
         """)
     self.AssertOutputEquals("""\
-https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet1
+https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/subnetworks/my-subnet1
 """,
                             normalize_space=True)
 

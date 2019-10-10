@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from apitools.base.py import exceptions as api_exceptions
+from apitools.base.py import exceptions as apitools_exceptions
+from apitools.base.py import http_wrapper
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import http
@@ -55,9 +56,17 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
     properties.VALUES.core.should_prompt_to_enable_api.Set(True)
 
     service_enablement = {'enabled': False}
+    service_enabled_mock = self.StartPatch(
+        'googlecloudsdk.api_lib.services.enable_api.'
+        'IsServiceEnabled')
+    def IsServiceEnabled(enable_project, enable_service):
+      self.assertEqual(enable_project, self.project)
+      self.assertEqual(enable_service, self.service)
+      return service_enablement['enabled']
+    service_enabled_mock.side_effect = IsServiceEnabled
     enable_mock = self.StartPatch(
         'googlecloudsdk.api_lib.services.enable_api.'
-        'EnableServiceIfDisabled')
+        'EnableService')
     def Enable(enable_project, enable_service):
       self.assertEqual(enable_project, self.project)
       self.assertEqual(enable_service, self.service)
@@ -103,6 +112,36 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
 
     enable_mock.assert_called_once_with(self.project, self.service)
 
+  def testRequestEnablementPromptsOnlyOnce(self):
+    properties.VALUES.core.should_prompt_to_enable_api.Set(True)
+
+    prompt_to_enable_mock = self.StartPatch(
+        'googlecloudsdk.api_lib.util.apis.'
+        'PromptToEnableApi')
+
+    service_enabled_response = http_wrapper.Response({'status': '200'},
+                                                     '{"field": "abc"}', '')
+    service_disabled_response = http_wrapper.Response({'status': '403'},
+                                                      textwrap.dedent("""\
+      {{
+       "error": {{
+        "code": 403,
+        "message": "{message}",
+        "status": "PERMISSION_DENIED"
+       }}
+      }}""").format(message=self.message), '')
+
+    callback = apis.CheckResponseForApiEnablement()
+    callback(service_disabled_response)
+    # Catch two retries while we wait for enablement propagation
+    with self.AssertRaisesExceptionMatches(apitools_exceptions.RequestError,
+                                           'Retry'):
+      callback(service_disabled_response)
+      callback(service_disabled_response)
+    callback(service_enabled_response)
+    prompt_to_enable_mock.assert_called_once_with(self.project, self.service,
+                                                  mock.ANY)
+
   def NoEnableApiBaseTest(self):
     # pylint: disable=unused-argument
     def Perform(arg, method, body, headers, redirections, connection_type):
@@ -125,7 +164,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
     client = apis.GetClientInstance('dataproc', 'v1')
     messages = client.MESSAGES_MODULE
 
-    with self.AssertRaisesExceptionMatches(api_exceptions.HttpError,
+    with self.AssertRaisesExceptionMatches(apitools_exceptions.HttpError,
                                            self.message):
       client.projects_regions_jobs.Get(
           messages.DataprocProjectsRegionsJobsGetRequest(

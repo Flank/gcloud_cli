@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha spanner databases execute-sql (DATABASE : --instance=INSTANCE)
         --sql=SQL [--enable-partitioned-dml]
-        [--query-mode=QUERY_MODE; default="NORMAL"] [GCLOUD_WIDE_FLAG ...]
+        [--query-mode=QUERY_MODE; default="NORMAL"]
+        [--timeout=TIMEOUT; default="10m"] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Executes a SQL query against a Cloud Spanner database.
@@ -49,6 +50,10 @@ OPTIONAL FLAGS
             Returns both the query plan and the execution statistics along with
             the result rows.
 
+     --timeout=TIMEOUT; default="10m"
+        Maximum time to wait for the SQL query to complete. See $ gcloud topic
+        datetimes for information on duration formats.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -66,9 +71,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud spanner databases execute-sql
         $ gcloud beta spanner databases execute-sql

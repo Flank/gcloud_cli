@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,11 +34,31 @@ class ListServicesPermissionDeniedException(Error):
   pass
 
 
+class GetServicePermissionDeniedException(Error):
+  pass
+
+
+class CreateQuotaOverridePermissionDeniedException(Error):
+  pass
+
+
+class UpdateQuotaOverridePermissionDeniedException(Error):
+  pass
+
+
+class DeleteQuotaOverridePermissionDeniedException(Error):
+  pass
+
+
 class CreateConnectionsPermissionDeniedException(Error):
   pass
 
 
 class ListConnectionsPermissionDeniedException(Error):
+  pass
+
+
+class GenerateServiceIdentityPermissionDeniedException(Error):
   pass
 
 

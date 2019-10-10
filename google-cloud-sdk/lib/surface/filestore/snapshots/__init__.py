@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,11 +28,15 @@ class Snapshots(base.Group):
 
   ## EXAMPLES
 
-  To create an snapshot with the name 'my-snapshot', run:
+  To create a snapshot with the name 'my-snapshot', run:
 
     $ {command} create my-snapshot
 
-  To delete an snapshot with the name 'my-snapshot', run:
+  To create a local snapshot with the name 'my-snapshot', run:
+
+    $ {command} create my-snapshot --local
+
+  To delete a snapshot with the name 'my-snapshot', run:
 
     $ {command} delete my-snapshot
 

@@ -41,7 +41,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Do not wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --host=HOST
         If set, this invalidation will apply only to requests to the specified

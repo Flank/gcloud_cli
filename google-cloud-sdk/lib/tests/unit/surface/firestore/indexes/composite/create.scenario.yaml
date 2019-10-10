@@ -9,7 +9,8 @@ summary:
   - stderr: |
       Create request issued
   - progress_tracker:
-    - message: Waiting for operation [9999] to complete
+    - message: Waiting for operation [projects/fake-project/databases/(default)/operations/9999]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created index [CICAgPigl4sK].
@@ -20,7 +21,7 @@ summary:
       --async
   - stderr: |
       Create request issued
-      Check operation [9999] for status.
+      Check operation [projects/fake-project/databases/(default)/operations/9999] for status.
 - execute:
   - command: |
       firestore indexes composite create --collection-group=Events --field-config
@@ -120,7 +121,8 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [9999] to complete
+        message: Waiting for operation [projects/fake-project/databases/(default)/operations/9999]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created index [CICAgPigl4sK].
@@ -161,7 +163,7 @@ actions:
             }
     - expect_stderr: |
         Create request issued
-        Check operation [9999] for status.
+        Check operation [projects/fake-project/databases/(default)/operations/9999] for status.
     - expect_exit:
         code: 0
 - execute_command:

@@ -1,0 +1,32 @@
+title: Data Catalog delete entry group scenario test.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog entry-groups delete group1 --location=us-central1
+  - prompt:
+    - message: You are about to delete entry group [group1]
+    - input: y
+  - stderr: |
+      Deleted entry group [group1].
+actions:
+- execute_command:
+    command: data-catalog entry-groups delete group1 --location=us-central1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete entry group [group1]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups/group1?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {}
+    - expect_stderr: |
+        Deleted entry group [group1].
+    - expect_exit:
+        code: 0

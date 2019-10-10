@@ -11,7 +11,7 @@ gcloud alpha compute instances set\-scheduling \- set scheduling options for Goo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances set\-scheduling\fR \fIINSTANCE_NAME\fR [\fB\-\-min\-node\-cpus\fR=\fIMIN_NODE_CPUS\fR] [\fB\-\-[no\-]restart\-on\-failure\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,6 +37,11 @@ Name of the instance to operate on.
 
 .RS 2m
 .TP 2m
+\fB\-\-min\-node\-cpus\fR=\fIMIN_NODE_CPUS\fR
+Minimum number of virtual CPUs this instance will consume when running on a
+sole\-tenant node.
+
+.TP 2m
 \fB\-\-[no\-]restart\-on\-failure\fR
 The instances will be restarted if they are terminated by Compute Engine. This
 does not affect terminations performed by the user. Use
@@ -45,12 +50,12 @@ to disable.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-Zone of the instance to operate on. If not specified, you may be prompted to
-select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
-resources in your project. If the zone cannot be determined, you will then be
-prompted with all Google Cloud Platform zones.
+Zone of the instance to operate on. If not specified, the user may be prompted
+to select a zone. \f5gcloud\fR will attempt to identify the zone by searching
+for resources in the user's project. If the zone cannot be determined, the user
+will then be prompted with all Google Cloud Platform zones.
 
-To avoid prompting when this flag is omitted, you can set the
+To avoid prompting when this flag is omitted, the user can set the
 \f5\fIcompute/zone\fR\fR property:
 
 .RS 2m
@@ -134,9 +139,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute instances set\-scheduling

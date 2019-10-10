@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -212,6 +212,33 @@ class ResourceArgCompletersTest(
         command='beta bigtable instances get-iam-policy', arg='instance')
     self.AssertCommandArgResourceCompleter(
         command='beta bigtable instances set-iam-policy', arg='instance')
+
+  def testTableCommandCompletersExist(self):
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables add-iam-policy-binding',
+        arg='table')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables add-iam-policy-binding',
+        arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables get-iam-policy', arg='table')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables get-iam-policy',
+        arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables remove-iam-policy-binding',
+        arg='table')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables remove-iam-policy-binding',
+        arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables set-iam-policy', arg='table')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances tables set-iam-policy',
+        arg='--instance')
 
   def testClusterCommandCompletersExist(self):
     self.AssertCommandArgResourceCompleter(

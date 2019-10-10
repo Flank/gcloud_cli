@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -512,6 +512,7 @@ class InstanceTemplatesCreateFromContainerTest(
     ])
     self.Run("""
         compute instance-templates create-with-container it-1
+          --custom-vm-type n2
           --custom-cpu 10
           --custom-memory 1000MiB
           --container-image=gcr.io/my-docker/test-image
@@ -527,7 +528,7 @@ class InstanceTemplatesCreateFromContainerTest(
                       canIpForward=False,
                       disks=[self.default_attached_disk],
                       labels=self.default_labels,
-                      machineType='custom-10-1000',
+                      machineType='n2-custom-10-1000',
                       metadata=self.default_metadata,
                       networkInterfaces=[self.default_network_interface],
                       scheduling=m.Scheduling(automaticRestart=True),

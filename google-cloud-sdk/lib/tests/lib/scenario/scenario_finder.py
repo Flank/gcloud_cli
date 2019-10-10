@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ def _MatchesPrefix(prefixes, relative_path):
 
 def LoadYAMLFile(path):
   full_path = sdk_test_base.SdkBase.Resource(path)
-  return yaml.load_path(full_path, round_trip=True)
+  return yaml.load_path(full_path, round_trip=True, version=yaml.VERSION_1_2)
 
 
 def GetTracks(spec_data):

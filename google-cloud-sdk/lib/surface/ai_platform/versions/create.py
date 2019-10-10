@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ class CreateGA(base.CreateCommand):
         staging_bucket=args.staging_bucket,
         runtime_version=args.runtime_version,
         config_file=args.config,
-        asyncronous=args.async,
+        asyncronous=args.async_,
         description=args.description,
         labels=labels,
         framework=framework,
@@ -121,45 +121,6 @@ class CreateGA(base.CreateCommand):
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(CreateGA):
-  """Create a new AI Platform version.
-
-  Creates a new version of an AI Platform model.
-
-  For more details on managing AI Platform models and versions see
-  https://cloud.google.com/ml-engine/docs/how-tos/managing-models-jobs
-  """
-
-  @staticmethod
-  def Args(parser):
-    _AddCreateArgs(parser)
-    flags.AddMachineTypeFlagToParser(parser)
-    flags.AddUserCodeArgs(parser)
-
-  def Run(self, args):
-    versions_client = versions_api.VersionsClient()
-    labels = versions_util.ParseCreateLabels(versions_client, args)
-    framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
-    return versions_util.Create(
-        versions_client,
-        operations.OperationsClient(),
-        args.version,
-        model=args.model,
-        origin=args.origin,
-        staging_bucket=args.staging_bucket,
-        runtime_version=args.runtime_version,
-        config_file=args.config,
-        asyncronous=args.async,
-        description=args.description,
-        labels=labels,
-        machine_type=args.machine_type,
-        framework=framework,
-        python_version=args.python_version,
-        prediction_class=args.prediction_class,
-        package_uris=args.package_uris)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(base.CreateCommand):
   """Create a new AI Platform version.
 
   Creates a new version of an AI Platform model.
@@ -181,6 +142,42 @@ class CreateAlpha(base.CreateCommand):
     labels = versions_util.ParseCreateLabels(versions_client, args)
     framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
     accelerator = flags.ParseAcceleratorFlag(args.accelerator)
+    return versions_util.Create(
+        versions_client,
+        operations.OperationsClient(),
+        args.version,
+        model=args.model,
+        origin=args.origin,
+        staging_bucket=args.staging_bucket,
+        runtime_version=args.runtime_version,
+        config_file=args.config,
+        asyncronous=args.async_,
+        description=args.description,
+        labels=labels,
+        machine_type=args.machine_type,
+        framework=framework,
+        python_version=args.python_version,
+        service_account=args.service_account,
+        prediction_class=args.prediction_class,
+        package_uris=args.package_uris,
+        accelerator_config=accelerator)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(CreateBeta):
+  """Create a new AI Platform version.
+
+  Creates a new version of an AI Platform model.
+
+  For more details on managing AI Platform models and versions see
+  https://cloud.google.com/ml-engine/docs/how-tos/managing-models-jobs
+  """
+
+  def Run(self, args):
+    versions_client = versions_api.VersionsClient()
+    labels = versions_util.ParseCreateLabels(versions_client, args)
+    framework = flags.FRAMEWORK_MAPPER.GetEnumForChoice(args.framework)
+    accelerator = flags.ParseAcceleratorFlag(args.accelerator)
     return versions_util.Create(versions_client,
                                 operations.OperationsClient(),
                                 args.version,
@@ -189,7 +186,7 @@ class CreateAlpha(base.CreateCommand):
                                 staging_bucket=args.staging_bucket,
                                 runtime_version=args.runtime_version,
                                 config_file=args.config,
-                                asyncronous=args.async,
+                                asyncronous=args.async_,
                                 labels=labels,
                                 description=args.description,
                                 machine_type=args.machine_type,

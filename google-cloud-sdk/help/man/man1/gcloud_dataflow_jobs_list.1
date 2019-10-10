@@ -40,7 +40,9 @@ datetimes for information on time formats.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-If provided, only resources from the given region are queried.
+Only resources from the given region are queried. If not provided, an attempt
+will be made to query from all available regions. In the event of an outage,
+jobs from certain regions may not be available.
 
 .TP 2m
 \fB\-\-status\fR=\fISTATUS\fR

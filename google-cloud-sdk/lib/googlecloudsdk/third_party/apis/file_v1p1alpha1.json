@@ -164,7 +164,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -234,7 +234,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only.\nThe resource name of the instance, in the format\nprojects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}.",
+          "description": "Output only. The resource name of the instance, in the format\nprojects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}.",
           "type": "string"
         },
         "description": {
@@ -242,7 +242,7 @@
           "type": "string"
         },
         "state": {
-          "description": "Output only.\nThe instance state.",
+          "description": "Output only. The instance state.",
           "enumDescriptions": [
             "State not set.",
             "The instance is being created.",
@@ -264,11 +264,11 @@
           ]
         },
         "statusMessage": {
-          "description": "Output only.\nAdditional information about the instance state, if available.",
+          "description": "Output only. Additional information about the instance state, if available.",
           "type": "string"
         },
         "createTime": {
-          "description": "Output only.\nThe time when the instance was created.",
+          "description": "Output only. The time when the instance was created.",
           "type": "string",
           "format": "google-datetime"
         },
@@ -277,13 +277,15 @@
           "enumDescriptions": [
             "Not set.",
             "STANDARD tier.",
-            "PREMIUM tier."
+            "PREMIUM tier.",
+            "SCALE OUT tier.\nThis is a possibly temporary change for\ngo\/elastifile-filestore-hackathon."
           ],
           "type": "string",
           "enum": [
             "TIER_UNSPECIFIED",
             "STANDARD",
-            "PREMIUM"
+            "PREMIUM",
+            "SCALE_OUT"
           ]
         },
         "labels": {
@@ -337,6 +339,13 @@
         "sourceSnapshot": {
           "description": "The resource name of the snapshot, in the format\nprojects\/{project_id}\/locations\/{location_id}\/snapshots\/{snapshot_id}, that\nthis file share has been restored from. Empty, if the file share is created\nfrom scratch and not restored from a snapshot.",
           "type": "string"
+        },
+        "nfsExportOptions": {
+          "description": "Nfs Export Options.\nThere is a limit of 10 export options per file share.",
+          "type": "array",
+          "items": {
+            "$ref": "NfsExportOptions"
+          }
         }
       }
     },
@@ -351,6 +360,58 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "NfsExportOptions": {
+      "id": "NfsExportOptions",
+      "description": "NFS export options specifications.",
+      "type": "object",
+      "properties": {
+        "ipRanges": {
+          "description": "List of either an IPv4 addresses in the format\n{octet 1}.{octet 2}.{octet 3}.{octet 4} or CIDR ranges in the format\n{octet 1}.{octet 2}.{octet 3}.{octet 4}\/{mask size} which may mount the\nfile share.\nOverlapping IP ranges are not allowed, both within and across\nNfsExportOptions. An error will be returned.\nThe limit is 128 IP ranges\/addresses for each FileShareConfig among all\nNfsExportOptions.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accessMode": {
+          "description": "Either READ_ONLY, for allowing only read requests on the exported\ndirectory, or READ_WRITE, for allowing both read and write requests.\nThe default is READ_WRITE.",
+          "enumDescriptions": [
+            "AccessMode not set.",
+            "The client can only read the file share.",
+            "The client can read and write the file share (default)."
+          ],
+          "type": "string",
+          "enum": [
+            "ACCESS_MODE_UNSPECIFIED",
+            "READ_ONLY",
+            "READ_WRITE"
+          ]
+        },
+        "squashMode": {
+          "description": "Either NO_ROOT_SQUASH, for allowing root access on the exported directory,\nor ROOT_SQUASH, for not allowing root access. The default is\nNO_ROOT_SQUASH.",
+          "enumDescriptions": [
+            "SquashMode not set.",
+            "The Root user has root access to the file share (default).",
+            "The Root user has squashed access to the anonymous uid\/gid."
+          ],
+          "type": "string",
+          "enum": [
+            "SQUASH_MODE_UNSPECIFIED",
+            "NO_ROOT_SQUASH",
+            "ROOT_SQUASH"
+          ]
+        },
+        "anonuid": {
+          "description": "An integer representing the anonymous user id with a default value of\n65534.\nAnonuid may only be set with squash_mode of ROOT_SQUASH.  An error will be\nreturned if this field is specified for other squash_mode settings.",
+          "type": "string",
+          "format": "int64"
+        },
+        "anongid": {
+          "description": "An integer representing the anonymous group id with a default value of\n65534.\nAnongid may only be set with squash_mode of ROOT_SQUASH.  An error will be\nreturned if this field is specified for other squash_mode settings.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -383,7 +444,7 @@
           "type": "string"
         },
         "ipAddresses": {
-          "description": "Output only.\nIPv4 addresses in the format\n{octet 1}.{octet 2}.{octet 3}.{octet 4} or IPv6 addresses in the format\n{block 1}:{block 2}:{block 3}:{block 4}:{block 5}:{block 6}:{block\n7}:{block 8}.",
+          "description": "Output only. IPv4 addresses in the format\n{octet 1}.{octet 2}.{octet 3}.{octet 4} or IPv6 addresses in the format\n{block 1}:{block 2}:{block 3}:{block 4}:{block 5}:{block 6}:{block\n7}:{block 8}.",
           "type": "array",
           "items": {
             "type": "string"
@@ -437,7 +498,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only.\nThe resource name of the snapshot, in the format\nprojects\/{project_id}\/locations\/{location_id}\/snapshots\/{snapshot_id}.",
+          "description": "Output only. The resource name of the snapshot, in the format\nprojects\/{project_id}\/locations\/{location_id}\/snapshots\/{snapshot_id}.",
           "type": "string"
         },
         "description": {
@@ -445,7 +506,7 @@
           "type": "string"
         },
         "state": {
-          "description": "Output only.\nThe snapshot state.",
+          "description": "Output only. The snapshot state.",
           "enumDescriptions": [
             "State not set.",
             "Point-in-time snapshot is being created.",
@@ -463,7 +524,7 @@
           ]
         },
         "createTime": {
-          "description": "Output only.\nThe time when the snapshot was created.",
+          "description": "Output only. The time when the snapshot was created.",
           "type": "string",
           "format": "google-datetime"
         },
@@ -475,12 +536,12 @@
           }
         },
         "capacityGb": {
-          "description": "Output only.\nCapacity of the snapshot. This would be the size of the file share when\nthe snapshot is restored.",
+          "description": "Output only. Capacity of the snapshot. This would be the size of the file share when\nthe snapshot is restored.",
           "type": "string",
           "format": "int64"
         },
         "storageBytes": {
-          "description": "Output only.\nThe size of the storage used by the snapshot. As snapshots share storage,\nthis number is expected to change with snapshot creation\/deletion.\nAlways equals to capacityGb for local snapshots.",
+          "description": "Output only. The size of the storage used by the snapshot. As snapshots share storage,\nthis number is expected to change with snapshot creation\/deletion.\nAlways equals to capacityGb for local snapshots.",
           "type": "string",
           "format": "int64"
         },
@@ -497,17 +558,19 @@
           "type": "boolean"
         },
         "sourceInstanceTier": {
-          "description": "Output only.\nThe service tier of the source Cloud Filestore instance that this snapshot\nis created from.",
+          "description": "Output only. The service tier of the source Cloud Filestore instance that this snapshot\nis created from.",
           "enumDescriptions": [
             "Not set.",
             "STANDARD tier.",
-            "PREMIUM tier."
+            "PREMIUM tier.",
+            "SCALE OUT tier.\nThis is a possibly temporary change for\ngo\/elastifile-filestore-hackathon."
           ],
           "type": "string",
           "enum": [
             "TIER_UNSPECIFIED",
             "STANDARD",
-            "PREMIUM"
+            "PREMIUM",
+            "SCALE_OUT"
           ]
         }
       }
@@ -603,7 +666,7 @@
     },
     "GoogleCloudSaasacceleratorManagementProvidersV1Instance": {
       "id": "GoogleCloudSaasacceleratorManagementProvidersV1Instance",
-      "description": "Instance represents the interface for SLM services to actuate the state\nof control plane resources.\n\nExample Instance in JSON, where\n  consumer-project=snapchat,\n  producer-project=cloud-sql:\n\n```json\nInstance:\n{\n  \"name\":\n  \"projects\/snapchat\/locations\/us-east1\/instances\/prod-instance\",\n  \"create_time\": {\n    \"seconds\": 1526406431,\n  },\n  \"labels\": {\n    \"env\": \"prod\",\n    \"foo\": \"bar\"\n  },\n  \"state\": READY,\n  \"software_versions\": {\n    \"software_update\": \"cloud-sql-09-28-2018\",\n  },\n  \"maintenance_policy_names\": {\n    \"UpdatePolicy\":\n    \"projects\/snapchat\/locations\/us-east1\/maintenancePolicies\/prod-update-policy\",\n  }\n  \"rollout_metadata\": {\n    \"projects\/cloud-sql\/locations\/global\/rolloutTypes\/software_update\": {\n      \"release\":\n      \"projects\/cloud-sql\/locations\/global\/releases\/cloud-sql-09-28-2018\",\n      \"rollout\":\n      \"projects\/cloud-sql\/locations\/us-east1\/rollouts\/cloud-sql-09-28-2018-canary\",\n    },\n    \"projects\/cloud-sql\/locations\/global\/rolloutTypes\/instance_restart\": {\n      \"release\":\n      \"projects\/cloud-sql\/locations\/global\/releases\/cloud-sql-09-20-repair\",\n      \"rollout\":\n      \"projects\/cloud-sql\/locations\/us-east1\/rollouts\/cloud-sql-09-20-repair-100-percent\",\n    }\n  }\n  \"tenant_project_id\": \"cloud-sql-test-tenant\",\n  \"producer_metadata\": {\n    \"cloud-sql-tier\": \"basic\",\n    \"cloud-sql-instance-size\": \"1G\",\n  },\n  \"provisioned_resources\": [\n    {\n      \"resource-type\": \"compute-instance\",\n      \"resource-url\":\n      \"https:\/\/www.googleapis.com\/compute\/v1\/projects\/cloud-sql\/zones\/us-east1-b\/instances\/vm-1\",\n    }\n  ],\n}\n```",
+      "description": "Instance represents the interface for SLM services to actuate the state\nof control plane resources.\n\nExample Instance in JSON, where\n  consumer-project=snapchat,\n  producer-project=cloud-sql:\n\n```json\nInstance:\n{\n  \"name\":\n  \"projects\/snapchat\/locations\/us-east1\/instances\/prod-instance\",\n  \"create_time\": {\n    \"seconds\": 1526406431,\n  },\n  \"labels\": {\n    \"env\": \"prod\",\n    \"foo\": \"bar\"\n  },\n  \"state\": READY,\n  \"software_versions\": {\n    \"software_update\": \"cloud-sql-09-28-2018\",\n  },\n  \"maintenance_policy_names\": {\n    \"UpdatePolicy\":\n    \"projects\/snapchat\/locations\/us-east1\/maintenancePolicies\/prod-update-policy\",\n  }\n  \"rollout_metadata\": {\n    \"projects\/cloud-sql\/locations\/global\/rolloutTypes\/software_update\": {\n      \"release\":\n      \"projects\/cloud-sql\/locations\/global\/releases\/cloud-sql-09-28-2018\",\n      \"rollout\":\n      \"projects\/cloud-sql\/locations\/us-east1\/rollouts\/cloud-sql-09-28-2018-canary\",\n    },\n    \"projects\/cloud-sql\/locations\/global\/rolloutTypes\/instance_restart\": {\n      \"release\":\n      \"projects\/cloud-sql\/locations\/global\/releases\/cloud-sql-09-20-repair\",\n      \"rollout\":\n      \"projects\/cloud-sql\/locations\/us-east1\/rollouts\/cloud-sql-09-20-repair-100-percent\",\n    }\n  }\n  \"tenant_project_id\": \"cloud-sql-test-tenant\",\n  \"producer_metadata\": {\n    \"cloud-sql-tier\": \"basic\",\n    \"cloud-sql-instance-size\": \"1G\",\n  },\n  \"provisioned_resources\": [\n    {\n      \"resource-type\": \"compute-instance\",\n      \"resource-url\":\n      \"https:\/\/www.googleapis.com\/compute\/v1\/projects\/cloud-sql\/zones\/us-east1-b\/instances\/vm-1\",\n    }\n  ],\n  \"maintenance_schedules\": {\n    \"csa_rollout\": {\n       \"start_time\": {\n          \"seconds\": 1526406431,\n       },\n       \"end_time\": {\n          \"seconds\": 1535406431,\n       },\n    },\n    \"ncsa_rollout\": {\n       \"start_time\": {\n          \"seconds\": 1526406431,\n       },\n       \"end_time\": {\n          \"seconds\": 1535406431,\n       },\n    }\n  },\n  \"consumer_defined_name\": \"my-sql-instance1\",\n}\n```",
       "type": "object",
       "properties": {
         "name": {
@@ -689,6 +752,17 @@
         "sloMetadata": {
           "description": "Output only. SLO metadata for instance classification in the\nStandardized dataplane SLO platform.\nSee go\/cloud-ssa-standard-slo for feature description.",
           "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata"
+        },
+        "maintenanceSchedules": {
+          "description": "The MaintenanceSchedule contains the scheduling information of published\nmaintenance schedule.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule"
+          }
+        },
+        "consumerDefinedName": {
+          "description": "consumer_defined_name is the name that is set by the consumer. On the other\nhand Name field represents system-assigned id of an instance so consumers\nare not necessarily aware of it.\nconsumer_defined_name is used for notification\/UI purposes for consumer to\nrecognize their instances.",
+          "type": "string"
         }
       }
     },
@@ -778,11 +852,11 @@
     },
     "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion": {
       "id": "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion",
-      "description": "A temporal SLO exclusion specification.",
+      "description": "SloExclusion represents an excusion in SLI calculation applies to all SLOs.",
       "type": "object",
       "properties": {
-        "sloName": {
-          "description": "Name of an SLI\/SLO that this exclusion applies to. Can be left empty,\nsignaling that the instance should be excluded from all SLI\/SLOs defined\nin the service SLO configuration.",
+        "sliName": {
+          "description": "Name of an SLI that this exclusion applies to. Can be left empty,\nsignaling that the instance should be excluded from all SLIs defined\nin the service SLO configuration.",
           "type": "string"
         },
         "exclusionStartTime": {
@@ -810,12 +884,41 @@
           "description": "The id of the node.\nThis should be equal to SaasInstanceNode.node_id.",
           "type": "string"
         },
+        "location": {
+          "description": "The location of the node, if different from instance location.",
+          "type": "string"
+        },
         "exclusions": {
           "description": "By default node is eligible if instance is eligible.\nBut individual node might be excluded from SLO by adding entry here.\nFor semantic see SloMetadata.exclusions.\nIf both instance and node level exclusions are present for time period,\nthe node level's reason will be reported by Eligibility Exporter.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion"
           }
+        }
+      }
+    },
+    "GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule": {
+      "id": "GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule",
+      "description": "Maintenance schedule which is exposed to customer and potentially end user,\nindicating published upcoming future maintenance schedule",
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "description": "The scheduled start time for the maintenance.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "The scheduled end time for the maintenance.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "canReschedule": {
+          "description": "Can this scheduled update be rescheduled?\nBy default, it's true and API needs to do explicitly check whether it's\nset, if it's set as false explicitly, it's false",
+          "type": "boolean"
+        },
+        "rolloutManagementPolicy": {
+          "description": "The rollout management policy this maintenance schedule is associated\nwith. When doing reschedule update request, the reschedule should be\nagainst this given policy.",
+          "type": "string"
         }
       }
     }
@@ -1130,14 +1233,14 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Output only.\nThe resource name of the instance, in the format\nprojects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}.",
+                      "description": "Output only. The resource name of the instance, in the format\nprojects\/{project_id}\/locations\/{location_id}\/instances\/{instance_id}.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Mask of fields to update.  At least one path must be supplied in this\nfield.  The elements of the repeated paths field may only include these\nfields:\n\"description\"",
+                      "description": "Mask of fields to update.  At least one path must be supplied in this\nfield.  The elements of the repeated paths field may only include these\nfields:\n\"description\"\n\"file_shares\"\n\"labels\"",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -1350,7 +1453,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Output only.\nThe resource name of the snapshot, in the format\nprojects\/{project_id}\/locations\/{location_id}\/snapshots\/{snapshot_id}.",
+                      "description": "Output only. The resource name of the snapshot, in the format\nprojects\/{project_id}\/locations\/{location_id}\/snapshots\/{snapshot_id}.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/snapshots\/[^\/]+$",

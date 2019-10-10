@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,9 +50,9 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
             insertTime: '2014-09-04T09:55:33.679-07:00'
             name: operation-1
             operationType: insert
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
             status: DONE
-            targetLink: https://www.googleapis.com/compute/v1/projects/my-project/resource/resource-1
+            targetLink: https://compute.googleapis.com/compute/v1/projects/my-project/resource/resource-1
             """))
 
   def testWithRegionFlag(self):
@@ -77,10 +77,10 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
             insertTime: '2014-09-04T09:53:33.679-07:00'
             name: operation-2
             operationType: insert
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
             status: DONE
-            targetLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/resource/resource-2
+            targetLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/resource/resource-2
             """))
 
   def testWithZoneFlag(self):
@@ -106,10 +106,10 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
             insertTime: '2014-09-04T09:56:33.679-07:00'
             name: operation-3
             operationType: insert
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
             status: DONE
-            targetLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/resource/resource-3
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            targetLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/resource/resource-3
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testUriSupportForGlobalOperations(self):
@@ -119,7 +119,7 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
     self.Run("""
         compute operations describe
-          https://www.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/operations/operation-1
         """)
 
     self.CheckRequests(
@@ -136,7 +136,7 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
     self.Run("""
         compute operations describe
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
         """)
 
     self.CheckRequests(
@@ -154,7 +154,7 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
     self.Run("""
         compute operations describe
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/operations/operation-3
         """)
 
     self.CheckRequests(
@@ -169,14 +169,14 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
     with self.assertRaises(resources.WrongResourceCollectionException):
       self.Run("""
           compute operations describe
-            https://www.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
           """)
 
   def testUriSupportWithIllegalTypeAlpha(self):
     with self.assertRaises(resources.WrongResourceCollectionException):
       self.Run("""
           alpha compute operations describe
-            https://www.googleapis.com/compute/alpha/projects/my-project/global/networks/network-1
+            https://compute.googleapis.com/compute/alpha/projects/my-project/global/networks/network-1
           """)
 
   def testDefaultScope(self):
@@ -196,10 +196,10 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
             insertTime: '2014-09-04T09:53:33.679-07:00'
             name: operation-2
             operationType: insert
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/operations/operation-2
             status: DONE
-            targetLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/resource/resource-2
+            targetLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/resource/resource-2
             """))
 
 

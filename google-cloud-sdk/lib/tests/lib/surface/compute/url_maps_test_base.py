@@ -126,9 +126,9 @@ class UrlMapsTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   def MakeTestUrlMap(self, messages, api):
     return messages.UrlMap(
         name='url-map-1',
-        defaultService='https://www.googleapis.com/compute/' + api +
+        defaultService='https://compute.googleapis.com/compute/' + api +
         '/projects/my-project/global/backendServices/default-service',
-        selfLink='https://www.googleapis.com/compute/' + api +
+        selfLink='https://compute.googleapis.com/compute/' + api +
         '/projects/my-project/global/urlMaps/url-map-1')
 
 

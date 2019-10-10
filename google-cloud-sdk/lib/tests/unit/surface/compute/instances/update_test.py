@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -536,8 +536,8 @@ class InstancesSetShieldedInstanceIntegrityPolicyAlphaTest(
 class DisplayDeviceTest(UpdateTestBaseClass, parameterized.TestCase):
 
   def PreSetUp(self):
-    self.api_version = 'beta'
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
   def ExpectUpdateDisplayDevice(self, client, enable_display):
     messages = self.messages

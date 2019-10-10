@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 from six.moves import map
 from six.moves import range
 
@@ -52,17 +53,16 @@ class PerimetersListTestGA(accesscontextmanager.Base):
   def testList(self):
     self.SetUpForTrack(self.track)
     perimeters = self._MakePerimeters()
-    self._ExpectList(perimeters, 'my-policy')
+    self._ExpectList(perimeters, '123')
 
-    results = self.Run(
-        'access-context-manager perimeters list --policy my-policy')
+    results = self.Run('access-context-manager perimeters list --policy 123')
 
     self.assertEqual(results, perimeters)
 
   def testList_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
     perimeters = self._MakePerimeters()
-    policy = 'my-acm-policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectList(perimeters, policy)
 
@@ -74,9 +74,9 @@ class PerimetersListTestGA(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     properties.VALUES.core.user_output_enabled.Set(True)
     perimeters = self._MakePerimeters()
-    self._ExpectList(perimeters, 'my-policy')
+    self._ExpectList(perimeters, '123')
 
-    self.Run('access-context-manager perimeters list --policy my-policy')
+    self.Run('access-context-manager perimeters list --policy 123')
 
     self.AssertOutputEquals(
         """\
@@ -86,6 +86,13 @@ class PerimetersListTestGA(accesscontextmanager.Base):
         MY_PERIMETER2  My Perimeter
         """,
         normalize_space=True)
+
+  def testList_InvalidPolicyArg(self):
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager perimeters list'
+               '    --policy accessPolicies/123')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class PerimetersListTestBeta(PerimetersListTestGA):

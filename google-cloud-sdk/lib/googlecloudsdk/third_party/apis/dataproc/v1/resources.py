@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,17 @@ class Collections(enum.Enum):
       [u'projectsId', u'locationsId'],
       True
   )
+  PROJECTS_LOCATIONS_AUTOSCALINGPOLICIES = (
+      'projects.locations.autoscalingPolicies',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'autoscalingPolicies/{autoscalingPoliciesId}',
+      },
+      [u'name'],
+      True
+  )
   PROJECTS_LOCATIONS_WORKFLOWTEMPLATES = (
       'projects.locations.workflowTemplates',
       '{+name}',
@@ -54,6 +65,17 @@ class Collections(enum.Enum):
       'projects/{projectId}/regions/{regionId}',
       {},
       [u'projectId', u'regionId'],
+      True
+  )
+  PROJECTS_REGIONS_AUTOSCALINGPOLICIES = (
+      'projects.regions.autoscalingPolicies',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/regions/{regionsId}/autoscalingPolicies/'
+              '{autoscalingPoliciesId}',
+      },
+      [u'name'],
       True
   )
   PROJECTS_REGIONS_CLUSTERS = (

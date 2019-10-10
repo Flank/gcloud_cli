@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test.ios import arg_manager
 from googlecloudsdk.api_lib.firebase.test.ios import catalog_manager
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.calliope import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.ios import fake_catalogs
 from tests.lib.surface.firebase.test.ios import unit_base
@@ -59,14 +58,6 @@ class IosArgsTests(unit_base.IosMockClientTest):
     self.assertEqual(args.type, 'xctest')
 
   # Ios arg preparation tests
-
-  def testPrepareArgs_MissingRequiredArg(self):
-    # gcloud test run invoked with no args, but --test is always required
-    args = self.NewTestArgs(test=None)
-    arg_mgr = _IosArgManagerWithFakeCatalog()
-    with self.assertRaises(core_exceptions.RequiredArgumentException) as ex_ctx:
-      arg_mgr.Prepare(args)
-    self.assertEqual(ex_ctx.exception.parameter_name, 'test')
 
   def testPrepareArgs_UsesDimensionDefaultsWhenNoDeviceSpecified(self):
     args = self.NewTestArgs(test='a.zip')
@@ -177,6 +168,42 @@ class IosArgsTests(unit_base.IosMockClientTest):
     arg_mgr = _IosArgManagerWithFakeCatalog()
     arg_mgr.Prepare(args)
     self.assertEqual(args.results_dir, 'x/y/z')
+
+  def testPrepareArgs_XctestAndAppAreInvalidTogether(self):
+    args = self.NewTestArgs(type='xctest', app='app')
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('[app]: may not be used with test type [xctest]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_GameLoopAndTestAreInvalidTogether(self):
+    args = self.NewTestArgs(type='game-loop', test='test')
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn('[test]: may not be used with test type [game-loop]',
+                  six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_GameLoopNegativeScenarioInvalid(self):
+    args = self.NewTestArgs(
+        type='game-loop', app='app', scenario_numbers=[1, -1])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn(
+        '[scenario-numbers]: Value must be greater than or equal to 1; received: -1',
+        six.text_type(ex_ctx.exception))
+
+  def testPrepareArgs_GameLoopZeroScenarioInvalid(self):
+    args = self.NewTestArgs(
+        type='game-loop', app='app', scenario_numbers=[0])
+    args_mgr = _IosArgManagerWithFakeCatalog()
+    with self.assertRaises(exceptions.InvalidArgException) as ex_ctx:
+      args_mgr.Prepare(args)
+    self.assertIn(
+        '[scenario-numbers]: Value must be greater than or equal to 1; received: 0',
+        six.text_type(ex_ctx.exception))
 
 
 def _IosArgManagerWithFakeCatalog():

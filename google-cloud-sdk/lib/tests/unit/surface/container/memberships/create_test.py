@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,21 +24,19 @@ from tests.lib import test_case
 from tests.lib.surface.container.memberships import base
 
 
-@test_case.Filters.SkipInDebPackage('Flaky in deb packaging.', 'b/124100527')
-class CreateTestAlpha(base.MembershipsTestBase):
-  """gcloud Alpha track using GKE Hub v1 API."""
+class CreateTestBeta(base.MembershipsTestBase):
+  """gcloud Beta track using GKE Hub v1 API."""
 
   # TODO(b/116715821): add more negative tests.
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _ExpectCreateCalls(self, membership, asynchronous=False):
     operation = self._MakeOperation()
     self.ExpectCreateMembership(membership, operation)
     if asynchronous:
       return
-    self.ExpectGetOperation(operation)
-    # Second time succeed.
+    self.ExpectGetOperation(operation)  # Second time succeed.
     response = encoding.PyValueToMessage(
         self.messages.Operation.ResponseValue, {
             '@type': ('type.googleapis.com/google.cloud.gkehub.{}.LongRunning'
@@ -66,6 +64,65 @@ class CreateTestAlpha(base.MembershipsTestBase):
   def testCreateMissingDescription(self):
     with self.AssertRaisesArgumentErrorMatches('--description'):
       self._RunMembershipCommand(['create', self.MEMBERSHIP_NAME])
+
+  def testCreateWithGKEClusterSelfLink(self):
+    self.WriteInput('y')
+    membership = self._MakeMembership(
+        description=self.MEMBERSHIP_DESCRIPTION,
+        gke_cluster_self_link=self.MEMBERSHIP_SELF_LINK)
+    self._ExpectCreateCalls(membership)
+    self._RunMembershipCommand([
+        'create',
+        self.MEMBERSHIP_NAME,
+        '--description',
+        self.MEMBERSHIP_DESCRIPTION,
+        '--gke-cluster-self-link',
+        self.MEMBERSHIP_SELF_LINK])
+
+  def testCreateWithLabels(self):
+    self.WriteInput('y')
+    membership = self._MakeMembership(
+        description=self.MEMBERSHIP_DESCRIPTION,
+        labels_dict={
+            'foo': 'bar',
+            'baz': 'bar',
+        })
+    self._ExpectCreateCalls(membership)
+    self._RunMembershipCommand([
+        'create',
+        self.MEMBERSHIP_NAME,
+        '--description',
+        self.MEMBERSHIP_DESCRIPTION,
+        '--labels',
+        'foo=bar,baz=bar'])
+
+  def testCreateWithAllFields(self):
+    self.WriteInput('y')
+    membership = self._MakeMembership(
+        description=self.MEMBERSHIP_DESCRIPTION,
+        gke_cluster_self_link=self.MEMBERSHIP_SELF_LINK,
+        labels_dict={
+            'foo': 'bar',
+            'baz': 'bar',
+        })
+    self._ExpectCreateCalls(membership)
+    self._RunMembershipCommand([
+        'create',
+        self.MEMBERSHIP_NAME,
+        '--description',
+        self.MEMBERSHIP_DESCRIPTION,
+        '--gke-cluster-self-link',
+        self.MEMBERSHIP_SELF_LINK,
+        '--labels',
+        'foo=bar,baz=bar',
+    ])
+
+
+class CreateTestAlpha(CreateTestBeta):
+  """gcloud Alpha track using GKE Hub v1 API."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

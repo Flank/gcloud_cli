@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,6 +62,9 @@ class LocalPredictTestBase(object):
         files, 'SearchForExecutableOnPath', return_value=['/tmp/python'])
     self.StartPropertyPatch(
         config.Paths, 'sdk_root', return_value='fake-sdk-root')
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.CheckRuntimeVersion',
+                    return_value=False)
 
   def _MockPopen(self, returncode=0, stdout='[]\n', stderr=''):
     popen_mock = mock.MagicMock()

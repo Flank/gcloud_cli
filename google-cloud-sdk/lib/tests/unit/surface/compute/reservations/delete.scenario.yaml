@@ -1,5 +1,5 @@
 title: compute reservations delete test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -9,7 +9,7 @@ summary:
     - input: y
   - stderr: |
       Delete request issued for: [my-reservation]
-      Check operation [operation-1234] for status.
+      Check operation [projects/fake-project/zones/my-zone/operations/operation-1234] for status.
 - execute:
   - command: compute reservations delete my-reservation --zone=my-zone
   - prompt:
@@ -18,7 +18,8 @@ summary:
   - stderr: |
       Delete request issued for: [my-reservation]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [projects/fake-project/zones/my-zone/operations/$$operation-basename$$]
+        to complete
     - status: SUCCESS
   - stderr: |
       Deleted reservation [my-reservation].
@@ -26,6 +27,7 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
+      GA: v1
       BETA: beta
       ALPHA: alpha
 - execute_command:
@@ -36,18 +38,18 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
           method: DELETE
           headers: {}
           body: null
         return_response:
           headers:
             status: '200'
-          body: {kind: compute#operation, name: operation-1234, zone: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone',
-                 status: RUNNING, selfLink: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234'}
+          body: {kind: compute#operation, name: operation-1234, zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone,
+            status: RUNNING, selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234}
     - expect_stderr: |
         Delete request issued for: [my-reservation]
-        Check operation [operation-1234] for status.
+        Check operation [projects/fake-project/zones/my-zone/operations/operation-1234] for status.
     - expect_exit:
         code: 0
 - execute_command:
@@ -58,20 +60,21 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
           method: DELETE
           headers: {}
           body: null
         return_response:
           headers:
             status: '200'
-          body: {kind: compute#operation, name: operation-1234, zone: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone',
-                 status: DONE, selfLink: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234'}
+          body: {kind: compute#operation, name: operation-1234, zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone,
+            status: DONE, selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234}
         poll_operation: true
     - expect_stderr: |
         Delete request issued for: [my-reservation]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [projects/fake-project/zones/my-zone/operations/$$operation-basename$$]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Deleted reservation [my-reservation].

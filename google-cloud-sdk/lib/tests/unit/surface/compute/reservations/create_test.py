@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ from tests.lib.surface.compute import allocations_test_base as base
 from tests.lib.surface.compute import test_base
 
 
-class CreateTestBeta(test_base.BaseTest, base.AllocationTestBase):
+class CreateTest(test_base.BaseTest, base.AllocationTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
 
   def testSimpleCreate(self):
     self.make_requests.side_effect = iter([[]])
@@ -130,6 +130,13 @@ class CreateTestBeta(test_base.BaseTest, base.AllocationTestBase):
                              project='my-project',
                              zone='fake-zone',
                          ))],)
+
+
+class CreateTestBeta(CreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
 
 class CreateTestAlpha(CreateTestBeta):

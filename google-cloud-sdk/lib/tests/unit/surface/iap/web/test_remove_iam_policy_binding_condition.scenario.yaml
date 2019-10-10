@@ -1,5 +1,5 @@
 title: Test remove IAM policy binding with condition
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -12,7 +12,7 @@ actions:
     reference: api-version
     track_values:
       GA: v1
-      BETA: beta
+      BETA: v1beta1
       ALPHA: v1beta1
 
 - execute_command:
@@ -47,7 +47,10 @@ actions:
           uri: https://iap.googleapis.com/$$api-version$$/projects/462803083913/iap_web/compute:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             cache-control: private

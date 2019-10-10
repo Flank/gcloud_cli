@@ -27,7 +27,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table/data?alt=json&maxResults=3&startIndex=1
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table/data?alt=json&maxResults=3&startIndex=1
           method: GET
           headers: {}
           body: null

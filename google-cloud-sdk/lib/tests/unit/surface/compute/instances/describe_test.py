@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-_COMPUTE_PATH = 'https://www.googleapis.com/compute'
+_COMPUTE_PATH = 'https://compute.googleapis.com/compute'
 
 
 def MakeCustomInstances(msgs, api):
@@ -98,7 +98,7 @@ class InstancesDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            machineType: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name: instance-1
             networkInterfaces:
             - accessConfigs:
@@ -108,9 +108,9 @@ class InstancesDescribeTest(test_base.BaseTest,
               automaticRestart: false
               onHostMaintenance: TERMINATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testTextOutput(self):
@@ -131,16 +131,16 @@ class InstancesDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            machineType:                                 https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType:                                 https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name:                                        instance-1
             networkInterfaces[0].accessConfigs[0].natIP: 23.251.133.75
             networkInterfaces[0].networkIP:              10.0.0.1
             scheduling.automaticRestart:                 False
             scheduling.onHostMaintenance:                TERMINATE
             scheduling.preemptible:                      False
-            selfLink:                                    https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            selfLink:                                    https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             status:                                      RUNNING
-            zone:                                        https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone:                                        https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testJsonOutput(self):
@@ -162,7 +162,7 @@ class InstancesDescribeTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             {
-              "machineType": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
+              "machineType": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
               "name": "instance-1",
               "networkInterfaces": [
                 {
@@ -179,16 +179,16 @@ class InstancesDescribeTest(test_base.BaseTest,
                 "onHostMaintenance": "TERMINATE",
                 "preemptible": false
               },
-              "selfLink": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1",
+              "selfLink": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1",
               "status": "RUNNING",
-              "zone": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
+              "zone": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
             }
             """))
 
   def testUriSupport(self):
     self.Run("""
         compute instances describe
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
         """)
 
     self.CheckRequests(
@@ -202,7 +202,7 @@ class InstancesDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            machineType: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name: instance-1
             networkInterfaces:
             - accessConfigs:
@@ -212,9 +212,9 @@ class InstancesDescribeTest(test_base.BaseTest,
               automaticRestart: false
               onHostMaintenance: TERMINATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testZonePrompting(self):
@@ -247,7 +247,7 @@ class InstancesDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            machineType: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
             name: instance-1
             networkInterfaces:
             - accessConfigs:
@@ -257,9 +257,9 @@ class InstancesDescribeTest(test_base.BaseTest,
               automaticRestart: false
               onHostMaintenance: TERMINATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testWithNonExistentInstance(self):
@@ -344,7 +344,7 @@ class InstancesCustomDescribeTest(test_base.BaseTest):
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            machineType: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/custom-2-3072
+            machineType: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/custom-2-3072
             name: instance-custom
             networkInterfaces:
             - accessConfigs:
@@ -354,9 +354,9 @@ class InstancesCustomDescribeTest(test_base.BaseTest):
               automaticRestart: false
               onHostMaintenance: TERMINATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-custom
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-custom
             status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
 
@@ -451,15 +451,15 @@ class InstancesAlphaDescribeTest(test_base.BaseTest,
     )
     self.assertMultiLineEqual(
         textwrap.dedent("""\
-            machineType: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/machineTypes/custom-2-3072
+            machineType: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/machineTypes/custom-2-3072
             name: instance-1
             networkInterfaces:
             - accessConfigs:
               - natIP: 23.251.133.77
               networkIP: 10.0.0.4
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-1
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-1
             status: RUNNING
-            zone: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/zone-1
             """),
         self.GetOutput(),)
 

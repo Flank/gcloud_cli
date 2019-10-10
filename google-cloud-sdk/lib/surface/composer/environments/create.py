@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ from googlecloudsdk.command_lib.composer import resource_args
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
+import six
 
 
 PREREQUISITE_OPTION_ERROR_MSG = """\
@@ -211,7 +212,7 @@ class Create(base.Command):
     operation = self.GetOperationMessage(args)
 
     details = 'with operation [{0}]'.format(operation.name)
-    if args.async:
+    if args.async_:
       log.CreatedResource(
           self.env_ref.RelativeName(),
           kind='environment',
@@ -228,7 +229,7 @@ class Create(base.Command):
       except command_util.OperationError as e:
         raise command_util.EnvironmentCreateError(
             'Error creating [{}]: {}'.format(self.env_ref.RelativeName(),
-                                             str(e)))
+                                             six.text_type(e)))
 
   def GetOperationMessage(self, args):
     """Constructs Create message."""

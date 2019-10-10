@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -362,6 +362,29 @@ class IsInstanceV1Test(base.SqlMockTestBeta):
     instance.backendType = ''
     instance.settings.tier = 'db-n1-standard-1'
     self.assertFalse(instances_util.IsInstanceV1(instance))
+
+  def testBlankTierInstance(self):
+    instance = data.GetV2Instance(self.project, self.instance)
+    instance.settings.tier = None
+    self.assertFalse(instances_util.IsInstanceV1(instance))
+
+
+class GetInstanceStateTest(base.SqlMockTestBeta):
+  """Tests instances_util.GetInstanceState."""
+  project = 'some-project'
+  instance = 'some-instance'
+
+  def testRunnableInstance(self):
+    instance = data.GetV2Instance(self.project, self.instance)
+    instance.settings.activationPolicy = 'ON_DEMAND'
+    instance.state = 'RUNNABLE'
+    self.assertEqual('RUNNABLE', instances_util.GetInstanceState(instance))
+
+  def testStoppedInstance(self):
+    instance = data.GetV2Instance(self.project, self.instance)
+    instance.settings.activationPolicy = 'NEVER'
+    instance.state = 'RUNNABLE'
+    self.assertEqual('STOPPED', instances_util.GetInstanceState(instance))
 
 
 if __name__ == '__main__':

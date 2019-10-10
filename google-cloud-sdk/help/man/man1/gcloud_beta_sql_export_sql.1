@@ -44,13 +44,13 @@ operation fails. If the filename ends with .gz, the contents are compressed.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-database\fR=\fIDATABASE\fR,[\fIDATABASE\fR,...], \fB\-d\fR \fIDATABASE\fR,[\fIDATABASE\fR,...]
-Database (for example, guestbook) from which the export is made. If unspecified,
-all databases are exported.
+Database(s) from which the export is made. Information on requirements can be
+found here:
+https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances/export#exportContext.databases
 
 .TP 2m
 \fB\-\-table\fR=\fITABLE\fR,[\fITABLE\fR,...], \fB\-t\fR \fITABLE\fR,[\fITABLE\fR,...]

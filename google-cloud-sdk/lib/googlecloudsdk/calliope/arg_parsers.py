@@ -540,7 +540,7 @@ class Range(object):
 
   def __str__(self):
     if self.start == self.end:
-      return str(self.start)
+      return six.text_type(self.start)
     return '{0}-{1}'.format(self.start, self.end)
 
 
@@ -816,7 +816,7 @@ class ArgList(ArgType):
         if typed_value not in choices:
           raise ArgumentTypeError('{value} must be one of [{choices}]'.format(
               value=typed_value, choices=', '.join(
-                  [str(choice) for choice in choices])))
+                  [six.text_type(choice) for choice in choices])))
         return typed_value
       self.element_type = ChoiceType
 
@@ -1402,18 +1402,14 @@ def HandleNoArgAction(none_arg, deprecation_message):
   return HandleNoArgActionInit
 
 
-class BufferedFileInput(object):
-  """Creates an argparse type that reads and buffers file or stdin contents.
+class FileContents(object):
+  """Creates an argparse type that reads the contents of a file or stdin.
 
   This is similar to argparse.FileType, but unlike FileType it does not leave
   a dangling file handle open. The argument stored in the argparse Namespace
   is the file's contents.
 
   Args:
-    max_bytes: int, The maximum file size in bytes, or None to specify no
-        maximum.
-    chunk_size: int, When max_bytes is not None, the buffer size to use when
-        reading chunks from the input file.
     binary: bool, If True, the contents of the file will be returned as bytes.
 
   Returns:
@@ -1428,8 +1424,6 @@ class BufferedFileInput(object):
     """Return the contents of the file with the specified name.
 
     If name is "-", stdin is read until EOF. Otherwise, the named file is read.
-    If max_bytes is provided when calling BufferedFileInput, this function will
-    raise an ArgumentTypeError if the specified file is too large.
 
     Args:
       name: str, The file name, or '-' to indicate stdin.
@@ -1467,3 +1461,36 @@ class StoreTrueFalseAction(argparse._StoreTrueAction):  # pylint: disable=protec
 
   def __init__(self, *args, **kwargs):
     super(StoreTrueFalseAction, self).__init__(*args, default=None, **kwargs)
+
+
+def StoreFilePathAndContentsAction(binary=False):
+  """Returns Action that stores both file content and file path.
+
+  Args:
+   binary: boolean, whether or not this is a binary file.
+
+  Returns:
+   An argparse action.
+  """
+
+  class Action(argparse.Action):
+    """Stores both file content and file path.
+
+      Stores file contents under original flag DEST and stores file path under
+      DEST_path.
+    """
+
+    def __init__(self, *args, **kwargs):
+      super(Action, self).__init__(*args, **kwargs)
+
+    def __call__(self, parser, namespace, value, option_string=None):
+      """Stores the contents of the file and the file name in namespace."""
+      try:
+        content = console_io.ReadFromFileOrStdin(value, binary=binary)
+      except files.Error as e:
+        raise ArgumentTypeError(e)
+      setattr(namespace, self.dest, content)
+      new_dest = '{}_path'.format(self.dest)
+      setattr(namespace, new_dest, value)
+
+  return Action

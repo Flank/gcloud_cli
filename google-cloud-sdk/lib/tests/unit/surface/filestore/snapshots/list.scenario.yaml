@@ -6,8 +6,14 @@ summary:
   - command: |
       filestore snapshots list --region us-central1
   - stdout: |
-      NAME   REGION         SRC_INSTANCE                   SRC_FILE_SHARE  STATE
-      snap1  us-central1-c  us-central1-c/instances/inst1  my_vol          READY
+      NAME   LOCATION     SRC_INSTANCE                   SRC_FILE_SHARE  STATE
+      snap1  us-central1  us-central1-c/instances/inst1  my_vol          READY
+- execute:
+  - command: |
+      filestore snapshots list --zone us-central1-c
+  - stdout: |
+      NAME   LOCATION       SRC_INSTANCE                   SRC_FILE_SHARE  STATE
+      snap2  us-central1-c  us-central1-c/instances/inst1  my_vol          READY
 actions:
 - execute_command:
     command: |
@@ -26,17 +32,51 @@ actions:
             {
               "snapshots": [
                 {
-                  "name": "projects/fake-project/locations/us-central1-c/snapshots/snap1",
+                  "name": "projects/fake-project/locations/us-central1/snapshots/snap1",
                   "description": "my new snapshot",
                   "state": "READY",
                   "createTime": "2019-02-27T00:04:52.633515884Z",
+                  "capacityGb": "1024",
                   "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/inst1",
                   "sourceFileShare": "my_vol"
                 }
               ]
             }
     - expect_stdout: |
-        NAME   REGION         SRC_INSTANCE                   SRC_FILE_SHARE  STATE
-        snap1  us-central1-c  us-central1-c/instances/inst1  my_vol          READY
+        NAME   LOCATION     SRC_INSTANCE                   SRC_FILE_SHARE  STATE
+        snap1  us-central1  us-central1-c/instances/inst1  my_vol          READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      filestore snapshots list --zone us-central1-c
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-c/snapshots?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "snapshots": [
+                {
+                  "name": "projects/fake-project/locations/us-central1-c/snapshots/snap2",
+                  "description": "my new snapshot",
+                  "state": "READY",
+                  "createTime": "2019-06-05T22:02:56.885646471Z",
+                  "capacityGb": "1024",
+                  "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/inst1",
+                  "sourceFileShare": "my_vol",
+                  "local": true
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME   LOCATION       SRC_INSTANCE                   SRC_FILE_SHARE  STATE
+        snap2  us-central1-c  us-central1-c/instances/inst1  my_vol          READY
     - expect_exit:
         code: 0

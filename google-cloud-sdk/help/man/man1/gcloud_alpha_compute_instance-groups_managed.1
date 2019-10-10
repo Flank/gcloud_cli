@@ -93,6 +93,11 @@ stateful metadata.
 \fB(ALPHA)\fR List Google Compute Engine managed instance groups.
 
 .TP 2m
+\fBlist\-errors\fR
+\fB(ALPHA)\fR List errors produced by managed instances in a managed instance
+group.
+
+.TP 2m
 \fBlist\-instances\fR
 \fB(ALPHA)\fR List instances present in the managed instance group.
 
@@ -138,6 +143,11 @@ group.
 \fB(ALPHA)\fR Update autoscaling parameters of a managed instance group.
 
 .TP 2m
+\fBupdate\-instances\fR
+\fB(ALPHA)\fR Immediately update selected instances in a Google Compute Engine
+managed instance group.
+
+.TP 2m
 \fBwait\-until\fR
 \fB(ALPHA)\fR Wait until managed instance group reaches desired state.
 
@@ -154,9 +164,8 @@ stable.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute instance\-groups managed

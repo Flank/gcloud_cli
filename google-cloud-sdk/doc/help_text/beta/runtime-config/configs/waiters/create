@@ -32,8 +32,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --failure-cardinality-number=FAILURE_CARDINALITY_NUMBER; default=1
         The minimum required number of failure variables.

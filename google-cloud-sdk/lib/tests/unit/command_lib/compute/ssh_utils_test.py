@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import datetime
+
+from googlecloudsdk.api_lib.compute import metadata_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import ssh_utils
+from googlecloudsdk.command_lib.util.ssh import ssh
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -111,6 +116,98 @@ class HostKeysTestsAlpha(sdk_test_base.SdkBase):
                                                    'ssh-rsa jkljkljkl',
                                                ],
                                                overwrite=False)
+
+
+class AddSSHKeyToMetadataMessageTests(parameterized.TestCase,
+                                      test_case.TestCase):
+
+  def RunAddSSHKeyToMetadataMessage(
+      self, user, public_key, expiration, legacy, existing_ssh_keys):
+    unused_mock_get_keys = self.StartObjectPatch(
+        ssh_utils, '_GetSSHKeysFromMetadata', autospec=True,
+        return_value=(existing_ssh_keys, []))
+    mock_construct = self.StartObjectPatch(metadata_utils,
+                                           'ConstructMetadataMessage')
+    ssh_utils._AddSSHKeyToMetadataMessage(None, user, public_key, None,
+                                          expiration, legacy)
+    if mock_construct.called:
+      return mock_construct.mock_calls[0][2]['metadata']
+    return {}
+
+  @parameterized.named_parameters(
+      ('legacy', True, 'sshKeys'),
+      ('non-legacy', False, 'ssh-keys'))
+  def testAddKey_CorrectMetadataKey(self, legacy, expected_key):
+    user = 'user'
+    public_key = ssh.Keys.PublicKey('type', 'data', 'comment')
+    ssh_keys = []
+    expected = {expected_key: 'user:type data comment'}
+
+    metadata_update = self.RunAddSSHKeyToMetadataMessage(
+        user, public_key, None, legacy, ssh_keys)
+    self.assertEqual(expected, metadata_update)
+
+  def testAddKey_KeyDataCorrectNonExpiring(self):
+    user = 'user'
+    public_key = ssh.Keys.PublicKey('type', 'data', 'comment')
+    ssh_keys = ['existing:type data comment']
+    expected = {'ssh-keys':
+                    'existing:type data comment\nuser:type data comment'}
+    metadata_update = self.RunAddSSHKeyToMetadataMessage(
+        user, public_key, None, False, ssh_keys)
+    self.assertEqual(expected, metadata_update)
+
+  def testAddKey_KeyDataCorrectExpiring(self):
+    user = 'user'
+    public_key = ssh.Keys.PublicKey('type', 'data', 'comment')
+    ssh_keys = []
+    expiration = datetime.datetime(2038, 1, 19, 3, 14, 6)
+    expected = {'ssh-keys': (
+        'user:type data google-ssh '
+        '{"userName":"user","expireOn":"2038-01-19T03:14:06+0000"}')}
+    metadata_update = self.RunAddSSHKeyToMetadataMessage(
+        user, public_key, expiration, False, ssh_keys)
+    self.assertEqual(expected, metadata_update)
+
+  def testAddKey_DoesNotReaddExistingKey(self):
+    user = 'user'
+    public_key = ssh.Keys.PublicKey('type', 'data', 'comment')
+    ssh_keys = ['user:type data comment']
+    # User has keys available, and no expiration is specified
+    # so no update to metadata occurs.
+    expected = {}
+    metadata_update = self.RunAddSSHKeyToMetadataMessage(
+        user, public_key, None, False, ssh_keys)
+    self.assertEqual(expected, metadata_update)
+
+  def testAddKey_DropsExpiredKeys(self):
+    user = 'user'
+    public_key = ssh.Keys.PublicKey('type', 'data', 'comment')
+    ssh_keys = [
+        'valid:type data comment',
+        ('expired:type data google-ssh '
+         '{"userName":"user","expireOn":"1970-01-01T00:00:00Z"}'),
+    ]
+    expected = {'ssh-keys':
+                    'valid:type data comment\nuser:type data comment'}
+    metadata_update = self.RunAddSSHKeyToMetadataMessage(
+        user, public_key, None, False, ssh_keys)
+    self.assertEqual(expected, metadata_update)
+
+  @parameterized.named_parameters(
+      ('not json', 'foo'),
+      ('no expiresOn', '{"userName": "user"}'),
+      ('unable to parse expiresOn', '{"userName": "user", "expiresOn": -1"}'))
+  def testAddKey_TreatInvalidExpirationsAsUnexpired(self, expiration_text):
+    user = 'user'
+    public_key = ssh.Keys.PublicKey('type', 'data', 'comment')
+    ssh_keys = [
+        'invalidexisting:type data google-ssh {}'.format(expiration_text)
+    ]
+    expected = {'ssh-keys': '\n'.join(ssh_keys + ['user:type data comment'])}
+    metadata_update = self.RunAddSSHKeyToMetadataMessage(
+        user, public_key, None, False, ssh_keys)
+    self.assertEqual(expected, metadata_update)
 
 
 if __name__ == '__main__':

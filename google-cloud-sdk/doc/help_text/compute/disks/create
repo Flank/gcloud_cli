@@ -6,7 +6,8 @@ SYNOPSIS
         [--csek-key-file=FILE] [--description=DESCRIPTION]
         [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
         [--licenses=[LICENSE,...]] [--replica-zones=ZONE,ZONE]
-        [--no-require-csek-key-create] [--size=SIZE] [--type=TYPE]
+        [--no-require-csek-key-create]
+        [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
@@ -108,6 +109,10 @@ FLAGS
         https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
+
+     --resource-policies=[RESOURCE_POLICY,...]
+        A list of resource policy names to be added to the disk. The policies
+        must exist in the same region as the disk.
 
      --size=SIZE
         Size of the disks. The value must be a whole number followed by a size

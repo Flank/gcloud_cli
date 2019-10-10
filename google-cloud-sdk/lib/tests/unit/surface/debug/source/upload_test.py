@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class UploadTest(base.DebugSdkTest):
   def testUpload(self):
     self.RunDebugBeta(['source', 'upload', self.tmpdir])
 
-    self.mock_upload.assert_called_with(None, self.tmpdir)
+    self.mock_upload.assert_called_with(None, self.tmpdir, None)
     self.AssertOutputContains('branch: randombranch')
     self.AssertErrContains('Wrote 5 file(s), 500 bytes.')
     self.AssertErrContains('Skipped 2 file(s) due to size limitations')
@@ -90,7 +90,7 @@ class UploadTest(base.DebugSdkTest):
 
     self.RunDebugBeta(['source', 'upload', '--branch=branch1', self.tmpdir])
 
-    self.mock_upload.assert_called_with('branch1', self.tmpdir)
+    self.mock_upload.assert_called_with('branch1', self.tmpdir, None)
     self.AssertOutputContains('branch: branch1')
 
   def testUploadSourceContextOutput(self):
@@ -108,3 +108,12 @@ class UploadTest(base.DebugSdkTest):
 
     self.assertEqual(self.source_context['context'],
                      _load_json(source_context_file))
+
+  def testUploadWithIgnorefile(self):
+    ignore_file = '.ignore_file_test'
+    self.mock_upload.return_value['files_skipped'] = 1
+    self.RunDebugBeta([
+        'source', 'upload', '--ignore-file={0}'.format(ignore_file), self.tmpdir
+    ])
+    self.mock_upload.assert_called_with(None, self.tmpdir, ignore_file)
+    self.AssertErrContains('Skipped 1 file(s) due to size limitations')

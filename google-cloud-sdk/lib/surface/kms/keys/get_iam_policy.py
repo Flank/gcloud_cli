@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class GetIamPolicy(base.ListCommand):
   The following command gets the IAM policy for the key `frodo` within
   the keyring `fellowship` and location `global`:
 
-    $ {command} frodo --keyring fellowship --location global
+    $ {command} frodo --keyring=fellowship --location=global
   """
 
   @staticmethod

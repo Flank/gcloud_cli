@@ -81,7 +81,8 @@ device\-name.
 .TP 2m
 \fBmode\fR
 Specifies the attachment mode of the disk. Supported options are 'ro' for
-read\-only and 'rw' for read\-write. If omitted, defaults to 'rw'.
+read\-only and 'rw' for read\-write. If omitted, defaults to 'rw'. \f5mode\fR
+can only be specified if \f5source\fR is given.
 
 .TP 2m
 \fBauto\-delete\fR
@@ -167,7 +168,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

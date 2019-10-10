@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,23 @@ class TopicsCreateTest(base.CloudPubsubTestBase):
     self.assertEqual(1, len(result))
     self.assertEqual(result[0].name, topic_ref.RelativeName())
 
+  def testSingleTopicCreateLabels(self):
+    topic_ref, topic_msg = self._CreateTopicResourceAndMessage('topic1')
+    labels = self.msgs.Topic.LabelsValue(
+        additionalProperties=[
+            self.msgs.Topic.LabelsValue.AdditionalProperty(
+                key='label1', value='value1'),
+            self.msgs.Topic.LabelsValue.AdditionalProperty(
+                key='label2', value='value2')])
+    topic_msg.labels = labels
+    self.svc.Expect(request=topic_msg, response=topic_msg)
+
+    result = list(self.Run('pubsub topics create topic1 '
+                           '--labels label1=value1,label2=value2'))
+
+    self.assertEqual(1, len(result))
+    self.assertEqual(result[0].name, topic_ref.RelativeName())
+
   def testSingleTopicCreateFullUri(self):
     topic_ref, topic_msg = self._CreateTopicResourceAndMessage('topic1')
     self.svc.Expect(request=topic_msg, response=topic_msg)
@@ -89,28 +106,31 @@ class TopicsCreateTest(base.CloudPubsubTestBase):
     self.AssertErrContains('Failed to create topic [{}]: ERROR2.'
                            .format(topic_ref2.RelativeName()))
 
+  def testMessageStoragePolicy(self):
+    topic_ref, topic_msg = self._CreateTopicResourceAndMessage('topic1')
+    topic_msg.messageStoragePolicy = self.msgs.MessageStoragePolicy(
+        allowedPersistenceRegions=['us-central1', 'us-east2'])
+    self.svc.Expect(request=topic_msg, response=topic_msg)
+
+    result = list(
+        self.Run(
+            'pubsub topics create topic1 --message-storage-policy-allowed-regions=us-central1,us-east2'
+        ))
+
+    self.assertEqual(1, len(result))
+    self.assertEqual(result[0].name, topic_ref.RelativeName())
+
+
+class TopicsCreateAlphaTest(TopicsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 class TopicsCreateBetaTest(TopicsCreateTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-
-  def testSingleTopicCreateLabels(self):
-    topic_ref, topic_msg = self._CreateTopicResourceAndMessage('topic1')
-    labels = self.msgs.Topic.LabelsValue(
-        additionalProperties=[
-            self.msgs.Topic.LabelsValue.AdditionalProperty(
-                key='label1', value='value1'),
-            self.msgs.Topic.LabelsValue.AdditionalProperty(
-                key='label2', value='value2')])
-    topic_msg.labels = labels
-    self.svc.Expect(request=topic_msg, response=topic_msg)
-
-    result = list(self.Run('pubsub topics create topic1 '
-                           '--labels label1=value1,label2=value2'))
-
-    self.assertEqual(1, len(result))
-    self.assertEqual(result[0].name, topic_ref.RelativeName())
 
   def testSingleTopicCreateWithLegacyOutput(self):
     properties.VALUES.pubsub.legacy_output.Set(True)
@@ -123,16 +143,11 @@ class TopicsCreateBetaTest(TopicsCreateTest):
     self.assertEqual(result[0]['topicId'], topic_ref.RelativeName())
 
 
-class TopicsCreateGATest(base.CloudPubsubTestBase):
+class TopicsCreateGATest(TopicsCreateTest):
 
   def SetUp(self):
     self.svc = self.client.projects_topics.Create
     self.track = calliope_base.ReleaseTrack.GA
-
-  def _CreateTopicResourceAndMessage(self, name):
-    topic_ref = util.ParseTopic(name, self.Project())
-    topic_msg = self.msgs.Topic(name=topic_ref.RelativeName())
-    return (topic_ref, topic_msg)
 
   def testSingleTopicCreateNoLegacyOutput(self):
     properties.VALUES.pubsub.legacy_output.Set(True)

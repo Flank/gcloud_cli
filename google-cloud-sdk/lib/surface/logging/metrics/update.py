@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -154,7 +154,7 @@ class UpdateBeta(base.UpdateCommand):
                               help=('A path to a YAML file specifying the '
                                     'updates to be made to the logs-based '
                                     'metric.'),
-                              type=arg_parsers.BufferedFileInput())
+                              type=arg_parsers.FileContents())
 
   def Run(self, args):
     """This is what gets called when the user runs this command.

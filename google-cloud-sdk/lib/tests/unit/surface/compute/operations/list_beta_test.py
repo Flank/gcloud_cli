@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,9 +64,9 @@ class OperationsListBetaTest(test_base.BaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/beta/projects/my-project/global/operations/operation-1
-            https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1/operations/operation-2
-            https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/operations/operation-3
+            https://compute.googleapis.com/compute/beta/projects/my-project/global/operations/operation-1
+            https://compute.googleapis.com/compute/beta/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/beta/projects/my-project/zones/zone-1/operations/operation-3
             """))
 
   def testWithGlobalFlag(self):
@@ -89,7 +89,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/beta/projects/my-project/global/operations/operation-1
+            https://compute.googleapis.com/compute/beta/projects/my-project/global/operations/operation-1
             """))
 
   def testWithManyArgumentRegionsFlag(self):
@@ -118,7 +118,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1/operations/operation-2
+            https://compute.googleapis.com/compute/beta/projects/my-project/regions/region-1/operations/operation-2
             """))
 
   def testWithNoArgumentZonesFlag(self):
@@ -162,7 +162,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/operations/operation-3
+            https://compute.googleapis.com/compute/beta/projects/my-project/zones/zone-1/operations/operation-3
             """))
 
   def testTabularOutputBeta(self):

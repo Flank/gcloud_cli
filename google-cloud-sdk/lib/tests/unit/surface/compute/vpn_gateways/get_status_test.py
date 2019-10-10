@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,16 +25,16 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class VpnGatewaysGetStatusBetaTest(test_base.BaseTest):
+class VpnGatewaysGetStatusGaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.api_version = 'v1'
     self.v1_messages = core_apis.GetMessagesModule('compute', self.api_version)
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', self.api_version)
-    self.message_version = self.compute_beta
+    self.message_version = self.compute_v1
 
   def testCall(self):
     self.make_requests.side_effect = [[self.messages.VpnGatewayStatus()]]
@@ -48,6 +48,18 @@ class VpnGatewaysGetStatusBetaTest(test_base.BaseTest):
                              project='my-project',
                              region='us-central1',
                              vpnGateway='my-gateway'))])
+
+
+class VpnGatewaysGetStatusBetaTest(VpnGatewaysGetStatusGaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.api_version = 'beta'
+    self.v1_messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', self.api_version)
+    self.message_version = self.compute_beta
 
 
 class VpnGatewaysGetStatusAlphaTest(VpnGatewaysGetStatusBetaTest):

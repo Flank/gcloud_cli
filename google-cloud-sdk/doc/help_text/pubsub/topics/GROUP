@@ -17,6 +17,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        Add IAM policy binding to a topic.
+
      create
         Creates one or more Cloud Pub/Sub topics.
 
@@ -26,6 +29,9 @@ COMMANDS
      describe
         Describes a Cloud Pub/Sub topic.
 
+     get-iam-policy
+        Get the IAM policy for a Cloud Pub/Sub Topic.
+
      list
         Lists Cloud Pub/Sub topics within a project.
 
@@ -34,6 +40,15 @@ COMMANDS
 
      publish
         Publishes a message to the specified topic.
+
+     remove-iam-policy-binding
+        Remove IAM policy binding of a topic.
+
+     set-iam-policy
+        Set IAM policy for a topic.
+
+     update
+        Updates an existing Cloud Pub/Sub topic.
 
 NOTES
     These variants are also available:

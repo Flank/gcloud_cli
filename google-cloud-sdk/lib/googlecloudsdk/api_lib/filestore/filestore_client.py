@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
-from googlecloudsdk.command_lib.filestore import locations_util
 from googlecloudsdk.command_lib.filestore.snapshots import util as snapshot_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
@@ -120,6 +119,12 @@ class FilestoreClient(object):
     request = self.messages.FileProjectsLocationsInstancesGetRequest(
         name=instance_ref.RelativeName())
     return self.client.projects_locations_instances.Get(request)
+
+  def GetSnapshot(self, snapshot_ref):
+    """Get Cloud Filestore snapshot information."""
+    request = self.messages.FileProjectsLocationsSnapshotsGetRequest(
+        name=snapshot_ref.RelativeName())
+    return self.client.projects_locations_snapshots.Get(request)
 
   def DeleteInstance(self, instance_ref, async_):
     """Delete an existing Cloud Filestore instance."""
@@ -322,8 +327,7 @@ class AlphaFilestoreAdapter(object):
       source_snapshot = None
       if 'source-snapshot' in file_share:
         project = properties.VALUES.core.project.Get(required=True)
-        location = (file_share.get('source-snapshot-region') or
-                    locations_util.GetRegionFromZone(instance_zone))
+        location = (file_share.get('source-snapshot-region') or instance_zone)
         source_snapshot = snapshot_util.SNAPSHOT_NAME_TEMPLATE.format(
             project, location, file_share.get('source-snapshot'))
       file_share_config = self.messages.FileShareConfig(

@@ -17,7 +17,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Do not wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --backup-id=BACKUP_ID
         The ID of the backup run to restore from.

@@ -28,14 +28,15 @@ EXAMPLES
     To view the details of a particular change, run:
 
         $ gcloud dns record-sets changes describe CHANGE_ID \
-            --zone MANAGED_ZONE
+            --zone=MANAGED_ZONE
 
     To view the list of all changes, run:
 
-        $ gcloud dns record-sets changes list --zone MANAGED_ZONE
+        $ gcloud dns record-sets changes list --zone=MANAGED_ZONE
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets changes
         $ gcloud beta dns record-sets changes
 

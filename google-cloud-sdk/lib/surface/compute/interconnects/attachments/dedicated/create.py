@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ from googlecloudsdk.core import log
 _DOCUMENTATION_LINK = 'https://cloud.google.com/interconnect/docs/how-to/dedicated/creating-vlan-attachments'
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
   """Create a Google Compute Engine dedicated interconnect attachment.
 
@@ -59,8 +60,7 @@ class Create(base.CreateCommand):
     attachment_flags.AddAdminEnabled(parser, default_behavior=True)
     attachment_flags.AddVlan(parser)
     attachment_flags.AddCandidateSubnets(parser)
-    attachment_flags.AddBandwidth(
-        parser, required=False, track=cls._release_track)
+    attachment_flags.AddBandwidth(parser, required=False)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -96,10 +96,28 @@ class Create(base.CreateCommand):
         vlan_tag_802_1q=args.vlan,
         admin_enabled=args.admin_enabled,
         candidate_subnets=args.candidate_subnets,
-        bandwidth=getattr(args, 'bandwidth', None))
+        bandwidth=getattr(args, 'bandwidth', None),
+        validate_only=getattr(args, 'dry_run', None),
+        mtu=getattr(args, 'mtu', None))
 
   def Epilog(self, resources_were_displayed):
     message = ('You must configure your Google Cloud Router with an interface '
                'and BGP peer for your created VLAN attachment. See also {} for '
                'more detailed help.'.format(_DOCUMENTATION_LINK))
     log.status.Print(message)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(Create):
+  """Create a Google Compute Engine dedicated interconnect attachment.
+
+  *{command}* is used to create a dedicated interconnect attachments. An
+  interconnect attachment is what binds the underlying connectivity of an
+  interconnect to a path into and out of the customer's cloud network.
+  """
+
+  @classmethod
+  def Args(cls, parser):
+    super(CreateAlpha, cls).Args(parser)
+    attachment_flags.AddDryRun(parser)
+    attachment_flags.AddMtu(parser)

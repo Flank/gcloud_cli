@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,66 +19,138 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import collections
+import os
 import re
 
+from googlecloudsdk.api_lib.container import kubeconfig
 from googlecloudsdk.api_lib.run import global_methods
+from googlecloudsdk.api_lib.services import enable_api
+from googlecloudsdk.calliope import actions
+from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.functions.deploy import env_vars_util
 from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
-from googlecloudsdk.command_lib.run import source_ref as source_ref_util
+from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.command_lib.util.args import map_util
 from googlecloudsdk.command_lib.util.args import repeated
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
-
 
 _VISIBILITY_MODES = {
     'internal': 'Visible only within the cluster.',
     'external': 'Visible from outside the cluster.',
 }
 
+_PLATFORMS = collections.OrderedDict([
+    ('managed', 'Fully managed version of Cloud Run. Use with the `--region` '
+                'flag or set the [run/region] property to specify a Cloud Run '
+                'region.'),
+    ('gke', 'Cloud Run for Anthos on Google Kubernetes Engine. Use with the '
+            '`--cluster` and `--cluster-location` flags or set the '
+            '[run/cluster] and [run/cluster_location] properties to specify a '
+            'cluster in a given zone.'),
+    ('kubernetes', 'Use a Knative-compatible kubernetes cluster. Use with the '
+                   '`--kubeconfig` and `--context` flags to specify a '
+                   'kubeconfig file and the context for connecting.'),
+])
+
+_PLATFORM_SHORT_DESCRIPTIONS = {
+    'managed': 'Cloud Run (fully managed)',
+    'gke': 'Cloud Run for Anthos deployed on GKE',
+    'kubernetes': 'Cloud Run for Anthos deployed on VMware',
+}
+
+_DEFAULT_KUBECONFIG_PATH = '~/.kube/config'
+
 
 class ArgumentError(exceptions.Error):
   pass
 
 
-def _AddSourceArg(parser):
-  """Add a source resource arg."""
-  parser.add_argument(
-      '--source',
-      # TODO(b/110538411): re-expose source arg when it's time.
-      hidden=True,
-      help="""\
-      The app source. Defaults to the working directory. May be a GCS bucket,
-      Google source code repository, or directory on the local filesystem.
-      """)
+class KubeconfigError(exceptions.Error):
+  pass
 
 
-def _AddImageArg(parser):
+def AddImageArg(parser):
   """Add an image resource arg."""
   parser.add_argument(
       '--image',
-      help='Path to the GCR container to deploy.')
+      required=True,
+      help='Name of the container image to deploy (e.g. '
+      '`gcr.io/cloudrun/hello:latest`).')
+
+
+_ARG_GROUP_HELP_TEXT = ('Only applicable if connecting to {platform_desc}. '
+                        'Specify {platform} to use:')
+
+
+def _GetOrAddArgGroup(parser, help_text):
+  """Create a new arg group or return existing group with given help text."""
+  for arg in parser.arguments:
+    if arg.is_group and arg.help == help_text:
+      return arg
+  return parser.add_argument_group(help_text)
+
+
+def GetManagedArgGroup(parser):
+  """Get an arg group for managed CR-only flags."""
+  return _GetOrAddArgGroup(
+      parser,
+      _ARG_GROUP_HELP_TEXT.format(
+          platform='\'--platform=managed\'',
+          platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+
+def GetGkeArgGroup(parser):
+  """Get an arg group for CRoGKE-only flags."""
+  return _GetOrAddArgGroup(
+      parser,
+      _ARG_GROUP_HELP_TEXT.format(
+          platform='\'--platform=gke\'',
+          platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+
+def GetKubernetesArgGroup(parser):
+  """Get an arg group for --platform=kubernetes only flags."""
+  return _GetOrAddArgGroup(
+      parser,
+      _ARG_GROUP_HELP_TEXT.format(
+          platform='\'--platform=kubernetes\'',
+          platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
+
+
+def GetClusterArgGroup(parser):
+  """Get an arg group for any generic cluster flags."""
+  return _GetOrAddArgGroup(
+      parser,
+      _ARG_GROUP_HELP_TEXT.format(
+          platform='\'--platform=gke\' or \'--platform=kubernetes\'',
+          platform_desc='{} or {}'.format(
+              _PLATFORM_SHORT_DESCRIPTIONS['gke'],
+              _PLATFORM_SHORT_DESCRIPTIONS['kubernetes'])))
 
 
 def AddAllowUnauthenticatedFlag(parser):
   """Add the --allow-unauthenticated flag."""
   parser.add_argument(
       '--allow-unauthenticated',
-      default=False,
-      action='store_true',
-      help='True to allow unauthenticated access to the service.')
+      action=arg_parsers.StoreTrueFalseAction,
+      help='Whether to enable allowing unauthenticated access to the service. '
+           'This may take a few moments to take effect.')
 
 
 def AddAsyncFlag(parser):
   """Add an async flag."""
-  parser.add_argument(
-      '--async', default=False, action='store_true',
-      help='True to deploy asynchronously.')
+  base.ASYNC_FLAG.AddToParser(parser)
 
 
 def AddEndpointVisibilityEnum(parser):
@@ -88,27 +160,22 @@ def AddEndpointVisibilityEnum(parser):
       choices=_VISIBILITY_MODES,
       help=('Defaults to \'external\'. If \'external\', the service can be '
             'invoked through the internet, in addition to through the cluster '
-            'network. Only applicable to Cloud Run on Kubernetes Engine.'))
+            'network.'))
 
 
 def AddServiceFlag(parser):
   """Add a service resource flag."""
   parser.add_argument(
-      '--service', required=False,
+      '--service',
+      required=False,
       help='Limit matched revisions to the given service.')
-
-
-def AddSourceRefFlags(parser):
-  """Add the image and source args."""
-  source_ref_group = parser.add_mutually_exclusive_group()
-  _AddSourceArg(source_ref_group)
-  _AddImageArg(source_ref_group)
 
 
 def AddRegionArg(parser):
   """Add a region arg."""
   parser.add_argument(
-      '--region', help='Region in which the resource can be found. '
+      '--region',
+      help='Region in which the resource can be found. '
       'Alternatively, set the property [run/region].')
 
 
@@ -122,7 +189,8 @@ def AddRegionArgWithDefault(parser):
     parser: ArgumentParser, The calliope argparse parser.
   """
   parser.add_argument(
-      '--region', default='us-central1',
+      '--region',
+      default='us-central1',
       help='Region in which to list the resources.')
 
 
@@ -135,6 +203,82 @@ def AddFunctionArg(parser):
       Specifies that the deployed object is a function. If a value is
       provided, that value is used as the entrypoint.
       """)
+
+
+def AddNoTrafficFlag(parser):
+  """Add flag to deploy a revision with no traffic."""
+
+  group = GetGkeArgGroup(parser).add_mutually_exclusive_group()
+
+  group.add_argument(
+      '--no-traffic',
+      default=False,
+      action='store_true',
+      help='True to avoid sending traffic to the revision beign deployed. '
+      'Setting this flag assigns any traffic assigned to the LATEST revision '
+      'to the specific revision bound to LATEST before the deployment. The '
+      'effect is that the revsion being deployed will not receive traffic. '
+      'After a deployment with this flag the LATEST revision will not recieve '
+      'traffic on future deployments.')
+
+
+def AddUpdateTrafficFlags(parser):
+  """Add flags for updating traffic assignments for a service."""
+
+  @staticmethod
+  def TrafficTargetKey(key):
+    return key
+
+  @staticmethod
+  def TrafficPercentageValue(value):
+    """Type validation for traffic percentage flag values."""
+    try:
+      result = int(value)
+    except  (TypeError, ValueError):
+      raise ArgumentError(
+          'Traffic percentage value %s is not an integer.' % value
+      )
+
+    if result < 0 or result > 100:
+      raise ArgumentError(
+          'Traffic percentage value %s is not between 0 and 100.' % value
+      )
+    return result
+
+  group = GetGkeArgGroup(parser).add_mutually_exclusive_group()
+
+  group.add_argument(
+      '--to-revisions',
+      metavar='REVISION-NAME=PERCENTAGE',
+      action=arg_parsers.UpdateAction,
+      type=arg_parsers.ArgDict(
+          key_type=TrafficTargetKey.__func__,
+          value_type=TrafficPercentageValue.__func__),
+      help='Comma separated list of traffic assignments in the form '
+      'REVISION-NAME=PERCENTAGE. REVISION-NAME must be the name for a '
+      'revision for the service as returned by \'gcloud beta run list '
+      'revisions\'. PERCENTAGE must be an integer percentage between '
+      '0 and 100 inclusive.  Ex service-nw9hs=10,service-nw9hs=20 '
+      'Up to 100 percent of traffic may be assigned. If 100 percent '
+      'of traffic is assigned,  the Service traffic is updated as '
+      'specified. If under 100 percent of traffic is assigned, the '
+      'Service traffic is updated as specified for revisions with '
+      'assignments and traffic is scaled up or down down proportionally '
+      'as needed for revision that are currently serving traffic but that do '
+      'not have new assignments. For example assume revision-1 is serving '
+      '40 percent of traffic and revision-2 is serving 60 percent. If '
+      'revision-1 is assigned 45 percent of traffic and no assignment is '
+      'made for revision-2, the service is updated with revsion-1 assigned '
+      '45 percent of traffic and revision-2 scaled down to 55 percent.')
+
+  group.add_argument(
+      '--to-latest',
+      default=False,
+      action='store_true',
+      help='True to assign 100 percent of traffic to the \'latest\' '
+      'revision of this service. Note that when a new revision is '
+      'created, it will become the \'latest\' and traffic will be '
+      'directed to it. Defaults to False.')
 
 
 def AddCloudSQLFlags(parser):
@@ -152,46 +296,73 @@ def AddCloudSQLFlags(parser):
       <project>:<region>:<instance> for the instance.""")
 
 
-def AddMutexEnvVarsFlags(parser):
-  """Add flags for creating updating and deleting env vars."""
-  # TODO(b/119837621): Use env_vars_util.AddUpdateEnvVarsFlags when
-  # `gcloud run` supports an env var file.
-  key_type = env_vars_util.EnvVarKeyType
-  value_type = env_vars_util.EnvVarValueType
-  flag_name = 'env-vars'
-  long_name = 'environment variables'
+def AddMapFlagsNoFile(parser,
+                      flag_name,
+                      group_help='',
+                      long_name=None,
+                      key_type=None,
+                      value_type=None):
+  """Add flags like map_util.AddUpdateMapFlags but without the file one.
 
-  group = parser.add_mutually_exclusive_group()
+  Args:
+    parser: The argument parser
+    flag_name: The name for the property to be used in flag names
+    group_help: Help text for the group of flags
+    long_name: The name for the property to be used in help text
+    key_type: A function to apply to map keys.
+    value_type: A function to apply to map values.
+  """
+  if not long_name:
+    long_name = flag_name
+
+  group = parser.add_mutually_exclusive_group(group_help)
   update_remove_group = group.add_argument_group(
       help=('Only --update-{0} and --remove-{0} can be used together. If both '
             'are specified, --remove-{0} will be applied first.'
            ).format(flag_name))
-  map_util.AddMapUpdateFlag(update_remove_group, flag_name, long_name,
-                            key_type=key_type, value_type=value_type)
-  map_util.AddMapRemoveFlag(update_remove_group, flag_name, long_name,
-                            key_type=key_type)
+  map_util.AddMapUpdateFlag(
+      update_remove_group,
+      flag_name,
+      long_name,
+      key_type=key_type,
+      value_type=value_type)
+  map_util.AddMapRemoveFlag(
+      update_remove_group, flag_name, long_name, key_type=key_type)
   map_util.AddMapClearFlag(group, flag_name, long_name)
-  map_util.AddMapSetFlag(group, flag_name, long_name, key_type=key_type,
-                         value_type=value_type)
+  map_util.AddMapSetFlag(
+      group, flag_name, long_name, key_type=key_type, value_type=value_type)
+
+
+def AddMutexEnvVarsFlags(parser):
+  """Add flags for creating updating and deleting env vars."""
+  # TODO(b/119837621): Use env_vars_util.AddUpdateEnvVarsFlags when
+  # `gcloud run` supports an env var file.
+  AddMapFlagsNoFile(
+      parser,
+      flag_name='env-vars',
+      long_name='environment variables',
+      key_type=env_vars_util.EnvVarKeyType,
+      value_type=env_vars_util.EnvVarValueType)
 
 
 def AddMemoryFlag(parser):
-  parser.add_argument('--memory',
-                      help='Set a memory limit. Ex: 1Gi, 512Mi.')
+  parser.add_argument('--memory', help='Set a memory limit. Ex: 1Gi, 512Mi.')
 
 
 def AddCpuFlag(parser):
-  parser.add_argument('--cpu',
-                      help='Set a CPU limit in Kubernetes cpu units. '
-                           'Ex: .5, 500m, 2.')
+  parser.add_argument(
+      '--cpu',
+      help='Set a CPU limit in Kubernetes cpu units. '
+      'Ex: .5, 500m, 2.')
 
 
 def AddConcurrencyFlag(parser):
-  parser.add_argument('--concurrency',
-                      help='Set the number of concurrent requests allowed per '
-                      'instance. A concurrency of 0 or unspecified indicates '
-                      'any number of concurrent requests are allowed. To unset '
-                      'this field, provide the special value `default`.')
+  parser.add_argument(
+      '--concurrency',
+      help='Set the number of concurrent requests allowed per '
+      'container instance. A concurrency of 0 or unspecified indicates '
+      'any number of concurrent requests are allowed. To unset '
+      'this field, provide the special value `default`.')
 
 
 def AddTimeoutFlag(parser):
@@ -213,34 +384,217 @@ def AddServiceAccountFlag(parser):
       'account.')
 
 
+def AddPlatformArg(parser):
+  """Add a platform arg."""
+  parser.add_argument(
+      '--platform',
+      choices=_PLATFORMS,
+      action=actions.StoreProperty(properties.VALUES.run.platform),
+      help='Target platform for running commands. '
+      'Alternatively, set the property [run/platform]. '
+      'If not specified, the user will be prompted to choose a platform.')
+
+
+def AddKubeconfigFlags(parser):
+  parser.add_argument(
+      '--kubeconfig',
+      help='The absolute path to your kubectl config file. If not specified, '
+      'the colon- or semicolon-delimited list of paths specified by '
+      '$KUBECONFIG will be used. If $KUBECONFIG is unset, this defaults to '
+      '`{}`.'.format(_DEFAULT_KUBECONFIG_PATH))
+  parser.add_argument(
+      '--context',
+      help='The name of the context in your kubectl config file to use for '
+      'connecting.')
+
+
+def AddRevisionSuffixArg(parser):
+  parser.add_argument(
+      '--revision-suffix',
+      help='Specify the suffix of the revision name. Revision names always '
+      'start with the service name automatically. For example, specifying '
+      '[--revision-suffix=v1] for a service named \'helloworld\', '
+      'would lead to a revision named \'helloworld-v1\'.')
+
+
+def AddVpcConnectorArg(parser):
+  parser.add_argument(
+      '--vpc-connector', help='Set a VPC connector for this Service.')
+  parser.add_argument(
+      '--clear-vpc-connector',
+      action='store_true',
+      help='Remove the VPC connector for this Service.')
+
+
+def AddSecretsFlags(parser):
+  """Adds flags for creating, updating, and deleting secrets."""
+  AddMapFlagsNoFile(
+      parser,
+      group_help=('Specify secrets to mount or provide as environment '
+                  "variables. Keys starting with a forward slash '/' are mount "
+                  'paths. All other keys correspond to environment variables. '
+                  'The values associated with each of these should be in the '
+                  'form SECRET_NAME:KEY_IN_SECRET; you may omit the '
+                  'key within the secret to specify a mount of all keys '
+                  'within the secret. For example: '
+                  "'--update-secrets=/my/path=mysecret,"
+                  "ENV=othersecret:key.json' "
+                  "will create a volume with secret 'mysecret' "
+                  "and mount that volume at '/my/path'. Because no secret "
+                  "key was specified, all keys in 'mysecret' will be included. "
+                  'An environment variable named ENV will also be created '
+                  "whose value is the value of 'key.json' in 'othersecret'."),
+      flag_name='secrets')
+
+
+def AddConfigMapsFlags(parser):
+  """Adds flags for creating, updating, and deleting config maps."""
+  AddMapFlagsNoFile(
+      parser,
+      group_help=('Specify config map to mount or provide as environment '
+                  "variables. Keys starting with a forward slash '/' are mount "
+                  'paths. All other keys correspond to environment variables. '
+                  'The values associated with each of these should be in the '
+                  'form CONFIG_MAP_NAME:KEY_IN_CONFIG_MAP; you may omit the '
+                  'key within the config map to specify a mount of all keys '
+                  'within the config map. For example: '
+                  "'--update-config-maps=/my/path=myconfig,"
+                  "ENV=otherconfig:key.json' "
+                  "will create a volume with config map 'myconfig' "
+                  "and mount that volume at '/my/path'. Because no config map "
+                  "key was specified, all keys in 'myconfig' will be included. "
+                  'An environment variable named ENV will also be created '
+                  "whose value is the value of 'key.json' in 'otherconfig'."),
+      flag_name='config-maps')
+
+
+def AddLabelsFlags(parser):
+  """Adds update command labels flags to an argparse parser.
+
+  Args:
+    parser: The argparse parser to add the flags to.
+  """
+  group = parser.add_group()
+  add_group = group.add_mutually_exclusive_group()
+  labels_util.GetCreateLabelsFlag(
+      'An alias to --update-labels.',
+      validate_keys=False, validate_values=False).AddToParser(add_group)
+  labels_util.GetUpdateLabelsFlag(
+      '', validate_keys=False, validate_values=False).AddToParser(add_group)
+  remove_group = group.add_mutually_exclusive_group()
+  labels_util.GetClearLabelsFlag().AddToParser(remove_group)
+  labels_util.GetRemoveLabelsFlag('').AddToParser(remove_group)
+
+
+class _ScaleValue(object):
+  """Type for min/max-instaces flag values."""
+
+  def __init__(self, value):
+    self.restore_default = value == 'default'
+    if not self.restore_default:
+      try:
+        self.instance_count = int(value)
+      except  (TypeError, ValueError):
+        raise ArgumentError(
+            'Instance count value %s is not an integer '
+            'or \'default\'.' % value
+        )
+
+      if self.instance_count < 0:
+        raise ArgumentError('Instance count value %s is negative.' % value)
+
+
+def AddMinInstancesFlag(parser):
+  """Add min scaling flag."""
+  GetClusterArgGroup(parser).add_argument(
+      '--min-instances',
+      type=_ScaleValue,
+      help=('The minimum number of container instances of the Service to run '
+            "or 'default' to remove any minimum."))
+
+
+def AddMaxInstancesFlag(parser):
+  """Add max scaling flag."""
+  parser.add_argument(
+      '--max-instances',
+      type=_ScaleValue,
+      help=('The maximum number of container instances of the Service to run '
+            "or 'default' to remove any maximum."))
+
+
+def AddCommandFlag(parser):
+  """Add flags for specifying container's startup command."""
+  parser.add_argument(
+      '--command',
+      help='Entrypoint for the container image. If not specified, the '
+      'container image\'s default Entrypoint is run. '
+      'To reset this field to its default, pass an empty string.')
+
+
+def AddArgsFlag(parser):
+  """Add flags for specifying container's startup args."""
+  parser.add_argument(
+      '--args',
+      help='Arguments passed to the command run by the container '
+      'image. If not specified and no \'--command\' is provided, the container '
+      'image\'s default Cmd is used. Otherwise, if not specified, no arguments '
+      'are passed. '
+      'To reset this field to its default, pass an empty string.')
+
+
+def _HasChanges(args, flags):
+  """True iff any of the passed flags are set."""
+  return any(_FlagIsExplicitlySet(args, flag) for flag in flags)
+
+
 def _HasEnvChanges(args):
   """True iff any of the env var flags are set."""
-  env_flags = ['update_env_vars', 'set_env_vars',
-               'remove_env_vars', 'clear_env_vars']
-  return any(args.IsSpecified(flag) for flag in env_flags)
+  env_flags = [
+      'update_env_vars', 'set_env_vars', 'remove_env_vars', 'clear_env_vars'
+  ]
+  return _HasChanges(args, env_flags)
 
 
 def _HasCloudSQLChanges(args):
   """True iff any of the cloudsql flags are set."""
-  instances_flags = ['add_cloudsql_instances', 'set_cloudsql_instances',
-                     'remove_cloudsql_instances', 'clear_cloudsql_instances']
-  # hasattr check is to allow the same code to work for release tracks that
-  # don't have the args at all yet.
-  return any(hasattr(args, flag) and args.IsSpecified(flag)
-             for flag in instances_flags)
+  instances_flags = [
+      'add_cloudsql_instances', 'set_cloudsql_instances',
+      'remove_cloudsql_instances', 'clear_cloudsql_instances'
+  ]
+  return _HasChanges(args, instances_flags)
 
 
 def _HasLabelChanges(args):
   """True iff any of the label flags are set."""
-  label_flags = ['update_labels', 'clear_labels', 'remove_labels']
-  # hasattr check is to allow the same code to work for release tracks that
-  # don't have the args at all yet.
-  return any(hasattr(args, flag) and args.IsSpecified(flag)
-             for flag in label_flags)
+  label_flags = ['labels', 'update_labels', 'clear_labels', 'remove_labels']
+  return _HasChanges(args, label_flags)
+
+
+def _HasSecretsChanges(args):
+  """True iff any of the secret flags are set."""
+  secret_flags = [
+      'update_secrets', 'set_secrets', 'remove_secrets', 'clear_secrets'
+  ]
+  return _HasChanges(args, secret_flags)
+
+
+def _HasConfigMapsChanges(args):
+  """True iff any of the config maps flags are set."""
+  config_maps_flags = [
+      'update_config_maps', 'set_config_maps', 'remove_config_maps',
+      'clear_config_maps'
+  ]
+  return _HasChanges(args, config_maps_flags)
+
+
+def _HasTrafficChanges(args):
+  """True iff any of the traffic flags are set."""
+  traffic_flags = ['to_revisions', 'to_latest']
+  return _HasChanges(args, traffic_flags)
 
 
 def _GetEnvChanges(args):
-  """Return config_changes.EnvVarChanges for given args."""
+  """Return config_changes.EnvVarLiteralChanges for given args."""
   kwargs = {}
 
   update = args.update_env_vars or args.set_env_vars
@@ -254,20 +608,172 @@ def _GetEnvChanges(args):
   if args.set_env_vars or args.clear_env_vars:
     kwargs['clear_others'] = True
 
-  return config_changes.EnvVarChanges(**kwargs)
+  return config_changes.EnvVarLiteralChanges(**kwargs)
+
+
+def _GetScalingChanges(args):
+  """Returns the list of changes for scaling for given args."""
+  result = []
+  if 'min_instances' in args and args.min_instances is not None:
+    scale_value = args.min_instances
+    if scale_value.restore_default or scale_value.instance_count == 0:
+      result.append(config_changes.DeleteTemplateAnnotationChange(
+          'autoscaling.knative.dev/minScale'))
+    else:
+      result.append(config_changes.SetTemplateAnnotationChange(
+          'autoscaling.knative.dev/minScale', str(scale_value.instance_count)))
+  if 'max_instances' in args and args.max_instances is not None:
+    scale_value = args.max_instances
+    if scale_value.restore_default:
+      result.append(config_changes.DeleteTemplateAnnotationChange(
+          'autoscaling.knative.dev/maxScale'))
+    else:
+      result.append(config_changes.SetTemplateAnnotationChange(
+          'autoscaling.knative.dev/maxScale', str(scale_value.instance_count)))
+  return result
+
+
+def _IsVolumeMountKey(key):
+  """Returns True if the key refers to a volume mount."""
+  return key.startswith('/')
+
+
+def _GetSecretsChanges(args):
+  """Return secret env var and volume changes for given args."""
+  volume_kwargs = {}
+  env_kwargs = {}
+
+  update = args.update_secrets or args.set_secrets
+  if update:
+    volume_update = {k: v for k, v in update.items() if _IsVolumeMountKey(k)}
+    if volume_update:
+      volume_kwargs['mounts_to_update'] = volume_update
+    env_update = {k: v for k, v in update.items() if not _IsVolumeMountKey(k)}
+    if env_update:
+      env_kwargs['env_vars_to_update'] = env_update
+
+  remove = args.remove_secrets
+  if remove:
+    volume_remove = [k for k in remove if _IsVolumeMountKey(k)]
+    if volume_remove:
+      volume_kwargs['mounts_to_remove'] = volume_remove
+    env_remove = [k for k in remove if not _IsVolumeMountKey(k)]
+    if env_remove:
+      env_kwargs['env_vars_to_remove'] = env_remove
+
+  if args.set_secrets or args.clear_secrets:
+    env_kwargs['clear_others'] = True
+    volume_kwargs['clear_others'] = True
+
+  secret_changes = []
+  if env_kwargs:
+    secret_changes.append(config_changes.SecretEnvVarChanges(**env_kwargs))
+  if volume_kwargs:
+    secret_changes.append(config_changes.SecretVolumeChanges(**volume_kwargs))
+  return secret_changes
+
+
+def _GetConfigMapsChanges(args):
+  """Return config map env var and volume changes for given args."""
+  volume_kwargs = {}
+  env_kwargs = {}
+
+  update = args.update_config_maps or args.set_config_maps
+  if update:
+    volume_update = {k: v for k, v in update.items() if _IsVolumeMountKey(k)}
+    if volume_update:
+      volume_kwargs['mounts_to_update'] = volume_update
+    env_update = {k: v for k, v in update.items() if not _IsVolumeMountKey(k)}
+    if env_update:
+      env_kwargs['env_vars_to_update'] = env_update
+
+  remove = args.remove_config_maps
+  if remove:
+    volume_remove = [k for k in remove if _IsVolumeMountKey(k)]
+    if volume_remove:
+      volume_kwargs['mounts_to_remove'] = volume_remove
+    env_remove = [k for k in remove if not _IsVolumeMountKey(k)]
+    if env_remove:
+      env_kwargs['env_vars_to_remove'] = env_remove
+
+  if args.set_config_maps or args.clear_config_maps:
+    env_kwargs['clear_others'] = True
+    volume_kwargs['clear_others'] = True
+
+  secret_changes = []
+  if env_kwargs:
+    secret_changes.append(config_changes.ConfigMapEnvVarChanges(**env_kwargs))
+  if volume_kwargs:
+    secret_changes.append(
+        config_changes.ConfigMapVolumeChanges(**volume_kwargs))
+  return secret_changes
+
+
+def PromptToEnableApi(service_name):
+  """Prompts to enable the API and throws if the answer is no.
+
+  Args:
+    service_name: str, The service token of the API to prompt for.
+  """
+  if not properties.VALUES.core.should_prompt_to_enable_api.GetBool():
+    return
+
+  project = properties.VALUES.core.project.Get(required=True)
+  # Don't prompt to enable an already enabled API
+  if not enable_api.IsServiceEnabled(project, service_name):
+    if console_io.PromptContinue(
+        default=False,
+        cancel_on_no=True,
+        prompt_string=('API [{}] not enabled on project [{}]. '
+                       'Would you like to enable and retry (this will take a '
+                       'few minutes)?').format(service_name, project)):
+      enable_api.EnableService(project, service_name)
+
+
+_CLOUD_SQL_API_SERVICE_TOKEN = 'sql-component.googleapis.com'
+_CLOUD_SQL_ADMIN_API_SERVICE_TOKEN = 'sqladmin.googleapis.com'
+
+
+def _CheckCloudSQLApiEnablement():
+  if not properties.VALUES.core.should_prompt_to_enable_api.GetBool():
+    return
+  PromptToEnableApi(_CLOUD_SQL_API_SERVICE_TOKEN)
+  PromptToEnableApi(_CLOUD_SQL_ADMIN_API_SERVICE_TOKEN)
+
+
+def _GetTrafficChanges(args):
+  """Returns a changes for traffic assignment based on the flags."""
+  new_percentages = args.to_revisions if args.to_revisions else {}
+  new_latest_percentage = 100 if args.to_latest else None
+  return config_changes.TrafficChanges(new_percentages, new_latest_percentage)
 
 
 def GetConfigurationChanges(args):
   """Returns a list of changes to Configuration, based on the flags set."""
   changes = []
+  changes.extend(_GetScalingChanges(args))
   if _HasEnvChanges(args):
     changes.append(_GetEnvChanges(args))
 
+  if _HasTrafficChanges(args):
+    changes.append(_GetTrafficChanges(args))
+
   if _HasCloudSQLChanges(args):
     region = GetRegion(args)
-    project = (getattr(args, 'project', None) or
-               properties.VALUES.core.project.Get(required=True))
+    project = (
+        getattr(args, 'project', None) or
+        properties.VALUES.core.project.Get(required=True))
+    _CheckCloudSQLApiEnablement()
     changes.append(config_changes.CloudSQLChanges(project, region, args))
+
+  if _HasSecretsChanges(args):
+    changes.extend(_GetSecretsChanges(args))
+
+  if _HasConfigMapsChanges(args):
+    changes.extend(_GetConfigMapsChanges(args))
+
+  if 'no_traffic' in args and args.no_traffic:
+    changes.append(config_changes.NoTrafficChange())
 
   if 'cpu' in args and args.cpu:
     changes.append(config_changes.ResourceChanges(cpu=args.cpu))
@@ -298,16 +804,34 @@ def GetConfigurationChanges(args):
         config_changes.ServiceAccountChanges(
             service_account=args.service_account))
   if _HasLabelChanges(args):
-    diff = labels_util.Diff.FromUpdateArgs(args)
+    additions = (
+        args.labels
+        if _FlagIsExplicitlySet(args, 'labels') else args.update_labels)
+    diff = labels_util.Diff(
+        additions=additions,
+        subtractions=args.remove_labels,
+        clear=args.clear_labels)
     if diff.MayHaveUpdates():
       changes.append(config_changes.LabelChanges(diff))
+  if 'revision_suffix' in args and args.revision_suffix:
+    changes.append(config_changes.RevisionNameChanges(args.revision_suffix))
+  if 'vpc_connector' in args and args.vpc_connector:
+    changes.append(config_changes.VpcConnectorChange(args.vpc_connector))
+  if 'clear_vpc_connector' in args and args.clear_vpc_connector:
+    changes.append(config_changes.ClearVpcConnectorChange())
+  if 'connectivity' in args and args.connectivity:
+    if args.connectivity == 'internal':
+      changes.append(config_changes.EndpointVisibilityChange(True))
+    elif args.connectivity == 'external':
+      changes.append(config_changes.EndpointVisibilityChange(False))
+  if 'command' in args and args.command is not None:
+    # Allow passing an empty string here to reset the field
+    changes.append(config_changes.ContainerCommandChange(args.command))
+  if 'args' in args and args.args is not None:
+    # Allow passing an empty string here to reset the field
+    changes.append(config_changes.ContainerArgsChange(args.args))
 
   return changes
-
-
-def GetFunction(function_arg):
-  """Returns the function name, or None if not deploying a function."""
-  return function_arg
 
 
 def GetService(args):
@@ -325,15 +849,35 @@ def GetService(args):
       'and cannot be longer than 63 characters.'.format(service_ref.servicesId))
 
 
-def GetSourceRef(source_arg, image_arg):
-  """Return a SourceRef representing either image path or source directory."""
-  if image_arg:
-    return source_ref_util.SourceRef.MakeImageRef(image_arg)
-  elif source_arg:
-    return source_ref_util.SourceRef.MakeDirRef(source_arg)
-  else:
-    raise ArgumentError(
-        'You must provide a container image using the --image flag.')
+def GetClusterRef(cluster):
+  project = properties.VALUES.core.project.Get(required=True)
+  return resources.REGISTRY.Parse(
+      cluster.name,
+      params={
+          'projectId': project,
+          'zone': cluster.zone
+      },
+      collection='container.projects.zones.clusters')
+
+
+def PromptForRegion():
+  """Prompt for region from list of available regions.
+
+  This method is referenced by the declaritive iam commands as a fallthrough
+  for getting the region.
+
+  Returns:
+    The region specified by the user, str
+  """
+  if console_io.CanPrompt():
+    client = global_methods.GetServerlessClientInstance()
+    all_regions = global_methods.ListRegions(client)
+    idx = console_io.PromptChoice(
+        all_regions, message='Please specify a region:\n', cancel_option=True)
+    region = all_regions[idx]
+    log.status.Print('To make this the default region, run '
+                     '`gcloud config set run/region {}`.\n'.format(region))
+    return region
 
 
 def GetRegion(args, prompt=False):
@@ -358,78 +902,400 @@ def GetRegion(args, prompt=False):
     return properties.VALUES.run.region.Get()
   if properties.VALUES.compute.region.IsExplicitlySet():
     return properties.VALUES.compute.region.Get()
-  if prompt and console_io.CanPrompt():
-    client = global_methods.GetServerlessClientInstance()
-    all_regions = global_methods.ListRegions(client)
-    idx = console_io.PromptChoice(
-        all_regions, message='Please specify a region:\n', cancel_option=True)
-    region = all_regions[idx]
-    # set the region on args, so we're not embarassed the next time we call
-    # GetRegion
-    args.region = region
-    log.status.Print(
-        'To make this the default region, run '
-        '`gcloud config set run/region {}`.\n'.format(region))
-    return region
+  if prompt:
+    region = PromptForRegion()
+    if region:
+      # set the region on args, so we're not embarassed the next time we call
+      # GetRegion
+      args.region = region
+      return region
 
 
-def ValidateClusterArgs(args):
-  """Raise an error if a cluster is provided with no region or vice versa.
+def GetAllowUnauthenticated(args, client=None, service_ref=None, prompt=False):
+  """Return bool for the explicit intent to allow unauth invocations or None.
+
+  If --[no-]allow-unauthenticated is set, return that value. If not set,
+  prompt for value if desired. If prompting not necessary or doable,
+  return None, indicating that no action needs to be taken.
+
+  Args:
+    args: Namespace, The args namespace
+    client: from googlecloudsdk.command_lib.run import serverless_operations
+      serverless_operations.ServerlessOperations object
+    service_ref: service resource reference (e.g. args.CONCEPTS.service.Parse())
+    prompt: bool, whether to attempt to prompt.
+
+  Returns:
+    bool indicating whether to allow/unallow unauthenticated or None if N/A
+  """
+  if getattr(args, 'allow_unauthenticated', None) is not None:
+    return args.allow_unauthenticated
+
+  if prompt:
+    # Need to check if the user has permissions before we prompt
+    assert client is not None and service_ref is not None
+    if client.CanSetIamPolicyBinding(service_ref):
+      return console_io.PromptContinue(
+          prompt_string=('Allow unauthenticated invocations '
+                         'to [{}]'.format(service_ref.servicesId)),
+          default=False)
+    else:
+      pretty_print.Info(
+          'This service will require authentication to be invoked.')
+  return None
+
+
+def GetKubeconfig(args):
+  """Get config from kubeconfig file.
+
+  Get config from potentially 3 different places, falling back to the next
+  option as necessary:
+  1. file_path specified as argument by the user
+  2. List of file paths specified in $KUBECONFIG
+  3. Default config path (~/.kube/config)
 
   Args:
     args: Namespace, The args namespace.
 
+  Returns:
+    dict: config object
+
   Raises:
-    ConfigurationError if a cluster is specified without a location or a
-    location is specified without a cluster.
+    KubeconfigError: if $KUBECONFIG is set but contains no valid paths
   """
-  cluster_name = args.cluster or properties.VALUES.run.cluster.Get()
-  cluster_location = (args.cluster_location or
-                      properties.VALUES.run.cluster_location.Get())
-  error_msg = ('Connecting to a cluster requires a {} to be specified. '
-               'Either set the {} property or use the `{}` flag.')
-  if cluster_name and not cluster_location:
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format('cluster location', 'run/cluster_location',
-                         '--cluster-location'))
-  if cluster_location and not cluster_name:
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format('cluster name', 'run/cluster', '--cluster'))
+  if getattr(args, 'kubeconfig', None):
+    return kubeconfig.Kubeconfig.LoadFromFile(
+        files.ExpandHomeDir(args.kubeconfig))
+  if os.getenv('KUBECONFIG'):
+    config_paths = os.getenv('KUBECONFIG').split(os.pathsep)
+    config = None
+    # Merge together all valid paths into single config
+    for path in config_paths:
+      try:
+        other_config = kubeconfig.Kubeconfig.LoadFromFile(
+            files.ExpandHomeDir(path))
+        if not config:
+          config = other_config
+        else:
+          config.Merge(other_config)
+      except kubeconfig.Error:
+        pass
+    if not config:
+      raise KubeconfigError('No valid file paths found in $KUBECONFIG')
+    return config
+  return kubeconfig.Kubeconfig.LoadFromFile(
+      files.ExpandHomeDir(_DEFAULT_KUBECONFIG_PATH))
+
+
+def _FlagIsExplicitlySet(args, flag):
+  """Return True if --flag is explicitly passed by the user."""
+  # hasattr check is to allow the same code to work for release tracks that
+  # don't have the args at all yet.
+  return hasattr(args, flag) and args.IsSpecified(flag)
 
 
 def VerifyOnePlatformFlags(args):
   """Raise ConfigurationError if args includes GKE only arguments."""
-  if getattr(args, 'connectivity', None):
+  error_msg = ('The `{flag}` flag is not supported on the fully managed '
+               'version of Cloud Run. Specify `--platform {platform}` or run '
+               '`gcloud config set run/platform {platform}` to work with '
+               '{platform_desc}.')
+  if _FlagIsExplicitlySet(args, 'min_instances'):
     raise serverless_exceptions.ConfigurationError(
-        'The `--connectivity=[internal|external]` flag '
-        'is not supported on OnePlatform.')
+        error_msg.format(
+            flag='--min-instances',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
 
-  if getattr(args, 'cpu', None):
+  if _FlagIsExplicitlySet(args, 'connectivity'):
     raise serverless_exceptions.ConfigurationError(
-        'The `--cpu flag is not supported on OnePlatform.')
+        error_msg.format(
+            flag='--connectivity=[internal|external]',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _FlagIsExplicitlySet(args, 'cpu'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--cpu',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _FlagIsExplicitlySet(args, 'namespace'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--namespace',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _FlagIsExplicitlySet(args, 'cluster'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--cluster',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _FlagIsExplicitlySet(args, 'cluster_location'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--cluster-location',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _HasSecretsChanges(args):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--[update|set|remove|clear]-secrets',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _HasConfigMapsChanges(args):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--[update|set|remove|clear]-config-maps',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _FlagIsExplicitlySet(args, 'kubeconfig'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--kubeconfig',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
+
+  if _FlagIsExplicitlySet(args, 'context'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--context',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
+
+  if _FlagIsExplicitlySet(args, 'no_traffic'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--no-traffic',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
+
+  if _FlagIsExplicitlySet(args, 'to_revisions'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--to-revisions',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
+
+  if _FlagIsExplicitlySet(args, 'to_latest'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--to-latest',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
 
 
 def VerifyGKEFlags(args):
   """Raise ConfigurationError if args includes OnePlatform only arguments."""
-  if getattr(args, 'allow_unauthenticated', None):
+  error_msg = ('The `{flag}` flag is not supported with Cloud Run on GKE. '
+               'Specify `--platform {platform}` or run `gcloud config set '
+               'run/platform {platform}` to work with {platform_desc}.')
+
+  if _FlagIsExplicitlySet(args, 'allow_unauthenticated'):
     raise serverless_exceptions.ConfigurationError(
-        'The `--allow-unauthenticated` flag '
-        'is not supported with Cloud Run on GKE.')
+        error_msg.format(
+            flag='--allow-unauthenticated',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
 
-  if getattr(args, 'service_account', None):
+  if _FlagIsExplicitlySet(args, 'service_account'):
     raise serverless_exceptions.ConfigurationError(
-        'The `--service-account` flag '
-        'is not supported with Cloud Run on GKE.')
+        error_msg.format(
+            flag='--service-account',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'region'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--region',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'revision_suffix'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--revision-suffix',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'vpc_connector'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--vpc-connector',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'clear_vpc_connector'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--clear-vpc-connector',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'kubeconfig'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--kubeconfig',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
+
+  if _FlagIsExplicitlySet(args, 'context'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--context',
+            platform='kubernetes',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
 
 
-def ValidateIsGKE(args):
+def VerifyKubernetesFlags(args):
+  """Raise ConfigurationError if args includes OnePlatform or GKE only arguments."""
+  error_msg = ('The `{flag}` flag is not supported when connecting to a '
+               'Kubenetes cluster. Specify `--platform {platform}` or run '
+               '`gcloud config set run/platform {platform}` to work with '
+               '{platform_desc}.')
+
+  if _FlagIsExplicitlySet(args, 'allow_unauthenticated'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--allow-unauthenticated',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'service_account'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--service-account',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'region'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--region',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'revision_suffix'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--revision-suffix',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'vpc_connector'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--vpc-connector',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'clear_vpc_connector'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--clear-vpc-connector',
+            platform='managed',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
+
+  if _FlagIsExplicitlySet(args, 'cluster'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--cluster',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+  if _FlagIsExplicitlySet(args, 'cluster_location'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--cluster-location',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
+
+def GetPlatformFallback():
+  """Fallback to accessing the property for declaritive commands."""
+  return properties.VALUES.run.platform.Get()
+
+
+def GetPlatform(args):
+  """Returns the platform to run on."""
+  platform = properties.VALUES.run.platform.Get()
+  if platform is None:
+    if console_io.CanPrompt():
+      platform_descs = [_PLATFORM_SHORT_DESCRIPTIONS[k] for k in _PLATFORMS]
+      index = console_io.PromptChoice(
+          platform_descs,
+          message='Please choose a target platform:',
+          cancel_option=True)
+      platform = list(_PLATFORMS.keys())[index]
+      # Set platform so we don't re-prompt on future calls to this method
+      properties.VALUES.run.platform.Set(platform)
+      log.status.Print(
+          'To specify the platform yourself, pass `--platform {0}`. '
+          'Or, to make this the default target platform, run '
+          '`gcloud config set run/platform {0}`.\n'.format(platform))
+    else:
+      raise ArgumentError(
+          'No platform specified. Pass the `--platform` flag or set '
+          'the [run/platform] property to specify a target platform.\n'
+          'Available platforms:\n{}'.format(
+              '\n'.join(
+                  ['- {}: {}'.format(k, v) for k, v in _PLATFORMS.items()])))
+
+  if platform == 'managed':
+    VerifyOnePlatformFlags(args)
+  elif platform == 'gke':
+    VerifyGKEFlags(args)
+  elif platform == 'kubernetes':
+    VerifyKubernetesFlags(args)
+  else:
+    raise ArgumentError(
+        'Invalid target platform specified: [{}].\n'
+        'Available platforms:\n{}'.format(
+            platform,
+            '\n'.join(['- {}: {}'.format(k, v) for k, v in _PLATFORMS.items()
+                      ])))
+  return platform
+
+
+def IsKubernetes(args):
+  """Returns True if args property specify Kubernetes.
+
+  Args:
+    args: Namespace, The args namespace.
+  """
+  return GetPlatform(args) == 'kubernetes'
+
+
+def IsGKE(args):
   """Returns True if args properly specify GKE.
 
   Args:
-    args: Namespace, The args namespace.  Caller must add
-      resource_args.CLUSTER_PRESENTATION to concept parser first.
+    args: Namespace, The args namespace.
   """
-  cluster_ref = args.CONCEPTS.cluster.Parse()
-  if not cluster_ref:
-    ValidateClusterArgs(args)
-  return bool(cluster_ref)
+  return GetPlatform(args) == 'gke'
+
+
+def IsManaged(args):
+  """Returns True if args properly specify managed.
+
+  Args:
+    args: Namespace, The args namespace.
+  """
+  return GetPlatform(args) == 'managed'
+
+
+def ValidatePlatformIsManaged(platform):
+  if platform != 'managed':
+    raise calliope_exceptions.BadArgumentException(
+        '--platform', 'The platform [{}] is not supported by this operation. '
+        'Specify `--platform managed` or run '
+        '`gcloud config set run/platform managed`.'.format(platform))
+  return platform

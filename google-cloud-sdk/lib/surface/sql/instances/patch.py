@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,9 +52,11 @@ def _PrintAndConfirmWarningMessage(args, database_version):
         'your instance to be restarted. Submitting this patch '
         'will immediately restart your instance if it\'s running.')
   elif any([args.database_flags, args.clear_database_flags]):
-    is_postgres = api_util.InstancesV1Beta4.IsPostgresDatabaseVersion(
-        database_version)
-    database_type_fragment = 'postgres' if is_postgres else 'mysql'
+    database_type_fragment = 'mysql'
+    if api_util.InstancesV1Beta4.IsPostgresDatabaseVersion(database_version):
+      database_type_fragment = 'postgres'
+    elif api_util.InstancesV1Beta4.IsSqlServerDatabaseVersion(database_version):
+      database_type_fragment = 'sqlserver'
     flag_docs_url = 'https://cloud.google.com/sql/docs/{}/flags'.format(
         database_type_fragment)
     continue_msg = (
@@ -99,11 +101,8 @@ def AddBaseArgs(parser):
   """Adds base args and flags to the parser."""
   # TODO(b/35705305): move common flags to command_lib.sql.flags
   flags.AddActivationPolicy(parser)
-  flags.AddAssignIp(parser, show_negated_in_help=True)
-  parser.add_argument(
-      '--async',
-      action='store_true',
-      help='Do not wait for the operation to complete.')
+  flags.AddAssignIp(parser)
+  base.ASYNC_FLAG.AddToParser(parser)
   gae_apps_group = parser.add_mutually_exclusive_group()
   flags.AddAuthorizedGAEApps(gae_apps_group, update=True)
   gae_apps_group.add_argument(
@@ -261,7 +260,7 @@ def RunBasePatchCommand(args, release_track):
       operation=result_operation.name,
       project=instance_ref.project)
 
-  if args.async:
+  if args.async_:
     return sql_client.operations.Get(
         sql_messages.SqlOperationsGetRequest(
             project=operation_ref.project, operation=operation_ref.operation))

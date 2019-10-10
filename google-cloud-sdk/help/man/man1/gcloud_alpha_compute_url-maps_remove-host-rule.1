@@ -11,7 +11,7 @@ gcloud alpha compute url\-maps remove\-host\-rule \- remove a host rule from a U
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute url\-maps remove\-host\-rule\fR \fIURL_MAP_NAME\fR \fB\-\-host\fR=\fIHOST\fR [\fB\-\-delete\-orphaned\-path\-matcher\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute url\-maps remove\-host\-rule\fR \fIURL_MAP\fR \fB\-\-host\fR=\fIHOST\fR [\fB\-\-delete\-orphaned\-path\-matcher\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -28,7 +28,7 @@ is only removed if it is not referenced by any other host rules and
 
 .RS 2m
 .TP 2m
-\fIURL_MAP_NAME\fR
+\fIURL_MAP\fR
 Name of the URL map to operate on.
 
 
@@ -121,9 +121,8 @@ $ gcloud alpha compute url\-maps remove\-host\-rule MY\-URL\-MAP \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute url\-maps remove\-host\-rule

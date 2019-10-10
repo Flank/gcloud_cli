@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,7 +67,8 @@ class SetMachineType(base.SilentCommand):
         machine_type=args.machine_type,
         custom_cpu=args.custom_cpu,
         custom_memory=args.custom_memory,
-        ext=getattr(args, 'custom_extensions', None))
+        ext=getattr(args, 'custom_extensions', None),
+        vm_type=getattr(args, 'custom_vm_type', None))
 
     instance_utils.CheckCustomCpuRamRatio(client,
                                           instance_ref.project,

@@ -11,7 +11,7 @@ gcloud beta compute routers nats update \- update a NAT on a Google Compute Engi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute routers nats update\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-async\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]] [\fB\-\-clear\-icmp\-idle\-timeout\fR\ |\ \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-clear\-min\-ports\-per\-vm\fR\ |\ \fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-clear\-tcp\-established\-idle\-timeout\fR\ |\ \fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-clear\-tcp\-transitory\-idle\-timeout\fR\ |\ \fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-clear\-udp\-idle\-timeout\fR\ |\ \fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute routers nats update\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-async\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]] [\fB\-\-clear\-drain\-nat\-ips\fR\ |\ \fB\-\-drain\-nat\-ips\fR=\fIDRAIN_NAT_IPS\fR,[...]] [\fB\-\-clear\-icmp\-idle\-timeout\fR\ |\ \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-clear\-min\-ports\-per\-vm\fR\ |\ \fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-clear\-tcp\-established\-idle\-timeout\fR\ |\ \fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-clear\-tcp\-transitory\-idle\-timeout\fR\ |\ \fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-clear\-udp\-idle\-timeout\fR\ |\ \fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,8 +49,7 @@ The Router to use for NAT.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-enable\-logging\fR
@@ -125,6 +124,23 @@ Automatically allocate external IP addresses for Cloud NAT
 .TP 2m
 \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]
 External IP Addresses to use for NAT
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-drain\-nat\-ips\fR
+Clear the drained NAT IPs
+
+.TP 2m
+\fB\-\-drain\-nat\-ips\fR=\fIDRAIN_NAT_IPS\fR,[...]
+External IP Addresses to be drained
+
+These IPs must be valid external IPs that have been used as NAT IPs
 
 .RE
 .sp

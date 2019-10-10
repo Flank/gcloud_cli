@@ -1,0 +1,98 @@
+
+.TH "GCLOUD_ALPHA_REDIS_OPERATIONS_CANCEL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha redis operations cancel \- cancel a Memorystore Redis import or export operation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha redis operations cancel\fR (\fIOPERATION\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Cancel a Memorystore Redis import or export operation.
+
+An export operation can be canceled at any time. This does not impact the data
+or availability of an instance.
+
+An import operation can also be canceled. Note that the cancellation will result
+in the instance recovering with a fully flushed cache.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Operation resource \- Arguments and flags that specify the Memorystore Redis
+operation you want to cancel. The arguments in this group can be used to specify
+the attributes of this resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [operation] on the command line with a fully specified
+name; provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of the operation or fully qualified identifier for the operation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Redis region of the operation. Overrides the default
+redis/region property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBredis/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/memorystore/docs/redis/
+
+
+
+.SH "EXAMPLES"
+
+To cancel an operation named \f5my\-redis\-operation\fR in the default region,
+run:
+
+.RS 2m
+$ gcloud alpha redis operations cancel my\-redis\-operation
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta redis operations cancel
+.RE
+

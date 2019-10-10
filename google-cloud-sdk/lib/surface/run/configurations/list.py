@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.run import commands
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import flags
@@ -26,8 +27,10 @@ from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
+from googlecloudsdk.core import log
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class List(commands.List):
   """List available Configurations.
 
@@ -46,17 +49,29 @@ class List(commands.List):
   }
 
   @classmethod
-  def Args(cls, parser):
-    flags.AddRegionArgWithDefault(parser)
+  def CommonArgs(cls, parser):
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddRegionArgWithDefault(managed_group)
+    # Flags specific to CRoGKE
+    gke_group = flags.GetGkeArgGroup(parser)
+    concept_parsers.ConceptParser(
+        [resource_args.CLUSTER_PRESENTATION]).AddToParser(gke_group)
+    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
+    kubernetes_group = flags.GetKubernetesArgGroup(parser)
+    flags.AddKubeconfigFlags(kubernetes_group)
+    # Flags specific to connecting to a cluster
+    cluster_group = flags.GetClusterArgGroup(parser)
     namespace_presentation = presentation_specs.ResourcePresentationSpec(
         '--namespace',
         resource_args.GetNamespaceResourceSpec(),
-        'Namespace list configurations in.',
+        'Namespace to list configurations in.',
         required=True,
         prefixes=False)
-    concept_parsers.ConceptParser([
-        resource_args.CLUSTER_PRESENTATION,
-        namespace_presentation]).AddToParser(parser)
+    concept_parsers.ConceptParser(
+        [namespace_presentation]).AddToParser(cluster_group)
+    # Flags not specific to any platform
+    flags.AddPlatformArg(parser)
     parser.display_info.AddFormat(
         'table('
         '{ready_column},'
@@ -67,10 +82,59 @@ class List(commands.List):
             ready_column=pretty_print.READY_COLUMN))
     parser.display_info.AddUriFunc(cls._GetResourceUri)
 
+  @classmethod
+  def Args(cls, parser):
+    cls.CommonArgs(parser)
+
+  def _SetFormat(self, args, show_region=False, show_namespace=False):
+    """Set display format for output.
+
+    Args:
+      args: Namespace, the args namespace
+      show_region: bool, True to show region of listed services
+      show_namespace: bool, True to show namespace of listed services
+    """
+    columns = [
+        pretty_print.READY_COLUMN,
+        'firstof(id,metadata.name):label=CONFIGURATION',
+    ]
+    if show_region:
+      columns.append('region:label=REGION')
+    if show_namespace:
+      columns.append('namespace:label=NAMESPACE')
+    columns.extend([
+        'status.latestCreatedRevisionName:label="LATEST REVISION"',
+        'status.latestReadyRevisionName:label="READY REVISION"',
+    ])
+    args.GetDisplayInfo().AddFormat(
+        'table({})'.format(','.join(columns)))
+
   def Run(self, args):
     """List available configurations."""
+    is_managed = flags.IsManaged(args)
     conn_context = connection_context.GetConnectionContext(args)
+    self._SetFormat(
+        args, show_region=is_managed, show_namespace=(not is_managed))
     namespace_ref = args.CONCEPTS.namespace.Parse()
     with serverless_operations.Connect(conn_context) as client:
       self.SetCompleteApiEndpoint(conn_context.endpoint)
-      return client.ListConfigurations(namespace_ref)
+      if not is_managed:
+        zone_label = ' in zone [{}]'.format(conn_context.cluster_location)
+        log.status.Print('For cluster [{cluster}]{zone}:'.format(
+            cluster=conn_context.cluster_name,
+            zone=zone_label if conn_context.cluster_location else ''))
+      return commands.SortByName(client.ListConfigurations(namespace_ref))
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaList(List):
+  """List available Configurations.
+
+  Every Configuration is paired with a Service of the same name.
+  """
+
+  @classmethod
+  def Args(cls, parser):
+    cls.CommonArgs(parser)
+
+AlphaList.__doc__ = List.__doc__

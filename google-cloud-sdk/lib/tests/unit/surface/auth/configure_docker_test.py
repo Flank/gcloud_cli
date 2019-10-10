@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
   def testDockerNotOnPath(self):
 
     def executable_on_path(binary):
-      if binary == 'docker':
+      if binary == 'docker' or binary == 'docker.exe':
         return False
       return True
 
@@ -107,7 +107,7 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
   def testDockerCredentialGcloudNotOnPath(self):
 
     def executable_on_path(binary):
-      if binary == 'docker-credential-gcloud':
+      if binary == 'docker-credential-gcloud' or binary == 'docker-credential-gcloud.cmd':
         return False
       return True
 

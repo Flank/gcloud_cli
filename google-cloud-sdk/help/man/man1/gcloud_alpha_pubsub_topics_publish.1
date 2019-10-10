@@ -11,7 +11,7 @@ gcloud alpha pubsub topics publish \- publishes a message to the specified topic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha pubsub topics publish\fR \fITOPIC\fR [\fIMESSAGE_BODY\fR] [\fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]] [\fB\-\-message\fR=\fIMESSAGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha pubsub topics publish\fR \fITOPIC\fR [\fIMESSAGE_BODY\fR] [\fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]] [\fB\-\-message\fR=\fIMESSAGE\fR] [\fB\-\-ordering\-key\fR=\fIORDERING_KEY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -61,7 +61,7 @@ Positional argument \f5MESSAGE_BODY\fR is deprecated. Please use
 .RS 2m
 .TP 2m
 \fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]
-Comma\-separated list of attributes. Each ATTRIBUTE has the form name=value".
+Comma\-separated list of attributes. Each ATTRIBUTE has the form name="value".
 You can specify up to 100 attributes.
 
 .TP 2m
@@ -69,6 +69,12 @@ You can specify up to 100 attributes.
 The body of the message to publish to the given topic name. Information on
 message formatting and size limits can be found at:
 https://cloud.google.com/pubsub/docs/publisher#publish
+
+.TP 2m
+\fB\-\-ordering\-key\fR=\fIORDERING_KEY\fR
+The key to use for ordering delivery to subscribers. All messages with the same
+key will be sent to subcribers in the order in which they were received by Cloud
+Pub/Sub.
 
 
 .RE
@@ -99,9 +105,8 @@ $ gcloud alpha pubsub topics publish mytopic \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud pubsub topics publish

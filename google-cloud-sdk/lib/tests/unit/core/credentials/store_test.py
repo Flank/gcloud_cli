@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import contextlib
 import datetime
 import json
 
+from googlecloudsdk.api_lib.iamcredentials import util as iamcredentials_util
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -175,11 +176,11 @@ gs_oauth2_refresh_token = fake-token
 
     properties.VALUES.auth.credential_file_override.Set(self.json_file)
     loaded = store.Load()
-    self.assertTrue(
-        isinstance(loaded, service_account.ServiceAccountCredentials))
+    self.assertIsInstance(
+        loaded, service_account.ServiceAccountCredentials)
     self.assertEqual('bar.apps.googleusercontent.com', loaded.client_id)
     self.assertEqual(loaded._scopes, ' '.join(config.CLOUDSDK_SCOPES))
-    self.assertNotEquals('token_uri', loaded.token_uri)
+    self.assertNotEqual('token_uri', loaded.token_uri)
 
     properties.VALUES.auth.token_host.Set('token_uri')
     loaded = store.Load()
@@ -196,15 +197,17 @@ gs_oauth2_refresh_token = fake-token
         r'Failed to load credential file: \[non-existing-file\]'):
       store.Load()
 
-  @test_case.Filters.skip('Flaky', 'b/119435008')
   def testServiceAccountImpersonationNotConfiguredError(self):
     store.Store(self.fake_cred)
     properties.VALUES.auth.impersonate_service_account.Set('asdf@google.com')
-    with self.assertRaisesRegex(
-        store.AccountImpersonationError,
-        r'gcloud is configured to impersonate service account '
-        r'\[asdf@google.com\] but impersonation support is not available.'):
-      store.Load()
+    with mock.patch(
+        'googlecloudsdk.core.credentials.store.IMPERSONATION_TOKEN_PROVIDER',
+        None):
+      with self.assertRaisesRegex(
+          store.AccountImpersonationError,
+          r'gcloud is configured to impersonate service account '
+          r'\[asdf@google.com\] but impersonation support is not available.'):
+        store.Load()
 
   def testNoAccountError(self):
     store.Store(self.fake_cred)
@@ -311,6 +314,46 @@ gs_oauth2_refresh_token = fake-token
     store.Refresh(loaded, http_client=http_mock)
     self.assertEqual(loaded.id_tokenb64, 'fresh-id-token')
     self.assertEqual(loaded.token_response['id_token'], 'fresh-id-token')
+
+  def testRefreshGceIdToken(self):
+    """Test that store.Refresh refreshes a gce service account's id_token."""
+    mock_GetIdToken = self.StartObjectPatch(  # pylint: disable=invalid-name
+        c_gce._GCEMetadata, 'GetIdToken', return_value='test-id-token')
+    test_cred = oauth2client_gce.AppAssertionCredentials()
+    test_cred.token_response = {'id_token': 'old-id-token'}
+    # Mock Refresh request
+    http_mock = mock.Mock()
+    store.Refresh(
+        test_cred,
+        http_client=http_mock,
+        gce_token_format='full',
+        gce_include_license=True)
+    self.assertEqual(test_cred.id_tokenb64, 'test-id-token')
+    self.assertEqual(test_cred.token_response['id_token'], 'test-id-token')
+    mock_GetIdToken.assert_called_once_with(
+        mock.ANY,
+        include_license=True,
+        token_format='full')
+
+  def testRefreshImpersonateServiceAccountIdToken(self):
+    test_cred = iamcredentials_util.ImpersonationCredentials(
+        'service-account-id', 'access-token', '2016-01-08T00:00:00Z',
+        config.CLOUDSDK_SCOPES)
+    store.IMPERSONATION_TOKEN_PROVIDER = (
+        iamcredentials_util.ImpersonationAccessTokenProvider())
+    mock_GetElevationIdToken = mock.Mock(return_value='test-id-token')  # pylint: disable=invalid-name
+    store.IMPERSONATION_TOKEN_PROVIDER.GetElevationIdToken = mock_GetElevationIdToken
+    test_cred.token_response = {'id_token': 'old-id-token'}
+    # Mock Refresh request
+    http_mock = mock.Mock()
+    store.Refresh(
+        test_cred,
+        http_client=http_mock,
+        is_impersonated_credential=True,
+        include_email=True)
+    self.assertEqual(test_cred.id_tokenb64, 'test-id-token')
+    mock_GetElevationIdToken.assert_called_once_with(
+        'service-account-id', mock.ANY, True)
 
   def testRefreshError(self):
     self.refresh_mock.side_effect = client.AccessTokenRefreshError

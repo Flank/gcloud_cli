@@ -9,40 +9,42 @@ SYNOPSIS
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
         [--create-subnetwork=[KEY=VALUE,...]]
+        [--database-encryption-key=DATABASE_ENCRYPTION_KEY]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
-        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--no-enable-autoupgrade] [--enable-binauthz]
-        [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
+        [--disable-default-snat] [--disk-size=DISK_SIZE]
+        [--disk-type=DISK_TYPE] [--enable-autorepair] [--no-enable-autoupgrade]
+        [--enable-binauthz] [--enable-cloud-logging]
+        [--enable-cloud-monitoring] [--enable-cost-management]
         [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-network-policy] [--enable-pod-security-policy]
-        [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
-        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
+        [--enable-shielded-nodes] [--enable-stackdriver-kubernetes]
+        [--enable-vertical-pod-autoscaling]
+        [--identity-namespace=IDENTITY_NAMESPACE] [--image-type=IMAGE_TYPE]
+        [--issue-client-certificate]
         [--istio-config=[auth=MTLS_PERMISSIVE,...]] [--labels=[KEY=VALUE,...]]
         [--linux-sysctls=KEY=VALUE,[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
-        [--maintenance-window=MAINTENANCE_WINDOW]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
         [--max-surge-upgrade=MAX_SURGE_UPGRADE]
-        [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE; default=1]
+        [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
-        [--node-labels=[NODE_LABEL,...]] [--node-pool-name=NODE_POOL_NAME]
-        [--node-taints=[NODE_TAINT,...]] [--num-nodes=NUM_NODES; default=3]
-        [--preemptible] [--security-group=SECURITY_GROUP]
-        [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
+        [--node-config=NODE_CONFIG] [--node-labels=[NODE_LABEL,...]]
+        [--node-pool-name=NODE_POOL_NAME] [--node-taints=[NODE_TAINT,...]]
+        [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--security-group=SECURITY_GROUP] [--services-ipv4-cidr=CIDR]
+        [--services-secondary-range-name=NAME]
+        [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
         [--additional-zones=ZONE,[ZONE,...] | --node-locations=ZONE,[ZONE,...]]
-        [--database-encryption-key=DATABASE_ENCRYPTION_KEY
-          : --database-encryption-key-keyring=DATABASE_ENCRYPTION_KEY_KEYRING
-          --database-encryption-key-location=DATABASE_ENCRYPTION_KEY_LOCATION
-          --database-encryption-key-project=DATABASE_ENCRYPTION_KEY_PROJECT]
         [[--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
-          | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY : --min-cpu=MIN_CPU
+          | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY
+          : --autoprovisioning-locations=ZONE,[ZONE,...] --min-cpu=MIN_CPU
           --min-memory=MIN_MEMORY
           [--max-accelerator=[type=TYPE,count=COUNT,...]
           : --min-accelerator=[type=TYPE,count=COUNT,...]]]]]
@@ -50,6 +52,7 @@ SYNOPSIS
         [--enable-master-authorized-networks
           --master-authorized-networks=NETWORK,[NETWORK,...]]
         [--enable-network-egress-metering
+          --enable-resource-consumption-metering
           --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET]
         [--enable-peering-route-sharing --enable-private-endpoint
           --enable-private-nodes
@@ -58,6 +61,9 @@ SYNOPSIS
         [--local-ssd-count=LOCAL_SSD_COUNT
           | --local-ssd-volumes=[[count=COUNT],
           [type=TYPE],[format=FORMAT],...]]
+        [--maintenance-window=START_TIME | --maintenance-window-end=TIME_STAMP
+          --maintenance-window-recurrence=RRULE
+          --maintenance-window-start=TIME_STAMP]
         [--password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
@@ -94,13 +100,14 @@ FLAGS
             The default value is 1.
 
      --addons=[ADDON,...]
-        Default set of addons includes HttpLoadBalancing,
-        HorizontalPodAutoscaling. Addons
+        Addons
         (https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
         are additional Kubernetes cluster components. Addons specified by this
-        flag will be enabled. The others will be disabled. ADDON must be one
-        of: HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        Istio, NetworkPolicy, CloudRun, NodeLocalDNS.
+        flag will be enabled. The others will be disabled. Default addons:
+        HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
+        HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
+        NetworkPolicy, Istio, CloudRun, NodeLocalDNS, ConfigConnector,
+        GcePersistentDiskCsiDriver.
 
      --allow-route-overlap
         Allows the provided cluster CIDRs to overlap with existing routes that
@@ -111,8 +118,12 @@ FLAGS
         both --cluster-ipv4-cidr and --services-ipv4-cidr must be fully
         specified.
 
+        Must be used in conjunction with '--enable-ip-alias' or
+        '--no-enable-ip-alias'.
+
      --async
-        Don't wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --cluster-ipv4-cidr=CLUSTER_IPV4_CIDR
         The IP address range for the pods in this cluster in CIDR notation
@@ -165,6 +176,16 @@ FLAGS
         Can not be specified unless '--enable-ip-alias' is also specified. Can
         not be used in conjunction with the '--subnetwork' option.
 
+     --database-encryption-key=DATABASE_ENCRYPTION_KEY
+        Enable Database Encryption.
+
+        Enable database encryption that will be used to encrypt Kubernetes
+        Secrets at the application layer. The key provided should be the
+        resource ID in the format of
+        projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+        For more information, see
+        <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+
      --default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE
         The default max number of pods per node for node pools in the cluster.
 
@@ -174,6 +195,17 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'.
 
+     --disable-default-snat
+        Disable default source NAT rules applied in cluster nodes.
+
+        By default, network traffic sending from Pods to outside of VPC will
+        get masqueraded by the node external IP. When this flag is set, no
+        default sNAT will be enforced on the cluster. The flag must be set if
+        the cluster uses privately used public IPs.
+
+        Must be used in conjunction with --enable-ip-alias and
+        --enable-private-nodes.
+
      --disk-size=DISK_SIZE
         Size for node VM boot disks. Defaults to 100GB.
 
@@ -182,20 +214,20 @@ FLAGS
         be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
-        Enable node autorepair feature for a cluster's default node-pool(s).
+        Enable node autorepair feature for a cluster's default node pool(s).
 
             $ gcloud alpha container clusters create example-cluster \
                 --enable-autorepair
 
-        Node autorepair is enabled by default for clusters using COS as a base
-        image, use --no-enable-autorepair to disable.
+        Node autorepair is enabled by default for clusters using COS or
+        COS_CONTAINERD as a base image, use --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
-        Sets autoupgrade feature for a cluster's default node-pool(s).
+        Sets autoupgrade feature for a cluster's default node pool(s).
 
             $ gcloud alpha container clusters create example-cluster \
                 --enable-autoupgrade
@@ -209,31 +241,50 @@ FLAGS
         Enable Binary Authorization for this cluster.
 
      --enable-cloud-logging
-        Automatically send logs from the cluster to the Google Cloud Logging
-        API. Enabled by default, use --no-enable-cloud-logging to disable.
+        (DEPRECATED) Automatically send logs from the cluster to the Google
+        Cloud Logging API. This flag is deprecated, use
+        --enable-stackdriver-kubernetes instead.
+
+        From 1.14, legacy Stackdriver GKE logging is deprecated. Thus, flag
+        --enable-cloud-logging is also deprecated. Please use
+        --enable-stackdriver-kubernetes instead, to migrate to new Stackdriver
+        Kubernetes Engine monitoring and logging. For more details, please
+        read: https://cloud.google.com/monitoring/kubernetes-engine/migration.
 
      --enable-cloud-monitoring
-        Automatically send metrics from pods in the cluster to the Google Cloud
-        Monitoring API. VM metrics will be collected by Google Compute Engine
-        regardless of this setting. Enabled by default, use
-        --no-enable-cloud-monitoring to disable.
+        (DEPRECATED) Automatically send metrics from pods in the cluster to the
+        Google Cloud Monitoring API. VM metrics will be collected by Google
+        Compute Engine regardless of this setting. This flag is deprecated, use
+        --enable-stackdriver-kubernetes instead.
+
+        From 1.14, legacy Stackdriver GKE monitoring is deprecated. Thus, flag
+        --enable-cloud-monitoring is also deprecated. Please use
+        --enable-stackdriver-kubernetes instead, to migrate to new Stackdriver
+        Kubernetes Engine monitoring and logging. For more details, please
+        read: https://cloud.google.com/monitoring/kubernetes-engine/migration.
+
+     --enable-cost-management
+        Enable the cost management feature.
+
+        When enabled, you can get informational GKE cost breakdowns by cluster,
+        namespace and label in your billing data exported to BigQuery
+        (https://cloud.google.com/billing/docs/how-to/export-data-bigquery).
 
      --enable-intra-node-visibility
         Enable Intra-node visibility for this cluster.
 
-        Enabling intra-node visibility makes your intra-node pod to pod traffic
+        Enabling intra-node visibility makes your intra-node pod-to-pod traffic
         visible to the networking fabric. With this feature, you can use VPC
         flow logging or other VPC features for intra-node traffic.
 
-        This is a beta feature, enabling it on existing cluster causes the
-        cluster master and the cluster nodes to restart, which might cause
-        disruption.
+        Enabling it on an existing cluster causes the cluster master and the
+        cluster nodes to restart, which might cause a disruption.
 
      --enable-ip-alias
         Enable use of alias IPs
-        (https://cloud.google.com/compute/docs/alias-ip/) for pod IPs. This
-        will create two secondary ranges, one for the pod IPs and another to
-        reserve space for the services range.
+        (https://cloud.google.com/compute/docs/alias-ip/) for Pod IPs. This
+        will require at least two secondary ranges in the subnetwork, one for
+        the pod IPs and another to reserve space for the services range.
 
      --enable-kubernetes-alpha
         Enable Kubernetes alpha features on this cluster. Selecting this option
@@ -266,11 +317,29 @@ FLAGS
         API objects. For more information, see
         https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies.
 
+     --enable-shielded-nodes
+        Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will
+        enable a more secure Node credential bootstrapping implementation.
+
      --enable-stackdriver-kubernetes
         Enable Stackdriver Kubernetes monitoring and logging.
 
      --enable-vertical-pod-autoscaling
         Enables vertical pod autoscaling for a cluster.
+
+     --identity-namespace=IDENTITY_NAMESPACE
+        Enable Workload Identity on the cluster.
+
+        When enabled, Kubernetes service accounts will be able to act as Cloud
+        IAM Service Accounts, through the provided identity namespace.
+
+        Currently, the only accepted identity namespace is the identity
+        namespace of the Cloud project containing the cluster,
+        PROJECT_NAME.svc.id.goog.
+
+        For more information on Workload Identity, see
+
+            https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 
      --image-type=IMAGE_TYPE
         The image type to use for the cluster. Defaults to server-specified.
@@ -337,15 +406,6 @@ FLAGS
             $ gcloud alpha container clusters create high-mem-pool \
                 --machine-type=custom-2-12288
 
-     --maintenance-window=MAINTENANCE_WINDOW
-        Set a time of day when you prefer maintenance to start on this cluster.
-        For example:
-
-            $ gcloud alpha container clusters create example-cluster \
-                --maintenance-window=12:43
-
-        The time corresponds to the UTC time zone, and must be in HH:MM format.
-
      --max-nodes-per-pool=MAX_NODES_PER_POOL
         The maximum number of nodes to allocate per default initial node pool.
         Kubernetes Engine will automatically create enough nodes pools such
@@ -373,7 +433,7 @@ FLAGS
             $ gcloud alpha container clusters create example-cluster \
                 --max-surge-upgrade 1
 
-     --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE; default=1
+     --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE
         Number of nodes that can be unavailable at the same time on each
         upgrade of a node pool.
 
@@ -443,8 +503,61 @@ FLAGS
         Kubernetes Engine will use this network when creating routes and
         firewalls for the clusters. Defaults to the 'default' network.
 
+     --node-config=NODE_CONFIG
+        Path of the YAML/JSON file that contains the node configuration,
+        including Linux kernel parameters (sysctls) and kubelet configs.
+
+        Example:
+
+            kubeletConfig:
+              cpuManagerPolicy: static
+            linuxConfig:
+              sysctl:
+                net.core.somaxconn: '2048'
+                net.ipv4.tcp_rmem: '4096 87380 6291456'
+
+        List of supported kubelet configs in 'kubeletConfig'.
+
+          KEY                VALUE
+          cpuManagerPolicy   either 'static' or 'default'
+          cpuCFSQuota        true or false (enabled by default)
+          cpuCFSQuotaPeriod  interval (e.g., '100ms')
+
+        List of supported sysctls in 'linuxConfig'.
+
+          KEY                                         VALUE
+          kernel.pid_max                              Must be [32768, 4194304]
+          fs.inotify.max_queued_events                Must be [16384, 4194304]
+          fs.inotify.max_user_instances               Must be [128, 4194304]
+          fs.inotify.max_user_watches                 Must be [12288, 4194304]
+          net.core.netdev_budget                      Any positive integer
+          net.core.netdev_budget_usecs                Any positive integer
+          net.core.netdev_max_backlog                 Any positive integer
+          net.core.rmem_default                       Any positive integer
+          net.core.rmem_max                           Any positive integer
+          net.core.wmem_default                       Any positive integer
+          net.core.wmem_max                           Any positive integer
+          net.core.optmem_max                         Any positive integer
+          net.core.somaxconn                          Must be [128, 4194304]
+          net.ipv4.tcp_rmem                           Any positive integer
+          net.ipv4.tcp_wmem                           Any positive integer tuple
+          net.ipv4.tcp_mem                            Any positive integer
+          net.ipv4.tcp_fin_timeout                    Any positive integer
+          net.ipv4.tcp_keepalive_intvl                Any positive integer
+          net.ipv4.tcp_keepalive_probes               Any positive integer
+          net.ipv4.tcp_keepalive_time                 Any positive integer
+          net.ipv4.tcp_max_orphans                    Any positive integer
+          net.ipv4.tcp_max_syn_backlog                Any positive integer
+          net.ipv4.tcp_max_tw_buckets                 Any positive integer
+          net.ipv4.tcp_syn_retries                    Any positive integer
+          net.ipv4.tcp_tw_reuse                       Must be {0, 1}
+          net.ipv4.udp_mem                            Any positive integer tuple
+          net.ipv4.udp_rmem_min                       Any positive integer
+          net.ipv4.udp_wmem_min                       Any positive integer
+          net.netfilter.nf_conntrack_generic_timeout  Any positive integer
+
      --node-labels=[NODE_LABEL,...]
-        Applies the given kubernetes labels on all nodes in the new node-pool.
+        Applies the given kubernetes labels on all nodes in the new node pool.
         Example:
 
             $ gcloud alpha container clusters create example-cluster \
@@ -475,8 +588,8 @@ FLAGS
                 --node-pool-name example-node-pool
 
      --node-taints=[NODE_TAINT,...]
-        Applies the given kubernetes taints on all nodes in default
-        node-pool(s) in new cluster, which can be used with tolerations for pod
+        Applies the given kubernetes taints on all nodes in default node
+        pool(s) in new cluster, which can be used with tolerations for pod
         scheduling. Example:
 
             $ gcloud alpha container clusters create example-cluster \
@@ -534,6 +647,15 @@ FLAGS
         Must be used in conjunction with '--enable-ip-alias'. Cannot be used
         with --create-subnetwork.
 
+     --shielded-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created.
+
+     --shielded-secure-boot
+        The instance will boot with secure boot enabled.
+
      --subnetwork=SUBNETWORK
         The Google Compute Engine subnetwork
         (https://cloud.google.com/compute/docs/subnetworks) to which the
@@ -556,11 +678,11 @@ FLAGS
         for examples.
 
      --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-        Type of metadata server available to pods running in the nodepool.
+        Type of metadata server available to pods running in the node pool.
         WORKLOAD_METADATA_FROM_NODE must be one of:
 
          EXPOSED
-            Pods running in this nodepool have access to the node's underlying
+            Pods running in this node pool have access to the node's underlying
             Compute Engine Metadata Server.
          GKE_METADATA_SERVER
             Run the Kubernetes Engine Metadata Server on this node. The
@@ -622,26 +744,6 @@ FLAGS
                   --zone us-central1-a \
                   --node-locations us-central1-a,us-central1-b
 
-     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
-     be used to protect the cluster. The 'Compute Engine Service Agent' service
-     account must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'.
-     The arguments in this group can be used to specify the attributes of this
-     resource.
-
-       --database-encryption-key=DATABASE_ENCRYPTION_KEY
-          ID of the key or fully qualified identifier for the key. This flag
-          must be specified if any of the other arguments in this group are
-          specified.
-
-       --database-encryption-key-keyring=DATABASE_ENCRYPTION_KEY_KEYRING
-          The KMS keyring of the key.
-
-       --database-encryption-key-location=DATABASE_ENCRYPTION_KEY_LOCATION
-          The Cloud location for the key.
-
-       --database-encryption-key-project=DATABASE_ENCRYPTION_KEY_PROJECT
-          The Cloud project for the key.
-
      Node autoprovisioning
 
        --enable-autoprovisioning
@@ -656,8 +758,8 @@ FLAGS
          --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
             Path of the JSON/YAML file which contains information about the
             cluster's node autoprovisioning configuration. Currently it
-            contains a list of resource limits and identity defaults for
-            autoprovisioning.
+            contains a list of resource limits, identity defaults for
+            autoprovisioning and node locations for autoprovisioning.
 
             Resource limits are specified in the field 'resourceLimits'. Each
             resource limits definition contains three fields: resourceType,
@@ -677,6 +779,11 @@ FLAGS
             information on defaults, look at:
             https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
 
+            Autoprovisioning locations is a set of zones where new node pools
+            can be created by Autoprovisioning. Autoprovisioning locations are
+            specified in the field 'autoprovisioningLocations'. All zones must
+            be in the same region as the cluster's master(s).
+
          Flags to configure autoprovisioned nodes
 
            --max-cpu=MAX_CPU
@@ -692,6 +799,12 @@ FLAGS
               Maximum number of gigabytes of memory to which the cluster can
               scale. This flag must be specified if any of the other arguments
               in this group are specified.
+
+           --autoprovisioning-locations=ZONE,[ZONE,...]
+              Set of zones where new node pools can be created by
+              autoprovisioning. All zones must be in the same region as the
+              cluster's master(s). Multiple locations can be specified,
+              separated by commas.
 
            --min-cpu=MIN_CPU
               Minimum number of cores in the cluster.
@@ -794,6 +907,17 @@ FLAGS
           Network egress metering is disabled if this flag is omitted, or when
           --no-enable-network-egress-metering is set.
 
+       --enable-resource-consumption-metering
+          Enable resource consumption metering on this cluster.
+
+          When enabled, a table will be created in the specified BigQuery
+          dataset to store resource consumption data. The resulting table can
+          be joined with the resource usage table or with BigQuery billing
+          export.
+
+          Resource consumption metering is enabled unless --no-enable-resource-
+          consumption-metering is set.
+
        --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
           The name of the BigQuery dataset to which the cluster's usage of
           cloud resources is exported. A table will be created in the specified
@@ -886,7 +1010,7 @@ FLAGS
           --local-ssd-count is the equivalent of using --local-ssd-volumes with
           type=scsi,format=fs
 
-          Adds the requested local SSDs on all nodes in default node-pool(s) in
+          Adds the requested local SSDs on all nodes in default node pool(s) in
           new cluster. Example:
 
               $ gcloud alpha container clusters create example_cluster \
@@ -906,6 +1030,68 @@ FLAGS
           number of disks available on a machine, which differs by compute
           zone. See https://cloud.google.com/compute/docs/disks/local-ssd for
           more information.
+
+     One of either maintenance-window or the group of maintenance-window flags
+     can be set. At most one of these may be specified:
+
+       --maintenance-window=START_TIME
+          Set a time of day when you prefer maintenance to start on this
+          cluster. For example:
+
+              $ gcloud alpha container clusters create example-cluster \
+                  --maintenance-window=12:43
+
+          The time corresponds to the UTC time zone, and must be in HH:MM
+          format.
+
+          Non-emergency maintenance will occur in the 4 hour block starting at
+          the specified time.
+
+          This is mutually exclusive with the recurring maintenance windows and
+          will overwrite any existing window. Compatible with maintenance
+          exclusions.
+
+       Set a flexible maintenance window by specifying a window that recurs per
+       an RFC 5545 RRULE. Non-emergency maintenance will occur in the recurring
+       windows.
+
+       Examples:
+
+       For a 9-5 Mon-Wed UTC-4 maintenance window:
+
+           $ gcloud alpha container clusters create example-cluster   \
+               --maintenance-window-start=2000-01-01T09:00:00-04:00   \
+               --maintenance-window-end=2000-01-01T17:00:00-04:00   \
+               --maintenance-window-recurrence='FREQ=WEEKLY;BYDAY=MO,TU,WE'
+
+       For a daily window from 22:00 - 04:00 UTC:
+
+           $ gcloud alpha container clusters create example-cluster   \
+               --maintenance-window-start=2000-01-01T22:00:00Z   \
+               --maintenance-window-end=2000-01-02T04:00:00Z   \
+               --maintenance-window-recurrence=FREQ=DAILY
+
+         --maintenance-window-end=TIME_STAMP
+            End time of the first window (can occur in the past). Must take
+            place after the start time. The difference in start and end time
+            specifies the length of each recurrence. See $ gcloud topic
+            datetimes for information on time formats. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+         --maintenance-window-recurrence=RRULE
+            An RFC 5545 RRULE, specifying how the window will recur. Note that
+            minimum requirements for maintenance periods will be enforced. Note
+            that FREQ=SECONDLY, MINUTELY, and HOURLY are not supported. This
+            flag must be specified if any of the other arguments in this group
+            are specified.
+
+         --maintenance-window-start=TIME_STAMP
+            Start time of the first window (can occur in the past). The start
+            time influences when the window will start for recurrences. See $
+            gcloud topic datetimes for information on time formats. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
 
      Basic auth
 
@@ -939,8 +1125,9 @@ FLAGS
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
-     --release-channel cannot be specified if --cluster-version or
-     --node-version are specified. At most one of these may be specified:
+     --release-channel cannot be specified if Custom Version Flags
+     (--cluster-version or --node-version) are used. At most one of these may
+     be specified:
 
        --release-channel=CHANNEL
           Release channel a cluster is subscribed to.
@@ -950,29 +1137,50 @@ FLAGS
           defaults to true and cannot be disabled. Updates to version related
           fields (e.g. --cluster-version) return an error.
 
-          CHANNEL must be (currently only one value is supported):
+          CHANNEL must be one of:
 
            rapid
-              'rapid' channel clusters are the first to receive the latest
-              releases of Kubernetes and other components.
+              WARNING: 'rapid' is recommended for testing, and not for
+              production workloads. Clusters on 'rapid' are not covered by GKE
+              SLA.
 
-       --cluster-version=CLUSTER_VERSION
-          The Kubernetes version to use for the master and nodes. Defaults to
-          server-specified.
+              Clusters subscribed to 'rapid' receive the latest qualified
+              components, before any other channel. 'rapid' is intended for
+              early testers and developers who require new features. New
+              upgrades will occur roughly weekly.
 
-          The default Kubernetes version is available using the following
-          command.
+           regular
+              Clusters subscribed to 'regular' receive versions that are
+              considered GA quality. 'regular' is intended for production users
+              who want to take advantage of new features. New upgrades will
+              occur roughly every few weeks.
 
-              $ gcloud container get-server-config
+           stable
+              Clusters subscribed to 'stable' receive versions that are known
+              to be stable and reliable in production. 'stable' is intended for
+              production users who need stability above all else, or for whom
+              frequent upgrades are too risky. New upgrades will occur roughly
+              every few months.
 
-       --node-version=NODE_VERSION
-          The Kubernetes version to use for nodes. Defaults to
-          server-specified.
+       Custom Version Flags:
 
-          The default Kubernetes version is available using the following
-          command.
+         --cluster-version=CLUSTER_VERSION
+            The Kubernetes version to use for the master and nodes. Defaults to
+            server-specified.
 
-              $ gcloud container get-server-config
+            The default Kubernetes version is available using the following
+            command.
+
+                $ gcloud container get-server-config
+
+         --node-version=NODE_VERSION
+            The Kubernetes version to use for nodes. Defaults to
+            server-specified.
+
+            The default Kubernetes version is available using the following
+            command.
+
+                $ gcloud container get-server-config
 
      Options to specify the node identity.
 
@@ -1072,9 +1280,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud container clusters create
         $ gcloud beta container clusters create

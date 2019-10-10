@@ -3,7 +3,7 @@ NAME
         Engine SSL policy
 
 SYNOPSIS
-    gcloud alpha compute ssl-policies create NAME
+    gcloud alpha compute ssl-policies create SSL_POLICY
         [--custom-features=[CUSTOM_FEATURES,...]] [--description=DESCRIPTION]
         [--min-tls-version=MIN_TLS_VERSION; default="1.0"]
         [--profile=PROFILE; default="COMPATIBLE"] [GCLOUD_WIDE_FLAG ...]
@@ -18,7 +18,7 @@ DESCRIPTION
     balancers and the backends.
 
 POSITIONAL ARGUMENTS
-     NAME
+     SSL_POLICY
         Name of the SSL policy to create.
 
 FLAGS
@@ -79,9 +79,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute ssl-policies create
         $ gcloud beta compute ssl-policies create

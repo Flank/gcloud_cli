@@ -42,8 +42,8 @@ EXAMPLES
     The following command sets version 9 as the primary version of the
     CryptoKey samwise within KeyRing fellowship and location global:
 
-        $ gcloud kms cryptokeys set-primary-version samwise --version 9 \
-            --keyring fellowship --location global
+        $ gcloud kms cryptokeys set-primary-version samwise --version=9 \
+            --keyring=fellowship --location=global
 
 NOTES
     This command is an internal implementation detail and may change or

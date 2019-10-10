@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,37 +89,41 @@ def IsValidLabelKey(key):
   return IsValidLabelValue(key)
 
 
-KEY_FORMAT_ERROR = (
+_KEY_FORMAT_ERROR = (
     'Only hyphens (-), underscores (_), lowercase characters, and numbers are '
     'allowed. Keys must start with a lowercase character. International '
     'characters are allowed.')
-KEY_FORMAT_HELP = (
+_KEY_FORMAT_HELP = (
     'Keys must start with a lowercase character and contain only hyphens '
     '(`-`), underscores (```_```), lowercase characters, and numbers.')
 
-VALUE_FORMAT_ERROR = (
+_VALUE_FORMAT_ERROR = (
     'Only hyphens (-), underscores (_), lowercase characters, and numbers are '
     'allowed. International characters are allowed.')
-VALUE_FORMAT_HELP = (
+_VALUE_FORMAT_HELP = (
     'Values must contain only hyphens (`-`), underscores (```_```), lowercase '
     'characters, and numbers.')
 
 KEY_FORMAT_VALIDATOR = arg_parsers.CustomFunctionValidator(
-    IsValidLabelKey, KEY_FORMAT_ERROR)
+    IsValidLabelKey, _KEY_FORMAT_ERROR)
 
 VALUE_FORMAT_VALIDATOR = arg_parsers.CustomFunctionValidator(
-    IsValidLabelValue, VALUE_FORMAT_ERROR)
+    IsValidLabelValue, _VALUE_FORMAT_ERROR)
 
 
 def GetCreateLabelsFlag(extra_message='', labels_name='labels',
-                        validate_values=True):
+                        validate_keys=True, validate_values=True):
   """Makes the base.Argument for --labels flag."""
+  key_type = KEY_FORMAT_VALIDATOR if validate_keys else None
   value_type = VALUE_FORMAT_VALIDATOR if validate_values else None
-  format_help = [KEY_FORMAT_HELP]
+  format_help = []
+  if validate_keys:
+    format_help.append(_KEY_FORMAT_HELP)
   if validate_values:
-    format_help.append(VALUE_FORMAT_HELP)
-  help_parts = ['List of label KEY=VALUE pairs to add.',
-                ' '.join(format_help)]
+    format_help.append(_VALUE_FORMAT_HELP)
+  help_parts = ['List of label KEY=VALUE pairs to add.']
+  if format_help:
+    help_parts.append(' '.join(format_help))
   if extra_message:
     help_parts.append(extra_message)
 
@@ -127,7 +131,7 @@ def GetCreateLabelsFlag(extra_message='', labels_name='labels',
       '--{}'.format(labels_name),
       metavar='KEY=VALUE',
       type=arg_parsers.ArgDict(
-          key_type=KEY_FORMAT_VALIDATOR, value_type=value_type),
+          key_type=key_type, value_type=value_type),
       action=arg_parsers.UpdateAction,
       help=('\n\n'.join(help_parts)))
 
@@ -152,16 +156,20 @@ def GetClearLabelsFlag(labels_name='labels'):
 
 
 def GetUpdateLabelsFlag(extra_message, labels_name='labels',
-                        validate_values=True):
+                        validate_keys=True, validate_values=True):
   """Makes a base.Argument for the `--update-labels` flag."""
+  key_type = KEY_FORMAT_VALIDATOR if validate_keys else None
   value_type = VALUE_FORMAT_VALIDATOR if validate_values else None
-  format_help = [KEY_FORMAT_HELP]
+  format_help = []
+  if validate_keys:
+    format_help.append(_KEY_FORMAT_HELP)
   if validate_values:
-    format_help.append(VALUE_FORMAT_HELP)
+    format_help.append(_VALUE_FORMAT_HELP)
   help_parts = [
       ('List of label KEY=VALUE pairs to update. If a label exists its value '
-       'is modified, otherwise a new label is created.'),
-      ' '.join(format_help)]
+       'is modified, otherwise a new label is created.')]
+  if format_help:
+    help_parts.append(' '.join(format_help))
   if extra_message:
     help_parts.append(extra_message)
 
@@ -169,7 +177,7 @@ def GetUpdateLabelsFlag(extra_message, labels_name='labels',
       '--update-{}'.format(labels_name),
       metavar='KEY=VALUE',
       type=arg_parsers.ArgDict(
-          key_type=KEY_FORMAT_VALIDATOR, value_type=value_type),
+          key_type=key_type, value_type=value_type),
       action=arg_parsers.UpdateAction,
       help='\n\n'.join(help_parts))
 

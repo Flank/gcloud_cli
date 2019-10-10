@@ -1,0 +1,85 @@
+title: Describe an instance (static instance). Then try and create (which will fail).
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      remote-build-execution instances describe default_instance
+  - stdout: |
+      location: us-central1
+      name: projects/cloud-sdk-integration-testing/instances/default_instance
+      state: RUNNING
+- execute:
+  - label: |
+      This operation will always fail because quota allows one instance per region and we have
+      a static resource. We have this command to validate the create request is valid.
+  - command: |
+      remote-build-execution instances create will-fail
+  - error: '1: .*RESOURCE_EXHAUSTED.*$'
+actions:
+- execute_command:
+    command: |
+      remote-build-execution instances describe default_instance
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances/default_instance?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '133'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/default_instance
+            location: us-central1
+            state: RUNNING
+    - expect_stdout: |
+        location: us-central1
+        name: projects/cloud-sdk-integration-testing/instances/default_instance
+        state: RUNNING
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: |
+      This operation will always fail because quota allows one instance per region and we have
+      a static resource. We have this command to validate the create request is valid.
+    command: |
+      remote-build-execution instances create will-fail
+    events:
+    - api_call:
+        expect_request:
+          uri: https://admin-remotebuildexecution.googleapis.com/v1alpha/projects/cloud-sdk-integration-testing/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              instance:
+                location: us-central1
+              instanceId: will-fail
+              parent: projects/cloud-sdk-integration-testing
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '494'
+            content-type: application/json; charset=UTF-8
+            status: '429'
+          body:
+            error:
+              code: 429
+              message: instance limit of 1 has already been reached in this region
+              status: RESOURCE_EXHAUSTED
+              details:
+              - '@type': type.googleapis.com/google.rpc.DebugInfo
+                detail: '[ORIGINAL ERROR] generic::resource_exhausted: instance limit
+                  of 1 has already been reached in this region [google.rpc.error_details_ext]
+                  { code: 8 message: "instance limit of 1 has already been reached
+                  in this region" }'
+        repeatable: true
+    - expect_exit:
+        code: 1
+        message:
+          matches: .*RESOURCE_EXHAUSTED.*

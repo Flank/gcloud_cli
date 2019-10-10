@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -216,6 +216,42 @@ class ParseModelOrVersionRefTest(base.MlBetaPlatformTestBase):
     with self.assertRaises(resources.RequiredFieldOmittedException):
       predict_utilities.ParseModelOrVersionRef(None, None)
 
+  def testCheckRuntimeVersionFromModelRef(self):
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.GetRuntimeVersion',
+                    return_value=('TENSORFLOW', '1.8'))
+    self.assertEqual(
+        predict_utilities.CheckRuntimeVersion(), True)
+
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.GetRuntimeVersion',
+                    return_value=('TENSORFLOW', '1.9'))
+    self.assertEqual(
+        predict_utilities.CheckRuntimeVersion(), True)
+
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.GetRuntimeVersion',
+                    return_value=('TENSORFLOW', '2.0'))
+    self.assertEqual(
+        predict_utilities.CheckRuntimeVersion(), True)
+
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.GetRuntimeVersion',
+                    return_value=('TENSORFLOW', '1.0'))
+    self.assertEqual(
+        predict_utilities.CheckRuntimeVersion(), False)
+
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.GetRuntimeVersion',
+                    return_value=('TENSORFLOW', '1.7'))
+    self.assertEqual(
+        predict_utilities.CheckRuntimeVersion(), False)
+
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.GetRuntimeVersion',
+                    return_value=('XGBOOST', '0.7'))
+    self.assertEqual(
+        predict_utilities.CheckRuntimeVersion(), False)
 
 if __name__ == '__main__':
   test_case.main()

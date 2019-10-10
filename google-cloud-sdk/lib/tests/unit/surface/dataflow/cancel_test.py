@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,18 +33,6 @@ class CancelUnitTest(base.DataflowMockingTestBase,
                      sdk_test_base.WithOutputCapture):
 
   def testCancelSuccess(self):
-    self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
-    self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_2_ID), response=self.SampleJob(JOB_2_ID))
-
-    self.Run('beta dataflow jobs cancel %s %s' % (JOB_1_ID, JOB_2_ID))
-    self.AssertErrEquals("""\
-Cancelled job [{0}]
-Cancelled job [{1}]
-""".format(JOB_1_ID, JOB_2_ID, normalize_space=True))
-
-  def testCancelSuccessWithRegion(self):
     my_region = 'europe-west1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
         request=self._CancelReq(JOB_1_ID, region=my_region),
@@ -60,18 +48,36 @@ Cancelled job [{0}]
 Cancelled job [{1}]
 """.format(JOB_1_ID, JOB_2_ID, normalize_space=True))
 
-  def testCancelReturnsPermissionsError(self):
-    my_region = 'us-central1'
+  def testCancelSuccessNoRegion(self):
     self.mocked_client.projects_locations_jobs.Update.Expect(
         request=self._CancelReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_2_ID),
+        request=self._CancelReq(JOB_2_ID), response=self.SampleJob(JOB_2_ID))
+
+    self.Run('beta dataflow jobs cancel %s %s' % (JOB_1_ID, JOB_2_ID))
+    self.AssertErrEquals("""\
+WARNING: `--region` not set; defaulting to 'us-central1'. In an upcoming \
+release, users must specify a region explicitly. See \
+https://cloud.google.com/dataflow/docs/concepts/regional-endpoints \
+for additional details.
+Cancelled job [{0}]
+Cancelled job [{1}]
+""".format(JOB_1_ID, JOB_2_ID, normalize_space=True))
+
+  def testCancelReturnsPermissionsError(self):
+    my_region = 'us-central1'
+    self.mocked_client.projects_locations_jobs.Update.Expect(
+        request=self._CancelReq(JOB_1_ID, region=my_region),
+        response=self.SampleJob(JOB_1_ID))
+    self.mocked_client.projects_locations_jobs.Update.Expect(
+        request=self._CancelReq(JOB_2_ID, region=my_region),
         exception=http_error.MakeHttpError(403))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_3_ID), response=self.SampleJob(JOB_3_ID))
+        request=self._CancelReq(JOB_3_ID, region=my_region),
+        response=self.SampleJob(JOB_3_ID))
 
-    self.Run('beta dataflow jobs cancel %s %s %s' %
-             (JOB_1_ID, JOB_2_ID, JOB_3_ID))
+    self.Run('beta dataflow jobs cancel --region=%s %s %s %s' %
+             (my_region, JOB_1_ID, JOB_2_ID, JOB_3_ID))
     self.AssertErrEquals("""\
 Cancelled job [{0}]
 Failed to cancel job [{1}]: Permission denied. Please ensure you have \
@@ -83,15 +89,17 @@ Cancelled job [{2}]
   def testCancelContinuesOnFailure(self):
     my_region = 'us-central1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
+        request=self._CancelReq(JOB_1_ID, region=my_region),
+        response=self.SampleJob(JOB_1_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_2_ID),
+        request=self._CancelReq(JOB_2_ID, region=my_region),
         exception=http_error.MakeHttpError(404))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._CancelReq(JOB_3_ID), response=self.SampleJob(JOB_3_ID))
+        request=self._CancelReq(JOB_3_ID, region=my_region),
+        response=self.SampleJob(JOB_3_ID))
 
-    self.Run('beta dataflow jobs cancel %s %s %s' %
-             (JOB_1_ID, JOB_2_ID, JOB_3_ID))
+    self.Run('beta dataflow jobs cancel --region=%s %s %s %s' %
+             (my_region, JOB_1_ID, JOB_2_ID, JOB_3_ID))
     self.AssertErrEquals("""\
 Cancelled job [{0}]
 Failed to cancel job [{1}]: Resource not found. Please ensure you have \

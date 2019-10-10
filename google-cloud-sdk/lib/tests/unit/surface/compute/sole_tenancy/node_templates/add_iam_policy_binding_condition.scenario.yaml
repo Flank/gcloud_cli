@@ -2,13 +2,25 @@ title: compute sole-tenancy node-templates add-iam-policy-binding-condition scen
 release_tracks: [ALPHA]
 
 actions:
+- define_reference:
+    reference: policy-version-parameter
+    track_values:
+      BETA: '&optionsRequestedPolicyVersion=3'
+      ALPHA: '&optionsRequestedPolicyVersion=3'
+
+- define_reference:
+    reference: policy-version
+    track_values:
+      BETA: '3'
+      ALPHA: '3'
+
 # add binding with condition to a policy with condition
 - execute_command:
     command: compute sole-tenancy node-templates add-iam-policy-binding my-node-template --region us-central1 --member=user:test@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/getIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/getIamPolicy?alt=json$$policy-version-parameter$$
           method: GET
           body: null
         return_response:
@@ -32,20 +44,11 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/setIamPolicy?alt=json
           method: POST
           body:
-            json:
-              policy:
-                bindings:
-                - role: 'roles/non-primitive'
-                  members: ['user:oldtest@gmail.com', 'user:test@gmail.com']
-                  condition:
-                    expression: 'expr'
-                    title: 'title'
-                    description: 'descr'
-                etag: 'etag'
-                version: 1
+            text: |-
+              {"policy": {"bindings": [{"condition": {"description": "descr", "expression": "expr", "title": "title"}, "members": ["user:oldtest@gmail.com", "user:test@gmail.com"], "role": "roles/non-primitive"}], "etag": "etag", "version": $$policy-version$$}}
         return_response:
           headers:
             status: '200'

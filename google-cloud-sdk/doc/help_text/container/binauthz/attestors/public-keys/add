@@ -1,0 +1,48 @@
+NAME
+    gcloud container binauthz attestors public-keys add - add a public key to
+        an Attestor
+
+SYNOPSIS
+    gcloud container binauthz attestors public-keys add --attestor=ATTESTOR
+        --pgp-public-key-file=PGP_PUBLIC_KEY_FILE [--comment=COMMENT]
+        [GCLOUD_WIDE_FLAG ...]
+
+REQUIRED FLAGS
+     Attestor resource - The attestor to which the public key should be added.
+     This represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [--attestor] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
+
+       --attestor=ATTESTOR
+          ID of the attestor or fully qualified identifier for the attestor.
+
+     --pgp-public-key-file=PGP_PUBLIC_KEY_FILE
+        The path to the file containing the ASCII-armored PGP public key to
+        add.
+
+OPTIONAL FLAGS
+     --comment=COMMENT
+        The comment describing the public key.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To add a new PGP public key to an existing Attestor my_attestor:
+
+        $ gcloud container binauthz attestors public-keys add \
+            --attestor=my_attestor \
+            --pgp-public-key-file=my_key.pub
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha container binauthz attestors public-keys add
+        $ gcloud beta container binauthz attestors public-keys add
+

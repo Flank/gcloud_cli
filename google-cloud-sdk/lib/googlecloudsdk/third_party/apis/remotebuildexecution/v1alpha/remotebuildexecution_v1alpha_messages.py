@@ -31,7 +31,8 @@ class BuildBazelRemoteExecutionV2Action(_messages.Message):
   Fields:
     commandDigest: The digest of the Command to run, which MUST be present in
       the ContentAddressableStorage.
-    doNotCache: If true, then the `Action`'s result cannot be cached.
+    doNotCache: If true, then the `Action`'s result cannot be cached, and in-
+      flight requests for the same `Action` may not be merged.
     inputRootDigest: The digest of the root Directory for the input files. The
       files in the directory tree are available in the correct location on the
       build machine before the command is executed. The root directory, as
@@ -86,20 +87,22 @@ class BuildBazelRemoteExecutionV2ActionResult(_messages.Message):
       proto with hash "4cf2eda940..." and size 43)     files: [       {
       name: "baz",         digest: {           hash: "b2c941073e...",
       size: 1294,         },         is_executable: true       }     ]   } }
-      ```
+      ``` If an output of the same name was found, but was not a directory,
+      the server will return a FAILED_PRECONDITION.
     outputDirectorySymlinks: The output directories of the action that are
       symbolic links to other directories. Those may be links to other output
       directories, or input directories, or even absolute paths outside of the
       working directory, if the server supports
       SymlinkAbsolutePathStrategy.ALLOWED. For each output directory requested
-      in the `output_directories` field of the Action, if the directory file
+      in the `output_directories` field of the Action, if the directory
       existed after the action completed, a single entry will be present
       either in this field, or in the `output_directories` field, if the
-      directory was not a symbolic link.  If the action does not produce the
-      requested output, or produces a file where a directory is expected or
-      vice versa, then that output will be omitted from the list. The server
-      is free to arrange the output list as desired; clients MUST NOT assume
-      that the output list is sorted.
+      directory was not a symbolic link.  If an output of the same name was
+      found, but was a symbolic link to a file instead of a directory, the
+      server will return a FAILED_PRECONDITION. If the action does not produce
+      the requested output, then that output will be omitted from the list.
+      The server is free to arrange the output list as desired; clients MUST
+      NOT assume that the output list is sorted.
     outputFileSymlinks: The output files of the action that are symbolic links
       to other files. Those may be links to other output files, or input
       files, or even absolute paths outside of the working directory, if the
@@ -107,38 +110,36 @@ class BuildBazelRemoteExecutionV2ActionResult(_messages.Message):
       file requested in the `output_files` field of the Action, if the
       corresponding file existed after the action completed, a single entry
       will be present either in this field, or in the `output_files` field, if
-      the file was not a symbolic link.  If the action does not produce the
-      requested output, or produces a directory where a regular file is
-      expected or vice versa, then that output will be omitted from the list.
+      the file was not a symbolic link.  If an output symbolic link of the
+      same name was found, but its target type was not a regular file, the
+      server will return a FAILED_PRECONDITION. If the action does not produce
+      the requested output, then that output will be omitted from the list.
       The server is free to arrange the output list as desired; clients MUST
       NOT assume that the output list is sorted.
     outputFiles: The output files of the action. For each output file
       requested in the `output_files` field of the Action, if the
       corresponding file existed after the action completed, a single entry
-      will be present either in this field, or in the output_file_symlinks
-      field, if the file was a symbolic link to another file.  If the action
-      does not produce the requested output, or produces a directory where a
-      regular file is expected or vice versa, then that output will be omitted
-      from the list. The server is free to arrange the output list as desired;
-      clients MUST NOT assume that the output list is sorted.
+      will be present either in this field, or the `output_file_symlinks`
+      field if the file was a symbolic link to another file.  If an output of
+      the same name was found, but was a directory rather than a regular file,
+      the server will return a FAILED_PRECONDITION. If the action does not
+      produce the requested output, then that output will be omitted from the
+      list. The server is free to arrange the output list as desired; clients
+      MUST NOT assume that the output list is sorted.
     stderrDigest: The digest for a blob containing the standard error of the
-      action, which can be retrieved from the ContentAddressableStorage. See
-      `stderr_raw` for when this will be set.
-    stderrRaw: The standard error buffer of the action. The server will
-      determine, based on the size of the buffer, whether to return it in raw
-      form or to return a digest in `stderr_digest` that points to the buffer.
-      If neither is set, then the buffer is empty. The client SHOULD NOT
-      assume it will get one of the raw buffer or a digest on any given
-      request and should be prepared to handle either.
+      action, which can be retrieved from the ContentAddressableStorage.
+    stderrRaw: The standard error buffer of the action. The server SHOULD NOT
+      inline stderr unless requested by the client in the
+      GetActionResultRequest message. The server MAY omit inlining, even if
+      requested, and MUST do so if inlining would cause the response to exceed
+      message size limits.
     stdoutDigest: The digest for a blob containing the standard output of the
-      action, which can be retrieved from the ContentAddressableStorage. See
-      `stdout_raw` for when this will be set.
-    stdoutRaw: The standard output buffer of the action. The server will
-      determine, based on the size of the buffer, whether to return it in raw
-      form or to return a digest in `stdout_digest` that points to the buffer.
-      If neither is set, then the buffer is empty. The client SHOULD NOT
-      assume it will get one of the raw buffer or a digest on any given
-      request and should be prepared to handle either.
+      action, which can be retrieved from the ContentAddressableStorage.
+    stdoutRaw: The standard output buffer of the action. The server SHOULD NOT
+      inline stdout unless requested by the client in the
+      GetActionResultRequest message. The server MAY omit inlining, even if
+      requested, and MUST do so if inlining would cause the response to exceed
+      message size limits.
   """
 
   executionMetadata = _messages.MessageField('BuildBazelRemoteExecutionV2ExecutedActionMetadata', 1)
@@ -187,10 +188,11 @@ class BuildBazelRemoteExecutionV2Command(_messages.Message):
       inputs.  In order to ensure consistent hashing of the same Action, the
       output paths MUST be sorted lexicographically by code point (or,
       equivalently, by UTF-8 bytes).  An output directory cannot be duplicated
-      or have the same path as any of the listed output files.  Directories
-      leading up to the output directories (but not the output directories
-      themselves) are created by the worker prior to execution, even if they
-      are not explicitly part of the input root.
+      or have the same path as any of the listed output files. An output
+      directory is allowed to be a parent of another output directory.
+      Directories leading up to the output directories (but not the output
+      directories themselves) are created by the worker prior to execution,
+      even if they are not explicitly part of the input root.
     outputFiles: A list of the output files that the client expects to
       retrieve from the action. Only the listed files, as well as directories
       listed in `output_directories`, will be returned to the client as
@@ -210,7 +212,8 @@ class BuildBazelRemoteExecutionV2Command(_messages.Message):
     platform: The platform requirements for the execution environment. The
       server MAY choose to execute the action on any worker satisfying the
       requirements, so the client SHOULD ensure that running the action on any
-      such worker will have the same result.
+      such worker will have the same result. A detailed lexicon for this can
+      be found in the accompanying platform.md.
     workingDirectory: The working directory, relative to the input root, for
       the command to run in. It must be a directory which exists in the input
       tree. If it is left empty, then the action is run in the input root.
@@ -284,7 +287,11 @@ class BuildBazelRemoteExecutionV2Directory(_messages.Message):
   restrictions MUST be obeyed when constructing a a `Directory`:  * Every
   child in the directory must have a path of exactly one segment.   Multiple
   levels of directory hierarchy may not be collapsed. * Each child in the
-  directory must have a unique path segment (file name). * The files,
+  directory must have a unique path segment (file name).   Note that while the
+  API itself is case-sensitive, the environment where   the Action is executed
+  may or may not be case-sensitive. That is, it is   legal to call the API
+  with a Directory that has both "Foo" and "foo" as   children, but the Action
+  may be rejected by the remote system upon   execution. * The files,
   directories and symlinks in the directory must each be sorted   in
   lexicographical order by path. The path strings must be sorted by code
   point, equivalently, by UTF-8 bytes.  A `Directory` that obeys the
@@ -329,11 +336,11 @@ class BuildBazelRemoteExecutionV2ExecuteOperationMetadata(_messages.Message):
   metadata field of the Operation.
 
   Enums:
-    StageValueValuesEnum:
+    StageValueValuesEnum: The current stage of execution.
 
   Fields:
     actionDigest: The digest of the Action being executed.
-    stage: A StageValueValuesEnum attribute.
+    stage: The current stage of execution.
     stderrStreamName: If set, the client can use this name with
       ByteStream.Read to stream the standard error.
     stdoutStreamName: If set, the client can use this name with
@@ -341,10 +348,10 @@ class BuildBazelRemoteExecutionV2ExecuteOperationMetadata(_messages.Message):
   """
 
   class StageValueValuesEnum(_messages.Enum):
-    r"""StageValueValuesEnum enum type.
+    r"""The current stage of execution.
 
     Values:
-      UNKNOWN: <no description>
+      UNKNOWN: Invalid value.
       CACHE_CHECK: Checking the result against the cache.
       QUEUED: Currently idle, awaiting a free machine to execute.
       EXECUTING: Currently being executed by a worker.
@@ -521,9 +528,13 @@ class BuildBazelRemoteExecutionV2OutputDirectory(_messages.Message):
 class BuildBazelRemoteExecutionV2OutputFile(_messages.Message):
   r"""An `OutputFile` is similar to a FileNode, but it is used as an output in
   an `ActionResult`. It allows a full file path rather than only a name.
-  `OutputFile` is binary-compatible with `FileNode`.
 
   Fields:
+    contents: The contents of the file if inlining was requested. The server
+      SHOULD NOT inline file contents unless requested by the client in the
+      GetActionResultRequest message. The server MAY omit inlining, even if
+      requested, and MUST do so if inlining would cause the response to exceed
+      message size limits.
     digest: The digest of the file's content.
     isExecutable: True if file is executable, false otherwise.
     path: The full path of the file relative to the working directory,
@@ -531,9 +542,10 @@ class BuildBazelRemoteExecutionV2OutputFile(_messages.Message):
       this is a relative path, it MUST NOT begin with a leading forward slash.
   """
 
-  digest = _messages.MessageField('BuildBazelRemoteExecutionV2Digest', 1)
-  isExecutable = _messages.BooleanField(2)
-  path = _messages.StringField(3)
+  contents = _messages.BytesField(1)
+  digest = _messages.MessageField('BuildBazelRemoteExecutionV2Digest', 2)
+  isExecutable = _messages.BooleanField(3)
+  path = _messages.StringField(4)
 
 
 class BuildBazelRemoteExecutionV2OutputSymlink(_messages.Message):
@@ -603,7 +615,12 @@ class BuildBazelRemoteExecutionV2RequestMetadata(_messages.Message):
   logging or other purposes. To use it, the client attaches the header to the
   call using the canonical proto serialization:  * name:
   `build.bazel.remote.execution.v2.requestmetadata-bin` * contents: the base64
-  encoded binary `RequestMetadata` message.
+  encoded binary `RequestMetadata` message. Note: the gRPC library serializes
+  binary headers encoded in base 64 by default
+  (https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+  Therefore, if the gRPC library is used to pass/retrieve this metadata, the
+  user may ignore the base64 encoding and assume it is simply serialized as a
+  binary message.
 
   Fields:
     actionId: An identifier that ties multiple requests to the same action.
@@ -711,6 +728,87 @@ class GoogleDevtoolsRemotebuildbotCommandEvents(_messages.Message):
   inputCacheMiss = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
   numErrors = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
   numWarnings = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
+
+
+class GoogleDevtoolsRemotebuildbotCommandStatus(_messages.Message):
+  r"""The internal status of the command result.
+
+  Enums:
+    CodeValueValuesEnum: The status code.
+
+  Fields:
+    code: The status code.
+    message: The error message.
+  """
+
+  class CodeValueValuesEnum(_messages.Enum):
+    r"""The status code.
+
+    Values:
+      OK: The command succeeded.
+      INVALID_ARGUMENT: The command input was invalid.
+      DEADLINE_EXCEEDED: The command had passed its expiry time while it was
+        still running.
+      NOT_FOUND: The resources requested by the command were not found.
+      PERMISSION_DENIED: The command failed due to permission errors.
+      INTERNAL: The command failed because of some invariants expected by the
+        underlying system have been broken. This usually indicates a bug wit
+        the system.
+      ABORTED: The command was aborted.
+      CLEANUP_ERROR: The bot failed to do the cleanup, e.g. unable to delete
+        the command working directory or the command process.
+      DOWNLOAD_INPUTS_ERROR: The bot failed to download the inputs.
+      UNKNOWN: Unknown error.
+      UPLOAD_OUTPUTS_ERROR: The bot failed to upload the outputs.
+      DOCKER_LOGIN_ERROR: The bot failed to login to docker.
+      DOCKER_IMAGE_PULL_ERROR: The bot failed to pull docker image.
+      DOCKER_IMAGE_EXIST_ERROR: The bot failed to check docker images.
+      DUPLICATE_INPUTS: The inputs contain duplicate files.
+      DOCKER_IMAGE_PERMISSION_DENIED: The bot doesn't have the permissions to
+        pull docker images.
+      DOCKER_IMAGE_NOT_FOUND: The docker image cannot be found.
+      WORKING_DIR_NOT_FOUND: Working directory is not found.
+      WORKING_DIR_NOT_IN_BASE_DIR: Working directory is not under the base
+        directory
+      DOCKER_UNAVAILABLE: There are issues with docker service/runtime.
+    """
+    OK = 0
+    INVALID_ARGUMENT = 1
+    DEADLINE_EXCEEDED = 2
+    NOT_FOUND = 3
+    PERMISSION_DENIED = 4
+    INTERNAL = 5
+    ABORTED = 6
+    CLEANUP_ERROR = 7
+    DOWNLOAD_INPUTS_ERROR = 8
+    UNKNOWN = 9
+    UPLOAD_OUTPUTS_ERROR = 10
+    DOCKER_LOGIN_ERROR = 11
+    DOCKER_IMAGE_PULL_ERROR = 12
+    DOCKER_IMAGE_EXIST_ERROR = 13
+    DUPLICATE_INPUTS = 14
+    DOCKER_IMAGE_PERMISSION_DENIED = 15
+    DOCKER_IMAGE_NOT_FOUND = 16
+    WORKING_DIR_NOT_FOUND = 17
+    WORKING_DIR_NOT_IN_BASE_DIR = 18
+    DOCKER_UNAVAILABLE = 19
+
+  code = _messages.EnumField('CodeValueValuesEnum', 1)
+  message = _messages.StringField(2)
+
+
+class GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig(_messages.Message):
+  r"""AcceleratorConfig defines the accelerator cards to attach to the VM.
+
+  Fields:
+    acceleratorCount: The number of guest accelerator cards exposed to each
+      VM.
+    acceleratorType: The type of accelerator to attach to each VM, e.g.
+      "nvidia-tesla-k80" for nVidia Tesla K80.
+  """
+
+  acceleratorCount = _messages.IntegerField(1)
+  acceleratorType = _messages.StringField(2)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateInstanceRequest(_messages.Message):
@@ -868,11 +966,28 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaListWorkerPoolsRequest(_mess
   object.
 
   Fields:
+    filter: Optional. A filter expression that filters resources listed in the
+      response. The expression must specify the field name, a comparison
+      operator, and the value that you want to use for filtering. The value
+      must be a string, a number, or a boolean. String values are case-
+      insensitive. The comparison operator must be either `:`, `=`, `!=`, `>`,
+      `>=`, `<=` or `<`. The `:` operator can be used with string fields to
+      match substrings. For non-string fields it is equivalent to the `=`
+      operator. The `:*` comparison can be used to test  whether a key has
+      been defined.  You can also filter on nested fields.  To filter on
+      multiple expressions, you can separate expression using `AND` and `OR`
+      operators, using parentheses to specify precedence. If neither operator
+      is specified, `AND` is assumed.  Examples:  Include only pools with more
+      than 100 reserved workers: `(worker_count > 100) (worker_config.reserved
+      = true)`  Include only pools with a certain label or machines of the
+      n1-standard family: `worker_config.labels.key1 : * OR
+      worker_config.machine_type: n1-standard`
     parent: Resource name of the instance. Format:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`.
   """
 
-  parent = _messages.StringField(1)
+  filter = _messages.StringField(1)
+  parent = _messages.StringField(2)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaListWorkerPoolsResponse(_messages.Message):
@@ -908,29 +1023,79 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig(_messages.Messa
   r"""Defines the configuration to be used for a creating workers in the
   worker pool.
 
+  Messages:
+    LabelsValue: Labels associated with the workers. Label keys and values can
+      be no longer than 63 characters, can only contain lowercase letters,
+      numeric characters, underscores and dashes. International letters are
+      permitted. Label keys must start with a letter. Label values are
+      optional. There can not be more than 64 labels per resource.
+
   Fields:
+    accelerator: The accelerator card attached to each VM.
     diskSizeGb: Required. Size of the disk attached to the worker, in GB. See
       https://cloud.google.com/compute/docs/disks/
     diskType: Required. Disk Type to use for the worker. See [Storage
       options](https://cloud.google.com/compute/docs/disks/#introduction).
       Currently only `pd-standard` is supported.
+    labels: Labels associated with the workers. Label keys and values can be
+      no longer than 63 characters, can only contain lowercase letters,
+      numeric characters, underscores and dashes. International letters are
+      permitted. Label keys must start with a letter. Label values are
+      optional. There can not be more than 64 labels per resource.
     machineType: Required. Machine type of the worker, such as
       `n1-standard-2`. See https://cloud.google.com/compute/docs/machine-types
       for a list of supported machine types. Note that `f1-micro` and
       `g1-small` are not yet supported.
     minCpuPlatform: Minimum CPU platform to use when creating the worker. See
       [CPU Platforms](https://cloud.google.com/compute/docs/cpu-platforms).
+    networkAccess: Determines the type of network access granted to workers.
+      Possible values:  - "public": Workers can connect to the public
+      internet. - "private": Workers can only connect to Google APIs and
+      services. - "restricted-private": Workers can only connect to Google
+      APIs that are   reachable through `restricted.googleapis.com`
+      (`199.36.153.4/30`).
     reserved: Determines whether the worker is reserved (equivalent to a
       Compute Engine on-demand VM and therefore won't be preempted). See
       [Preemptible VMs](https://cloud.google.com/preemptible-vms/) for more
       details.
   """
 
-  diskSizeGb = _messages.IntegerField(1)
-  diskType = _messages.StringField(2)
-  machineType = _messages.StringField(3)
-  minCpuPlatform = _messages.StringField(4)
-  reserved = _messages.BooleanField(5)
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels associated with the workers. Label keys and values can be no
+    longer than 63 characters, can only contain lowercase letters, numeric
+    characters, underscores and dashes. International letters are permitted.
+    Label keys must start with a letter. Label values are optional. There can
+    not be more than 64 labels per resource.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  accelerator = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig', 1)
+  diskSizeGb = _messages.IntegerField(2)
+  diskType = _messages.StringField(3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  machineType = _messages.StringField(5)
+  minCpuPlatform = _messages.StringField(6)
+  networkAccess = _messages.StringField(7)
+  reserved = _messages.BooleanField(8)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerPool(_messages.Message):
@@ -980,430 +1145,6 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerPool(_messages.Message
   state = _messages.EnumField('StateValueValuesEnum', 2)
   workerConfig = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig', 3)
   workerCount = _messages.IntegerField(4)
-
-
-class GoogleDevtoolsRemoteexecutionV1testActionResult(_messages.Message):
-  r"""An ActionResult represents the result of an Action being run.
-
-  Fields:
-    exitCode: The exit code of the command.
-    outputDirectories: The output directories of the action. For each output
-      directory requested in the `output_directories` field of the Action, if
-      the corresponding directory existed after the action completed, a single
-      entry will be present in the output list, which will contain the digest
-      of a Tree message containing the directory tree, and the path equal
-      exactly to the corresponding Action output_directories member. As an
-      example, suppose the Action had an output directory `a/b/dir` and the
-      execution produced the following contents in `a/b/dir`: a file named
-      `bar` and a directory named `foo` with an executable file named `baz`.
-      Then, output_directory will contain (hashes shortened for readability):
-      ```json // OutputDirectory proto: {   path: "a/b/dir"   tree_digest: {
-      hash: "4a73bc9d03...",     size: 55   } } // Tree proto with hash
-      "4a73bc9d03..." and size 55: {   root: {     files: [       {
-      name: "bar",         digest: {           hash: "4a73bc9d03...",
-      size: 65534         }       }     ],     directories: [       {
-      name: "foo",         digest: {           hash: "4cf2eda940...",
-      size: 43         }       }     ]   }   children : {     // (Directory
-      proto with hash "4cf2eda940..." and size 43)     files: [       {
-      name: "baz",         digest: {           hash: "b2c941073e...",
-      size: 1294,         },         is_executable: true       }     ]   } }
-      ```
-    outputFiles: The output files of the action. For each output file
-      requested in the `output_files` field of the Action, if the
-      corresponding file existed after the action completed, a single entry
-      will be present in the output list.  If the action does not produce the
-      requested output, or produces a directory where a regular file is
-      expected or vice versa, then that output will be omitted from the list.
-      The server is free to arrange the output list as desired; clients MUST
-      NOT assume that the output list is sorted.
-    stderrDigest: The digest for a blob containing the standard error of the
-      action, which can be retrieved from the ContentAddressableStorage. See
-      `stderr_raw` for when this will be set.
-    stderrRaw: The standard error buffer of the action. The server will
-      determine, based on the size of the buffer, whether to return it in raw
-      form or to return a digest in `stderr_digest` that points to the buffer.
-      If neither is set, then the buffer is empty. The client SHOULD NOT
-      assume it will get one of the raw buffer or a digest on any given
-      request and should be prepared to handle either.
-    stdoutDigest: The digest for a blob containing the standard output of the
-      action, which can be retrieved from the ContentAddressableStorage. See
-      `stdout_raw` for when this will be set.
-    stdoutRaw: The standard output buffer of the action. The server will
-      determine, based on the size of the buffer, whether to return it in raw
-      form or to return a digest in `stdout_digest` that points to the buffer.
-      If neither is set, then the buffer is empty. The client SHOULD NOT
-      assume it will get one of the raw buffer or a digest on any given
-      request and should be prepared to handle either.
-  """
-
-  exitCode = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  outputDirectories = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testOutputDirectory', 2, repeated=True)
-  outputFiles = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testOutputFile', 3, repeated=True)
-  stderrDigest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 4)
-  stderrRaw = _messages.BytesField(5)
-  stdoutDigest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 6)
-  stdoutRaw = _messages.BytesField(7)
-
-
-class GoogleDevtoolsRemoteexecutionV1testCommand(_messages.Message):
-  r"""A `Command` is the actual command executed by a worker running an
-  Action.  Except as otherwise required, the environment (such as which system
-  libraries or binaries are available, and what filesystems are mounted where)
-  is defined by and specific to the implementation of the remote execution
-  API.
-
-  Fields:
-    arguments: The arguments to the command. The first argument must be the
-      path to the executable, which must be either a relative path, in which
-      case it is evaluated with respect to the input root, or an absolute
-      path.  The working directory will always be the input root.
-    environmentVariables: The environment variables to set when running the
-      program. The worker may provide its own default environment variables;
-      these defaults can be overridden using this field. Additional variables
-      can also be specified.  In order to ensure that equivalent `Command`s
-      always hash to the same value, the environment variables MUST be
-      lexicographically sorted by name. Sorting of strings is done by code
-      point, equivalently, by the UTF-8 bytes.
-  """
-
-  arguments = _messages.StringField(1, repeated=True)
-  environmentVariables = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testCommandEnvironmentVariable', 2, repeated=True)
-
-
-class GoogleDevtoolsRemoteexecutionV1testCommandEnvironmentVariable(_messages.Message):
-  r"""An `EnvironmentVariable` is one variable to set in the running program's
-  environment.
-
-  Fields:
-    name: The variable name.
-    value: The variable value.
-  """
-
-  name = _messages.StringField(1)
-  value = _messages.StringField(2)
-
-
-class GoogleDevtoolsRemoteexecutionV1testDigest(_messages.Message):
-  r"""A content digest. A digest for a given blob consists of the size of the
-  blob and its hash. The hash algorithm to use is defined by the server, but
-  servers SHOULD use SHA-256.  The size is considered to be an integral part
-  of the digest and cannot be separated. That is, even if the `hash` field is
-  correctly specified but `size_bytes` is not, the server MUST reject the
-  request.  The reason for including the size in the digest is as follows: in
-  a great many cases, the server needs to know the size of the blob it is
-  about to work with prior to starting an operation with it, such as
-  flattening Merkle tree structures or streaming it to a worker. Technically,
-  the server could implement a separate metadata store, but this results in a
-  significantly more complicated implementation as opposed to having the
-  client specify the size up-front (or storing the size along with the digest
-  in every message where digests are embedded). This does mean that the API
-  leaks some implementation details of (what we consider to be) a reasonable
-  server implementation, but we consider this to be a worthwhile tradeoff.
-  When a `Digest` is used to refer to a proto message, it always refers to the
-  message in binary encoded form. To ensure consistent hashing, clients and
-  servers MUST ensure that they serialize messages according to the following
-  rules, even if there are alternate valid encodings for the same message. -
-  Fields are serialized in tag order. - There are no unknown fields. - There
-  are no duplicate fields. - Fields are serialized according to the default
-  semantics for their type.  Most protocol buffer implementations will always
-  follow these rules when serializing, but care should be taken to avoid
-  shortcuts. For instance, concatenating two messages to merge them may
-  produce duplicate fields.
-
-  Fields:
-    hash: The hash. In the case of SHA-256, it will always be a lowercase hex
-      string exactly 64 characters long.
-    sizeBytes: The size of the blob, in bytes.
-  """
-
-  hash = _messages.StringField(1)
-  sizeBytes = _messages.IntegerField(2)
-
-
-class GoogleDevtoolsRemoteexecutionV1testDirectory(_messages.Message):
-  r"""A `Directory` represents a directory node in a file tree, containing
-  zero or more children FileNodes and DirectoryNodes. Each `Node` contains its
-  name in the directory, the digest of its content (either a file blob or a
-  `Directory` proto), as well as possibly some metadata about the file or
-  directory.  In order to ensure that two equivalent directory trees hash to
-  the same value, the following restrictions MUST be obeyed when constructing
-  a a `Directory`:   - Every child in the directory must have a path of
-  exactly one segment.     Multiple levels of directory hierarchy may not be
-  collapsed.   - Each child in the directory must have a unique path segment
-  (file name).   - The files and directories in the directory must each be
-  sorted in     lexicographical order by path. The path strings must be sorted
-  by code     point, equivalently, by UTF-8 bytes.  A `Directory` that obeys
-  the restrictions is said to be in canonical form.  As an example, the
-  following could be used for a file named `bar` and a directory named `foo`
-  with an executable file named `baz` (hashes shortened for readability):
-  ```json // (Directory proto) {   files: [     {       name: "bar",
-  digest: {         hash: "4a73bc9d03...",         size: 65534       }     }
-  ],   directories: [     {       name: "foo",       digest: {         hash:
-  "4cf2eda940...",         size: 43       }     }   ] }  // (Directory proto
-  with hash "4cf2eda940..." and size 43) {   files: [     {       name: "baz",
-  digest: {         hash: "b2c941073e...",         size: 1294,       },
-  is_executable: true     }   ] } ```
-
-  Fields:
-    directories: The subdirectories in the directory.
-    files: The files in the directory.
-  """
-
-  directories = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDirectoryNode', 1, repeated=True)
-  files = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testFileNode', 2, repeated=True)
-
-
-class GoogleDevtoolsRemoteexecutionV1testDirectoryNode(_messages.Message):
-  r"""A `DirectoryNode` represents a child of a Directory which is itself a
-  `Directory` and its associated metadata.
-
-  Fields:
-    digest: The digest of the Directory object represented. See Digest for
-      information about how to take the digest of a proto message.
-    name: The name of the directory.
-  """
-
-  digest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 1)
-  name = _messages.StringField(2)
-
-
-class GoogleDevtoolsRemoteexecutionV1testExecuteOperationMetadata(_messages.Message):
-  r"""Metadata about an ongoing execution, which will be contained in the
-  metadata field of the Operation.
-
-  Enums:
-    StageValueValuesEnum:
-
-  Fields:
-    actionDigest: The digest of the Action being executed.
-    stage: A StageValueValuesEnum attribute.
-    stderrStreamName: If set, the client can use this name with
-      ByteStream.Read to stream the standard error.
-    stdoutStreamName: If set, the client can use this name with
-      ByteStream.Read to stream the standard output.
-  """
-
-  class StageValueValuesEnum(_messages.Enum):
-    r"""StageValueValuesEnum enum type.
-
-    Values:
-      UNKNOWN: <no description>
-      CACHE_CHECK: Checking the result against the cache.
-      QUEUED: Currently idle, awaiting a free machine to execute.
-      EXECUTING: Currently being executed by a worker.
-      COMPLETED: Finished execution.
-    """
-    UNKNOWN = 0
-    CACHE_CHECK = 1
-    QUEUED = 2
-    EXECUTING = 3
-    COMPLETED = 4
-
-  actionDigest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 1)
-  stage = _messages.EnumField('StageValueValuesEnum', 2)
-  stderrStreamName = _messages.StringField(3)
-  stdoutStreamName = _messages.StringField(4)
-
-
-class GoogleDevtoolsRemoteexecutionV1testExecuteResponse(_messages.Message):
-  r"""The response message for Execution.Execute, which will be contained in
-  the response field of the Operation.
-
-  Messages:
-    ServerLogsValue: An optional list of additional log outputs the server
-      wishes to provide. A server can use this to return execution-specific
-      logs however it wishes. This is intended primarily to make it easier for
-      users to debug issues that may be outside of the actual job execution,
-      such as by identifying the worker executing the action or by providing
-      logs from the worker's setup phase. The keys SHOULD be human readable so
-      that a client can display them to a user.
-
-  Fields:
-    cachedResult: True if the result was served from cache, false if it was
-      executed.
-    result: The result of the action.
-    serverLogs: An optional list of additional log outputs the server wishes
-      to provide. A server can use this to return execution-specific logs
-      however it wishes. This is intended primarily to make it easier for
-      users to debug issues that may be outside of the actual job execution,
-      such as by identifying the worker executing the action or by providing
-      logs from the worker's setup phase. The keys SHOULD be human readable so
-      that a client can display them to a user.
-    status: If the status has a code other than `OK`, it indicates that the
-      action did not finish execution. For example, if the operation times out
-      during execution, the status will have a `DEADLINE_EXCEEDED` code.
-      Servers MUST use this field for errors in execution, rather than the
-      error field on the `Operation` object.  If the status code is other than
-      `OK`, then the result MUST NOT be cached. For an error status, the
-      `result` field is optional; the server may populate the output-,
-      stdout-, and stderr-related fields if it has any information available,
-      such as the stdout and stderr of a timed-out action.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class ServerLogsValue(_messages.Message):
-    r"""An optional list of additional log outputs the server wishes to
-    provide. A server can use this to return execution-specific logs however
-    it wishes. This is intended primarily to make it easier for users to debug
-    issues that may be outside of the actual job execution, such as by
-    identifying the worker executing the action or by providing logs from the
-    worker's setup phase. The keys SHOULD be human readable so that a client
-    can display them to a user.
-
-    Messages:
-      AdditionalProperty: An additional property for a ServerLogsValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type ServerLogsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a ServerLogsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A GoogleDevtoolsRemoteexecutionV1testLogFile attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testLogFile', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  cachedResult = _messages.BooleanField(1)
-  result = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testActionResult', 2)
-  serverLogs = _messages.MessageField('ServerLogsValue', 3)
-  status = _messages.MessageField('GoogleRpcStatus', 4)
-
-
-class GoogleDevtoolsRemoteexecutionV1testFileNode(_messages.Message):
-  r"""A `FileNode` represents a single file and associated metadata.
-
-  Fields:
-    digest: The digest of the file's content.
-    isExecutable: True if file is executable, false otherwise.
-    name: The name of the file.
-  """
-
-  digest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 1)
-  isExecutable = _messages.BooleanField(2)
-  name = _messages.StringField(3)
-
-
-class GoogleDevtoolsRemoteexecutionV1testLogFile(_messages.Message):
-  r"""A `LogFile` is a log stored in the CAS.
-
-  Fields:
-    digest: The digest of the log contents.
-    humanReadable: This is a hint as to the purpose of the log, and is set to
-      true if the log is human-readable text that can be usefully displayed to
-      a user, and false otherwise. For instance, if a command-line client
-      wishes to print the server logs to the terminal for a failed action,
-      this allows it to avoid displaying a binary file.
-  """
-
-  digest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 1)
-  humanReadable = _messages.BooleanField(2)
-
-
-class GoogleDevtoolsRemoteexecutionV1testOutputDirectory(_messages.Message):
-  r"""An `OutputDirectory` is the output in an `ActionResult` corresponding to
-  a directory's full contents rather than a single file.
-
-  Fields:
-    digest: DEPRECATED: This field is deprecated and should no longer be used.
-    path: The full path of the directory relative to the working directory.
-      The path separator is a forward slash `/`. Since this is a relative
-      path, it MUST NOT begin with a leading forward slash. The empty string
-      value is allowed, and it denotes the entire working directory.
-    treeDigest: The digest of the encoded Tree proto containing the
-      directory's contents.
-  """
-
-  digest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 1)
-  path = _messages.StringField(2)
-  treeDigest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 3)
-
-
-class GoogleDevtoolsRemoteexecutionV1testOutputFile(_messages.Message):
-  r"""An `OutputFile` is similar to a FileNode, but it is tailored for output
-  as part of an `ActionResult`. It allows a full file path rather than only a
-  name, and allows the server to include content inline.  `OutputFile` is
-  binary-compatible with `FileNode`.
-
-  Fields:
-    content: The raw content of the file.  This field may be used by the
-      server to provide the content of a file inline in an ActionResult and
-      avoid requiring that the client make a separate call to
-      [ContentAddressableStorage.GetBlob] to retrieve it.  The client SHOULD
-      NOT assume that it will get raw content with any request, and always be
-      prepared to retrieve it via `digest`.
-    digest: The digest of the file's content.
-    isExecutable: True if file is executable, false otherwise.
-    path: The full path of the file relative to the input root, including the
-      filename. The path separator is a forward slash `/`. Since this is a
-      relative path, it MUST NOT begin with a leading forward slash.
-  """
-
-  content = _messages.BytesField(1)
-  digest = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDigest', 2)
-  isExecutable = _messages.BooleanField(3)
-  path = _messages.StringField(4)
-
-
-class GoogleDevtoolsRemoteexecutionV1testRequestMetadata(_messages.Message):
-  r"""An optional Metadata to attach to any RPC request to tell the server
-  about an external context of the request. The server may use this for
-  logging or other purposes. To use it, the client attaches the header to the
-  call using the canonical proto serialization: name:
-  google.devtools.remoteexecution.v1test.requestmetadata-bin contents: the
-  base64 encoded binary RequestMetadata message.
-
-  Fields:
-    actionId: An identifier that ties multiple requests to the same action.
-      For example, multiple requests to the CAS, Action Cache, and Execution
-      API are used in order to compile foo.cc.
-    correlatedInvocationsId: An identifier to tie multiple tool invocations
-      together. For example, runs of foo_test, bar_test and baz_test on a
-      post-submit of a given patch.
-    toolDetails: The details for the tool invoking the requests.
-    toolInvocationId: An identifier that ties multiple actions together to a
-      final result. For example, multiple actions are required to build and
-      run foo_test.
-  """
-
-  actionId = _messages.StringField(1)
-  correlatedInvocationsId = _messages.StringField(2)
-  toolDetails = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testToolDetails', 3)
-  toolInvocationId = _messages.StringField(4)
-
-
-class GoogleDevtoolsRemoteexecutionV1testToolDetails(_messages.Message):
-  r"""Details for the tool used to call the API.
-
-  Fields:
-    toolName: Name of the tool, e.g. bazel.
-    toolVersion: Version of the tool used for the request, e.g. 5.0.3.
-  """
-
-  toolName = _messages.StringField(1)
-  toolVersion = _messages.StringField(2)
-
-
-class GoogleDevtoolsRemoteexecutionV1testTree(_messages.Message):
-  r"""A `Tree` contains all the Directory protos in a single directory Merkle
-  tree, compressed into one message.
-
-  Fields:
-    children: All the child directories: the directories referred to by the
-      root and, recursively, all its children. In order to reconstruct the
-      directory tree, the client must take the digests of each of the child
-      directories and then build up a tree starting from the `root`.
-    root: The root directory in the tree.
-  """
-
-  children = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDirectory', 1, repeated=True)
-  root = _messages.MessageField('GoogleDevtoolsRemoteexecutionV1testDirectory', 2)
 
 
 class GoogleDevtoolsRemoteworkersV1test2AdminTemp(_messages.Message):
@@ -1862,37 +1603,10 @@ class GoogleLongrunningOperation(_messages.Message):
 class GoogleRpcStatus(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -1995,11 +1709,28 @@ class RemotebuildexecutionProjectsInstancesWorkerpoolsListRequest(_messages.Mess
   r"""A RemotebuildexecutionProjectsInstancesWorkerpoolsListRequest object.
 
   Fields:
+    filter: Optional. A filter expression that filters resources listed in the
+      response. The expression must specify the field name, a comparison
+      operator, and the value that you want to use for filtering. The value
+      must be a string, a number, or a boolean. String values are case-
+      insensitive. The comparison operator must be either `:`, `=`, `!=`, `>`,
+      `>=`, `<=` or `<`. The `:` operator can be used with string fields to
+      match substrings. For non-string fields it is equivalent to the `=`
+      operator. The `:*` comparison can be used to test  whether a key has
+      been defined.  You can also filter on nested fields.  To filter on
+      multiple expressions, you can separate expression using `AND` and `OR`
+      operators, using parentheses to specify precedence. If neither operator
+      is specified, `AND` is assumed.  Examples:  Include only pools with more
+      than 100 reserved workers: `(worker_count > 100) (worker_config.reserved
+      = true)`  Include only pools with a certain label or machines of the
+      n1-standard family: `worker_config.labels.key1 : * OR
+      worker_config.machine_type: n1-standard`
     parent: Resource name of the instance. Format:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`.
   """
 
-  parent = _messages.StringField(1, required=True)
+  filter = _messages.StringField(1)
+  parent = _messages.StringField(2, required=True)
 
 
 class RemotebuildexecutionProjectsInstancesWorkerpoolsPatchRequest(_messages.Message):

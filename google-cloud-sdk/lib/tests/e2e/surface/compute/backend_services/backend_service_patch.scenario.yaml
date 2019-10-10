@@ -7,12 +7,12 @@ summary:
 - execute:
   - command: compute health-checks create tcp $$tcp-hc$$ --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
 - execute:
   - command: compute backend-services create $$tcp-bs$$ --protocol TCP --health-checks
       $$tcp-hc$$ --connection-draining-timeout 10 --global --format 'text(name)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
   - stdout: |
       ---
       name: $$tcp-bs$$
@@ -20,7 +20,7 @@ summary:
   - command: compute backend-services update $$tcp-bs$$ --description new-desc --global
       --format 'text(name,description)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
   - stdout: |
       ---
       description: new-desc
@@ -29,7 +29,7 @@ summary:
   - command: compute backend-services update $$tcp-bs$$ --description "" --global
       --format 'text(name,description)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
   # yamllint disable rule:trailing-spaces
   - stdout: |
       ---
@@ -38,17 +38,17 @@ summary:
 - execute:
   - command: compute backend-services delete $$tcp-bs$$ --global --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
 - execute:
   - command: compute health-checks delete $$tcp-hc$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
 
 
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -63,6 +63,7 @@ actions:
     value: ""
     track_values:
       ALPHA: --global
+      BETA: --global
 
 
 - define_reference:
@@ -70,6 +71,7 @@ actions:
     value: ""
     track_values:
       ALPHA: --global-health-checks
+      BETA: --global-health-checks
 
 
 - generate_resource_id:
@@ -79,8 +81,9 @@ actions:
     command: compute health-checks create tcp $$tcp-hc$$ $$global-flag$$ --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
     - expect_exit:
         code: 0
 
@@ -93,8 +96,9 @@ actions:
       $$tcp-hc$$ --connection-draining-timeout 10 --global $$global-hc-flag$$ --format 'text(name)'
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - expect_stdout: |
         ---
         name: $$tcp-bs$$
@@ -181,8 +185,9 @@ actions:
             insertTime: '2018-09-25T12:32:26.009-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537903945365-576b72a5cb60a-9e681afb-f15b4688
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
@@ -303,8 +308,9 @@ actions:
             insertTime: '2018-09-25T12:32:41.744-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537903957850-576b72b1b3790-b71f4b9d-ffd77de0
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
@@ -352,8 +358,9 @@ actions:
     cleanup_for: tcp-bs
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - expect_exit:
         code: 0
 
@@ -363,7 +370,8 @@ actions:
     cleanup_for: tcp-hc
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
     - expect_exit:
         code: 0

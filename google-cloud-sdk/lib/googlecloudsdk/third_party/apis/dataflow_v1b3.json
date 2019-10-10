@@ -221,6 +221,33 @@
             "FAILED",
             "DELETED"
           ]
+        },
+        "pubsubMetadata": {
+          "description": "PubSub snapshot metadata.",
+          "type": "array",
+          "items": {
+            "$ref": "PubsubSnapshotMetadata"
+          }
+        }
+      }
+    },
+    "PubsubSnapshotMetadata": {
+      "id": "PubsubSnapshotMetadata",
+      "description": "Represents a Pubsub snapshot.",
+      "type": "object",
+      "properties": {
+        "topicName": {
+          "description": "The name of the Pubsub topic.",
+          "type": "string"
+        },
+        "snapshotName": {
+          "description": "The name of the Pubsub snapshot.",
+          "type": "string"
+        },
+        "expireTime": {
+          "description": "The expire time of the Pubsub snapshot.",
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -516,6 +543,14 @@
             "FLEXRS_SPEED_OPTIMIZED",
             "FLEXRS_COST_OPTIMIZED"
           ]
+        },
+        "workerRegion": {
+          "description": "The Compute Engine region\n(https:\/\/cloud.google.com\/compute\/docs\/regions-zones\/regions-zones) in\nwhich worker processing should occur, e.g. \"us-west1\". Mutually exclusive\nwith worker_zone. If neither worker_region nor worker_zone is specified,\ndefault to the control plane's region.",
+          "type": "string"
+        },
+        "workerZone": {
+          "description": "The Compute Engine zone\n(https:\/\/cloud.google.com\/compute\/docs\/regions-zones\/regions-zones) in\nwhich worker processing should occur, e.g. \"us-west1-a\". Mutually exclusive\nwith worker_region. If neither worker_region nor worker_zone is specified,\na zone in the control plane's region is chosen based on available capacity.",
+          "type": "string"
         }
       }
     },
@@ -1454,6 +1489,10 @@
         "location": {
           "description": "The location that contains this job.",
           "type": "string"
+        },
+        "snapshotSources": {
+          "description": "If true, perform snapshots for sources which support this.",
+          "type": "boolean"
         }
       }
     },
@@ -1757,7 +1796,7 @@
           "format": "int32"
         },
         "zone": {
-          "description": "The Compute Engine [availability\nzone](https:\/\/cloud.google.com\/compute\/docs\/regions-zones\/regions-zones)\nfor launching worker instances to run your pipeline.",
+          "description": "The Compute Engine [availability\nzone](https:\/\/cloud.google.com\/compute\/docs\/regions-zones\/regions-zones)\nfor launching worker instances to run your pipeline.\nIn the future, worker_zone will take precedence.",
           "type": "string"
         },
         "serviceAccountEmail": {
@@ -1797,6 +1836,32 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "kmsKeyName": {
+          "description": "Optional. Name for the Cloud KMS key for the job.\nKey format is:\nprojects\/<project>\/locations\/<location>\/keyRings\/<keyring>\/cryptoKeys\/<key>",
+          "type": "string"
+        },
+        "ipConfiguration": {
+          "description": "Configuration for VM IPs.",
+          "enumDescriptions": [
+            "The configuration is unknown, or unspecified.",
+            "Workers should have public IP addresses.",
+            "Workers should have private IP addresses."
+          ],
+          "type": "string",
+          "enum": [
+            "WORKER_IP_UNSPECIFIED",
+            "WORKER_IP_PUBLIC",
+            "WORKER_IP_PRIVATE"
+          ]
+        },
+        "workerRegion": {
+          "description": "The Compute Engine region\n(https:\/\/cloud.google.com\/compute\/docs\/regions-zones\/regions-zones) in\nwhich worker processing should occur, e.g. \"us-west1\". Mutually exclusive\nwith worker_zone. If neither worker_region nor worker_zone is specified,\ndefault to the control plane's region.",
+          "type": "string"
+        },
+        "workerZone": {
+          "description": "The Compute Engine zone\n(https:\/\/cloud.google.com\/compute\/docs\/regions-zones\/regions-zones) in\nwhich worker processing should occur, e.g. \"us-west1-a\". Mutually exclusive\nwith worker_region. If neither worker_region nor worker_zone is specified,\na zone in the control plane's region is chosen based on available capacity.\nIf both `worker_zone` and `zone` are set, `worker_zone` takes precedence.",
+          "type": "string"
         }
       }
     },
@@ -1819,6 +1884,17 @@
         "environment": {
           "description": "The runtime environment for the job.",
           "$ref": "RuntimeEnvironment"
+        },
+        "update": {
+          "description": "If set, replace the existing pipeline with the name specified by jobName\nwith this pipeline, preserving state.",
+          "type": "boolean"
+        },
+        "transformNameMapping": {
+          "description": "Only applicable when updating a pipeline. Map of transform name prefixes of\nthe job to be replaced to the corresponding name prefixes of the new job.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1850,7 +1926,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -2838,6 +2914,10 @@
             "$ref": "MetricShortId"
           }
         },
+        "hotKeyDetection": {
+          "description": "A hot key is a symptom of poor data distribution in which there are enough\nelements mapped to a single key to impact pipeline performance. When\npresent, this field includes metadata associated with any hot key.",
+          "$ref": "HotKeyDetection"
+        },
         "suggestedStopPosition": {
           "description": "Obsolete, always empty.",
           "$ref": "Position"
@@ -2883,6 +2963,26 @@
           "description": "The service-generated short identifier for the metric.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "HotKeyDetection": {
+      "id": "HotKeyDetection",
+      "description": "Proto describing a hot key detected on a given WorkItem.",
+      "type": "object",
+      "properties": {
+        "hotKeyAge": {
+          "description": "The age of the hot key measured from when it was first detected.",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "systemName": {
+          "description": "System-defined name of the step containing this hot key.\nUnique across the workflow.",
+          "type": "string"
+        },
+        "userStepName": {
+          "description": "User-provided name of the step that contains this hot key.",
+          "type": "string"
         }
       }
     },
@@ -3874,6 +3974,16 @@
           "description": "Maximum size for work item commit supported windmill storage layer.",
           "type": "string",
           "format": "int64"
+        },
+        "commitStreamChunkSizeBytes": {
+          "description": "Chunk size for commit streams from the harness to windmill.",
+          "type": "string",
+          "format": "int64"
+        },
+        "getDataStreamChunkSizeBytes": {
+          "description": "Chunk size for get data streams from the harness to windmill.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -4300,6 +4410,11 @@
                   "description": "The project ID to list snapshots for.",
                   "location": "path",
                   "required": true,
+                  "type": "string"
+                },
+                "jobId": {
+                  "description": "If specified, list snapshots created from this job.",
+                  "location": "query",
                   "type": "string"
                 },
                 "location": {
@@ -5198,6 +5313,11 @@
                       "location": "path",
                       "required": true,
                       "type": "string"
+                    },
+                    "jobId": {
+                      "description": "If specified, list snapshots created from this job.",
+                      "location": "query",
+                      "type": "string"
                     }
                   },
                   "parameterOrder": [
@@ -5618,6 +5738,51 @@
                         "https://www.googleapis.com/auth/userinfo.email"
                       ],
                       "description": "Send encoded debug capture data for component."
+                    }
+                  }
+                },
+                "snapshots": {
+                  "methods": {
+                    "list": {
+                      "id": "dataflow.projects.locations.jobs.snapshots.list",
+                      "path": "v1b3/projects/{projectId}/locations/{location}/jobs/{jobId}/snapshots",
+                      "flatPath": "v1b3/projects/{projectId}/locations/{location}/jobs/{jobId}/snapshots",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "projectId": {
+                          "description": "The project ID to list snapshots for.",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "location": {
+                          "description": "The location to list snapshots in.",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "jobId": {
+                          "description": "If specified, list snapshots created from this job.",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "projectId",
+                        "location",
+                        "jobId"
+                      ],
+                      "response": {
+                        "$ref": "ListSnapshotsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/compute",
+                        "https://www.googleapis.com/auth/compute.readonly",
+                        "https://www.googleapis.com/auth/userinfo.email"
+                      ],
+                      "description": "Lists snapshots."
                     }
                   }
                 },

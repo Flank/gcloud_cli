@@ -6,7 +6,7 @@ summary:
   - command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
   - stderr: |
       WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$\].
   - stdout: |
       ---
       name:   $$disk$$
@@ -16,7 +16,7 @@ summary:
   - command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
       $$my-zone$$ --format="text(name)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
   - stdout: |
       ---
       name: $$image$$
@@ -32,7 +32,7 @@ summary:
       labels.x:   y
       name:       $$image$$
 - execute:
-  - command: compute images remove-labels $$image$$ --labels abc
+  - command: compute images remove-labels $$image$$ --labels=abc
   - progress_tracker:
     - message: Updating labels of image [$$image$$]
     - status: SUCCESS
@@ -53,15 +53,12 @@ summary:
 - execute:
   - command: compute images delete $$image$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
 - execute:
   - command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$\].
 actions:
-- define_reference:
-    reference: compute-uri
-    value: www.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
@@ -100,8 +97,9 @@ actions:
       $$my-zone$$ --format="text(name)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
     - expect_stdout: |
         ---
         name: $$image$$
@@ -109,132 +107,17 @@ actions:
         code: 0
 - execute_command:
     command: compute images add-labels $$image$$ --labels x=y,abc=xyz
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '658'
-            content-type: application/json; charset=UTF-8
-            etag: '"KrN2ilNvrnG3DWCpQ0ett5ymBIo=/7HYv7N4QQR3zr43lae4hDhm8bes="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labelFingerprint: 42WmSpB8rSM=
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: 42WmSpB8rSM=
-              labels:
-                abc: xyz
-                x: y
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '787'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '4979930615340352104'
-            name: operation-1541012614700-5798af57e5be4-fb1f9e35-a94f681e
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            targetId: '2765970752023052928'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2018-10-31T12:03:35.430-07:00'
-            startTime: '2018-10-31T12:03:35.432-07:00'
-            endTime: '2018-10-31T12:03:35.432-07:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1541012614700-5798af57e5be4-fb1f9e35-a94f681e
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of image [$$image$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '702'
-            content-type: application/json; charset=UTF-8
-            etag: '"eoGsilJPKYr90aAdwNz5JPJzrH4=/xvCS6AiHMUG4JyUeaxGizApipKo="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
     - expect_exit:
         code: 0
 - execute_command:
     command: compute images describe $$image$$ --format="text(name,labels)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '702'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"TZdN7J7aILlN8bQH69CLNacCt_E=/QboOcMbvTE6kLDtXt5TWJTetXtg="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
     - expect_stdout: |
         labels.abc: xyz
         labels.x:   y
@@ -242,133 +125,18 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute images remove-labels $$image$$ --labels abc
+    command: compute images remove-labels $$image$$ --labels=abc
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '702'
-            content-type: application/json; charset=UTF-8
-            etag: '"cuMpMjzFtBxYRY4zG8TDbYnM0zk=/bEWaNtqFs1SPV61-0QJdaWx6Z2o="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: ecVX6WS0TtA=
-              labels:
-                x: y
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '787'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '2967181624719196773'
-            name: operation-1541012618139-5798af5b2d579-36291f13-e1d98979
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            targetId: '2765970752023052928'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2018-10-31T12:03:38.557-07:00'
-            startTime: '2018-10-31T12:03:38.560-07:00'
-            endTime: '2018-10-31T12:03:38.560-07:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1541012618139-5798af5b2d579-36291f13-e1d98979
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of image [$$image$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '686'
-            content-type: application/json; charset=UTF-8
-            etag: '"HohUg895hJYbuvwGQkvs01dV1hQ=/THyddVt0iOb44INLSs3_AJxHInQ="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labels:
-              x: y
-            labelFingerprint: WVTkmv1GU64=
     - expect_exit:
         code: 0
 - execute_command:
     command: compute images describe $$image$$ --format="text(name,labels)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '686'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"c59qwxrZ7ZBfoc4bG8pfKKMsCBY=/O0LDb-skw87LDNvH0QVe02wda_E="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labels:
-              x: y
-            labelFingerprint: WVTkmv1GU64=
     - expect_stdout: |
         labels.x: y
         name:     $$image$$
@@ -376,126 +144,17 @@ actions:
         code: 0
 - execute_command:
     command: compute images remove-labels $$image$$ --all
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '686'
-            content-type: application/json; charset=UTF-8
-            etag: '"pmSn39mc_TYaIfIlK9o-RBhxCSk=/UZCMD2EJj2wsJU97qOo1DhZmjKU="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labels:
-              x: y
-            labelFingerprint: WVTkmv1GU64=
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: WVTkmv1GU64=
-              labels: {}
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '787'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '3993908524789023330'
-            name: operation-1541012621168-5798af5e10d81-cccfbc86-24d06fad
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            targetId: '2765970752023052928'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2018-10-31T12:03:41.623-07:00'
-            startTime: '2018-10-31T12:03:41.626-07:00'
-            endTime: '2018-10-31T12:03:41.626-07:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1541012621168-5798af5e10d81-cccfbc86-24d06fad
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of image [$$image$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '658'
-            content-type: application/json; charset=UTF-8
-            etag: '"z9uQt6RdW3gh5v-6mTOVYgQgE_E=/QJXg5dfysUGhzrI7iHSpd7R2W0M="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labelFingerprint: 42WmSpB8rSM=
     - expect_exit:
         code: 0
 - execute_command:
     command: compute images describe $$image$$ --format="text(name,labels)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '658'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"PUCXlSMOqrZBI8aEhou8PlBfM4A=/yHL9HYPii_VdZRIrGfqC0GHgS74="'
-            status: '200'
-          body:
-            kind: compute#image
-            id: '2765970752023052928'
-            creationTimestamp: '2018-10-31T12:03:12.226-07:00'
-            name: $$image$$
-            description: ''
-            sourceType: RAW
-            status: READY
-            diskSizeGb: '10'
-            sourceDisk: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$
-            sourceDiskId: '8514614543043019397'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$
-            labelFingerprint: 42WmSpB8rSM=
     - expect_stdout: |
         name: $$image$$
     - expect_exit:
@@ -505,8 +164,9 @@ actions:
     cleanup_for: image
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -514,7 +174,8 @@ actions:
     cleanup_for: disk
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$\].
     - expect_exit:
         code: 0

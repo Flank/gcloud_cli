@@ -62,17 +62,17 @@ EXAMPLES
     To filter results by subscription name (ie. only show subscription
     'mysubs'), run:
 
-        $ gcloud beta pubsub topics list-subscriptions --topic mytopic \
+        $ gcloud beta pubsub topics list-subscriptions mytopic \
             --filter=subscriptionId:mysubs
 
     To combine multiple filters (with AND or OR), run:
 
-        $ gcloud beta pubsub topics list-subscriptions --topic mytopic \
+        $ gcloud beta pubsub topics list-subscriptions mytopic \
             --filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
 
     To filter subscriptions that match an expression:
 
-        $ gcloud beta pubsub topics list-subscriptions --topic mytopic \
+        $ gcloud beta pubsub topics list-subscriptions mytopic \
             --filter="subscriptionId:subs_*"
 
 NOTES

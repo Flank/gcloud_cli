@@ -11,7 +11,7 @@ gcloud container clusters resize \- resizes an existing cluster for running cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters resize\fR \fINAME\fR \fB\-\-num\-nodes\fR=\fINUM_NODES\fR, \fB\-\-size\fR=\fINUM_NODES\fR [\fB\-\-async\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters resize\fR \fINAME\fR (\fB\-\-num\-nodes\fR=\fINUM_NODES\fR\ |\ \fB\-\-size\fR=\fINUM_NODES\fR) [\fB\-\-async\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,10 +53,22 @@ The name of this cluster.
 
 .RS 2m
 .TP 2m
-\fB\-\-num\-nodes\fR=\fINUM_NODES\fR, \fB\-\-size\fR=\fINUM_NODES\fR
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-num\-nodes\fR=\fINUM_NODES\fR
 Target number of nodes in the cluster.
 
+.TP 2m
+\fB\-\-size\fR=\fINUM_NODES\fR
+(DEPRECATED) Target number of nodes in the cluster.
 
+The \-\-size flag is now deprecated. Please use \f5\-\-num\-nodes\fR instead.
+
+
+.RE
 .RE
 .sp
 
@@ -65,7 +77,7 @@ Target number of nodes in the cluster.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Don't wait for the operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-node\-pool\fR=\fINODE_POOL\fR

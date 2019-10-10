@@ -5,13 +5,13 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute start\-iap\-tunnel \- starts an IAP TCP forwarding tunnel over WebSocket connection
+gcloud alpha compute start\-iap\-tunnel \- starts an IAP TCP forwarding tunnel
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute start\-iap\-tunnel\fR \fIINSTANCE_NAME\fR \fIINSTANCE_PORT\fR [\fB\-\-local\-host\-port\fR=\fILOCAL_HOST_PORT\fR;\ default="localhost:0"] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute start\-iap\-tunnel\fR \fIINSTANCE_NAME\fR \fIINSTANCE_PORT\fR [\fB\-\-local\-host\-port\fR=\fILOCAL_HOST_PORT\fR;\ default="localhost:0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -46,18 +46,13 @@ The name or number of the instance's port to connect to.
 Host:port to which the proxy should be bound.
 
 .TP 2m
-\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR; default="nic0"
-Specifies the name of the instance network interface to connect to. If this is
-not provided, then "nic0" is used as the default.
-
-.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-Zone of the instance to operate on. If not specified, you may be prompted to
-select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
-resources in your project. If the zone cannot be determined, you will then be
-prompted with all Google Cloud Platform zones.
+Zone of the instance to operate on. If not specified, the user may be prompted
+to select a zone. \f5gcloud\fR will attempt to identify the zone by searching
+for resources in the user's project. If the zone cannot be determined, the user
+will then be prompted with all Google Cloud Platform zones.
 
-To avoid prompting when this flag is omitted, you can set the
+To avoid prompting when this flag is omitted, the user can set the
 \f5\fIcompute/zone\fR\fR property:
 
 .RS 2m
@@ -93,15 +88,32 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To open a tunnel to the instances's RDP port on an arbitrary local port, run:
+
+.RS 2m
+$ gcloud alpha compute start\-iap\-tunnel my\-instance 3389
+.RE
+
+To open a tunnel to the instance's RDP port on a specific local port, run:
+
+.RS 2m
+$ gcloud alpha compute start\-iap\-tunnel my\-instance 3389 \e
+    \-\-local\-host\-port=localhost:3333
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute start\-iap\-tunnel
 $ gcloud beta compute start\-iap\-tunnel
 .RE
 

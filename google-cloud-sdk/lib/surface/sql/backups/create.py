@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,11 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import exceptions as apitools_exceptions
+
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.api_lib.sql import operations
 from googlecloudsdk.api_lib.sql import validate
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.sql import flags
+from googlecloudsdk.command_lib.sql import instances as command_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
@@ -44,10 +47,7 @@ class CreateBackup(base.CreateCommand):
     flags.AddInstance(parser)
     parser.add_argument(
         '--description', help='A friendly description of the backup.')
-    parser.add_argument(
-        '--async',
-        action='store_true',
-        help='Do not wait for the operation to complete.')
+    base.ASYNC_FLAG.AddToParser(parser)
     parser.display_info.AddCacheUpdater(None)
 
   def Run(self, args):
@@ -72,6 +72,17 @@ class CreateBackup(base.CreateCommand):
         params={'project': properties.VALUES.core.project.GetOrFail},
         collection='sql.instances')
 
+    # Check if instance has customer-managed key; show warning if so.
+    try:
+      instance_resource = sql_client.instances.Get(
+          sql_messages.SqlInstancesGetRequest(
+              project=instance_ref.project, instance=instance_ref.instance))
+      if instance_resource.diskEncryptionConfiguration:
+        command_util.ShowCmekWarning('backup', 'this instance')
+    except apitools_exceptions.HttpError:
+      # This is for informational purposes, so don't throw an error if failure.
+      pass
+
     result_operation = sql_client.backupRuns.Insert(
         sql_messages.SqlBackupRunsInsertRequest(
             project=instance_ref.project,
@@ -86,7 +97,7 @@ class CreateBackup(base.CreateCommand):
         operation=result_operation.name,
         project=instance_ref.project)
 
-    if args.async:
+    if args.async_:
       return sql_client.operations.Get(
           sql_messages.SqlOperationsGetRequest(
               project=operation_ref.project, operation=operation_ref.operation))

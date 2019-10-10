@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import json
-import re
 
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
@@ -39,67 +38,12 @@ def GetAdminMessages():
   return apis.GetMessagesModule('bigtableadmin', 'v2')
 
 
-def AddClusterIdArgs(parser):
-  """Adds --zone and --cluster args to the parser."""
-  parser.add_argument(
-      '--zone',
-      help='ID of the zone where the cluster is located.',
-      # TODO(b/36049937): specify list of zones or not? eg...
-      # choices=['europe-west1-c', 'us-central1-b'],
-      required=True)
-  parser.add_argument(
-      'cluster',
-      help='Unique ID of the cluster.')
-
-
-def AddClusterInfoArgs(parser):
-  """Adds --name and --nodes args to the parser."""
-  parser.add_argument(
-      '--description',
-      help='Friendly name of the cluster.',
-      required=True)
-  parser.add_argument(
-      '--nodes',
-      help='Number of Cloud Bigtable nodes to serve.',
-      required=True,
-      type=int)
-  parser.add_argument(
-      '--async',
-      help='Return immediately, without waiting for operation to finish.',
-      action='store_true')
-
-
 def ProjectUrl():
   return '/'.join(['projects', properties.VALUES.core.project.Get()])
 
 
-def ZoneUrl(args):
-  return '/'.join([ProjectUrl(), 'zones', args.zone])
-
-
 def LocationUrl(location):
-  # TODO(b/36049938): deprecate when a location resource is available in the API
   return '/'.join([ProjectUrl(), 'locations', location])
-
-
-def ClusterUrl(args):
-  """Creates the canonical URL for a cluster resource."""
-  return '/'.join([ZoneUrl(args), 'clusters', args.cluster])
-
-
-def MakeCluster(args):
-  """Creates a dict representing a Cluster proto from user-specified args."""
-  cluster = {}
-  if args.description:
-    cluster['display_name'] = args.description
-  if args.nodes:
-    cluster['serve_nodes'] = args.nodes
-  return cluster
-
-
-def ExtractZoneAndCluster(cluster_id):
-  m = re.match('projects/[^/]+/zones/([^/]+)/clusters/(.*)', cluster_id)
-  return m.group(1), m.group(2)
 
 
 def _Await(result_service, operation_ref, message):
@@ -124,6 +68,12 @@ def AwaitAppProfile(operation_ref, message):
   """Waits for app profile long running operation to complete."""
   client = GetAdminClient()
   return _Await(client.projects_instances_appProfiles, operation_ref, message)
+
+
+def AwaitTable(operation_ref, message):
+  """Waits for table long running operation to complete."""
+  client = GetAdminClient()
+  return _Await(client.projects_instances_tables, operation_ref, message)
 
 
 def GetAppProfileRef(instance, app_profile):
@@ -162,6 +112,17 @@ def GetInstanceRef(instance):
           'projectsId': properties.VALUES.core.project.GetOrFail,
       },
       collection='bigtableadmin.projects.instances')
+
+
+def GetTableRef(instance, table):
+  """Get a resource reference to a table."""
+  return resources.REGISTRY.Parse(
+      table,
+      params={
+          'projectsId': properties.VALUES.core.project.GetOrFail,
+          'instancesId': instance,
+      },
+      collection='bigtableadmin.projects.instances.tables')
 
 
 WARNING_TYPE_PREFIX = 'CLOUD_BIGTABLE_APP_PROFILE_WARNING'

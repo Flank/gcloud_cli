@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class URLMapsCreateTest(test_base.BaseTest):
               project='my-project',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-service') % {
                           'api': self._api},
                   name='my-url-map')))],
@@ -65,7 +65,7 @@ class URLMapsCreateTest(test_base.BaseTest):
               project='my-project',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') % {
                           'api': self._api},
                   name='my-url-map')))],
@@ -85,7 +85,7 @@ class URLMapsCreateTest(test_base.BaseTest):
               project='my-project',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') % {
                           'api': self._api},
                   description='My URL map',
@@ -116,8 +116,8 @@ class URLMapsCreateTest(test_base.BaseTest):
 
   def testUriSupportBackendService(self):
     self.RunCreate("""
-        https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-url-map
-          --default-service https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-service
+        https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-url-map
+          --default-service https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/my-service
         """ % {'api': self._api})
 
     self.CheckRequests(
@@ -127,7 +127,7 @@ class URLMapsCreateTest(test_base.BaseTest):
               project='my-project',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-service') % {
                           'api': self._api},
                   name='my-url-map')))],
@@ -135,8 +135,8 @@ class URLMapsCreateTest(test_base.BaseTest):
 
   def testUriSupportBackendBucket(self):
     self.RunCreate("""
-        https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-url-map
-          --default-backend-bucket https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/my-backend-bucket
+        https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-url-map
+          --default-backend-bucket https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/my-backend-bucket
         """ % {'api': self._api})
 
     self.CheckRequests(
@@ -146,11 +146,22 @@ class URLMapsCreateTest(test_base.BaseTest):
               project='my-project',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') % {
                           'api': self._api},
                   name='my-url-map')))],
     )
+
+
+class URLMapsCreateBetaTest(URLMapsCreateTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.urlMaps
+
+  def RunCreate(self, command):
+    self.Run('beta compute url-maps create --global ' + command)
 
 
 class URLMapsCreateAlphaTest(URLMapsCreateTest):
@@ -164,15 +175,15 @@ class URLMapsCreateAlphaTest(URLMapsCreateTest):
     self.Run('alpha compute url-maps create --global ' + command)
 
 
-class RegionURLMapsCreateTest(test_base.BaseTest):
+class RegionURLMapsCreateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._api = 'alpha'
-    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.regionUrlMaps
 
   def RunCreate(self, command):
-    self.Run('alpha compute url-maps create --region us-west-1 ' + command)
+    self.Run('beta compute url-maps create --region us-west-1 ' + command)
 
   def testSimpleBackendServiceCase(self):
     self.RunCreate("""
@@ -187,7 +198,7 @@ class RegionURLMapsCreateTest(test_base.BaseTest):
               region='us-west-1',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/regions/us-west-1/backendServices/my-service')
                   % {'api': self._api},
                   name='my-url-map')))],)
@@ -205,7 +216,7 @@ class RegionURLMapsCreateTest(test_base.BaseTest):
               region='us-west-1',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') %
                   {'api': self._api},
                   name='my-url-map')))],)
@@ -224,7 +235,7 @@ class RegionURLMapsCreateTest(test_base.BaseTest):
               region='us-west-1',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') %
                   {'api': self._api},
                   description='My URL map',
@@ -254,8 +265,8 @@ class RegionURLMapsCreateTest(test_base.BaseTest):
 
   def testUriSupportBackendService(self):
     self.RunCreate("""
-        https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-url-map
-          --default-service https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/my-service
+        https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-url-map
+          --default-service https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/my-service
         """ % {'api': self._api})
 
     self.CheckRequests(
@@ -265,15 +276,15 @@ class RegionURLMapsCreateTest(test_base.BaseTest):
               region='us-west-1',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/regions/us-west-1/backendServices/my-service')
                   % {'api': self._api},
                   name='my-url-map')))],)
 
   def testUriSupportBackendBucket(self):
     self.RunCreate("""
-        https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-url-map
-          --default-backend-bucket https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/my-backend-bucket
+        https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-url-map
+          --default-backend-bucket https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/my-backend-bucket
         """ % {'api': self._api})
 
     self.CheckRequests(
@@ -283,21 +294,21 @@ class RegionURLMapsCreateTest(test_base.BaseTest):
               region='us-west-1',
               urlMap=self.messages.UrlMap(
                   defaultService=(
-                      'https://www.googleapis.com/compute/%(api)s/projects/'
+                      'https://compute.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') %
                   {'api': self._api},
                   name='my-url-map')))],)
 
 
-class URLMapsCreateBetaTest(URLMapsCreateTest):
+class RegionURLMapsCreateAlphaTest(RegionURLMapsCreateBetaTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._api = 'beta'
-    self._url_maps_api = self.compute_beta.urlMaps
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
 
   def RunCreate(self, command):
-    self.Run('beta compute url-maps create ' + command)
+    self.Run('alpha compute url-maps create --region us-west-1 ' + command)
 
 
 if __name__ == '__main__':

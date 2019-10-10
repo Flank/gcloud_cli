@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,18 +25,52 @@ from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute.health_checks import flags
 
 
-def _Run(args,
-         holder,
-         supports_response=False,
-         regionalized=False):
+def _DetailedHelp():
+  return {
+      'brief':
+          'Create a HTTP2 health check to monitor load balanced instances',
+      'DESCRIPTION':
+          """\
+          *{command}* is used to create a HTTP2 health check. HTTP2 health
+          checks monitor instances in a load balancer controlled by a target
+          pool. All arguments to the command are optional except for the name of
+          the health check. For more information on load balancing, see
+          [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
+          """,
+      'EXAMPLES':
+          """\
+          To create a HTTP2 health check with default options, run:
+
+            $ {command} my-health-check-name
+          """,
+  }
+
+
+def _Args(parser, include_l7_internal_load_balancing):
+  """Set up arguments to create an HTTP2 HealthCheck."""
+  parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
+  flags.HealthCheckArgument(
+      'HTTP2',
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).AddArgument(
+      parser, operation_type='create')
+  health_checks_utils.AddHttpRelatedCreationArgs(parser)
+  health_checks_utils.AddHttpRelatedResponseArg(parser)
+  health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'HTTP2')
+  parser.display_info.AddCacheUpdater(
+      completers.HealthChecksCompleterAlpha if
+      include_l7_internal_load_balancing else completers.HealthChecksCompleter)
+
+
+def _Run(args, holder, include_l7_internal_load_balancing):
   """Issues the request necessary for adding the health check."""
   client = holder.client
   messages = client.messages
 
   health_check_ref = flags.HealthCheckArgument(
       'HTTP2',
-      include_l7_internal_load_balancing=regionalized).ResolveAsResource(
-          args, holder.resources)
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).ResolveAsResource(args, holder.resources)
   proxy_header = messages.HTTP2HealthCheck.ProxyHeaderValueValuesEnum(
       args.proxy_header)
   http2_health_check = messages.HTTP2HealthCheck(
@@ -44,10 +78,9 @@ def _Run(args,
       port=args.port,
       portName=args.port_name,
       requestPath=args.request_path,
-      proxyHeader=proxy_header)
+      proxyHeader=proxy_header,
+      response=args.response)
 
-  if supports_response:
-    http2_health_check.response = args.response
   health_checks_utils.ValidateAndAddPortSpecificationToHealthCheck(
       args, http2_health_check)
 
@@ -83,54 +116,29 @@ def _Run(args,
   return client.MakeRequests([(collection, 'Insert', request)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
-  """Create a HTTP2 health check to monitor load balanced instances."""
+  """Create a HTTP2 health check."""
 
-  @staticmethod
-  def Args(parser, supports_use_serving_port=True, regionalized=False):
-    parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
-    flags.HealthCheckArgument(
-        'HTTP2', include_l7_internal_load_balancing=regionalized).AddArgument(
-            parser, operation_type='create')
-    health_checks_utils.AddHttpRelatedCreationArgs(parser)
-    health_checks_utils.AddHttpRelatedResponseArg(parser)
-    health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'HTTP2')
-    parser.display_info.AddCacheUpdater(completers.HealthChecksCompleterAlpha
-                                        if regionalized else
-                                        completers.HealthChecksCompleter)
+  _include_l7_internal_load_balancing = False
+  detailed_help = _DetailedHelp()
+
+  @classmethod
+  def Args(cls, parser):
+    _Args(parser, cls._include_l7_internal_load_balancing)
 
   def Run(self, args):
-    """Issues the request necessary for adding the health check."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder, supports_response=True)
+    return _Run(args, holder, self._include_l7_internal_load_balancing)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+  """Create a HTTP2 health check."""
+
+  _include_l7_internal_load_balancing = True
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
-  """Create a HTTP2 health check to monitor load balanced instances."""
-
-  @staticmethod
-  def Args(parser):
-    Create.Args(parser, regionalized=True)
-
-  def Run(self, args):
-    """Issues the request necessary for adding the health check."""
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(
-        args,
-        holder,
-        supports_response=True,
-        regionalized=True)
-
-
-Create.detailed_help = {
-    'brief': ('Create a HTTP2 health check to monitor load balanced instances'),
-    'DESCRIPTION': """\
-        *{command}* is used to create a HTTP2 health check. HTTP2 health checks
-        monitor instances in a load balancer controlled by a target pool. All
-        arguments to the command are optional except for the name of the health
-        check. For more information on load balancing, see
-        [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
-        """,
-}
+class CreateAlpha(CreateBeta):
+  pass

@@ -1,13 +1,12 @@
 title: Add and remove labels from a compute disk snapshot.
 release_tracks: [GA]
-
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute disks create $$disk$$ --image-family=debian-9 --image-project=debian-cloud
       --zone us-central1-f --format 'yaml(name,zone,status)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
   - stdout: |
       ---
       name: $$disk$$
@@ -60,15 +59,16 @@ summary:
 - execute:
   - command: compute snapshots delete $$snapshot$$ -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$\].
 - execute:
   - command: compute disks delete $$disk$$ --zone us-central1-f -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
+
 - generate_resource_id:
     reference: disk
     prefix: gcloud-compute-test-snapshot-labels
@@ -76,96 +76,11 @@ actions:
 - execute_command:
     command: compute disks create $$disk$$ --image-family=debian-9 --image-project=debian-cloud
       --zone us-central1-f --format 'yaml(name,zone,status)'
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '510'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"GlPNbeUv0vLAnbGf6rUuS0JNqmw=/DG8x2s5omFlng_paWQp94eo0qzw="'
-            status: '200'
-          body:
-            kind: compute#zone
-            id: '2004'
-            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
-            name: us-central1-f
-            description: us-central1-f
-            status: UP
-            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            availableCpuPlatforms:
-            - Intel Skylake
-            - Intel Broadwell
-            - Intel Haswell
-            - Intel Ivy Bridge
-    - api_call:
-        poll_operation: true
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks?alt=json&sourceImage=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Fv1%2Fprojects%2Fdebian-cloud%2Fglobal%2Fimages%2Ffamily%2Fdebian-9
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: $$disk$$
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '836'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '6544386063654366964'
-            name: operation-1536102426640-57513b77a7e83-bd394766-5a1040dc
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            operationType: insert
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            targetId: '4437336569218772725'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-09-04T16:07:07.321-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102426640-57513b77a7e83-bd394766-5a1040dc
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '1054'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"BEqPspEJ5LS1uiTQeFeB_8STHvY=/WINSEq3-XHHhat6P8AlHdN5ett0="'
-            status: '200'
-          body:
-            kind: compute#disk
-            id: '4437336569218772725'
-            creationTimestamp: '2018-09-04T16:07:07.286-07:00'
-            name: $$disk$$
-            sizeGb: '10'
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            status: READY
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20180820
-            sourceImageId: '1810947815570337941'
-            type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            guestOsFeatures:
-            - type: VIRTIO_SCSI_MULTIQUEUE
-            labelFingerprint: 42WmSpB8rSM=
-            licenseCodes:
-            - '1000205'
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
     - expect_stdout: |
         ---
         name: $$disk$$
@@ -181,68 +96,11 @@ actions:
 - execute_command:
     command: compute disks snapshot $$disk$$ --zone us-central1-f --snapshot-names
       $$snapshot$$
+    validation_only: true
     events:
-    - api_call:
-        poll_operation: true
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$/createSnapshot?alt=json&guestFlush=False
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: $$snapshot$$
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '844'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '1784997971048443599'
-            name: operation-1536102431645-57513b7c6dd4a-f4674a7a-48d922ea
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            operationType: createSnapshot
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            targetId: '4437336569218772725'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-09-04T16:07:12.671-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102431645-57513b7c6dd4a-f4674a7a-48d922ea
     - expect_progress_tracker:
         message: Creating snapshot(s) $$snapshot$$
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '853'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"QurZwkV6siLfZvk1x5laVK6NoTw=/PO7GhTADfldZin4br_DqXDWhXJI="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labelFingerprint: 42WmSpB8rSM=
-            licenseCodes:
-            - '1000205'
     - expect_exit:
         code: 0
 
@@ -258,20 +116,20 @@ actions:
         return_response:
           headers:
             cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '853'
+            content-length: '886'
             content-type: application/json; charset=UTF-8
-            etag: '"GlPNbeUv0vLAnbGf6rUuS0JNqmw=/kRes1gz9brZRCMlsdpzwv-e4Z90="'
+            etag: '"IXbWJmULfOTDAwbNz3f2selwx1k=/GGBV5ph0Z_7WMtCbUJspVYvCJE4="'
             status: '200'
           body:
             kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
+            id: '707242517242513704'
+            creationTimestamp: '2019-05-23T08:09:59.918-07:00'
             name: $$snapshot$$
             status: READY
             sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
+            sourceDiskId: '4813701108755794221'
             diskSizeGb: '10'
-            storageBytes: '557533248'
+            storageBytes: '542156864'
             storageBytesStatus: UP_TO_DATE
             licenses:
             - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
@@ -279,6 +137,8 @@ actions:
             labelFingerprint: 42WmSpB8rSM=
             licenseCodes:
             - '1000205'
+            storageLocations:
+            - us
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
@@ -293,24 +153,24 @@ actions:
         return_response:
           headers:
             cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '792'
+            content-length: '791'
             content-type: application/json; charset=UTF-8
             pragma: no-cache
             status: '200'
           body:
             kind: compute#operation
-            id: '8707921632232124071'
-            name: operation-1536102472683-57513ba390df9-baa8218e-e06d4655
+            id: '7829245497508038395'
+            name: operation-1558624275943-5898f7e4e5085-4931a440-7a519886
             operationType: setLabels
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            targetId: '4596861610326404815'
+            targetId: '707242517242513704'
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 100
-            insertTime: '2018-09-04T16:07:52.952-07:00'
-            startTime: '2018-09-04T16:07:52.954-07:00'
-            endTime: '2018-09-04T16:07:52.954-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102472683-57513ba390df9-baa8218e-e06d4655
+            insertTime: '2019-05-23T08:11:16.731-07:00'
+            startTime: '2019-05-23T08:11:16.734-07:00'
+            endTime: '2019-05-23T08:11:16.734-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1558624275943-5898f7e4e5085-4931a440-7a519886
         poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of snapshot [$$snapshot$$]
@@ -323,20 +183,21 @@ actions:
           body: null
         return_response:
           headers:
-            cache-control: private
-            content-length: '919'
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '926'
             content-type: application/json; charset=UTF-8
-            etag: dVNiZeteuzG3gM1nHJLb_LZ7u18=/s2z9JA_jkb0nITGl-VYfgcABUFU=
+            etag: '"dGnABeWdmw94R9VYGmSklKfQu0Q=/rMQ_1A4rfA5Qo10KoWk8U_wjE-8="'
             status: '200'
           body:
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
+            kind: compute#snapshot
+            id: '707242517242513704'
+            creationTimestamp: '2019-05-23T08:09:59.918-07:00'
             name: $$snapshot$$
             status: READY
             sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
+            sourceDiskId: '4813701108755794221'
             diskSizeGb: '10'
-            storageBytes: '557533248'
+            storageBytes: '542156864'
             storageBytesStatus: UP_TO_DATE
             licenses:
             - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
@@ -347,7 +208,8 @@ actions:
             labelFingerprint: Vo9_MJ9gxBs=
             licenseCodes:
             - '1000205'
-            kind: compute#snapshot
+            storageLocations:
+            - us
     - expect_exit:
         code: 0
 
@@ -363,20 +225,20 @@ actions:
         return_response:
           headers:
             cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '893'
+            content-length: '926'
             content-type: application/json; charset=UTF-8
-            etag: '"Rw4SFp6vDPi1HN3h-BkIZg9QP6I=/XVftQnAd9MmN7qTX0AoWj1PEiuM="'
+            etag: '"yVHAAJdAw-mzGn2EV-kyLrHVQNE=/Yw1bobjzCKmNIvZhAvKINUmsjpA="'
             status: '200'
           body:
             kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
+            id: '707242517242513704'
+            creationTimestamp: '2019-05-23T08:09:59.918-07:00'
             name: $$snapshot$$
             status: READY
             sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
+            sourceDiskId: '4813701108755794221'
             diskSizeGb: '10'
-            storageBytes: '557533248'
+            storageBytes: '542156864'
             storageBytesStatus: UP_TO_DATE
             licenses:
             - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
@@ -387,6 +249,8 @@ actions:
             labelFingerprint: Vo9_MJ9gxBs=
             licenseCodes:
             - '1000205'
+            storageLocations:
+            - us
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
@@ -403,24 +267,24 @@ actions:
         return_response:
           headers:
             cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '792'
+            content-length: '791'
             content-type: application/json; charset=UTF-8
             pragma: no-cache
             status: '200'
           body:
             kind: compute#operation
-            id: '8807270685419417252'
-            name: operation-1536102474990-57513ba5c41b1-ed2ff75d-69b2bb78
+            id: '2631903395070019320'
+            name: operation-1558624278813-5898f7e7a1a6e-838c597e-fe586a35
             operationType: setLabels
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            targetId: '4596861610326404815'
+            targetId: '707242517242513704'
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 100
-            insertTime: '2018-09-04T16:07:55.421-07:00'
-            startTime: '2018-09-04T16:07:55.423-07:00'
-            endTime: '2018-09-04T16:07:55.423-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102474990-57513ba5c41b1-ed2ff75d-69b2bb78
+            insertTime: '2019-05-23T08:11:19.343-07:00'
+            startTime: '2019-05-23T08:11:19.346-07:00'
+            endTime: '2019-05-23T08:11:19.346-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1558624278813-5898f7e7a1a6e-838c597e-fe586a35
         poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of snapshot [$$snapshot$$]
@@ -434,20 +298,20 @@ actions:
         return_response:
           headers:
             cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '917'
+            content-length: '950'
             content-type: application/json; charset=UTF-8
-            etag: '"p7w9E94mHEf0tyLJl5FSsir-kOQ=/fT6kwqE83IpRS7B_IJGBiVhxGcg="'
+            etag: '"aqJrWH_5yt8sE3cDDsoeBF4I4O4=/XEfmcsFwwUm_LG38UCyOmdAUdj4="'
             status: '200'
           body:
             kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
+            id: '707242517242513704'
+            creationTimestamp: '2019-05-23T08:09:59.918-07:00'
             name: $$snapshot$$
             status: READY
             sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
+            sourceDiskId: '4813701108755794221'
             diskSizeGb: '10'
-            storageBytes: '557533248'
+            storageBytes: '542156864'
             storageBytesStatus: UP_TO_DATE
             licenses:
             - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
@@ -460,47 +324,15 @@ actions:
             labelFingerprint: pHg2n84irYY=
             licenseCodes:
             - '1000205'
+            storageLocations:
+            - us
     - expect_exit:
         code: 0
 
 - execute_command:
     command: compute snapshots describe $$snapshot$$ --format 'value(labels)'
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '917'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"7gCG4tPG8_RdZsDzkababkBJUds=/iBToaU0hw80Yvb2D-WGU7FKnpxw="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              c: d
-              e: f
-              g: h
-            labelFingerprint: pHg2n84irYY=
-            licenseCodes:
-            - '1000205'
     - expect_stdout: |
         a=b;c=d;e=f;g=h
     - expect_exit:
@@ -508,262 +340,29 @@ actions:
 
 - execute_command:
     command: compute snapshots remove-labels $$snapshot$$ --labels c
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '917'
-            content-type: application/json; charset=UTF-8
-            etag: '"r1OroiDNElDuejiXWcqfMR97Tvc=/uEks6TTekl1ldAHxB0zbKvf3jv0="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              c: d
-              e: f
-              g: h
-            labelFingerprint: pHg2n84irYY=
-            licenseCodes:
-            - '1000205'
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: pHg2n84irYY=
-              labels:
-                a: b
-                e: f
-                g: h
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '792'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '5922047106350231201'
-            name: operation-1536102477922-57513ba88fed1-6dcdfab7-9db839a9
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            targetId: '4596861610326404815'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2018-09-04T16:07:58.425-07:00'
-            startTime: '2018-09-04T16:07:58.426-07:00'
-            endTime: '2018-09-04T16:07:58.426-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102477922-57513ba88fed1-6dcdfab7-9db839a9
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of snapshot [$$snapshot$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '905'
-            content-type: application/json; charset=UTF-8
-            etag: '"yWTfjQgFqmJX8tH68SO_a350EMA=/VxU0Eb_jYzGuX0-tiYPEdUna3GU="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              e: f
-              g: h
-            labelFingerprint: NwJ6mjQwzgg=
-            licenseCodes:
-            - '1000205'
     - expect_exit:
         code: 0
 
 - execute_command:
     command: compute snapshots update $$snapshot$$ --update-labels e=x --remove-labels
       g
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '905'
-            content-type: application/json; charset=UTF-8
-            etag: '"12hkY6zYAEBFebCkzuGLfcoYOGA=/mkyvAXaQWPk-jyUtuCh0g1DoeOE="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              e: f
-              g: h
-            labelFingerprint: NwJ6mjQwzgg=
-            licenseCodes:
-            - '1000205'
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: NwJ6mjQwzgg=
-              labels:
-                a: b
-                e: x
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '792'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '5333295257157283519'
-            name: operation-1536102480633-57513bab25ca9-026253e6-9c55bee9
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            targetId: '4596861610326404815'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2018-09-04T16:08:01.072-07:00'
-            startTime: '2018-09-04T16:08:01.076-07:00'
-            endTime: '2018-09-04T16:08:01.076-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102480633-57513bab25ca9-026253e6-9c55bee9
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of snapshot [$$snapshot$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '893'
-            content-type: application/json; charset=UTF-8
-            etag: '"aHlDiE6TWh0SfkVx2xgPfHSag48=/vSwRHBYR1sPu4qdTHpFLseUU7Lg="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              e: x
-            labelFingerprint: 3PFyKn6s08Q=
-            licenseCodes:
-            - '1000205'
     - expect_exit:
         code: 0
 
 - execute_command:
     command: compute snapshots describe $$snapshot$$ --format 'value(labels)'
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '893'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"oTkhv0dOdRFgDMJX4pDAA_uAPno=/cYlFCHqUC0UGCDFTY_bq0QAJrgI="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              e: x
-            labelFingerprint: 3PFyKn6s08Q=
-            licenseCodes:
-            - '1000205'
     - expect_stdout: |
         a=b;e=x
     - expect_exit:
@@ -771,140 +370,18 @@ actions:
 
 - execute_command:
     command: compute snapshots remove-labels $$snapshot$$ --all
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '893'
-            content-type: application/json; charset=UTF-8
-            etag: '"zzpeMfOxmi0oJQ3vC22ff4Kb2OQ=/2fEFIghOnviC-sAJf4s0QGVmKYk="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labels:
-              a: b
-              e: x
-            labelFingerprint: 3PFyKn6s08Q=
-            licenseCodes:
-            - '1000205'
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: 3PFyKn6s08Q=
-              labels: {}
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '792'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '4812049079697845948'
-            name: operation-1536102483391-57513badc7219-326e0a1c-593cdfd9
-            operationType: setLabels
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            targetId: '4596861610326404815'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2018-09-04T16:08:03.791-07:00'
-            startTime: '2018-09-04T16:08:03.794-07:00'
-            endTime: '2018-09-04T16:08:03.794-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102483391-57513badc7219-326e0a1c-593cdfd9
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of snapshot [$$snapshot$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '853'
-            content-type: application/json; charset=UTF-8
-            etag: '"AGbFNN-ixvss6pjVUsaq8uJ3jXQ=/PfN8sWuTsgSwUhP2KE0QP3GTIMA="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labelFingerprint: 42WmSpB8rSM=
-            licenseCodes:
-            - '1000205'
     - expect_exit:
         code: 0
 
 - execute_command:
     command: compute snapshots describe $$snapshot$$ --format 'value(labels)'
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '853'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"KgwOuFf9CusCyKFwHVlmdUOrZo8=/aDxNoP3Hcr04Ucf2-d1-HgUdIVA="'
-            status: '200'
-          body:
-            kind: compute#snapshot
-            id: '4596861610326404815'
-            creationTimestamp: '2018-09-04T16:07:13.895-07:00'
-            name: $$snapshot$$
-            status: READY
-            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceDiskId: '4437336569218772725'
-            diskSizeGb: '10'
-            storageBytes: '557533248'
-            storageBytesStatus: UP_TO_DATE
-            licenses:
-            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            labelFingerprint: 42WmSpB8rSM=
-            licenseCodes:
-            - '1000205'
     - expect_stdout: |2+
 
     - expect_exit:
@@ -914,68 +391,21 @@ actions:
 - execute_command:
     command: compute snapshots delete $$snapshot$$ -q
     cleanup_for: snapshot
+    validation_only: true
     events:
-    - api_call:
-        poll_operation: true
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '698'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '2320515650522623673'
-            name: operation-1536102486133-57513bb064909-32a74881-41c8db79
-            operationType: delete
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            targetId: '4596861610326404815'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-09-04T16:08:06.758-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102486133-57513bb064909-32a74881-41c8db79
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$\].
     - expect_exit:
         code: 0
 
 - execute_command:
     command: compute disks delete $$disk$$ --zone us-central1-f -q
     cleanup_for: disk
+    validation_only: true
     events:
-    - api_call:
-        poll_operation: true
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '836'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '5063705253818576524'
-            name: operation-1536102498135-57513bbbd6bda-f5151d67-51c38f42
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            operationType: delete
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            targetId: '4437336569218772725'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-09-04T16:08:19.311-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102498135-57513bbbd6bda-f5151d67-51c38f42
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
     - expect_exit:
         code: 0

@@ -31,7 +31,10 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -61,7 +64,7 @@ actions:
                 - role: 'roles/non-primitive'
                   members: ['user:test@gmail.com']
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
@@ -107,7 +110,10 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -137,7 +143,7 @@ actions:
                 - role: 'roles/non-primitive'
                   members: ['user:test@gmail.com']
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
@@ -183,7 +189,10 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -219,13 +228,13 @@ actions:
                     expression: "request.time < timestamp(\"2019-01-01T00:00:00Z\")"
                     title: 'expires_end_of_2018'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -260,7 +269,7 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0
 
@@ -272,13 +281,16 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -307,13 +319,13 @@ actions:
                     title: 'title'
                     description: 'descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -343,7 +355,7 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0
 
@@ -355,13 +367,16 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -396,13 +411,13 @@ actions:
                     title: 'new_title'
                     description: 'new_descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -448,7 +463,7 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0
 
@@ -460,13 +475,16 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -497,13 +515,13 @@ actions:
                 - role: 'roles/non-primitive'
                   members: ['user:test@gmail.com']
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -540,7 +558,7 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0
 
@@ -552,13 +570,16 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -587,13 +608,13 @@ actions:
                     title: 'title'
                     description: 'descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -623,7 +644,7 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0
 
@@ -635,13 +656,16 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -670,13 +694,13 @@ actions:
                     title: 'title'
                     description: 'descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -706,7 +730,7 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0
 
@@ -745,7 +769,10 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -775,7 +802,7 @@ actions:
                 - role: 'roles/editor'
                   members: ['user:test@gmail.com']
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
@@ -821,7 +848,10 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/projects/test-project:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -862,7 +892,7 @@ actions:
                     title: 'invalid_expression'
                     description: 'descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '400'

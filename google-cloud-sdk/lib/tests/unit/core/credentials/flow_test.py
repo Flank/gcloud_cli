@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import socket
-import sys
-import webbrowser
 from googlecloudsdk.core.credentials import flow
-from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -104,29 +101,6 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
     webflow_mock.step2_exchange.assert_called_with(
         self._AUTH_CODE, http=http_mock)
     self.assertEqual(cred, self._CREDENTIALS)
-
-  def testFlowWithMacChromeBrowser(self):
-    self.StartObjectPatch(sys, 'platform', 'darwin')
-    six.moves.reload_module(webbrowser)
-    webflow_mock = self._mockWebflow()
-    http_mock = mock.Mock()
-    http_server_mock = mock.Mock()
-    http_server_mock.query_params = {'code': self._AUTH_CODE}
-
-    self.StartPatch('webbrowser.open')
-    self.StartObjectPatch(platforms.OperatingSystem, 'Current',
-                          return_value=platforms.OperatingSystem.MACOSX)
-
-    self.StartPatch('oauth2client.tools.ClientRedirectServer',
-                    side_effect=lambda x, y: http_server_mock)
-
-    flow.Run(
-        webflow_mock,
-        launch_browser=True,
-        http=http_mock)
-
-    self.assertIsNotNone(webbrowser.get('Google Chrome'))
-    self.AssertErrContains('Your browser has been opened to visit')
 
   def testFlowBrowserIntoNoBrowser(self):
     webflow_mock = self._mockWebflow()

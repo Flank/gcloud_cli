@@ -7,7 +7,7 @@ summary:
       --async
   - stderr: |
       Request issued for: [us-east1]
-      Check operation [41b80896f39592e9] for status.
+      Check operation [projects/fake-project/locations/us-east1/operations/41b80896f39592e9] for status.
   - stdout: |
       name: projects/fake-project/locations/us-east1/operations/41b80896f39592e9
 - execute:
@@ -15,7 +15,8 @@ summary:
   - stderr: |
       Request issued for: [us-east1]
   - progress_tracker:
-    - message: Waiting for operation [41b80896f39592e9] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-east1/operations/41b80896f39592e9]
+        to complete
     - status: SUCCESS
   - stdout: |
       done: true
@@ -49,7 +50,7 @@ actions:
             }
     - expect_stderr: |
         Request issued for: [us-east1]
-        Check operation [41b80896f39592e9] for status.
+        Check operation [projects/fake-project/locations/us-east1/operations/41b80896f39592e9] for status.
     - expect_stdout: |
         name: projects/fake-project/locations/us-east1/operations/41b80896f39592e9
     - expect_exit:
@@ -97,7 +98,8 @@ actions:
               "done": true
             }
     - expect_progress_tracker:
-        message: Waiting for operation [41b80896f39592e9] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-east1/operations/41b80896f39592e9]
+          to complete
         status: SUCCESS
     - expect_stdout: |
         done: true

@@ -15,12 +15,6 @@ gcloud beta compute networks peerings update \- update a Google Compute Engine n
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Update a Google Compute Engine network peering.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -71,12 +65,26 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To update the peering named peering\-name to both export and import custom
+routes, run:
 
 .RS 2m
+$ gcloud beta compute networks peerings update peering\-name \e
+  \-\-export\-custom\-routes \e
+  \-\-import\-custom\-routes
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute networks peerings update
 $ gcloud alpha compute networks peerings update
 .RE
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class CommandBuilderTests(base.Base):
 
   def testGlobalAttributes(self):
     d = yaml_command_schema.CommandData('describe', self.MakeCommandData())
-    d.is_hidden = True
+    d.hidden = True
     d.release_tracks = [calliope_base.ReleaseTrack.GA,
                         calliope_base.ReleaseTrack.BETA]
     cb = yaml_command_translator.CommandBuilder(d, ['abc', 'xyz', 'describe'])
@@ -180,11 +180,11 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     self.AssertOutputEquals('foo: bar\n')
     self.assertEqual(
         str(modify_request_mock1.call_args[0][0]),
-        'https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
     self.assertEqual(modify_request_mock1.call_args[0][1].instance, 'i')
     self.assertEqual(
         str(modify_request_mock2.call_args[0][0]),
-        'https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
     self.assertEqual(modify_request_mock2.call_args[0][1].instance, 'i')
 
   def testRunWithParseResourceFalse(self):
@@ -221,7 +221,7 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     self.AssertOutputEquals('foo: bar\n')
     self.assertEqual(
         str(create_request_mock.call_args[0][0]),
-        'https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
     self.assertEqual(create_request_mock.call_args[0][1].project, 'p')
     gen_mock.assert_not_called()
 
@@ -240,7 +240,7 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     self.AssertOutputEquals('custom: response\n')
     self.assertEqual(
         str(issue_request_mock.call_args[0][0]),
-        'https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i')
     self.assertEqual(issue_request_mock.call_args[0][1].project, 'p')
     gen_mock.assert_not_called()
     call_mock.assert_not_called()
@@ -418,92 +418,6 @@ class DescribeCommandTests(yaml_command_base.CommandTestsBase,
     self.assertEqual(result, {'foo': 'bar'})
     self.AssertOutputEquals('foo: bar\n')
 
-  @parameterized.named_parameters(
-      ('WithExtra',
-       ['command', '--project', 'p', '--location', 'l', '--registry', 'r',
-        '--group', 'g', 'd'],
-       'projects_locations_registries_groups_devices',
-       'CloudiotProjectsLocationsRegistriesGroupsDevicesGetRequest',
-       'projects/p/locations/l/registries/r/groups/g/devices/d'),
-      ('NoExtra',
-       ['command', '--project', 'p', '--location', 'l', '--registry', 'r', 'd'],
-       'projects_locations_registries_devices',
-       'CloudiotProjectsLocationsRegistriesDevicesGetRequest',
-       'projects/p/locations/l/registries/r/devices/d'))
-  def testRunWithMultitype_ExtraAttribute(
-      self, arg_list, expected_service, expected_request_type,
-      expected_name):
-    iot_client = apis.GetClientClass('cloudiot', 'v1')
-    mocked_iot_client = apitools_mock.Client(iot_client)
-    iot_messages = iot_client.MESSAGES_MODULE
-    mocked_iot_client.Mock()
-    self.addCleanup(mocked_iot_client.Unmock)
-
-    expected_msg = getattr(iot_messages, expected_request_type)(
-        name=expected_name)
-    service = getattr(mocked_iot_client, expected_service)
-    service.Get.Expect(
-        expected_msg, response={'foo': 'bar'}, enable_type_checking=False)
-
-    # Set up the multitype resource - a device with or without a group.
-    command_data = self.MakeCommandData(
-        collection='cloudiot.projects.locations.registries.devices')
-    command_data['request']['parse_resource_into_request'] = False
-    project_attr = {
-        'parameter_name': 'projectsId', 'attribute_name': 'project',
-        'help': 'help'}
-    location_attr = {
-        'parameter_name': 'locationsId', 'attribute_name': 'location',
-        'help': 'help'}
-    registry_attr = {
-        'parameter_name': 'registriesId', 'attribute_name': 'registry',
-        'help': 'help'}
-    group_attr = {
-        'parameter_name': 'groupsId', 'attribute_name': 'group',
-        'help': 'help'}
-    device_attr = {
-        'parameter_name': 'devicesId', 'attribute_name': 'device',
-        'help': 'help'}
-    sub_resources = [
-        {'name': 'device',
-         'collection': 'cloudiot.projects.locations.registries.devices',
-         'attributes': [project_attr, location_attr, registry_attr,
-                        device_attr]},
-        {'name': 'device',
-         'collection': 'cloudiot.projects.locations.registries.groups.devices',
-         'attributes': [project_attr, location_attr, registry_attr,
-                        group_attr, device_attr]}]
-    command_data['arguments']['resource'] = {
-        'arg_name': 'device',
-        'help_text': 'group help',
-        'spec': {'name': 'device', 'resources': sub_resources}}
-    d = yaml_command_schema.CommandData('describe', command_data)
-
-    # Set up the issue request hook (similar to what would be used in real
-    # life, chooses service/request type based on result of parsing.)
-    def request(ref, args):
-      device = args.CONCEPTS.device.Parse()
-      if device.type_.name == 'cloudiot.projects.locations.registries.devices':
-        service = mocked_iot_client.projects_locations_registries_devices
-        req = (iot_messages
-               .CloudiotProjectsLocationsRegistriesDevicesGetRequest())
-      else:
-        service = (
-            mocked_iot_client.projects_locations_registries_groups_devices)
-        req = (iot_messages
-               .CloudiotProjectsLocationsRegistriesGroupsDevicesGetRequest())
-      req.name = ref.RelativeName()
-      return service.Get(req)
-    issue_request_mock = mock.MagicMock()
-    d.request.issue_request_hook = issue_request_mock
-    issue_request_mock.side_effect = request
-
-    cli = self.MakeCLI(d)
-    self.AssertArgs(cli, 'DEVICE', '--location', '--registry', '--group')
-    result = cli.Execute(arg_list)
-    self.assertEqual(result, {'foo': 'bar'})
-    self.AssertOutputEquals('foo: bar\n')
-
 
 class ListCommandTests(yaml_command_base.CommandTestsBase):
 
@@ -550,8 +464,8 @@ class ListCommandTests(yaml_command_base.CommandTestsBase):
                     '--sort-by', '--uri', '--no-uri')
     cli.Execute(['command', '--project', 'p', '--zone', 'z', '--uri'])
     self.AssertOutputEquals("""
-https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-1
-https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-2
+https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-1
+https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-2
 """.lstrip('\n'), normalize_space=True)
 
 
@@ -579,9 +493,9 @@ class DeleteCommandTests(yaml_command_base.CommandTestsBase):
     _, done_response = self.Expect()
     d = yaml_command_schema.CommandData(
         'delete', self.MakeCommandData(is_async='zoneOperations'))
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async')
     self.WriteInput('y\n')
@@ -590,7 +504,8 @@ class DeleteCommandTests(yaml_command_base.CommandTestsBase):
     self.AssertErrContains('You are about to delete instance [i]')
     self.AssertErrContains('Delete request issued for: [i]')
     self.AssertErrContains(
-        'Waiting for operation [operation-12345] to complete')
+        'Waiting for operation [projects/p/zones/z/operations/operation-12345] '
+        'to complete')
     self.AssertErrContains('Deleted instance [i]')
     self.assertEqual(result, done_response)
 
@@ -598,9 +513,9 @@ class DeleteCommandTests(yaml_command_base.CommandTestsBase):
     running_response, _ = self.Expect(is_async=True)
     d = yaml_command_schema.CommandData(
         'delete', self.MakeCommandData(is_async='zoneOperations'))
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async')
     self.WriteInput('y\n')
@@ -610,7 +525,8 @@ class DeleteCommandTests(yaml_command_base.CommandTestsBase):
     self.AssertErrContains('You are about to delete instance [i]')
     self.AssertErrContains(
         'Delete request issued for: [i]\n'
-        'Check operation [operation-12345] for status.')
+        'Check operation [projects/p/zones/z/operations/operation-12345] for '
+        'status.')
     self.AssertErrNotContains('Deleted instance [i]')
     self.assertEqual(result, running_response)
 
@@ -634,9 +550,9 @@ class DeleteCommandTests(yaml_command_base.CommandTestsBase):
     d = yaml_command_schema.CommandData(
         'delete', self.MakeCommandData(is_async='zoneOperations'))
     d.arguments.resource.display_name_hook = lambda x, y: 'display name'
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.WriteInput('y\n')
     cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
@@ -663,6 +579,40 @@ class CreateCommandTests(yaml_command_base.CommandTestsBase):
           enable_type_checking=False)
     return running_response, {'foo': 'bar'}
 
+  def testCreateWithLabels(self):
+    running_response, _ = self.OperationResponses()
+    labels_cls = self.messages.Instance.LabelsValue
+    additional_property_cls = labels_cls.AdditionalProperty
+    self.mocked_client.instances.Insert.Expect(
+        self.messages.ComputeInstancesInsertRequest(
+            instance=self.messages.Instance(
+                name='i',
+                labels=labels_cls(additionalProperties=[
+                    additional_property_cls(key='k1', value='v1')
+                ])),
+            zone='z',
+            project='p'),
+        response=running_response)
+    command_data = self.MakeCommandData(
+        is_create=True, is_async='zoneOperations')
+    command_data['arguments']['labels'] = {'api_field': 'instance.labels'}
+    d = yaml_command_schema.CommandData('create', command_data)
+    d.request.method = 'insert'
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
+    cli = self.MakeCLI(d)
+    result = cli.Execute([
+        'command', '--project', 'p', '--zone', 'z', 'i', '--async', '--labels',
+        'k1=v1'
+    ])
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Create request issued for: [i]\n'
+                           'Check operation [projects/p/zones/z/operations/'
+                           'operation-12345] for status.')
+    self.AssertErrNotContains('Created instance [i]')
+    self.assertEqual(result, running_response)
+
   def testGeneration(self):
     global_mock = self.StartObjectPatch(yaml_command_translator.CommandBuilder,
                                         '_ConfigureGlobalAttributes')
@@ -679,16 +629,17 @@ class CreateCommandTests(yaml_command_base.CommandTestsBase):
         'create', self.MakeCommandData(is_create=True,
                                        is_async='zoneOperations'))
     d.request.method = 'insert'
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async')
     result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
     self.AssertOutputEquals('')
     self.AssertErrContains('Create request issued for: [i]')
     self.AssertErrContains(
-        'Waiting for operation [operation-12345] to complete')
+        'Waiting for operation [projects/p/zones/z/operations/operation-12345] '
+        'to complete')
     self.AssertErrContains('Created instance [i]')
     self.assertEqual(result, done_response)
 
@@ -698,9 +649,9 @@ class CreateCommandTests(yaml_command_base.CommandTestsBase):
         'create', self.MakeCommandData(is_create=True,
                                        is_async='zoneOperations'))
     d.request.method = 'insert'
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async')
     result = cli.Execute(
@@ -708,7 +659,8 @@ class CreateCommandTests(yaml_command_base.CommandTestsBase):
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Create request issued for: [i]\n'
-        'Check operation [operation-12345] for status.')
+        'Check operation [projects/p/zones/z/operations/operation-12345] '
+        'for status.')
     self.AssertErrNotContains('Created instance [i]')
     self.assertEqual(result, running_response)
 
@@ -781,11 +733,11 @@ class CreateCommandTests(yaml_command_base.CommandTestsBase):
     modify_request_mock1.side_effect = augment
     d.request.modify_request_hooks = [modify_request_mock1]
     d.request.method = 'insert'
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
-    d.async.extract_resource_result = False
-    d.async.result_attribute = 'targetLink'
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
+    d.async_.extract_resource_result = False
+    d.async_.result_attribute = 'targetLink'
 
     def get_name(resource_ref, args):
       if args.CONCEPTS.instance.Parse().type_.name == 'zone':
@@ -820,9 +772,9 @@ class CreateCommandTests(yaml_command_base.CommandTestsBase):
         'create', self.MakeCommandData(is_create=True,
                                        is_async='zoneOperations'))
     d.request.method = 'insert'
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     d.arguments.resource.display_name_hook = lambda x, y: 'display name'
     cli = self.MakeCLI(d)
     cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
@@ -974,7 +926,8 @@ class WaitCommandTests(yaml_command_base.CommandTestsBase):
     result = cli.Execute(
         ['command', '--project', 'p', '--zone', 'z', 'operation-12345'])
     self.AssertErrContains(
-        'Waiting for operation [operation-12345] to complete')
+        'Waiting for operation [projects/p/zones/z/operations/operation-12345] '
+        'to complete')
     self.AssertOutputEquals("""
 id: '12345'
 name: operation-12345
@@ -1020,9 +973,9 @@ class GenericCommandTests(yaml_command_base.CommandTestsBase):
          'help_text': 'the tags'}]
     d = yaml_command_schema.CommandData('set-tags', data)
     d.request.method = 'setTags'
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async',
                     '--tags')
@@ -1031,7 +984,8 @@ class GenericCommandTests(yaml_command_base.CommandTestsBase):
     self.AssertOutputEquals('foo: bar\n')
     self.AssertErrContains('Request issued for: [i]')
     self.AssertErrContains(
-        'Waiting for operation [operation-12345] to complete')
+        'Waiting for operation [projects/p/zones/z/operations/operation-12345] '
+        'to complete')
     self.assertEqual(result, done_response)
 
   def testRunAsync(self):
@@ -1042,9 +996,10 @@ class GenericCommandTests(yaml_command_base.CommandTestsBase):
         {'api_field': 'tags.items', 'arg_name': 'tags',
          'help_text': 'the tags'}]
     d = yaml_command_schema.CommandData('set-tags', data)
-    d.async.response_name_field = 'selfLink'
-    d.async.state.field = 'status'
-    d.async.state.success_values = ['DONE']
+    d.async_.request_issued_message = 'Test message: [{__name__}]'
+    d.async_.response_name_field = 'selfLink'
+    d.async_.state.field = 'status'
+    d.async_.state.success_values = ['DONE']
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--zone', '--async', '--no-async',
                     '--tags')
@@ -1057,8 +1012,9 @@ selfLink: https://www.googleapis.com/compute/v1/projects/p/zones/z/operations/op
 status: RUNNING
 """.lstrip('\n'), normalize_space=True)
     self.AssertErrContains(
-        'Request issued for: [i]\n'
-        'Check operation [operation-12345] for status.')
+        'Test message: [i]\n'
+        'Check operation [projects/p/zones/z/operations/operation-12345] for '
+        'status.')
     self.assertEqual(result, running_response)
 
   def testRunNoOperationMethod(self):
@@ -1088,10 +1044,10 @@ class AsyncPollerTests(yaml_command_base.CommandTestsBase):
   def testIsDone(self):
     d = yaml_command_schema.CommandData(
         'delete', self.MakeCommandData(is_async='zoneOperations'))
-    d.async.state.field = 'status'
-    d.async.error.field = 'error'
-    d.async.state.success_values = ['DONE']
-    d.async.state.error_values = ['ERROR']
+    d.async_.state.field = 'status'
+    d.async_.error.field = 'error'
+    d.async_.state.success_values = ['DONE']
+    d.async_.state.error_values = ['ERROR']
 
     class Op(object):
 
@@ -1127,7 +1083,7 @@ class AsyncPollerTests(yaml_command_base.CommandTestsBase):
   def testPoll(self):
     running_response = self.messages.Operation(
         id=12345, name='operation-12345',
-        selfLink='https://www.googleapis.com/compute/v1/projects/p/zones/z/'
+        selfLink='https://compute.googleapis.com/compute/v1/projects/p/zones/z/'
                  'operations/operation-12345',
         error=None,
         status=self.messages.Operation.StatusValueValuesEnum.RUNNING)
@@ -1148,13 +1104,13 @@ class AsyncPollerTests(yaml_command_base.CommandTestsBase):
 
     # Test operations api version override.
     d.request.api_version = 'v2'
-    d.async.api_version = 'v1'
+    d.async_.api_version = 'v1'
     poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     result = poller.Poll(op_ref)
     self.assertEqual(result, running_response)
 
     # Intentionally swapping zone and project to test the remapping.
-    d.async.operation_get_method_params = {
+    d.async_.operation_get_method_params = {
         'project': 'zone', 'zone': 'project', 'operation': 'operation'}
     # Swap project and zone in the reference as well so it ends up being the
     # same request.
@@ -1180,12 +1136,12 @@ class AsyncPollerTests(yaml_command_base.CommandTestsBase):
 
     # Doesn't return result when explicitly disabled even if resource ref is
     # valid.
-    d.async.extract_resource_result = False
+    d.async_.extract_resource_result = False
     poller = yaml_command_translator.AsyncOperationPoller(d, object(), None)
     self.assertEqual(o, poller.GetResult(o))
 
     # Test extracting a specific attribute from the operation.
-    d.async.result_attribute = 'name'
+    d.async_.result_attribute = 'name'
     poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     self.assertEqual(o.name, poller.GetResult(o))
 
@@ -1216,12 +1172,12 @@ class AsyncPollerTests(yaml_command_base.CommandTestsBase):
     self.assertEqual(response, poller.GetResult(None))
 
     # Test extracting a specific attribute from the result.
-    d.async.result_attribute = 'foo.name'
+    d.async_.result_attribute = 'foo.name'
     poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     self.assertEqual('bar', poller.GetResult(None))
 
     # Test invalid attribute on the result.
-    d.async.result_attribute = 'foo.junk'
+    d.async_.result_attribute = 'foo.junk'
     poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     with self.assertRaisesRegex(AttributeError,
                                 r'Attribute path \[foo.junk\] not found'):
@@ -1286,12 +1242,12 @@ class AsyncPollerTests(yaml_command_base.CommandTestsBase):
     self.assertEqual(response, poller.GetResult(None))
 
     # Test extracting a specific attribute from the result.
-    d.async.result_attribute = 'foo.name'
+    d.async_.result_attribute = 'foo.name'
     poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     self.assertEqual('bar', poller.GetResult(None))
 
     # Test invalid attribute on the result.
-    d.async.result_attribute = 'foo.junk'
+    d.async_.result_attribute = 'foo.junk'
     poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     with self.assertRaisesRegex(AttributeError,
                                 r'Attribute path \[foo.junk\] not found'):
@@ -2031,17 +1987,27 @@ class UpdateCommandTests(yaml_command_base.CommandTestsBase):
         'update': {}
     }
 
-  def _ExpectUpdate(self, field_mask, is_async=False, full_update=False):
+  def _ExpectUpdate(self,
+                    field_mask,
+                    is_async=False,
+                    full_update=False,
+                    labels=False):
+    instance = self.messages.Instance(
+        displayName='dn' if full_update else None,
+        name='projects/p/instances/i' if full_update else None,
+        nodeCount=2,
+    )
+    if labels:
+      labels_cls = self.messages.Instance.LabelsValue
+      additional_property_cls = labels_cls.AdditionalProperty
+      instance.labels = labels_cls(
+          additionalProperties=[additional_property_cls(key='k1', value='v1')])
+
     running_response, _ = self._OperationResponses()
     req = self.messages.SpannerProjectsInstancesPatchRequest(
         name='projects/p/instances/i',
         updateInstanceRequest=self.messages.UpdateInstanceRequest(
-            instance=self.messages.Instance(
-                displayName='dn' if full_update else None,
-                name='projects/p/instances/i' if full_update else None,
-                nodeCount=2,
-            ),
-            fieldMask=field_mask))
+            instance=instance, fieldMask=field_mask))
     self.mocked_client.projects_instances.Patch.Expect(
         request=req, response=running_response)
 
@@ -2095,8 +2061,8 @@ class UpdateCommandTests(yaml_command_base.CommandTestsBase):
     }]
     d = yaml_command_schema.CommandData('update', data)
     d.request.method = 'patch'
-    d.async.state.field = 'done'
-    d.async.state.success_values = [True]
+    d.async_.state.field = 'done'
+    d.async_.state.success_values = [True]
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--nodes', '--async', '--no-async')
     cli.Execute(['command', 'i', '--project', 'p', '--async', '--nodes', '2'])
@@ -2107,7 +2073,8 @@ name: projects/p/instances/i/operations/o
 """.lstrip('\n'),
         normalize_space=True)
     self.AssertErrContains('Request issued for: [i]')
-    self.AssertErrContains('Check operation [o] for status.')
+    self.AssertErrContains('Check operation [projects/p/instances/i/'
+                           'operations/o] for status.')
     self.AssertErrContains('Updated instance [i].\n')
 
   def testRunSync(self):
@@ -2178,8 +2145,8 @@ name: projects/p/instances/i/operations/o
     data['update']['read_modify_update'] = True
     d = yaml_command_schema.CommandData('update', data)
     d.request.method = 'patch'
-    d.async.state.field = 'done'
-    d.async.state.success_values = [True]
+    d.async_.state.field = 'done'
+    d.async_.state.success_values = [True]
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--nodes', '--async', '--no-async')
     cli.Execute(['command', 'i', '--project', 'p', '--async', '--nodes', '2'])
@@ -2191,7 +2158,48 @@ name: projects/p/instances/i/operations/o
 """.lstrip('\n'),
         normalize_space=True)
     self.AssertErrContains('Request issued for: [i]')
-    self.AssertErrContains('Check operation [o] for status.')
+    self.AssertErrContains('Check operation [projects/p/instances/i/'
+                           'operations/o] for status.')
+    self.AssertErrContains('Updated instance [i].\n')
+
+  def testUpdateLabels(self):
+    self._ExpectGet()
+    self._ExpectUpdate(
+        field_mask='nodeCount,labels',
+        is_async=True,
+        full_update=True,
+        labels=True)
+    data = self._MakeUpdateCommandData()
+    data['async'] = {'collection': 'spanner.projects.instances.operations'}
+    data['request']['method'] = 'patch'
+    data['arguments']['params'] = [{
+        'api_field': 'updateInstanceRequest.instance.nodeCount',
+        'arg_name': 'nodes',
+        'help_text': 'the number of the nodes of the instance to update'
+    }]
+    data['arguments']['labels'] = {
+        'api_field': 'updateInstanceRequest.instance.labels'
+    }
+    data['update']['read_modify_update'] = True
+    d = yaml_command_schema.CommandData('update', data)
+    d.request.method = 'patch'
+    d.async_.state.field = 'done'
+    d.async_.state.success_values = [True]
+    cli = self.MakeCLI(d)
+    cli.Execute([
+        'command', 'i', '--project', 'p', '--async', '--nodes', '2',
+        '--update-labels', 'k1=v1'
+    ])
+
+    self.AssertOutputEquals(
+        """
+done: false
+name: projects/p/instances/i/operations/o
+""".lstrip('\n'),
+        normalize_space=True)
+    self.AssertErrContains('Request issued for: [i]')
+    self.AssertErrContains('Check operation [projects/p/instances/i/'
+                           'operations/o] for status.')
     self.AssertErrContains('Updated instance [i].\n')
 
   def testRunDisableAutoFieldMask(self):
@@ -2207,8 +2215,8 @@ name: projects/p/instances/i/operations/o
     data['update']['disable_auto_field_mask'] = True
     d = yaml_command_schema.CommandData('update', data)
     d.request.method = 'patch'
-    d.async.state.field = 'done'
-    d.async.state.success_values = [True]
+    d.async_.state.field = 'done'
+    d.async_.state.success_values = [True]
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'INSTANCE', '--nodes', '--async', '--no-async')
     cli.Execute(['command', 'i', '--project', 'p', '--async', '--nodes', '2'])
@@ -2220,7 +2228,8 @@ name: projects/p/instances/i/operations/o
 """.lstrip('\n'),
         normalize_space=True)
     self.AssertErrContains('Request issued for: [i]')
-    self.AssertErrContains('Check operation [o] for status.')
+    self.AssertErrContains('Check operation [projects/p/instances/i/'
+                           'operations/o] for status.')
     self.AssertErrContains('Updated instance [i].\n')
 
 
@@ -2246,6 +2255,76 @@ class ModifyMethodHookTests(yaml_command_base.CommandTestsBase):
     self.assertEqual(result, {'foo': 'bar'})
     self.AssertOutputEquals('foo: bar\n')
     modify_method_hook.assert_called_once()
+
+
+class DescribeComplexObjectCommandTests(yaml_command_base.CommandTestsBase,
+                                        parameterized.TestCase):
+
+  def Expect(self, instance='i', response=None):
+    self.mocked_client.instances.Get.Expect(
+        self.messages.ComputeInstancesGetRequest(
+            instance=instance, zone='z', project='p'),
+        response=response or {'foo': [{'bar': {'key': 'value1'}},
+                                      {'bar': {'key': 'value2'}},
+                                      {'bar': {'key': 'value3'}}]},
+        enable_type_checking=False)
+
+  def testRunWithDefaultFlatten(self):
+    # Command with default flattener should run the flattener on the output
+    self.Expect()
+    d = yaml_command_schema.CommandData('describe', self.MakeCommandData())
+    d.output.flatten = ['foo[].bar']
+    cli = self.MakeCLI(d)
+    cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.AssertOutputEquals(
+        """
+---
+key: value1
+---
+key: value2
+---
+key: value3
+""".lstrip('\n'))
+
+  def testRunWithDefaultAndFlagFlatten(self):
+    # Command with default flattener should use the flattener specified via flag
+    self.Expect()
+    d = yaml_command_schema.CommandData('describe', self.MakeCommandData())
+    d.output.flatten = ['foo[].bar']
+    cli = self.MakeCLI(d)
+    cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i',
+                 "--flatten=['foo']"])
+    self.AssertOutputEquals(
+        """
+---
+foo:
+  bar:
+    key: value1
+---
+foo:
+  bar:
+    key: value2
+---
+foo:
+  bar:
+    key: value3
+""".lstrip('\n'))
+
+  def testRunWithFlattenAndFormat(self):
+    # Check flattener applied with format
+    self.Expect()
+    d = yaml_command_schema.CommandData('describe', self.MakeCommandData())
+    d.output.flatten = ['foo[].bar']
+    d.output.format = 'table(key)'
+    cli = self.MakeCLI(d)
+    cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.AssertOutputEquals(
+        """
+KEY
+value1
+value2
+value3
+""".lstrip('\n'))
 
 
 if __name__ == '__main__':

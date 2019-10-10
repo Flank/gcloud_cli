@@ -3,7 +3,7 @@ NAME
         Engine SSL policy
 
 SYNOPSIS
-    gcloud beta compute ssl-policies create NAME
+    gcloud beta compute ssl-policies create SSL_POLICY
         [--custom-features=[CUSTOM_FEATURES,...]] [--description=DESCRIPTION]
         [--min-tls-version=MIN_TLS_VERSION; default="1.0"]
         [--profile=PROFILE; default="COMPATIBLE"] [GCLOUD_WIDE_FLAG ...]
@@ -18,7 +18,7 @@ DESCRIPTION
     balancers and the backends.
 
 POSITIONAL ARGUMENTS
-     NAME
+     SSL_POLICY
         Name of the SSL policy to create.
 
 FLAGS

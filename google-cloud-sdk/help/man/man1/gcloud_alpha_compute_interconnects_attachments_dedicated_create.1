@@ -11,7 +11,7 @@ gcloud alpha compute interconnects attachments dedicated create \- create a Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute interconnects attachments dedicated create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-bandwidth\fR=\fIBANDWIDTH\fR] [\fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vlan\fR=\fIVLAN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute interconnects attachments dedicated create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-bandwidth\fR=\fIBANDWIDTH\fR] [\fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dry\-run\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-mtu\fR=\fIMTU\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vlan\fR=\fIVLAN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -114,10 +114,20 @@ Google's edge.
 Human\-readable plain\-text description of attachment.
 
 .TP 2m
+\fB\-\-dry\-run\fR
+If supplied, validates the attachment without creating it.
+
+.TP 2m
 \fB\-\-enable\-admin\fR
 Administrative status of the interconnect attachment. If not provided on
 creation, defaults to enabled. When this is enabled, the attachment is
 operational and will carry traffic. Use \-\-no\-enable\-admin to disable it.
+
+.TP 2m
+\fB\-\-mtu\fR=\fIMTU\fR
+Maximum transmission unit(MTU) is the size of the largest frame passing through
+this interconnect attachment. Only 1440 and 1500 are allowed. If not specified,
+the value will default to 1440.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -169,9 +179,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute interconnects attachments dedicated create

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import exec_utils
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 
 from six.moves import urllib
 
@@ -133,6 +134,7 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     test_app = self._Resource('app_engine_php_flex_data', 'app.yaml')
     self.deployApp(test_app)
 
+  @test_case.Filters.skip('Flaky', 'b/117423915')
   def testDeployOpenJDK8(self):
     test_app = self._Resource('app_engine_java_vm_openjdk8_data', 'app.yaml')
     self.deployApp(test_app)

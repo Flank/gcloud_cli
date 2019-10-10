@@ -3,7 +3,8 @@ NAME
         Resource Policies
 
 SYNOPSIS
-    gcloud alpha compute resource-policies COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute resource-policies GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Google Compute Engine Resource Policies.
@@ -15,15 +16,22 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+GROUPS
+    GROUP is one of the following:
+
+     create
+        (ALPHA) Create Google Compute Engine Resource Policies.
+
 COMMANDS
     COMMAND is one of the following:
 
      create-snapshot-schedule
-        (ALPHA) Create a Google Compute Engine Snapshot Schedule Resource
-        Policy.
+        (ALPHA) (DEPRECATED) Create a Google Compute Engine Snapshot Schedule
+        Resource Policy.
 
      create-vm-maintenance
-        (ALPHA) Create a Google Compute Engine VM Maintenance Resource Policy.
+        (ALPHA) (DEPRECATED) Create a Google Compute Engine VM Maintenance
+        Resource Policy.
 
      delete
         (ALPHA) Delete a Google Compute Engine resource policy.
@@ -37,9 +45,9 @@ COMMANDS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud compute resource-policies
         $ gcloud beta compute resource-policies
 

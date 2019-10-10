@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container.binauthz import apis
 from googlecloudsdk.api_lib.container.binauthz import policies
 from googlecloudsdk.api_lib.container.binauthz import util
+from googlecloudsdk.api_lib.util import messages as messages_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.binauthz import arg_parsers
-from googlecloudsdk.command_lib.container.binauthz import encoding
 from googlecloudsdk.command_lib.container.binauthz import parsing
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
@@ -35,18 +35,18 @@ class Import(base.Command):
 
   This command accepts a description of the desired policy in the form of a
   YAML-formatted file. A representation of the current policy can be retrieved
-  using the $ {parent_command} describe command. One method of modifying the
-  policy is to run {parent_command} export, dump the contents to a file, modify
-  them to reflect the desired end-state, and provide this modifyied file to
-  {command}.
+  using the  $ {parent_command} export  command. One method of modifying the
+  policy is to run `$ {parent_command} export`, dump the contents to a file,
+  modify the policy file to reflect the desired new policy, and provide this
+  modified file to `$ {command}`.
 
-  ## EXAMPLE
+  ## EXAMPLES
 
-  One way of updating the current project's policy is to run:
+  To update the current project's policy:
 
       $ {parent_command} export > my_policy.yaml
       $ edit my_policy.yaml
-      $ {parent_command} import --policy-file=my_policy.yaml
+      $ {parent_command} import my_policy.yaml
   """
 
   @classmethod
@@ -81,6 +81,7 @@ class Import(base.Command):
 
     # Decode the dict into a Policy message, allowing DecodeErrors to bubble up
     # to the user if they are raised.
-    policy = encoding.DictToMessageWithErrorCheck(policy_obj, messages.Policy)
+    policy = messages_util.DictToMessageWithErrorCheck(
+        policy_obj, messages.Policy)
 
     return policies.Client(api_version).Set(util.GetPolicyRef(), policy)

@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha compute org-security-policies update - update a Google Compute
+        Engine organization security policy
+
+SYNOPSIS
+    gcloud alpha compute org-security-policies update SECURITY_POLICY_ID
+        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute org-security-policies update is used to update
+    organization security policies. An organization security policy is a set of
+    rules that controls access to various resources.
+
+POSITIONAL ARGUMENTS
+     SECURITY_POLICY_ID
+        Resource ID of the security policy to update.
+
+FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the organization security policy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.auth import util as auth_util
+from googlecloudsdk.core import config
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import gce
 from googlecloudsdk.core.credentials import store
@@ -99,7 +100,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
 
     self.mock_webflow.assert_called_once_with(
         launch_browser=True,
-        scopes=['scope1', 'scope2'],
+        scopes=['scope1', 'scope2', config.REAUTH_SCOPE],
         client_id=auth_util.DEFAULT_CREDENTIALS_DEFAULT_CLIENT_ID,
         client_secret=auth_util.DEFAULT_CREDENTIALS_DEFAULT_CLIENT_SECRET)
 
@@ -140,7 +141,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
 
     self.mock_create_webflow.assert_called_once_with(
         filename=client_id_file,
-        scope=['scope1', 'scope2'])
+        scope=['scope1', 'scope2', config.REAUTH_SCOPE])
     self.mock_run_webflow.assert_called_once_with(
         self.fake_webflow,
         launch_browser=True)

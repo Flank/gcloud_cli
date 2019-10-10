@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ class HealthChecksUpdateHttp2Test(
     test_base.BaseTest, test_case.WithOutputCapture, parameterized.TestCase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def global_flag(self):
     return ''
@@ -60,7 +60,7 @@ class HealthChecksUpdateHttp2Test(
 
     self.Run("""
         compute health-checks update http2
-          https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
           --host www.google.com
         """)
 
@@ -977,22 +977,29 @@ class HealthChecksUpdateHttp2Test(
     )
 
 
-class HealthChecksUpdateHttp2AlphaTest(HealthChecksUpdateHttp2Test):
+class HealthChecksUpdateHttp2BetaTest(HealthChecksUpdateHttp2Test):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def global_flag(self):
     return ' --global'
 
 
-class RegionHealthChecksUpdateHttp2Test(test_base.BaseTest,
-                                        test_case.WithOutputCapture):
+class HealthChecksUpdateHttp2AlphaTest(HealthChecksUpdateHttp2BetaTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class RegionHealthChecksUpdateHttp2BetaTest(test_base.BaseTest,
+                                            test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testUriSupport(self):
     # This is the same as testHostOption, but uses a full URI.
@@ -1009,7 +1016,7 @@ class RegionHealthChecksUpdateHttp2Test(test_base.BaseTest,
 
     self.Run("""
         compute health-checks update http2
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
           --host www.google.com
         """)
 
@@ -1071,6 +1078,14 @@ class RegionHealthChecksUpdateHttp2Test(test_base.BaseTest,
               project='my-project',
               region='us-west-1'))],
     )
+
+
+class RegionHealthChecksUpdateHttp2AlphaTest(
+    RegionHealthChecksUpdateHttp2BetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

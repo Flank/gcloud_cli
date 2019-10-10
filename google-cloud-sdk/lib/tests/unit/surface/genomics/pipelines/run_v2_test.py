@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -315,6 +315,10 @@ class RunTest(base.GenomicsUnitTest):
   def testPipelinesRun_Inputs(self):
     self._runFileTest(PIPELINE_INPUT_OBJECT, PIPELINE_MINIMAL_JSON,
                       ['--inputs', 'key=value'])
+
+  def testPipelinesRun_DiskSizeAndInputs(self):
+    self._runFileTest(PIPELINE_INPUT_OBJECT, PIPELINE_MINIMAL_JSON,
+                      ['--inputs', 'key=value', '--disk-size', 'd1:10'])
 
   def testPipelinesRun_PipelineAndCommand(self):
     with self.assertRaises(exceptions.GenomicsError):

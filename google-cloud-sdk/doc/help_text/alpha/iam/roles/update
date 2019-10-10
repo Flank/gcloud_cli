@@ -2,8 +2,8 @@ NAME
     gcloud alpha iam roles update - update an IAM custom role
 
 SYNOPSIS
-    gcloud alpha iam roles update ROLE_ID [--file=FILE]
-        [--organization=ORGANIZATION]
+    gcloud alpha iam roles update ROLE_ID
+        (--organization=ORGANIZATION | --project=PROJECT_ID) [--file=FILE]
         [--add-permissions=ADD_PERMISSIONS --description=DESCRIPTION
           --permissions=PERMISSIONS
           --remove-permissions=REMOVE_PERMISSIONS --stage=STAGE --title=TITLE]
@@ -17,13 +17,30 @@ POSITIONAL ARGUMENTS
         The id of the custom role to update. For example: CustomRole. You must
         also specify the --organization or --project flag.
 
-FLAGS
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --organization=ORGANIZATION
+          The organization of the role you want to update.
+
+       --project=PROJECT_ID
+          The project of the role you want to update.
+
+          The Google Cloud Platform project name to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
+
+OPTIONAL FLAGS
      --file=FILE
         The Yaml file you want to use to update a role. Can not be specified
         with other flags except role-id.
-
-     --organization=ORGANIZATION
-        The organization of the role you want to update.
 
      The following flags determine the fields need to be updated. You can
      update a role by specifying the following flags, or you can update a role
@@ -71,9 +88,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud iam roles update
         $ gcloud beta iam roles update

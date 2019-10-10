@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,10 +54,18 @@ class InstancesTestBase(e2e_test_base.BaseTest):
     self.instance_names_used.append(name)
     return name
 
-  def _TestInstanceCreation(self):
+  def _TestInstanceCreation(self, metadata=None):
     self.GetInstanceName()
-    self.Run('compute instances create {0} --zone {1}'.format(
-        self.instance_name, self.zone))
+    # metadata should be a dictionary of key/value pairs to add to the
+    # instance metadata.
+    metadata_flag = ''
+    if metadata:
+      # Convert the metadata dictionary to a comma-separated string of 'a=b'
+      # pairs. e.g. {'a':'b', 'c':'d'} ==> 'a=b,c=d'
+      metadata_values = ','.join('='.join(item) for item in metadata.items())
+      metadata_flag = '--metadata {0}'.format(metadata_values)
+    self.Run('compute instances create {0} --zone {1} {2}'.format(
+        self.instance_name, self.zone, metadata_flag))
     self.AssertNewOutputContains(self.instance_name)
     self.Run('compute instances list')
     self.AssertNewOutputContains(self.instance_name)

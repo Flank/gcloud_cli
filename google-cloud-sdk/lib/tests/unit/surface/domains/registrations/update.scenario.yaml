@@ -191,7 +191,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
           method: GET
           headers: {}
           body: null
@@ -337,7 +337,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
+          uri: https://dns.googleapis.com/dns/v1/projects/fake-project/managedZones/example-com?alt=json
           method: GET
           headers: {}
           body: null

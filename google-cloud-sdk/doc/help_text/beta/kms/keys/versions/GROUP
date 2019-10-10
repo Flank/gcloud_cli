@@ -33,6 +33,12 @@ COMMANDS
      enable
         (BETA) Enable a given version.
 
+     get-public-key
+        (BETA) Get the public key for a given version.
+
+     import
+        (BETA) Import a version into an existing crypto key.
+
      list
         (BETA) List the versions within a key.
 

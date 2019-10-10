@@ -164,7 +164,7 @@
     },
     "GoogleRpc_Status": {
       "id": "GoogleRpc_Status",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -287,6 +287,10 @@
         "textDetectionConfig": {
           "description": "Config for TEXT_DETECTION.",
           "$ref": "GoogleCloudVideointelligenceV1_TextDetectionConfig"
+        },
+        "objectTrackingConfig": {
+          "description": "Config for OBJECT_TRACKING.",
+          "$ref": "GoogleCloudVideointelligenceV1_ObjectTrackingConfig"
         }
       }
     },
@@ -447,6 +451,21 @@
           "items": {
             "type": "string"
           }
+        },
+        "model": {
+          "description": "Model to use for text detection.\nSupported values: \"builtin\/stable\" (the default if unset) and\n\"builtin\/latest\".",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1_ObjectTrackingConfig": {
+      "id": "GoogleCloudVideointelligenceV1_ObjectTrackingConfig",
+      "description": "Config for OBJECT_TRACKING.",
+      "type": "object",
+      "properties": {
+        "model": {
+          "description": "Model to use for object tracking.\nSupported values: \"builtin\/stable\" (the default if unset) and\n\"builtin\/latest\".",
+          "type": "string"
         }
       }
     },
@@ -473,15 +492,33 @@
           "description": "Video file location in\n[Google Cloud Storage](https:\/\/cloud.google.com\/storage\/).",
           "type": "string"
         },
+        "segment": {
+          "description": "Video segment on which the annotation is run.",
+          "$ref": "GoogleCloudVideointelligenceV1beta2_VideoSegment"
+        },
         "segmentLabelAnnotations": {
-          "description": "Label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
+          }
+        },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
           }
         },
         "shotLabelAnnotations": {
-          "description": "Label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
+          }
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
@@ -529,6 +566,23 @@
         "error": {
           "description": "If set, indicates an error. Note that for a single `AnnotateVideoRequest`\nsome videos may succeed and some may fail.",
           "$ref": "GoogleRpc_Status"
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1beta2_VideoSegment": {
+      "id": "GoogleCloudVideointelligenceV1beta2_VideoSegment",
+      "description": "Video segment.",
+      "type": "object",
+      "properties": {
+        "startTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "endTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -596,23 +650,6 @@
           "description": "Confidence that the label is accurate. Range: [0, 1].",
           "type": "number",
           "format": "float"
-        }
-      }
-    },
-    "GoogleCloudVideointelligenceV1beta2_VideoSegment": {
-      "id": "GoogleCloudVideointelligenceV1beta2_VideoSegment",
-      "description": "Video segment.",
-      "type": "object",
-      "properties": {
-        "startTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
-        },
-        "endTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
         }
       }
     },
@@ -707,12 +744,12 @@
           "type": "string"
         },
         "confidence": {
-          "description": "The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is typically provided only for the top hypothesis, and\nonly for `is_final=true` results. Clients should not rely on the\n`confidence` field as it is not guaranteed to be accurate or consistent.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
+          "description": "Output only. The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is set only for the top alternative.\nThis field is not guaranteed to be accurate and users should not rely on it\nto be always provided.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
           "type": "number",
           "format": "float"
         },
         "words": {
-          "description": "A list of word-specific information for each recognized word.",
+          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When `enable_speaker_diarization` is true, you will see all the words\nfrom the beginning of the audio.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1beta2_WordInfo"
@@ -951,6 +988,32 @@
           "description": "Time of the most recent update.",
           "type": "string",
           "format": "google-datetime"
+        },
+        "feature": {
+          "description": "Specifies which feature is being tracked if the request contains more than\none features.",
+          "enumDescriptions": [
+            "Unspecified.",
+            "Label detection. Detect objects, such as dog or flower.",
+            "Shot change detection.",
+            "Explicit content detection.",
+            "Speech transcription.",
+            "OCR text detection and tracking.",
+            "Object detection and tracking."
+          ],
+          "type": "string",
+          "enum": [
+            "FEATURE_UNSPECIFIED",
+            "LABEL_DETECTION",
+            "SHOT_CHANGE_DETECTION",
+            "EXPLICIT_CONTENT_DETECTION",
+            "SPEECH_TRANSCRIPTION",
+            "TEXT_DETECTION",
+            "OBJECT_TRACKING"
+          ]
+        },
+        "segment": {
+          "description": "Specifies which segment is being tracked if the request contains more than\none segments.",
+          "$ref": "GoogleCloudVideointelligenceV1beta2_VideoSegment"
         }
       }
     },
@@ -977,15 +1040,33 @@
           "description": "Video file location in\n[Google Cloud Storage](https:\/\/cloud.google.com\/storage\/).",
           "type": "string"
         },
+        "segment": {
+          "description": "Video segment on which the annotation is run.",
+          "$ref": "GoogleCloudVideointelligenceV1_VideoSegment"
+        },
         "segmentLabelAnnotations": {
-          "description": "Label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
+          }
+        },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
           }
         },
         "shotLabelAnnotations": {
-          "description": "Label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
+          }
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
@@ -1194,12 +1275,12 @@
           "type": "string"
         },
         "confidence": {
-          "description": "The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is typically provided only for the top hypothesis, and\nonly for `is_final=true` results. Clients should not rely on the\n`confidence` field as it is not guaranteed to be accurate or consistent.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
+          "description": "Output only. The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is set only for the top alternative.\nThis field is not guaranteed to be accurate and users should not rely on it\nto be always provided.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
           "type": "number",
           "format": "float"
         },
         "words": {
-          "description": "A list of word-specific information for each recognized word.",
+          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When `enable_speaker_diarization` is true, you will see all the words\nfrom the beginning of the audio.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1_WordInfo"
@@ -1438,6 +1519,32 @@
           "description": "Time of the most recent update.",
           "type": "string",
           "format": "google-datetime"
+        },
+        "feature": {
+          "description": "Specifies which feature is being tracked if the request contains more than\none features.",
+          "enumDescriptions": [
+            "Unspecified.",
+            "Label detection. Detect objects, such as dog or flower.",
+            "Shot change detection.",
+            "Explicit content detection.",
+            "Speech transcription.",
+            "OCR text detection and tracking.",
+            "Object detection and tracking."
+          ],
+          "type": "string",
+          "enum": [
+            "FEATURE_UNSPECIFIED",
+            "LABEL_DETECTION",
+            "SHOT_CHANGE_DETECTION",
+            "EXPLICIT_CONTENT_DETECTION",
+            "SPEECH_TRANSCRIPTION",
+            "TEXT_DETECTION",
+            "OBJECT_TRACKING"
+          ]
+        },
+        "segment": {
+          "description": "Specifies which segment is being tracked if the request contains more than\none segments.",
+          "$ref": "GoogleCloudVideointelligenceV1_VideoSegment"
         }
       }
     },
@@ -1464,15 +1571,33 @@
           "description": "Video file location in\n[Google Cloud Storage](https:\/\/cloud.google.com\/storage\/).",
           "type": "string"
         },
+        "segment": {
+          "description": "Video segment on which the annotation is run.",
+          "$ref": "GoogleCloudVideointelligenceV1p1beta1_VideoSegment"
+        },
         "segmentLabelAnnotations": {
-          "description": "Label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
+          }
+        },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
           }
         },
         "shotLabelAnnotations": {
-          "description": "Label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
+          }
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
@@ -1520,6 +1645,23 @@
         "error": {
           "description": "If set, indicates an error. Note that for a single `AnnotateVideoRequest`\nsome videos may succeed and some may fail.",
           "$ref": "GoogleRpc_Status"
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1p1beta1_VideoSegment": {
+      "id": "GoogleCloudVideointelligenceV1p1beta1_VideoSegment",
+      "description": "Video segment.",
+      "type": "object",
+      "properties": {
+        "startTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "endTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -1587,23 +1729,6 @@
           "description": "Confidence that the label is accurate. Range: [0, 1].",
           "type": "number",
           "format": "float"
-        }
-      }
-    },
-    "GoogleCloudVideointelligenceV1p1beta1_VideoSegment": {
-      "id": "GoogleCloudVideointelligenceV1p1beta1_VideoSegment",
-      "description": "Video segment.",
-      "type": "object",
-      "properties": {
-        "startTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
-        },
-        "endTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
         }
       }
     },
@@ -1698,12 +1823,12 @@
           "type": "string"
         },
         "confidence": {
-          "description": "The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is typically provided only for the top hypothesis, and\nonly for `is_final=true` results. Clients should not rely on the\n`confidence` field as it is not guaranteed to be accurate or consistent.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
+          "description": "Output only. The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is set only for the top alternative.\nThis field is not guaranteed to be accurate and users should not rely on it\nto be always provided.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
           "type": "number",
           "format": "float"
         },
         "words": {
-          "description": "A list of word-specific information for each recognized word.",
+          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When `enable_speaker_diarization` is true, you will see all the words\nfrom the beginning of the audio.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p1beta1_WordInfo"
@@ -1942,6 +2067,32 @@
           "description": "Time of the most recent update.",
           "type": "string",
           "format": "google-datetime"
+        },
+        "feature": {
+          "description": "Specifies which feature is being tracked if the request contains more than\none features.",
+          "enumDescriptions": [
+            "Unspecified.",
+            "Label detection. Detect objects, such as dog or flower.",
+            "Shot change detection.",
+            "Explicit content detection.",
+            "Speech transcription.",
+            "OCR text detection and tracking.",
+            "Object detection and tracking."
+          ],
+          "type": "string",
+          "enum": [
+            "FEATURE_UNSPECIFIED",
+            "LABEL_DETECTION",
+            "SHOT_CHANGE_DETECTION",
+            "EXPLICIT_CONTENT_DETECTION",
+            "SPEECH_TRANSCRIPTION",
+            "TEXT_DETECTION",
+            "OBJECT_TRACKING"
+          ]
+        },
+        "segment": {
+          "description": "Specifies which segment is being tracked if the request contains more than\none segments.",
+          "$ref": "GoogleCloudVideointelligenceV1p1beta1_VideoSegment"
         }
       }
     },
@@ -1968,15 +2119,33 @@
           "description": "Video file location in\n[Google Cloud Storage](https:\/\/cloud.google.com\/storage\/).",
           "type": "string"
         },
+        "segment": {
+          "description": "Video segment on which the annotation is run.",
+          "$ref": "GoogleCloudVideointelligenceV1p2beta1_VideoSegment"
+        },
         "segmentLabelAnnotations": {
-          "description": "Label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
+          }
+        },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
           }
         },
         "shotLabelAnnotations": {
-          "description": "Label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
+          }
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
@@ -2024,6 +2193,23 @@
         "error": {
           "description": "If set, indicates an error. Note that for a single `AnnotateVideoRequest`\nsome videos may succeed and some may fail.",
           "$ref": "GoogleRpc_Status"
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1p2beta1_VideoSegment": {
+      "id": "GoogleCloudVideointelligenceV1p2beta1_VideoSegment",
+      "description": "Video segment.",
+      "type": "object",
+      "properties": {
+        "startTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "endTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -2091,23 +2277,6 @@
           "description": "Confidence that the label is accurate. Range: [0, 1].",
           "type": "number",
           "format": "float"
-        }
-      }
-    },
-    "GoogleCloudVideointelligenceV1p2beta1_VideoSegment": {
-      "id": "GoogleCloudVideointelligenceV1p2beta1_VideoSegment",
-      "description": "Video segment.",
-      "type": "object",
-      "properties": {
-        "startTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
-        },
-        "endTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
         }
       }
     },
@@ -2202,12 +2371,12 @@
           "type": "string"
         },
         "confidence": {
-          "description": "The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is typically provided only for the top hypothesis, and\nonly for `is_final=true` results. Clients should not rely on the\n`confidence` field as it is not guaranteed to be accurate or consistent.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
+          "description": "Output only. The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is set only for the top alternative.\nThis field is not guaranteed to be accurate and users should not rely on it\nto be always provided.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
           "type": "number",
           "format": "float"
         },
         "words": {
-          "description": "A list of word-specific information for each recognized word.",
+          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When `enable_speaker_diarization` is true, you will see all the words\nfrom the beginning of the audio.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p2beta1_WordInfo"
@@ -2446,6 +2615,32 @@
           "description": "Time of the most recent update.",
           "type": "string",
           "format": "google-datetime"
+        },
+        "feature": {
+          "description": "Specifies which feature is being tracked if the request contains more than\none features.",
+          "enumDescriptions": [
+            "Unspecified.",
+            "Label detection. Detect objects, such as dog or flower.",
+            "Shot change detection.",
+            "Explicit content detection.",
+            "Speech transcription.",
+            "OCR text detection and tracking.",
+            "Object detection and tracking."
+          ],
+          "type": "string",
+          "enum": [
+            "FEATURE_UNSPECIFIED",
+            "LABEL_DETECTION",
+            "SHOT_CHANGE_DETECTION",
+            "EXPLICIT_CONTENT_DETECTION",
+            "SPEECH_TRANSCRIPTION",
+            "TEXT_DETECTION",
+            "OBJECT_TRACKING"
+          ]
+        },
+        "segment": {
+          "description": "Specifies which segment is being tracked if the request contains more than\none segments.",
+          "$ref": "GoogleCloudVideointelligenceV1p2beta1_VideoSegment"
         }
       }
     },
@@ -2472,15 +2667,33 @@
           "description": "Video file location in\n[Google Cloud Storage](https:\/\/cloud.google.com\/storage\/).",
           "type": "string"
         },
+        "segment": {
+          "description": "Video segment on which the annotation is run.",
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_VideoSegment"
+        },
         "segmentLabelAnnotations": {
-          "description": "Label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
+          }
+        },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
           }
         },
         "shotLabelAnnotations": {
-          "description": "Label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
+          }
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin\/latest\" in the request.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
@@ -2525,9 +2738,33 @@
             "$ref": "GoogleCloudVideointelligenceV1p3beta1_ObjectTrackingAnnotation"
           }
         },
+        "logoRecognitionAnnotations": {
+          "description": "Annotations for list of logos detected, tracked and recognized in video.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_LogoRecognitionAnnotation"
+          }
+        },
         "error": {
           "description": "If set, indicates an error. Note that for a single `AnnotateVideoRequest`\nsome videos may succeed and some may fail.",
           "$ref": "GoogleRpc_Status"
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_VideoSegment": {
+      "id": "GoogleCloudVideointelligenceV1p3beta1_VideoSegment",
+      "description": "Video segment.",
+      "type": "object",
+      "properties": {
+        "startTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "endTimeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -2595,23 +2832,6 @@
           "description": "Confidence that the label is accurate. Range: [0, 1].",
           "type": "number",
           "format": "float"
-        }
-      }
-    },
-    "GoogleCloudVideointelligenceV1p3beta1_VideoSegment": {
-      "id": "GoogleCloudVideointelligenceV1p3beta1_VideoSegment",
-      "description": "Video segment.",
-      "type": "object",
-      "properties": {
-        "startTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the start of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
-        },
-        "endTimeOffset": {
-          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the end of the segment (inclusive).",
-          "type": "string",
-          "format": "google-duration"
         }
       }
     },
@@ -2706,12 +2926,12 @@
           "type": "string"
         },
         "confidence": {
-          "description": "The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is typically provided only for the top hypothesis, and\nonly for `is_final=true` results. Clients should not rely on the\n`confidence` field as it is not guaranteed to be accurate or consistent.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
+          "description": "Output only. The confidence estimate between 0.0 and 1.0. A higher number\nindicates an estimated greater likelihood that the recognized words are\ncorrect. This field is set only for the top alternative.\nThis field is not guaranteed to be accurate and users should not rely on it\nto be always provided.\nThe default of 0.0 is a sentinel value indicating `confidence` was not set.",
           "type": "number",
           "format": "float"
         },
         "words": {
-          "description": "A list of word-specific information for each recognized word.",
+          "description": "Output only. A list of word-specific information for each recognized word.\nNote: When `enable_speaker_diarization` is true, you will see all the words\nfrom the beginning of the audio.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p3beta1_WordInfo"
@@ -2913,6 +3133,104 @@
         }
       }
     },
+    "GoogleCloudVideointelligenceV1p3beta1_LogoRecognitionAnnotation": {
+      "id": "GoogleCloudVideointelligenceV1p3beta1_LogoRecognitionAnnotation",
+      "description": "Annotation corresponding to one detected, tracked and recognized logo class.",
+      "type": "object",
+      "properties": {
+        "entity": {
+          "description": "Entity category information to specify the logo class that all the logo\ntracks within this LogoRecognitionAnnotation are recognized as.",
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_Entity"
+        },
+        "tracks": {
+          "description": "All logo tracks where the recognized logo appears. Each track corresponds\nto one logo instance appearing in consecutive frames.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_Track"
+          }
+        },
+        "segments": {
+          "description": "All video segments where the recognized logo appears. There might be\nmultiple instances of the same logo class appearing in one VideoSegment.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_VideoSegment"
+          }
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_Track": {
+      "id": "GoogleCloudVideointelligenceV1p3beta1_Track",
+      "description": "A track of an object instance.",
+      "type": "object",
+      "properties": {
+        "segment": {
+          "description": "Video segment of a track.",
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_VideoSegment"
+        },
+        "timestampedObjects": {
+          "description": "The object with timestamp and attributes per frame in the track.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_TimestampedObject"
+          }
+        },
+        "attributes": {
+          "description": "Optional. Attributes in the track level.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_DetectedAttribute"
+          }
+        },
+        "confidence": {
+          "description": "Optional. The confidence score of the tracked object.",
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_TimestampedObject": {
+      "id": "GoogleCloudVideointelligenceV1p3beta1_TimestampedObject",
+      "description": "For tracking related features, such as LOGO_RECOGNITION, FACE_DETECTION,\nCELEBRITY_RECOGNITION, PERSON_DETECTION.\nAn object at time_offset with attributes, and located with\nnormalized_bounding_box.",
+      "type": "object",
+      "properties": {
+        "normalizedBoundingBox": {
+          "description": "Normalized Bounding box in a frame, where the object is located.",
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_NormalizedBoundingBox"
+        },
+        "timeOffset": {
+          "description": "Time-offset, relative to the beginning of the video,\ncorresponding to the video frame for this object.",
+          "type": "string",
+          "format": "google-duration"
+        },
+        "attributes": {
+          "description": "Optional. The attributes of the object in the bounding box.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_DetectedAttribute"
+          }
+        }
+      }
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_DetectedAttribute": {
+      "id": "GoogleCloudVideointelligenceV1p3beta1_DetectedAttribute",
+      "description": "A generic detected attribute represented by name in string format.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the attribute, i.e. glasses, dark_glasses, mouth_open etc.\nA full list of supported type names will be provided in the document.",
+          "type": "string"
+        },
+        "confidence": {
+          "description": "Detected attribute confidence. Range [0, 1].",
+          "type": "number",
+          "format": "float"
+        },
+        "value": {
+          "description": "Text value of the detection result. For example, the value for \"HairColor\"\ncan be \"black\", \"blonde\", etc.",
+          "type": "string"
+        }
+      }
+    },
     "GoogleCloudVideointelligenceV1p3beta1_AnnotateVideoProgress": {
       "id": "GoogleCloudVideointelligenceV1p3beta1_AnnotateVideoProgress",
       "description": "Video annotation progress. Included in the `metadata`\nfield of the `Operation` returned by the `GetOperation`\ncall of the `google::longrunning::Operations` service.",
@@ -2950,6 +3268,34 @@
           "description": "Time of the most recent update.",
           "type": "string",
           "format": "google-datetime"
+        },
+        "feature": {
+          "description": "Specifies which feature is being tracked if the request contains more than\none features.",
+          "enumDescriptions": [
+            "Unspecified.",
+            "Label detection. Detect objects, such as dog or flower.",
+            "Shot change detection.",
+            "Explicit content detection.",
+            "Speech transcription.",
+            "OCR text detection and tracking.",
+            "Object detection and tracking.",
+            "Logo detection, tracking, and recognition."
+          ],
+          "type": "string",
+          "enum": [
+            "FEATURE_UNSPECIFIED",
+            "LABEL_DETECTION",
+            "SHOT_CHANGE_DETECTION",
+            "EXPLICIT_CONTENT_DETECTION",
+            "SPEECH_TRANSCRIPTION",
+            "TEXT_DETECTION",
+            "OBJECT_TRACKING",
+            "LOGO_RECOGNITION"
+          ]
+        },
+        "segment": {
+          "description": "Specifies which segment is being tracked if the request contains more than\none segments.",
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_VideoSegment"
         }
       }
     },
@@ -3006,123 +3352,225 @@
     }
   },
   "resources": {
+    "projects": {
+      "resources": {
+        "locations": {
+          "resources": {
+            "operations": {
+              "methods": {
+                "list": {
+                  "id": "videointelligence.projects.locations.operations.list",
+                  "path": "v1/{+name}/operations",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation's parent resource.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "filter": {
+                      "description": "The standard list filter.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The standard list page size.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "pageToken": {
+                      "description": "The standard list page token.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleLongrunning_ListOperationsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists operations that match the specified filter in the request. If the\nserver doesn't support this method, it returns `UNIMPLEMENTED`.\n\nNOTE: the `name` binding allows API services to override the binding\nto use different resource name schemes, such as `users\/*\/operations`. To\noverride the binding, API services can add a binding such as\n`\"\/v1\/{name=users\/*}\/operations\"` to their service configuration.\nFor backwards compatibility, the default name includes the operations\ncollection id, however overriding users must ensure the name binding\nis the parent resource, without the operations collection id."
+                },
+                "get": {
+                  "id": "videointelligence.projects.locations.operations.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleLongrunning_Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice."
+                },
+                "delete": {
+                  "id": "videointelligence.projects.locations.operations.delete",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be deleted.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "GoogleProtobuf_Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes a long-running operation. This method indicates that the client is\nno longer interested in the operation result. It does not cancel the\noperation. If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`."
+                },
+                "cancel": {
+                  "id": "videointelligence.projects.locations.operations.cancel",
+                  "path": "v1/{+name}:cancel",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be cancelled.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "GoogleLongrunning_CancelOperationRequest"
+                  },
+                  "response": {
+                    "$ref": "GoogleProtobuf_Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "operations": {
-      "methods": {
-        "list": {
-          "id": "videointelligence.operations.list",
-          "path": "v1/operations",
-          "flatPath": "v1/operations",
-          "httpMethod": "GET",
-          "parameters": {
-            "name": {
-              "description": "The name of the operation's parent resource.",
-              "location": "query",
-              "type": "string"
-            },
-            "filter": {
-              "description": "The standard list filter.",
-              "location": "query",
-              "type": "string"
-            },
-            "pageSize": {
-              "description": "The standard list page size.",
-              "location": "query",
-              "type": "integer",
-              "format": "int32"
-            },
-            "pageToken": {
-              "description": "The standard list page token.",
-              "location": "query",
-              "type": "string"
+      "resources": {
+        "projects": {
+          "resources": {
+            "locations": {
+              "resources": {
+                "operations": {
+                  "methods": {
+                    "get": {
+                      "id": "videointelligence.operations.projects.locations.operations.get",
+                      "path": "v1/operations/{+name}",
+                      "flatPath": "v1/operations/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "name": {
+                          "description": "The name of the operation resource.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "GoogleLongrunning_Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice."
+                    },
+                    "delete": {
+                      "id": "videointelligence.operations.projects.locations.operations.delete",
+                      "path": "v1/operations/{+name}",
+                      "flatPath": "v1/operations/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                      "httpMethod": "DELETE",
+                      "parameters": {
+                        "name": {
+                          "description": "The name of the operation resource to be deleted.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "GoogleProtobuf_Empty"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Deletes a long-running operation. This method indicates that the client is\nno longer interested in the operation result. It does not cancel the\noperation. If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`."
+                    },
+                    "cancel": {
+                      "id": "videointelligence.operations.projects.locations.operations.cancel",
+                      "path": "v1/operations/{+name}:cancel",
+                      "flatPath": "v1/operations/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "The name of the operation resource to be cancelled.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "response": {
+                        "$ref": "GoogleProtobuf_Empty"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`."
+                    }
+                  }
+                }
+              }
             }
-          },
-          "parameterOrder": [
-          ],
-          "response": {
-            "$ref": "GoogleLongrunning_ListOperationsResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "description": "Lists operations that match the specified filter in the request. If the\nserver doesn't support this method, it returns `UNIMPLEMENTED`.\n\nNOTE: the `name` binding allows API services to override the binding\nto use different resource name schemes, such as `users\/*\/operations`. To\noverride the binding, API services can add a binding such as\n`\"\/v1\/{name=users\/*}\/operations\"` to their service configuration.\nFor backwards compatibility, the default name includes the operations\ncollection id, however overriding users must ensure the name binding\nis the parent resource, without the operations collection id."
-        },
-        "get": {
-          "id": "videointelligence.operations.get",
-          "path": "v1/operations/{+name}",
-          "flatPath": "v1/operations/{operationsId}",
-          "httpMethod": "GET",
-          "parameters": {
-            "name": {
-              "description": "The name of the operation resource.",
-              "location": "path",
-              "required": true,
-              "pattern": "^[^\/]+$",
-              "type": "string"
-            }
-          },
-          "parameterOrder": [
-            "name"
-          ],
-          "response": {
-            "$ref": "GoogleLongrunning_Operation"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice."
-        },
-        "delete": {
-          "id": "videointelligence.operations.delete",
-          "path": "v1/operations/{+name}",
-          "flatPath": "v1/operations/{operationsId}",
-          "httpMethod": "DELETE",
-          "parameters": {
-            "name": {
-              "description": "The name of the operation resource to be deleted.",
-              "location": "path",
-              "required": true,
-              "pattern": "^[^\/]+$",
-              "type": "string"
-            }
-          },
-          "parameterOrder": [
-            "name"
-          ],
-          "response": {
-            "$ref": "GoogleProtobuf_Empty"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "description": "Deletes a long-running operation. This method indicates that the client is\nno longer interested in the operation result. It does not cancel the\noperation. If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`."
-        },
-        "cancel": {
-          "id": "videointelligence.operations.cancel",
-          "path": "v1/operations/{+name}:cancel",
-          "flatPath": "v1/operations/{operationsId}:cancel",
-          "httpMethod": "POST",
-          "parameters": {
-            "name": {
-              "description": "The name of the operation resource to be cancelled.",
-              "location": "path",
-              "required": true,
-              "pattern": "^[^\/]+$",
-              "type": "string"
-            }
-          },
-          "parameterOrder": [
-            "name"
-          ],
-          "request": {
-            "$ref": "GoogleLongrunning_CancelOperationRequest"
-          },
-          "response": {
-            "$ref": "GoogleProtobuf_Empty"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`."
+          }
         }
       }
     },

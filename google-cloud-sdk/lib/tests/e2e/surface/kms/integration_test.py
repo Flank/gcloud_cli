@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,6 +85,52 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
         'projects/{0}/locations/{1}/keyRings/{2}/cryptoKeys/{3}'.format(
             self.Project(), self.glbl, self.keyring, cryptokey))
     self.AssertOutputContains('k1: v1')
+
+  def testIamCommandsKeyrings(self):
+    # Test keyring getIamPolicy
+    self.RunKms('keyrings', 'get-iam-policy', self.keyring,
+                '--location', self.glbl)
+
+    # Expect the default etag value "ACAB" when no policy is set.
+    self.AssertOutputContains('etag: ACAB')
+    self.ClearOutput()
+
+    policy_file = self.Touch(
+        self.temp_path,
+        contents="""{{
+  "etag": "ACAB",
+  "bindings": [ {{ "members": ["serviceAccount:{0}"], "role": "roles/owner" }} ]
+}}
+""".format(self.Account()))
+    self.RunKms('keyrings', 'set-iam-policy', self.keyring,
+                '--location', self.glbl, policy_file)
+    etag = yaml.load(self.GetOutput())['etag']
+    self.ClearOutput()
+
+    files.WriteFileContents(policy_file, """{{
+  "etag": "{0}"
+}}
+""".format(etag))
+    self.RunKms('keyrings', 'set-iam-policy', self.keyring,
+                '--location', self.glbl, policy_file)
+
+    self.AssertOutputContains("""bindings:
+- members:
+  - serviceAccount:{0}
+  role: roles/owner
+""".format(self.Account()))
+    etag = yaml.load(self.GetOutput())['etag']
+    self.ClearOutput()
+
+    files.WriteFileContents(policy_file, """{{
+  "etag": "{0}",
+  "bindings": []
+}}
+""".format(etag))
+    self.RunKms('keyrings', 'set-iam-policy', self.keyring,
+                '--location', self.glbl, policy_file)
+    # "bindings" is set to [], so all entries should be removed.
+    self.AssertOutputNotContains('bindings:')
 
   def testIamCommands(self):
     cryptokey = next(self.cryptokey_namer)
@@ -351,9 +397,8 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
     self.RunKms('keyrings', 'create', kr, '--location', hsm_location)
     self.keyrings_to_clean.append({'name': kr, 'location': hsm_location})
     ck = next(self.cryptokey_namer)
-    self.RunKmsAlpha('keys', 'create', ck, '--keyring', kr, '--location',
-                     'us-east1', '--purpose', 'encryption',
-                     '--protection-level', 'hsm')
+    self.RunKms('keys', 'create', ck, '--keyring', kr, '--location', 'us-east1',
+                '--purpose', 'encryption', '--protection-level', 'hsm')
 
     plaintext = os.urandom(3 * 1024)
     pt_path = self.Touch(self.temp_path, 'plaintext', contents=plaintext)
@@ -375,7 +420,7 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
     # Windows.
     with open(dc_path, 'rb') as f:
       decrypted = f.read()
-    self.assertEquals(plaintext, decrypted)
+    self.assertEqual(plaintext, decrypted)
 
   @parameterized.parameters(
       ('asymmetric-signing', 'ec-sign-p256-sha256'),
@@ -384,9 +429,9 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
   def testGetPublicKey(self, purpose, algorithm):
     ck = next(self.cryptokey_namer)
 
-    self.RunKmsAlpha('keys', 'create', ck, '--keyring', self.keyring,
-                     '--location', self.glbl, '--purpose', purpose,
-                     '--default-algorithm', algorithm)
+    self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
+                self.glbl, '--purpose', purpose, '--default-algorithm',
+                algorithm)
 
     self.ReRunUntilOutputContains(
         self.FormatCmdKms('keys', 'versions', 'describe', '1', '--key', ck,
@@ -396,9 +441,9 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
         max_wait_ms=60000)
 
     output_file = self.Touch(self.temp_path, 'output_file')
-    self.RunKmsAlpha('keys', 'versions', 'get-public-key', '1', '--location',
-                     self.glbl, '--keyring', self.keyring, '--key', ck,
-                     '--output-file', output_file)
+    self.RunKms('keys', 'versions', 'get-public-key', '1', '--location',
+                self.glbl, '--keyring', self.keyring, '--key', ck,
+                '--output-file', output_file)
 
     self.AssertFileContains('-----BEGIN PUBLIC KEY-----', output_file)
     self.AssertFileContains('-----END PUBLIC KEY-----', output_file)
@@ -407,9 +452,9 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
   def testAsymmetricSign(self, algorithm):
     ck = next(self.cryptokey_namer)
 
-    self.RunKmsAlpha('keys', 'create', ck, '--keyring', self.keyring,
-                     '--location', self.glbl, '--purpose', 'asymmetric-signing',
-                     '--default-algorithm', algorithm)
+    self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
+                self.glbl, '--purpose', 'asymmetric-signing',
+                '--default-algorithm', algorithm)
 
     self.ReRunUntilOutputContains(
         self.FormatCmdKms('keys', 'versions', 'describe', '1', '--key', ck,
@@ -423,10 +468,10 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
     signature_file = self.Touch(self.temp_path, 'signature')
 
     digest_algorithm = algorithm[-6:]
-    self.RunKmsAlpha('asymmetric-sign', '--location', self.glbl, '--keyring',
-                     self.keyring, '--key', ck, '--version', '1',
-                     '--digest-algorithm', digest_algorithm, '--input-file',
-                     input_file, '--signature-file', signature_file)
+    self.RunKms('asymmetric-sign', '--location', self.glbl, '--keyring',
+                self.keyring, '--key', ck, '--version', '1',
+                '--digest-algorithm', digest_algorithm, '--input-file',
+                input_file, '--signature-file', signature_file)
 
     # AssertFileEquals opens the file in text mode, which causes issues on
     # Windows.
@@ -445,20 +490,20 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
         self.temp_path, 'ciphertext', contents=base64.b64decode(ciphertext))
     plaintext_file = self.Touch(self.temp_path, 'plaintext')
 
-    self.RunKmsAlpha('asymmetric-decrypt', '--location', 'us-central1',
-                     '--keyring', 'kms-beta-keyring', '--key',
-                     'rsa-decrypt-oaep-2048-sha256-software', '--version', '1',
-                     '--ciphertext-file', ciphertext_file, '--plaintext-file',
-                     plaintext_file)
+    self.RunKms('asymmetric-decrypt', '--location', 'us-central1', '--keyring',
+                'kms-beta-keyring', '--key',
+                'rsa-decrypt-oaep-2048-sha256-software', '--version', '1',
+                '--ciphertext-file', ciphertext_file, '--plaintext-file',
+                plaintext_file)
 
     self.AssertFileEquals('Bonjour!\n', plaintext_file)
 
   def testUpdateDefaultAlgorithm(self):
     ck = next(self.cryptokey_namer)
 
-    self.RunKmsAlpha('keys', 'create', ck, '--keyring', self.keyring,
-                     '--location', self.glbl, '--purpose', 'asymmetric-signing',
-                     '--default-algorithm', 'ec-sign-p256-sha256')
+    self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
+                self.glbl, '--purpose', 'asymmetric-signing',
+                '--default-algorithm', 'ec-sign-p256-sha256')
 
     self.ReRunUntilOutputContains(
         self.FormatCmdKms('keys', 'versions', 'describe', '1', '--key', ck,
@@ -467,12 +512,11 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
         max_retrials=10,
         max_wait_ms=60000)
 
-    self.RunKmsAlpha('keys', 'update', ck, '--location', self.glbl, '--keyring',
-                     self.keyring, '--default-algorithm',
-                     'rsa-sign-pss-2048-sha256')
+    self.RunKms('keys', 'update', ck, '--location', self.glbl, '--keyring',
+                self.keyring, '--default-algorithm', 'rsa-sign-pss-2048-sha256')
 
-    self.RunKmsAlpha('keys', 'versions', 'create', '--key', ck, '--keyring',
-                     self.keyring, '--location', self.glbl)
+    self.RunKms('keys', 'versions', 'create', '--key', ck, '--keyring',
+                self.keyring, '--location', self.glbl)
 
     self.ReRunUntilOutputContains(
         self.FormatCmdKms('keys', 'versions', 'describe', '2', '--key', ck,

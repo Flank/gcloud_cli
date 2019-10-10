@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -201,7 +201,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
   def testUriSupport(self):
     self.Run("""
         compute images create my-image
-          --source-disk https://www.googleapis.com/compute/{}/projects/my-project/zones/central2-b/disks/my-disk
+          --source-disk https://compute.googleapis.com/compute/{}/projects/my-project/zones/central2-b/disks/my-disk
         """.format(self.api_version))
 
     self.CheckRequests(
@@ -255,7 +255,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
     )
 
   def testSingleLicense(self):
-    licenses = ['https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+    licenses = ['https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
                 'global/licenses/rhel-6-server']
     self.Run("""
         compute images create my-image --description nifty
@@ -278,11 +278,11 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
     )
 
   def testMultipleLicenses(self):
-    licenses = ['https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+    licenses = ['https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
                 'global/licenses/rhel-6-server',
-                'https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+                'https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
                 'global/licenses/rhel-7-server',
-                'https://www.googleapis.com/compute/v1/projects/rhel-cloud/'
+                'https://compute.googleapis.com/compute/v1/projects/rhel-cloud/'
                 'global/licenses/rhel-8-server',
                ]
     self.Run("""
@@ -593,7 +593,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               image=m.Image(
                   labels=m.Image.LabelsValue(
                       additionalProperties=[
-                          m.Image.LabelsValue.AdditionalProperty(
+                          m.Image.LabelsValue.AdditionalProperty(  # pylint:disable=g-complex-comprehension
                               key=key, value=value)
                           for key, value in sorted(
                               six.iteritems(labels_in_request))]),
@@ -1004,6 +1004,26 @@ class ImagesCreateBetaTest(ImagesCreateTest):
     self.AssertLogContains(
         'Flag force-create is deprecated. Use --force instead.')
 
+  def testStorageLocation(self):
+    self.Run("""
+        compute images create my-image
+          --source-uri gs://31dd/source-image
+          --storage-location us-central1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source=_STORAGE_IMAGE_URL),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
+                  storageLocations=['us-central1']),
+              project='my-project'))],
+    )
+
 
 class ImagesCreateAlphaTest(ImagesCreateBetaTest):
   """Tests for features currently available in alpha."""
@@ -1117,26 +1137,6 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
     choices.sort()
 
     self.assertEqual(enums, choices)
-
-  def testStorageLocation(self):
-    self.Run("""
-        compute images create my-image
-          --source-uri gs://31dd/source-image
-          --storage-location us-central1
-        """)
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
-                  storageLocations=['us-central1']),
-              project='my-project'))],
-    )
 
   def testShieldedInstanceInitialState(self):
     self.Run("""

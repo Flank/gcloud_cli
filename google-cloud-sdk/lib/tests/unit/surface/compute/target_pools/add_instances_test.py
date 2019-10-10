@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
               targetPoolsAddInstanceRequest=(
                   messages.TargetPoolsAddInstanceRequest(
                       instances=[messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/v1/'
+                          instance=('https://compute.googleapis.com/compute/v1/'
                                     'projects/my-project/zones/us-central2-a/'
                                     'instances/my-instance'))]))))],
     )
@@ -67,11 +67,11 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
                   messages.TargetPoolsAddInstanceRequest(
                       instances=[
                           messages.InstanceReference(
-                              instance=('https://www.googleapis.com/compute/v1/'
+                              instance=('https://compute.googleapis.com/compute/v1/'
                                         'projects/my-project/zones/'
                                         'us-central2-a/instances/instance-1')),
                           messages.InstanceReference(
-                              instance=('https://www.googleapis.com/compute/v1/'
+                              instance=('https://compute.googleapis.com/compute/v1/'
                                         'projects/my-project/zones/'
                                         'us-central2-a/instances/instance-2')),
                       ]))))],
@@ -82,9 +82,9 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
     # different regions) here.
     self.Run("""
         compute target-pools add-instances
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/targetPools/my-pool
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/targetPools/my-pool
           --instances
-              https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance-1,https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instances/my-instance-2
+              https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance-1,https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instances/my-instance-2
         """)
 
     self.CheckRequests(
@@ -98,12 +98,12 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
                   messages.TargetPoolsAddInstanceRequest(
                       instances=[
                           messages.InstanceReference(
-                              instance=('https://www.googleapis.com/compute/v1/'
+                              instance=('https://compute.googleapis.com/compute/v1/'
                                         'projects/my-project/zones/'
                                         'us-central1-a/instances/'
                                         'my-instance-1')),
                           messages.InstanceReference(
-                              instance=('https://www.googleapis.com/compute/v1/'
+                              instance=('https://compute.googleapis.com/compute/v1/'
                                         'projects/my-project/zones/'
                                         'us-central1-b/instances/my-instance-2')
                           )]))))],
@@ -114,9 +114,9 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
         'Instances must all be in the same region as the target pool.'):
       self.Run("""
           compute target-pools add-instances
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/targetPools/my-pool
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/targetPools/my-pool
             --instances
-                https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance-1,https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central2-a/instances/my-instance-2
+                https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance-1,https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central2-a/instances/my-instance-2
         """)
 
     self.CheckRequests()
@@ -126,10 +126,10 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
         'Instances must all be in the same region as the target pool.'):
       self.Run("""
           compute target-pools add-instances
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/targetPools/my-pool
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/targetPools/my-pool
             --region us-central2
             --instances
-                https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance-1
+                https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance-1
         """)
 
     self.CheckRequests()
@@ -167,12 +167,12 @@ class TargetPoolsAddInstanceTest(test_base.BaseTest):
                   messages.TargetPoolsAddInstanceRequest(
                       instances=[
                           messages.InstanceReference(
-                              instance=('https://www.googleapis.com/compute/v1/'
+                              instance=('https://compute.googleapis.com/compute/v1/'
                                         'projects/my-project/zones/'
                                         'us-central1-a/instances/'
                                         'my-instance-1')),
                           messages.InstanceReference(
-                              instance=('https://www.googleapis.com/compute/v1/'
+                              instance=('https://compute.googleapis.com/compute/v1/'
                                         'projects/my-project/zones/'
                                         'us-central1-a/instances/my-instance-2')
                           )]))))],

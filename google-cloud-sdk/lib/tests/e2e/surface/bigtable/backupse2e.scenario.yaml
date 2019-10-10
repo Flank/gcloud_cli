@@ -1,0 +1,286 @@
+title: Create, Describe, Update, List and Delete a backup
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: bigtable backups create $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster --table do-not-delete-table --retention-period
+      2w
+  - stderr: |
+      Create request issued for: [$$my-backup$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created backup [$$my-backup$$].
+- execute:
+  - command: bigtable operations describe $$operation$$
+  - stdout: |-
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.bigtable.admin.v2.CreateBackupMetadata.*
+        name: $$my-backup$$
+        sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table.*
+      name: $$operation$$
+      response:
+        '@type': type.googleapis.com/google.bigtable.admin.v2.Backup.*
+        name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$.*
+        sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table.*
+        state: READY
+      $
+- execute:
+  - command: bigtable operations list --instance=cloud-bigtable-static-instance --limit=1
+  - stdout: |-
+      OPERATION_ID.*INSTANCE.*DONE.*START_TIME.*END_TIME
+      .*cloud-bigtable-static-instance.*True.*
+      $
+- execute:
+  - command: bigtable backups describe $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster
+  - stdout: |-
+      endTime: '.*'
+      expireTime: '.*'
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+      sizeBytes: '.*'
+      sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+      startTime: '.*'
+      state: READY
+      $
+- execute:
+  - command: bigtable backups update $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster --retention-period 10d
+  - stderr: |
+      Updated backup [$$my-backup$$].
+  - stdout: |-
+      endTime: '.*'
+      expireTime: '.*'
+      name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+      sizeBytes: '.*'
+      sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+      startTime: '.*'
+      state: READY
+      $
+- execute:
+  - command: |
+      bigtable backups list --instance cloud-bigtable-static-instance --cluster cloud-bigtable-static-cluster
+  - stdout: |-
+      NAME.*CLUSTER.*TABLE.*EXPIRE_TIME.*STATE
+      .*$$my-backup$$.*cloud-bigtable-static-cluster.*do-not-delete-table.*READY.*
+      $
+- execute:
+  - command: |
+      bigtable instances tables restore --source projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+      --destination projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/$$my-table$$
+  - progress_tracker:
+    - message: Creating bigtable table $$my-table$$
+    - status: SUCCESS
+- execute:
+  - command: bigtable backups delete $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster
+  - prompt:
+    - message: You are about to delete backup [$$my-backup$$]
+    - input: y
+  - stderr: |
+      Deleted backup [$$my-backup$$].
+
+actions:
+- generate_resource_id:
+    reference: my-backup
+    prefix: mybackup
+
+- generate_resource_id:
+    reference: my-table
+    prefix: mytable
+
+- execute_command:
+    command: bigtable backups create $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster --table do-not-delete-table --retention-period
+      2w
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups?alt=json&backupId=$$my-backup$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '554'
+            content-type: application/json; charset=UTF-8
+            expect-ct: preload
+            status: '200'
+          body:
+            name: operations/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$/locations/us-east1-b/operations/7007571945579088155
+            metadata:
+              '@type': type.googleapis.com/google.bigtable.admin.v2.CreateBackupMetadata
+              name: $$my-backup$$
+              sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+        poll_operation: true
+    - expect_stderr: |
+        Create request issued for: [$$my-backup$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - expireTime
+          - startTime
+          - endTime
+          - sizeBytes
+          headers:
+            cache-control: private
+            content-length: '468'
+            content-type: application/json; charset=UTF-8
+            expect-ct: preload
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+            sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+            state: READY
+    - expect_stderr: |
+        Created backup [$$my-backup$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: bigtable operations describe $$operation$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - expireTime
+          - startTime
+          - endTime
+          - sizeBytes
+          headers:
+            cache-control: private
+            content-length: '1207'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: $$operation$$
+            metadata:
+              '@type': type.googleapis.com/google.bigtable.admin.v2.CreateBackupMetadata
+              name: $$my-backup$$
+              sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+            done: true
+            response:
+              '@type': type.googleapis.com/google.bigtable.admin.v2.Backup
+              name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+              sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+              state: READY
+    - expect_stdout:
+        matches: |
+          done: true
+          metadata:
+            '@type': type.googleapis.com/google.bigtable.admin.v2.CreateBackupMetadata.*
+            name: $$my-backup$$
+            sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table.*
+          name: $$operation$$
+          response:
+            '@type': type.googleapis.com/google.bigtable.admin.v2.Backup.*
+            name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$.*
+            sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table.*
+            state: READY
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: bigtable operations list --instance=cloud-bigtable-static-instance --limit=1
+    validation_only: true
+    events:
+    - expect_stdout:
+        matches: |
+          OPERATION_ID.*INSTANCE.*DONE.*START_TIME.*END_TIME
+          .*cloud-bigtable-static-instance.*True.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: bigtable backups describe $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster
+    validation_only: true
+    events:
+    - expect_stdout:
+        matches: |
+          endTime: '.*'
+          expireTime: '.*'
+          name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+          sizeBytes: '.*'
+          sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+          startTime: '.*'
+          state: READY
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: bigtable backups update $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster --retention-period 10d
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Updated backup [$$my-backup$$].
+    - expect_stdout:
+        matches: |
+          endTime: '.*'
+          expireTime: '.*'
+          name: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+          sizeBytes: '.*'
+          sourceTable: projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/do-not-delete-table
+          startTime: '.*'
+          state: READY
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      bigtable backups list --instance cloud-bigtable-static-instance --cluster cloud-bigtable-static-cluster
+    validation_only: true
+    events:
+    - expect_stdout:
+        matches: |
+          NAME.*CLUSTER.*TABLE.*EXPIRE_TIME.*STATE
+          .*$$my-backup$$.*cloud-bigtable-static-cluster.*do-not-delete-table.*READY.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      bigtable instances tables restore --source projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/clusters/cloud-bigtable-static-cluster/backups/$$my-backup$$
+      --destination projects/cloud-sdk-integration-testing/instances/cloud-bigtable-static-instance/tables/$$my-table$$
+    cleanup_for: my-table
+    validation_only: true
+    events:
+    - expect_progress_tracker:
+        message: Creating bigtable table $$my-table$$
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: bigtable backups delete $$my-backup$$ --instance cloud-bigtable-static-instance
+      --cluster cloud-bigtable-static-cluster
+    cleanup_for: my-backup
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete backup [$$my-backup$$]
+        user_input: y
+    - expect_stderr: |
+        Deleted backup [$$my-backup$$].
+    - expect_exit:
+        code: 0

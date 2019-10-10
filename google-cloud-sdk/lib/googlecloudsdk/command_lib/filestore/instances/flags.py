@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.filestore import filestore_client
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.filestore import flags
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.args import labels_util
@@ -61,12 +62,8 @@ FILE_SHARE_ARG_SPEC = {
 }
 
 
-def AddAsyncFlag(parser, operation):
-  parser.add_argument(
-      '--async',
-      action='store_true',
-      default=False,
-      help='Do not wait for the {} operation to complete.'.format(operation))
+def AddAsyncFlag(parser):
+  base.ASYNC_FLAG.AddToParser(parser)
 
 
 def AddLocationArg(parser):
@@ -117,7 +114,7 @@ def AddNetworkArg(parser):
       instance is connected.
 
       *reserved-ip-range*::: A /29 CIDR block in one of the
-      [internal IP address ranges(https://www.arin.net/knowledge/address_filters.html)
+      [internal IP address ranges](https://www.arin.net/knowledge/address_filters.html)
       that identifies the range of IP addresses reserved for this
       instance. For example, 10.0.0.0/29 or 192.168.0.0/29. The range you
       specify can't overlap with either existing subnets or assigned IP address
@@ -156,7 +153,8 @@ def AddFileShareArg(parser, include_snapshot_flags=False, required=True):
       *source-snapshot*::: The name of the snapshot to restore from.
 
       *source-snapshot-region*::: The region of the source snapshot. If
-      unspecified, the region of the instance will be used.
+      unspecified, it is assumed that the Filestore snapshot is local and
+      instance-zone will be used.
       """
   parser.add_argument(
       '--file-share',
@@ -175,7 +173,7 @@ def AddInstanceCreateArgs(parser, api_version):
   AddLocationArg(parser)
   messages = filestore_client.GetMessages(version=api_version)
   GetTierArg(messages).choice_arg.AddToParser(parser)
-  AddAsyncFlag(parser, 'create')
+  AddAsyncFlag(parser)
   AddFileShareArg(parser, include_snapshot_flags=
                   (api_version == filestore_client.ALPHA_API_VERSION))
   AddNetworkArg(parser)
@@ -188,6 +186,6 @@ def AddInstanceUpdateArgs(parser):
       'The instance to update.')]).AddToParser(parser)
   AddDescriptionArg(parser)
   AddLocationArg(parser)
-  AddAsyncFlag(parser, 'update')
+  AddAsyncFlag(parser)
   labels_util.AddUpdateLabelsFlags(parser)
   AddFileShareArg(parser, required=False)

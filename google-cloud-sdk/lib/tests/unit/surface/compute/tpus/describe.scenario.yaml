@@ -3,6 +3,7 @@ release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - label: Base Case
   - command: compute tpus describe dec-tpu-3 --zone us-central1-b
   - stdout: |
       acceleratorType: v2-8

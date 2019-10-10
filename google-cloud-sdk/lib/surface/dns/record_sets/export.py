@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,16 +43,16 @@ class Export(base.Command):
 
   To export record-sets into a yaml file, run:
 
-    $ {command} records.yaml --zone examplezonename
+    $ {command} records.yaml --zone=examplezonename
 
   To export record-sets into a BIND zone formatted file instead, run:
 
-    $ {command} pathto.zonefile --zone examplezonename --zone-file-format
+    $ {command} pathto.zonefile --zone=examplezonename --zone-file-format
 
   Similarly, to import record-sets into a BIND zone formatted zone file, run:
 
     $ gcloud dns record-sets import pathto.zonefile --zone-file-format \
-      --zone examplezonename
+      --zone=examplezonename
   """
 
   @staticmethod
@@ -78,6 +78,8 @@ class Export(base.Command):
     # this patter of checking ReleaseTrack. Break this into multiple classes.
     if self.ReleaseTrack() == base.ReleaseTrack.BETA:
       api_version = 'v1beta2'
+    if self.ReleaseTrack() == base.ReleaseTrack.ALPHA:
+      api_version = 'v1alpha2'
 
     dns = apis.GetClientInstance('dns', api_version)
 

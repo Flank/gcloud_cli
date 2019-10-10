@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
 
     request = self._ExpectCreate(policy)
 
-    result = self.Run('compute resource-policies create-snapshot-schedule pol1 '
+    result = self.Run('compute resource-policies create snapshot-schedule pol1 '
                       '--start-time 04:00Z --region {} --daily-schedule '
                       '--max-retention-days 1'.format(self.region))
 
@@ -84,7 +84,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 '
+        'compute resource-policies create snapshot-schedule pol1 '
         '--start-time 04:00Z --region {} --description "{}" --daily-schedule '
         '--max-retention-days 1'.format(self.region, description))
 
@@ -107,7 +107,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1'
+        'compute resource-policies create snapshot-schedule pol1'
         ' --start-time 03:00.52-1:00 --region {} --daily-schedule '
         '--max-retention-days 1'.format(self.region))
 
@@ -130,7 +130,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 --region {} '
+        'compute resource-policies create snapshot-schedule pol1 --region {} '
         ' --start-time 04:00Z --hourly-schedule 2 '
         '--max-retention-days 1'.format(self.region))
 
@@ -155,7 +155,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 --region {} '
+        'compute resource-policies create snapshot-schedule pol1 --region {} '
         ' --start-time 04:00Z --weekly-schedule monday '
         '--max-retention-days 1'.format(self.region))
 
@@ -186,7 +186,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     schedule_file = self.Touch(self.temp_path, 'my-schedule.json',
                                contents=contents)
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 --region {0} '
+        'compute resource-policies create snapshot-schedule pol1 --region {0} '
         '--max-retention-days 3 --weekly-schedule-from-file {1}'.format(
             self.region, schedule_file))
 
@@ -211,7 +211,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 --region {} '
+        'compute resource-policies create snapshot-schedule pol1 --region {} '
         ' --start-time 17:00-07 --weekly-schedule wednesday '
         '--max-retention-days 1'.format(self.region))
 
@@ -242,7 +242,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     schedule_file = self.Touch(self.temp_path, 'my-schedule.json',
                                contents=contents)
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 --region {0} '
+        'compute resource-policies create snapshot-schedule pol1 --region {0} '
         '--max-retention-days 3 --weekly-schedule-from-file {1}'.format(
             self.region, schedule_file))
 
@@ -268,7 +268,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 --region {} '
+        'compute resource-policies create snapshot-schedule pol1 --region {} '
         '--start-time 04:00Z --hourly-schedule 2 --max-retention-days 1 '
         '--on-source-disk-delete keep-auto-snapshots'.format(self.region))
 
@@ -309,7 +309,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     request = self._ExpectCreate(policy)
 
     result = self.Run(
-        'compute resource-policies create-snapshot-schedule pol1 '
+        'compute resource-policies create snapshot-schedule pol1 '
         '--start-time 04:00Z --region {} --description "{}" --daily-schedule '
         '--max-retention-days 1 --guest-flush --snapshot-labels k1=v1,k2=v2 {}'
         .format(self.region, description, storage_location_flag))
@@ -322,7 +322,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
         exceptions.InvalidArgumentException,
         'cannot request a non-daily cycle.'):
       self.Run(
-          'compute resource-policies create-snapshot-schedule pol1 --region {0}'
+          'compute resource-policies create snapshot-schedule pol1 --region {0}'
           ' --max-retention-days 1 --no-daily-schedule  --start-time 04:00Z'
           .format(self.region))
 
@@ -332,7 +332,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
   def testCreate_FreqGroupValidation(self, flags):
     with self.AssertRaisesArgumentError():
       self.Run(
-          'compute resource-policies create-snapshot-schedule pol1 --region {0}'
+          'compute resource-policies create snapshot-schedule pol1 --region {0}'
           ' --max-retention-days 1 {1}'.format(self.region, flags))
 
   @parameterized.parameters(
@@ -354,7 +354,7 @@ class CreateSnapshotScheduleBetaTest(resource_policies_base.TestBase,
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException, message):
       self.Run(
-          'compute resource-policies create-snapshot-schedule pol1 --region {0}'
+          'compute resource-policies create snapshot-schedule pol1 --region {0}'
           ' --max-retention-days 1 --weekly-schedule-from-file {1}'.format(
               self.region, schedule_file))
 

@@ -5,7 +5,7 @@
  "name": "toolresults",
  "canonicalName": "Tool Results",
  "version": "v1beta3",
- "revision": "20190506",
+ "revision": "20191001",
  "title": "Cloud Tool Results API",
  "description": "Reads and publishes results from Firebase Test Lab.",
  "ownerDomain": "google.com",
@@ -342,7 +342,7 @@
   "Duration": {
    "id": "Duration",
    "type": "object",
-   "description": "A Duration represents a signed, fixed-length span of time represented as a count of seconds and fractions of seconds at nanosecond resolution. It is independent of any calendar and concepts like \"day\" or \"month\". It is related to Timestamp in that the difference between two Timestamp values is a Duration and it can be added or subtracted from a Timestamp. Range is approximately +-10,000 years.\n\n# Examples\n\nExample 1: Compute Duration from two Timestamps in pseudo code.\n\nTimestamp start = ...; Timestamp end = ...; Duration duration = ...;\n\nduration.seconds = end.seconds - start.seconds; duration.nanos = end.nanos - start.nanos;\n\nif (duration.seconds  0) { duration.seconds += 1; duration.nanos -= 1000000000; } else if (durations.seconds \u003e 0 && duration.nanos \u003c 0) { duration.seconds -= 1; duration.nanos += 1000000000; }\n\nExample 2: Compute Timestamp from Timestamp + Duration in pseudo code.\n\nTimestamp start = ...; Duration duration = ...; Timestamp end = ...;\n\nend.seconds = start.seconds + duration.seconds; end.nanos = start.nanos + duration.nanos;\n\nif (end.nanos = 1000000000) { end.seconds += 1; end.nanos -= 1000000000; }\n\nExample 3: Compute Duration from datetime.timedelta in Python.\n\ntd = datetime.timedelta(days=3, minutes=10) duration = Duration() duration.FromTimedelta(td)\n\n# JSON Mapping\n\nIn JSON format, the Duration type is encoded as a string rather than an object, where the string ends in the suffix \"s\" (indicating seconds) and is preceded by the number of seconds, with nanoseconds expressed as fractional seconds. For example, 3 seconds with 0 nanoseconds should be encoded in JSON format as \"3s\", while 3 seconds and 1 nanosecond should be expressed in JSON format as \"3.000000001s\", and 3 seconds and 1 microsecond should be expressed in JSON format as \"3.000001s\".",
+   "description": "A Duration represents a signed, fixed-length span of time represented as a count of seconds and fractions of seconds at nanosecond resolution. It is independent of any calendar and concepts like \"day\" or \"month\". It is related to Timestamp in that the difference between two Timestamp values is a Duration and it can be added or subtracted from a Timestamp. Range is approximately +-10,000 years.\n\n# Examples\n\nExample 1: Compute Duration from two Timestamps in pseudo code.\n\nTimestamp start = ...; Timestamp end = ...; Duration duration = ...;\n\nduration.seconds = end.seconds - start.seconds; duration.nanos = end.nanos - start.nanos;\n\nif (duration.seconds  0) { duration.seconds += 1; duration.nanos -= 1000000000; } else if (duration.seconds \u003e 0 && duration.nanos \u003c 0) { duration.seconds -= 1; duration.nanos += 1000000000; }\n\nExample 2: Compute Timestamp from Timestamp + Duration in pseudo code.\n\nTimestamp start = ...; Duration duration = ...; Timestamp end = ...;\n\nend.seconds = start.seconds + duration.seconds; end.nanos = start.nanos + duration.nanos;\n\nif (end.nanos = 1000000000) { end.seconds += 1; end.nanos -= 1000000000; }\n\nExample 3: Compute Duration from datetime.timedelta in Python.\n\ntd = datetime.timedelta(days=3, minutes=10) duration = Duration() duration.FromTimedelta(td)\n\n# JSON Mapping\n\nIn JSON format, the Duration type is encoded as a string rather than an object, where the string ends in the suffix \"s\" (indicating seconds) and is preceded by the number of seconds, with nanoseconds expressed as fractional seconds. For example, 3 seconds with 0 nanoseconds should be encoded in JSON format as \"3s\", while 3 seconds and 1 nanosecond should be expressed in JSON format as \"3.000000001s\", and 3 seconds and 1 microsecond should be expressed in JSON format as \"3.000001s\".",
    "externalTypeName": "google.protobuf.Duration",
    "properties": {
     "nanos": {
@@ -408,6 +408,7 @@
   "FailureDetail": {
    "id": "FailureDetail",
    "type": "object",
+   "description": "Details for an outcome with a FAILURE outcome summary.",
    "externalTypeName": "google.devtools.toolresults.v1.FailureDetail",
    "properties": {
     "crashed": {
@@ -578,11 +579,16 @@
   "InconclusiveDetail": {
    "id": "InconclusiveDetail",
    "type": "object",
+   "description": "Details for an outcome with an INCONCLUSIVE outcome summary.",
    "externalTypeName": "google.devtools.toolresults.v1.InconclusiveDetail",
    "properties": {
     "abortedByUser": {
      "type": "boolean",
      "description": "If the end user aborted the test execution before a pass or fail could be determined. For example, the user pressed ctrl-c which sent a kill signal to the test runner while the test was running."
+    },
+    "hasErrorLogs": {
+     "type": "boolean",
+     "description": "If results are being provided to the user in certain cases of infrastructure failures"
     },
     "infrastructureFailure": {
      "type": "boolean",
@@ -929,7 +935,7 @@
    "properties": {
     "sampleTime": {
      "$ref": "Timestamp",
-     "description": "Timestamp of collection"
+     "description": "Timestamp of collection."
     },
     "value": {
      "type": "number",
@@ -1088,6 +1094,7 @@
   "SkippedDetail": {
    "id": "SkippedDetail",
    "type": "object",
+   "description": "Details for an outcome with a SKIPPED outcome summary.",
    "externalTypeName": "google.devtools.toolresults.v1.SkippedDetail",
    "properties": {
     "incompatibleAppVersion": {
@@ -1131,7 +1138,7 @@
   "Status": {
    "id": "Status",
    "type": "object",
-   "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users - Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of [google.rpc.Code][], but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.",
+   "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
    "externalTypeName": "google.rpc.Status",
    "properties": {
     "code": {
@@ -1155,7 +1162,7 @@
   "Step": {
    "id": "Step",
    "type": "object",
-   "description": "A Step represents a single operation performed as part of Execution. A step can be used to represent the execution of a tool ( for example a test runner execution or an execution of a compiler).\n\nSteps can overlap (for instance two steps might have the same start time if some operations are done in parallel).\n\nHere is an example, let's consider that we have a continuous build is executing a test runner for each iteration. The workflow would look like: - user creates a Execution with id 1 - user creates an TestExecutionStep with id 100 for Execution 1 - user update TestExecutionStep with id 100 to add a raw xml log + the service parses the xml logs and returns a TestExecutionStep with updated TestResult(s). - user update the status of TestExecutionStep with id 100 to COMPLETE\n\nA Step can be updated until its state is set to COMPLETE at which points it becomes immutable.",
+   "description": "A Step represents a single operation performed as part of Execution. A step can be used to represent the execution of a tool ( for example a test runner execution or an execution of a compiler).\n\nSteps can overlap (for instance two steps might have the same start time if some operations are done in parallel).\n\nHere is an example, let's consider that we have a continuous build is executing a test runner for each iteration. The workflow would look like: - user creates a Execution with id 1 - user creates an TestExecutionStep with id 100 for Execution 1 - user update TestExecutionStep with id 100 to add a raw xml log + the service parses the xml logs and returns a TestExecutionStep with updated TestResult(s). - user update the status of TestExecutionStep with id 100 to COMPLETE\n\nA Step can be updated until its state is set to COMPLETE at which points it becomes immutable.\n\nNext tag: 27",
    "externalTypeName": "google.devtools.toolresults.v1.Step",
    "properties": {
     "completionTime": {
@@ -1267,6 +1274,7 @@
   "SuccessDetail": {
    "id": "SuccessDetail",
    "type": "object",
+   "description": "Details for an outcome with a SUCCESS outcome summary.",
    "externalTypeName": "google.devtools.toolresults.v1.SuccessDetail",
    "properties": {
     "otherNativeCrash": {
@@ -1280,6 +1288,10 @@
    "type": "object",
    "externalTypeName": "google.devtools.toolresults.v1.TestCase",
    "properties": {
+    "elapsedTime": {
+     "$ref": "Duration",
+     "description": "The elapsed run time of the test case.\n\nRequired."
+    },
     "endTime": {
      "$ref": "Timestamp",
      "description": "The end time of the test case.\n\nOptional."
@@ -1305,10 +1317,12 @@
      "enum": [
       "error",
       "failed",
+      "flaky",
       "passed",
       "skipped"
      ],
      "enumDescriptions": [
+      "",
       "",
       "",
       "",
@@ -1434,8 +1448,10 @@
      "enum": [
       "anr",
       "availableDeepLinks",
+      "blankScreen",
       "compatibleWithOrchestrator",
       "completeRoboScriptExecution",
+      "crashDialogError",
       "encounteredLoginScreen",
       "encounteredNonAndroidUiWidgetScreen",
       "failedToInstall",
@@ -1449,15 +1465,21 @@
       "nativeCrash",
       "nonSdkApiUsageReport",
       "nonSdkApiUsageViolation",
+      "overlappingUiElements",
       "performedGoogleLogin",
       "performedMonkeyActions",
       "startActivityNotFound",
+      "uiElementsTooDeep",
       "unspecifiedType",
       "unusedRoboDirective",
       "usedRoboDirective",
       "usedRoboIgnoreDirective"
      ],
      "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
       "",
       "",
       "",
@@ -1496,6 +1518,10 @@
    "description": "A summary of a test suite result either parsed from XML or uploaded directly by a user.\n\nNote: the API related comments are for StepService only. This message is also being used in ExecutionService in a read only mode for the corresponding step.",
    "externalTypeName": "google.devtools.toolresults.v1.TestSuiteOverview",
    "properties": {
+    "elapsedTime": {
+     "$ref": "Duration",
+     "description": "Elapsed time of test suite."
+    },
     "errorCount": {
      "type": "integer",
      "description": "Number of test cases in error, typically set by the service by parsing the xml_source.\n\n- In create/response: always set - In update request: never",
@@ -2071,19 +2097,19 @@
            "parameters": {
             "executionId": {
              "type": "string",
-             "description": "A Execution id.\n\nRequired.",
+             "description": "Required. An Execution id.",
              "required": true,
              "location": "path"
             },
             "historyId": {
              "type": "string",
-             "description": "A History id.\n\nRequired.",
+             "description": "Required. A History id.",
              "required": true,
              "location": "path"
             },
             "projectId": {
              "type": "string",
-             "description": "A Project id.\n\nRequired.",
+             "description": "Required. A Project id.",
              "required": true,
              "location": "path"
             },

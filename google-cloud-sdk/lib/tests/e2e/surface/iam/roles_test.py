@@ -19,7 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from tests.lib import test_case
 from tests.lib.surface.iam import e2e_test_base
 
 
@@ -42,8 +41,8 @@ class RolesTest(e2e_test_base.CustomRolesBaseTest):
     self.DeleteRole()
     self.UndeleteRole()
 
-  @test_case.Filters.skip('Failing', 'b/132247210')
   def testListTestablePermissions(self):
+    self._dirs_size_limit_method = 2<<21
     self.SetPermissions('buckets')
     self.ClearOutputs()
     self.Run(

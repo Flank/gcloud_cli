@@ -1,0 +1,63 @@
+title: build-artifacts repositories get-iam-policy
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: build-artifacts repositories get-iam-policy my-repo --project=my-project
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:oldtest@gmail.com
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+actions:
+- execute_command:
+    command: build-artifacts repositories get-iam-policy my-repo --project=my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://buildartifacts.googleapis.com/v1alpha2/projects/my-project/repositories/my-repo:getIamPolicy?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:oldtest@gmail.com",
+                    "user:test@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:oldtest@gmail.com
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

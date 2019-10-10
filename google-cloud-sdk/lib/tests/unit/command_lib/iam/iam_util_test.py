@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import argparse
+import copy
 import json
-import pickle
 
 from apitools.base.py import encoding
 
@@ -360,12 +360,12 @@ class IAMUtilTest(cli_test_base.CliTestBase, parameterized.TestCase):
     args = parser.parse_args(['--role=roles/editor',
                               '--member=user:etest@gmail.com'])
 
-    expected_policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY)
     expected_policy.bindings.append(self.messages.Binding(
         members=['user:etest@gmail.com'],
         role='roles/editor'))
 
-    actual_policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY)
     iam_util.AddBindingToIamPolicy(self.messages.Binding, actual_policy,
                                    args.member, args.role)
 
@@ -395,17 +395,17 @@ class IAMUtilTest(cli_test_base.CliTestBase, parameterized.TestCase):
     args = parser.parse_args(['--role=roles/owner',
                               '--member=user:slick@gmail.com'])
 
-    expected_policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY)
     expected_policy.bindings[0].members.remove('user:slick@gmail.com')
 
-    actual_policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY)
     iam_util.RemoveBindingFromIamPolicy(actual_policy,
                                         args.member, args.role)
 
     self.assertEqual(actual_policy, expected_policy)
 
   def testRemoveNonExistingBindingFromIamPolicy(self):
-    policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
+    policy = copy.deepcopy(self.TEST_IAM_POLICY)
     message = 'Policy binding with the specified member and role not found!'
     with self.assertRaisesRegex(iam_util.IamPolicyBindingNotFound, message):
       iam_util.RemoveBindingFromIamPolicy(policy,
@@ -470,7 +470,7 @@ class IAMUtilTest(cli_test_base.CliTestBase, parameterized.TestCase):
                           contents=bad_contents)
     with self.assertRaisesRegex(iam_util.IamEtagReadError,
                                 r'The etag of policy file \[.*\] is not '
-                                'properly formatted. .*Incorrect padding'):
+                                'properly formatted.'):
       iam_util.ParsePolicyFile(bad_file, self.messages.Policy)
 
   def testParseIamPolicyWithMask(self):
@@ -510,8 +510,7 @@ class IAMUtilPolicyNoConditionTest(cli_test_base.CliTestBase,
   }
 
   def testAddBindingToIamPolicyWithCondition(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     # when user does not specify --condition
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
@@ -520,8 +519,7 @@ class IAMUtilPolicyNoConditionTest(cli_test_base.CliTestBase,
         member='user:viewer@gmail.com',
         role='roles/viewer',
         condition=None)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     expected_policy.bindings.append(
         self.messages.Binding(
             members=['user:viewer@gmail.com'],
@@ -531,8 +529,7 @@ class IAMUtilPolicyNoConditionTest(cli_test_base.CliTestBase,
     self.AssertErrNotContains('Adding binding with condition to a policy')
 
   def testAddBindingToIamPolicyWithCondition_Existing(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     # when user does not specify --condition
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
@@ -542,16 +539,14 @@ class IAMUtilPolicyNoConditionTest(cli_test_base.CliTestBase,
         role='roles/owner',
         condition=None)
 
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     expected_policy.bindings[0].members.append('user:owner@gmail.com')
 
     self.assertEqual(actual_policy, expected_policy)
     self.AssertErrNotContains('Adding binding with condition to a policy')
 
   def testAddBindingToIamPolicyWithCondition_WARNING(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
         self.messages.Expr,
@@ -559,8 +554,7 @@ class IAMUtilPolicyNoConditionTest(cli_test_base.CliTestBase,
         member='user:owner@gmail.com',
         role='roles/owner',
         condition=self.TEST_CONDITION)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     expected_policy.bindings.append(
         self.messages.Binding(
             members=['user:owner@gmail.com'],
@@ -576,21 +570,18 @@ class IAMUtilPolicyNoConditionTest(cli_test_base.CliTestBase,
     self.assertEqual(actual_policy, expected_policy)
 
   def testRemoveBindingFromIamPolicyWithCondition(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     iam_util.RemoveBindingFromIamPolicyWithCondition(
         policy=actual_policy,
         member='user:slick@gmail.com',
         role='roles/owner',
         condition=None)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     expected_policy.bindings[0].members.remove('user:slick@gmail.com')
     self.assertEqual(actual_policy, expected_policy)
 
   def testRemoveBindingFromIamPolicyWithCondition_NotFound(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_NONE_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_NONE_CONDITION)
     with self.AssertRaisesExceptionMatches(
         iam_util.IamPolicyBindingNotFound,
         r'Policy binding with the specified member'
@@ -673,8 +664,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         'Adding a binding without specifying a condition to a '
         'policy containing conditions is prohibited in non-interactive '
         'mode. Run the command again with `--condition=None`'):
-      actual_policy = pickle.loads(
-          pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+      actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
       iam_util.AddBindingToIamPolicyWithCondition(
           self.messages.Binding,
           self.messages.Expr,
@@ -684,8 +674,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
           condition=None)
 
   def testAddBindingToIamPolicyWithCondition_NoPrompt(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
         self.messages.Expr,
@@ -693,8 +682,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         member='user:owner@gmail.com',
         role='roles/non-primitive',
         condition=self.TEST_CONDITION)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings[0].members.append('user:owner@gmail.com')
     self.assertEqual(actual_policy, expected_policy)
     self.AssertErrNotContains(
@@ -703,8 +691,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
   def testAddBindingToIamPolicyWithCondition_PromptNoneCondition(self):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     self.WriteInput('2')
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
@@ -713,8 +700,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         member='user:owner@gmail.com',
         role='roles/non-primitive',
         condition=None)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings.append(
         self.messages.Binding(
             members=['user:owner@gmail.com'],
@@ -736,8 +722,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
     self.assertEqual(choices[2], 'Specify a new condition')
 
   def testAddBindingToIamPolicyWithCondition_SpecifyNoneCondition(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
         self.messages.Expr,
@@ -745,8 +730,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         member='user:owner@gmail.com',
         role='roles/non-primitive',
         condition=self.TEST_CONDITION_NONE)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings.append(
         self.messages.Binding(
             members=['user:owner@gmail.com'],
@@ -758,8 +742,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
   def testAddBindingToIamPolicyWithCondition_PromptNewCondition(self):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     self.WriteInput('3')
     self.WriteInput(
         ('expression=ip=whitelist_ip,title=whitelist ip,description='
@@ -771,8 +754,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         member='user:owner@gmail.com',
         role='roles/non-primitive',
         condition=None)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings[0].members.append('user:owner@gmail.com')
     self.assertEqual(actual_policy, expected_policy)
     err_message = self.GetErr().split('\n', 1)
@@ -798,8 +780,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         'title=[title],description=[description].\\nSpecify the condition:  "}')
 
   def testAddBindingToIamPolicyWithCondition_NewCondition(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     iam_util.AddBindingToIamPolicyWithCondition(
         self.messages.Binding,
         self.messages.Expr,
@@ -807,8 +788,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         member='user:tester@gmail.com',
         role='roles/tester',
         condition=self.TEST_CONDITION_NEW)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings.append(
         self.messages.Binding(
             members=['user:tester@gmail.com'],
@@ -823,31 +803,27 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
         'Adding binding with condition to a policy without condition')
 
   def testRemoveBindingFromIamPolicyWithCondition_NoPrompt(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     iam_util.RemoveBindingFromIamPolicyWithCondition(
         policy=actual_policy,
         member='user:tester@gmail.com',
         role='roles/non-primitive',
         condition=self.TEST_CONDITION)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings[0].members.remove('user:tester@gmail.com')
     self.assertEqual(actual_policy, expected_policy)
 
   def testRemoveBindingFromIamPolicyWithCondition_PromptOldCondition(self):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     self.WriteInput('1')
     iam_util.RemoveBindingFromIamPolicyWithCondition(
         policy=actual_policy,
         member='user:slick@gmail.com',
         role='roles/non-primitive',
         condition=None)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings[0].members.remove('user:slick@gmail.com')
     self.assertEqual(actual_policy, expected_policy)
     err_message = json.loads(self.GetErr())
@@ -863,15 +839,13 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
     self.assertEqual(choices[1], 'all conditions')
 
   def testRemoveBindingFromIamPolicyWithCondition_SpecifyNoneCondition(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     iam_util.RemoveBindingFromIamPolicyWithCondition(
         policy=actual_policy,
         member='user:peeker@gmail.com',
         role='roles/viewer',
         condition=self.TEST_CONDITION_NONE)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     expected_policy.bindings[1].members.remove('user:peeker@gmail.com')
     self.assertEqual(actual_policy, expected_policy)
     self.AssertErrNotContains('The policy contains bindings with conditions')
@@ -879,8 +853,7 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
   def testRemoveBindingFromIamPolicyWithCondition_NotFound_Prompt(self):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION)
     with self.AssertRaisesExceptionMatches(
         iam_util.IamPolicyBindingNotFound,
         r'Policy binding with the specified member and '
@@ -892,16 +865,14 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
           condition=None)
 
   def testRemoveBindingFromIamPolicyWithCondition_DeleteAll(self):
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE)
     iam_util.RemoveBindingFromIamPolicyWithCondition(
         policy=actual_policy,
         member='user:tester@gmail.com',
         role='roles/non-primitive',
         condition=None,
         all_conditions=True)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE)
     expected_policy.bindings[0].members.remove('user:tester@gmail.com')
     expected_policy.bindings[2].members.remove('user:tester@gmail.com')
     expected_policy.bindings[3].members.remove('user:tester@gmail.com')
@@ -910,16 +881,14 @@ class IAMUtilPolicyWithConditionTest(cli_test_base.CliTestBase,
   def testRemoveBindingFromIamPolicyWithCondition_Prompt_DeleteAll(self):
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    actual_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE))
+    actual_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE)
     self.WriteInput('4')
     iam_util.RemoveBindingFromIamPolicyWithCondition(
         policy=actual_policy,
         member='user:tester@gmail.com',
         role='roles/non-primitive',
         condition=None)
-    expected_policy = pickle.loads(
-        pickle.dumps(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE))
+    expected_policy = copy.deepcopy(self.TEST_IAM_POLICY_MIX_CONDITION_MULTIPLE)
     expected_policy.bindings[0].members.remove('user:tester@gmail.com')
     expected_policy.bindings[2].members.remove('user:tester@gmail.com')
     expected_policy.bindings[3].members.remove('user:tester@gmail.com')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import os
 import sys
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 
 
@@ -55,6 +56,9 @@ class DataprocTestBase(cli_test_base.CliTestBase):
     # Show captured output and error on debug and finer.
     if self.log.getEffectiveLevel() <= logging.DEBUG:
       self._show_test_output = True
+    # Setting a default value for region
+    if properties.VALUES.dataproc.region.Get() is None:
+      properties.VALUES.dataproc.region.Set('global')
 
   def RunDataproc(self, command, output_format='disable'):
     """Wrapper around test_base.Run to abstract out common args."""

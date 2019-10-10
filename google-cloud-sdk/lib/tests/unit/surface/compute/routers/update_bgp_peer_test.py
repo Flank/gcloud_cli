@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for peer [my-peer] in router [my-router] '
-        '[https://www.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
@@ -272,42 +272,17 @@ class UpdateBgpPeerTestBeta(UpdateBgpPeerTestGA):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
 
-
-class UpdateBgpPeerTestAlpha(UpdateBgpPeerTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-
   def testUpdateBfdFields(self):
     self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateDefaultRouterMessage(self.messages)
     orig.bgpPeers[
         0].enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.FALSE
-    orig.bgpPeers[0].bfd = self.messages.RouterBgpPeerBfd(
-        mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.PASSIVE,
-        minReceiveInterval=400,
-        minTransmitInterval=500,
-        multiplier=5,
-        packetMode=(self.messages.RouterBgpPeerBfd.PacketModeValueValuesEnum
-                    .CONTROL_ONLY),
-        slowTimerInterval=6000,
-    )
+    orig.bgpPeers[0].bfd = self._GetRouterBgpPeerBfdMessage()
 
     updated = copy.deepcopy(orig)
 
-    updated.bgpPeers[
-        0].enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.TRUE
-    updated.bgpPeers[0].bfd.mode = (
-        self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.PASSIVE)
-    updated.bgpPeers[0].bfd.minReceiveInterval = 700
-    updated.bgpPeers[0].bfd.minTransmitInterval = 800
-    updated.bgpPeers[0].bfd.multiplier = 4
-    updated.bgpPeers[0].bfd.packetMode = (
-        self.messages.RouterBgpPeerBfd.PacketModeValueValuesEnum
-        .CONTROL_AND_ECHO)
-    updated.bgpPeers[0].bfd.slowTimerInterval = 7000
+    self._UpdateRouterBgpPeerBfdMessage(updated.bgpPeers[0])
     self.ExpectGet(orig)
     self.ExpectPatch(updated)
     self.ExpectOperationsGet()
@@ -321,11 +296,53 @@ class UpdateBgpPeerTestAlpha(UpdateBgpPeerTestBeta):
         --bfd-min-receive-interval 700
         --bfd-min-transmit-interval 800
         --bfd-multiplier 4
-        --bfd-packet-mode CONTROL_AND_ECHO
-        --bfd-slow-timer-interval 7000
         """)
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
+
+  def _GetRouterBgpPeerBfdMessage(self):
+    return self.messages.RouterBgpPeerBfd(
+        sessionInitializationMode=self.messages.RouterBgpPeerBfd
+        .SessionInitializationModeValueValuesEnum.ACTIVE,
+        minReceiveInterval=400,
+        minTransmitInterval=500,
+        multiplier=5)
+
+  def _UpdateRouterBgpPeerBfdMessage(self, bgp_peer):
+    bgp_peer.enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.TRUE
+    bgp_peer.bfd.sessionInitializationMode = (
+        self.messages.RouterBgpPeerBfd.SessionInitializationModeValueValuesEnum
+        .PASSIVE)
+    bgp_peer.bfd.minReceiveInterval = 700
+    bgp_peer.bfd.minTransmitInterval = 800
+    bgp_peer.bfd.multiplier = 4
+
+
+class UpdateBgpPeerTestAlpha(UpdateBgpPeerTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def _GetRouterBgpPeerBfdMessage(self):
+    return self.messages.RouterBgpPeerBfd(
+        mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.ACTIVE,
+        sessionInitializationMode=self.messages.RouterBgpPeerBfd
+        .SessionInitializationModeValueValuesEnum.PASSIVE,
+        minReceiveInterval=400,
+        minTransmitInterval=500,
+        multiplier=5)
+
+  def _UpdateRouterBgpPeerBfdMessage(self, bgp_peer):
+    bgp_peer.enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.TRUE
+    bgp_peer.bfd.mode = (
+        self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.PASSIVE)
+    bgp_peer.bfd.sessionInitializationMode = (
+        self.messages.RouterBgpPeerBfd.SessionInitializationModeValueValuesEnum
+        .PASSIVE)
+    bgp_peer.bfd.minReceiveInterval = 700
+    bgp_peer.bfd.minTransmitInterval = 800
+    bgp_peer.bfd.multiplier = 4
 
 
 if __name__ == '__main__':

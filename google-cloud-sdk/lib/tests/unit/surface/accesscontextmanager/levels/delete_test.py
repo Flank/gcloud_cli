@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class LevelsDeleteTestGA(accesscontextmanager.Base):
@@ -39,9 +40,7 @@ class LevelsDeleteTestGA(accesscontextmanager.Base):
     m = self.messages
     request_type = m.AccesscontextmanagerAccessPoliciesAccessLevelsDeleteRequest
     self.client.accessPolicies_accessLevels.Delete.Expect(
-        request_type(
-            name=level_name
-        ),
+        request_type(name=level_name),
         self.messages.Operation(name='operations/my-op', done=False))
     self._ExpectGetOperation('operations/my-op')
 
@@ -49,32 +48,39 @@ class LevelsDeleteTestGA(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
-      self.Run('access-context-manager levels delete --policy my_policy')
+      self.Run('access-context-manager levels delete --policy 123')
 
   def testDelete_Prompt(self):
     self.SetUpForTrack(self.track)
     with self.assertRaises(console_io.UnattendedPromptError):
-      self.Run(
-          'access-context-manager levels delete my_level --policy my_policy')
+      self.Run('access-context-manager levels delete my_level --policy 123')
 
   def testDelete(self):
     self.SetUpForTrack(self.track)
-    self._ExpectDelete('my_level', 'my_policy')
+    self._ExpectDelete('my_level', '123')
 
-    self.Run('access-context-manager levels delete my_level --policy my_policy '
+    self.Run('access-context-manager levels delete my_level --policy 123 '
              '    --quiet')
 
     self.AssertOutputEquals('')
 
   def testDelete_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
-    policy = 'my_acm_policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectDelete('my_level', policy)
 
     self.Run('access-context-manager levels delete my_level --quiet')
 
     self.AssertOutputEquals('')
+
+  def testDelete_InvalidPolicyArg(self):
+    self.SetUpForTrack(self.track)
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager levels delete my_level --quiet'
+               ' --policy accessPolicy/123')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class LevelsDeleteTestBeta(LevelsDeleteTestGA):
@@ -87,6 +93,7 @@ class LevelsDeleteTestAlpha(LevelsDeleteTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

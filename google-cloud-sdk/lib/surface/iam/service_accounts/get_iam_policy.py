@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,4 +58,6 @@ class GetIamPolicy(base.ListCommand):
     client, messages = util.GetClientAndMessages()
     return client.projects_serviceAccounts.GetIamPolicy(
         messages.IamProjectsServiceAccountsGetIamPolicyRequest(
-            resource=iam_util.EmailToAccountResourceName(args.service_account)))
+            resource=iam_util.EmailToAccountResourceName(args.service_account),
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))

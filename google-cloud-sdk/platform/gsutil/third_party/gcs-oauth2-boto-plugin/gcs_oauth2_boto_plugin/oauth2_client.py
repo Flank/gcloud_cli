@@ -30,7 +30,6 @@ notice.
 
 from __future__ import absolute_import
 
-import cgi
 import datetime
 import errno
 from hashlib import sha1
@@ -244,7 +243,7 @@ class FileSystemTokenCache(TokenCache):
     serialized = value.Serialize()
     if isinstance(serialized, six.text_type):
       serialized = serialized.encode('utf-8')
-    f.write(serialized)
+    f.write(six.ensure_binary(serialized))
     f.close()
 
   def GetToken(self, key):
@@ -674,6 +673,7 @@ class OAuth2GCEClient(OAuth2Client):
       http = httplib2.Http()
       response, content = http.request(META_TOKEN_URI, method='GET',
                                        body=None, headers=META_HEADERS)
+      content = six.ensure_text(content)
     except Exception as e:
       raise GsAccessTokenRefreshError(e)
 
@@ -735,8 +735,8 @@ class AccessToken(object):
 
     def GetValue(d, key):
       return (d.get(key, [None]))[0]
-    kv = cgi.parse_qs(query)
-    if not kv['token']:
+    kv = urllib.parse.parse_qs(query)
+    if 'token' not in kv or not kv['token']:
       return None
     expiry = None
     expiry_tuple = GetValue(kv, 'expiry')

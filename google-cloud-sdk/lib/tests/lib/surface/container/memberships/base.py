@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,11 +28,12 @@ import six
 
 class MembershipsTestBase(cli_test_base.CliTestBase,
                           sdk_test_base.WithFakeAuth):
-  """Base class for membership Alpha testing."""
+  """Base class for membership testing."""
 
   MODULE_NAME = 'gkehub'
   API_VERSION = 'v1beta1'
   MEMBERSHIP_DESCRIPTION = 'my-external-cluster'
+  MEMBERSHIP_SELF_LINK = 'my-external-cluster'
   MEMBERSHIP_NAME = '12345-abcde'
 
   def SetUp(self):
@@ -64,8 +65,26 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
       return self.Run(' '.join(prefix + [cmd]))
     return self.Run(prefix + cmd)
 
-  def _MakeMembership(self, name=None, description=None):
-    return self.messages.Membership(name=name, description=description)
+  def _MakeMembership(self,
+                      name=None,
+                      description=None,
+                      gke_cluster_self_link=None,
+                      labels_dict=None):
+    membership = self.messages.Membership(
+        name=name,
+        description=description,
+        labels=self._MakeLabelsProto(labels_dict) if labels_dict else None)
+    if gke_cluster_self_link:
+      membership.endpoint = self.messages.MembershipEndpoint(
+          gkeCluster=self.messages.GkeCluster(
+              resourceLink=gke_cluster_self_link))
+    return membership
+
+  def _MakeLabelsProto(self, labels_dict):
+    return self.messages.Membership.LabelsValue(additionalProperties=[
+        self.messages.Membership.LabelsValue.AdditionalProperty(
+            key=key, value=value) for key, value in sorted(labels_dict.items())
+    ])
 
   def _MakeOperation(self, name=None, done=False, error=None, response=None):
     operation = self.messages.Operation(
@@ -75,35 +94,35 @@ class MembershipsTestBase(cli_test_base.CliTestBase,
     return operation
 
   def ExpectGetMembership(self, membership):
-    self.mocked_client.projects_locations_global_memberships.Get.Expect(
-        (self.messages.GkehubProjectsLocationsGlobalMembershipsGetRequest(
+    self.mocked_client.projects_locations_memberships.Get.Expect(
+        (self.messages.GkehubProjectsLocationsMembershipsGetRequest(
             name=self.membership)),
         response=membership)
 
   def ExpectCreateMembership(self, membership, response):
-    self.mocked_client.projects_locations_global_memberships.Create.Expect(
-        (self.messages.GkehubProjectsLocationsGlobalMembershipsCreateRequest(
+    self.mocked_client.projects_locations_memberships.Create.Expect(
+        (self.messages.GkehubProjectsLocationsMembershipsCreateRequest(
             parent=self.parent,
             membershipId=self.MEMBERSHIP_NAME,
             membership=membership)),
         response=response)
 
   def ExpectDeleteMembership(self, membership, response):
-    self.mocked_client.projects_locations_global_memberships.Delete.Expect(
+    self.mocked_client.projects_locations_memberships.Delete.Expect(
         request=(
-            self.messages.GkehubProjectsLocationsGlobalMembershipsDeleteRequest(
+            self.messages.GkehubProjectsLocationsMembershipsDeleteRequest(
                 name=self.membership)),
         response=response)
 
   def ExpectListMemberships(self, responses):
-    self.mocked_client.projects_locations_global_memberships.List.Expect(
-        (self.messages.GkehubProjectsLocationsGlobalMembershipsListRequest(
+    self.mocked_client.projects_locations_memberships.List.Expect(
+        (self.messages.GkehubProjectsLocationsMembershipsListRequest(
             parent=self.parent)),
         response=self.messages.ListMembershipsResponse(resources=responses))
 
   def ExpectUpdateMembership(self, membership, mask, response):
-    self.mocked_client.projects_locations_global_memberships.Patch.Expect(
-        self.messages.GkehubProjectsLocationsGlobalMembershipsPatchRequest(
+    self.mocked_client.projects_locations_memberships.Patch.Expect(
+        self.messages.GkehubProjectsLocationsMembershipsPatchRequest(
             name=self.membership, membership=membership, updateMask=mask),
         response=response)
 

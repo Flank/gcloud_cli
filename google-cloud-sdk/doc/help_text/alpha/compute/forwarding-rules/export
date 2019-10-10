@@ -7,8 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Exports a forwarding rule's configuration to a file. This
-    configuration can be imported at a later time.
+    (ALPHA) Exports a forwarding rule's configuration to a file.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -54,10 +53,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    A forwarding rule can be exported by running:
+
+        $ gcloud alpha compute forwarding-rules export NAME \
+            --destination=<path-to-file>
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute forwarding-rules export
 

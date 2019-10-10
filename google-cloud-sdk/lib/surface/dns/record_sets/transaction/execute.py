@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class Execute(base.ListCommand):
 
   To execute the transaction, run:
 
-    $ {command} --zone MANAGED_ZONE
+    $ {command} --zone=MANAGED_ZONE
   """
 
   @staticmethod
@@ -55,6 +55,8 @@ class Execute(base.ListCommand):
     # this patter of checking ReleaseTrack. Break this into multiple classes.
     if self.ReleaseTrack() == base.ReleaseTrack.BETA:
       api_version = 'v1beta2'
+    elif self.ReleaseTrack() == base.ReleaseTrack.ALPHA:
+      api_version = 'v1alpha2'
 
     with transaction_util.TransactionFile(args.transaction_file) as trans_file:
       change = transaction_util.ChangeFromYamlFile(

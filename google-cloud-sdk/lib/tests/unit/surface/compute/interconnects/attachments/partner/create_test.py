@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,20 +26,31 @@ from tests.lib.surface.compute import test_base
 class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.message_version = self.compute_alpha
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.message_version = self.compute_v1
 
   def CheckInterconnectAttachmentRequest(self, **kwargs):
     interconnect_attachment_msg = {}
     interconnect_attachment_msg.update(kwargs)
-    self.CheckRequests(
-        [(self.message_version.interconnectAttachments, 'Insert',
-          self.messages.ComputeInterconnectAttachmentsInsertRequest(
-              project='my-project',
-              region='us-central1',
-              interconnectAttachment=self.messages.InterconnectAttachment(
-                  **interconnect_attachment_msg)))],)
+    if 'validateOnly' in kwargs:
+      validate_only = interconnect_attachment_msg.pop('validateOnly')
+      self.CheckRequests(
+          [(self.message_version.interconnectAttachments, 'Insert',
+            self.messages.ComputeInterconnectAttachmentsInsertRequest(
+                project='my-project',
+                region='us-central1',
+                validateOnly=validate_only,
+                interconnectAttachment=self.messages.InterconnectAttachment(
+                    **interconnect_attachment_msg)))],)
+    else:
+      self.CheckRequests(
+          [(self.message_version.interconnectAttachments, 'Insert',
+            self.messages.ComputeInterconnectAttachmentsInsertRequest(
+                project='my-project',
+                region='us-central1',
+                interconnectAttachment=self.messages.InterconnectAttachment(
+                    **interconnect_attachment_msg)))],)
 
   def testCreateInterconnectAttachment(self):
     messages = self.messages
@@ -148,10 +159,81 @@ class InterconnectAttachmentsPartnerCreateBetaTest(
     self.message_version = self.compute_beta
 
 
-class InterconnectAttachmentsPartnerCreateGaTest(
+class InterconnectAttachmentsPartnerCreateAlphaTest(
     InterconnectAttachmentsPartnerCreateBetaTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-    self.SelectApi('v1')
-    self.message_version = self.compute_v1
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.message_version = self.compute_alpha
+
+  def testCreateInterconnectAttachmentValidateOnly(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='',
+                region='us-central1',
+                router=self.compute_uri + '/projects/my-project/regions/'
+                'us-central1/routers/my-router',
+                type=messages.InterconnectAttachment.TypeValueValuesEnum(
+                    'PARTNER'),
+                edgeAvailabilityDomain=messages.InterconnectAttachment
+                .EdgeAvailabilityDomainValueValuesEnum('AVAILABILITY_DOMAIN_2'),
+                adminEnabled=True)
+        ],
+    ])
+
+    self.Run(
+        'compute interconnects attachments partner create my-attachment '
+        '--region us-central1 --router my-router --description "this is my '
+        'attachment" --edge-availability-domain availability-domain-2 '
+        '--admin-enabled --dry-run')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
+        router=self.compute_uri + '/projects/my-project/regions/us-central1/'
+        'routers/my-router',
+        type=messages.InterconnectAttachment.TypeValueValuesEnum('PARTNER'),
+        edgeAvailabilityDomain=messages.InterconnectAttachment
+        .EdgeAvailabilityDomainValueValuesEnum('AVAILABILITY_DOMAIN_2'),
+        adminEnabled=True,
+        validateOnly=True)
+    self.AssertErrContains('Please use the pairing key to provision the '
+                           'attachment with your partner:')
+
+  def testInterconnectAttachmentWithMtu(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='',
+                region='us-central1',
+                router=self.compute_uri + '/projects/my-project/regions/'
+                'us-central1/routers/my-router',
+                type=messages.InterconnectAttachment.TypeValueValuesEnum(
+                    'PARTNER'),
+                edgeAvailabilityDomain=messages.InterconnectAttachment
+                .EdgeAvailabilityDomainValueValuesEnum('AVAILABILITY_DOMAIN_2'),
+                mtu=1500)
+        ],
+    ])
+
+    self.Run(
+        'compute interconnects attachments partner create my-attachment '
+        '--region us-central1 --router my-router --description "this is my '
+        'attachment" --edge-availability-domain availability-domain-2 '
+        '--mtu 1500')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
+        router=self.compute_uri + '/projects/my-project/regions/us-central1/'
+        'routers/my-router',
+        type=messages.InterconnectAttachment.TypeValueValuesEnum('PARTNER'),
+        edgeAvailabilityDomain=messages.InterconnectAttachment
+        .EdgeAvailabilityDomainValueValuesEnum('AVAILABILITY_DOMAIN_2'),
+        mtu=1500)

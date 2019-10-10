@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,33 +33,34 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
 
   def SetUp(self):
     self.messages = core_apis.GetMessagesModule('compute', 'alpha')
+    self.resources = base_classes.ComputeApiHolder(calliope_base.ReleaseTrack.ALPHA).resources
     self.new_versions = [
-        self.messages.InstanceGroupManagerVersion(instanceTemplate='t-1')
+        self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-1')
     ]
     self.other_new_versions = [
-        self.messages.InstanceGroupManagerVersion(instanceTemplate='t-2'),
-        self.messages.InstanceGroupManagerVersion(instanceTemplate='t-3')
+        self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-2'),
+        self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-3')
     ]
     self.identical_new_versions = [
-        self.messages.InstanceGroupManagerVersion(instanceTemplate='t-2'),
-        self.messages.InstanceGroupManagerVersion(instanceTemplate='t-2')
+        self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-2'),
+        self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-2')
     ]
     self.igm_with_versions = self.messages.InstanceGroupManager(
         versions=[
-            self.messages.InstanceGroupManagerVersion(instanceTemplate='t-1'),
-            self.messages.InstanceGroupManagerVersion(instanceTemplate='t-2')
+            self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-1'),
+            self.messages.InstanceGroupManagerVersion(instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-2')
         ]
     )
     self.igm_with_instance_template = self.messages.InstanceGroupManager(
-        instanceTemplate='t-1'
+        instanceTemplate='https://www.googleapis.com/compute/alpha/projects/fake-project/global/instanceTemplates/t-1'
     )
 
   def testAddAutoscalersToMigs(self):
     holder = base_classes.ComputeApiHolder(calliope_base.ReleaseTrack.GA)
-    region = ('https://www.googleapis.com/compute/v1/projects/{}/regions/'
+    region = ('https://compute.googleapis.com/compute/v1/projects/{}/regions/'
               'us-central1').format(self.Project())
     migs = [{'region': region, 'name': 'my-mig'}]
-    mig_url = ('https://www.googleapis.com/compute/v1/projects/{}/'
+    mig_url = ('https://compute.googleapis.com/compute/v1/projects/{}/'
                'regions/us-central1/instanceGroupManagers/my-mig').format(
                    self.Project())
     autoscaler = self.messages.Autoscaler(region=region, target=mig_url)
@@ -76,14 +77,14 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
 
   def testAddAutoscalersToMigs_MismatchedRegionProjects(self):
     holder = base_classes.ComputeApiHolder(calliope_base.ReleaseTrack.GA)
-    region = ('https://www.googleapis.com/compute/v1/projects/{}/regions/'
+    region = ('https://compute.googleapis.com/compute/v1/projects/{}/regions/'
               'us-central1').format(self.Project())
     migs = [{'region': region, 'name': 'my-mig'}]
-    mig_url = ('https://www.googleapis.com/compute/v1/projects/{}/'
+    mig_url = ('https://compute.googleapis.com/compute/v1/projects/{}/'
                'regions/us-central1/instanceGroupManagers/my-mig').format(
                    self.Project())
     autoscaler = self.messages.Autoscaler(
-        region=('https://www.googleapis.com/compute/v1/projects/other-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/other-project/'
                 'regions/us-central1'),
         target=mig_url)
 
@@ -105,28 +106,28 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
 
   def testValidateVersionsWithIgmVersions(self):
     managed_instance_groups_utils.ValidateVersions(
-        self.igm_with_versions, self.new_versions)
+        self.igm_with_versions, self.new_versions, self.resources)
 
   def testValidateVersionsWithIgmInstanceTemplate(self):
     managed_instance_groups_utils.ValidateVersions(
-        self.igm_with_instance_template, self.new_versions)
+        self.igm_with_instance_template, self.new_versions, self.resources)
 
   def testValidateVersionsWithIgmEmptyFail(self):
     with self.AssertRaisesToolExceptionMatches(
         'Either versions or instance template must be specified for '
         'managed instance group.'):
       managed_instance_groups_utils.ValidateVersions(
-          self.messages.InstanceGroupManager(), self.new_versions)
+          self.messages.InstanceGroupManager(), self.new_versions, self.resources)
 
   def testValidateVersionsIdenticalFail(self):
     with self.AssertRaisesToolExceptionMatches(
         'Provided instance templates must be different.'):
       managed_instance_groups_utils.ValidateVersions(
-          self.igm_with_versions, self.identical_new_versions)
+          self.igm_with_versions, self.identical_new_versions, self.resources)
 
   def testValidateVersionsWithTooManyVersionsForce(self):
     managed_instance_groups_utils.ValidateVersions(
-        self.igm_with_versions, self.other_new_versions, force=True)
+        self.igm_with_versions, self.other_new_versions, self.resources, force=True)
 
   def testValidateVersionsWithTooManyVersionsFail(self):
     with self.AssertRaisesToolExceptionMatches(
@@ -135,11 +136,11 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
       managed_instance_groups_utils.ValidateVersions(
-          self.igm_with_versions, self.other_new_versions)
+          self.igm_with_versions, self.other_new_versions, self.resources)
 
   def testValidateVersionsWithTooManyVersionsAndInstanceTemplateForce(self):
     managed_instance_groups_utils.ValidateVersions(
-        self.igm_with_instance_template, self.other_new_versions, force=True)
+        self.igm_with_instance_template, self.other_new_versions, self.resources, force=True)
 
   def testValidateVersionsWithTooManyVersionsAndInstanceTemplateFail(self):
     with self.AssertRaisesToolExceptionMatches(
@@ -148,7 +149,7 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
       managed_instance_groups_utils.ValidateVersions(
-          self.igm_with_instance_template, self.other_new_versions)
+          self.igm_with_instance_template, self.other_new_versions, self.resources)
 
 
 if __name__ == '__main__':

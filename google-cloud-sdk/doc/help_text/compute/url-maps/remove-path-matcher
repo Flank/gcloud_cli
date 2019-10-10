@@ -3,7 +3,7 @@ NAME
         URL map
 
 SYNOPSIS
-    gcloud compute url-maps remove-path-matcher URL_MAP_NAME
+    gcloud compute url-maps remove-path-matcher URL_MAP
         --path-matcher-name=PATH_MATCHER_NAME [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -12,7 +12,7 @@ DESCRIPTION
     refer to the path matcher are also removed.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS

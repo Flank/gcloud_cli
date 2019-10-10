@@ -26,6 +26,9 @@ GROUPS
      instances
         Manage Cloud Bigtable instances.
 
+     operations
+        Manage Cloud Bigtable operations.
+
 NOTES
     These variants are also available:
 

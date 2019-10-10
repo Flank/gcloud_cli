@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,25 +28,35 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class CreateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+class CreateTest(base.WithMockGaBinauthz, base.BinauthzTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.name = 'bar'
     proj = self.Project()
     self.note_ref = 'projects/{}/notes/{}'.format(proj, self.name)
     self.description = 'an attestor'
-    self.attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, self.name),
-        description=self.description,
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference=self.note_ref,
-            publicKeys=[],
-        ))
-    self.req = self.messages.BinaryauthorizationProjectsAttestorsCreateRequest(  # pylint: disable=line-too-long
+    try:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          description=self.description,
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference=self.note_ref,
+              publicKeys=[],
+          ))
+    except AttributeError:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          description=self.description,
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference=self.note_ref,
+              publicKeys=[],
+          ))
+    self.req = self.messages.BinaryauthorizationProjectsAttestorsCreateRequest(
         attestor=self.attestor,
         attestorId=self.name,
         parent='projects/{}'.format(proj),
@@ -85,7 +95,13 @@ class CreateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
     self.assertEqual(response, self.updated_attestor)
 
 
-class CreateAlphaTest(base.WithMockAlphaBinauthz, CreateTest):
+class CreateBetaTest(base.WithMockBetaBinauthz, CreateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateAlphaTest(base.WithMockAlphaBinauthz, CreateBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_BETA_KMS_ASYMMETRIC\-DECRYPT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta kms asymmetric\-decrypt \- decrypt an input file using an asymmetric\-encryption key version
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta kms asymmetric\-decrypt\fR \fB\-\-ciphertext\-file\fR=\fICIPHERTEXT_FILE\fR \fB\-\-plaintext\-file\fR=\fIPLAINTEXT_FILE\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Decrypts the given ciphertext file using the provided
+asymmetric\-encryption key version and saves the decrypted data to the plaintext
+file.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ciphertext\-file\fR=\fICIPHERTEXT_FILE\fR
+File path of the ciphertext file to decrypt.
+
+.TP 2m
+\fB\-\-plaintext\-file\fR=\fIPLAINTEXT_FILE\fR
+File path of the plaintext file to output.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+to use for asymmetric\-decryption.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the keyring.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+Version to use for asymmetric\-decryption.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read the file '/tmp/my/secret.file.enc', decrypt it
+using the asymmetric CryptoKey \f5dont\-panic\fR Version 3 and write the
+plaintext to '/tmp/my/secret.file.dec'.
+
+.RS 2m
+$ gcloud beta kms asymmetric\-decrypt \e
+\-\-location=us\-central1 \e
+\-\-keyring=hitchhiker \e
+\-\-key=dont\-panic \e
+\-\-version=3 \e
+\-\-ciphertext\-file=/tmp/my/secret.file.enc \e
+\-\-plaintext\-file=/tmp/my/secret.file.dec
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud kms asymmetric\-decrypt
+$ gcloud alpha kms asymmetric\-decrypt
+.RE
+

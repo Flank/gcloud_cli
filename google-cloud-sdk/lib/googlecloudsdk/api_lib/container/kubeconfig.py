@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,6 +59,10 @@ class Kubeconfig(object):
   def current_context(self):
     return self._data['current-context']
 
+  @property
+  def filename(self):
+    return self._filename
+
   def Clear(self, key):
     self.contexts.pop(key, None)
     self.clusters.pop(key, None)
@@ -83,9 +87,10 @@ class Kubeconfig(object):
 
   @classmethod
   def _Validate(cls, data):
+    """Make sure we have the main fields of a kubeconfig."""
+    if not data:
+      raise Error('empty file')
     try:
-      if not data:
-        raise Error('empty file')
       for key in ('clusters', 'users', 'contexts'):
         if not isinstance(data[key], list):
           raise Error(
@@ -105,6 +110,7 @@ class Kubeconfig(object):
 
   @classmethod
   def LoadOrCreate(cls, filename):
+    """Read in the kubeconfig, and if it doesn't exist create one there."""
     try:
       return cls.LoadFromFile(filename)
     except (Error, IOError) as error:
@@ -145,6 +151,23 @@ class Kubeconfig(object):
               vars='HOMEDRIVE/HOMEPATH, USERPROFILE, HOME,'
               if platforms.OperatingSystem.IsWindows() else 'HOME'))
     return os.path.join(home_dir, '.kube', 'config')
+
+  def Merge(self, kubeconfig):
+    """Merge another kubeconfig into self.
+
+    In case of overlapping keys, the value in self is kept and the value in
+    the other kubeconfig is lost.
+
+    Args:
+      kubeconfig: a Kubeconfig instance
+    """
+    self.SetCurrentContext(self.current_context or kubeconfig.current_context)
+    self.clusters = dict(
+        list(kubeconfig.clusters.items()) + list(self.clusters.items()))
+    self.users = dict(
+        list(kubeconfig.users.items()) + list(self.users.items()))
+    self.contexts = dict(
+        list(kubeconfig.contexts.items()) + list(self.contexts.items()))
 
 
 def Cluster(name, server, ca_path=None, ca_data=None):

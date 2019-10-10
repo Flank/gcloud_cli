@@ -9,7 +9,7 @@ SYNOPSIS
         (--partner-interconnect-name=PARTNER_INTERCONNECT_NAME
           --partner-name=PARTNER_NAME --partner-portal-url=PARTNER_PORTAL_URL)
         [--candidate-subnets=[SUBNET,...]] [--description=DESCRIPTION]
-        [--partner-asn=PARTNER_ASN] [--region=REGION] [--vlan=VLAN]
+        [--dry-run] [--partner-asn=PARTNER_ASN] [--region=REGION] [--vlan=VLAN]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -93,6 +93,9 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.
 
+     --dry-run
+        If supplied, validates the attachment without creating it.
+
      --partner-asn=PARTNER_ASN
         BGP ASN of the partner. This should only be supplied by layer 3
         providers that have configured BGP on behalf of the customer.
@@ -132,7 +135,6 @@ NOTES
     This command is an internal implementation detail and may change or
     disappear without notice. This command is currently in ALPHA and may change
     without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
 

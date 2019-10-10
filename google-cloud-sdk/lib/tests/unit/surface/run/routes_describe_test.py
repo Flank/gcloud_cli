@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import route
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.run import flags
-from tests.lib import cli_test_base
-from tests.lib import sdk_test_base
 from tests.lib.surface.run import base
 
 
-class DescribeTest(base.ServerlessSurfaceBase,
-                   cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
+class DescribeTestBeta(base.ServerlessSurfaceBase):
   """Tests outputs of describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.mock_route = route.Route.New(
@@ -49,3 +50,10 @@ class DescribeTest(base.ServerlessSurfaceBase,
     with self.assertRaises(flags.ArgumentError) as context:
       self.Run('run routes describe kale')
     self.assertIn('Cannot find route [kale]', str(context.exception))
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+  """Tests outputs of describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

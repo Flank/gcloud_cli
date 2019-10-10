@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,15 +34,20 @@ from tests.lib.surface.ml.video import base
     ('GA', calliope_base.ReleaseTrack.GA))
 class WaitTest(base.MlVideoTestBase):
 
+  def SetUp(self):
+    self.operation_name = ('projects/{}/locations/us-east1/operations/123'
+                           .format(self.Project()))
+
   def testBasicOutputComplete(self, track):
     """Test that command correctly outputs json of results."""
     self.track = track
     self.ExpectWaitOperationRequest(
-        '123',
+        self.operation_name,
         attempts=3,
         results=self._GetResponseJsonForLabels(['mug', 'coffee']))
-    result = self.Run('ml video operations wait 123')
-    self.AssertErrContains('Waiting for operation [123] to complete')
+    result = self.Run('ml video operations wait {}'.format(self.operation_name))
+    self.AssertErrContains('Waiting for operation [{}] to complete'.format(
+        self.operation_name))
     self.AssertOutputContains(textwrap.dedent("""\
     {
       "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse",
@@ -95,9 +100,10 @@ class WaitTest(base.MlVideoTestBase):
     """Test when operation contains an error."""
     self.track = track
     error_json = {'code': 400, 'message': 'Error message.'}
-    self.ExpectWaitOperationRequest('123', attempts=3, error_json=error_json)
+    self.ExpectWaitOperationRequest(
+        self.operation_name, attempts=3, error_json=error_json)
     with self.assertRaisesRegex(waiter.OperationError, 'Error message.'):
-      self.Run('ml video operations wait 123')
+      self.Run('ml video operations wait {}'.format(self.operation_name))
 
 
 if __name__ == '__main__':

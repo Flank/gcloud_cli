@@ -65,8 +65,7 @@ Compute region (e.g. us\-central1) for the connector.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 
 .RE
@@ -103,5 +102,10 @@ $ gcloud beta compute networks vpc\-access connectors delete \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud compute networks vpc\-access connectors delete
+.RE
 

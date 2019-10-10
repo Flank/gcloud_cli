@@ -1,5 +1,6 @@
 title: Describe and list single-field index settings
-description: Field updates are too expensive to test, so this only tests describe and list.
+description: Field updates are too expensive to test, so this only tests describe
+  and list.
 release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.

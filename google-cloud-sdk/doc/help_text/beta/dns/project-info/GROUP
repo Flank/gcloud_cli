@@ -27,8 +27,9 @@ EXAMPLES
         $ gcloud beta dns project-info describe
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns project-info
+        $ gcloud alpha dns project-info
 

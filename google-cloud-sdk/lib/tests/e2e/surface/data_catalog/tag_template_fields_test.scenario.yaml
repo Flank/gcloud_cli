@@ -1,0 +1,241 @@
+title: Create, describe, and update a Data Catalog tag template.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog tag-templates create $$my-tag-template$$ --location=$$location$$
+      --display-name="Template display name" --field=id=dbl_field,display_name=double_field,type=double
+  - stderr: |
+      Created tag template [$$my-tag-template$$].
+- execute:
+  - command: data-catalog tag-templates fields create $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --display-name="Field display name" --type=enum(A|B)
+  - stderr: |
+      Created tag template field [$$my-tag-template-field$$1].
+- execute:
+  - command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D
+  - stderr: |
+      Updated tag template field [$$my-tag-template-field$$1].
+  - stdout: |
+      displayName: New field display name
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1
+      type:
+        enumType:
+          allowedValues:
+          - displayName: A
+          - displayName: B
+          - displayName: C
+          - displayName: D
+- execute:
+  - command: data-catalog tag-templates fields rename $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --new-id=$$my-tag-template-field$$2
+  - stdout: |
+      displayName: New field display name
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$2
+      type:
+        enumType:
+          allowedValues:
+          - displayName: A
+          - displayName: B
+          - displayName: C
+          - displayName: D
+- execute:
+  - command: data-catalog tag-templates fields delete $$my-tag-template-field$$2 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --force --quiet
+  - stderr: |
+      Deleted tag template field [$$my-tag-template-field$$2].
+- execute:
+  - command: data-catalog tag-templates delete $$my-tag-template$$ --location=$$location$$
+      --force --quiet
+  - stderr: |
+      Deleted tag template [$$my-tag-template$$].
+actions:
+- define_reference:
+    reference: location
+    value: us-central1
+- generate_resource_id:
+    reference: my-tag-template
+    prefix: datacatalog
+    delimiter: _
+- generate_resource_id:
+    reference: my-tag-template-field
+    prefix: datacatalog
+- execute_command:
+    command: data-catalog tag-templates create $$my-tag-template$$ --location=$$location$$
+      --display-name="Template display name" --field=id=dbl_field,display_name=double_field,type=double
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates?alt=json&tagTemplateId=$$my-tag-template$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: Template display name
+              fields:
+                dbl_field:
+                  displayName: double_field
+                  type:
+                    primitiveType: DOUBLE
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '445'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+            displayName: Template display name
+            fields:
+              dbl_field:
+                displayName: double_field
+                type:
+                  primitiveType: DOUBLE
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+    - expect_stderr: |
+        Created tag template [$$my-tag-template$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates fields create $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --display-name="Field display name" --type=enum(A|B)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields?alt=json&tagTemplateFieldId=$$my-tag-template-field$$1
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: Field display name
+              type:
+                enumType:
+                  allowedValues:
+                  - displayName: A
+                  - displayName: B
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '376'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            displayName: Field display name
+            type:
+              enumType:
+                allowedValues:
+                - displayName: A
+                - displayName: B
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1
+    - expect_stderr: |
+        Created tag template field [$$my-tag-template-field$$1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates fields update $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --display-name="New field display name" --add-enum-values=C,D
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1?alt=json&updateMask=display_name%2Ctype.enum_type
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: New field display name
+              type:
+                enumType:
+                  allowedValues:
+                  - displayName: C
+                  - displayName: D
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '480'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            displayName: New field display name
+            type:
+              enumType:
+                allowedValues:
+                - displayName: A
+                - displayName: B
+                - displayName: C
+                - displayName: D
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1
+    - expect_stderr: |
+        Updated tag template field [$$my-tag-template-field$$1].
+    - expect_stdout: |
+        displayName: New field display name
+        name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1
+        type:
+          enumType:
+            allowedValues:
+            - displayName: A
+            - displayName: B
+            - displayName: C
+            - displayName: D
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates fields rename $$my-tag-template-field$$1 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --new-id=$$my-tag-template-field$$2
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$1:rename?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              newTagTemplateFieldId: $$my-tag-template-field$$2
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '480'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            displayName: New field display name
+            type:
+              enumType:
+                allowedValues:
+                - displayName: A
+                - displayName: B
+                - displayName: C
+                - displayName: D
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$2
+    - expect_stdout: |
+        displayName: New field display name
+        name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/$$my-tag-template-field$$2
+        type:
+          enumType:
+            allowedValues:
+            - displayName: A
+            - displayName: B
+            - displayName: C
+            - displayName: D
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates fields delete $$my-tag-template-field$$2 --tag-template=$$my-tag-template$$
+      --location=$$location$$ --force --quiet
+    validation_only: true
+    cleanup_for: my-tag-template-field
+    events:
+    - expect_stderr: |
+        Deleted tag template field [$$my-tag-template-field$$2].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates delete $$my-tag-template$$ --location=$$location$$
+      --force --quiet
+    validation_only: true
+    cleanup_for: my-tag-template
+    events:
+    - expect_stderr: |
+        Deleted tag template [$$my-tag-template$$].
+    - expect_exit:
+        code: 0

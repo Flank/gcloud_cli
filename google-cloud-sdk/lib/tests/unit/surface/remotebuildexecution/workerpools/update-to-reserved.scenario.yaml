@@ -8,7 +8,8 @@ summary:
   - stderr: |
       Request issued for: [to-reserved-pool]
   - progress_tracker:
-    - message: Waiting for operation [update_operation_id] to complete
+    - message: Waiting for operation [projects/fake-project/operations/update_operation_id]
+        to complete
     - status: SUCCESS
   - stderr: |
       Updated workerpool [to-reserved-pool].
@@ -23,9 +24,9 @@ summary:
           diskSizeGb: '200'
           diskType: pd-standard
           machineType: n1-standard-2
+          networkAccess: public
           reserved: 'true'
         workerCount: '2'
-
 actions:
 - execute_command:
     command: |
@@ -71,7 +72,8 @@ actions:
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
-                  "reserved": "true"
+                  "reserved": "true",
+                  "networkAccess": "public"
                 },
                 "workerCount": "2",
                 "state": "RUNNING"
@@ -79,7 +81,8 @@ actions:
             }
 
     - expect_progress_tracker:
-        message: Waiting for operation [update_operation_id] to complete
+        message: Waiting for operation [projects/fake-project/operations/update_operation_id]
+          to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -101,7 +104,8 @@ actions:
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
-                  "reserved": "true"
+                  "reserved": "true",
+                  "networkAccess": "public"
                 },
                 "workerCount": "2",
                 "state": "RUNNING"
@@ -121,6 +125,7 @@ actions:
             diskSizeGb: '200'
             diskType: pd-standard
             machineType: n1-standard-2
+            networkAccess: public
             reserved: 'true'
           workerCount: '2'
     - expect_exit:

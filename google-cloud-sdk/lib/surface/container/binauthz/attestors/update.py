@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,15 @@ from googlecloudsdk.command_lib.container.binauthz import flags
 
 
 class Update(base.UpdateCommand):
-  """Update an existing Attestor."""
+  r"""Update an existing Attestor.
+
+  ## EXAMPLES
+
+  To update an existing Attestor `my_attestor`:
+
+    $ {command} my_attestor \
+        --description="my new attestor description"
+  """
 
   @classmethod
   def Args(cls, parser):

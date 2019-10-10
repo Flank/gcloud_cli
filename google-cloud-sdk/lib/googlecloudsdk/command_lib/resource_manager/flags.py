@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,12 +54,7 @@ def OperationIdArg(use_description):
 
 
 def OperationAsyncFlag():
-  return base.Argument(
-      '--async',
-      action='store_true',
-      help=(
-          'Whether to return an asynchronous long-running operation immediately'
-          ' instead of waiting for the operation to finish'))
+  return base.ASYNC_FLAG
 
 
 def LienIdArg(use_description):

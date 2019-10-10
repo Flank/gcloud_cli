@@ -25,7 +25,7 @@ POSITIONAL ARGUMENTS
 FLAGS
      --attribute=[ATTRIBUTE,...]
         Comma-separated list of attributes. Each ATTRIBUTE has the form
-        name=value". You can specify up to 100 attributes.
+        name="value". You can specify up to 100 attributes.
 
      --message=MESSAGE
         The body of the message to publish to the given topic name. Information

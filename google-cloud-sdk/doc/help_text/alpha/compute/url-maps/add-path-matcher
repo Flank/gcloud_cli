@@ -3,7 +3,7 @@ NAME
         URL map
 
 SYNOPSIS
-    gcloud alpha compute url-maps add-path-matcher URL_MAP_NAME
+    gcloud alpha compute url-maps add-path-matcher URL_MAP
         --path-matcher-name=PATH_MATCHER_NAME
         (--default-backend-bucket=DEFAULT_BACKEND_BUCKET
           | --default-service=DEFAULT_SERVICE)
@@ -25,7 +25,7 @@ DESCRIPTION
     will fail unless --delete-orphaned-path-matcher is provided.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS
@@ -110,11 +110,12 @@ EXAMPLES
     to the images-service under the hosts example.com and *.example.com, run:
 
         $ gcloud alpha compute url-maps add-path-matcher MY-URL-MAP \
-            --path-matcher-name MY-MATCHER --default-service
-        MY-DEFAULT-SERVICE --backend-service-path-rules
-        '/search/*=search_service,/images/*=images-service'
-        --backend-bucket-path-rules '/static/*=static-bucket' --new-hosts
-        example.com '*.example.com' --global
+            --path-matcher-name MY-MATCHER \
+            --default-service MY-DEFAULT-SERVICE \
+            --backend-service-path-rules \
+            '/search/*=search_service,/images/*=images-service' \
+            --backend-bucket-path-rules '/static/*=static-bucket' \
+            --new-hosts example.com '*.example.com' --global
 
     Note that a default service or default backend bucket must be provided to
     handle paths for which there is no mapping.
@@ -122,9 +123,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute url-maps add-path-matcher
         $ gcloud beta compute url-maps add-path-matcher

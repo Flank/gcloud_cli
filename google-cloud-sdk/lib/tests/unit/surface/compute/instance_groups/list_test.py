@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -245,10 +245,10 @@ class InstanceGroupsListTest(InstanceGroupsListTestBase,
     )
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-1
-            https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-2
-            https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-3
-            https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-4
+            https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroups/group-4
             """.format(self.api)), normalize_space=True)
 
   def testZonalUriOutput(self):
@@ -272,10 +272,10 @@ class InstanceGroupsListTest(InstanceGroupsListTestBase,
     )
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-2
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-3
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-4
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-4
             """.format(self.api)), normalize_space=True)
 
   def testZonalTableOutputOnlyManaged(self):
@@ -351,9 +351,9 @@ class InstanceGroupsListTest(InstanceGroupsListTestBase,
     )
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-2
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-3
             """.format(self.api)), normalize_space=True)
 
   def testZonalUriOutputOnlyUnmanaged(self):
@@ -378,7 +378,7 @@ class InstanceGroupsListTest(InstanceGroupsListTestBase,
     )
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-4
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-4
             """.format(self.api)), normalize_space=True)
 
   def testInvalidUsage(self):

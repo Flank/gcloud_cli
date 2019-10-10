@@ -126,29 +126,42 @@ OPTIONAL FLAGS
         Defines the strategy for balancing load. BALANCING_MODE must be one of:
 
          CONNECTION
-            Spreads load based on how many concurrent connections the backend
-            can handle. This balancing mode is only available to backend
-            services that use SSL, TCP, or UDP protocols. For backend services
-            with --load-balancing-scheme EXTERNAL, you must specify exactly one
-            of these additional parameters: --max-connections,
-            --max-connections-per-instance, or --max-connections-per-endpoint.
-            For backend services with --load-balancing-scheme INTERNAL, you
-            must omit all of these parameters.
+            Available if the backend service's load balancing scheme is either
+            INTERNAL or EXTERNAL. Available if the backend service's protocol
+            is one of SSL, TCP, or UDP.
+
+                Spreads load based on how many concurrent connections the backend
+                can handle.
+
+                For backend services with --load-balancing-scheme `EXTERNAL`, you
+                must specify exactly one of these additional parameters:
+                `--max-connections`, `--max-connections-per-instance`, or
+                `--max-connections-per-endpoint`.
+
+                For backend services where `--load-balancing-scheme` is `INTERNAL`,
+                you must omit all of these parameters.
          RATE
-            Spreads load based on how many HTTP requests per second (RPS) the
-            backend can handle. This balancing mode is only available to
-            backend services that use HTTP, HTTPS, or HTTP/2 protocols. You
-            must specify exactly one of these additional parameters:
-            --max-rate, --max-rate-per-instance, or--max-rate-per-endpoint.
+            Available if the backend service's load balancing scheme is
+            INTERNAL_MANAGED, INTERNAL_SELF_MANAGED, or EXTERNAL. Available if
+            the backend service's protocol is one of HTTP, HTTPS, or HTTP/2.
+
+                Spreads load based on how many HTTP requests per second (RPS) the
+                backend can handle.
+
+                You must specify exactly one of these additional parameters:
+                `--max-rate`, `--max-rate-per-instance`, or `--max-rate-per-endpoint`.
          UTILIZATION
-            Spreads load based on the CPU utilization of instances in a backend
-            instance group. This balancing mode is only available to backend
-            services with --load-balancing-scheme EXTERNAL and instance group
-            backends. There is no restriction on the backend service protocol.
-            The following additional parameters may be specified:
-            --max-utilization, --max-rate, --max-rate-per-instance,
-            --max-connections, --max-connections-per-instance. For valid
-            combinations, see --max-utilization below.
+            Available if the backend service's load balancing scheme is
+            INTERNAL_MANAGED, INTERNAL_SELF_MANAGED, or EXTERNAL. Available
+            only for managed or unmanaged instance group backends.
+
+                Spreads load based on the CPU utilization of instances in a backend
+                instance group.
+
+                The following additional parameters may be specified:
+                `--max-utilization`, `--max-rate`, `--max-rate-per-instance`,
+                `--max-connections`, `--max-connections-per-instance`.
+                For valid combinations, see `--max-utilization`.
 
      --capacity-scaler=CAPACITY_SCALER
         A setting that applies to all balancing modes. This value is multiplied

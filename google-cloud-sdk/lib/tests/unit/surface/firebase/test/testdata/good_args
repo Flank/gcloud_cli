@@ -115,3 +115,8 @@ other-files.good:
   other-files:
     local/dir/file1: /sdcard/dir1
     'gs://bucket/file2': '/sdcard/dir2'
+
+client-details.good:
+  client-details:
+    k1: v1
+    k2: v2

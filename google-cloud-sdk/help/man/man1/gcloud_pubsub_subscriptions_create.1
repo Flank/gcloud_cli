@@ -11,7 +11,7 @@ gcloud pubsub subscriptions create \- creates one or more Cloud Pub/Sub subscrip
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -87,6 +87,15 @@ omitted, seconds is assumed. This flag additionally accepts the special value
 "never" to indicate that the subscription will never expire.
 
 .TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
 \fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR
 How long to retain unacknowledged messages in the subscription's backlog, from
 the moment a message is published. If \-\-retain\-acked\-messages is true, this
@@ -95,6 +104,16 @@ days, the minimum is 10 minutes, and the maximum is 7 days. Valid values are
 strings of the form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d"
 for seconds, minutes, hours, and days, respectively. If the unit is omitted,
 seconds is assumed.
+
+.TP 2m
+\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR
+Service account email used as the identity for the generated Open ID Connect
+token for authenticated push.
+
+.TP 2m
+\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR
+Audience used in the generated Open ID Connect token for authenticated push. If
+not specified, it will be set to the push\-endpoint.
 
 .TP 2m
 \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR

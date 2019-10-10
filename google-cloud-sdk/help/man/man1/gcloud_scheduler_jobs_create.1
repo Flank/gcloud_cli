@@ -1,0 +1,63 @@
+
+.TH "GCLOUD_SCHEDULER_JOBS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud scheduler jobs create \- create Cloud Scheduler jobs for various types of targets
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud scheduler jobs create\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create Cloud Scheduler jobs for various types of targets.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBapp\-engine\fR
+Create a Cloud Scheduler job with an App Engine target.
+
+.TP 2m
+\fBhttp\fR
+Create a Cloud Scheduler job that triggers an action via HTTP.
+
+.TP 2m
+\fBpubsub\fR
+Create a Cloud Scheduler job with a Pub/Sub target.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha scheduler jobs create
+$ gcloud beta scheduler jobs create
+.RE
+

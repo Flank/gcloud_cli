@@ -1,6 +1,3 @@
-skip:
-  reason: Failing
-  bug: b/132255827
 title: Create an instance with accelerator and delete it
 release_tracks: [GA]
 summary:
@@ -10,7 +7,7 @@ summary:
       --zone us-central1-a --accelerator type=nvidia-tesla-p4,count=1 --maintenance-policy
       TERMINATE --restart-on-failure --format 'text(name,zone)'
   - stderr: |
-      Created [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$].
+      Created [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$\].
   - stdout: |
       ---
       name: $$instance1$$
@@ -25,12 +22,12 @@ summary:
 - execute:
   - command: compute instances delete $$instance1$$ --zone us-central1-a --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$].
+      Deleted [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$\].
 actions:
 
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: instance1
     prefix: gcloud-compute-container
@@ -7653,15 +7650,11 @@ actions:
               disks:
               - autoDelete: true
                 boot: true
-                initializeParams:
-                  sourceImage: https://$$compute-uri$$/v1/projects/cos-cloud/global/images/cos-stable-74-11895-86-0
                 mode: READ_WRITE
                 type: PERSISTENT
               guestAccelerators:
               - acceleratorCount: 1
                 acceleratorType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/acceleratorTypes/nvidia-tesla-p4
-              labels:
-                container-vm: cos-stable-74-11895-86-0
               machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/machineTypes/n1-standard-1
               metadata:
                 items:
@@ -7725,8 +7718,9 @@ actions:
             startTime: '2019-05-03T01:07:46.589-07:00'
             selfLink: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/operations/operation-1556870862938-587f73ebf203c-9f47ae36-fcc5f53e
         poll_operation: true
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$?alt=json
@@ -7826,10 +7820,11 @@ actions:
               acceleratorCount: 1
             startRestricted: false
             deletionProtection: false
-    - expect_stdout: |
-        ---
-        name: $$instance1$$
-        zone: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a
+    - expect_stdout:
+        matches: |
+          ---
+          name: $$instance1$$
+          zone: https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a
     - expect_exit:
         code: 0
 - execute_command:
@@ -7935,10 +7930,11 @@ actions:
               acceleratorCount: 1
             startRestricted: false
             deletionProtection: false
-    - expect_stdout: |
-        name:   $$instance1$$
-        status: RUNNING
-        zone:   https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a
+    - expect_stdout:
+        matches: |
+          name:   $$instance1$$
+          status: RUNNING
+          zone:   https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a
     - expect_exit:
         code: 0
 - execute_command:
@@ -7946,7 +7942,8 @@ actions:
     cleanup_for: instance1
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instances/$$instance1$$\].
     - expect_exit:
         code: 0

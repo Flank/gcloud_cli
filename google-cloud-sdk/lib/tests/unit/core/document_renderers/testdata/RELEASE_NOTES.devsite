@@ -4,8 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="project_path" value="/sdk/_project.yaml">
 <meta name="book_path" value="/sdk/_book.yaml">
-<!-- Cloud SDK reference documentation consumer survey snippet. -->
-<script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
 <!--
         THIS DOC IS GENERATED.  DO NOT EDIT.
   -->
@@ -37,7 +35,7 @@
 <section id="Google-Cloud-SDK---Release-Notes">
 <dt>Google Cloud SDK - Release Notes</dt>
 <dd class="sectionbody">
-Copyright 2013-2014 Google Inc. All rights reserved.
+Copyright 2013-2014 Google LLC. All rights reserved.
 </dd>
 </section>
 

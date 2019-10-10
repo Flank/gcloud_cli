@@ -35,6 +35,12 @@ COMMANDS
      edit
         (BETA) Modify URL maps.
 
+     export
+        (BETA) Export a URL map.
+
+     import
+        (BETA) Import a URL map.
+
      invalidate-cdn-cache
         (BETA) Invalidate specified objects for a URL map in Cloud CDN caches.
 

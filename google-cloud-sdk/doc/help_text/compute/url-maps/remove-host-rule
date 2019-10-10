@@ -3,7 +3,7 @@ NAME
         map
 
 SYNOPSIS
-    gcloud compute url-maps remove-host-rule URL_MAP_NAME --host=HOST
+    gcloud compute url-maps remove-host-rule URL_MAP --host=HOST
         [--delete-orphaned-path-matcher] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -13,7 +13,7 @@ DESCRIPTION
     --delete-orphaned-path-matcher is provided.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS

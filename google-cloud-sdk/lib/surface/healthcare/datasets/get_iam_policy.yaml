@@ -1,10 +1,19 @@
-- help_text:
+- release_tracks: [ALPHA, BETA]
+
+  help_text:
     brief: Retrieve the IAM policy for a Cloud Healthcare API dataset.
     description: Retrieve the IAM policy for a Cloud Healthcare API dataset.
+    examples: |
+      To print the IAM policy for the dataset 'test-dataset', run:
+
+        $ {command} test-dataset
 
   request:
     collection: healthcare.projects.locations.datasets
-    api_version: v1alpha2
+    ALPHA:
+      api_version: v1alpha2
+    BETA:
+      api_version: v1beta1
 
   arguments:
     resource:

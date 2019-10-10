@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.resource_manager import folders
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
@@ -78,7 +79,11 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
 
   def ExpectedRequest(self):
     return self.messages.CloudresourcemanagerFoldersGetIamPolicyRequest(
-        foldersId=folders.FolderNameToId(self.TEST_FOLDER.name))
+        foldersId=folders.FolderNameToId(self.TEST_FOLDER.name),
+        getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+            options=self.messages.GetPolicyOptions(
+                requestedPolicyVersion=iam_util
+                .MAX_LIBRARY_IAM_SUPPORTED_VERSION)))
 
   def DoRequest(self, args=None):
     command = ['get-iam-policy', folders.FolderNameToId(self.TEST_FOLDER.name)]

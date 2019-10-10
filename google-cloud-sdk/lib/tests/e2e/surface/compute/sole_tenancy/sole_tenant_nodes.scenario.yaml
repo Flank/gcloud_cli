@@ -6,17 +6,23 @@ summary:
   - command: compute sole-tenancy node-templates create $$template$$ --region $$my-region$$
       --node-type=n1-node-96-624
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$\].
+- execute:
+  - command: compute sole-tenancy node-templates describe $$template$$ --region $$my-region$$
+      --format="table(name, nodeType)"
+  - stdout: |
+      NAME                                          NODE_TYPE
+      $$template$$  n1-node-96-624
 - execute:
   - command: compute sole-tenancy node-groups create $$group$$ --zone $$my-zone$$
       --node-template $$template$$ --target-size 1
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$\].
 - execute:
   - command: compute instances create $$instance$$ --zone $$my-zone$$ --node-group
       $$group$$ --machine-type n1-standard-2
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$\].
   - stdout: .*$$instance$$\s+$$my-zone$$\s+n1-standard-2.*RUNNING.*$
 - execute:
   - command: compute sole-tenancy node-groups list-nodes $$group$$ --zone $$my-zone$$
@@ -24,29 +30,29 @@ summary:
 - execute:
   - command: compute instances delete $$instance$$ --zone $$my-zone$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$\].
 - execute:
   - command: compute sole-tenancy node-groups delete $$group$$ --zone $$my-zone$$
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$\].
 - execute:
   - command: compute sole-tenancy node-templates delete $$template$$ --region $$my-region$$
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
-# We have the most CPU quota in us-central1
+    value: compute.googleapis.com/compute
+# We have the most CPU quota in us-central1, but it is overloaded
 - define_reference:
     reference: my-region
-    value: us-central1
+    value: us-west1
 
 - define_reference:
     reference: my-zone
-    value: us-central1-c
+    value: us-west1-b
 
 - generate_resource_id:
     reference: template
@@ -63,63 +69,25 @@ actions:
 - execute_command:
     command: compute sole-tenancy node-templates create $$template$$ --region $$my-region$$
       --node-type=n1-node-96-624
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: $$template$$
-              nodeType: n1-node-96-624
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '903'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '6173865458440784950'
-            name: operation-1539797720077-57870182192c9-10afaf13-ffb9c748
-            operationType: compute.nodeTemplates.insert
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$
-            targetId: '1252997019390889014'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-10-17T10:35:21.543-07:00'
-            startTime: '2018-10-17T10:35:21.544-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1539797720077-57870182192c9-10afaf13-ffb9c748
-            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$].
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '512'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"GmWpSWmmdU7JicjpGs3kUhxJ8tc=/FdGqv2QG_0Wxh13vXNg2TjipfZA="'
-            status: '200'
-          body:
-            kind: compute#nodeTemplate
-            id: '1252997019390889014'
-            creationTimestamp: '2018-10-17T10:35:21.583-07:00'
-            name: $$template$$
-            nodeType: n1-node-96-624
-            status: READY
-            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$\].
     - expect_exit:
         code: 0
+
+- execute_command:
+    command: compute sole-tenancy node-templates describe $$template$$ --region $$my-region$$
+      --format="table(name, nodeType)"
+    validation_only: true
+    events:
+    - expect_stdout: |
+        NAME                                          NODE_TYPE
+        $$template$$  n1-node-96-624
+    - expect_exit:
+        code: 0
+
 - execute_command:
     command: compute sole-tenancy node-groups create $$group$$ --zone $$my-zone$$
       --node-template $$template$$ --target-size 1
@@ -132,7 +100,7 @@ actions:
           body:
             json:
               name: $$group$$
-              nodeTemplate: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$
+              nodeTemplate: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -141,21 +109,22 @@ actions:
             status: '200'
           body:
             kind: compute#operation
-            id: '7631067400056261680'
-            name: operation-1539797725905-57870187a8068-456eb2c6-2d1b8371
+            id: '4333547688030850631'
+            name: operation-1558638760037-58992dda00d9a-74645d03-4c039cb4
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
             operationType: compute.nodeGroups.insert
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$
-            targetId: '6757311257791614000'
+            targetId: '8412069535918280263'
             status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-10-17T10:35:27.281-07:00'
-            startTime: '2018-10-17T10:35:27.281-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1539797725905-57870187a8068-456eb2c6-2d1b8371
+            insertTime: '2019-05-23T12:12:40.399-07:00'
+            startTime: '2019-05-23T12:12:40.429-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1558638760037-58992dda00d9a-74645d03-4c039cb4
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$?alt=json
@@ -167,12 +136,12 @@ actions:
             Cache-Control: private, max-age=0
             Content-Length: '661'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"iovahcWW_-kGvHF34EI9SUbo8C0=/lMpIGg-mxWzV4c1R3pkuTBmw9yM="'
+            ETag: '"mTVUvN2TcLl86w7BhZVenEUbg_I=/t6cOzfBgWjR-HIE_RY-wvY54I-0="'
             status: '200'
           body:
             kind: compute#nodeGroup
-            id: '6757311257791614000'
-            creationTimestamp: '2018-10-17T10:35:27.297-07:00'
+            id: '8412069535918280263'
+            creationTimestamp: '2019-05-23T12:12:40.407-07:00'
             name: $$group$$
             nodeTemplate: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
@@ -184,230 +153,19 @@ actions:
 - execute_command:
     command: compute instances create $$instance$$ --zone $$my-zone$$ --node-group
       $$group$$ --machine-type n1-standard-2
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '488'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"mjrrRYPfsOVxGKMzIKVphdmBA_A=/fMOE-zoLleGR_yxoJoDW1rXxEV0="'
-            status: '200'
-          body:
-            kind: compute#zone
-            id: '2002'
-            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
-            name: $$my-zone$$
-            description: $$my-zone$$
-            status: UP
-            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-            availableCpuPlatforms:
-            - Intel Skylake
-            - Intel Broadwell
-            - Intel Haswell
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          omit_fields:
-          - commonInstanceMetadata
-          - quotas
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '145248'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"Hce6MYwUbRZ3zzHFnVxJcohXytc=/dVGGpsyHHPo1F6mHeBpPATrOokA="'
-            status: '200'
-          body:
-            kind: compute#project
-            id: '17966956004057981335'
-            creationTimestamp: '2014-09-30T07:55:22.502-07:00'
-            name: cloud-sdk-integration-testing
-            usageExportLocation:
-              bucketName: cloud-sdk-integration-test-usage
-              reportNamePrefix: ''
-            enabledFeatures:
-            - alpha-api
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing
-            defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
-            xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
-            defaultNetworkTier: PREMIUM
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              canIpForward: false
-              deletionProtection: false
-              disks:
-              - autoDelete: true
-                boot: true
-                initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
-                mode: READ_WRITE
-                type: PERSISTENT
-              machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/machineTypes/n1-standard-2
-              metadata: {}
-              name: $$instance$$
-              networkInterfaces:
-              - accessConfigs:
-                - name: external-nat
-                  type: ONE_TO_ONE_NAT
-                network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              scheduling:
-                automaticRestart: true
-                nodeAffinities:
-                - key: compute.googleapis.com/node-group-name
-                  operator: IN
-                  values:
-                  - $$group$$
-              serviceAccounts:
-              - email: default
-                scopes:
-                - https://www.googleapis.com/auth/devstorage.read_only
-                - https://www.googleapis.com/auth/logging.write
-                - https://www.googleapis.com/auth/monitoring.write
-                - https://www.googleapis.com/auth/pubsub
-                - https://www.googleapis.com/auth/service.management.readonly
-                - https://www.googleapis.com/auth/servicecontrol
-                - https://www.googleapis.com/auth/trace.append
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '825'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '37151344794717686'
-            name: operation-1539797782114-578701bd42ed2-4e8eb526-0763210e
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-            operationType: insert
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$
-            targetId: '391354213909319161'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-10-17T10:36:26.252-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1539797782114-578701bd42ed2-4e8eb526-0763210e
-        poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '2759'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"ZX24-gzzJiszWrikTpYS-RJDXfo=/2VnDWDWFgSNqhAEskwvljP39hgs="'
-            status: '200'
-          body:
-            kind: compute#instance
-            id: '391354213909319161'
-            creationTimestamp: '2018-10-17T10:36:25.636-07:00'
-            name: $$instance$$
-            tags:
-              fingerprint: 42WmSpB8rSM=
-            machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/machineTypes/n1-standard-2
-            status: RUNNING
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-            canIpForward: false
-            networkInterfaces:
-            - kind: compute#networkInterface
-              network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.0.149
-              name: nic0
-              accessConfigs:
-              - kind: compute#accessConfig
-                type: ONE_TO_ONE_NAT
-                name: external-nat
-                natIP: 35.232.191.78
-                networkTier: PREMIUM
-              fingerprint: DTwltafW9ZQ=
-            disks:
-            - kind: compute#attachedDisk
-              type: PERSISTENT
-              mode: READ_WRITE
-              source: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$instance$$
-              deviceName: persistent-disk-0
-              index: 0
-              boot: true
-              autoDelete: true
-              licenses:
-              - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
-              interface: SCSI
-              guestOsFeatures:
-              - type: VIRTIO_SCSI_MULTIQUEUE
-            metadata:
-              kind: compute#metadata
-              fingerprint: 4_QxQ57NQak=
-            serviceAccounts:
-            - email: 462803083913-compute@developer.gserviceaccount.com
-              scopes:
-              - https://www.googleapis.com/auth/devstorage.read_only
-              - https://www.googleapis.com/auth/logging.write
-              - https://www.googleapis.com/auth/monitoring.write
-              - https://www.googleapis.com/auth/pubsub
-              - https://www.googleapis.com/auth/service.management.readonly
-              - https://www.googleapis.com/auth/servicecontrol
-              - https://www.googleapis.com/auth/trace.append
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$
-            scheduling:
-              onHostMaintenance: MIGRATE
-              automaticRestart: true
-              preemptible: false
-              nodeAffinities:
-              - key: compute.googleapis.com/node-group-name
-                operator: IN
-                values:
-                - $$group$$
-            cpuPlatform: Intel Skylake
-            labelFingerprint: 42WmSpB8rSM=
-            startRestricted: false
-            deletionProtection: false
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$\].
     - expect_stdout:
         matches: .*$$instance$$\s+$$my-zone$$\s+n1-standard-2.*RUNNING.*
     - expect_exit:
         code: 0
 - execute_command:
     command: compute sole-tenancy node-groups list-nodes $$group$$ --zone $$my-zone$$
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$/listNodes?alt=json&maxResults=500
-          method: POST
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '474'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#nodeGroupsListNodes
-            items:
-            - name: $$group$$-gjc6
-              status: READY
-              nodeType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeTypes/n1-node-96-624
-              instances:
-              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$
     - expect_stdout:
         matches: .*$$group$$.*READY\s+n1-node-96-624\s+$$instance$$.*
     - expect_exit:
@@ -415,106 +173,32 @@ actions:
 - execute_command:
     command: compute instances delete $$instance$$ --zone $$my-zone$$ --quiet
     cleanup_for: instance
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '827'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '2089718294317288867'
-            name: operation-1539797835681-578701f058cea-8c43c58c-f4aabfb4
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-            operationType: delete
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$
-            targetId: '391354213909319161'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-10-17T10:37:16.694-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1539797835681-578701f058cea-8c43c58c-f4aabfb4
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute sole-tenancy node-groups delete $$group$$ --zone $$my-zone$$
       --quiet
     cleanup_for: group
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '895'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '3548540044193746242'
-            name: operation-1539797932464-5787024ca5784-1854d8d0-c0a6c6f9
-            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-            operationType: compute.nodeGroups.delete
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$
-            targetId: '6757311257791614000'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-10-17T10:38:53.833-07:00'
-            startTime: '2018-10-17T10:38:53.833-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1539797932464-5787024ca5784-1854d8d0-c0a6c6f9
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute sole-tenancy node-templates delete $$template$$ --region $$my-region$$
       --quiet
     cleanup_for: template
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '903'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '2719838310727601493'
-            name: operation-1539797945362-57870258f2651-55be92b6-1b722f3f
-            operationType: compute.nodeTemplates.delete
-            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$
-            targetId: '1252997019390889014'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2018-10-17T10:39:06.837-07:00'
-            startTime: '2018-10-17T10:39:06.837-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1539797945362-57870258f2651-55be92b6-1b722f3f
-            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$\].
     - expect_exit:
         code: 0

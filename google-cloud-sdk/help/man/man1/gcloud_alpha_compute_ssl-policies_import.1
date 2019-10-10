@@ -1,0 +1,69 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SSL\-POLICIES_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute ssl\-policies import \- import an SSL policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute ssl\-policies import\fR \fISSL_POLICY\fR [\fB\-\-source\fR=\fISOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR If the specified SSL policy already exists, it will be
+overwritten. Otherwise, a new SSL policy will be created. To edit an SSL policy
+you can export the SSL policy to a file, edit its configuration, and then import
+the new configuration.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISSL_POLICY\fR
+Name of the SSL policy to import.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a YAML file containing ssl policy configuration export data. The YAML
+file must not contain any output\-only fields. Alternatively, you may omit this
+flag to read from standard input. A schema describing the export/import format
+can be found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/alpha/SslPolicy.yaml.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

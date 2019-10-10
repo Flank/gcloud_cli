@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Flags and helpers for the compute subnetworks commands."""
 
 from __future__ import absolute_import
@@ -61,14 +60,20 @@ def SubnetworkResolver():
       'subnetwork', {compute_scope.ScopeEnum.REGION: 'compute.subnetworks'})
 
 
-def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
+def AddUpdateArgs(parser, include_alpha_logging,
+                  include_l7_internal_load_balancing,
+                  include_private_ipv6_access):
   """Add args to the parser for subnet update.
 
   Args:
     parser: The argparse parser.
-    include_beta: Include beta functionality.
-    include_alpha: Include alpha functionality.
+    include_alpha_logging: Include alpha-specific logging args.
+    include_l7_internal_load_balancing: Include Internal HTTP(S) LB args.
+    include_private_ipv6_access: Include Private Ipv6 Access args.
   """
+  messages = apis.GetMessagesModule('compute',
+                                    compute_api.COMPUTE_GA_API_VERSION)
+
   updated_field = parser.add_mutually_exclusive_group()
 
   updated_field.add_argument(
@@ -111,14 +116,25 @@ def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
             'for VPC flow logs can be found at '
             'https://cloud.google.com/vpc/docs/using-flow-logs.'))
 
-  if include_beta:
+  AddLoggingAggregationInterval(parser, messages)
+  parser.add_argument(
+      '--logging-flow-sampling',
+      type=arg_parsers.BoundedFloat(lower_bound=0.0, upper_bound=1.0),
+      help="""\
+      Can only be specified if VPC flow logging for this subnetwork is
+      enabled. The value of the field must be in [0, 1]. Set the sampling rate
+      of VPC flow logs within the subnetwork where 1.0 means all collected
+      logs are reported and 0.0 means no logs are reported. Default is 0.5
+      which means half of all collected logs are reported.
+      """)
+  AddLoggingMetadata(parser, messages)
+
+  if include_alpha_logging:
     messages = apis.GetMessagesModule('compute',
-                                      compute_api.COMPUTE_BETA_API_VERSION)
-
-    AddLoggingAggregationInterval(parser, messages)
-
+                                      compute_api.COMPUTE_ALPHA_API_VERSION)
+    AddLoggingAggregationIntervalAlpha(parser, messages)
     parser.add_argument(
-        '--logging-flow-sampling',
+        '--flow-sampling',
         type=arg_parsers.BoundedFloat(lower_bound=0.0, upper_bound=1.0),
         help="""\
         Can only be specified if VPC flow logging for this subnetwork is
@@ -127,12 +143,9 @@ def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
         logs are reported and 0.0 means no logs are reported. Default is 0.5
         which means half of all collected logs are reported.
         """)
+    AddLoggingMetadataAlpha(parser, messages)
 
-    AddLoggingMetadata(parser, messages)
-
-  if include_alpha:
-    messages = apis.GetMessagesModule('compute',
-                                      compute_api.COMPUTE_ALPHA_API_VERSION)
+  if include_l7_internal_load_balancing:
     updated_field.add_argument(
         '--role',
         choices={'ACTIVE': 'The ACTIVE subnet that is currently used.'},
@@ -144,7 +157,6 @@ def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
               '\n\nThis field is only valid when updating a reserved IP '
               'address range used\nfor the purpose of Internal HTTP(S) Load '
               'Balancer.'))
-
     parser.add_argument(
         '--drain-timeout',
         type=arg_parsers.Duration(lower_bound='0s'),
@@ -159,28 +171,31 @@ def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
         only applicable when the [--role=ACTIVE] flag is being used.
         """)
 
-    AddLoggingAggregationIntervalAlpha(parser, messages)
-
-    parser.add_argument(
-        '--flow-sampling',
-        type=arg_parsers.BoundedFloat(lower_bound=0.0, upper_bound=1.0),
-        help="""\
-        Can only be specified if VPC flow logging for this subnetwork is
-        enabled. The value of the field must be in [0, 1]. Set the sampling rate
-        of VPC flow logs within the subnetwork where 1.0 means all collected
-        logs are reported and 0.0 means no logs are reported. Default is 0.5
-        which means half of all collected logs are reported.
-        """)
-
-    AddLoggingMetadataAlpha(parser, messages)
-
+  if include_private_ipv6_access:
     updated_field.add_argument(
         '--enable-private-ipv6-access',
         action=arg_parsers.StoreTrueFalseAction,
         help=('Enable/disable private IPv6 access for the subnet.'))
-
+    update_private_ipv6_access_field = updated_field.add_argument_group()
     GetPrivateIpv6GoogleAccessTypeFlagMapper(messages).choice_arg.AddToParser(
-        updated_field)
+        update_private_ipv6_access_field)
+    update_private_ipv6_access_field.add_argument(
+        '--private-ipv6-google-access-service-accounts',
+        default=None,
+        metavar='EMAIL',
+        type=arg_parsers.ArgList(min_length=0),
+        help="""\
+        The service accounts can be used to selectively turn on Private IPv6
+        Google Access only on the VMs primary service account matching the
+        value.
+
+        Setting this will override the existing Private IPv6 Google Access
+        service accounts for the subnetwork.
+        The following will clear the existing Private IPv6 Google Access service
+        accounts:
+
+        $ {command} MY-SUBNET --private-ipv6-google-access-service-accounts ''
+        """)
 
 
 def GetPrivateIpv6GoogleAccessTypeFlagMapper(messages):
@@ -193,7 +208,9 @@ def GetPrivateIpv6GoogleAccessTypeFlagMapper(messages):
           'ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE':
               'enable-bidirectional-access',
           'ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE':
-              'enable-outbound-vm-access'
+              'enable-outbound-vm-access',
+          'ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS':
+              'enable-outbound-vm-access-for-service-accounts'
       },
       help_str='The private IPv6 google access type for the VMs in this subnet.'
   )

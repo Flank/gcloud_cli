@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import json
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.resource import resource_printer
+import six
 
 
 def SecurityPolicyFromFile(input_file, messages, file_format):
@@ -45,7 +46,7 @@ def SecurityPolicyFromFile(input_file, messages, file_format):
       parsed_security_policy = json.load(input_file)
     except ValueError as e:
       raise exceptions.BadFileException('Error parsing JSON: {0}'.format(
-          str(e)))
+          six.text_type(e)))
 
   security_policy = messages.SecurityPolicy()
   if 'description' in parsed_security_policy:

@@ -58,16 +58,17 @@ help\fR for details.
 To look at the contents of the transaction, run:
 
 .RS 2m
-$ gcloud dns record\-sets transaction describe \-\-zone MANAGED_ZONE
+$ gcloud dns record\-sets transaction describe \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha dns record\-sets transaction describe
 $ gcloud beta dns record\-sets transaction describe
 .RE
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class Detach(base.DeleteCommand):
   @staticmethod
   def Args(parser):
     resource_args.AddRegistrationResourceArg(parser, 'to detach')
-    flags.AddAsyncFlagToParser(parser, 'detach')
+    flags.AddAsyncFlagToParser(parser)
 
   def Run(self, args):
     client = registrations.RegistrationsClient()
@@ -64,7 +64,7 @@ class Detach(base.DeleteCommand):
 
     response = client.Detach(registration_ref)
 
-    if args.async:
+    if args.async_:
       # TODO(b/110077203): Log something sensible.
       return response
 

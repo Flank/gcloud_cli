@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +19,15 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import domain_mapping
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.run import flags
 from tests.lib.surface.run import base
 
 
-class DomainMappingCreateTest(base.ServerlessSurfaceBase):
+class DomainMappingCreateTestBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDescribe_Succeed(self):
     """Successfully describe a domain mapping."""
@@ -55,3 +59,9 @@ class DomainMappingCreateTest(base.ServerlessSurfaceBase):
     self.assertIn(
         'Cannot find domain mapping for domain name [www.not-mapped.com]',
         str(context.exception))
+
+
+class DomainMappingCreateTestAlpha(DomainMappingCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

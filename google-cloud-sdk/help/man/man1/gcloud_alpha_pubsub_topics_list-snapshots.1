@@ -99,21 +99,21 @@ help\fR for details.
 To filter results by snapshot name (ie. only show snapshot 'mysnaps'), run:
 
 .RS 2m
-$ gcloud alpha pubsub topics list\-snapshots \-\-topic mytopic \e
+$ gcloud alpha pubsub topics list\-snapshots mytopic \e
     \-\-filter=snapshotId:mysnaps
 .RE
 
 To combine multiple filters (with AND or OR), run:
 
 .RS 2m
-$ gcloud alpha pubsub topics list\-snapshots \-\-topic mytopic \e
+$ gcloud alpha pubsub topics list\-snapshots mytopic \e
     \-\-filter="snapshotId:mysnaps1 AND snapshotId:mysnaps2"
 .RE
 
 To filter snapshots that match an expression:
 
 .RS 2m
-$ gcloud alpha pubsub topics list\-snapshots \-\-topic mytopic \e
+$ gcloud alpha pubsub topics list\-snapshots mytopic \e
     \-\-filter="snapshotId:snaps_*"
 .RE
 
@@ -123,7 +123,6 @@ $ gcloud alpha pubsub topics list\-snapshots \-\-topic mytopic \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

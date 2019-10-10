@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -483,6 +483,8 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_NoLaunchBrowser(self):
     """Test when the user does not want to open the browser."""
+    self.ExpectGetApplicationRequest(self.Project())
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app services browse --no-launch-browser service1 service2')
     self.open_mock.assert_not_called()
     self.launch_browser_mock.assert_called_with(False)
@@ -495,6 +497,7 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_SpecifyOneService(self):
     """Test `app services browse` with one service specified."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app services browse service1')
     self.launch_browser_mock.assert_called_with(True)
     self.open_mock.assert_called_once_with(
@@ -502,6 +505,8 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_SpecifyMultipleServices(self):
     """Test `app services browse` with multiple services specified."""
+    self.ExpectGetApplicationRequest(self.Project())
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app services browse service1 service2')
     self.open_mock.assert_has_calls([
         mock.call(
@@ -513,18 +518,22 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_SpecifyVersionDefaultService(self):
     """Test `app services browse` with no service specified and --version."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app services browse default --version="v1"')
     self.open_mock.assert_called_once_with(
         'https://v1-dot-{0}.appspot.com'.format(self.Project()))
 
   def testBrowse_SpecifyVersionAndService(self):
     """Test `app services browse` with one service and version specified."""
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app services browse service1 --version=v1')
     self.open_mock.assert_called_once_with(
         'https://v1-dot-service1-dot-{0}.appspot.com'.format(self.Project()))
 
   def testBrowse_MultiServicesSpecifyVersion(self):
     """Test `app services browse` with one version and 2 services specified."""
+    self.ExpectGetApplicationRequest(self.Project())
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app services browse service1 service2 -v=v1')
     self.open_mock.assert_has_calls([
         mock.call(

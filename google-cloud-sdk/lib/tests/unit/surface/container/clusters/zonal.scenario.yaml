@@ -156,7 +156,7 @@ actions:
               selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$/nodePools/default-pool
               version: 1.9.7-gke.5
               instanceGroupUrls:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
               status: RUNNING
             locations:
             - us-central1-f
@@ -175,7 +175,7 @@ actions:
             nodeIpv4CidrSize: 24
             servicesIpv4Cidr: 10.47.240.0/20
             instanceGroupUrls:
-            - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+            - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
             currentNodeCount: 1
     - expect_file_written:
         path: ~/.kube/config
@@ -258,7 +258,7 @@ actions:
                 selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$/nodePools/default-pool
                 version: 1.9.7-gke.5
                 instanceGroupUrls:
-                - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+                - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
                 status: RUNNING
               locations:
               - us-central1-f
@@ -277,7 +277,7 @@ actions:
               nodeIpv4CidrSize: 24
               servicesIpv4Cidr: 10.47.240.0/20
               instanceGroupUrls:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
               currentNodeCount: 1
             - name: us-central1-composer-enviro-f1a6ba1a-gke
               initialNodeCount: 3
@@ -318,7 +318,7 @@ actions:
                 selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-c/clusters/us-central1-composer-enviro-f1a6ba1a-gke/nodePools/default-pool
                 version: 1.7.11-gke.1
                 instanceGroupUrls:
-                - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-c/instanceGroupManagers/gke-us-central1-composer-default-pool-cd7d1e63-grp
+                - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-c/instanceGroupManagers/gke-us-central1-composer-default-pool-cd7d1e63-grp
                 status: RUNNING
               locations:
               - us-central1-c
@@ -341,7 +341,7 @@ actions:
               nodeIpv4CidrSize: 24
               servicesIpv4Cidr: 10.43.240.0/20
               instanceGroupUrls:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-c/instanceGroupManagers/gke-us-central1-composer-default-pool-cd7d1e63-grp
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-c/instanceGroupManagers/gke-us-central1-composer-default-pool-cd7d1e63-grp
     - expect_stdout:
         matches: .*$$cluster$$\s+us-central1-f.*RUNNING.*
     - expect_stderr:

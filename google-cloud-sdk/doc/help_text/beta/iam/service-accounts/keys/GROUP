@@ -29,6 +29,9 @@ COMMANDS
      list
         (BETA) List the keys for a service account.
 
+     upload
+        (BETA) Upload a public key for an IAM service account.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

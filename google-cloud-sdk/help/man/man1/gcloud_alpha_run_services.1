@@ -64,6 +64,10 @@ help\fR for details.
 \fB(ALPHA)\fR Remove IAM policy binding of a Cloud Run service.
 
 .TP 2m
+\fBreplace\fR
+\fB(ALPHA)\fR Creates or replaces a service from a YAML Service specification.
+
+.TP 2m
 \fBset\-iam\-policy\fR
 \fB(ALPHA)\fR Set the IAM policy for a service.
 
@@ -71,6 +75,10 @@ help\fR for details.
 \fBupdate\fR
 \fB(ALPHA)\fR Update Cloud Run environment variables and other configuration
 settings.
+
+.TP 2m
+\fBupdate\-traffic\fR
+\fB(ALPHA)\fR Adjust the trafic assignments for a Cloud Run service.
 
 
 .RE
@@ -90,9 +98,8 @@ $ gcloud alpha run services list
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
 
 .RS 2m
 $ gcloud beta run services

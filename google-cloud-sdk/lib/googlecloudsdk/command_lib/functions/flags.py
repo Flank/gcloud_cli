@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,19 +36,17 @@ API_VERSION = 'v1'
 LOCATIONS_COLLECTION = API + '.projects.locations'
 
 SEVERITIES = ['DEBUG', 'INFO', 'ERROR']
-EGRESS_SETTINGS = ['UNSPECIFIED', 'PRIVATE', 'ALL']
-INGRESS_SETTINGS = ['UNSPECIFIED', 'ALL', 'INTERNAL-ONLY', 'INTERNAL-AND-GCLB']
+EGRESS_SETTINGS = ['PRIVATE-RANGES-ONLY', 'ALL']
+INGRESS_SETTINGS = ['ALL', 'INTERNAL-ONLY', 'INTERNAL-AND-GCLB']
 INGRESS_SETTINGS_MAPPING = {
     'ALLOW_ALL': 'all',
     'ALLOW_INTERNAL_ONLY': 'internal-only',
     'ALLOW_INTERNAL_AND_GCLB': 'internal-and-gclb',
-    'INGRESS_SETTINGS_UNSPECIFIED': 'unspecified',
 }
 
 EGRESS_SETTINGS_MAPPING = {
-    'PRIVATE_RANGES_ONLY': 'private',
+    'PRIVATE_RANGES_ONLY': 'private-ranges-only',
     'ALL_TRAFFIC': 'all',
-    'VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED': 'unspecified',
 }
 
 
@@ -66,7 +64,7 @@ def AddIngressSettingsFlag(parser):
       '--ingress-settings',
       choices=[x.lower() for x in INGRESS_SETTINGS],
       help_str='Ingress settings controls what traffic can reach the function.'
-  )
+      'By default `all` will be used.')
   ingress_settings_arg.AddToParser(parser)
 
 
@@ -75,9 +73,8 @@ def AddEgressSettingsFlag(parser):
       '--egress-settings',
       choices=[x.lower() for x in EGRESS_SETTINGS],
       help_str='Egress settings controls what traffic is diverted through the '
-               'VPC Access Connector resource. '
-               'By default private_ranges_only will be used.'
-  )
+      'VPC Access Connector resource. '
+      'By default `private-ranges-only` will be used.')
   egress_settings_arg.AddToParser(parser)
 
 
@@ -260,16 +257,25 @@ def AddRuntimeFlag(parser):
           """)
 
 
-def AddVPCConnectorFlag(parser):
+def AddVPCConnectorMutexGroup(parser):
   """Add flag for specyfying VPC connector to the parser."""
-  parser.add_argument(
+  mutex_group = parser.add_group(mutex=True)
+  mutex_group.add_argument(
       '--vpc-connector',
       help="""\
-        The VPC Access connector that the function can connect to. It
-        should be the fully-qualified URI of the VPC Access connector
-        resource whose format is:
+        The VPC Access connector that the function can connect to. It can be
+        either the fully-qualified URI, or the short name of the VPC Access
+        connector resource. If the short name is used, the connector must
+        belong to the same project. The format of this field is either
         `projects/${PROJECT}/locations/${LOCATION}/connectors/${CONNECTOR}`
-        or an empty string to clear the field.
+        or `${CONNECTOR}`, where `${CONNECTOR}` is the short name of the VPC
+        Access connector.
+      """)
+  mutex_group.add_argument(
+      '--clear-vpc-connector',
+      action='store_true',
+      help="""\
+        Clears the VPC connector field.
       """)
 
 
@@ -449,3 +455,10 @@ def AddIAMPolicyFileArg(parser):
       metavar='POLICY_FILE',
       help='Path to a local JSON or YAML formatted file '
       'containing a valid policy.')
+
+
+def AddIgnoreFileFlag(parser):
+  parser.add_argument(
+      '--ignore-file',
+      help='Override the .gcloudignore file and use the specified file instead.'
+      )

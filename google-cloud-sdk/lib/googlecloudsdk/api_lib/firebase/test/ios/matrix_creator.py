@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ import uuid
 
 from apitools.base.py import exceptions as apitools_exceptions
 
+from googlecloudsdk.api_lib.firebase.test import matrix_creator_common
 from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.firebase.test import util
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 
 
@@ -96,10 +96,25 @@ class MatrixCreator(object):
             xcodeVersion=self._args.xcode_version))
     return spec
 
+  def _BuildIosTestLoopTestSpec(self):
+    """Build a TestSpecification for an IosXcTest."""
+    setup = self._messages.IosTestSetup(
+        networkProfile=getattr(self._args, 'network_profile', None))
+    spec = self._messages.TestSpecification(
+        disableVideoRecording=not self._args.record_video,
+        iosTestSetup=setup,
+        testTimeout=matrix_ops.ReformatDuration(self._args.timeout),
+        iosTestLoop=self._messages.IosTestLoop(
+            appIpa=self._BuildFileReference(self._args.app),
+            scenarios=self._args.scenario_numbers))
+    return spec
+
   def _TestSpecFromType(self, test_type):
     """Map a test type into its corresponding TestSpecification message ."""
     if test_type == 'xctest':
       return self._BuildIosXcTestSpec()
+    elif test_type == 'game-loop':
+      return self._BuildIosTestLoopTestSpec()
     else:  # It's a bug in our arg validation if we ever get here.
       raise exceptions.InvalidArgumentException(
           'type', 'Unknown test type "{}".'.format(test_type))
@@ -123,14 +138,9 @@ class MatrixCreator(object):
     results = self._messages.ResultStorage(googleCloudStorage=gcs,
                                            toolResultsHistory=hist)
 
-    client_info = self._messages.ClientInfo(
-        name='gcloud',
-        clientInfoDetails=[
-            self._messages.ClientInfoDetail(
-                key='Cloud SDK Version', value=config.CLOUD_SDK_VERSION),
-            self._messages.ClientInfoDetail(
-                key='Release Track', value=self._release_track)
-        ])
+    client_info = matrix_creator_common.BuildClientInfo(
+        self._messages,
+        getattr(self._args, 'client_details', {}) or {}, self._release_track)
 
     return self._messages.TestMatrix(
         testSpecification=spec,

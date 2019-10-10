@@ -3,9 +3,10 @@ NAME
         running containers
 
 SYNOPSIS
-    gcloud alpha container clusters resize NAME --num-nodes=NUM_NODES,
-        --size=NUM_NODES [--async] [--node-pool=NODE_POOL]
-        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha container clusters resize NAME
+        (--num-nodes=NUM_NODES | --size=NUM_NODES) [--async]
+        [--node-pool=NODE_POOL] [--region=REGION | --zone=ZONE, -z ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Resize an existing cluster to a provided size.
@@ -33,12 +34,20 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 REQUIRED FLAGS
-     --num-nodes=NUM_NODES, --size=NUM_NODES
-        Target number of nodes in the cluster.
+     Exactly one of these must be specified:
+
+       --num-nodes=NUM_NODES
+          Target number of nodes in the cluster.
+
+       --size=NUM_NODES
+          (DEPRECATED) Target number of nodes in the cluster.
+
+          The --size flag is now deprecated. Please use --num-nodes instead.
 
 OPTIONAL FLAGS
      --async
-        Don't wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --node-pool=NODE_POOL
         The node pool to resize.
@@ -62,9 +71,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud container clusters resize
         $ gcloud beta container clusters resize

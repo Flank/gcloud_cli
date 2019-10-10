@@ -11,21 +11,40 @@ gcloud beta resource\-manager org\-policies list \- list Organization Policies a
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta resource\-manager org\-policies list\fR [\fB\-\-folder\fR=\fIFOLDER_ID\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fB\-\-show\-unset\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta resource\-manager org\-policies list\fR (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-show\-unset\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Resource that is associated with the organization policy. Exactly one of these
+must be specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-folder\fR=\fIFOLDER_ID\fR
-Folder ID for Org Policies.
+Folder ID.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION_ID\fR
-Organization ID for Org Policies.
+Organization ID.
 
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+Project ID. Overrides the default \fBcore/project\fR property value for this
+command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
 .TP 2m
 \fB\-\-show\-unset\fR
 Show available constraints. For more information about constraints, see

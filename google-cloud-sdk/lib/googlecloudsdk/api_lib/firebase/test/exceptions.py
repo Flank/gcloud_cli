@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -164,6 +164,10 @@ def ExternalArgNameFrom(arg_internal_name):
   Returns:
     The user visible name for the argument.
   """
+  if arg_internal_name == 'async_':
+    # The async flag has a special destination in the argparse namespace since
+    # 'async' is a reserved keyword as of Python 3.7.
+    return 'async'
   return arg_internal_name.replace('_', '-')
 
 

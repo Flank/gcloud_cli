@@ -50,7 +50,7 @@ ID of the registration or fully qualified identifier for the registration.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Don't wait for update operation to finish.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-registrant\-contact\-from\-file\fR=\fIREGISTRANT_CONTACT_FROM_FILE\fR
@@ -183,7 +183,6 @@ $ gcloud alpha domains registrations update example.com \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

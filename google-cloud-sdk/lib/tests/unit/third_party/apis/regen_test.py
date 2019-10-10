@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ _CONFIG = os.path.join(
     _BASE_DIR, 'googlecloudsdk', 'third_party', 'regen_apis_config.yaml')
 
 
-@test_case.Filters.SkipOnPy3('Not yet modernized', 'b/80532599')
+@test_case.Filters.SkipOnPy3('Support both py2 and py3', 'b/138241113')
 class ClientGenCliTest(test_case.TestCase):
   pass
 

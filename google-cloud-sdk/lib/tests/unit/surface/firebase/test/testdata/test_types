@@ -9,6 +9,9 @@ type-robo:
 type-xctest:
   type: xctest
 
+type-game-loop:
+  type: game-loop
+
 # Invalid test type args
 
 type-misspell:

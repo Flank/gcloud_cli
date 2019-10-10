@@ -177,13 +177,28 @@ class AccesscontextmanagerAccessPoliciesAccessLevelsPatchRequest(_messages.Messa
     name: Required. Resource name for the Access Level. The `short_name`
       component must begin with a letter and only include alphanumeric and
       '_'. Format: `accessPolicies/{policy_id}/accessLevels/{short_name}`
-    updateMask: Required.  Mask to control which fields get updated. Must be
+    updateMask: Required. Mask to control which fields get updated. Must be
       non-empty.
   """
 
   accessLevel = _messages.MessageField('AccessLevel', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class AccesscontextmanagerAccessPoliciesAccessLevelsReplaceAllRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesAccessLevelsReplaceAllRequest
+  object.
+
+  Fields:
+    parent: Required. Resource name for the access policy which owns these
+      Access Levels.  Format: `accessPolicies/{policy_id}`
+    replaceAccessLevelsRequest: A ReplaceAccessLevelsRequest resource to be
+      passed as the request body.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  replaceAccessLevelsRequest = _messages.MessageField('ReplaceAccessLevelsRequest', 2)
 
 
 class AccesscontextmanagerAccessPoliciesDeleteRequest(_messages.Message):
@@ -315,6 +330,21 @@ class AccesscontextmanagerAccessPoliciesServicePerimetersPatchRequest(_messages.
   updateMask = _messages.StringField(3)
 
 
+class AccesscontextmanagerAccessPoliciesServicePerimetersReplaceAllRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesServicePerimetersReplaceAllRequest
+  object.
+
+  Fields:
+    parent: Required. Resource name for the access policy which owns these
+      Service Perimeters.  Format: `accessPolicies/{policy_id}`
+    replaceServicePerimetersRequest: A ReplaceServicePerimetersRequest
+      resource to be passed as the request body.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  replaceServicePerimetersRequest = _messages.MessageField('ReplaceServicePerimetersRequest', 2)
+
+
 class AccesscontextmanagerOperationsGetRequest(_messages.Message):
   r"""A AccesscontextmanagerOperationsGetRequest object.
 
@@ -363,6 +393,21 @@ class BasicLevel(_messages.Message):
 
   combiningFunction = _messages.EnumField('CombiningFunctionValueValuesEnum', 1)
   conditions = _messages.MessageField('Condition', 2, repeated=True)
+
+
+class BridgeServiceRestriction(_messages.Message):
+  r"""Alpha. Specifies which services are granted access via this Bridge
+  Service Perimeter.
+
+  Fields:
+    allowedServices: The list of APIs usable through the Bridge Perimeter.
+      Must be empty unless 'enable_restriction' is True.
+    enableRestriction: Whether to restrict the set of APIs callable through
+      the Bridge Service Perimeter.
+  """
+
+  allowedServices = _messages.StringField(1, repeated=True)
+  enableRestriction = _messages.BooleanField(2)
 
 
 class Condition(_messages.Message):
@@ -470,6 +515,21 @@ class DevicePolicy(_messages.Message):
   requireAdminApproval = _messages.BooleanField(4)
   requireCorpOwned = _messages.BooleanField(5)
   requireScreenlock = _messages.BooleanField(6)
+
+
+class IngressServiceRestriction(_messages.Message):
+  r"""Alpha. Specifies how Access Levels are to be used for accessing the
+  Service Perimeter.
+
+  Fields:
+    allowedServices: The list of APIs usable with a valid Access Level. Must
+      be empty unless 'enable_restriction' is True.
+    enableRestriction: Whether to restrict the set of APIs callable outside
+      the Service Perimeter via Access Levels.
+  """
+
+  allowedServices = _messages.StringField(1, repeated=True)
+  enableRestriction = _messages.BooleanField(2)
 
 
 class ListAccessLevelsResponse(_messages.Message):
@@ -658,6 +718,52 @@ class OsConstraint(_messages.Message):
   requireVerifiedChromeOs = _messages.BooleanField(3)
 
 
+class ReplaceAccessLevelsRequest(_messages.Message):
+  r"""A request to replace all existing Access Levels in an Access Policy with
+  the Access Levels provided. This is done within one transaction.
+
+  Fields:
+    accessLevels: Required. The desired Access Levels that should replace all
+      existing Access Levels in the Access Policy.
+  """
+
+  accessLevels = _messages.MessageField('AccessLevel', 1, repeated=True)
+
+
+class ReplaceAccessLevelsResponse(_messages.Message):
+  r"""A response to ReplaceAccessLevelsRequest. This will be put inside of
+  Operation.response field.
+
+  Fields:
+    accessLevels: List of the Access Level instances.
+  """
+
+  accessLevels = _messages.MessageField('AccessLevel', 1, repeated=True)
+
+
+class ReplaceServicePerimetersRequest(_messages.Message):
+  r"""A request to replace all existing Service Perimeters in an Access Policy
+  with the Service Perimeters provided. This is done within one transaction.
+
+  Fields:
+    servicePerimeters: Required. The desired Service Perimeters that should
+      replace all existing Service Perimeters in the Access Policy.
+  """
+
+  servicePerimeters = _messages.MessageField('ServicePerimeter', 1, repeated=True)
+
+
+class ReplaceServicePerimetersResponse(_messages.Message):
+  r"""A response to ReplaceServicePerimetersRequest. This will be put inside
+  of Operation.response field.
+
+  Fields:
+    servicePerimeters: List of the Service Perimeter instances.
+  """
+
+  servicePerimeters = _messages.MessageField('ServicePerimeter', 1, repeated=True)
+
+
 class ServicePerimeter(_messages.Message):
   r"""`ServicePerimeter` describes a set of GCP resources which can freely
   import and export data amongst themselves, but not export outside of the
@@ -682,6 +788,13 @@ class ServicePerimeter(_messages.Message):
     createTime: Output only. Time the `ServicePerimeter` was created in UTC.
     description: Description of the `ServicePerimeter` and its use. Does not
       affect behavior.
+    dryRun: Dry run flag. This flag enables dry run tests for the "proposed"
+      Service Perimeter configuration. When this flag is enabled, access
+      restrictions suggestions from the proposed("spec") configuration are
+      tested without actually enforcing them. This testing is done through
+      analyzing the differences between currently enforced and suggested
+      restrictions. As of now, dry_run must be set to true if there is any
+      proposed config
     name: Required. Resource name for the ServicePerimeter.  The `short_name`
       component must begin with a letter and only include alphanumeric and
       '_'. Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
@@ -691,6 +804,10 @@ class ServicePerimeter(_messages.Message):
       being included in regular perimeter. For perimeter bridges,
       restricted/unrestricted service lists as well as access lists must be
       empty.
+    spec: Proposed (or dry run) ServicePerimeter configuration. This
+      configuration allows to specify and test ServicePerimeter configuration
+      without enforcing actual access restrictions. Only allowed to be set
+      when the "dry_run" flag is set.
     status: Current ServicePerimeter configuration. Specifies sets of
       resources, restricted/unrestricted services and access levels that
       determine perimeter content and boundaries.
@@ -714,11 +831,13 @@ class ServicePerimeter(_messages.Message):
 
   createTime = _messages.StringField(1)
   description = _messages.StringField(2)
-  name = _messages.StringField(3)
-  perimeterType = _messages.EnumField('PerimeterTypeValueValuesEnum', 4)
-  status = _messages.MessageField('ServicePerimeterConfig', 5)
-  title = _messages.StringField(6)
-  updateTime = _messages.StringField(7)
+  dryRun = _messages.BooleanField(3)
+  name = _messages.StringField(4)
+  perimeterType = _messages.EnumField('PerimeterTypeValueValuesEnum', 5)
+  spec = _messages.MessageField('ServicePerimeterConfig', 6)
+  status = _messages.MessageField('ServicePerimeterConfig', 7)
+  title = _messages.StringField(8)
+  updateTime = _messages.StringField(9)
 
 
 class ServicePerimeterConfig(_messages.Message):
@@ -735,6 +854,11 @@ class ServicePerimeterConfig(_messages.Message):
       the perimeter. Example:
       `"accessPolicies/MY_POLICY/accessLevels/MY_LEVEL"`. For Service
       Perimeter Bridge, must be empty.
+    bridgeServiceRestriction: Alpha. Configuration for what services are
+      accessible via the Bridge Perimeter. Must be empty for non-Bridge
+      Perimeters.
+    ingressServiceRestriction: Alpha. Configuration for which services may be
+      used with Access Levels.
     resources: A list of GCP resources that are inside of the service
       perimeter. Currently only projects are allowed. Format:
       `projects/{project_number}`
@@ -746,12 +870,17 @@ class ServicePerimeterConfig(_messages.Message):
       Perimeter restrictions. Deprecated. Must be set to a single wildcard
       "*".  The wildcard means that unless explicitly specified by
       "restricted_services" list, any service is treated as unrestricted.
+    vpcServiceRestriction: Alpha. Configuration for within Perimeter allowed
+      APIs.
   """
 
   accessLevels = _messages.StringField(1, repeated=True)
-  resources = _messages.StringField(2, repeated=True)
-  restrictedServices = _messages.StringField(3, repeated=True)
-  unrestrictedServices = _messages.StringField(4, repeated=True)
+  bridgeServiceRestriction = _messages.MessageField('BridgeServiceRestriction', 2)
+  ingressServiceRestriction = _messages.MessageField('IngressServiceRestriction', 3)
+  resources = _messages.StringField(4, repeated=True)
+  restrictedServices = _messages.StringField(5, repeated=True)
+  unrestrictedServices = _messages.StringField(6, repeated=True)
+  vpcServiceRestriction = _messages.MessageField('VpcServiceRestriction', 7)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -820,37 +949,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -893,6 +995,21 @@ class Status(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
+
+
+class VpcServiceRestriction(_messages.Message):
+  r"""Alpha. Specifies how APIs are allowed to communicate within the Service
+  Perimeter.
+
+  Fields:
+    allowedServices: The list of APIs usable within the Service Perimeter.
+      Must be empty unless 'enable_restriction' is True.
+    enableRestriction: Whether to restrict API calls within the Service
+      Perimeter to the list of APIs specified in 'allowed_services'.
+  """
+
+  allowedServices = _messages.StringField(1, repeated=True)
+  enableRestriction = _messages.BooleanField(2)
 
 
 encoding.AddCustomJsonFieldMapping(

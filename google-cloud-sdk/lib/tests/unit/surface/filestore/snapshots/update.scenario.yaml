@@ -1,0 +1,1317 @@
+title: Create Filestore Snapshot
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      filestore snapshots update snap --region us-west1 --description "New description"
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: New description
+      labels:
+        key1: val1
+        key2: val2
+      name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap2 --zone us-west1-b --description "New description"
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: New description
+      labels:
+        key1: val1
+        key2: val2
+      name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap --region us-west1 --update-labels "key1=val1,key2=val2"
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      labels:
+        key1: val1
+        key2: val2
+      name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap2 --zone us-west1-b --update-labels "key1=val1,key2=val2"
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      labels:
+        key1: val1
+        key2: val2
+      name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap --region us-west1 --update-labels "key2=val22,key3=val3" --remove-labels "key1"
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      labels:
+        key2: val22
+      name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap2 --zone us-west1-b --update-labels "key2=val22,key3=val3" --remove-labels "key1"
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      labels:
+        key2: val22
+      name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap --region us-west1 --clear-labels
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+- execute:
+  - command: |
+      filestore snapshots update snap2 --zone us-west1-b --clear-labels
+  - progress_tracker:
+    - message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated snapshot.
+  - stdout: |
+      capacityGb: '2000'
+      createTime: '2019-04-29T22:20:53.258903211Z'
+      description: Description
+      name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+      sourceFileShare: vol
+      sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+      sourceInstanceTier: STANDARD
+      state: READY
+      storageBytes: '15260160'
+actions:
+- execute_command:
+    command: |
+      filestore snapshots update snap --region us-west1 --description "New description"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json&updateMask=description
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: New description
+              labels:
+                key1: val1
+                key2: val2
+              name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "description": "New description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "New description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: New description
+        labels:
+          key1: val1
+          key2: val2
+        name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore snapshots update snap2 --zone us-west1-b --description "New description"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json&updateMask=description
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: New description
+              labels:
+                key1: val1
+                key2: val2
+              name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "description": "New description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+              "description": "New description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: New description
+        labels:
+          key1: val1
+          key2: val2
+        name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore snapshots update snap --region us-west1 --update-labels "key1=val1,key2=val2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels:
+                key1: val1
+                key2: val2
+              name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        labels:
+          key1: val1
+          key2: val2
+        name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore snapshots update snap2 --zone us-west1-b --update-labels "key1=val1,key2=val2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels:
+                key1: val1
+                key2: val2
+              name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        labels:
+          key1: val1
+          key2: val2
+        name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore snapshots update snap --region us-west1 --update-labels "key2=val22,key3=val3" --remove-labels "key1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels:
+                key2: val22
+              name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key2": "val22"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        labels:
+          key2: val22
+        name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore snapshots update snap2 --zone us-west1-b --update-labels "key2=val22,key3=val3" --remove-labels "key1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels:
+                key2: val22
+              name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key2": "val22"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        labels:
+          key2: val22
+        name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore snapshots update snap --region us-west1 --clear-labels
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels: {}
+              name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1/snapshots/snap",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        name: projects/grigora-consumer/locations/us-west1/snapshots/snap
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: |
+      filestore snapshots update snap2 --zone us-west1-b --clear-labels
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "labels": {
+                "key1": "val1",
+                "key2": "val2"
+              },
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              capacityGb: '2000'
+              createTime: '2019-04-29T22:20:53.258903211Z'
+              description: Description
+              labels: {}
+              name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+              sourceFileShare: vol
+              sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+              sourceInstanceTier: STANDARD
+              state: READY
+              storageBytes: '15260160'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-06-03T17:50:50.906089070Z",
+                "endTime": "2019-06-03T17:50:50.938615432Z",
+                "target": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "verb": "update",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Snapshot",
+                "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+                "description": "Description",
+                "state": "READY",
+                "createTime": "2019-04-29T22:20:53.258903211Z",
+                "capacityGb": "2000",
+                "storageBytes": "15260160",
+                "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+                "sourceFileShare": "vol",
+                "sourceInstanceTier": "STANDARD"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/grigora-consumer/locations/us-west1-b/operations/operation-1559584250891-58a6f01458d63-db2e7bb0-171de28b]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Updated snapshot.
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-west1-b/snapshots/snap2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/grigora-consumer/locations/us-west1-b/snapshots/snap2",
+              "description": "Description",
+              "state": "READY",
+              "createTime": "2019-04-29T22:20:53.258903211Z",
+              "capacityGb": "2000",
+              "storageBytes": "15260160",
+              "sourceInstance": "projects/grigora-consumer/locations/us-central1-c/instances/grigora-test",
+              "sourceFileShare": "vol",
+              "sourceInstanceTier": "STANDARD"
+            }
+    - expect_stdout: |
+        capacityGb: '2000'
+        createTime: '2019-04-29T22:20:53.258903211Z'
+        description: Description
+        name: projects/grigora-consumer/locations/us-west1-b/snapshots/snap2
+        sourceFileShare: vol
+        sourceInstance: projects/grigora-consumer/locations/us-central1-c/instances/grigora-test
+        sourceInstanceTier: STANDARD
+        state: READY
+        storageBytes: '15260160'
+    - expect_exit:
+        code: 0

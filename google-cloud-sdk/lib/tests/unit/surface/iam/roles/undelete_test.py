@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
@@ -52,9 +51,11 @@ class UndeleteTest(unit_test_base.BaseTest):
     self.AssertOutputContains('resourcemanager.projects.delete')
 
   def testInvalidArgument(self):
-    with self.assertRaises(exceptions.RequiredArgumentException):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--organization | --project) must be specified.'):
       self.Run('iam roles undelete viewer')
-    with self.assertRaises(exceptions.InvalidArgumentException):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--organization | --project) must be specified.'):
       self.Run('iam roles undelete roles/viewer')
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,6 +70,9 @@ class MockEndpoints(object):
 
   def GetPostgresInstance(self, name=data.DEFAULT_INSTANCE_NAME):
     return data.GetPostgresInstance(self.Project(), name)
+
+  def GetSqlServerInstance(self, name=data.DEFAULT_INSTANCE_NAME):
+    return data.GetSqlServerInstance(self.Project(), name)
 
   def GetExternalMasterInstance(self, name=data.DEFAULT_INSTANCE_NAME):
     return data.GetExternalMasterInstance(self.Project(), name)

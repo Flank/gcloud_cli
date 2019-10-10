@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud alpha web-security-scanner scan-configs update SCAN_CONFIG
         [--blacklist-patterns=[BLACKLIST_PATTERNS,...]]
         [--display-name=DISPLAY_NAME] [--no-export-to-security-center]
-        [--max-qps=MAX_QPS] [--schedule-interval-days=SCHEDULE_INTERVAL_DAYS]
+        [--max-qps=MAX_QPS] [--risk-level=RISK_LEVEL; default="normal"]
+        [--schedule-interval-days=SCHEDULE_INTERVAL_DAYS]
         [--schedule-next-start=SCHEDULE_NEXT_START]
         [--starting-urls=[STARTING_URLS,...]]
         [--target-platforms=[TARGET_PLATFORMS,...];
@@ -46,6 +47,10 @@ FLAGS
      --max-qps=MAX_QPS
         Maximum queries per second (QPS) of the scanners. Defaults to 15, with
         a maximum of 20.
+
+     --risk-level=RISK_LEVEL; default="normal"
+        The risk level selected for the scan. Defaults to normal scanning.
+        RISK_LEVEL must be one of: low, normal.
 
      --schedule-interval-days=SCHEDULE_INTERVAL_DAYS
         How frequently the scan should be run automatically (in days). If not
@@ -121,7 +126,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

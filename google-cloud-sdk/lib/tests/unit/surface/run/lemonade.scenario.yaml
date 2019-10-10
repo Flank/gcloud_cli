@@ -1,0 +1,875 @@
+title: Tests that server giving new fields sends new fields, and vice versa.
+release_tracks: [ALPHA]
+summary:
+- set_property: run/platform managed
+- execute:
+  - command: run services update --region us-central1 compris
+      --add-cloudsql-instances foo,bar
+      --update-env-vars FOO=bar
+      --update-labels label1=one,label2=two
+  - staged_progress_tracker:
+    - message: Deploying...
+    - status: SUCCESS
+  - stderr: |
+      Service [compris] revision [compris-00002] is active and serving traffic at https://compris-ixwc4imo7a-uc.a.run.app
+- execute:
+  - command: run services update --region us-central1 compris
+      --add-cloudsql-instances foo,bar
+      --update-env-vars FOO=bar
+      --update-labels label1=one,label2=two
+  - staged_progress_tracker:
+    - message: Deploying...
+    - status: SUCCESS
+  - stderr: |
+      Service [compris] revision [compris-00002] is active and serving traffic at https://compris-ixwc4imo7a-uc.a.run.app
+actions:
+- set_property:
+    run/platform: managed
+- execute_command:
+    command: run services update --region us-central1 compris
+      --add-cloudsql-instances foo,bar
+      --update-env-vars FOO=bar
+      --update-labels label1=one,label2=two
+    events:
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2240'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kGnyBg
+              generation: 1
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: jyrmuylacr
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:32.348Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 1
+              traffic:
+              - revisionName: compris-00001
+                percent: 100
+              latestReadyRevisionName: compris-00001
+              latestCreatedRevisionName: compris-00001
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions\?alt=json&labelSelector=client.knative.dev%2Fnonce\+%3D\+.*
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3407'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: RevisionList
+            metadata:
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions
+              resourceVersion: '1556900976073000'
+            items:
+            - apiVersion: serving.knative.dev/v1alpha1
+              kind: Revision
+              metadata:
+                name: compris-00001
+                namespace: fake-project
+                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/compris-00001
+                uid: 010ab974-8322-4a8d-aa55-cfbf394c4d38
+                resourceVersion: AAWH/kGhGSg
+                generation: 1
+                creationTimestamp: '2019-05-03T16:29:22.639Z'
+                labels:
+                  serving.knative.dev/route: compris
+                  serving.knative.dev/configuration: compris
+                  client.knative.dev/nonce: jyrmuylacr
+                  serving.knative.dev/configurationGeneration: '1'
+                  serving.knative.dev/service: compris
+                  cloud.googleapis.com/location: us-central1
+                annotations:
+                  serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                ownerReferences:
+                - kind: Configuration
+                  name: compris
+                  uid: 7943dc18-575d-411a-86d9-5422fb7ba2a1
+                  apiVersion: serving.knative.dev/v1alpha1
+                  controller: true
+                  blockOwnerDeletion: true
+              spec:
+                containers:
+                - image: gcr.io/knative-samples/helloworld-nodejs
+              status:
+                logUrl: https://console.cloud.google.com/logs/viewer?project=fake-project&resource=cloud_run_revision/service_name/compris/revision_name/compris-00001&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22compris%22%0Aresource.labels.revision_name%3D%22compris-00001%22
+                conditions:
+                - type: Ready
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:31.895Z'
+                - type: ResourcesAvailable
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:29.017Z'
+                - type: ContainerHealthy
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:31.895Z'
+                - type: Active
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:31.895Z'
+                observedGeneration: 1
+                imageDigest: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                generation: 1
+                labels:
+                  cloud.googleapis.com/location: us-central1
+                  label1: one
+                  label2: two
+                name: compris
+                namespace: fake-project
+                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              spec:
+                template:
+                  metadata:
+                    labels:
+                      label1: one
+                      label2: two
+                  spec:
+                    containers:
+                    - env:
+                      - name: FOO
+                        value: bar
+                      image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+              status:
+                latestCreatedRevisionName: compris-00001
+                observedGeneration: 1
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2860'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kHY8gg
+              generation: 2
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                label1: one
+                label2: two
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: ubzzvhpqne
+                    label1: one
+                    label2: two
+                  annotations:
+                    run.googleapis.com/cloudsql-instances: fake-project:us-central1:foo,fake-project:us-central1:bar
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                    env:
+                  - name: FOO
+                    value: bar
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:32.348Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 1
+              traffic:
+              - revisionName: compris-00001
+                percent: 100
+              latestReadyRevisionName: compris-00001
+              latestCreatedRevisionName: compris-00001
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2860'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kMAkbg
+              generation: 2
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                label1: one
+                label2: two
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: ubzzvhpqne
+                  annotations:
+                    run.googleapis.com/cloudsql-instances: fake-project:us-central1:foo,fake-project:us-central1:bar
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                    env:
+                    - name: FOO
+                      value: bar
+                    resources:
+                      limits:
+                        memory: 512Mi
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:51.318Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 2
+              traffic:
+              - revisionName: compris-00002
+                percent: 100
+              latestReadyRevisionName: compris-00002
+              latestCreatedRevisionName: compris-00002
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - expect_staged_progress_tracker:
+        message: Deploying...
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2860'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kMAkbg
+              generation: 2
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                label1: one
+                label2: two
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      labels:
+                        client.knative.dev/nonce: ubzzvhpqne
+                      annotations:
+                        run.googleapis.com/cloudsql-instances: fake-project:us-central1:foo,fake-project:us-central1:bar
+                    spec:
+                      container:
+                        image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                        env:
+                        - name: FOO
+                          value: bar
+                        resources:
+                          limits:
+                            memory: 512Mi
+                      containerConcurrency: 3
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:51.318Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 2
+              traffic:
+              - revisionName: compris-00002
+                percent: 100
+              latestReadyRevisionName: compris-00002
+              latestCreatedRevisionName: compris-00002
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2042'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Route
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/compris
+              uid: 74b734e6-c6c8-45a9-b3b9-bad302bf4ea9
+              resourceVersion: AAWH/kL92mg
+              generation: 1
+              creationTimestamp: '2019-05-03T16:29:22.302Z'
+              labels:
+                serving.knative.dev/service: compris
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              ownerReferences:
+              - kind: Service
+                name: compris
+                uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+                apiVersion: serving.knative.dev/v1alpha1
+                controller: true
+                blockOwnerDeletion: true
+            spec:
+              traffic:
+              - configurationName: compris
+                percent: 100
+            status:
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              traffic:
+              - revisionName: compris-00002
+                percent: 100
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:58.935Z'
+              observedGeneration: 1
+              domainInternal: https://compris-ixwc4imo7a-uc.a.run.app
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - expect_stderr: |
+        Service [compris] revision [compris-00002] is active and serving traffic at https://compris-ixwc4imo7a-uc.a.run.app
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: run services update --region us-central1 compris
+      --add-cloudsql-instances foo,bar
+      --update-env-vars FOO=bar
+      --update-labels label1=one,label2=two
+    events:
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2240'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kGnyBg
+              generation: 1
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      labels:
+                        client.knative.dev/nonce: jyrmuylacr
+                    spec:
+                      container:
+                        image: gcr.io/knative-samples/helloworld-nodejs
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:32.348Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 1
+              traffic:
+              - revisionName: compris-00001
+                percent: 100
+              latestReadyRevisionName: compris-00001
+              latestCreatedRevisionName: compris-00001
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions\?alt=json&labelSelector=client.knative.dev%2Fnonce\+%3D\+.*
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3407'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: RevisionList
+            metadata:
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions
+              resourceVersion: '1556900976073000'
+            items:
+            - apiVersion: serving.knative.dev/v1alpha1
+              kind: Revision
+              metadata:
+                name: compris-00001
+                namespace: fake-project
+                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/compris-00001
+                uid: 010ab974-8322-4a8d-aa55-cfbf394c4d38
+                resourceVersion: AAWH/kGhGSg
+                generation: 1
+                creationTimestamp: '2019-05-03T16:29:22.639Z'
+                labels:
+                  serving.knative.dev/route: compris
+                  serving.knative.dev/configuration: compris
+                  client.knative.dev/nonce: jyrmuylacr
+                  serving.knative.dev/configurationGeneration: '1'
+                  serving.knative.dev/service: compris
+                  cloud.googleapis.com/location: us-central1
+                annotations:
+                  serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                ownerReferences:
+                - kind: Configuration
+                  name: compris
+                  uid: 7943dc18-575d-411a-86d9-5422fb7ba2a1
+                  apiVersion: serving.knative.dev/v1alpha1
+                  controller: true
+                  blockOwnerDeletion: true
+              spec:
+                container:
+                  image: gcr.io/knative-samples/helloworld-nodejs
+              status:
+                logUrl: https://console.cloud.google.com/logs/viewer?project=fake-project&resource=cloud_run_revision/service_name/compris/revision_name/compris-00001&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22compris%22%0Aresource.labels.revision_name%3D%22compris-00001%22
+                conditions:
+                - type: Ready
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:31.895Z'
+                - type: ResourcesAvailable
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:29.017Z'
+                - type: ContainerHealthy
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:31.895Z'
+                - type: Active
+                  status: 'True'
+                  lastTransitionTime: '2019-05-03T16:29:31.895Z'
+                observedGeneration: 1
+                imageDigest: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                generation: 1
+                labels:
+                  cloud.googleapis.com/location: us-central1
+                name: compris
+                namespace: fake-project
+                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              spec:
+                runLatest:
+                  configuration:
+                    revisionTemplate:
+                      spec:
+                        container:
+                          env:
+                          - name: FOO
+                            value: bar
+                          image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+              status:
+                latestCreatedRevisionName: compris-00001
+                observedGeneration: 1
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2860'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kHY8gg
+              generation: 2
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                label1: one
+                label2: two
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: ubzzvhpqne
+                  annotations:
+                    run.googleapis.com/cloudsql-instances: fake-project:us-central1:foo,fake-project:us-central1:bar
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                    env:
+                  - name: FOO
+                    value: bar
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:32.348Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:36.518Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 1
+              traffic:
+              - revisionName: compris-00001
+                percent: 100
+              latestReadyRevisionName: compris-00001
+              latestCreatedRevisionName: compris-00001
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2860'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kMAkbg
+              generation: 2
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                label1: one
+                label2: two
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      labels:
+                        client.knative.dev/nonce: ubzzvhpqne
+                      annotations:
+                        run.googleapis.com/cloudsql-instances: cloud-sdk-integration-testing:us-central1:foo,cloud-sdk-integration-testing:us-central1:bar
+                    spec:
+                      container:
+                        image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                        env:
+                        - name: FOO
+                          value: bar
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:51.318Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 2
+              traffic:
+              - revisionName: compris-00002
+                percent: 100
+              latestReadyRevisionName: compris-00002
+              latestCreatedRevisionName: compris-00002
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - expect_staged_progress_tracker:
+        message: Deploying...
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2860'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris
+              uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+              resourceVersion: AAWH/kMAkbg
+              generation: 2
+              creationTimestamp: '2019-05-03T16:29:22.146Z'
+              labels:
+                label1: one
+                label2: two
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+            spec:
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      labels:
+                        client.knative.dev/nonce: ubzzvhpqne
+                      annotations:
+                        run.googleapis.com/cloudsql-instances: fake-project:us-central1:foo,fake-project:us-central1:bar
+                    spec:
+                      container:
+                        image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                        env:
+                        - name: FOO
+                          value: bar
+                        resources:
+                          limits:
+                            memory: 512Mi
+                      containerConcurrency: 3
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:51.318Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:59.115Z'
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 2
+              traffic:
+              - revisionName: compris-00002
+                percent: 100
+              latestReadyRevisionName: compris-00002
+              latestCreatedRevisionName: compris-00002
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - api_call:
+        expect_request:
+          uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/compris?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2042'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Route
+            metadata:
+              name: compris
+              namespace: fake-project
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/compris
+              uid: 74b734e6-c6c8-45a9-b3b9-bad302bf4ea9
+              resourceVersion: AAWH/kL92mg
+              generation: 1
+              creationTimestamp: '2019-05-03T16:29:22.302Z'
+              labels:
+                serving.knative.dev/service: compris
+                cloud.googleapis.com/location: us-central1
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              ownerReferences:
+              - kind: Service
+                name: compris
+                uid: 89cd2ca1-3490-4fc3-9c7e-75c064ba0b15
+                apiVersion: serving.knative.dev/v1alpha1
+                controller: true
+                blockOwnerDeletion: true
+            spec:
+              traffic:
+              - configurationName: compris
+                percent: 100
+            status:
+              domain: https://compris-ixwc4imo7a-uc.a.run.app
+              traffic:
+              - revisionName: compris-00002
+                percent: 100
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-05-03T16:29:58.935Z'
+              observedGeneration: 1
+              domainInternal: https://compris-ixwc4imo7a-uc.a.run.app
+              address:
+                hostname: https://compris-ixwc4imo7a-uc.a.run.app
+    - expect_stderr: |
+        Service [compris] revision [compris-00002] is active and serving traffic at https://compris-ixwc4imo7a-uc.a.run.app
+    - expect_exit:
+        code: 0

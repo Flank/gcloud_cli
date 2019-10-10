@@ -182,17 +182,31 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBcloudscheduler/v1beta1\fR API. The full documentation
-for this API can be found at: https://cloud.google.com/scheduler/
+This command uses the \fBcloudscheduler/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/scheduler/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a job that sends a request to the '/cron\-handler'
+path in you App Engine app every 3 hours:
+
+.RS 2m
+$ gcloud beta scheduler jobs create app\-engine my\-job \e
+    \-\-schedule="0 */3 * * *"
+  \-\-relative\-url="/cron\-handler"
+.RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud scheduler jobs create app\-engine
 $ gcloud alpha scheduler jobs create app\-engine
 .RE
 

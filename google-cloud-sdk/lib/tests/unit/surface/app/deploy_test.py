@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import multiprocessing.pool
 import os
+import shutil
 import tempfile
 import time
 
@@ -171,6 +172,15 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
   UTIL_CONTENT = 'def bar(): pass'
 
   def SetUp(self):
+    # set up mock clients.
+    self.su_services_messages = core_apis.GetMessagesModule(
+        'serviceusage', 'v1')
+    self.su_mocked_client = apitools_mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1'),
+        real_client=core_apis.GetClientInstance(
+            'serviceusage', 'v1', no_http=True))
+    self.su_mocked_client.Mock()
+    self.addCleanup(self.su_mocked_client.Unmock)
     # Mock out copying files to GCS.
     self._storage_client_mock = self.StartObjectPatch(storage_api,
                                                       'StorageClient')
@@ -499,6 +509,41 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     with self.assertRaisesRegex(exceptions.ConfigError, error_regex):
       self.Run('app deploy --version=1 ' + self.FullPath('app.yaml'))
 
+  def testStaging_Java11JarWithManifestClassPath(self):
+    """Tests that a deployment of Java11 jar with dep jars functions correctly.
+    """
+
+    # Add a foo.jar in a temp app directory that we want to deploy as a jar.
+    with file_utils.TemporaryDirectory() as app_dir:
+      # exploded_jar has a complex MANIFEST.MF entry used for testing.
+      dir_name = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                               'exploded_jar')
+      jar_file = os.path.join(app_dir, 'foo.jar')
+      shutil.make_archive(jar_file, 'zip', dir_name)
+      # Remove zip extension.
+      os.rename(jar_file + '.zip', jar_file)
+      # Copy dependent jar file to deploy as well.
+      os.mkdir(os.path.join(app_dir, 'lib'))
+      shutil.copy2(
+          self.Resource('tests', 'unit', 'surface', 'app', 'test_data', 'lib',
+                        'dependent.jar'), os.path.join(app_dir, 'lib'))
+
+      with file_utils.TemporaryDirectory() as staging_area:
+        # Create a stager with an empty staging directory.
+        stager = staging.GetStager(staging_area)
+        # Call the staging phase:
+        staging_dir = stager.Stage(jar_file, app_dir, 'java-jar', env.STANDARD)
+
+        # Staging directory should now contain a copy of the jar, and a
+        # generated app.yaml with a single line: runtime: java11.
+        staged_jar_file = os.path.join(staging_dir, 'foo.jar')
+        self.AssertFileExists(staged_jar_file)
+        staged_dependent_jar_file = os.path.join(staging_dir, 'lib',
+                                                 'dependent.jar')
+        self.AssertFileExists(staged_dependent_jar_file)
+        staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+        self.AssertFileExistsWithContents('runtime: java11\n', staged_yaml_file)
+
   def testDeploy_StructuredOutput(self):
     """Tests that the output of a single-service deploy matches expected."""
     self.WriteApp('app.yaml')
@@ -537,6 +582,40 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     # Check that if no handlers, we get https
     url = 'https://{project}.appspot.com'.format(project=self.Project())
     self.AssertErrContains('Deployed service [default] to [{0}]'.format(url))
+
+  def testStaging_Java11JarRuntime(self):
+    """Tests that a Titanium Java11 fatjar deployment functions correctly."""
+
+    # We are trying to deploy a simple jar with a simple MANIFEST.MF.
+    with file_utils.TemporaryDirectory() as app_dir:
+      jar_file = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                               'lib', 'example.jar')
+      with file_utils.TemporaryDirectory() as staging_area:
+        # Create a stager with an empty staging directory.
+        stager = staging.GetStager(staging_area)
+        # Call the staging phase:
+        staging_dir = stager.Stage(jar_file, app_dir, 'java-jar', env.STANDARD)
+
+        # Staging directory should now contain a copy of the jar, and a
+        # generated app.yaml with a single line: runtime: java11.
+        self.AssertFileExists(os.path.join(staging_dir, 'example.jar'))
+
+        staged_yaml_file = os.path.join(staging_dir, 'app.yaml')
+        self.AssertFileExistsWithContents('runtime: java11\n', staged_yaml_file)
+
+  def testStaging_ErrorWhenNoMainClass(self):
+    """Tests error detection when a jar is incomplete."""
+
+    # We are trying to deploy a simple jar with a simple MANIFEST.MF.
+    with file_utils.TemporaryDirectory() as app_dir:
+      jar_file = self.Resource('tests', 'unit', 'surface', 'app', 'test_data',
+                               'lib', 'dependent.jar')
+      with file_utils.TemporaryDirectory() as staging_area:
+        # Create a stager with an empty staging directory.
+        stager = staging.GetStager(staging_area)
+
+        with self.assertRaises(staging.NoMainClassError):
+          stager.Stage(jar_file, app_dir, 'java-jar', env.STANDARD)
 
   def testDeploy_JavaStandard(self):
     """Tests that a Java standard deployment invokes staging etc."""
@@ -672,7 +751,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.assertNotEqual(unstaged_app_dir, staging_dir)
 
     get_source_files_mock.assert_called_once_with(
-        staging_dir, mock.ANY, mock.ANY, mock.ANY, mock.ANY, unstaged_app_dir)
+        staging_dir, mock.ANY, mock.ANY, mock.ANY, mock.ANY,
+        unstaged_app_dir, None)
 
     build_mock.assert_called_once_with(
         mock.ANY, mock.ANY, staging_dir, ['f1', 'f2'], mock.ANY, mock.ANY,
@@ -1375,67 +1455,48 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
 class FlexDeployWithApiTests(DeployWithFlexBase):
 
   def SetUp(self):
-    self.service_messages = core_apis.GetMessagesModule('servicemanagement',
-                                                        'v1')
-    self.mock_service_client = apitools_mock.Client(
-        core_apis.GetClientClass('servicemanagement', 'v1'),
-        real_client=core_apis.GetClientInstance(
-            'servicemanagement', 'v1', no_http=True))
-    self.mock_service_client.Mock()
-    # If any API calls were made but weren't expected, this will throw an error
-    self.addCleanup(self.mock_service_client.Unmock)
-    self.services = [
-        (self.service_messages.ManagedService(
-            serviceName='appengineflex.googleapis.com',
-            serviceConfig=self.service_messages.Service(
-                name='appengineflex.googleapis.com',
-                id='12345'))),
-        (self.service_messages.ManagedService(
-            serviceName='service1.googleapis.com',
-            serviceConfig=self.service_messages.Service(
-                name='service1.googleapis.com',
-                id='12345')))
-    ]
     self.service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                       runtime='python-compat')
 
-  def _ServiceManagementExpectListServicesRequest(self, enabled_services,
+  def _ServiceManagementExpectListServicesRequest(self,
+                                                  enabled=False,
                                                   error=None):
-    if enabled_services:
-      response = self.service_messages.ListServicesResponse(
-          services=enabled_services)
-    else:
-      response = None
-    self.mock_service_client.services.List.Expect(
-        self.service_messages.ServicemanagementServicesListRequest(
-            consumerId='project:{}'.format(self.Project()), pageSize=100),
-        response=response,
+    state_type = self.su_services_messages.GoogleApiServiceusageV1Service.StateValueValuesEnum
+    service = self.su_services_messages.GoogleApiServiceusageV1Service(
+        state=state_type.ENABLED if enabled else state_type.DISABLED)
+    self.su_mocked_client.services.Get.Expect(
+        self.su_services_messages.ServiceusageServicesGetRequest(
+            name='projects/%s/services/appengineflex.googleapis.com' %
+            self.Project(),),
+        response=None if error else service,
         exception=error)
 
   def _ServiceManagementExpectEnableServicesRequest(self, error=None):
-    operation = self.service_messages.Operation(
+    operation = self.su_services_messages.Operation(
         name='12345',
-        done=False)
-    complete_operation = self.service_messages.Operation(
+        done=False,
+    )
+    complete_operation = self.su_services_messages.Operation(
         name='12345',
-        done=True)
-    self.mock_service_client.services.Enable.Expect(
-        self.service_messages.ServicemanagementServicesEnableRequest(
-            serviceName='appengineflex.googleapis.com',
-            enableServiceRequest=self.service_messages.EnableServiceRequest(
-                consumerId='project:{}'.format(self.Project()))),
-        response=operation if not error else None,
-        exception=error)
+        done=True,
+    )
+    self.su_mocked_client.services.Enable.Expect(
+        request=self.su_services_messages.ServiceusageServicesEnableRequest(
+            name='projects/%s/services/appengineflex.googleapis.com' %
+            self.Project(),),
+        response=None if error else operation,
+        exception=error,
+    )
     if not error:
-      self.mock_service_client.operations.Get.Expect(
-          self.service_messages.ServicemanagementOperationsGetRequest(
-              operationsId='12345'),
+      self.su_mocked_client.operations.Get.Expect(
+          request=self.su_services_messages.ServiceusageOperationsGetRequest(
+              name='12345'),
           response=complete_operation)
 
   def testSkipFilesWithFlex(self):
     """Test that skip files is respected in cloud build."""
     self._ExpectServiceDeployed()
-    self._ServiceManagementExpectListServicesRequest(self.services)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp(
         'app.yaml',
         data=self.APP_DATA_ENV_FLEX + self.SKIP_FILES_DATA,
@@ -1467,7 +1528,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
   def testDefaultSkipFilesWithFlex(self):
     """Test that the default skip files for flexible deployments is correct."""
     self._ExpectServiceDeployed()
-    self._ServiceManagementExpectListServicesRequest(self.services)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp(
         'app.yaml',
         data=self.APP_DATA_ENV_FLEX,
@@ -1511,7 +1572,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     """
     properties.VALUES.app.use_runtime_builders.Set(True)
     self._ExpectServiceDeployed('python-compat')
-    self._ServiceManagementExpectListServicesRequest(self.services)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='python-compat')
 
@@ -1527,7 +1588,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     """Tests that non-beta deployments don't use beta whitelisted builders.
     """
     self._ExpectServiceDeployed('test-beta')
-    self._ServiceManagementExpectListServicesRequest(self.services)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='test-beta')
 
@@ -1540,7 +1601,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
     """Tests that non-beta deployments use GA whitelisted runtime builders.
     """
     self._ExpectServiceDeployed('test-ga')
-    self._ServiceManagementExpectListServicesRequest(self.services)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='test-ga')
 
@@ -1554,21 +1615,20 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
 
   def testDeploy_EnablesFlexSuccessfully(self):
     """Test that deploy command attempts to enable Flexible API."""
-    self._ServiceManagementExpectListServicesRequest(self.services[1:])
+    self._ServiceManagementExpectListServicesRequest(enabled=False)
     self._ServiceManagementExpectEnableServicesRequest()
     self._ExpectServiceDeployed()
     self.Run('app deploy {} --version=1 '.format(self.service_path))
 
   def testDeploy_FlexEnabled(self):
     """Test that deploy command attempts to enable Flexible API."""
-    self._ServiceManagementExpectListServicesRequest(self.services)
+    self._ServiceManagementExpectListServicesRequest(enabled=True)
     self._ExpectServiceDeployed()
     self.Run('app deploy {} --version=1 '.format(self.service_path))
 
   def testDeploy_EnableFlex_ListFails(self):
     """Test that deploy succeeds if cannot confirm API enabled."""
     self._ServiceManagementExpectListServicesRequest(
-        None,
         error=http_error.MakeDetailedHttpError(
             code=403, message='Message.'))
     self._ExpectServiceDeployed()
@@ -1580,7 +1640,6 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
   def testDeploy_EnableFlex_ListFailsGenericError(self):
     """Test that deploy command succeeds if cannot confirm API enabled."""
     self._ServiceManagementExpectListServicesRequest(
-        None,
         error=http_error.MakeDetailedHttpError(code=400, message='Message.'))
     # Deploy should fail before any other requests to AppEngine.
     self.ExpectGetApplicationRequest(self.Project())
@@ -1590,7 +1649,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
   def testDeploy_EnableFlex_EnableFails(self):
     """Test that deploy command raises if enabling API raises permissions error.
     """
-    self._ServiceManagementExpectListServicesRequest(self.services[1:])
+    self._ServiceManagementExpectListServicesRequest(enabled=False)
     self._ServiceManagementExpectEnableServicesRequest(
         error=http_error.MakeDetailedHttpError(code=403, message='Message'))
     # Deploy should fail before any other requests to AppEngine.
@@ -1603,7 +1662,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
 
   def testDeploy_EnableFlex_EnableFailsGenericError(self):
     """Test that deploy command fails if enabling API fails with any error."""
-    self._ServiceManagementExpectListServicesRequest(self.services[1:])
+    self._ServiceManagementExpectListServicesRequest(enabled=False)
     self._ServiceManagementExpectEnableServicesRequest(
         error=http_error.MakeDetailedHttpError(code=400, message='Message'))
     # Deploy should fail before any other requests to AppEngine.

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_printer
+
+import six
 
 
 COMPUTE_ALPHA_API_VERSION = 'alpha'
@@ -203,6 +205,14 @@ def WarnIfDiskSizeIsTooSmall(size_gb, disk_type):
         'poor I/O performance. For more information, see: '
         'https://developers.google.com/compute/docs/disks#performance.',
         warning_threshold_gb)
+
+
+def WarnIfPartialRequestFail(problems):
+  errors = []
+  for _, message in problems:
+    errors.append(six.text_type(message))
+
+  log.warning(ConstructList('Some requests did not succeed.', errors))
 
 
 def IsValidIPV4(ip):

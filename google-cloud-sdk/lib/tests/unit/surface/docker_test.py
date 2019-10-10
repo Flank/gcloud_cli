@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import base64
 import json
 import os
 
+from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import store
@@ -657,6 +658,32 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.AssertErrContains(registry)
     # Check that we Refresh explicitly regardless of Load refreshing
     self.assertTrue(self.refreshed)
+
+  def testAccountFlagWarning(self):
+    self.TouchNewDockerConfig()
+    try:
+      self.Run('docker --account=fake_account')
+    except calliope_exceptions.ExitCodeNoError:
+      # Excepting the failed docker command since we only
+      # test to verify account warnings.
+      pass
+    self.AssertErrContains(
+        'Docker uses the account from the gcloud config.'
+        'To set the account in the gcloud config, run `gcloud config set '
+        'account <account_name>`')
+
+  def testNoAccountFlagNoWarning(self):
+    self.TouchNewDockerConfig()
+    try:
+      self.Run('docker')
+    except calliope_exceptions.ExitCodeNoError:
+      # Excepting the failed docker command since we only
+      # test to verify account warnings.
+      pass
+    self.AssertErrNotContains(
+        'Docker uses the account from the gcloud config.'
+        'To set the account in the gcloud config, run `gcloud config set '
+        'account <account_name>`')
 
 
 if __name__ == '__main__':

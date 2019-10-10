@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,18 +63,18 @@ class RoutersListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             name='my-router',
             region='us-central1',
             network=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/networks/default'),
-            selfLink=('https://www.googleapis.com/compute/v1/projects/'
+            selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/us-central2/routers/my-router'),
         ),
         self.messages.Router(
             name='my-router-2',
             region='us-central2',
             network=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/networks/default'),
-            selfLink=('https://www.googleapis.com/compute/v1/projects/'
+            selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/us-central2/routers/my-router-2'),
         )
     ]

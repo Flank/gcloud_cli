@@ -18,14 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.hub import util
 from googlecloudsdk.command_lib.projects import util as p_util
+from googlecloudsdk.core import exceptions
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
+# LINT.IfChange
 def TestDataFile(*args):
   """Returns an SdkBase.Resource for a file from the test data directory.
 
@@ -39,8 +42,8 @@ def TestDataFile(*args):
                                         'hub', 'testdata', *args)
 
 
-class UnregisterClusterTest(cli_test_base.CliTestBase,
-                            sdk_test_base.WithFakeAuth):
+class UnregisterClusterTestBeta(cli_test_base.CliTestBase,
+                                sdk_test_base.WithFakeAuth):
   """Tests the logic in the UnregisterCluster class.
 
   These tests are not meant to test the business logic in
@@ -49,10 +52,10 @@ class UnregisterClusterTest(cli_test_base.CliTestBase,
   """
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    self.kubeconfig_file = TestDataFile('kubeconfig')
+    self.kubeconfig = TestDataFile('kubeconfig')
     self.mock_kubernetes_client = self.MockOutKubernetesClient()
 
   def RunCommand(self, params):
@@ -89,15 +92,90 @@ class UnregisterClusterTest(cli_test_base.CliTestBase,
     self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
         'gke-connect-12321'
     ]
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
     mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
-
+    self.StartObjectPatch(
+        util, 'GetMembershipCROwnerID', return_value='fake-project')
+    self.StartObjectPatch(
+        util, 'ProjectForClusterUUID', return_value='fake-project')
+    self.StartObjectPatch(
+        util,
+        'UserAccessibleProjectIDSet',
+        return_value={'fake-project', 'other-project'})
     self.RunCommand([
-        '--kubeconfig-file=' + self.kubeconfig_file,
+        '--kubeconfig=' + self.kubeconfig,
         '--context=test-context',
+        '--project=fake-project',
     ])
+    mock_delete_connect_namespace.assert_called_once()
     mock_delete_membership.assert_called_with(
         'projects/fake-project/locations/global/memberships/fake-uid')
+    mock_delete_membership_resource.assert_called_once()
+
+  def testUnregistrationWithoutMembership(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership.side_effect = apitools_exceptions.HttpNotFoundError(
+        None, None, None, None)
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        util, 'GetMembershipCROwnerID', return_value='fake-project')
+    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
+    self.StartObjectPatch(
+        util,
+        'UserAccessibleProjectIDSet',
+        return_value={'fake-project', 'other-project'})
+
+    self.RunCommand([
+        '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context',
+        '--project=fake-project',
+    ])
+    mock_delete_connect_namespace.assert_not_called()
+    mock_delete_membership.assert_not_called()
+    mock_delete_membership_resource.assert_called_once()
+
+  def testSuccessfulUnregistrationWithoutMembershipResource(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(util, 'GetMembershipCROwnerID', return_value=None)
+    self.StartObjectPatch(
+        util, 'ProjectForClusterUUID', return_value='fake-project')
+    self.StartObjectPatch(
+        util,
+        'UserAccessibleProjectIDSet',
+        return_value={'fake-project', 'other-project'})
+
+    self.RunCommand([
+        '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context',
+        '--project=fake-project',
+    ])
+    mock_delete_connect_namespace.assert_called_once()
+    mock_delete_membership.assert_called_with(
+        'projects/fake-project/locations/global/memberships/fake-uid')
+    mock_delete_membership_resource.assert_called_once()
 
   def testSuccessfulUnregistrationWithoutKubeconfigFlag(self):
     self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
@@ -106,13 +184,131 @@ class UnregisterClusterTest(cli_test_base.CliTestBase,
         'gke-connect-12321'
     ]
     mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
     self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        util, 'GetMembershipCROwnerID', return_value='fake-project')
+    self.StartObjectPatch(
+        util, 'ProjectForClusterUUID', return_value='fake-project')
+    self.StartObjectPatch(
+        util,
+        'UserAccessibleProjectIDSet',
+        return_value={'fake-project', 'other-project'})
 
-    self.RunCommand(['--context=test-context'])
+    self.RunCommand([
+        '--context=test-context',
+        '--project=fake-project',
+    ])
 
+    mock_delete_connect_namespace.assert_called_once()
     mock_delete_membership.assert_called_with(
         'projects/fake-project/locations/global/memberships/fake-uid')
+    mock_delete_membership_resource.assert_called_once()
 
+  def testUnsuccessfulUnregistrationWithDifferentMembershipOwner(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        util, 'GetMembershipCROwnerID', return_value='other-project')
+    self.StartObjectPatch(
+        util, 'ProjectForClusterUUID', return_value='fake-project')
+    self.StartObjectPatch(
+        util,
+        'UserAccessibleProjectIDSet',
+        return_value={'fake-project', 'other-project'})
+
+    with self.AssertRaisesExceptionMatches(exceptions.Error,
+                                           'registered to another'):
+      self.RunCommand([
+          '--kubeconfig=' + self.kubeconfig,
+          '--context=test-context',
+          '--project=fake-project',
+      ])
+      mock_delete_connect_namespace.assert_not_called()
+      mock_delete_membership.assert_not_called()
+      mock_delete_membership_resource.assert_not_called()
+
+  def testUnsuccessfulUnregistrationWithExistingMembership(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        util, 'GetMembershipCROwnerID', return_value='fake-project')
+    self.StartObjectPatch(
+        util,
+        'ProjectForClusterUUID',
+        return_value={'fake-uid': 'other-project'})
+    self.StartObjectPatch(
+        util,
+        'UserAccessibleProjectIDSet',
+        return_value={'fake-project', 'other-project'})
+
+    with self.AssertRaisesExceptionMatches(exceptions.Error,
+                                           'registered to another'):
+      self.RunCommand([
+          '--kubeconfig=' + self.kubeconfig,
+          '--context=test-context',
+          '--project=fake-project',
+      ])
+      mock_delete_connect_namespace.assert_not_called()
+      mock_delete_membership.assert_not_called()
+      mock_delete_membership_resource.assert_not_called()
+
+  def testUnsuccessfulUnregistrationWithUnauthorizedProject(self):
+    self.mock_kubernetes_client.GetNamespaceUID.return_value = 'fake-uid'
+    self.mock_kubernetes_client.DeleteNamespace.return_value = None
+    self.mock_kubernetes_client.NamespacesWithLabelSelector.return_value = [
+        'gke-connect-12321'
+    ]
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+    mock_delete_connect_namespace = self.StartObjectPatch(
+        util, 'DeleteConnectNamespace')
+    self.StartObjectPatch(p_util, 'GetProjectNumber', return_value=12321)
+    self.StartObjectPatch(
+        util, 'GetMembershipCROwnerID', return_value='other-project')
+    self.StartObjectPatch(util, 'ProjectForClusterUUID', return_value=None)
+    self.StartObjectPatch(
+        util, 'UserAccessibleProjectIDSet', return_value={'fake-project'})
+
+    with self.AssertRaisesExceptionMatches(exceptions.Error, 'not authorized'):
+      self.RunCommand([
+          '--kubeconfig=' + self.kubeconfig,
+          '--context=test-context',
+          '--project=fake-project',
+      ])
+      mock_delete_connect_namespace.assert_not_called()
+      mock_delete_membership.assert_not_called()
+      mock_delete_membership_resource.assert_not_called()
+
+
+class UnregisterClusterTestAlpha(UnregisterClusterTestBeta):
+  """gcolud Alpha track using GKE Hub v1 API."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()
+# LINT.ThenChange(../memberships/unregister_test.py)

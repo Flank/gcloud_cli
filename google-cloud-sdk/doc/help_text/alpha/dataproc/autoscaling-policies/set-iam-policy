@@ -1,6 +1,6 @@
 NAME
     gcloud alpha dataproc autoscaling-policies set-iam-policy - set IAM policy
-        for an autoscaling-policy
+        for an autoscaling policy
 
 SYNOPSIS
     gcloud alpha dataproc autoscaling-policies set-iam-policy
@@ -55,6 +55,7 @@ EXAMPLES
     'example-autoscaling-policy'
 
         $ gcloud alpha dataproc autoscaling-policies set-iam-policy \
+          autoscaling-policies set-iam-policy \
             example-autoscaling-policy policy.json
 
     See https://cloud.google.com/iam/docs/managing-policies for details of the
@@ -63,9 +64,9 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud dataproc autoscaling-policies set-iam-policy
         $ gcloud beta dataproc autoscaling-policies set-iam-policy
 

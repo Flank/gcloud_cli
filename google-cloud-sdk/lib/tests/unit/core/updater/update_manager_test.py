@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1150,6 +1150,7 @@ project = cloudsdktest
     with self.assertRaises(installers.ComponentDownloadFailedError):
       manager.Update(['a'])
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testPermissionsWhenRemoving(self):
     # initial install
     component_tuples = [('a', 1, [])]

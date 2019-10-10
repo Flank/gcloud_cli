@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud firebase test ios run [ARGSPEC] [--device=DIMENSION=VALUE,[...]]
-        [--test=XCTEST_ZIP] [--timeout=TIMEOUT] [--xcode-version=XCODE_VERSION]
-        [--xctestrun-file=XCTESTRUN_FILE] [--async]
-        [--num-flaky-test-attempts=int] [--record-video]
+        [--test=XCTEST_ZIP] [--timeout=TIMEOUT] [--type=TYPE]
+        [--xcode-version=XCODE_VERSION] [--xctestrun-file=XCTESTRUN_FILE]
+        [--async] [--num-flaky-test-attempts=int] [--record-video]
         [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME] [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
@@ -70,6 +70,9 @@ COMMONLY USED FLAGS
         * --timeout 5m is 5 minutes
         * --timeout 200s is 200 seconds
         * --timeout 100 is 100 seconds
+
+     --type=TYPE
+        The type of iOS test to run. TYPE must be one of: xctest, game-loop.
 
      --xcode-version=XCODE_VERSION
         The version of Xcode that should be used to run an XCTest. Defaults to

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class Rollback(base.Command):
 
       op_ref = adapter.RollbackUpgrade(pool_ref)
 
-      if not args.async:
+      if not args.async_:
         adapter.WaitForOperation(
             op_ref,
             'Rolling back {0}'.format(pool_ref.nodePoolId),

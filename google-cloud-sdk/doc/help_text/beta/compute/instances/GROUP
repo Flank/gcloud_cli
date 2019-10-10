@@ -22,6 +22,10 @@ GROUPS
         (BETA) Read and manipulate Google Compute Engine instance network
         interfaces.
 
+     os-inventory
+        (BETA) Read Google Compute Engine OS Inventory Data and Related
+        Resources.
+
 COMMANDS
     COMMAND is one of the following:
 
@@ -75,6 +79,10 @@ COMMANDS
 
      get-shielded-identity
         (BETA) Get the Shielded identity for a Google Compute Engine instance.
+
+     import
+        (BETA) Create Google Compute Engine virtual machine instances from
+        virtual appliance in OVA/OVF format.
 
      list
         (BETA) List Google Compute Engine instances.

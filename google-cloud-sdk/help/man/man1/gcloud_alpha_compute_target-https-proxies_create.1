@@ -11,7 +11,7 @@ gcloud alpha compute target\-https\-proxies create \- create a target HTTPS prox
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR;\ default="NONE"] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-ssl\-certificates\fR\ |\ \fB\-\-ssl\-certificates\-region\fR=\fISSL_CERTIFICATES_REGION\fR] [\fB\-\-global\-url\-map\fR\ |\ \fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-proxy\-bind\fR] [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR;\ default="NONE"] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-ssl\-certificates\fR\ |\ \fB\-\-ssl\-certificates\-region\fR=\fISSL_CERTIFICATES_REGION\fR] [\fB\-\-global\-url\-map\fR\ |\ \fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -43,14 +43,6 @@ Name of the target HTTPS proxy to create.
 
 .RS 2m
 .TP 2m
-\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
-References to at most 15 SSL certificate resources that are used for
-server\-side authentication. The first SSL certificate in this list is
-considered the primary SSL certificate associated with the load balancer. The
-SSL certificate must exist and cannot be deleted while referenced by a target
-HTTPS proxy.
-
-.TP 2m
 \fB\-\-url\-map\fR=\fIURL_MAP\fR
 A reference to a URL map resource that defines the mapping of URLs to backend
 services. The URL map must exist and cannot be deleted while referenced by a
@@ -66,6 +58,12 @@ target HTTPS proxy.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the target HTTPS proxy.
+
+.TP 2m
+\fB\-\-proxy\-bind\fR
+This flag only applies when the load_balancing_scheme of the associated backend
+service is INTERNAL_SELF_MANAGED. When specified, the envoy binds to the IP
+address and port specified by the forwarding rule. By default this flag is off.
 
 .TP 2m
 \fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR; default="NONE"
@@ -87,6 +85,14 @@ Allows Google to control when QUIC is rolled out.
 .RE
 .sp
 
+
+.TP 2m
+\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
+References to at most 15 SSL certificate resources that are used for
+server\-side authentication. The first SSL certificate in this list is
+considered the primary SSL certificate associated with the load balancer. The
+SSL certificates must exist and cannot be deleted while referenced by a target
+HTTPS proxy.
 
 .TP 2m
 \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR
@@ -204,9 +210,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute target\-https\-proxies create

@@ -139,12 +139,25 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To update labels for a VPN gateway, run:
 
 .RS 2m
+$ gcloud beta compute vpn\-gateways update my\-gateway \e
+  \-\-region=us\-central1                 \e
+  \-\-update\-labels=k0=value1,k1=value2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute vpn\-gateways update
 $ gcloud alpha compute vpn\-gateways update
 .RE
 

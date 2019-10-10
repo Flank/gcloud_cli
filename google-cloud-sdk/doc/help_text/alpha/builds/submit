@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud alpha builds submit [[SOURCE] --no-source] [--async] [--no-cache]
         [--disk-size=DISK_SIZE] [--gcs-log-dir=GCS_LOG_DIR]
         [--gcs-source-staging-dir=GCS_SOURCE_STAGING_DIR]
-        [--machine-type=MACHINE_TYPE] [--substitutions=[KEY=VALUE,...]]
-        [--timeout=TIMEOUT]
+        [--ignore-file=IGNORE_FILE] [--machine-type=MACHINE_TYPE]
+        [--substitutions=[KEY=VALUE,...]] [--timeout=TIMEOUT]
         [--config=CONFIG; default="cloudbuild.yaml" | --tag=TAG, -t TAG]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -26,19 +26,20 @@ POSITIONAL ARGUMENTS
           The location of the source to build. The location can be a directory
           on a local disk or a gzipped archive file (.tar.gz) in Google Cloud
           Storage. If the source is a local directory, this command skips the
-          files specified in the .gcloudignore file. If a .gitignore file is
-          present in the local source directory, gcloud will use a
-          Git-compatible .gcloudignore file that respects your .gitignored
-          files. The global .gitignore is not respected. For more information
-          on .gcloudignore, see gcloud topic gcloudignore.
+          files specified in the --ignore-file. If --ignore-file is not
+          specified, use.gcloudignore file. If a .gitignore file is present in
+          the local source directory, gcloud will use a Git-compatible
+          .gcloudignore file that respects your .gitignored files. The global
+          .gitignore is not respected. For more information on .gcloudignore,
+          see gcloud topic gcloudignore.
 
        --no-source
           Specify that no source should be uploaded with this build.
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --no-cache
         If set, disable layer caching when building with Kaniko.
@@ -62,6 +63,9 @@ FLAGS
         the build. If the specified bucket does not exist, Cloud Build will
         create one. If you don't set this field,
         gs://[PROJECT_ID]_cloudbuild/source is used.
+
+     --ignore-file=IGNORE_FILE
+        Override the .gcloudignore file and use the specified file instead.
 
      --machine-type=MACHINE_TYPE
         Machine type used to run the build. MACHINE_TYPE must be one of:
@@ -122,9 +126,8 @@ NOTES
 
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud builds submit
         $ gcloud beta builds submit

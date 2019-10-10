@@ -9,13 +9,16 @@ actions:
         expect_request:
           uri: https://cloudresourcemanager.googleapis.com/v1/organizations/test-organization:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -44,13 +47,13 @@ actions:
                     title: 'title'
                     description: 'descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -80,6 +83,6 @@ actions:
           - user:test@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0

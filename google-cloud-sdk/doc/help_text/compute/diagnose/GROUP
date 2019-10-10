@@ -22,6 +22,8 @@ COMMANDS
         Routes to/from Google Compute Engine virtual machine instances.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice.
+    These variants are also available:
+
+        $ gcloud alpha compute diagnose
+        $ gcloud beta compute diagnose
 

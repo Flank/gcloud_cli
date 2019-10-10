@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -212,6 +212,8 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     actual = times.FormatDateTime(dt, '%Z')
     self.assertEqual(expected, actual)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
+  @test_case.Filters.SkipOnMacAndPy3('failing', 'b/139006909')
   def testFormatTzNameUtf8Unaware(self):
     encoding = 'utf-8'
     self.SetEncoding(encoding)
@@ -222,6 +224,8 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     actual = times.FormatDateTime(dt, '%Z', tz)
     self.assertEqual(expected, actual)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
+  @test_case.Filters.SkipOnMacAndPy3('failing', 'b/139006909')
   def testFormatTzNameUtf8(self):
     encoding = 'utf-8'
     self.SetEncoding(encoding)

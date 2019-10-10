@@ -1,0 +1,110 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_RESOURCE\-POLICIES_CREATE_VM\-MAINTENANCE_CONCURRENCY\-LIMIT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute resource\-policies create vm\-maintenance concurrency\-limit \- create a Google Compute Engine VM Maintenance Resource Policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute resource\-policies create vm\-maintenance concurrency\-limit\fR \fINAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-percent\fR=\fIMAX_PERCENT\fR;\ default=1] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Google Compute Engine VM Maintenance Resource Policy
+that, when attached to an instance, recognizes that instance as a part of a
+group of instances where only up the configured amount of instances in that
+group can undergo simultaneous maintenance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the resource policy to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the backend.
+
+.TP 2m
+\fB\-\-max\-percent\fR=\fIMAX_PERCENT\fR; default=1
+Sets maximum percentage of instances in the group that can undergo simultaneous
+maintenance. If this flag is not specified default value of 1% will be set.
+Usage example: \f5\-\-max\-percent=10\fR sets to 10%.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the resource policy to operate on. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a VM maintenance resource policy with a
+concurrency maintenance limit set to 1%.
+
+.RS 2m
+$ gcloud alpha compute resource\-policies create vm\-maintenance \e
+  concurrency\-limit my\-resource\-policy \-\-region=REGION
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

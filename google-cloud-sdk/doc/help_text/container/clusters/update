@@ -5,15 +5,21 @@ NAME
 SYNOPSIS
     gcloud container clusters update NAME
         (--complete-credential-rotation | --complete-ip-rotation
-          | --enable-autoscaling | --enable-legacy-authorization
+          | --enable-autoscaling | --enable-binauthz
+          | --enable-intra-node-visibility | --enable-legacy-authorization
           | --enable-master-authorized-networks | --enable-network-policy
-          | --generate-password | --logging-service=LOGGING_SERVICE
-          | --maintenance-window=MAINTENANCE_WINDOW
-          | --monitoring-service=MONITORING_SERVICE
-          | --node-locations=ZONE,[ZONE,...] | --remove-labels=[KEY,...]
-          | --set-password | --start-credential-rotation | --start-ip-rotation
+          | --enable-stackdriver-kubernetes | --generate-password
+          | --maintenance-window=START_TIME | --node-locations=ZONE,[ZONE,...]
+          | --remove-labels=[KEY,...] | --set-password
+          | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...]
+          | --clear-resource-usage-bigquery-dataset
+          | --enable-network-egress-metering
+          --enable-resource-consumption-metering
+          --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+          | --logging-service=LOGGING_SERVICE
+          --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
@@ -55,6 +61,19 @@ REQUIRED FLAGS
           Enables autoscaling in the node pool specified by --node-pool or the
           default node pool if --node-pool is not provided.
 
+       --enable-binauthz
+          Enable Binary Authorization for this cluster.
+
+       --enable-intra-node-visibility
+          Enable Intra-node visibility for this cluster.
+
+          Enabling intra-node visibility makes your intra-node pod-to-pod
+          traffic visible to the networking fabric. With this feature, you can
+          use VPC flow logging or other VPC features for intra-node traffic.
+
+          Enabling it on an existing cluster causes the cluster master and the
+          cluster nodes to restart, which might cause a disruption.
+
        --enable-legacy-authorization
           Enables the legacy ABAC authentication for the cluster. User rights
           are granted through the use of policies which combine attributes
@@ -84,16 +103,14 @@ REQUIRED FLAGS
           addon must first be enabled on the master by using
           --update-addons=NetworkPolicy=ENABLED flag.
 
+       --enable-stackdriver-kubernetes
+          Enable Stackdriver Kubernetes monitoring and logging.
+
        --generate-password
           Ask the server to generate a secure password and use that as the
           basic auth password, keeping the existing username.
 
-       --logging-service=LOGGING_SERVICE
-          Logging service to use for the cluster. Options are:
-          "logging.googleapis.com" (the Google Cloud Logging service), "none"
-          (logs will not be exported from the cluster)
-
-       --maintenance-window=MAINTENANCE_WINDOW
+       --maintenance-window=START_TIME
           Set a time of day when you prefer maintenance to start on this
           cluster. For example:
 
@@ -102,12 +119,7 @@ REQUIRED FLAGS
 
           The time corresponds to the UTC time zone, and must be in HH:MM
           format. To remove an existing maintenance window from the cluster,
-          use '--maintenance-window=None'
-
-       --monitoring-service=MONITORING_SERVICE
-          Monitoring service to use for the cluster. Options are:
-          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
-          "none" (no metrics will be exported from the cluster)
+          use '--maintenance-window=None'.
 
        --node-locations=ZONE,[ZONE,...]
           The set of zones in which the specified node footprint should be
@@ -174,6 +186,62 @@ REQUIRED FLAGS
               $ gcloud container clusters update example-cluster \
                   --update-labels=label_a=value1,label_b=value2
 
+       Exports cluster's usage of cloud resources At most one of these may be
+       specified:
+
+         --clear-resource-usage-bigquery-dataset
+            Disables exporting cluster resource usage to BigQuery.
+
+         --enable-network-egress-metering
+            Enable network egress metering on this cluster.
+
+            When enabled, a DaemonSet is deployed into the cluster. Each
+            DaemonSet pod meters network egress traffic by collecting data from
+            the conntrack table, and exports the metered metrics to the
+            specified destination.
+
+            Network egress metering is disabled if this flag is omitted, or
+            when --no-enable-network-egress-metering is set.
+
+         --enable-resource-consumption-metering
+            Enable resource consumption metering on this cluster.
+
+            When enabled, a table will be created in the specified BigQuery
+            dataset to store resource consumption data. The resulting table can
+            be joined with the resource usage table or with BigQuery billing
+            export.
+
+            To disable resource consumption metering, set
+            --no-enable-resource-consumption- metering. If this flag is
+            omitted, then resource consumption metering will remain enabled or
+            disabled depending on what is already configured for this cluster.
+
+         --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
+            The name of the BigQuery dataset to which the cluster's usage of
+            cloud resources is exported. A table will be created in the
+            specified dataset to store cluster resource usage. The resulting
+            table can be joined with BigQuery Billing Export to produce a
+            fine-grained cost breakdown.
+
+            Example:
+
+                $ gcloud container clusters update example-cluster \
+                    --resource-usage-bigquery-dataset=example_bigquery_dataset_name
+
+       --logging-service=LOGGING_SERVICE
+          Logging service to use for the cluster. Options are:
+          "logging.googleapis.com/kubernetes" (the Google Cloud Logging service
+          with Kubernetes-native resource model enabled),
+          "logging.googleapis.com" (the Google Cloud Logging service), "none"
+          (logs will not be exported from the cluster)
+
+       --monitoring-service=MONITORING_SERVICE
+          Monitoring service to use for the cluster. Options are:
+          "monitoring.googleapis.com/kubernetes" (the Google Cloud Monitoring
+          service with Kubernetes-native resource model enabled),
+          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
+          "none" (no metrics will be exported from the cluster)
+
        Basic auth
 
          --password=PASSWORD
@@ -200,7 +268,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Don't wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
         The list of CIDR blocks (up to 50) that are allowed to connect to

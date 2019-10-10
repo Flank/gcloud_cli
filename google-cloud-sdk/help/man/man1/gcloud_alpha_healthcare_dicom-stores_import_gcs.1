@@ -1,0 +1,124 @@
+
+.TH "GCLOUD_ALPHA_HEALTHCARE_DICOM\-STORES_IMPORT_GCS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha healthcare dicom\-stores import gcs \- import DICOM objects into a Cloud Healthcare API DICOM store
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha healthcare dicom\-stores import gcs\fR (\fIDICOM_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-gcs\-uri\fR=\fIGCS_URI\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Import DICOM objects into a Cloud Healthcare API DICOM store.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+DicomStore resource \- Cloud Healthcare API DICOM store into which the data is
+imported. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[dicom_store] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDICOM_STORE\fR
+ID of the dicomStore or fully qualified identifier for the dicomStore. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+Cloud Healthcare dataset.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-gcs\-uri\fR=\fIGCS_URI\fR
+Google Cloud Storage URI containing DICOM object data. It must match individual
+DICOM files or co
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBhealthcare/v1alpha2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/healthcare
+
+
+
+.SH "EXAMPLES"
+
+To import the DICOM objects from the existing bucket 'testGcsBucket' in the
+folder 'someFolder' into the DICOM store 'test\-dicom\-store', run:
+
+.RS 2m
+$ gcloud alpha healthcare dicom\-stores import gcs test\-dicom\-store \e
+    \-\-gcs\-uri="gs://testGcsBucket/someFolder/*" \e
+    \-\-dataset=test\-dataset
+.RE
+
+Note that '\fB' matches any files within a folder, and '**' also recursively
+matches files within sub\-folders.
+
+
+\fR
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta healthcare dicom\-stores import gcs
+.RE
+

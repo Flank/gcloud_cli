@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,7 +64,12 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
         results_history_name='darkages.1',
         timeout=321,
         xctestrun_file='myxctestrun',
-        num_flaky_test_attempts=1)
+        num_flaky_test_attempts=1,
+        client_details={
+            'branch': 'my-branch',
+            'buildNumber': '1234',
+        },
+    )
 
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('request-id-123')
@@ -94,6 +99,15 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     test = spec.iosXcTest
     self.assertEqual(test.testsZip.gcsPath, 'gs://kfc/2018-02-24/ios-test.zip')
     self.assertEqual(test.xctestrun.gcsPath, 'gs://kfc/2018-02-24/myxctestrun')
+
+    client_details = matrix.clientInfo.clientInfoDetails
+    client_detail1 = TESTING_V1_MESSAGES.ClientInfoDetail(
+        key='branch', value='my-branch')
+    client_detail2 = TESTING_V1_MESSAGES.ClientInfoDetail(
+        key='buildNumber', value='1234')
+
+    self.assertIn(client_detail1, client_details)
+    self.assertIn(client_detail2, client_details)
 
   def testMatrixCreator_CreateIosTestMatrix_GetsHttpError(self):
     creator = self.CreateMatrixCreator(self.args)
@@ -144,6 +158,19 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     creator = self.CreateMatrixCreator(self.args)
     spec = creator._BuildIosXcTestSpec()
     self.assertEqual(spec.iosXcTest.xcodeVersion, None)
+
+  def testMatrixCreator_BuildTestLoopTestSpec_withScenarios(self):
+    self.args.scenario_numbers = [3, 4]
+    creator = self.CreateMatrixCreator(self.args)
+    spec = creator._BuildIosTestLoopTestSpec()
+    self.assertEqual(spec.iosTestLoop.scenarios, [3, 4])
+
+  def testMatrixCreator_BuildTestLoopTestSpec_withAppIpa(self):
+    self.args.app = 'app.ipa'
+    self.args.scenario_numbers = [1]
+    creator = self.CreateMatrixCreator(self.args)
+    spec = creator._BuildIosTestLoopTestSpec()
+    self.assertEqual(spec.iosTestLoop.appIpa.gcsPath, 'gs://oak/dir/app.ipa')
 
 
 if __name__ == '__main__':

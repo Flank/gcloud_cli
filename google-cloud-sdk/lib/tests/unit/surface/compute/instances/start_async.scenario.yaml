@@ -6,8 +6,8 @@ summary:
 - execute:
   - command: compute instances start a1 a2 --zone us-east1-b --async
   - stderr: |
-      Start instance in progress for [http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b].
-      Start instance in progress for [http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67].
+      Start instance in progress for [http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b].
+      Start instance in progress for [http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67].
       Use [gcloud compute operations describe URI] command to check the status of the operation(s).
 actions:
 - execute_command:
@@ -16,7 +16,7 @@ actions:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1/start?alt=json
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1/start?alt=json
           method: POST
           headers: {}
           body: null
@@ -31,16 +31,16 @@ actions:
             name: operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b
             operationType: start
             progress: 100
-            selfLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b
+            selfLink: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b
             startTime: '2017-10-31T11:14:11.591-07:00'
             status: DONE
             targetId: '1226287828989968909'
-            targetLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1
-            zone: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
+            targetLink: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1
+            zone: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2/start?alt=json
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2/start?alt=json
           method: POST
           headers: {}
           body: null
@@ -55,15 +55,15 @@ actions:
             name: operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67
             operationType: start
             progress: 100
-            selfLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67
+            selfLink: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67
             startTime: '2017-10-31T11:14:11.605-07:00'
             status: DONE
             targetId: '2363104829734455276'
-            targetLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2
-            zone: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
+            targetLink: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2
+            zone: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
     - expect_stderr: |
-        Start instance in progress for [http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b].
-        Start instance in progress for [http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67].
+        Start instance in progress for [http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651000-55cdbb8c402c0-f164d2ae-4c66064b].
+        Start instance in progress for [http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509473651003-55cdbb8c40e78-958bad2c-03873e67].
         Use [gcloud compute operations describe URI] command to check the status of the operation(s).
     - expect_exit:
         code: 0

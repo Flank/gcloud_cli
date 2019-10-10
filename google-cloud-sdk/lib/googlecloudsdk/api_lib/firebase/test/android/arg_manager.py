@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,8 +72,9 @@ def SharedArgRules():
       'optional': [
           'additional_apks',
           'app_package',
-          'async',
+          'async_',
           'auto_google_login',
+          'client_details',
           'device',
           'device_ids',
           'directories_to_pull',
@@ -93,7 +94,7 @@ def SharedArgRules():
           'timeout',
       ],
       'defaults': {
-          'async': False,
+          'async_': False,
           'auto_google_login': True,
           'num_flaky_test_attempts': 0,
           'performance_metrics': True,

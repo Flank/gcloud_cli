@@ -32,8 +32,8 @@ EXAMPLES
     within the keyring fellowship and location global:
 
         $ gcloud kms keys remove-rotation-schedule frodo \
-            --location global \
-            --keyring fellowship
+            --location=global \
+            --keyring=fellowship
 
 NOTES
     These variants are also available:

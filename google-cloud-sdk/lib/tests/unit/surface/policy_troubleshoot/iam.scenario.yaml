@@ -1,0 +1,94 @@
+title: policytroubleshoot iam scenario test
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: policy-troubleshoot iam 'my-resource' --principal-email 'user@foo.com'
+      --permission 'storage.getIAMPolicy'
+  - stdout: |
+      access: DENIED
+      policies:
+      - access: DENIED
+        explainations:
+        - access: DENIED
+          permissionInRole: EXCLUDED
+          principalInMembers:
+            user:newowner@gmail.com: INCLUDED
+            user@foo.com: EXCLUDED
+          role: storage.getIAMPolicy
+        fullResourceName: my-resource
+        policy:
+          bindings:
+          - members:
+            - user@foo.com
+            - newowner@gmail.com
+            role: roles/owner
+          etag: etag
+          version: 1
+actions:
+# troubleshoot iam policy without a condition
+- execute_command:
+    command: policy-troubleshoot iam 'my-resource' --principal-email 'user@foo.com'
+      --permission 'storage.getIAMPolicy'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://policytroubleshooter.googleapis.com/v1beta/iam:troubleshoot?alt=json
+          method: POST
+          body: |-
+            {
+              "fullResourceName": "my-resource",
+              "principal": "user@foo.com",
+              "permission": "storage.getIAMPolicy"
+            }
+
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "access": "DENIED",
+              "policies": [{
+                   "access": "DENIED",
+                   "fullResourceName": "my-resource",
+                   "policy": {
+                     "version": 1,
+                      "etag": "etag",
+                      "bindings": [{
+                        "role": "roles/owner",
+                        "members": ["user@foo.com","newowner@gmail.com"]
+                      }]
+                   },
+                   "explainations": [{
+                      "access": "DENIED",
+                      "role": "storage.getIAMPolicy",
+                      "permissionInRole": "EXCLUDED",
+                      "principalInMembers": {
+                          "user@foo.com": "EXCLUDED",
+                          "user:newowner@gmail.com": "INCLUDED"
+                      }
+                   }]
+              }]
+            }
+    - expect_stdout: |
+        access: DENIED
+        policies:
+        - access: DENIED
+          explainations:
+          - access: DENIED
+            permissionInRole: EXCLUDED
+            principalInMembers:
+              user:newowner@gmail.com: INCLUDED
+              user@foo.com: EXCLUDED
+            role: storage.getIAMPolicy
+          fullResourceName: my-resource
+          policy:
+            bindings:
+            - members:
+              - user@foo.com
+              - newowner@gmail.com
+              role: roles/owner
+            etag: etag
+            version: 1
+    - expect_exit:
+        code: 0

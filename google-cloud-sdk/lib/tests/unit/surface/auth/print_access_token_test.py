@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ class PrintAccessTokenTest(sdk_test_base.WithFakeAuth,
                            cli_test_base.CliTestBase):
 
   def testPrint(self):
-    # pylint: disable=unused-argument, Has to match real signature.
     def FakeRefresh(cred, http=None):
+      del http
       if cred:
         cred.access_token = 'FakeAccessToken'
 
@@ -38,8 +38,8 @@ class PrintAccessTokenTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('FakeAccessToken\n')
 
   def testBadCred(self):
-    # pylint: disable=unused-argument, Has to match real signature.
     def FakeRefresh(cred, http=None):
+      del http
       if cred:
         cred.access_token = None
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,11 +41,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central1-a/instances/my-instance'
                       ).format(api=self.api),
                   priority=1000,
@@ -85,11 +85,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/zone-1/instances/my-instance'
                       ).format(api=self.api),
                   priority=1000,
@@ -124,7 +124,7 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopIp='10.240.0.2',
@@ -149,7 +149,7 @@ class RoutesCreateTest(test_base.BaseTest):
                   name='my-route',
                   description='a route that routes packets',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopIp='10.240.0.2',
@@ -172,11 +172,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopGateway=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/global/gateways/default-internet-gateway'
                       ).format(api=self.api),
                   priority=1000,
@@ -238,11 +238,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central1-a/instances/my-instance'
                       ).format(api=self.api),
                   priority=99,
@@ -266,11 +266,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central1-a/instances/my-instance'
                       ).format(api=self.api),
                   priority=1000,
@@ -295,11 +295,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/my-network'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central1-a/instances/my-instance'
                       ).format(api=self.api),
                   priority=1000,
@@ -310,10 +310,10 @@ class RoutesCreateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute routes create
-          https://www.googleapis.com/compute/{api}/projects/my-project/global/routes/my-route
+          https://compute.googleapis.com/compute/{api}/projects/my-project/global/routes/my-route
           --destination-range 10.0.0.0/8
-          --next-hop-instance https://www.googleapis.com/compute/{api}/projects/my-project/zones/us-central1-a/instances/my-instance
-          --network https://www.googleapis.com/compute/{api}/projects/my-project/global/networks/my-network
+          --next-hop-instance https://compute.googleapis.com/compute/{api}/projects/my-project/zones/us-central1-a/instances/my-instance
+          --network https://compute.googleapis.com/compute/{api}/projects/my-project/global/networks/my-network
         """.format(api=self.api))
 
     self.CheckRequests(
@@ -323,11 +323,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/my-network'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central1-a/instances/my-instance'
                       ).format(api=self.api),
                   priority=1000,
@@ -350,11 +350,11 @@ class RoutesCreateTest(test_base.BaseTest):
               route=self.messages.Route(
                   name='my-route',
                   destRange='10.0.0.0/8',
-                  network=('https://www.googleapis.com/compute/{api}/projects/'
+                  network=('https://compute.googleapis.com/compute/{api}/projects/'
                            'my-project/global/networks/default'
                           ).format(api=self.api),
                   nextHopInstance=(
-                      'https://www.googleapis.com/compute/{api}/projects/'
+                      'https://compute.googleapis.com/compute/{api}/projects/'
                       'my-project/zones/us-central1-a/instances/my-instance'
                       ).format(api=self.api),
                   priority=1000,

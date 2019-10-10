@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta resource-manager org-policies set-policy POLICY_FILE
-        [--folder=FOLDER_ID] [--organization=ORGANIZATION_ID]
-        [GCLOUD_WIDE_FLAG ...]
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Sets an Organization Policy associated with the specified resource
@@ -15,12 +15,19 @@ POSITIONAL ARGUMENTS
      POLICY_FILE
         JSON or YAML file with the Organization Policy.
 
-FLAGS
-     --folder=FOLDER_ID
-        Folder ID for Org Policies.
+REQUIRED FLAGS
+     Resource that is associated with the organization policy. Exactly one of
+     these must be specified:
 
-     --organization=ORGANIZATION_ID
-        Organization ID for Org Policies.
+       --folder=FOLDER_ID
+          Folder ID.
+
+       --organization=ORGANIZATION_ID
+          Organization ID.
+
+       --project=PROJECT_ID
+          Project ID. Overrides the default core/project property value for
+          this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

@@ -128,7 +128,8 @@ under specified \f5device\-name\fR.
 \fBmode\fR
 Specifies the mode of the disk to attach. Supported options are \f5ro\fR for
 read\-only and \f5rw\fR for read\-write. If omitted when source is specified,
-\f5rw\fR is used as a default.
+\f5rw\fR is used as a default. \f5mode\fR can only be specified if \f5source\fR
+is given.
 
 .TP 2m
 \fBauto\-delete\fR
@@ -214,7 +215,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

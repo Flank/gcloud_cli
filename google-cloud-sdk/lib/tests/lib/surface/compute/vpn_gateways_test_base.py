@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class VpnGatewaysTestBase(sdk_test_base.WithFakeAuth,
     """
     api_name = self._GetApiName(release_track)
     self.track = release_track
-    self.base_uri = 'https://www.googleapis.com/compute/{}/projects/{}'.format(
+    self.base_uri = 'https://compute.googleapis.com/compute/{}/projects/{}'.format(
         api_name, self.Project())
 
     apitools_client = api_mock.Client(

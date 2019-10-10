@@ -1,5 +1,5 @@
 NAME
-    gcloud compute routes list - list Google Compute Engine routes
+    gcloud compute routes list - list non-dynamic Google Compute Engine routes
 
 SYNOPSIS
     gcloud compute routes list [NAME ...] [--regexp=REGEXP, -r REGEXP]
@@ -7,8 +7,13 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute routes list displays all Google Compute Engine routes in a
-    project.
+    gcloud compute routes list displays all custom static, subnet, and peering
+    routes in VPC networks in a project.
+
+    To list custom dynamic routes learned by Cloud Routers, query the status of
+    the Cloud Router that learned the route using gcloud compute routers
+    get-status. For more details, refer to
+    https://cloud.google.com/vpc/docs/using-routes#listingroutes.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -63,11 +68,11 @@ GCLOUD WIDE FLAGS
     details.
 
 EXAMPLES
-    To list all routes in a project in table form, run:
+    To list all non-dynamic routes in a project in table form, run:
 
         $ gcloud compute routes list
 
-    To list the URIs of all routes in a project, run:
+    To list the URIs of all non-dynamic routes in a project, run:
 
         $ gcloud compute routes list --uri
 

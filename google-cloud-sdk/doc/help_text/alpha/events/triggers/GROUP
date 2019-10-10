@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha events triggers - view and manage your Events triggers
+
+SYNOPSIS
+    gcloud alpha events triggers COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This set of commands can be used to view and manage your Events
+    resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete a trigger.
+
+     describe
+        (ALPHA) Get details about a given trigger.
+
+     list
+        (ALPHA) List existing triggers.
+
+EXAMPLES
+    To list your existing triggers, run:
+
+        $ gcloud alpha events triggers list
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

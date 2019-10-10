@@ -1,0 +1,134 @@
+
+.TH "GCLOUD_ALPHA_DNS_RECORD\-SETS_TRANSACTION" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dns record\-sets transaction \- make scriptable and transactional changes to your record\-sets
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dns record\-sets transaction\fR \fICOMMAND\fR [\fB\-\-transaction\-file\fR=\fITRANSACTION_FILE\fR;\ default="transaction.yaml"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Make scriptable and transactional changes to your record\-sets.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-transaction\-file\fR=\fITRANSACTION_FILE\fR; default="transaction.yaml"
+Path of the file which contains the transaction.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBabort\fR
+\fB(ALPHA)\fR Abort transaction.
+
+.TP 2m
+\fBadd\fR
+\fB(ALPHA)\fR Append a record\-set addition to the transaction.
+
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Describe the transaction.
+
+.TP 2m
+\fBexecute\fR
+\fB(ALPHA)\fR Execute the transaction on Cloud DNS.
+
+.TP 2m
+\fBremove\fR
+\fB(ALPHA)\fR Append a record\-set deletion to the transaction.
+
+.TP 2m
+\fBstart\fR
+\fB(ALPHA)\fR Start a transaction.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To start a transaction, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction start \-\-zone=MANAGED_ZONE
+.RE
+
+To append a record\-set addition to the transaction, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction add \e
+    \-\-name RECORD_SET_NAME \-\-ttl TTL \-\-type TYPE DATA \e
+    \-\-zone=MANAGED_ZONE
+.RE
+
+To append a record\-set removal to the transaction, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction remove \e
+    \-\-name RECORD_SET_NAME \-\-ttl TTL \-\-type TYPE DATA
+.RE
+
+To look at the details of the transaction, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction describe \e
+    \-\-zone=MANAGED_ZONE
+.RE
+
+To delete the transaction, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction abort \-\-zone=MANAGED_ZONE
+.RE
+
+To execute the transaction, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction execute \e
+    \-\-zone=MANAGED_ZONE
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud dns record\-sets transaction
+$ gcloud beta dns record\-sets transaction
+.RE
+

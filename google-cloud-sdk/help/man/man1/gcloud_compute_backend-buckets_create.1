@@ -11,7 +11,7 @@ gcloud compute backend\-buckets create \- create a backend bucket
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-buckets create\fR \fIBACKEND_BUCKET_NAME\fR \fB\-\-gcs\-bucket\-name\fR=\fIGCS_BUCKET_NAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-buckets create\fR \fIBACKEND_BUCKET_NAME\fR \fB\-\-gcs\-bucket\-name\fR=\fIGCS_BUCKET_NAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,9 +54,10 @@ must be in the same project.
 An optional, textual description for the backend bucket.
 
 .TP 2m
-\fB\-\-enable\-cdn\fR
+\fB\-\-[no\-]enable\-cdn\fR
 Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP responses from
-a backend bucket at the edge of the network, close to users.
+a backend bucket at the edge of the network, close to users. Use
+\fB\-\-enable\-cdn\fR to enable and \fB\-\-no\-enable\-cdn\fR to disable.
 
 .TP 2m
 \fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR

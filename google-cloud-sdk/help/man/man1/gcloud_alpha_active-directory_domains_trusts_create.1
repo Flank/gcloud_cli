@@ -1,0 +1,156 @@
+
+.TH "GCLOUD_ALPHA_ACTIVE\-DIRECTORY_DOMAINS_TRUSTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha active\-directory domains trusts create \- create a Microsoft Active Directory Trust between a Managed Microsoft AD domain and another domain
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha active\-directory domains trusts create\fR \fIDOMAIN\fR \fB\-\-target\-dns\-ip\-addresses\fR=[\fITARGET_DNS_IP_ADDRESSES\fR,...] \fB\-\-target\-domain\-name\fR=\fITARGET_DOMAIN_NAME\fR [\fB\-\-async\fR] [\fB\-\-direction\fR=\fIDIRECTION\fR;\ default="BIDIRECTIONAL"] [\fB\-\-handshake\-secret\fR=\fIHANDSHAKE_SECRET\fR] [\fB\-\-selective\-authentication\fR] [\fB\-\-type\fR=\fITYPE\fR;\ default="FOREST"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Microsoft Active Directory Trust between a Managed
+Microsoft AD domain and another domain.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The domain specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given domain.
+.IP "\(bu" 2m
+A trust already exists with the same target domain name.
+.IP "\(bu" 2m
+The active account does not have permission to create AD trusts.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Domain resource \- Name of the Managed Microsoft AD domain you want to create an
+AD trust from. This represents a Cloud resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [domain] on the command line with a fully
+specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDOMAIN\fR
+ID of the domain or fully qualified identifier for the domain.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-target\-dns\-ip\-addresses\fR=[\fITARGET_DNS_IP_ADDRESSES\fR,...]
+Target DNS server IP addresses that can resolve the target domain.
+
+Only IPv4 is supported.
+
+.TP 2m
+\fB\-\-target\-domain\-name\fR=\fITARGET_DOMAIN_NAME\fR
+Target domain name for the Managed Microsoft AD Trust.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-direction\fR=\fIDIRECTION\fR; default="BIDIRECTIONAL"
+Direction of the trust.
+
+Must be one of: INBOUND, OUTBOUND, BIDIRECTIONAL. Default is BIDIRECTIONAL.
+
+\fIDIRECTION\fR must be one of: \fBbidirectional\fR, \fBinbound\fR,
+\fBoutbound\fR, \fBtrust\-direction\-unspecified\fR.
+
+.TP 2m
+\fB\-\-handshake\-secret\fR=\fIHANDSHAKE_SECRET\fR
+Trust handshake secret with target domain. The secret will not be stored. If not
+specified, command will prompt user for secret.
+
+.TP 2m
+\fB\-\-selective\-authentication\fR
+If specified, trusted side will only have selective access to approved set of
+resources.
+
+Otherwise, the trusted side has forest/domain wide access. Default is false.
+
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR; default="FOREST"
+Type of the trust. Must be FOREST or EXTERNAL. Default is FOREST. \fITYPE\fR
+must be one of: \fBexternal\fR, \fBforest\fR, \fBtrust\-type\-unspecified\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmanagedidentities/v1beta1\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/managed\-microsoft\-ad/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates an external, bidirectional AD trust between
+\f5my\-domain.com\fR and \f5target\-domain.com\fR.
+
+.RS 2m
+$ gcloud alpha active\-directory domains trusts create \e
+    my\-domain.com \-\-target\-domain\-name=target\-domain.com
+\-\-target\-dns\-ip\-addresses=10.177.0.2 \-\-type=EXTERNAL \-\-direction=BIDIRECTIONAL
+\-\-selective\-authentication=false \-\-async
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta active\-directory domains trusts create
+.RE
+

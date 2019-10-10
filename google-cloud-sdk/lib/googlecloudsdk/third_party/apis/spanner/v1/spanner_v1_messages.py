@@ -13,182 +13,6 @@ from apitools.base.py import extra_types
 package = 'spanner'
 
 
-class AuditConfig(_messages.Message):
-  r"""Specifies the audit configuration for a service. The configuration
-  determines which permission types are logged, and what identities, if any,
-  are exempted from logging. An AuditConfig must have one or more
-  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
-  specific service, the union of the two AuditConfigs is used for that
-  service: the log_types specified in each AuditConfig are enabled, and the
-  exempted_members in each AuditLogConfig are exempted.  Example Policy with
-  multiple AuditConfigs:      {       "audit_configs": [         {
-  "service": "allServices"           "audit_log_configs": [             {
-  "log_type": "DATA_READ",               "exempted_members": [
-  "user:foo@gmail.com"               ]             },             {
-  "log_type": "DATA_WRITE",             },             {
-  "log_type": "ADMIN_READ",             }           ]         },         {
-  "service": "fooservice.googleapis.com"           "audit_log_configs": [
-  {               "log_type": "DATA_READ",             },             {
-  "log_type": "DATA_WRITE",               "exempted_members": [
-  "user:bar@gmail.com"               ]             }           ]         }
-  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
-  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
-  and bar@gmail.com from DATA_WRITE logging.
-
-  Fields:
-    auditLogConfigs: The configuration for logging of each type of permission.
-    exemptedMembers: A string attribute.
-    service: Specifies a service that will be enabled for audit logging. For
-      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-      `allServices` is a special value that covers all services.
-  """
-
-  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
-  exemptedMembers = _messages.StringField(2, repeated=True)
-  service = _messages.StringField(3)
-
-
-class AuditLogConfig(_messages.Message):
-  r"""Provides the configuration for logging a type of permissions. Example:
-  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
-  "exempted_members": [             "user:foo@gmail.com"           ]
-  },         {           "log_type": "DATA_WRITE",         }       ]     }
-  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-  foo@gmail.com from DATA_READ logging.
-
-  Enums:
-    LogTypeValueValuesEnum: The log type that this config enables.
-
-  Fields:
-    exemptedMembers: Specifies the identities that do not cause logging for
-      this type of permission. Follows the same format of Binding.members.
-    logType: The log type that this config enables.
-  """
-
-  class LogTypeValueValuesEnum(_messages.Enum):
-    r"""The log type that this config enables.
-
-    Values:
-      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
-      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
-      DATA_WRITE: Data writes. Example: CloudSQL Users create
-      DATA_READ: Data reads. Example: CloudSQL Users list
-    """
-    LOG_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    DATA_WRITE = 2
-    DATA_READ = 3
-
-  exemptedMembers = _messages.StringField(1, repeated=True)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
-
-
-class AuthorizationLoggingOptions(_messages.Message):
-  r"""Authorization-related information used by Cloud Audit Logging.
-
-  Enums:
-    PermissionTypeValueValuesEnum: The type of the permission that was
-      checked.
-
-  Fields:
-    permissionType: The type of the permission that was checked.
-  """
-
-  class PermissionTypeValueValuesEnum(_messages.Enum):
-    r"""The type of the permission that was checked.
-
-    Values:
-      PERMISSION_TYPE_UNSPECIFIED: Default. Should not be used.
-      ADMIN_READ: A read of admin (meta) data.
-      ADMIN_WRITE: A write of admin (meta) data.
-      DATA_READ: A read of standard data.
-      DATA_WRITE: A write of standard data.
-    """
-    PERMISSION_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    ADMIN_WRITE = 2
-    DATA_READ = 3
-    DATA_WRITE = 4
-
-  permissionType = _messages.EnumField('PermissionTypeValueValuesEnum', 1)
-
-
-class Backup(_messages.Message):
-  r"""A Backup object.
-
-  Enums:
-    StateValueValuesEnum: Output only. The current state of the backup.
-
-  Fields:
-    createTime: Output only. The backup will contain an externally consistent
-      copy of the database at the timestamp specified by `create_time`.
-      `create_time` is approximately the time the CreateBackup request is
-      received.
-    database: Required for the CreateBackup operation. Name of the database
-      from which this backup was created. This needs to be in the same
-      instance as the backup. Values are of the form
-      `projects/<project>/instances/<instance>/databases/<database>`.
-    expireTime: Required for the CreateBackup operation. The expiration time
-      of the backup, with microseconds granularity that must be at least 6
-      hours and at most 366 days from the time the request is received. Once
-      the `expire_time` has passed, Cloud Spanner will delete the backup and
-      free the resources used by the backup.
-    name: Output only. A globally unique identifier for the backup which
-      cannot be changed. Values are of the form
-      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]` The final
-      segment of the name must be between 2 and 60 characters in length.  The
-      backup is stored in the location(s) specified in the instance
-      configuration of the instance containing the backup, identified by the
-      prefix of the backup name of the form
-      `projects/<project>/instances/<instance>`.
-    referencingDatabases: Output only. The names of the restored databases
-      that reference the backup. The database names are of the form
-      `projects/<project>/instances/<instance>/databases/<database>`.
-      Referencing databases may exist in different instances. The existence of
-      any referencing database prevents the backup from being deleted. When a
-      restored database from the backup enters the `READY` state, the
-      reference to the backup is removed.
-    sizeBytes: Output only. Size of the backup in bytes.
-    state: Output only. The current state of the backup.
-  """
-
-  class StateValueValuesEnum(_messages.Enum):
-    r"""Output only. The current state of the backup.
-
-    Values:
-      STATE_UNSPECIFIED: Not specified.
-      CREATING: The pending backup is still being created. Operations on the
-        backup may fail with `FAILED_PRECONDITION` in this state.
-      READY: The backup is complete and ready for use.
-    """
-    STATE_UNSPECIFIED = 0
-    CREATING = 1
-    READY = 2
-
-  createTime = _messages.StringField(1)
-  database = _messages.StringField(2)
-  expireTime = _messages.StringField(3)
-  name = _messages.StringField(4)
-  referencingDatabases = _messages.StringField(5, repeated=True)
-  sizeBytes = _messages.IntegerField(6)
-  state = _messages.EnumField('StateValueValuesEnum', 7)
-
-
-class BackupInfo(_messages.Message):
-  r"""A BackupInfo object.
-
-  Fields:
-    backup: Name of the backup.
-    createTime: The backup contains an externally consistent copy of
-      `source_database` at the timestamp specified by `create_time`.
-    sourceDatabase: Name of the database the backup was created from.
-  """
-
-  backup = _messages.StringField(1)
-  createTime = _messages.StringField(2)
-  sourceDatabase = _messages.StringField(3)
-
-
 class BatchCreateSessionsRequest(_messages.Message):
   r"""The request for BatchCreateSessions.
 
@@ -197,8 +21,7 @@ class BatchCreateSessionsRequest(_messages.Message):
       call. The API may return fewer than the requested number of sessions. If
       a specific number of sessions are desired, the client can make
       additional calls to BatchCreateSessions (adjusting session_count as
-      necessary). The maximum allowed sessions are documented at
-      https://goo.gl/hBUQED.
+      necessary).
     sessionTemplate: Parameters to be applied to each created session.
   """
 
@@ -240,9 +63,9 @@ class Binding(_messages.Message):
       with or without a Google account.  * `allAuthenticatedUsers`: A special
       identifier that represents anyone    who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
-      represents a specific Google    account. For example, `alice@gmail.com`
-      .   * `serviceAccount:{emailid}`: An email address that represents a
-      service    account. For example, `my-other-
+      represents a specific Google    account. For example,
+      `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
+      that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
       * `domain:{domain}`: The G Suite domain (primary) that represents all
@@ -280,35 +103,6 @@ class ChildLink(_messages.Message):
   variable = _messages.StringField(3)
 
 
-class CloudAuditOptions(_messages.Message):
-  r"""Write a Cloud Audit log
-
-  Enums:
-    LogNameValueValuesEnum: The log_name to populate in the Cloud Audit
-      Record.
-
-  Fields:
-    authorizationLoggingOptions: Information used by the Cloud Audit Logging
-      pipeline.
-    logName: The log_name to populate in the Cloud Audit Record.
-  """
-
-  class LogNameValueValuesEnum(_messages.Enum):
-    r"""The log_name to populate in the Cloud Audit Record.
-
-    Values:
-      UNSPECIFIED_LOG_NAME: Default. Should not be used.
-      ADMIN_ACTIVITY: Corresponds to "cloudaudit.googleapis.com/activity"
-      DATA_ACCESS: Corresponds to "cloudaudit.googleapis.com/data_access"
-    """
-    UNSPECIFIED_LOG_NAME = 0
-    ADMIN_ACTIVITY = 1
-    DATA_ACCESS = 2
-
-  authorizationLoggingOptions = _messages.MessageField('AuthorizationLoggingOptions', 1)
-  logName = _messages.EnumField('LogNameValueValuesEnum', 2)
-
-
 class CommitRequest(_messages.Message):
   r"""The request for Commit.
 
@@ -341,160 +135,6 @@ class CommitResponse(_messages.Message):
   commitTimestamp = _messages.StringField(1)
 
 
-class Condition(_messages.Message):
-  r"""A condition to be met.
-
-  Enums:
-    IamValueValuesEnum: Trusted attributes supplied by the IAM system.
-    OpValueValuesEnum: An operator to apply the subject with.
-    SysValueValuesEnum: Trusted attributes supplied by any service that owns
-      resources and uses the IAM system for access control.
-
-  Fields:
-    iam: Trusted attributes supplied by the IAM system.
-    op: An operator to apply the subject with.
-    svc: Trusted attributes discharged by the service.
-    sys: Trusted attributes supplied by any service that owns resources and
-      uses the IAM system for access control.
-    values: The objects of the condition.
-  """
-
-  class IamValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by the IAM system.
-
-    Values:
-      NO_ATTR: Default non-attribute.
-      AUTHORITY: Either principal or (if present) authority selector.
-      ATTRIBUTION: The principal (even if an authority selector is present),
-        which must only be used for attribution, not authorization.
-      SECURITY_REALM: Any of the security realms in the IAMContext (go
-        /security-realms). When used with IN, the condition indicates "any of
-        the request's realms match one of the given values; with NOT_IN, "none
-        of the realms match any of the given values". Note that a value can
-        be:  - 'self' (i.e., allow connections from clients that are in the
-        same  security realm)  - a realm (e.g., 'campus-abc')  - a realm group
-        (e.g., 'realms-for-borg-cell-xx', see: go/realm-groups) A match is
-        determined by a realm group membership check performed by a
-        RealmAclRep object (go/realm-acl-howto). It is not permitted to grant
-        access based on the *absence* of a realm, so realm conditions can only
-        be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-      APPROVER: An approver (distinct from the requester) that has authorized
-        this request. When used with IN, the condition indicates that one of
-        the approvers associated with the request matches the specified
-        principal, or is a member of the specified group. Approvers can only
-        grant additional access, and are thus only used in a strictly positive
-        context (e.g. ALLOW/IN or DENY/NOT_IN).
-      JUSTIFICATION_TYPE: What types of justifications have been supplied with
-        this request. String values should match enum names from
-        tech.iam.JustificationType, e.g. "MANUAL_STRING". It is not permitted
-        to grant access based on the *absence* of a justification, so
-        justification conditions can only be used in a "positive" context
-        (e.g., ALLOW/IN or DENY/NOT_IN).  Multiple justifications, e.g., a
-        Buganizer ID and a manually-entered reason, are normal and supported.
-      CREDENTIALS_TYPE: What type of credentials have been supplied with this
-        request. String values should match enum names from
-        security_loas_l2.CredentialsType - currently, only
-        CREDS_TYPE_EMERGENCY is supported. It is not permitted to grant access
-        based on the *absence* of a credentials type, so the conditions can
-        only be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-    """
-    NO_ATTR = 0
-    AUTHORITY = 1
-    ATTRIBUTION = 2
-    SECURITY_REALM = 3
-    APPROVER = 4
-    JUSTIFICATION_TYPE = 5
-    CREDENTIALS_TYPE = 6
-
-  class OpValueValuesEnum(_messages.Enum):
-    r"""An operator to apply the subject with.
-
-    Values:
-      NO_OP: Default no-op.
-      EQUALS: DEPRECATED. Use IN instead.
-      NOT_EQUALS: DEPRECATED. Use NOT_IN instead.
-      IN: The condition is true if the subject (or any element of it if it is
-        a set) matches any of the supplied values.
-      NOT_IN: The condition is true if the subject (or every element of it if
-        it is a set) matches none of the supplied values.
-      DISCHARGED: Subject is discharged
-    """
-    NO_OP = 0
-    EQUALS = 1
-    NOT_EQUALS = 2
-    IN = 3
-    NOT_IN = 4
-    DISCHARGED = 5
-
-  class SysValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by any service that owns resources and
-    uses the IAM system for access control.
-
-    Values:
-      NO_ATTR: Default non-attribute type
-      REGION: Region of the resource
-      SERVICE: Service name
-      NAME: Resource name
-      IP: IP address of the caller
-    """
-    NO_ATTR = 0
-    REGION = 1
-    SERVICE = 2
-    NAME = 3
-    IP = 4
-
-  iam = _messages.EnumField('IamValueValuesEnum', 1)
-  op = _messages.EnumField('OpValueValuesEnum', 2)
-  svc = _messages.StringField(3)
-  sys = _messages.EnumField('SysValueValuesEnum', 4)
-  values = _messages.StringField(5, repeated=True)
-
-
-class CounterOptions(_messages.Message):
-  r"""Increment a streamz counter with the specified metric and field names.
-  Metric names should start with a '/', generally be lowercase-only, and end
-  in "_count". Field names should not contain an initial slash. The actual
-  exported metric names will have "/iam/policy" prepended.  Field names
-  correspond to IAM request parameters and field values are their respective
-  values.  Supported field names:    - "authority", which is "[token]" if
-  IAMContext.token is present,      otherwise the value of
-  IAMContext.authority_selector if present, and      otherwise a
-  representation of IAMContext.principal; or    - "iam_principal", a
-  representation of IAMContext.principal even if a      token or authority
-  selector is present; or    - "" (empty string), resulting in a counter with
-  no fields.  Examples:   counter { metric: "/debug_access_count"  field:
-  "iam_principal" }   ==> increment counter
-  /iam/policy/backend_debug_access_count
-  {iam_principal=[value of IAMContext.principal]}  At this time we do not
-  support multiple field names (though this may be supported in the future).
-
-  Fields:
-    field: The field value to attribute.
-    metric: The metric to update.
-  """
-
-  field = _messages.StringField(1)
-  metric = _messages.StringField(2)
-
-
-class CreateBackupMetadata(_messages.Message):
-  r"""A CreateBackupMetadata object.
-
-  Fields:
-    cancelTime: The time at which this operation was cancelled. If set, this
-      operation is in the process of undoing itself (which is guaranteed to
-      succeed) and cannot be cancelled again.
-    database: The name of the database the backup is created from.
-    name: The name of the backup being created.
-    progress: The progress of the CreateBackup operation.
-  """
-
-  cancelTime = _messages.StringField(1)
-  database = _messages.StringField(2)
-  name = _messages.StringField(3)
-  progress = _messages.MessageField('OperationProgress', 4)
-
-
 class CreateDatabaseMetadata(_messages.Message):
   r"""Metadata type for the operation returned by CreateDatabase.
 
@@ -514,7 +154,6 @@ class CreateDatabaseRequest(_messages.Message):
       expression `a-z*[a-z0-9]` and be between 2 and 30 characters in length.
       If the database ID is a reserved word or if it contains a hyphen, the
       database ID must be enclosed in backticks (`` ` ``).
-    encryptionConfig: A EncryptionConfig attribute.
     extraStatements: An optional list of DDL statements to run inside the
       newly created database. Statements can create tables, indexes, etc.
       These statements execute atomically with the creation of the database:
@@ -522,8 +161,7 @@ class CreateDatabaseRequest(_messages.Message):
   """
 
   createStatement = _messages.StringField(1)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 2)
-  extraStatements = _messages.StringField(3, repeated=True)
+  extraStatements = _messages.StringField(2, repeated=True)
 
 
 class CreateInstanceMetadata(_messages.Message):
@@ -570,44 +208,6 @@ class CreateSessionRequest(_messages.Message):
   session = _messages.MessageField('Session', 1)
 
 
-class DataAccessOptions(_messages.Message):
-  r"""Write a Data Access (Gin) log
-
-  Enums:
-    LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
-      manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.
-
-  Fields:
-    logMode: Whether Gin logging should happen in a fail-closed manner at the
-      caller. This is relevant only in the LocalIAM implementation, for now.
-  """
-
-  class LogModeValueValuesEnum(_messages.Enum):
-    r"""Whether Gin logging should happen in a fail-closed manner at the
-    caller. This is relevant only in the LocalIAM implementation, for now.
-
-    Values:
-      LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
-        immediately after the authorization check. If client chooses to write
-        one and it fails, client may either fail open (allow the operation to
-        continue) or fail closed (handle as a DENY outcome).
-      LOG_FAIL_CLOSED: The application's operation in the context of which
-        this authorization check is being made may only be performed if it is
-        successfully logged to Gin. For instance, the authorization library
-        may satisfy this obligation by emitting a partial log entry at
-        authorization check time and only returning ALLOW to the application
-        if it succeeds.  If a matching Rule has this directive, but the client
-        has not indicated that it will honor such requirements, then the IAM
-        check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.
-    """
-    LOG_MODE_UNSPECIFIED = 0
-    LOG_FAIL_CLOSED = 1
-
-  logMode = _messages.EnumField('LogModeValueValuesEnum', 1)
-
-
 class Database(_messages.Message):
   r"""A Cloud Spanner database.
 
@@ -615,15 +215,10 @@ class Database(_messages.Message):
     StateValueValuesEnum: Output only. The current database state.
 
   Fields:
-    createTime: A string attribute.
-    encryptionConfig: Output only. Custom encryption configuration (Cloud KMS
-      keys). Applicable only for databases using the Customer Managed
-      Encryption Keys feature.
     name: Required. The name of the database. Values are of the form
       `projects/<project>/instances/<instance>/databases/<database>`, where
       `<database>` is as specified in the `CREATE DATABASE` statement. This
       name can be passed to other API methods to identify the database.
-    restoreInfo: A RestoreInfo attribute.
     state: Output only. The current database state.
   """
 
@@ -635,18 +230,13 @@ class Database(_messages.Message):
       CREATING: The database is still being created. Operations on the
         database may fail with `FAILED_PRECONDITION` in this state.
       READY: The database is fully created and ready for use.
-      READY_OPTIMIZING: <no description>
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
     READY = 2
-    READY_OPTIMIZING = 3
 
-  createTime = _messages.StringField(1)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 2)
-  name = _messages.StringField(3)
-  restoreInfo = _messages.MessageField('RestoreInfo', 4)
-  state = _messages.EnumField('StateValueValuesEnum', 5)
+  name = _messages.StringField(1)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
 
 
 class Delete(_messages.Message):
@@ -673,35 +263,25 @@ class Empty(_messages.Message):
 
 
 
-class EncryptionConfig(_messages.Message):
-  r"""Encryption configuration describing key resources in Cloud KMS used to
-  encrypt/decrypt a Cloud Spanner database.
-
-  Fields:
-    kmsKey: A required resource name of the Cloud KMS key that was used to
-      encrypt and decrypt the database. The form of the kms_key is `projects/[
-      PROJECT_ID]/locations/[LOCATION]/keyRings/[KEY_RING]/cryptoKeys/kms_key>
-      `.
-  """
-
-  kmsKey = _messages.StringField(1)
-
-
 class ExecuteBatchDmlRequest(_messages.Message):
-  r"""The request for ExecuteBatchDml
+  r"""The request for ExecuteBatchDml.
 
   Fields:
     seqno: A per-transaction sequence number used to identify this request.
-      This is used in the same space as the seqno in ExecuteSqlRequest. See
-      more details in ExecuteSqlRequest.
+      This field makes each request idempotent such that if the request is
+      received multiple times, at most one will succeed.  The sequence number
+      must be monotonically increasing within the transaction. If a request
+      arrives for the first time with an out-of-order sequence number, the
+      transaction may be aborted. Replays of previously handled requests will
+      yield the same response as the first execution.
     statements: The list of statements to execute in this batch. Statements
-      are executed serially, such that the effects of statement i are visible
-      to statement i+1. Each statement must be a DML statement. Execution will
-      stop at the first failed statement; the remaining statements will not
-      run.  REQUIRES: `statements_size()` > 0.
-    transaction: The transaction to use. A ReadWrite transaction is required.
-      Single-use transactions are not supported (to avoid replay).  The caller
-      must either supply an existing transaction ID or begin a new
+      are executed serially, such that the effects of statement `i` are
+      visible to statement `i+1`. Each statement must be a DML statement.
+      Execution stops at the first failed statement; the remaining statements
+      are not executed.  Callers must provide at least one statement.
+    transaction: The transaction to use. Must be a read-write transaction.  To
+      protect against replays, single-use transactions are not supported. The
+      caller must either supply an existing transaction ID or begin a new
       transaction.
   """
 
@@ -711,29 +291,30 @@ class ExecuteBatchDmlRequest(_messages.Message):
 
 
 class ExecuteBatchDmlResponse(_messages.Message):
-  r"""The response for ExecuteBatchDml. Contains a list of ResultSet, one for
-  each DML statement that has successfully executed. If a statement fails, the
-  error is returned as part of the response payload. Clients can determine
-  whether all DML statements have run successfully, or if a statement failed,
-  using one of the following approaches:    1. Check if `'status'` field is
-  `OkStatus`.   2. Check if `result_sets_size()` equals the number of
-  statements in      ExecuteBatchDmlRequest.  Example 1: A request with 5 DML
-  statements, all executed successfully.  Result: A response with 5
-  ResultSets, one for each statement in the same order, and an `OkStatus`.
-  Example 2: A request with 5 DML statements. The 3rd statement has a syntax
-  error.  Result: A response with 2 ResultSets, for the first 2 statements
-  that run successfully, and a syntax error (`INVALID_ARGUMENT`) status. From
-  `result_set_size()` client can determine that the 3rd statement has failed.
+  r"""The response for ExecuteBatchDml. Contains a list of ResultSet messages,
+  one for each DML statement that has successfully executed, in the same order
+  as the statements in the request. If a statement fails, the status in the
+  response body identifies the cause of the failure.  To check for DML
+  statements that failed, use the following approach:  1. Check the status in
+  the response message. The google.rpc.Code enum    value `OK` indicates that
+  all statements were executed successfully. 2. If the status was not `OK`,
+  check the number of result sets in the    response. If the response contains
+  `N` ResultSet messages, then    statement `N+1` in the request failed.
+  Example 1:  * Request: 5 DML statements, all executed successfully. *
+  Response: 5 ResultSet messages, with the status `OK`.  Example 2:  *
+  Request: 5 DML statements. The third statement has a syntax error. *
+  Response: 2 ResultSet messages, and a syntax error (`INVALID_ARGUMENT`)
+  status. The number of ResultSet messages indicates that the third
+  statement failed, and the fourth and fifth statements were not executed.
 
   Fields:
-    resultSets: ResultSets, one for each statement in the request that ran
+    resultSets: One ResultSet for each statement in the request that ran
       successfully, in the same order as the statements in the request. Each
-      ResultSet will not contain any rows. The ResultSetStats in each
-      ResultSet will contain the number of rows modified by the statement.
-      Only the first ResultSet in the response contains a valid
-      ResultSetMetadata.
-    status: If all DML statements are executed successfully, status will be
-      OK. Otherwise, the error status of the first failed statement.
+      ResultSet does not contain any rows. The ResultSetStats in each
+      ResultSet contain the number of rows modified by the statement.  Only
+      the first ResultSet in the response contains valid ResultSetMetadata.
+    status: If all DML statements are executed successfully, the status is
+      `OK`. Otherwise, the error status of the first failed statement.
   """
 
   resultSets = _messages.MessageField('ResultSet', 1, repeated=True)
@@ -755,16 +336,14 @@ class ExecuteSqlRequest(_messages.Message):
       these cases, `param_types` can be used to specify the exact SQL type for
       some or all of the SQL statement parameters. See the definition of Type
       for more information about SQL types.
-    ParamsValue: The SQL string can contain parameter placeholders. A
-      parameter placeholder consists of `'@'` followed by the parameter name.
-      Parameter names consist of any combination of letters, numbers, and
-      underscores.  Parameters can appear anywhere that a literal value is
-      expected.  The same parameter name can be used more than once, for
-      example:   `"WHERE id > @msg_id AND id < @msg_id + 100"`  It is an error
-      to execute an SQL statement with unbound parameters.  Parameter values
-      are specified using `params`, which is a JSON object whose keys are
-      parameter names, and whose values are the corresponding parameter
-      values.
+    ParamsValue: Parameter names and values that bind to placeholders in the
+      SQL string.  A parameter placeholder consists of the `@` character
+      followed by the parameter name (for example, `@firstName`). Parameter
+      names can contain letters, numbers, and underscores.  Parameters can
+      appear anywhere that a literal value is expected.  The same parameter
+      name can be used more than once, for example:  `"WHERE id > @msg_id AND
+      id < @msg_id + 100"`  It is an error to execute a SQL statement with
+      unbound parameters.
 
   Fields:
     paramTypes: It is not always possible for Cloud Spanner to infer the right
@@ -773,15 +352,14 @@ class ExecuteSqlRequest(_messages.Message):
       cases, `param_types` can be used to specify the exact SQL type for some
       or all of the SQL statement parameters. See the definition of Type for
       more information about SQL types.
-    params: The SQL string can contain parameter placeholders. A parameter
-      placeholder consists of `'@'` followed by the parameter name. Parameter
-      names consist of any combination of letters, numbers, and underscores.
-      Parameters can appear anywhere that a literal value is expected.  The
-      same parameter name can be used more than once, for example:   `"WHERE
-      id > @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL
-      statement with unbound parameters.  Parameter values are specified using
-      `params`, which is a JSON object whose keys are parameter names, and
-      whose values are the corresponding parameter values.
+    params: Parameter names and values that bind to placeholders in the SQL
+      string.  A parameter placeholder consists of the `@` character followed
+      by the parameter name (for example, `@firstName`). Parameter names can
+      contain letters, numbers, and underscores.  Parameters can appear
+      anywhere that a literal value is expected.  The same parameter name can
+      be used more than once, for example:  `"WHERE id > @msg_id AND id <
+      @msg_id + 100"`  It is an error to execute a SQL statement with unbound
+      parameters.
     partitionToken: If present, results will be restricted to the specified
       partition previously created using PartitionQuery().  There must be an
       exact match for the values of fields common to this message and the
@@ -796,22 +374,21 @@ class ExecuteSqlRequest(_messages.Message):
       rest of the request parameters must exactly match the request that
       yielded this token.
     seqno: A per-transaction sequence number used to identify this request.
-      This makes each request idempotent such that if the request is received
-      multiple times, at most one will succeed.  The sequence number must be
-      monotonically increasing within the transaction. If a request arrives
-      for the first time with an out-of-order sequence number, the transaction
-      may be aborted. Replays of previously handled requests will yield the
-      same response as the first execution.  Required for DML statements.
-      Ignored for queries.
+      This field makes each request idempotent such that if the request is
+      received multiple times, at most one will succeed.  The sequence number
+      must be monotonically increasing within the transaction. If a request
+      arrives for the first time with an out-of-order sequence number, the
+      transaction may be aborted. Replays of previously handled requests will
+      yield the same response as the first execution.  Required for DML
+      statements. Ignored for queries.
     sql: Required. The SQL string.
-    transaction: The transaction to use. If none is provided, the default is a
-      temporary read-only transaction with strong concurrency.  The
-      transaction to use.  For queries, if none is provided, the default is a
-      temporary read-only transaction with strong concurrency.  Standard DML
-      statements require a ReadWrite transaction. Single-use transactions are
-      not supported (to avoid replay).  The caller must either supply an
-      existing transaction ID or begin a new transaction.  Partitioned DML
-      requires an existing PartitionedDml transaction ID.
+    transaction: The transaction to use.  For queries, if none is provided,
+      the default is a temporary read-only transaction with strong
+      concurrency.  Standard DML statements require a read-write transaction.
+      To protect against replays, single-use transactions are not supported.
+      The caller must either supply an existing transaction ID or begin a new
+      transaction.  Partitioned DML requires an existing Partitioned DML
+      transaction ID.
   """
 
   class QueryModeValueValuesEnum(_messages.Enum):
@@ -861,15 +438,13 @@ class ExecuteSqlRequest(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ParamsValue(_messages.Message):
-    r"""The SQL string can contain parameter placeholders. A parameter
-    placeholder consists of `'@'` followed by the parameter name. Parameter
-    names consist of any combination of letters, numbers, and underscores.
-    Parameters can appear anywhere that a literal value is expected.  The same
-    parameter name can be used more than once, for example:   `"WHERE id >
-    @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL
-    statement with unbound parameters.  Parameter values are specified using
-    `params`, which is a JSON object whose keys are parameter names, and whose
-    values are the corresponding parameter values.
+    r"""Parameter names and values that bind to placeholders in the SQL
+    string.  A parameter placeholder consists of the `@` character followed by
+    the parameter name (for example, `@firstName`). Parameter names can
+    contain letters, numbers, and underscores.  Parameters can appear anywhere
+    that a literal value is expected.  The same parameter name can be used
+    more than once, for example:  `"WHERE id > @msg_id AND id < @msg_id +
+    100"`  It is an error to execute a SQL statement with unbound parameters.
 
     Messages:
       AdditionalProperty: An additional property for a ParamsValue object.
@@ -954,7 +529,28 @@ class GetDatabaseDdlResponse(_messages.Message):
 
 
 class GetIamPolicyRequest(_messages.Message):
-  r"""Request message for `GetIamPolicy` method."""
+  r"""Request message for `GetIamPolicy` method.
+
+  Fields:
+    options: OPTIONAL: A `GetPolicyOptions` object for specifying options to
+      `GetIamPolicy`. This field is only used by Cloud IAM.
+  """
+
+  options = _messages.MessageField('GetPolicyOptions', 1)
+
+
+class GetPolicyOptions(_messages.Message):
+  r"""Encapsulates settings provided to GetIamPolicy.
+
+  Fields:
+    requestedPolicyVersion: Optional. The policy format version to be
+      returned.  Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.  Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
+  """
+
+  requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class Instance(_messages.Message):
@@ -1198,55 +794,6 @@ class KeySet(_messages.Message):
   ranges = _messages.MessageField('KeyRange', 3, repeated=True)
 
 
-class ListBackupOperationsResponse(_messages.Message):
-  r"""A ListBackupOperationsResponse object.
-
-  Fields:
-    nextPageToken: `next_page_token` can be sent in a subsequent
-      ListBackupOperations call to fetch more of the matching metadata.
-    operations: The list of matching long-running operations whose names are
-      prefixed by a backup name. The long-running operation metadata field
-      type `metadata.type_url` describes the type of the metadata. Operations
-      returned include those that have completed/failed/canceled within the
-      last 7 days, and pending operations. Operations returned are ordered by
-      `operation.metadata.value.progress.start_time` in descending order
-      starting from the most recently started operation.
-  """
-
-  nextPageToken = _messages.StringField(1)
-  operations = _messages.MessageField('Operation', 2, repeated=True)
-
-
-class ListBackupsResponse(_messages.Message):
-  r"""A ListBackupsResponse object.
-
-  Fields:
-    backups: The list of matching backups. Backups returned are ordered by
-      `create_time` in descending order, starting from the most recent
-      `create_time`.
-    nextPageToken: `next_page_token` can be sent in a subsequent ListBackups
-      call to fetch more of the matching backups.
-  """
-
-  backups = _messages.MessageField('Backup', 1, repeated=True)
-  nextPageToken = _messages.StringField(2)
-
-
-class ListDatabaseOperationsResponse(_messages.Message):
-  r"""A ListDatabaseOperationsResponse object.
-
-  Fields:
-    nextPageToken: `next_page_token` can be sent in a subsequent
-      ListDatabaseOperations call to fetch more of the matching metadata.
-    operations: The list of matching long-running operations whose names are
-      prefixed by a database name. The long-running operation metadata field
-      type `metadata.type_url` describes the type of the metadata.
-  """
-
-  nextPageToken = _messages.StringField(1)
-  operations = _messages.MessageField('Operation', 2, repeated=True)
-
-
 class ListDatabasesResponse(_messages.Message):
   r"""The response for ListDatabases.
 
@@ -1313,20 +860,6 @@ class ListSessionsResponse(_messages.Message):
   sessions = _messages.MessageField('Session', 2, repeated=True)
 
 
-class LogConfig(_messages.Message):
-  r"""Specifies what kind of log the caller must write
-
-  Fields:
-    cloudAudit: Cloud audit options.
-    counter: Counter options.
-    dataAccess: Data access options.
-  """
-
-  cloudAudit = _messages.MessageField('CloudAuditOptions', 1)
-  counter = _messages.MessageField('CounterOptions', 2)
-  dataAccess = _messages.MessageField('DataAccessOptions', 3)
-
-
 class Mutation(_messages.Message):
   r"""A modification to one or more Cloud Spanner rows.  Mutations can be
   applied to a Cloud Spanner database by sending them in a Commit call.
@@ -1342,7 +875,10 @@ class Mutation(_messages.Message):
     replace: Like insert, except that if the row already exists, it is
       deleted, and the column values provided are inserted instead. Unlike
       insert_or_update, this means any values not explicitly written become
-      `NULL`.
+      `NULL`.  In an interleaved table, if you create the child table with the
+      `ON DELETE CASCADE` annotation, then replacing a parent row also deletes
+      the child rows. Otherwise, you must delete the child rows before you
+      replace the parent row.
     update: Update existing rows in a table. If any of the rows does not
       already exist, the transaction fails with error `NOT_FOUND`.
   """
@@ -1462,34 +998,6 @@ class Operation(_messages.Message):
   response = _messages.MessageField('ResponseValue', 5)
 
 
-class OperationProgress(_messages.Message):
-  r"""A OperationProgress object.
-
-  Fields:
-    endTime: If set, the time at which this operation failed or was completed
-      successfully.
-    progressPercent: Percent completion of the operation. Values are between 0
-      and 100 inclusive.
-    startTime: Time the request was received.
-  """
-
-  endTime = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-
-
-class OptimizeRestoredDatabaseMetadata(_messages.Message):
-  r"""A OptimizeRestoredDatabaseMetadata object.
-
-  Fields:
-    name: Name of the restored database being optimized.
-    progress: The progress of the post-restore optimizations.
-  """
-
-  name = _messages.StringField(1)
-  progress = _messages.MessageField('OperationProgress', 2)
-
-
 class PartialResultSet(_messages.Message):
   r"""Partial results from a streaming read or SQL query. Streaming reads and
   SQL queries better tolerate large result sets, large rows, and large values,
@@ -1601,16 +1109,14 @@ class PartitionQueryRequest(_messages.Message):
       these cases, `param_types` can be used to specify the exact SQL type for
       some or all of the SQL query parameters. See the definition of Type for
       more information about SQL types.
-    ParamsValue: The SQL query string can contain parameter placeholders. A
-      parameter placeholder consists of `'@'` followed by the parameter name.
-      Parameter names consist of any combination of letters, numbers, and
-      underscores.  Parameters can appear anywhere that a literal value is
-      expected.  The same parameter name can be used more than once, for
-      example:   `"WHERE id > @msg_id AND id < @msg_id + 100"`  It is an error
-      to execute an SQL query with unbound parameters.  Parameter values are
-      specified using `params`, which is a JSON object whose keys are
-      parameter names, and whose values are the corresponding parameter
-      values.
+    ParamsValue: Parameter names and values that bind to placeholders in the
+      SQL string.  A parameter placeholder consists of the `@` character
+      followed by the parameter name (for example, `@firstName`). Parameter
+      names can contain letters, numbers, and underscores.  Parameters can
+      appear anywhere that a literal value is expected.  The same parameter
+      name can be used more than once, for example:  `"WHERE id > @msg_id AND
+      id < @msg_id + 100"`  It is an error to execute a SQL statement with
+      unbound parameters.
 
   Fields:
     paramTypes: It is not always possible for Cloud Spanner to infer the right
@@ -1619,16 +1125,14 @@ class PartitionQueryRequest(_messages.Message):
       cases, `param_types` can be used to specify the exact SQL type for some
       or all of the SQL query parameters. See the definition of Type for more
       information about SQL types.
-    params: The SQL query string can contain parameter placeholders. A
-      parameter placeholder consists of `'@'` followed by the parameter name.
-      Parameter names consist of any combination of letters, numbers, and
-      underscores.  Parameters can appear anywhere that a literal value is
-      expected.  The same parameter name can be used more than once, for
-      example:   `"WHERE id > @msg_id AND id < @msg_id + 100"`  It is an error
-      to execute an SQL query with unbound parameters.  Parameter values are
-      specified using `params`, which is a JSON object whose keys are
-      parameter names, and whose values are the corresponding parameter
-      values.
+    params: Parameter names and values that bind to placeholders in the SQL
+      string.  A parameter placeholder consists of the `@` character followed
+      by the parameter name (for example, `@firstName`). Parameter names can
+      contain letters, numbers, and underscores.  Parameters can appear
+      anywhere that a literal value is expected.  The same parameter name can
+      be used more than once, for example:  `"WHERE id > @msg_id AND id <
+      @msg_id + 100"`  It is an error to execute a SQL statement with unbound
+      parameters.
     partitionOptions: Additional options that affect how many partitions are
       created.
     sql: The query request to generate partitions for. The request will fail
@@ -1674,15 +1178,13 @@ class PartitionQueryRequest(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ParamsValue(_messages.Message):
-    r"""The SQL query string can contain parameter placeholders. A parameter
-    placeholder consists of `'@'` followed by the parameter name. Parameter
-    names consist of any combination of letters, numbers, and underscores.
-    Parameters can appear anywhere that a literal value is expected.  The same
-    parameter name can be used more than once, for example:   `"WHERE id >
-    @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL query
-    with unbound parameters.  Parameter values are specified using `params`,
-    which is a JSON object whose keys are parameter names, and whose values
-    are the corresponding parameter values.
+    r"""Parameter names and values that bind to placeholders in the SQL
+    string.  A parameter placeholder consists of the `@` character followed by
+    the parameter name (for example, `@firstName`). Parameter names can
+    contain letters, numbers, and underscores.  Parameters can appear anywhere
+    that a literal value is expected.  The same parameter name can be used
+    more than once, for example:  `"WHERE id > @msg_id AND id < @msg_id +
+    100"`  It is an error to execute a SQL statement with unbound parameters.
 
     Messages:
       AdditionalProperty: An additional property for a ParamsValue object.
@@ -1883,27 +1385,37 @@ class PlanNode(_messages.Message):
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.   A `Policy`
-  consists of a list of `bindings`. A `binding` binds a list of `members` to a
-  `role`, where the members can be user accounts, Google groups, Google
-  domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **JSON Example**      {       "bindings": [         {
-  "role": "roles/owner",           "members": [
+  is a collection of `bindings`. A `binding` binds one or more `members` to a
+  single `role`. Members can be user accounts, service accounts, Google
+  groups, and domains (such as G Suite). A `role` is a named list of
+  permissions (defined by IAM or configured by users). A `binding` can
+  optionally specify a `condition`, which is a logic expression that further
+  constrains the role binding based on attributes about the request and/or
+  target resource.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
-  "domain:google.com",             "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com"           ]         },         {
-  "role": "roles/viewer",           "members": ["user:sean@example.com"]
-  }       ]     }  **YAML Example**      bindings:     - members:       -
-  user:mike@example.com       - group:admins@example.com       -
-  domain:google.com       - serviceAccount:my-other-
-  app@appspot.gserviceaccount.com       role: roles/owner     - members:
-  - user:sean@example.com       role: roles/viewer   For a description of IAM
-  and its features, see the [IAM developer's
+  "domain:google.com",             "serviceAccount:my-project-
+  id@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/resourcemanager.organizationViewer",           "members":
+  ["user:eve@example.com"],           "condition": {             "title":
+  "expirable access",             "description": "Does not grant access after
+  Sep 2020",             "expression": "request.time <
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
+  **YAML Example**      bindings:     - members:       - user:mike@example.com
+  - group:admins@example.com       - domain:google.com       - serviceAccount
+  :my-project-id@appspot.gserviceaccount.com       role:
+  roles/resourcemanager.organizationAdmin     - members:       -
+  user:eve@example.com       role: roles/resourcemanager.organizationViewer
+  condition:         title: expirable access         description: Does not
+  grant access after Sep 2020         expression: request.time <
+  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
+  features, see the [IAM developer's
   guide](https://cloud.google.com/iam/docs).
 
   Fields:
-    auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. `bindings` with no
-      members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally may
+      specify a `condition` that determines when binding is in effect.
+      `bindings` with no members will result in an error.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1912,24 +1424,23 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
       policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten blindly.
-    iamOwned: A boolean attribute.
-    rules: If more than one rule is specified, the rules are applied in the
-      following manner: - All matching LOG rules are always applied. - If any
-      DENY/DENY_WITH_LOG rule matches, permission is denied.   Logging will be
-      applied if one or more matching rule requires logging. - Otherwise, if
-      any ALLOW/ALLOW_WITH_LOG rule matches, permission is   granted.
-      Logging will be applied if one or more matching rule requires logging. -
-      Otherwise, if no rule applies, permission is denied.
-    version: Deprecated.
+      the existing policy is overwritten. Due to blind-set semantics of an
+      etag-less policy, 'setIamPolicy' will not fail even if either of
+      incoming or stored policy does not meet the version requirements.
+    version: Specifies the format of the policy.  Valid values are 0, 1, and
+      3. Requests specifying an invalid value will be rejected.  Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.  If no etag is provided in the call to
+      `setIamPolicy`, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
-  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
-  bindings = _messages.MessageField('Binding', 2, repeated=True)
-  etag = _messages.BytesField(3)
-  iamOwned = _messages.BooleanField(4)
-  rules = _messages.MessageField('Rule', 5, repeated=True)
-  version = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  bindings = _messages.MessageField('Binding', 1, repeated=True)
+  etag = _messages.BytesField(2)
+  version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class QueryPlan(_messages.Message):
@@ -2066,15 +1577,15 @@ class ReplicaInfo(_messages.Message):
     Values:
       TYPE_UNSPECIFIED: Not specified.
       READ_WRITE: Read-write replicas support both reads and writes. These
-        replicas: * Maintain a full copy of your data. * Serve reads. * Can
+        replicas:  * Maintain a full copy of your data. * Serve reads. * Can
         vote whether to commit a write. * Participate in leadership election.
         * Are eligible to become a leader.
       READ_ONLY: Read-only replicas only support reads (not writes). Read-only
-        replicas: * Maintain a full copy of your data. * Serve reads. * Do not
-        participate in voting to commit writes. * Are not eligible to become a
-        leader.
+        replicas:  * Maintain a full copy of your data. * Serve reads. * Do
+        not participate in voting to commit writes. * Are not eligible to
+        become a leader.
       WITNESS: Witness replicas don't support reads but do participate in
-        voting to commit writes. Witness replicas: * Do not maintain a full
+        voting to commit writes. Witness replicas:  * Do not maintain a full
         copy of data. * Do not serve reads. * Vote whether to commit writes. *
         Participate in leader election but are not eligible to become leader.
     """
@@ -2086,93 +1597,6 @@ class ReplicaInfo(_messages.Message):
   defaultLeaderLocation = _messages.BooleanField(1)
   location = _messages.StringField(2)
   type = _messages.EnumField('TypeValueValuesEnum', 3)
-
-
-class RestoreDatabaseMetadata(_messages.Message):
-  r"""A RestoreDatabaseMetadata object.
-
-  Enums:
-    SourceTypeValueValuesEnum: The type of the restore source.
-
-  Fields:
-    backupInfo: Information about the backup used to restore the database.
-    cancelTime: The time at which this operation was cancelled. If set, this
-      operation is in the process of undoing itself (which is guaranteed to
-      succeed) and cannot be cancelled again.
-    name: Name of the database being created and restored to.
-    optimizeDatabaseOperationName: If exists, the name of the long-running
-      operation that will be used to track the post-restore optimization
-      process to optimize the performance of the restored database, and remove
-      the dependency on the restore source. The name is of the form `projects/
-      <project>/instances/<instance>/databases/<database>/operations/<operatio
-      n> where the <database> is the name of database being created and
-      restored to. The metadata type of the  long-running operation is
-      OptimizeRestoreDatabaseMetadata. This long-running operation will be
-      automatically created by the system after the RestoreDatabase long-
-      running operation completes successfully. This operation will not be
-      created if the restore was not successful.
-    progress: The progress of the RestoreDatabase operation.
-    sourceType: The type of the restore source.
-  """
-
-  class SourceTypeValueValuesEnum(_messages.Enum):
-    r"""The type of the restore source.
-
-    Values:
-      TYPE_UNSPECIFIED: No restore associated.
-      BACKUP: A backup was used as the source of the restore.
-    """
-    TYPE_UNSPECIFIED = 0
-    BACKUP = 1
-
-  backupInfo = _messages.MessageField('BackupInfo', 1)
-  cancelTime = _messages.StringField(2)
-  name = _messages.StringField(3)
-  optimizeDatabaseOperationName = _messages.StringField(4)
-  progress = _messages.MessageField('OperationProgress', 5)
-  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 6)
-
-
-class RestoreDatabaseRequest(_messages.Message):
-  r"""A RestoreDatabaseRequest object.
-
-  Fields:
-    backup: Name of the backup from which to restore.  Values are of the form
-      `projects/<project>/instances/<instance>/backups/<backup>`.
-    databaseId: Required. The id of the database to create and restore to.
-      This database must not already exist. The `database_id` appended to
-      `parent` forms the full database name of the form
-      `projects/<project>/instances/<instance>/databases/<database_id>`.
-  """
-
-  backup = _messages.StringField(1)
-  databaseId = _messages.StringField(2)
-
-
-class RestoreInfo(_messages.Message):
-  r"""A RestoreInfo object.
-
-  Enums:
-    SourceTypeValueValuesEnum: The type of the restore source.
-
-  Fields:
-    backupInfo: Information about the backup used to restore the database. The
-      backup may no longer exist.
-    sourceType: The type of the restore source.
-  """
-
-  class SourceTypeValueValuesEnum(_messages.Enum):
-    r"""The type of the restore source.
-
-    Values:
-      TYPE_UNSPECIFIED: No restore associated.
-      BACKUP: A backup was used as the source of the restore.
-    """
-    TYPE_UNSPECIFIED = 0
-    BACKUP = 1
-
-  backupInfo = _messages.MessageField('BackupInfo', 1)
-  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 2)
 
 
 class ResultSet(_messages.Message):
@@ -2290,60 +1714,6 @@ class RollbackRequest(_messages.Message):
   transactionId = _messages.BytesField(1)
 
 
-class Rule(_messages.Message):
-  r"""A rule to be applied in a Policy.
-
-  Enums:
-    ActionValueValuesEnum: Required
-
-  Fields:
-    action: Required
-    conditions: Additional restrictions that must be met. All conditions must
-      pass for the rule to match.
-    description: Human-readable description of the rule.
-    in_: If one or more 'in' clauses are specified, the rule matches if the
-      PRINCIPAL/AUTHORITY_SELECTOR is in at least one of these entries.
-    logConfig: The config returned to callers of tech.iam.IAM.CheckPolicy for
-      any entries that match the LOG action.
-    notIn: If one or more 'not_in' clauses are specified, the rule matches if
-      the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries. The format
-      for in and not_in entries can be found at in the Local IAM documentation
-      (see go/local-iam#features).
-    permissions: A permission is a string of form '<service>.<resource
-      type>.<verb>' (e.g., 'storage.buckets.list'). A value of '*' matches all
-      permissions, and a verb part of '*' (e.g., 'storage.buckets.*') matches
-      all verbs.
-  """
-
-  class ActionValueValuesEnum(_messages.Enum):
-    r"""Required
-
-    Values:
-      NO_ACTION: Default no action.
-      ALLOW: Matching 'Entries' grant access.
-      ALLOW_WITH_LOG: Matching 'Entries' grant access and the caller promises
-        to log the request per the returned log_configs.
-      DENY: Matching 'Entries' deny access.
-      DENY_WITH_LOG: Matching 'Entries' deny access and the caller promises to
-        log the request per the returned log_configs.
-      LOG: Matching 'Entries' tell IAM.Check callers to generate logs.
-    """
-    NO_ACTION = 0
-    ALLOW = 1
-    ALLOW_WITH_LOG = 2
-    DENY = 3
-    DENY_WITH_LOG = 4
-    LOG = 5
-
-  action = _messages.EnumField('ActionValueValuesEnum', 1)
-  conditions = _messages.MessageField('Condition', 2, repeated=True)
-  description = _messages.StringField(3)
-  in_ = _messages.StringField(4, repeated=True)
-  logConfig = _messages.MessageField('LogConfig', 5, repeated=True)
-  notIn = _messages.StringField(6, repeated=True)
-  permissions = _messages.StringField(7, repeated=True)
-
-
 class Session(_messages.Message):
   r"""A session in the Cloud Spanner API.
 
@@ -2416,14 +1786,9 @@ class SetIamPolicyRequest(_messages.Message):
       size of the policy is limited to a few 10s of KB. An empty policy is a
       valid policy but certain Cloud Platform services (such as Projects)
       might reject them.
-    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
-      modify. Only the fields in the mask will be modified. If no mask is
-      provided, the following default mask is used: paths: "bindings, etag"
-      This field is only used by Cloud IAM.
   """
 
   policy = _messages.MessageField('Policy', 1)
-  updateMask = _messages.StringField(2)
 
 
 class ShortRepresentation(_messages.Message):
@@ -2508,217 +1873,6 @@ class SpannerProjectsInstanceConfigsListRequest(_messages.Message):
   parent = _messages.StringField(3, required=True)
 
 
-class SpannerProjectsInstancesBackupOperationsListRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupOperationsListRequest object.
-
-  Fields:
-    filter: A filter expression that filters what operations are returned in
-      the response.  The response returns a list of long-running operations
-      whose names are prefixed by a backup name within the specified instance.
-      The long-running operation metadata field type `metadata.type_url`
-      describes the type of the metadata.  The filter expression must specify
-      the field name of an operation, a comparison operator, and the value
-      that you want to use for filtering. The value must be a string, a
-      number, or a boolean. The comparison operator must be <, >, <=, >=, !=,
-      =, or :. Colon ':' represents a HAS operator which is roughly synonymous
-      with equality. Filter rules are case insensitive.  The long-running
-      operation fields eligible for filtering are:   * `name` --> The name of
-      the long-running operation   * `done` --> False if the operation is in
-      progress, else true.   * `metadata.type_url` (using filter string
-      `metadata.@type`) and fields      in `metadata.value` (using filter
-      string `metadata.<field_name>`,      where <field_name> is a field in
-      metadata.value) are eligible for      filtering.   * `error` --> Error
-      associated with the long-running operation.   * `response.type_url`
-      (using filter string `response.@type`) and fields      in
-      `response.value` (using filter string `response.<field_name>`,
-      where <field_name> is a field in response.value) are eligible for
-      filtering.  To filter on multiple expressions, provide each separate
-      expression within parentheses. By default, each expression is an AND
-      expression. However, you can include AND, OR, and NOT expressions
-      explicitly.  Some examples of using filters are:    * `done:true` -->
-      The operation is complete.   * `metadata.database:prod`          --> The
-      database the backup was taken from has a name containing
-      the string "prod".   * `(metadata.@type:type.googleapis.com/google.spann
-      er.admin.database.v1.CreateBackupMetadata)      AND (metadata.name:howl)
-      AND (metadata.progress.start_time < \"2018-03-28T14:50:00Z\")      AND
-      (error:*)`          --> Return CreateBackup operations where the created
-      backup name              contains the string "howl", the
-      progress.start_time of the              backup operation is before
-      2018-03-28T14:50:00Z, and the              operation returned an error.
-    pageSize: Number of operations to be returned in the response. If 0 or
-      less, defaults to the server's maximum allowed page size.
-    pageToken: If non-empty, `page_token` should contain a next_page_token
-      from a previous ListBackupOperationsResponse to the same `parent` and
-      with the same `filter`.
-    parent: Required. The instance of the backup operations. Values are of the
-      form `projects/<project>/instances/<instance>`.
-  """
-
-  filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
-
-
-class SpannerProjectsInstancesBackupsCreateRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsCreateRequest object.
-
-  Fields:
-    backup: A Backup resource to be passed as the request body.
-    backupId: Required. The id of the backup to be created. The `backup_id`
-      appended to `parent` forms the full backup name of the form
-      `projects/<project>/instances/<instance>/backups/<backup_id>`.
-    parent: Required. The name of the instance in which the backup will be
-      created. This must be the same instance that contains the database the
-      backup will be created from. The backup will be stored in the
-      location(s) specified in the instance configuration of this instance.
-      Values are of the form `projects/<project>/instances/<instance>`.
-  """
-
-  backup = _messages.MessageField('Backup', 1)
-  backupId = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
-
-
-class SpannerProjectsInstancesBackupsDeleteRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsDeleteRequest object.
-
-  Fields:
-    name: Required. Name of the backup to delete. Values are of the form
-      `projects/<project>/instances/<instance>/backups/<backup>`.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class SpannerProjectsInstancesBackupsGetIamPolicyRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsGetIamPolicyRequest object.
-
-  Fields:
-    getIamPolicyRequest: A GetIamPolicyRequest resource to be passed as the
-      request body.
-    resource: REQUIRED: The Cloud Spanner resource for which the policy is
-      being retrieved. The format is `projects/<project
-      ID>/instances/<instance ID>` for instance resources and
-      `projects/<project ID>/instances/<instance ID>/databases/<database ID>`
-      for database resources.
-  """
-
-  getIamPolicyRequest = _messages.MessageField('GetIamPolicyRequest', 1)
-  resource = _messages.StringField(2, required=True)
-
-
-class SpannerProjectsInstancesBackupsGetRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsGetRequest object.
-
-  Fields:
-    name: Required. Name of the backup. Values are of the form
-      `projects/<project>/instances/<instance>/backups/<backup>`.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class SpannerProjectsInstancesBackupsListRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsListRequest object.
-
-  Fields:
-    filter: A filter expression that filters backups listed in the response.
-      The expression must specify the field name, a comparison operator, and
-      the value that you want to use for filtering. The value must be a
-      string, a number, or a boolean. The comparison operator must be <, >,
-      <=, >=, !=, =, or :. Colon ':' represents a HAS operator which is
-      roughly synonymous with equality. Filter rules are case insensitive.
-      The fields eligible for filtering are:   * `name`   * `database`   *
-      `state`   * `create_time` (and values are of the format YYYY-MM-
-      DDTHH:MM:SSZ)   * `expire_time` (and values are of the format YYYY-MM-
-      DDTHH:MM:SSZ)   * `size_bytes`  To filter on multiple expressions,
-      provide each separate expression within parentheses. By default, each
-      expression is an AND expression. However, you can include AND, OR, and
-      NOT expressions explicitly.  Some examples of using filters are:    *
-      `name:Howl` --> The backup's name contains the string "howl".   *
-      `database:prod`          --> The database's name contains the string
-      "prod".   * `state:CREATING` --> The backup is pending creation.   *
-      `state:READY` --> The backup is fully created and ready for use.   *
-      `(name:howl) AND (create_time < \"2018-03-28T14:50:00Z\")`          -->
-      The backup name contains the string "howl" and `create_time`
-      of the backup is before 2018-03-28T14:50:00Z.   * `expire_time <
-      \"2018-03-28T14:50:00Z\"`          --> The backup `expire_time` is
-      before 2018-03-28T14:50:00Z.   * `size_bytes > 10000000000` --> The
-      backup's size is greater than 10GB
-    pageSize: Number of backups to be returned in the response. If 0 or less,
-      defaults to the server's maximum allowed page size.
-    pageToken: If non-empty, `page_token` should contain a next_page_token
-      from a previous ListBackupsResponse to the same `parent` and with the
-      same `filter`.
-    parent: Required. The instance to list backups from.  Values are of the
-      form `projects/<project>/instances/<instance>`.
-  """
-
-  filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
-
-
-class SpannerProjectsInstancesBackupsPatchRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsPatchRequest object.
-
-  Fields:
-    backup: A Backup resource to be passed as the request body.
-    name: Output only. A globally unique identifier for the backup which
-      cannot be changed. Values are of the form
-      `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]` The final
-      segment of the name must be between 2 and 60 characters in length.  The
-      backup is stored in the location(s) specified in the instance
-      configuration of the instance containing the backup, identified by the
-      prefix of the backup name of the form
-      `projects/<project>/instances/<instance>`.
-    updateMask: Required. A mask specifying which fields (e.g. `expire_time`)
-      in the Backup resource should be updated. This mask is relative to the
-      Backup resource, not to the request message. The field mask must always
-      be specified; this prevents any future fields from being erased
-      accidentally by clients that do not know about them.
-  """
-
-  backup = _messages.MessageField('Backup', 1)
-  name = _messages.StringField(2, required=True)
-  updateMask = _messages.StringField(3)
-
-
-class SpannerProjectsInstancesBackupsSetIamPolicyRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsSetIamPolicyRequest object.
-
-  Fields:
-    resource: REQUIRED: The Cloud Spanner resource for which the policy is
-      being set. The format is `projects/<project ID>/instances/<instance ID>`
-      for instance resources and `projects/<project ID>/instances/<instance
-      ID>/databases/<database ID>` for databases resources.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
-
-
-class SpannerProjectsInstancesBackupsTestIamPermissionsRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesBackupsTestIamPermissionsRequest object.
-
-  Fields:
-    resource: REQUIRED: The Cloud Spanner resource for which permissions are
-      being tested. The format is `projects/<project ID>/instances/<instance
-      ID>` for instance resources and `projects/<project
-      ID>/instances/<instance ID>/databases/<database ID>` for database
-      resources.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
-
-
 class SpannerProjectsInstancesCreateRequest(_messages.Message):
   r"""A SpannerProjectsInstancesCreateRequest object.
 
@@ -2731,60 +1885,6 @@ class SpannerProjectsInstancesCreateRequest(_messages.Message):
 
   createInstanceRequest = _messages.MessageField('CreateInstanceRequest', 1)
   parent = _messages.StringField(2, required=True)
-
-
-class SpannerProjectsInstancesDatabaseOperationsListRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesDatabaseOperationsListRequest object.
-
-  Fields:
-    filter: A filter expression that filters what operations are returned in
-      the response.  The response returns a list of long-running operations
-      whose names are prefixed by a database name within the specified
-      instance. The long-running operation metadata field type
-      `metadata.type_url` describes the type of the metadata.  The filter
-      expression must specify the field name, a comparison operator, and the
-      value that you want to use for filtering. The value must be a string, a
-      number, or a boolean. The comparison operator must be <, >, <=, >=, !=,
-      =, or :. Colon ':' represents a HAS operator which is roughly synonymous
-      with equality. Filter rules are case insensitive.  The long-running
-      operation fields eligible for filtering are:   * `name` --> The name of
-      the long-running operation   * `done` --> False if the operation is in
-      progress, else true.   * `metadata.type_url` (using filter string
-      `metadata.@type`) and fields      in `metadata.value` (using filter
-      string `metadata.<field_name>`,      where <field_name> is a field in
-      metadata.value) are eligible for      filtering.   * `error` --> Error
-      associated with the long-running operation.   * `response.type_url`
-      (using filter string `response.@type`) and fields      in
-      `response.value` (using filter string `response.<field_name>`,
-      where <field_name> is a field in response.value) are eligible for
-      filtering.  To filter on multiple expressions, provide each separate
-      expression within parentheses. By default, each expression is an AND
-      expression. However, you can include AND, OR, and NOT expressions
-      explicitly.  Some examples of using filters are:    * `done:true` -->
-      The operation is complete.   * `(metadata.@type:type.googleapis.com/goog
-      le.spanner.admin.database.v1.RestoreDatabaseMetadata)      AND
-      (metadata.source_type:BACKUP)      AND
-      (metadata.backup_info.backup:backup_howl)      AND
-      (metadata.name:restored_howl)      AND (metadata.progress.start_time <
-      \"2018-03-28T14:50:00Z\")      AND (error:*)`          --> Return
-      RestoreDatabase operations from backups whose name              contains
-      "backup_howl", where the created database name              contains the
-      string "restored_howl", the start_time of the              restore
-      operation is before 2018-03-28T14:50:00Z,              and the operation
-      returned an error.
-    pageSize: Number of operations to be returned in the response. If 0 or
-      less, defaults to the server's maximum allowed page size.
-    pageToken: If non-empty, `page_token` should contain a next_page_token
-      from a previous ListDatabaseOperationsResponse to the same `parent` and
-      with the same `filter`.
-    parent: Required. The instance of the database operations. Values are of
-      the form `projects/<project>/instances/<instance>`.
-  """
-
-  filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
 
 
 class SpannerProjectsInstancesDatabasesCreateRequest(_messages.Message):
@@ -2911,22 +2011,6 @@ class SpannerProjectsInstancesDatabasesOperationsListRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
-
-
-class SpannerProjectsInstancesDatabasesRestoreRequest(_messages.Message):
-  r"""A SpannerProjectsInstancesDatabasesRestoreRequest object.
-
-  Fields:
-    parent: Required. The name of the instance in which to create the restored
-      database. This instance must be in the same project and have the same
-      instance configuration as the instance containing the source backup.
-      Values are of the form `projects/<project>/instances/<instance>.
-    restoreDatabaseRequest: A RestoreDatabaseRequest resource to be passed as
-      the request body.
-  """
-
-  parent = _messages.StringField(1, required=True)
-  restoreDatabaseRequest = _messages.MessageField('RestoreDatabaseRequest', 2)
 
 
 class SpannerProjectsInstancesDatabasesSessionsBatchCreateRequest(_messages.Message):
@@ -3414,16 +2498,14 @@ class Statement(_messages.Message):
       these cases, `param_types` can be used to specify the exact SQL type for
       some or all of the SQL statement parameters. See the definition of Type
       for more information about SQL types.
-    ParamsValue: The DML string can contain parameter placeholders. A
-      parameter placeholder consists of `'@'` followed by the parameter name.
-      Parameter names consist of any combination of letters, numbers, and
-      underscores.  Parameters can appear anywhere that a literal value is
-      expected.  The same parameter name can be used more than once, for
-      example:   `"WHERE id > @msg_id AND id < @msg_id + 100"`  It is an error
-      to execute an SQL statement with unbound parameters.  Parameter values
-      are specified using `params`, which is a JSON object whose keys are
-      parameter names, and whose values are the corresponding parameter
-      values.
+    ParamsValue: Parameter names and values that bind to placeholders in the
+      DML string.  A parameter placeholder consists of the `@` character
+      followed by the parameter name (for example, `@firstName`). Parameter
+      names can contain letters, numbers, and underscores.  Parameters can
+      appear anywhere that a literal value is expected.  The same parameter
+      name can be used more than once, for example:  `"WHERE id > @msg_id AND
+      id < @msg_id + 100"`  It is an error to execute a SQL statement with
+      unbound parameters.
 
   Fields:
     paramTypes: It is not always possible for Cloud Spanner to infer the right
@@ -3432,15 +2514,14 @@ class Statement(_messages.Message):
       cases, `param_types` can be used to specify the exact SQL type for some
       or all of the SQL statement parameters. See the definition of Type for
       more information about SQL types.
-    params: The DML string can contain parameter placeholders. A parameter
-      placeholder consists of `'@'` followed by the parameter name. Parameter
-      names consist of any combination of letters, numbers, and underscores.
-      Parameters can appear anywhere that a literal value is expected.  The
-      same parameter name can be used more than once, for example:   `"WHERE
-      id > @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL
-      statement with unbound parameters.  Parameter values are specified using
-      `params`, which is a JSON object whose keys are parameter names, and
-      whose values are the corresponding parameter values.
+    params: Parameter names and values that bind to placeholders in the DML
+      string.  A parameter placeholder consists of the `@` character followed
+      by the parameter name (for example, `@firstName`). Parameter names can
+      contain letters, numbers, and underscores.  Parameters can appear
+      anywhere that a literal value is expected.  The same parameter name can
+      be used more than once, for example:  `"WHERE id > @msg_id AND id <
+      @msg_id + 100"`  It is an error to execute a SQL statement with unbound
+      parameters.
     sql: Required. The DML string.
   """
 
@@ -3475,15 +2556,13 @@ class Statement(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ParamsValue(_messages.Message):
-    r"""The DML string can contain parameter placeholders. A parameter
-    placeholder consists of `'@'` followed by the parameter name. Parameter
-    names consist of any combination of letters, numbers, and underscores.
-    Parameters can appear anywhere that a literal value is expected.  The same
-    parameter name can be used more than once, for example:   `"WHERE id >
-    @msg_id AND id < @msg_id + 100"`  It is an error to execute an SQL
-    statement with unbound parameters.  Parameter values are specified using
-    `params`, which is a JSON object whose keys are parameter names, and whose
-    values are the corresponding parameter values.
+    r"""Parameter names and values that bind to placeholders in the DML
+    string.  A parameter placeholder consists of the `@` character followed by
+    the parameter name (for example, `@firstName`). Parameter names can
+    contain letters, numbers, and underscores.  Parameters can appear anywhere
+    that a literal value is expected.  The same parameter name can be used
+    more than once, for example:  `"WHERE id > @msg_id AND id < @msg_id +
+    100"`  It is an error to execute a SQL statement with unbound parameters.
 
     Messages:
       AdditionalProperty: An additional property for a ParamsValue object.
@@ -3513,37 +2592,10 @@ class Statement(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -4029,8 +3081,6 @@ class Write(_messages.Message):
   values = _messages.MessageField('ValuesValueListEntry', 3, repeated=True)
 
 
-encoding.AddCustomJsonFieldMapping(
-    Rule, 'in_', 'in')
 encoding.AddCustomJsonFieldMapping(
     StandardQueryParameters, 'f__xgafv', '$.xgafv')
 encoding.AddCustomJsonEnumMapping(

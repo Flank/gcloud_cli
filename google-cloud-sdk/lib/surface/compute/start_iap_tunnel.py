@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,25 +27,25 @@ from googlecloudsdk.command_lib.compute import iap_tunnel
 from googlecloudsdk.command_lib.compute import scope
 from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.command_lib.compute.instances import flags
-from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 
 
-class ArgumentError(exceptions.Error):
-  pass
-
-
-class NoInterfacesError(exceptions.Error):
-  pass
-
-
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class StartIapTunnel(base.Command):
-  """Starts an IAP TCP forwarding tunnel over WebSocket connection.
+  """Starts an IAP TCP forwarding tunnel.
 
   Starts a tunnel to the Cloud Identity-Aware Proxy through which another
   process can create a connection (eg. SSH, RDP) to a Google Compute Engine
   instance.
+
+  ## EXAMPLES
+
+  To open a tunnel to the instances's RDP port on an arbitrary local port, run:
+
+    $ {command} my-instance 3389
+
+  To open a tunnel to the instance's RDP port on a specific local port, run:
+
+    $ {command} my-instance 3389 --local-host-port=localhost:3333
   """
 
   @staticmethod
@@ -73,12 +73,6 @@ class StartIapTunnel(base.Command):
               'listening on a socket.  It is an error to specify '
               '--local-host-port with this, because that flag has no meaning '
               'with this.'))
-    parser.add_argument(
-        '--network-interface',
-        default='nic0',
-        help=('Specifies the name of the instance network interface to connect '
-              'to. If this is not provided, then "nic0" is used as the '
-              'default.'))
 
   def Run(self, args):
     if args.listen_on_stdin and args.IsSpecified('local_host_port'):
@@ -98,7 +92,7 @@ class StartIapTunnel(base.Command):
       iap_tunnel_helper.StartProxyServer()
 
   def _GetTargetArgs(self, args):
-    holder = base_classes.ComputeApiHolder(base.ReleaseTrack.GA)
+    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
     ssh_helper = ssh_utils.BaseSSHCLIHelper()
 
@@ -111,25 +105,9 @@ class StartIapTunnel(base.Command):
     zone = instance_ref.zone
     instance = instance_obj.name
     port = args.instance_port
-    interface = self._GetInterface(args, instance_obj)
+    interface = ssh_utils.GetInternalInterface(instance_obj).name
 
     return project, zone, instance, interface, port
-
-  def _GetInterface(self, args, instance_obj):
-    if not instance_obj.networkInterfaces:
-      raise NoInterfacesError('No network interfaces found for instance [%s]' %
-                              instance_obj.name)
-    interface = args.network_interface
-    if interface:
-      available_interfaces = [ni.name for ni in instance_obj.networkInterfaces]
-      if interface not in available_interfaces:
-        raise ArgumentError(
-            'Invalid value for [--network-interface]: interface [%s] not found'
-            % interface)
-    else:
-      interface = instance_obj.networkInterfaces[0].name
-      log.status.Print('Defaulting to first interface found [%s].' % interface)
-    return interface
 
   def _GetLocalHostPort(self, args):
     local_host_arg = args.local_host_port.host or 'localhost'

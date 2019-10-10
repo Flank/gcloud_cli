@@ -11,9 +11,9 @@ DESCRIPTION
     (ALPHA) List an assets's security marks.
 
 POSITIONAL ARGUMENTS
-     Asset resource - The asset to be used for the SCC command. The arguments
-     in this group can be used to specify the attributes of this resource. This
-     must be specified.
+     Asset resource - The asset to be used for the SCC (Security Command
+     Center) command. The arguments in this group can be used to specify the
+     attributes of this resource. This must be specified.
 
        ASSET
           ID of the asset or fully qualified identifier for the asset. This
@@ -84,7 +84,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

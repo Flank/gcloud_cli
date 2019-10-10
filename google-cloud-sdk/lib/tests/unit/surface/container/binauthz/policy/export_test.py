@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,24 +24,23 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class ExportTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+class ExportTest(base.WithMockGaBinauthz, base.BinauthzTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSuccess(self):
     # Create the expected policy proto.
-    EvaluationModeEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.EvaluationModeValueValuesEnum)
-    EnforcementModeEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.EnforcementModeValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
             key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
-                evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
+                evaluationMode=(
+                    self.messages.AdmissionRule.EvaluationModeValueValuesEnum
+                    .REQUIRE_ATTESTATION),
                 enforcementMode=(
-                    EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                    self.messages.AdmissionRule.EnforcementModeValueValuesEnum
+                    .ENFORCED_BLOCK_AND_AUDIT_LOG),
                 requireAttestationsBy=[
                     'projects/fake-project/attestors/build-env',
                 ],
@@ -59,9 +58,11 @@ class ExportTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
             additionalProperties=cluster_rules,
         ),
         defaultAdmissionRule=self.messages.AdmissionRule(
-            evaluationMode=EvaluationModeEnum.ALWAYS_ALLOW,
+            evaluationMode=(self.messages.AdmissionRule
+                            .EvaluationModeValueValuesEnum.ALWAYS_ALLOW),
             enforcementMode=(
-                EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                self.messages.AdmissionRule.EnforcementModeValueValuesEnum
+                .ENFORCED_BLOCK_AND_AUDIT_LOG),
             requireAttestationsBy=[],
         ),
     )
@@ -77,7 +78,13 @@ class ExportTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
     self.assertEqual(response, policy_proto)
 
 
-class ExportAlphaTest(base.WithMockAlphaBinauthz, ExportTest):
+class ExportBetaTest(base.WithMockBetaBinauthz, ExportTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ExportAlphaTest(base.WithMockAlphaBinauthz, ExportBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

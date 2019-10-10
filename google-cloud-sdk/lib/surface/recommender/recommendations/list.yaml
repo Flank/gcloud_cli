@@ -1,15 +1,21 @@
-- release_tracks: [ALPHA]
+- release_tracks: [ALPHA, BETA]
   help_text:
     brief: |
       Lists recommendations for a Cloud project.
     description: |
       Lists recommendations for a Cloud project.
     examples: |
-      $ {command} --project=concord-api-testing --location=global --recommender=google.iam.policy.RoleRecommender
+      To list recommendations:
+
+        $ {command} --project=project-name --location=global --recommender=google.iam.policy.RoleRecommender
 
   request:
     collection: recommender.projects.locations.recommenders.recommendations
     method: list
+    ALPHA:
+      api_version: v1alpha1
+    BETA:
+      api_version: v1beta1
 
   response:
     id_field: name

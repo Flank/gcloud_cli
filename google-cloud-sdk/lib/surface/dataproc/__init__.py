@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
 
@@ -63,5 +64,18 @@ class Dataproc(base.Group):
   detailed_help = DETAILED_HELP
 
   def Filter(self, context, args):
-    del context, args
+    del context
     base.DisableUserProjectQuota()
+
+    if hasattr(args, 'region') and not args.region:
+      if self.ReleaseTrack() == base.ReleaseTrack.GA:
+        if not properties.VALUES.dataproc.region.Get():
+          log.warning(
+              'Specifying a Cloud Dataproc region will become required in '
+              'January 2020. Please either specify --region=<your-region>, or '
+              'set a default Cloud Dataproc region by running '
+              '\'gcloud config set dataproc/region <your-default-region>\'')
+          properties.VALUES.dataproc.region.Set('global')
+      else:
+        # Enfore flag or default value is required.
+        properties.VALUES.dataproc.region.GetOrFail()

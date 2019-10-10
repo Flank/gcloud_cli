@@ -6,9 +6,6 @@ SYNOPSIS
     gcloud alpha container binauthz attestors public-keys remove PUBLIC_KEY_ID
         --attestor=ATTESTOR [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) Remove a public key from an Attestor.
-
 POSITIONAL ARGUMENTS
      PUBLIC_KEY_ID
         The ID of the public key to remove.
@@ -31,12 +28,19 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To remove a public key from the Attestor my_attestor:
+
+        $ gcloud alpha container binauthz attestors public-keys remove \
+            0638AADD940361EA2D7F14C58C124F0E663DA097 \
+            --attestor=my_attestor
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud container binauthz attestors public-keys remove
         $ gcloud beta container binauthz attestors public-keys remove
 

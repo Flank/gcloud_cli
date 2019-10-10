@@ -29,10 +29,16 @@ API REFERENCE
     This command uses the cloudbuild/v1 API. The full documentation for this
     API can be found at: https://cloud.google.com/cloud-build/docs/
 
+EXAMPLES
+    To delete a build trigger, run:
+
+        $ gcloud alpha builds triggers delete my-trigger
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta builds triggers delete
 

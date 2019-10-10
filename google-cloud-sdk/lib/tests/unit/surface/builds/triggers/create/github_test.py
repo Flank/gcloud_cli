@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import copy
 
-from apitools.base.protorpclite import protojson
+from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -45,6 +45,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
 
   def test_create_github_trigger_dockerfile(self):
     trigger = self.msg.BuildTrigger(
+        description='foo',
         github=self.msg.GitHubEventsConfig(
             owner='gcb',
             name='test',
@@ -69,8 +70,9 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
         response=want)
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
-        'alpha', 'builds', 'triggers', 'create', 'github', '--repo_owner=gcb',
-        '--repo_name=test', '--branch_pattern=.*', '--dockerfile=Dockerfile'
+        'alpha', 'builds', 'triggers', 'create', 'github', '--description=foo',
+        '--repo-owner=gcb', '--repo-name=test', '--branch-pattern=.*',
+        '--dockerfile=Dockerfile'
     ])
     self.assertEqual(want, resp)
 
@@ -86,9 +88,12 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
             ),
         ),
         filename='cloudbuild.yaml',
+        substitutions=encoding.PyValueToMessage(
+            self.msg.BuildTrigger.SubstitutionsValue,
+            {'_FAVORITE_COLOR': 'blue'}),
     )
     path = self.Touch(
-        '.', 'trigger.json', contents=protojson.encode_message(trigger))
+        '.', 'trigger.json', contents=encoding.MessageToJson(trigger))
 
     want = copy.deepcopy(trigger)
     want.id = 'id'
@@ -99,7 +104,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
         response=want)
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
-        'alpha', 'builds', 'triggers', 'create', 'github', '--trigger_config',
+        'alpha', 'builds', 'triggers', 'create', 'github', '--trigger-config',
         path
     ])
     self.assertEqual(want, resp)
@@ -130,11 +135,11 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
         response=want)
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
-        'alpha', 'builds', 'triggers', 'create', 'github', '--repo_owner=gcb',
-        '--repo_name=test', '--tag_pattern=.*',
-        '--build_config=cloudbuild.yaml',
-        '--substitutions=_FAVORITE_COLOR=blue', '--included_files=src/**',
-        '--ignored_files=docs/**'
+        'alpha', 'builds', 'triggers', 'create', 'github', '--repo-owner=gcb',
+        '--repo-name=test', '--tag-pattern=.*',
+        '--build-config=cloudbuild.yaml',
+        '--substitutions=_FAVORITE_COLOR=blue', '--included-files=src/**',
+        '--ignored-files=docs/**'
     ])
     self.assertEqual(want, resp)
 

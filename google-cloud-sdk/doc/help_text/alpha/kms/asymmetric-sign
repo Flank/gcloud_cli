@@ -52,18 +52,20 @@ EXAMPLES
     '/tmp/my/signature'.
 
         $ gcloud alpha kms asymmetric-sign \
-        --location us-central1 \
-        --keyring hitchhiker \
-        --key dont-panic \
-        --version 1 \
-        --digest-algorithm sha256 \
-        --input-file /tmp/my/file.to.sign \
-        --signature-file /tmp/my/signature
+        --location=us-central1 \
+        --keyring=hitchhiker \
+        --key=dont-panic \
+        --version=1 \
+        --digest-algorithm=sha256 \
+        --input-file=/tmp/my/file.to.sign \
+        --signature-file=/tmp/my/signature
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud kms asymmetric-sign
+        $ gcloud beta kms asymmetric-sign
 

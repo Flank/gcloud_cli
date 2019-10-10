@@ -1,0 +1,46 @@
+title: List insights
+release_tracks: [ALPHA]
+actions:
+- execute_command:
+    command: recommender insights list --project=my-project --location=my-location
+      --insight-type=my-insight-type
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/v1alpha2/projects/my-project/locations/my-location/insightTypes/my-insight-type/insights?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "insights": [
+                {
+                  "category": "SECURITY",
+                  "content": {
+                    "shadowingFirewalls": [
+                      "//compute.googleapis.com/projects/cloud-test/global/firewalls/deny-to-vm2"
+                    ]
+                  },
+                  "description": "Test insight for my-project.",
+                  "etag": "\"1234567890abcde1\"",
+                  "insightSubtype": "SHADOWED_RULE",
+                  "lastRefreshTime": "2019-09-04T17:33:46Z",
+                  "name": "projects/12345678901/locations/global/insightTypes/my-insight-type/insights/my-insight",
+                  "observationPeriod": "0s",
+                  "stateInfo": {
+                    "state": "ACTIVE"
+                  },
+                  "targetResources": [
+                    "//compute.googleapis.com/projects/cloud-test/global/firewalls/deny-to-vm2-shadowed"
+                  ]
+                }
+              ]
+            }
+    - expect_stdout: |
+        ID          LOCATION  INSIGHT_TYPE     CATEGORY  STATE   LAST_REFRESH_TIME
+        my-insight  global    my-insight-type  SECURITY  ACTIVE  2019-09-04T17:33:46Z
+    - expect_exit:
+        code: 0

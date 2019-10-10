@@ -35,13 +35,13 @@ class AuditConfig(_messages.Message):
   exempted_members in each AuditLogConfig are exempted.  Example Policy with
   multiple AuditConfigs:  { "audit_configs": [ { "service": "allServices"
   "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [
-  "user:foo@gmail.com" ] }, { "log_type": "DATA_WRITE", }, { "log_type":
-  "ADMIN_READ", } ] }, { "service": "fooservice.googleapis.com"
+  "user:jose@example.com" ] }, { "log_type": "DATA_WRITE", }, { "log_type":
+  "ADMIN_READ", } ] }, { "service": "sampleservice.googleapis.com"
   "audit_log_configs": [ { "log_type": "DATA_READ", }, { "log_type":
-  "DATA_WRITE", "exempted_members": [ "user:bar@gmail.com" ] } ] } ] }  For
-  fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-  logging. It also exempts foo@gmail.com from DATA_READ logging, and
-  bar@gmail.com from DATA_WRITE logging.
+  "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] }
+  For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+  logging. It also exempts jose@example.com from DATA_READ logging, and
+  aliya@example.com from DATA_WRITE logging.
 
   Fields:
     auditLogConfigs: The configuration for logging of each type of permission.
@@ -59,18 +59,20 @@ class AuditConfig(_messages.Message):
 class AuditLogConfig(_messages.Message):
   r"""Provides the configuration for logging a type of permissions. Example:
   { "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [
-  "user:foo@gmail.com" ] }, { "log_type": "DATA_WRITE", } ] }  This enables
-  'DATA_READ' and 'DATA_WRITE' logging, while exempting foo@gmail.com from
+  "user:jose@example.com" ] }, { "log_type": "DATA_WRITE", } ] }  This enables
+  'DATA_READ' and 'DATA_WRITE' logging, while exempting jose@example.com from
   DATA_READ logging.
 
   Fields:
     exemptedMembers: Specifies the identities that do not cause logging for
       this type of permission. Follows the same format of [Binding.members][].
+    ignoreChildExemptions:
     logType: The log type that this config enables.
   """
 
   exemptedMembers = _messages.StringField(1, repeated=True)
-  logType = _messages.StringField(2)
+  ignoreChildExemptions = _messages.BooleanField(2)
+  logType = _messages.StringField(3)
 
 
 class AuthorizationLoggingOptions(_messages.Message):
@@ -126,7 +128,7 @@ class Binding(_messages.Message):
       or without a Google account.  * `allAuthenticatedUsers`: A special
       identifier that represents anyone who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
-      represents a specific Google account. For example, `alice@gmail.com` .
+      represents a specific Google account. For example, `alice@example.com` .
       * `serviceAccount:{emailid}`: An email address that represents a service
       account. For example, `my-other-app@appspot.gserviceaccount.com`.  *
       `group:{emailid}`: An email address that represents a Google group. For
@@ -1368,12 +1370,29 @@ class LogConfigCounterOptions(_messages.Message):
   (though this may be supported in the future).
 
   Fields:
+    customFields: Custom fields.
     field: The field value to attribute.
     metric: The metric to update.
   """
 
-  field = _messages.StringField(1)
-  metric = _messages.StringField(2)
+  customFields = _messages.MessageField('LogConfigCounterOptionsCustomField', 1, repeated=True)
+  field = _messages.StringField(2)
+  metric = _messages.StringField(3)
+
+
+class LogConfigCounterOptionsCustomField(_messages.Message):
+  r"""Custom fields. These can be used to create a counter with arbitrary
+  field/value pairs. See: go/rpcsp-custom-fields.
+
+  Fields:
+    name: Name is the field name.
+    value: Value is the field value. It is important that in contrast to the
+      CounterOptions.field, the value here is a constant that is not derived
+      from the IAMContext.
+  """
+
+  name = _messages.StringField(1)
+  value = _messages.StringField(2)
 
 
 class LogConfigDataAccessOptions(_messages.Message):
@@ -1458,13 +1477,13 @@ class Operation(_messages.Message):
     httpErrorStatusCode: [Output Only] If the operation fails, this field
       contains the HTTP error status code that was returned. For example, a
       404 means the resource was not found.
-    id: [Output Only] The unique identifier for the resource. This identifier
+    id: [Output Only] The unique identifier for the operation. This identifier
       is defined by the server.
     insertTime: [Output Only] The time that this operation was requested. This
       value is in RFC3339 text format.
     kind: [Output Only] Type of the resource. Always compute#operation for
       Operation resources.
-    name: [Output Only] Name of the resource.
+    name: [Output Only] Name of the operation.
     operationType: [Output Only] The type of operation, such as insert,
       update, or delete, and so on.
     progress: [Output Only] An optional progress indicator that ranges from 0
@@ -1473,9 +1492,7 @@ class Operation(_messages.Message):
       operation will be complete. This number should monotonically increase as
       the operation progresses.
     region: [Output Only] The URL of the region where the operation resides.
-      Only available when performing regional operations. You must specify
-      this field as part of the HTTP request URL. It is not settable as a
-      field in the request body.
+      Only applicable when performing regional operations.
     selfLink: [Output Only] Server-defined URL for the resource.
     startTime: [Output Only] The time that this operation was started by the
       server. This value is in RFC3339 text format.
@@ -1493,9 +1510,7 @@ class Operation(_messages.Message):
     warnings: [Output Only] If warning messages are generated during
       processing of the operation, this field will be populated.
     zone: [Output Only] The URL of the zone where the operation resides. Only
-      available when performing per-zone operations. You must specify this
-      field as part of the HTTP request URL. It is not settable as a field in
-      the request body.
+      applicable when performing per-zone operations.
   """
 
   class ErrorValue(_messages.Message):
@@ -1628,24 +1643,35 @@ class Options(_messages.Message):
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.    A `Policy`
-  consists of a list of `bindings`. A `binding` binds a list of `members` to a
-  `role`, where the members can be user accounts, Google groups, Google
-  domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **JSON Example**  { "bindings": [ { "role": "roles/owner",
-  "members": [ "user:mike@example.com", "group:admins@example.com",
-  "domain:google.com", "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com" ] }, { "role": "roles/viewer", "members":
-  ["user:sean@example.com"] } ] }  **YAML Example**  bindings: - members: -
-  user:mike@example.com - group:admins@example.com - domain:google.com -
-  serviceAccount:my-other-app@appspot.gserviceaccount.com role: roles/owner -
-  members: - user:sean@example.com role: roles/viewer    For a description of
-  IAM and its features, see the [IAM developer's
+  is a collection of `bindings`. A `binding` binds one or more `members` to a
+  single `role`. Members can be user accounts, service accounts, Google
+  groups, and domains (such as G Suite). A `role` is a named list of
+  permissions (defined by IAM or configured by users). A `binding` can
+  optionally specify a `condition`, which is a logic expression that further
+  constrains the role binding based on attributes about the request and/or
+  target resource.  **JSON Example**  { "bindings": [ { "role":
+  "roles/resourcemanager.organizationAdmin", "members": [
+  "user:mike@example.com", "group:admins@example.com", "domain:google.com",
+  "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role":
+  "roles/resourcemanager.organizationViewer", "members":
+  ["user:eve@example.com"], "condition": { "title": "expirable access",
+  "description": "Does not grant access after Sep 2020", "expression":
+  "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ] }  **YAML
+  Example**  bindings: - members: - user:mike@example.com -
+  group:admins@example.com - domain:google.com - serviceAccount:my-project-
+  id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin
+  - members: - user:eve@example.com role:
+  roles/resourcemanager.organizationViewer condition: title: expirable access
+  description: Does not grant access after Sep 2020 expression: request.time <
+  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
+  features, see the [IAM developer's
   guide](https://cloud.google.com/iam/docs).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. `bindings` with no
-      members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally may
+      specify a `condition` that determines when binding is in effect.
+      `bindings` with no members will result in an error.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1654,7 +1680,9 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
       policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten blindly.
+      the existing policy is overwritten. Due to blind-set semantics of an
+      etag-less policy, 'setIamPolicy' will not fail even if either of
+      incoming or stored policy does not meet the version requirements.
     iamOwned:
     rules: If more than one rule is specified, the rules are applied in the
       following manner: - All matching LOG rules are always applied. - If any
@@ -1663,7 +1691,15 @@ class Policy(_messages.Message):
       any ALLOW/ALLOW_WITH_LOG rule matches, permission is granted. Logging
       will be applied if one or more matching rule requires logging. -
       Otherwise, if no rule applies, permission is denied.
-    version: Deprecated.
+    version: Specifies the format of the policy.  Valid values are 0, 1, and
+      3. Requests specifying an invalid value will be rejected.  Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.  If no etag is provided in the call to
+      `setIamPolicy`, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)

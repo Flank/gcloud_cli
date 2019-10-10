@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,9 +74,9 @@ class InstanceGroupsDescribeTest(
               port: 2222
             - name: serv-3
               port: 3333
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instanceGroups/group-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instanceGroups/group-1
             size: 0
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testDescribeRegional(self):
@@ -107,8 +107,8 @@ class InstanceGroupsDescribeTest(
               port: 2222
             - name: serv-3
               port: 3333
-            region: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/instanceGroups/group-1
+            region: https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/regions/region-1/instanceGroups/group-1
             size: 0
             """))
 

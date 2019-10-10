@@ -82,7 +82,7 @@ actions:
 - write_file:
     path: expanded_vm.yaml
     contents: |
-      # Copyright 2015 Google Inc. All rights reserved.
+      # Copyright 2015 Google LLC. All rights reserved.
       #
       # Licensed under the Apache License, Version 2.0 (the "License");
       # you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ actions:
 - write_file:
     path: vm_glob.yaml
     contents: |
-      # Copyright 2015 Google Inc. All rights reserved.
+      # Copyright 2015 Google LLC. All rights reserved.
       #
       # Licensed under the Apache License, Version 2.0 (the "License");
       # you may not use this file except in compliance with the License.
@@ -176,7 +176,7 @@ actions:
     path: with_output.jinja
     contents: |
       {#
-      Copyright 2016 Google Inc. All rights reserved.
+      Copyright 2016 Google LLC. All rights reserved.
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
       You may obtain a copy of the License at
@@ -250,7 +250,7 @@ actions:
 - write_file:
     path: vm.yaml
     contents: |
-      # Copyright 2015 Google Inc. All rights reserved.
+      # Copyright 2015 Google LLC. All rights reserved.
       #
       # Licensed under the Apache License, Version 2.0 (the "License");
       # you may not use this file except in compliance with the License.
@@ -275,9 +275,9 @@ actions:
 - write_file:
     path: vm_template.jinja
     contents: |
-      # Copyright 2015 Google Inc. All Rights Reserved.
+      # Copyright 2015 Google LLC. All Rights Reserved.
       {#
-      Copyright 2015 Google Inc. All rights reserved.
+      Copyright 2015 Google LLC. All rights reserved.
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
       You may obtain a copy of the License at
@@ -361,7 +361,7 @@ actions:
               target:
                 config:
                   content: |
-                    # Copyright 2015 Google Inc. All rights reserved.
+                    # Copyright 2015 Google LLC. All rights reserved.
                     #
                     # Licensed under the Apache License, Version 2.0 (the "License");
                     # you may not use this file except in compliance with the License.
@@ -385,9 +385,9 @@ actions:
                         zone: us-central1-f
                 imports:
                 - content: |
-                    # Copyright 2015 Google Inc. All Rights Reserved.
+                    # Copyright 2015 Google LLC. All Rights Reserved.
                     {#
-                    Copyright 2015 Google Inc. All rights reserved.
+                    Copyright 2015 Google LLC. All rights reserved.
                     Licensed under the Apache License, Version 2.0 (the "License");
                     you may not use this file except in compliance with the License.
                     You may obtain a copy of the License at
@@ -691,7 +691,7 @@ actions:
             name: manifest-1543428447490
             config:
               content: |
-                # Copyright 2015 Google Inc. All rights reserved.
+                # Copyright 2015 Google LLC. All rights reserved.
                 #
                 # Licensed under the Apache License, Version 2.0 (the "License");
                 # you may not use this file except in compliance with the License.
@@ -716,9 +716,9 @@ actions:
             imports:
             - name: vm_template.jinja
               content: |
-                # Copyright 2015 Google Inc. All Rights Reserved.
+                # Copyright 2015 Google LLC. All Rights Reserved.
                 {#
-                Copyright 2015 Google Inc. All rights reserved.
+                Copyright 2015 Google LLC. All rights reserved.
                 Licensed under the Apache License, Version 2.0 (the "License");
                 you may not use this file except in compliance with the License.
                 You may obtain a copy of the License at
@@ -1007,7 +1007,7 @@ actions:
             name: manifest-1543428447490
             config:
               content: |
-                # Copyright 2015 Google Inc. All rights reserved.
+                # Copyright 2015 Google LLC. All rights reserved.
                 #
                 # Licensed under the Apache License, Version 2.0 (the "License");
                 # you may not use this file except in compliance with the License.
@@ -1032,9 +1032,9 @@ actions:
             imports:
             - name: vm_template.jinja
               content: |
-                # Copyright 2015 Google Inc. All Rights Reserved.
+                # Copyright 2015 Google LLC. All Rights Reserved.
                 {#
-                Copyright 2015 Google Inc. All rights reserved.
+                Copyright 2015 Google LLC. All rights reserved.
                 Licensed under the Apache License, Version 2.0 (the "License");
                 you may not use this file except in compliance with the License.
                 You may obtain a copy of the License at
@@ -1472,7 +1472,7 @@ actions:
             name: manifest-1543428447490
             config:
               content: |
-                # Copyright 2015 Google Inc. All rights reserved.
+                # Copyright 2015 Google LLC. All rights reserved.
                 #
                 # Licensed under the Apache License, Version 2.0 (the "License");
                 # you may not use this file except in compliance with the License.
@@ -1497,9 +1497,9 @@ actions:
             imports:
             - name: vm_template.jinja
               content: |
-                # Copyright 2015 Google Inc. All Rights Reserved.
+                # Copyright 2015 Google LLC. All Rights Reserved.
                 {#
-                Copyright 2015 Google Inc. All rights reserved.
+                Copyright 2015 Google LLC. All rights reserved.
                 Licensed under the Apache License, Version 2.0 (the "License");
                 you may not use this file except in compliance with the License.
                 You may obtain a copy of the License at
@@ -1698,31 +1698,31 @@ actions:
                 location: If-Match
                 debugInfo: |
                   com.google.api.server.core.Fault: ImmutableErrorDefinition{base=PRECONDITION_FAILED, category=USER_ERROR, cause=null, debugInfo=null, domain=global, extendedHelp=null, httpHeaders={}, httpStatus=preconditionFailed, internalReason=Reason{arguments={}, cause=null, code=gdata.CoreErrorDomain.CONDITION_NOT_MET, createdByBackend=true, debugMessage=null, errorProtoCode=CONDITION_NOT_MET, errorProtoDomain=gdata.CoreErrorDomain, filteredMessage=null, location=null, message=Cannot preview a deployment metadata change with a PATCH request., unnamedArguments=[Cannot preview a deployment metadata change with a PATCH request.]}, location=headers.If-Match, message=Cannot preview a deployment metadata change with a PATCH request., reason=conditionNotMet, rpcCode=412} Cannot preview a deployment metadata change with a PATCH request.
-                  	at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
-                  	at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
-                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
-                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
-                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
-                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
-                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
-                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
-                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
-                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
-                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
-                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
-                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
-                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
-                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
-                  	at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
-                  	at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
-                  	at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
-                  	at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
-                  	at io.grpc.Context.run(Context.java:565)
-                  	at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
-                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
-                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
-                  	at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
-                  	at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
+                    at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
+                    at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
+                    at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
+                    at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
+                    at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                    at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                    at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                    at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                    at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                    at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                    at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                    at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                    at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                    at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                    at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                    at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
+                    at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
+                    at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
+                    at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
+                    at io.grpc.Context.run(Context.java:565)
+                    at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
+                    at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
+                    at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
+                    at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
+                    at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
               code: 412
               message: Cannot preview a deployment metadata change with a PATCH request.
     - expect_exit:
@@ -1797,7 +1797,7 @@ actions:
               target:
                 config:
                   content: |
-                    # Copyright 2015 Google Inc. All rights reserved.
+                    # Copyright 2015 Google LLC. All rights reserved.
                     #
                     # Licensed under the Apache License, Version 2.0 (the "License");
                     # you may not use this file except in compliance with the License.
@@ -1821,9 +1821,9 @@ actions:
                         zone: us-central1-f
                 imports:
                 - content: |
-                    # Copyright 2015 Google Inc. All Rights Reserved.
+                    # Copyright 2015 Google LLC. All Rights Reserved.
                     {#
-                    Copyright 2015 Google Inc. All rights reserved.
+                    Copyright 2015 Google LLC. All rights reserved.
                     Licensed under the Apache License, Version 2.0 (the "License");
                     you may not use this file except in compliance with the License.
                     You may obtain a copy of the License at
@@ -2128,7 +2128,7 @@ actions:
             name: manifest-1543428517684
             config:
               content: |
-                # Copyright 2015 Google Inc. All rights reserved.
+                # Copyright 2015 Google LLC. All rights reserved.
                 #
                 # Licensed under the Apache License, Version 2.0 (the "License");
                 # you may not use this file except in compliance with the License.
@@ -2153,9 +2153,9 @@ actions:
             imports:
             - name: vm_template.jinja
               content: |
-                # Copyright 2015 Google Inc. All Rights Reserved.
+                # Copyright 2015 Google LLC. All Rights Reserved.
                 {#
-                Copyright 2015 Google Inc. All rights reserved.
+                Copyright 2015 Google LLC. All rights reserved.
                 Licensed under the Apache License, Version 2.0 (the "License");
                 you may not use this file except in compliance with the License.
                 You may obtain a copy of the License at
@@ -2353,31 +2353,31 @@ actions:
                 location: If-Match
                 debugInfo: |
                   com.google.api.server.core.Fault: ImmutableErrorDefinition{base=PRECONDITION_FAILED, category=USER_ERROR, cause=null, debugInfo=null, domain=global, extendedHelp=null, httpHeaders={}, httpStatus=preconditionFailed, internalReason=Reason{arguments={}, cause=null, code=gdata.CoreErrorDomain.CONDITION_NOT_MET, createdByBackend=true, debugMessage=null, errorProtoCode=CONDITION_NOT_MET, errorProtoDomain=gdata.CoreErrorDomain, filteredMessage=null, location=null, message=Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING., unnamedArguments=[Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING.]}, location=headers.If-Match, message=Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING., reason=conditionNotMet, rpcCode=412} Cannot do a deployment metadata PATCH for a deployment in states PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING.
-                  	at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
-                  	at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
-                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
-                  	at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
-                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
-                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
-                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
-                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
-                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
-                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
-                  	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
-                  	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
-                  	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
-                  	at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
-                  	at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
-                  	at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
-                  	at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
-                  	at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
-                  	at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
-                  	at io.grpc.Context.run(Context.java:565)
-                  	at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
-                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
-                  	at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
-                  	at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
-                  	at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
+                    at com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)
+                    at com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)
+                    at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)
+                    at com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)
+                    at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                    at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                    at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                    at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                    at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                    at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                    at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+                    at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1143)
+                    at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:963)
+                    at com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:731)
+                    at com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)
+                    at com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)
+                    at com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:453)
+                    at com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:824)
+                    at com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:460)
+                    at io.grpc.Context.run(Context.java:565)
+                    at com.google.tracing.CurrentContext.runInContext(CurrentContext.java:166)
+                    at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:319)
+                    at com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:311)
+                    at com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:457)
+                    at com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)
               code: 412
               message: Cannot do a deployment metadata PATCH for a deployment in states
                 PREVIEWING, UPDATING, or CANCELING. This deployment is in state PREVIEWING.
@@ -2666,7 +2666,7 @@ actions:
             name: manifest-1543428517684
             config:
               content: |
-                # Copyright 2015 Google Inc. All rights reserved.
+                # Copyright 2015 Google LLC. All rights reserved.
                 #
                 # Licensed under the Apache License, Version 2.0 (the "License");
                 # you may not use this file except in compliance with the License.
@@ -2691,9 +2691,9 @@ actions:
             imports:
             - name: vm_template.jinja
               content: |
-                # Copyright 2015 Google Inc. All Rights Reserved.
+                # Copyright 2015 Google LLC. All Rights Reserved.
                 {#
-                Copyright 2015 Google Inc. All rights reserved.
+                Copyright 2015 Google LLC. All rights reserved.
                 Licensed under the Apache License, Version 2.0 (the "License");
                 you may not use this file except in compliance with the License.
                 You may obtain a copy of the License at
@@ -2963,7 +2963,7 @@ actions:
             name: manifest-1543428517684
             config:
               content: |
-                # Copyright 2015 Google Inc. All rights reserved.
+                # Copyright 2015 Google LLC. All rights reserved.
                 #
                 # Licensed under the Apache License, Version 2.0 (the "License");
                 # you may not use this file except in compliance with the License.
@@ -2988,9 +2988,9 @@ actions:
             imports:
             - name: vm_template.jinja
               content: |
-                # Copyright 2015 Google Inc. All Rights Reserved.
+                # Copyright 2015 Google LLC. All Rights Reserved.
                 {#
-                Copyright 2015 Google Inc. All rights reserved.
+                Copyright 2015 Google LLC. All rights reserved.
                 Licensed under the Apache License, Version 2.0 (the "License");
                 you may not use this file except in compliance with the License.
                 You may obtain a copy of the License at

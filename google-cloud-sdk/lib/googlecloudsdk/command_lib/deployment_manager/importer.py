@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ class _ImportFile(_BaseImport):
         self.content = files.ReadFileContents(self.full_path)
       except files.Error as e:
         raise exceptions.ConfigError(
-            "Unable to read file '%s'. %s" % (self.full_path, str(e)))
+            "Unable to read file '%s'. %s" % (self.full_path, six.text_type(e)))
     return self.content
 
   def BuildChildPath(self, child_path):

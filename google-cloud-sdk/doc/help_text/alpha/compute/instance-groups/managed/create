@@ -8,8 +8,7 @@ SYNOPSIS
         [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
         [--instance-redistribution-type=TYPE]
         [--stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]]
-        [--stateful-names] [--target-pool=[TARGET_POOL,...]]
-        [--zones=ZONE,[ZONE,...]]
+        [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
         [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
           | --https-health-check=HTTPS_HEALTH_CHECK]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -94,11 +93,6 @@ OPTIONAL FLAGS
             example when the group is resized down). If omitted, 'never' is
             used as the default.
 
-     --stateful-names
-        Enable stateful names of instances. Whenever instances with those names
-        are restarted or recreated, they will have the same names as before.
-        Use --no-stateful-names to disable stateful names.
-
      --target-pool=[TARGET_POOL,...]
         Specifies any target pools you want the instances of this managed
         instance group to be part of.
@@ -167,9 +161,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instance-groups managed create
         $ gcloud beta compute instance-groups managed create

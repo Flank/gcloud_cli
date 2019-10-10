@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class PerimetersCreateTestGA(accesscontextmanager.Base):
@@ -32,6 +33,13 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
+
+  def _SupportsServiceFilters(self):
+    return {
+        calliope_base.ReleaseTrack.ALPHA: True,
+        calliope_base.ReleaseTrack.BETA: False,
+        calliope_base.ReleaseTrack.GA: False
+    }[self.track]
 
   def _ExpectCreate(self, perimeter, policy):
     policy_name = 'accessPolicies/{}'.format(policy)
@@ -52,7 +60,7 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
       self.Run('access-context-manager perimeters create my_perimeter '
-               '    --policy MY_POLICY --title "My Title"')
+               '    --policy 123 --title "My Title"')
 
   def testCreate(self):
     self.SetUpForTrack(self.track)
@@ -68,10 +76,10 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
       perimeter_kwargs['unrestricted_services'] = ['*']
 
     perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
-    self._ExpectCreate(perimeter, 'MY_POLICY')
+    self._ExpectCreate(perimeter, '123')
 
     result = self.Run('access-context-manager perimeters create MY_PERIMETER '
-                      '    --policy MY_POLICY --title "My Perimeter Title" '
+                      '    --policy 123 --title "My Perimeter Title" '
                       '    --resources projects/12345,projects/67890')
 
     self.assertEqual(result, perimeter)
@@ -79,7 +87,7 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
   def testCreate_PolicyFromProperty(self):
 
     self.SetUpForTrack(self.track)
-    policy = 'my_acm_policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
 
     perimeter_kwargs = {
@@ -116,17 +124,27 @@ class PerimetersCreateTestGA(accesscontextmanager.Base):
     }
 
     perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
-    self._ExpectCreate(perimeter, 'MY_POLICY')
+    self._ExpectCreate(perimeter, '123')
 
     result = self.Run(
         'access-context-manager perimeters create MY_PERIMETER '
-        '    --policy MY_POLICY --access-levels MY_LEVEL,MY_LEVEL_2 '
+        '    --policy 123 --access-levels MY_LEVEL,MY_LEVEL_2 '
         '    --perimeter-type bridge '
         '    --restricted-services foo.googleapis.com,bar.googleapis.com'
         '    --title "My Perimeter Title" '
         '    --resources projects/12345,projects/67890')
 
     self.assertEqual(result, perimeter)
+
+  def testCreate_InvalidPolicyArg(self):
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager perimeters create MY_PERIMETER '
+               '    --policy accessPolicies/123'
+               '    --restricted-services foo.googleapis.com,bar.googleapis.com'
+               '    --title "My Perimeter Title" '
+               '    --resources projects/12345,projects/67890')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class PerimetersCreateTestBeta(PerimetersCreateTestGA):
@@ -139,6 +157,34 @@ class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreate_ServiceFilterCreation(self):
+    self.SetUpForTrack(self.track)
+    perimeter_kwargs = {
+        'title': 'My Perimeter Title',
+        'description': None,
+        'restricted_services': ['foo.googleapis.com', 'bar.googleapis.com'],
+        'unrestricted_services': [],
+        'access_levels': ['MY_LEVEL', 'MY_LEVEL_2'],
+        'type_': 'PERIMETER_TYPE_BRIDGE',
+        'vpc_allowed_services': ['foo-vpc.googleapis.com'],
+        'enable_vpc_service_restriction': True,
+    }
+
+    perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
+    self._ExpectCreate(perimeter, '123')
+
+    result = self.Run(
+        'access-context-manager perimeters create MY_PERIMETER '
+        '    --policy 123 --access-levels MY_LEVEL,MY_LEVEL_2 '
+        '    --perimeter-type bridge '
+        '    --restricted-services foo.googleapis.com,bar.googleapis.com'
+        '    --title "My Perimeter Title" '
+        '    --resources projects/12345,projects/67890'
+        '    --vpc-allowed-services foo-vpc.googleapis.com'
+        '    --enable-vpc-service-restriction')
+
+    self.assertEqual(result, perimeter)
 
 
 if __name__ == '__main__':

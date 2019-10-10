@@ -35,8 +35,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --export-format=EXPORT_FORMAT
         Specify the format to export to, such as vmdk, vhdx, vpc, or qcow2.
@@ -53,9 +53,9 @@ OPTIONAL FLAGS
           current default project is used.
 
      --log-location=LOG_LOCATION
-        Directory in Google Cloud Storage to hold build logs. If not set,
-        gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
-        created and used.
+        Directory in Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ is created
+        and used.
 
      --network=NETWORK
         The name of the network in your project to use for the image export.
@@ -70,9 +70,9 @@ OPTIONAL FLAGS
         should be specified.
 
      --timeout=TIMEOUT; default="2h"
-        Maximum time a build can last before it is failed as "TIMEOUT". For
-        example, specifying 2h will fail the process after 2 hours. See $
-        gcloud topic datetimes for information on duration formats.
+        Maximum time a build can last before it fails as "TIMEOUT". For
+        example, specifying 2h fails the process after 2 hours. See $ gcloud
+        topic datetimes for information about duration formats.
 
      --zone=ZONE
         Zone of the image to export. The zone to use when exporting the image.

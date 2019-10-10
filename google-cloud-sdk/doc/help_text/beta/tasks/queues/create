@@ -2,7 +2,8 @@ NAME
     gcloud beta tasks queues create - create a Cloud Tasks queue
 
 SYNOPSIS
-    gcloud beta tasks queues create QUEUE [--max-attempts=MAX_ATTEMPTS]
+    gcloud beta tasks queues create QUEUE
+        [--log-sampling-ratio=LOG_SAMPLING_RATIO] [--max-attempts=MAX_ATTEMPTS]
         [--max-backoff=MAX_BACKOFF]
         [--max-concurrent-dispatches=MAX_CONCURRENT_DISPATCHES]
         [--max-dispatches-per-second=MAX_DISPATCHES_PER_SECOND]
@@ -19,6 +20,11 @@ POSITIONAL ARGUMENTS
         The queue to create.
 
 FLAGS
+     --log-sampling-ratio=LOG_SAMPLING_RATIO
+        Specifies the fraction of operations to write to Stackdriver Logging.
+        This field may contain any value between 0.0 and 1.0, inclusive. 0.0 is
+        the default and means that no operations are logged.
+
      --max-attempts=MAX_ATTEMPTS
         The maximum number of attempts per task in the queue.
 

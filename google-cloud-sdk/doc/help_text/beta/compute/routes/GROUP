@@ -27,7 +27,7 @@ COMMANDS
         (BETA) Describe a route.
 
      list
-        (BETA) List Google Compute Engine routes.
+        (BETA) List non-dynamic Google Compute Engine routes.
 
 NOTES
     This command is currently in BETA and may change without notice. These

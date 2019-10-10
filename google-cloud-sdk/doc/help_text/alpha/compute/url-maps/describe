@@ -2,15 +2,15 @@ NAME
     gcloud alpha compute url-maps describe - describe a URL map
 
 SYNOPSIS
-    gcloud alpha compute url-maps describe URL_MAP_NAME
-        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute url-maps describe URL_MAP [--global | --region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute url-maps describe displays all data associated
     with a URL map in a project.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to describe.
 
 FLAGS
@@ -49,9 +49,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute url-maps describe
         $ gcloud beta compute url-maps describe

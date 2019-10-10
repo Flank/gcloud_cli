@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import vpn_gateways_test_base
 
 
-class VpnGatewayListBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
+class VpnGatewayListGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
   _OUTPUT_HEADER = 'NAME INTERFACE0 INTERFACE1 NETWORK REGION'
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
     # Since list command returns a generator, we do not want the items to
     # go to STDOUT (which will cause the test to fail otherwise).
     self._ConfigureOutput(False)
@@ -166,6 +166,16 @@ class VpnGatewayListBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
     self.ExpectListRequest(scoped_vpn_gateways)
     list(self.Run('compute vpn-gateways list'))
     self.AssertOutputEquals(expected_output, normalize_space=True)
+
+
+class VpnGatewayListBetaTest(VpnGatewayListGaTest):
+  _OUTPUT_HEADER = 'NAME INTERFACE0 INTERFACE1 NETWORK REGION'
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    # Since list command returns a generator, we do not want the items to
+    # go to STDOUT (which will cause the test to fail otherwise).
+    self._ConfigureOutput(False)
 
 
 class VpnGatewayListAlphaTest(VpnGatewayListBetaTest):

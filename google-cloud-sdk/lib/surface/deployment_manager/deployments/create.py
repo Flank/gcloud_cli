@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -163,7 +163,7 @@ class Create(base.CreateCommand, dm_base.DmCommand):
         args.deployment_name,
         params={'project': properties.VALUES.core.project.GetOrFail},
         collection='deploymentmanager.deployments')
-    if (not args.IsSpecified('format')) and (args.async):
+    if (not args.IsSpecified('format')) and (args.async_):
       args.format = flags.OPERATION_FORMAT
 
     deployment = self.messages.Deployment(
@@ -193,7 +193,7 @@ class Create(base.CreateCommand, dm_base.DmCommand):
 
     except apitools_exceptions.HttpError as error:
       raise exceptions.HttpException(error, dm_api_util.HTTP_ERROR_FORMAT)
-    if args.async:
+    if args.async_:
       return operation
     else:
       op_name = operation.name
@@ -243,7 +243,7 @@ class Create(base.CreateCommand, dm_base.DmCommand):
       self, error, args, operation, project, deployment_ref):
     if args.automatic_rollback:
       delete_operation = self._PerformRollback(deployment_ref.deployment,
-                                               str(error))
+                                               six.text_type(error))
       create_operation = dm_api_util.GetOperation(self.client, self.messages,
                                                   operation, project)
 

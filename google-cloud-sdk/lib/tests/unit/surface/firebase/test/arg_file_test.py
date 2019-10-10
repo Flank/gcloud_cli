@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ BOOLEANS = os.path.join(unit_base.TEST_DATA_PATH, 'booleans')
 INCLUDES = os.path.join(unit_base.TEST_DATA_PATH, 'include_groups')
 
 COMMON_ARGS = set(
-    ['test', 'type', 'async', 'results_bucket', 'timeout', 'timeout_us'])
+    ['test', 'type', 'async_', 'results_bucket', 'timeout', 'timeout_us'])
 
 
 class CommonArgFileTests(unit_base.TestUnitTestBase):
@@ -239,38 +239,38 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
   def testBooleans_ValidString_LowerCaseTrue(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-true-lower',
                                        COMMON_ARGS)
-    self.assertTrue(args['async'])
+    self.assertTrue(args['async_'])
 
   def testBooleans_ValidString_UpperCaseTrue(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-true-upper',
                                        COMMON_ARGS)
-    self.assertTrue(args['async'])
+    self.assertTrue(args['async_'])
 
   def testBooleans_ValidString_LowerCaseFalse(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-false-lower',
                                        COMMON_ARGS)
-    self.assertFalse(args['async'])
+    self.assertFalse(args['async_'])
 
   def testBooleans_ValidString_MixedCaseFalse(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-false-mixedcase',
                                        COMMON_ARGS)
-    self.assertFalse(args['async'])
+    self.assertFalse(args['async_'])
 
   def testBooleans_ValidString_YesSameAsTrue(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-yes', COMMON_ARGS)
-    self.assertTrue(args['async'])
+    self.assertTrue(args['async_'])
 
   def testBooleans_ValidString_OnSameAsTrue(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-on', COMMON_ARGS)
-    self.assertTrue(args['async'])
+    self.assertTrue(args['async_'])
 
   def testBooleans_ValidString_NoSameAsFalse(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-no', COMMON_ARGS)
-    self.assertFalse(args['async'])
+    self.assertFalse(args['async_'])
 
   def testBooleans_ValidString_OffSameAsFalse(self):
     args = arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-off', COMMON_ARGS)
-    self.assertFalse(args['async'])
+    self.assertFalse(args['async_'])
 
   def testBooleans_InvalidString(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from tests.lib.surface.compute import test_base
 
 class UrlMapsRemoveHostRuleTest(test_base.BaseTest):
 
-  _V1_URI_PREFIX = 'https://www.googleapis.com/compute/v1/projects/my-project/'
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def RunRemoveHostRule(self, command):
@@ -191,9 +191,54 @@ class UrlMapsRemoveHostRuleTest(test_base.BaseTest):
                              urlMap='url-map-1', project='my-project'))])
 
 
+class UrlMapsRemoveHostRuleBetaTest(UrlMapsRemoveHostRuleTest):
+
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+  _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._collection = self.compute_beta.urlMaps
+
+    self.url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com'], pathMatcher='youtube'),
+            self.messages.HostRule(hosts=['google.com'], pathMatcher='google'),
+            self.messages.HostRule(
+                hosts=['*-youtube.com'], pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-search'),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-watch'),
+                ]),
+            self.messages.PathMatcher(
+                name='google',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'google-default'),
+        ],
+    )
+
+  def RunRemoveHostRule(self, command):
+    self.Run('beta compute url-maps remove-host-rule --global ' + command)
+
+
 class UrlMapsRemoveHostRuleAlphaTest(UrlMapsRemoveHostRuleTest):
 
-  _V1_URI_PREFIX = 'https://www.googleapis.com/compute/v1/projects/my-project/'
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def SetUp(self):
@@ -236,18 +281,18 @@ class UrlMapsRemoveHostRuleAlphaTest(UrlMapsRemoveHostRuleTest):
     self.Run('alpha compute url-maps remove-host-rule --global ' + command)
 
 
-class RegionUrlMapsRemoveHostRuleTest(test_base.BaseTest):
+class RegionUrlMapsRemoveHostRuleBetaTest(test_base.BaseTest):
 
-  _V1_URI_PREFIX = 'https://www.googleapis.com/compute/v1/projects/my-project/'
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def RunRemoveHostRule(self, command):
-    self.Run('alpha compute url-maps remove-host-rule --region us-west1 ' +
+    self.Run('beta compute url-maps remove-host-rule --region us-west1 ' +
              command)
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._collection = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._collection = self.compute_beta.regionUrlMaps
 
     self.url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -413,6 +458,52 @@ class RegionUrlMapsRemoveHostRuleTest(test_base.BaseTest):
                              urlMap='url-map-1',
                              project='my-project',
                              region='us-west1'))])
+
+
+class RegionUrlMapsRemoveHostRuleAlphaTest(RegionUrlMapsRemoveHostRuleBetaTest):
+
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
+  _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
+
+  def RunRemoveHostRule(self, command):
+    self.Run('alpha compute url-maps remove-host-rule --region us-west1 ' +
+             command)
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._collection = self.compute_alpha.regionUrlMaps
+
+    self.url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com'], pathMatcher='youtube'),
+            self.messages.HostRule(hosts=['google.com'], pathMatcher='google'),
+            self.messages.HostRule(
+                hosts=['*-youtube.com'], pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-search'),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-watch'),
+                ]),
+            self.messages.PathMatcher(
+                name='google',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'google-default'),
+        ],
+    )
 
 
 if __name__ == '__main__':

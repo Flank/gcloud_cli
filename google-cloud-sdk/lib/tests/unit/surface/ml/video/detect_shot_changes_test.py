@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ class DetectShotChangesTest(base.MlVideoTestBase):
     """Pseudo SetUp method for use with parameterized tests."""
     self.track = track
     self.feature = self.feature_enum.SHOT_CHANGE_DETECTION
+    self.operation_name = ('projects/{}/locations/us-east1/operations/123'
+                           .format(self.Project()))
 
   def _GetResponseJsonForShotChanges(self, changes):
     """Build responses for the video client given a list of shot changes.
@@ -66,13 +68,13 @@ class DetectShotChangesTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     self.Run('ml video detect-shot-changes gs://bucket/object --async')
     self.AssertOutputEquals(textwrap.dedent("""\
     {
-      "name": "10000"
+      "name": "%s"
     }
-    """))
+    """ % self.operation_name))
 
   def testBasicOutputComplete(self, track):
     """Test that command correctly outputs json of results."""
@@ -80,13 +82,14 @@ class DetectShotChangesTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     self.ExpectWaitOperationRequest(
-        operation_id='10000',
+        operation_name=self.operation_name,
         attempts=3,
         results=self._GetResponseJsonForShotChanges([(0, 100), (300, 400)]))
     self.Run('ml video detect-shot-changes gs://bucket/object')
-    self.AssertErrContains('Waiting for operation [10000] to complete')
+    self.AssertErrContains('Waiting for operation [{}] to complete'.format(
+        self.operation_name))
     self.AssertOutputContains(textwrap.dedent("""\
     {
       "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse",
@@ -113,11 +116,11 @@ class DetectShotChangesTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     result = self.Run('ml video detect-shot-changes gs://bucket/object --async')
     self.assertEqual(
         result, self.messages.GoogleLongrunningOperation(
-            name='10000'))
+            name=self.operation_name))
 
   def testBasicResultComplete(self, track):
     """Test that results return correctly with operation polling."""
@@ -125,9 +128,9 @@ class DetectShotChangesTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_uri='gs://bucket/object',
-        operation_id='10000')
+        operation_name=self.operation_name)
     self.ExpectWaitOperationRequest(
-        operation_id='10000',
+        operation_name=self.operation_name,
         attempts=3,
         results=self._GetResponseJsonForShotChanges([(0, 5), (5, 10)]))
     result = self.Run('ml video detect-shot-changes gs://bucket/object')
@@ -151,7 +154,7 @@ class DetectShotChangesTest(base.MlVideoTestBase):
             self.segment_msg(startTimeOffset='0.0s', endTimeOffset='100.0s'),
             self.segment_msg(startTimeOffset='400.0s', endTimeOffset='500.0s')],
         location_id='us-east1',
-        operation_id='123'
+        operation_name=self.operation_name
     )
     result = self.Run('ml video detect-shot-changes gs://bucket/object '
                       '--output-uri gs://bucket/output '
@@ -159,7 +162,7 @@ class DetectShotChangesTest(base.MlVideoTestBase):
                       '--region us-east1 '
                       '--async')
     self.assertEqual(
-        self.messages.GoogleLongrunningOperation(name='123'),
+        self.messages.GoogleLongrunningOperation(name=self.operation_name),
         result)
 
   def testLocalVideo(self, track):
@@ -170,12 +173,12 @@ class DetectShotChangesTest(base.MlVideoTestBase):
     self.ExpectAnnotateRequest(
         self.feature,
         input_content=b'video content',
-        operation_id='10000'
+        operation_name=self.operation_name
     )
     result = self.Run(
         'ml video detect-shot-changes {} --async'.format(video_path))
     self.assertEqual(
-        self.messages.GoogleLongrunningOperation(name='10000'),
+        self.messages.GoogleLongrunningOperation(name=self.operation_name),
         result)
 
 

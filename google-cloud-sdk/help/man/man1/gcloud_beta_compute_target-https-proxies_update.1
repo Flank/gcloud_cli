@@ -11,7 +11,7 @@ gcloud beta compute target\-https\-proxies update \- update a target HTTPS proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute target\-https\-proxies update\fR \fINAME\fR [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]] [\fB\-\-url\-map\fR=\fIURL_MAP\fR] [\fB\-\-clear\-ssl\-policy\fR\ |\ \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute target\-https\-proxies update\fR \fINAME\fR [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]] [\fB\-\-url\-map\fR=\fIURL_MAP\fR] [\fB\-\-clear\-ssl\-policy\fR\ |\ \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-ssl\-certificates\fR\ |\ \fB\-\-ssl\-certificates\-region\fR=\fISSL_CERTIFICATES_REGION\fR] [\fB\-\-global\-url\-map\fR\ |\ \fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -69,7 +69,7 @@ Allows Google to control when QUIC is rolled out.
 References to at most 15 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The
-SSL certificate must exist and cannot be deleted while referenced by a target
+SSL certificates must exist and cannot be deleted while referenced by a target
 HTTPS proxy.
 
 .TP 2m
@@ -93,6 +93,98 @@ A reference to an SSL policy resource that defines the server\-side support for
 SSL features and affects the connections between clients and the HTTPS proxy
 load balancer. The SSL policy must exist and cannot be deleted while referenced
 by a target HTTPS proxy.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the target HTTPS proxy is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the target HTTPS proxy to update. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-ssl\-certificates\fR
+If set, the ssl certificates are global.
+
+.TP 2m
+\fB\-\-ssl\-certificates\-region\fR=\fISSL_CERTIFICATES_REGION\fR
+Region of the ssl certificates to operate on. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\-url\-map\fR
+If set, the url map is global.
+
+.TP 2m
+\fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR
+Region of the url map to operate on. Overrides the default \fBcompute/region\fR
+property value for this command invocation.
 
 
 .RE

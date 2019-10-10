@@ -17,6 +17,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     cancel
+        (BETA) Cancel a Memorystore Redis import or export operation.
+
      describe
         (BETA) Show metadata for a Memorystore Redis operation.
 

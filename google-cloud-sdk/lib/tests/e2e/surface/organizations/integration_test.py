@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import retry
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
 
@@ -27,6 +28,7 @@ class OrganizationIntegrationTest(testbase.OrganizationsE2ETestBase):
   def SetUp(self):
     super(OrganizationIntegrationTest, self).SetUp()
     properties.VALUES.core.user_output_enabled.Set(False)
+    self.retryer = retry.Retryer(max_wait_ms=60000)
 
   def compareOrganizations(self, expected, other):
     return expected.name == other.name and expected.owner == other.owner
@@ -39,6 +41,12 @@ class OrganizationIntegrationTest(testbase.OrganizationsE2ETestBase):
     self.assertTrue(
         self.compareOrganizations(self.TEST_ORGANIZATION, result))
 
+  def testGetIamPolicy(self):
+    policy = self.RunOrganizations(
+        'get-iam-policy',
+        self.TEST_ORGANIZATION.name[len('organizations/'):])
+    self.assertIsInstance(policy, self.messages.Policy)
+
   def testListOrganizations(self):
     result = self.RunOrganizations('list')
     # Result is a generator. Get everything into a list so we can iterate over
@@ -50,13 +58,6 @@ class OrganizationIntegrationTest(testbase.OrganizationsE2ETestBase):
                      'Expected organizations list result to contain '
                      'test organization: \n{0}\n\n'
                      'Actual result is: \n{1}'.format(expected, orgs))
-
-  def testGetIamPolicy(self):
-    policy = self.RunOrganizations(
-        'get-iam-policy',
-        self.TEST_ORGANIZATION.name[len('organizations/'):])
-    self.assertIsInstance(policy, self.messages.Policy)
-
 
 if __name__ == '__main__':
   test_case.main()

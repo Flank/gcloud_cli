@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock as apitools_mock
-from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.api_lib.resource_manager import org_policies
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
@@ -123,9 +122,9 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-4
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-4
             """))
 
   def testWithShowPreviewImages(self):
@@ -145,9 +144,9 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-4
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-4
             """))
 
   def testWithShowDeprecated(self):
@@ -235,10 +234,10 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-4
-            https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-6-v20140408
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-4
+            https://compute.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-6-v20140408
             """))
 
   def testPositionalArgsWithSimpleNames(self):
@@ -255,14 +254,14 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-2
             """))
 
   def testPositionalArgsWithUri(self):
     self.Run("""
         compute images list
-          https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
           --uri
         """)
 
@@ -273,13 +272,13 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
             """))
 
   def testPositionalArgsWithUriAndSimpleName(self):
     self.Run("""
         compute images list
-          https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
           image-2
           --uri
         """)
@@ -291,8 +290,8 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/images/image-2
             """))
 
   def testWithRequestError(self):
@@ -302,15 +301,15 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
       kwargs['errors'].append((500, 'Internal Error'))
     self.list_json.side_effect = MakeRequests
 
-    with self.AssertRaisesExceptionMatches(
-        lister.ListException,
+    self.Run("""
+        compute images list
+        """)
+    self.AssertErrContains(
         textwrap.dedent("""\
-        Some requests did not succeed:
+        WARNING: Some requests did not succeed.
          - Internal Error
-        """)):
-      self.Run("""
-          compute images list
-          """)
+
+        """))
 
     self.list_json.assert_called_once_with(
         requests=self.all_project_requests,

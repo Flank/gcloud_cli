@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -136,6 +136,10 @@ class SinksUpdateTest(base.LoggingTestBase):
     self.AssertErrContains('not found')
 
   def testUpdateMissingRequiredFlag(self):
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'),
+        self.msgs.LogSink())
     with self.AssertRaisesExceptionRegexp(exceptions.MinimumArgumentException,
                                           r'Please specify.*'):
       self.RunLogging('sinks update my-sink')
@@ -196,6 +200,122 @@ class SinksUpdateTestAlpha(SinksUpdateTest):
     self.AssertOutputContains('inspectTemplateName: my-inspect-template')
     self.AssertOutputContains('deidentifyTemplateName: my-deidentify-template')
 
+  def testUpdateSuccessPartitionedTables(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    expected_sink = self.msgs.LogSink(
+        name=test_sink.name,
+        bigqueryOptions=self.msgs.BigQueryOptions(usePartitionedTables=True))
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com',
+        bigqueryOptions=self.msgs.BigQueryOptions(usePartitionedTables=True))
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='bigquery_options.use_partitioned_tables'),
+        updated_sink)
+    self.RunLogging('sinks update my-sink '
+                    '--use-partitioned-tables '
+                    '--format=default')
+    self.AssertErrContains('Updated')
+    self.AssertOutputContains('usePartitionedTables: true')
+
+  def testUpdateSuccessClearExclusions(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter1')
+        ],
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    expected_sink = self.msgs.LogSink(name=test_sink.name)
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='exclusions'),
+        updated_sink)
+    self.RunLogging('sinks update my-sink --clear-exclusions')
+    self.AssertErrContains('Updated')
+    self.AssertOutputNotContains('exclusions')
+
+  def testUpdateRemoveNonexistentExclusion(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter1')
+        ],
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.InvalidArgumentException, r'Exclusions.*'):
+      self.RunLogging('sinks update my-sink --remove-exclusions porkpie')
+
+  def testUpdateRemoveExclusionsSuccess(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter'),
+            self.msgs.LogExclusion(name='ex2', filter='filter'),
+            self.msgs.LogExclusion(name='ex3', filter='filter'),
+            self.msgs.LogExclusion(name='ex4', filter='filter')
+        ],
+        writerIdentity='foo@bar.com')
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter'),
+            self.msgs.LogExclusion(name='ex3', filter='filter'),
+        ])
+    new_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter'),
+            self.msgs.LogExclusion(name='ex3', filter='filter'),
+        ])
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=updated_sink,
+            uniqueWriterIdentity=True,
+            updateMask='exclusions'),
+        new_sink)
+
+    self.RunLogging('sinks update my-sink --remove-exclusions ex2,ex4')
+    self.AssertErrContains('Updated')
 
 if __name__ == '__main__':
   test_case.main()

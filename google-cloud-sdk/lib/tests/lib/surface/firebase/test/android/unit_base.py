@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ ANDROID_CATALOG_GET = TESTING_V1_MSGS.TestingTestEnvironmentCatalogGetRequest(
     projectId=unit_base.TestUnitTestBase.PROJECT_ID)
 
 ALL_GA_TEST_RUN_ARGS = [
-    'app', 'app_package', 'async', 'auto_google_login', 'device', 'device_ids',
+    'app', 'app_package', 'async_', 'auto_google_login', 'device', 'device_ids',
     'directories_to_pull', 'environment_variables', 'locales',
     'network_profile', 'num_flaky_test_attempts', 'obb_files', 'orientations',
     'os_version_ids', 'performance_metrics', 'record_video', 'results_bucket',
@@ -50,7 +50,8 @@ ALL_TEST_RUN_ARGS = {
     calliope_base.ReleaseTrack.GA:
         ALL_GA_TEST_RUN_ARGS,
     calliope_base.ReleaseTrack.BETA:
-        ALL_GA_TEST_RUN_ARGS + ['robo_script', 'additional_apks', 'other_files']
+        ALL_GA_TEST_RUN_ARGS +
+        ['additional_apks', 'client_details', 'other_files', 'robo_script']
 }
 
 

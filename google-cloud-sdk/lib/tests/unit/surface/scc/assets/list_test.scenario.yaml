@@ -1,96 +1,282 @@
 title: scc asset list scenario test
 release_tracks: [ALPHA]
 summary:
+# This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       scc assets list 345840165995 --order-by="resource_properties.sort_prop ASC" --compare-duration="100000s"
   - stdout: |
-        ---
-        asset:
-          createTime: '2018-09-12T18:12:04.214Z'
-          iamPolicy: {}
-          name: organizations/345840165995/assets/10851265360336357506
-          resourceProperties:
-            creationTime: 2018-09-12t17:22:24.286z
-            displayName: cscc-prober-org.joonix.net
-            lastModifiedTime: 2018-09-12t17:22:25.87z
-            lifecycleState: active
-            name: organizations/345840165995
-            organizationId: '345840165995'
-            owner: '{"directoryCustomerId":"C011uk192"}'
-          securityCenterProperties:
-            resourceName: //cloudresourcemanager.googleapis.com/organizations/345840165995
-            resourceType: google.cloud.resourcemanager.Organization
-          securityMarks:
-            name: organizations/345840165995/assets/10851265360336357506/securityMarks
-          updateTime: '2018-10-17T22:00:25.516Z'
-        state: ACTIVE
-        stateChange: ACTIVE
-        ---
-        asset:
-          createTime: '2018-09-12T18:12:07.356Z'
-          iamPolicy: {}
-          name: organizations/345840165995/assets/595423472147994486
-          resourceProperties:
-            createTime: 2018-09-12t17:39:00.974z
-            lifecycleState: active
-            name: prober project 1
-            parent: '{"id":"345840165995","type":"organization"}'
-            projectId: prober-project-1
-            projectNumber: 428809690096
-          securityCenterProperties:
-            resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
-            resourceOwners:
-            - user:riskdashboard.prober@cscc-prober-org.joonix.net
-            resourceParent: //cloudresourcemanager.googleapis.com/organizations/345840165995
-            resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
-            resourceType: google.cloud.resourcemanager.Project
-          securityMarks:
-            marks:
-              probermark: proberTestValue
-              testA: valueA
-              testB: valueB
-            name: organizations/345840165995/assets/595423472147994486/securityMarks
-          updateTime: '2018-10-17T22:00:25.516Z'
-        state: ACTIVE
-        stateChange: ACTIVE
-        ---
-        asset:
-          createTime: '2018-09-12T19:07:10.045Z'
-          iamPolicy: {}
-          name: organizations/345840165995/assets/4285038039734670702
-          resourceProperties:
-            acl: '[{"bucket":"prober-test-bucket","entity":"project-editors-428809690096","etag":"CAE=","id":"prober-test-bucket/project-editors-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-editors-428809690096"},
-              {"bucket":"prober-test-bucket","entity":"project-owners-428809690096","etag":"CAE=","id":"prober-test-bucket/project-owners-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-owners-428809690096"},
-              {"bucket":"prober-test-bucket","entity":"project-viewers-428809690096","etag":"CAE=","id":"prober-test-bucket/project-viewers-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-viewers-428809690096"}]'
-            defaultObjectAcl: '[{"entity":"project-editors-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER"},
-              {"entity":"project-owners-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER"},
-              {"entity":"project-viewers-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER"}]'
-            etag: CAE=
-            iamConfiguration: '{"bucketPolicyOnly":{"enabled":false}}'
-            id: prober-test-bucket
-            kind: storage#bucket
-            location: US
-            metageneration: 1
-            name: prober-test-bucket
-            owner: '{"entity":"project-owners-428809690096"}'
-            projectNumber: '428809690096'
-            selfLink: https://www.googleapis.com/storage/v1/b/prober-test-bucket
-            storageClass: MULTI_REGIONAL
-            timeCreated: 1536779133294
-            updated: 1536779133294
-          securityCenterProperties:
-            resourceName: //storage.googleapis.com/prober-test-bucket
-            resourceOwners:
-            - user:riskdashboard.prober@cscc-prober-org.joonix.net
-            resourceParent: //cloudresourcemanager.googleapis.com/projects/428809690096
-            resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
-            resourceType: google.cloud.storage.Bucket
-          securityMarks:
-            name: organizations/345840165995/assets/4285038039734670702/securityMarks
-          updateTime: '2018-12-05T02:21:32.285Z'
-        state: ACTIVE
-        stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T18:12:04.214Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/10851265360336357506
+        resourceProperties:
+          creationTime: 2018-09-12t17:22:24.286z
+          displayName: cscc-prober-org.joonix.net
+          lastModifiedTime: 2018-09-12t17:22:25.87z
+          lifecycleState: active
+          name: organizations/345840165995
+          organizationId: '345840165995'
+          owner: '{"directoryCustomerId":"C011uk192"}'
+        securityCenterProperties:
+          resourceName: //cloudresourcemanager.googleapis.com/organizations/345840165995
+          resourceType: google.cloud.resourcemanager.Organization
+        securityMarks:
+          name: organizations/345840165995/assets/10851265360336357506/securityMarks
+        updateTime: '2018-10-17T22:00:25.516Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T18:12:07.356Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/595423472147994486
+        resourceProperties:
+          createTime: 2018-09-12t17:39:00.974z
+          lifecycleState: active
+          name: prober project 1
+          parent: '{"id":"345840165995","type":"organization"}'
+          projectId: prober-project-1
+          projectNumber: 428809690096
+        securityCenterProperties:
+          resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceOwners:
+          - user:riskdashboard.prober@cscc-prober-org.joonix.net
+          resourceParent: //cloudresourcemanager.googleapis.com/organizations/345840165995
+          resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceType: google.cloud.resourcemanager.Project
+        securityMarks:
+          marks:
+            probermark: proberTestValue
+            testA: valueA
+            testB: valueB
+          name: organizations/345840165995/assets/595423472147994486/securityMarks
+        updateTime: '2018-10-17T22:00:25.516Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T19:07:10.045Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/4285038039734670702
+        resourceProperties:
+          acl: '[{"bucket":"prober-test-bucket","entity":"project-editors-428809690096","etag":"CAE=","id":"prober-test-bucket/project-editors-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-editors-428809690096"},
+            {"bucket":"prober-test-bucket","entity":"project-owners-428809690096","etag":"CAE=","id":"prober-test-bucket/project-owners-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-owners-428809690096"},
+            {"bucket":"prober-test-bucket","entity":"project-viewers-428809690096","etag":"CAE=","id":"prober-test-bucket/project-viewers-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-viewers-428809690096"}]'
+          defaultObjectAcl: '[{"entity":"project-editors-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER"},
+            {"entity":"project-owners-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER"},
+            {"entity":"project-viewers-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER"}]'
+          etag: CAE=
+          iamConfiguration: '{"bucketPolicyOnly":{"enabled":false}}'
+          id: prober-test-bucket
+          kind: storage#bucket
+          location: US
+          metageneration: 1
+          name: prober-test-bucket
+          owner: '{"entity":"project-owners-428809690096"}'
+          projectNumber: '428809690096'
+          selfLink: https://www.googleapis.com/storage/v1/b/prober-test-bucket
+          storageClass: MULTI_REGIONAL
+          timeCreated: 1536779133294
+          updated: 1536779133294
+        securityCenterProperties:
+          resourceName: //storage.googleapis.com/prober-test-bucket
+          resourceOwners:
+          - user:riskdashboard.prober@cscc-prober-org.joonix.net
+          resourceParent: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceType: google.cloud.storage.Bucket
+        securityMarks:
+          name: organizations/345840165995/assets/4285038039734670702/securityMarks
+        updateTime: '2018-12-05T02:21:32.285Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+- execute:
+  - command: |
+      scc assets list organizations/345840165995 --order-by="resource_properties.sort_prop ASC" --compare-duration="100000s"
+  - stdout: |
+      ---
+      asset:
+        createTime: '2018-09-12T18:12:04.214Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/10851265360336357506
+        resourceProperties:
+          creationTime: 2018-09-12t17:22:24.286z
+          displayName: cscc-prober-org.joonix.net
+          lastModifiedTime: 2018-09-12t17:22:25.87z
+          lifecycleState: active
+          name: organizations/345840165995
+          organizationId: '345840165995'
+          owner: '{"directoryCustomerId":"C011uk192"}'
+        securityCenterProperties:
+          resourceName: //cloudresourcemanager.googleapis.com/organizations/345840165995
+          resourceType: google.cloud.resourcemanager.Organization
+        securityMarks:
+          name: organizations/345840165995/assets/10851265360336357506/securityMarks
+        updateTime: '2018-10-17T22:00:25.516Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T18:12:07.356Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/595423472147994486
+        resourceProperties:
+          createTime: 2018-09-12t17:39:00.974z
+          lifecycleState: active
+          name: prober project 1
+          parent: '{"id":"345840165995","type":"organization"}'
+          projectId: prober-project-1
+          projectNumber: 428809690096
+        securityCenterProperties:
+          resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceOwners:
+          - user:riskdashboard.prober@cscc-prober-org.joonix.net
+          resourceParent: //cloudresourcemanager.googleapis.com/organizations/345840165995
+          resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceType: google.cloud.resourcemanager.Project
+        securityMarks:
+          marks:
+            probermark: proberTestValue
+            testA: valueA
+            testB: valueB
+          name: organizations/345840165995/assets/595423472147994486/securityMarks
+        updateTime: '2018-10-17T22:00:25.516Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T19:07:10.045Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/4285038039734670702
+        resourceProperties:
+          acl: '[{"bucket":"prober-test-bucket","entity":"project-editors-428809690096","etag":"CAE=","id":"prober-test-bucket/project-editors-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-editors-428809690096"},
+            {"bucket":"prober-test-bucket","entity":"project-owners-428809690096","etag":"CAE=","id":"prober-test-bucket/project-owners-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-owners-428809690096"},
+            {"bucket":"prober-test-bucket","entity":"project-viewers-428809690096","etag":"CAE=","id":"prober-test-bucket/project-viewers-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-viewers-428809690096"}]'
+          defaultObjectAcl: '[{"entity":"project-editors-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER"},
+            {"entity":"project-owners-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER"},
+            {"entity":"project-viewers-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER"}]'
+          etag: CAE=
+          iamConfiguration: '{"bucketPolicyOnly":{"enabled":false}}'
+          id: prober-test-bucket
+          kind: storage#bucket
+          location: US
+          metageneration: 1
+          name: prober-test-bucket
+          owner: '{"entity":"project-owners-428809690096"}'
+          projectNumber: '428809690096'
+          selfLink: https://www.googleapis.com/storage/v1/b/prober-test-bucket
+          storageClass: MULTI_REGIONAL
+          timeCreated: 1536779133294
+          updated: 1536779133294
+        securityCenterProperties:
+          resourceName: //storage.googleapis.com/prober-test-bucket
+          resourceOwners:
+          - user:riskdashboard.prober@cscc-prober-org.joonix.net
+          resourceParent: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceType: google.cloud.storage.Bucket
+        securityMarks:
+          name: organizations/345840165995/assets/4285038039734670702/securityMarks
+        updateTime: '2018-12-05T02:21:32.285Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+- execute:
+  - command: |
+      config set scc/organization 345840165995
+  - stderr: |
+      Updated property [scc/organization].
+- execute:
+  - command: |
+      scc assets list --order-by="resource_properties.sort_prop ASC" --compare-duration="100000s"
+  - stdout: |
+      ---
+      asset:
+        createTime: '2018-09-12T18:12:04.214Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/10851265360336357506
+        resourceProperties:
+          creationTime: 2018-09-12t17:22:24.286z
+          displayName: cscc-prober-org.joonix.net
+          lastModifiedTime: 2018-09-12t17:22:25.87z
+          lifecycleState: active
+          name: organizations/345840165995
+          organizationId: '345840165995'
+          owner: '{"directoryCustomerId":"C011uk192"}'
+        securityCenterProperties:
+          resourceName: //cloudresourcemanager.googleapis.com/organizations/345840165995
+          resourceType: google.cloud.resourcemanager.Organization
+        securityMarks:
+          name: organizations/345840165995/assets/10851265360336357506/securityMarks
+        updateTime: '2018-10-17T22:00:25.516Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T18:12:07.356Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/595423472147994486
+        resourceProperties:
+          createTime: 2018-09-12t17:39:00.974z
+          lifecycleState: active
+          name: prober project 1
+          parent: '{"id":"345840165995","type":"organization"}'
+          projectId: prober-project-1
+          projectNumber: 428809690096
+        securityCenterProperties:
+          resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceOwners:
+          - user:riskdashboard.prober@cscc-prober-org.joonix.net
+          resourceParent: //cloudresourcemanager.googleapis.com/organizations/345840165995
+          resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceType: google.cloud.resourcemanager.Project
+        securityMarks:
+          marks:
+            probermark: proberTestValue
+            testA: valueA
+            testB: valueB
+          name: organizations/345840165995/assets/595423472147994486/securityMarks
+        updateTime: '2018-10-17T22:00:25.516Z'
+      state: ACTIVE
+      stateChange: ACTIVE
+      ---
+      asset:
+        createTime: '2018-09-12T19:07:10.045Z'
+        iamPolicy: {}
+        name: organizations/345840165995/assets/4285038039734670702
+        resourceProperties:
+          acl: '[{"bucket":"prober-test-bucket","entity":"project-editors-428809690096","etag":"CAE=","id":"prober-test-bucket/project-editors-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-editors-428809690096"},
+            {"bucket":"prober-test-bucket","entity":"project-owners-428809690096","etag":"CAE=","id":"prober-test-bucket/project-owners-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-owners-428809690096"},
+            {"bucket":"prober-test-bucket","entity":"project-viewers-428809690096","etag":"CAE=","id":"prober-test-bucket/project-viewers-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-viewers-428809690096"}]'
+          defaultObjectAcl: '[{"entity":"project-editors-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER"},
+            {"entity":"project-owners-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER"},
+            {"entity":"project-viewers-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER"}]'
+          etag: CAE=
+          iamConfiguration: '{"bucketPolicyOnly":{"enabled":false}}'
+          id: prober-test-bucket
+          kind: storage#bucket
+          location: US
+          metageneration: 1
+          name: prober-test-bucket
+          owner: '{"entity":"project-owners-428809690096"}'
+          projectNumber: '428809690096'
+          selfLink: https://www.googleapis.com/storage/v1/b/prober-test-bucket
+          storageClass: MULTI_REGIONAL
+          timeCreated: 1536779133294
+          updated: 1536779133294
+        securityCenterProperties:
+          resourceName: //storage.googleapis.com/prober-test-bucket
+          resourceOwners:
+          - user:riskdashboard.prober@cscc-prober-org.joonix.net
+          resourceParent: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+          resourceType: google.cloud.storage.Bucket
+        securityMarks:
+          name: organizations/345840165995/assets/4285038039734670702/securityMarks
+        updateTime: '2018-12-05T02:21:32.285Z'
+      state: ACTIVE
+      stateChange: ACTIVE
 actions:
 - execute_command:
     command: |
@@ -301,10 +487,226 @@ actions:
         stateChange: ACTIVE
     - expect_exit:
         code: 0
-# Uses resource name
 - execute_command:
     command: |
       scc assets list organizations/345840165995 --order-by="resource_properties.sort_prop ASC" --compare-duration="100000s"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&compareDuration=100000s&orderBy=resource_properties.sort_prop+ASC
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listAssetsResults": [
+                {
+                  "asset": {
+                    "name": "organizations/345840165995/assets/10851265360336357506",
+                    "securityCenterProperties": {
+                      "resourceName": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceType": "google.cloud.resourcemanager.Organization"
+                    },
+                    "resourceProperties": {
+                      "organizationId": "345840165995",
+                      "name": "organizations/345840165995",
+                      "owner": "{\"directoryCustomerId\":\"C011uk192\"}",
+                      "lifecycleState": "active",
+                      "displayName": "cscc-prober-org.joonix.net",
+                      "creationTime": "2018-09-12t17:22:24.286z",
+                      "lastModifiedTime": "2018-09-12t17:22:25.87z"
+                    },
+                    "securityMarks": {
+                      "name": "organizations/345840165995/assets/10851265360336357506/securityMarks"
+                    },
+                    "createTime": "2018-09-12T18:12:04.214Z",
+                    "updateTime": "2018-10-17T22:00:25.516Z",
+                    "iamPolicy": {}
+                  },
+                  "stateChange": "ACTIVE",
+                  "state": "ACTIVE"
+                },
+                {
+                  "asset": {
+                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "securityCenterProperties": {
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceType": "google.cloud.resourcemanager.Project",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceOwners": [
+                        "user:riskdashboard.prober@cscc-prober-org.joonix.net"
+                      ]
+                    },
+                    "resourceProperties": {
+                      "name": "prober project 1",
+                      "lifecycleState": "active",
+                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
+                      "projectId": "prober-project-1",
+                      "createTime": "2018-09-12t17:39:00.974z",
+                      "projectNumber": 428809690096
+                    },
+                    "securityMarks": {
+                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "marks": {
+                        "probermark": "proberTestValue",
+                        "testB": "valueB",
+                        "testA": "valueA"
+                      }
+                    },
+                    "createTime": "2018-09-12T18:12:07.356Z",
+                    "updateTime": "2018-10-17T22:00:25.516Z",
+                    "iamPolicy": {}
+                  },
+                  "stateChange": "ACTIVE",
+                  "state": "ACTIVE"
+                },
+                {
+                  "asset": {
+                    "name": "organizations/345840165995/assets/4285038039734670702",
+                    "securityCenterProperties": {
+                      "resourceName": "//storage.googleapis.com/prober-test-bucket",
+                      "resourceType": "google.cloud.storage.Bucket",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceOwners": [
+                        "user:riskdashboard.prober@cscc-prober-org.joonix.net"
+                      ]
+                    },
+                    "resourceProperties": {
+                      "etag": "CAE=",
+                      "kind": "storage#bucket",
+                      "name": "prober-test-bucket",
+                      "owner": "{\"entity\":\"project-owners-428809690096\"}",
+                      "storageClass": "MULTI_REGIONAL",
+                      "acl": "[{\"bucket\":\"prober-test-bucket\",\"entity\":\"project-editors-428809690096\",\"etag\":\"CAE=\",\"id\":\"prober-test-bucket/project-editors-428809690096\",\"kind\":\"storage#bucketAccessControl\",\"projectTeam\":{\"projectNumber\":\"428809690096\",\"team\":\"editors\"},\"role\":\"OWNER\",\"selfLink\":\"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-editors-428809690096\"}, {\"bucket\":\"prober-test-bucket\",\"entity\":\"project-owners-428809690096\",\"etag\":\"CAE=\",\"id\":\"prober-test-bucket/project-owners-428809690096\",\"kind\":\"storage#bucketAccessControl\",\"projectTeam\":{\"projectNumber\":\"428809690096\",\"team\":\"owners\"},\"role\":\"OWNER\",\"selfLink\":\"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-owners-428809690096\"}, {\"bucket\":\"prober-test-bucket\",\"entity\":\"project-viewers-428809690096\",\"etag\":\"CAE=\",\"id\":\"prober-test-bucket/project-viewers-428809690096\",\"kind\":\"storage#bucketAccessControl\",\"projectTeam\":{\"projectNumber\":\"428809690096\",\"team\":\"viewers\"},\"role\":\"READER\",\"selfLink\":\"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-viewers-428809690096\"}]",
+                      "timeCreated": 1536779133294,
+                      "defaultObjectAcl": "[{\"entity\":\"project-editors-428809690096\",\"etag\":\"CAE=\",\"kind\":\"storage#objectAccessControl\",\"projectTeam\":{\"projectNumber\":\"428809690096\",\"team\":\"editors\"},\"role\":\"OWNER\"}, {\"entity\":\"project-owners-428809690096\",\"etag\":\"CAE=\",\"kind\":\"storage#objectAccessControl\",\"projectTeam\":{\"projectNumber\":\"428809690096\",\"team\":\"owners\"},\"role\":\"OWNER\"}, {\"entity\":\"project-viewers-428809690096\",\"etag\":\"CAE=\",\"kind\":\"storage#objectAccessControl\",\"projectTeam\":{\"projectNumber\":\"428809690096\",\"team\":\"viewers\"},\"role\":\"READER\"}]",
+                      "location": "US",
+                      "updated": 1536779133294,
+                      "metageneration": 1,
+                      "selfLink": "https://www.googleapis.com/storage/v1/b/prober-test-bucket",
+                      "iamConfiguration": "{\"bucketPolicyOnly\":{\"enabled\":false}}",
+                      "id": "prober-test-bucket",
+                      "projectNumber": "428809690096"
+                    },
+                    "securityMarks": {
+                      "name": "organizations/345840165995/assets/4285038039734670702/securityMarks"
+                    },
+                    "createTime": "2018-09-12T19:07:10.045Z",
+                    "updateTime": "2018-12-05T02:21:32.285Z",
+                    "iamPolicy": {}
+                  },
+                  "stateChange": "ACTIVE",
+                  "state": "ACTIVE"
+                }
+              ],
+              "readTime": "2019-03-15T19:00:34.313Z",
+              "totalSize": 3
+            }
+    - expect_stdout: |
+        ---
+        asset:
+          createTime: '2018-09-12T18:12:04.214Z'
+          iamPolicy: {}
+          name: organizations/345840165995/assets/10851265360336357506
+          resourceProperties:
+            creationTime: 2018-09-12t17:22:24.286z
+            displayName: cscc-prober-org.joonix.net
+            lastModifiedTime: 2018-09-12t17:22:25.87z
+            lifecycleState: active
+            name: organizations/345840165995
+            organizationId: '345840165995'
+            owner: '{"directoryCustomerId":"C011uk192"}'
+          securityCenterProperties:
+            resourceName: //cloudresourcemanager.googleapis.com/organizations/345840165995
+            resourceType: google.cloud.resourcemanager.Organization
+          securityMarks:
+            name: organizations/345840165995/assets/10851265360336357506/securityMarks
+          updateTime: '2018-10-17T22:00:25.516Z'
+        state: ACTIVE
+        stateChange: ACTIVE
+        ---
+        asset:
+          createTime: '2018-09-12T18:12:07.356Z'
+          iamPolicy: {}
+          name: organizations/345840165995/assets/595423472147994486
+          resourceProperties:
+            createTime: 2018-09-12t17:39:00.974z
+            lifecycleState: active
+            name: prober project 1
+            parent: '{"id":"345840165995","type":"organization"}'
+            projectId: prober-project-1
+            projectNumber: 428809690096
+          securityCenterProperties:
+            resourceName: //cloudresourcemanager.googleapis.com/projects/428809690096
+            resourceOwners:
+            - user:riskdashboard.prober@cscc-prober-org.joonix.net
+            resourceParent: //cloudresourcemanager.googleapis.com/organizations/345840165995
+            resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+            resourceType: google.cloud.resourcemanager.Project
+          securityMarks:
+            marks:
+              probermark: proberTestValue
+              testA: valueA
+              testB: valueB
+            name: organizations/345840165995/assets/595423472147994486/securityMarks
+          updateTime: '2018-10-17T22:00:25.516Z'
+        state: ACTIVE
+        stateChange: ACTIVE
+        ---
+        asset:
+          createTime: '2018-09-12T19:07:10.045Z'
+          iamPolicy: {}
+          name: organizations/345840165995/assets/4285038039734670702
+          resourceProperties:
+            acl: '[{"bucket":"prober-test-bucket","entity":"project-editors-428809690096","etag":"CAE=","id":"prober-test-bucket/project-editors-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-editors-428809690096"},
+              {"bucket":"prober-test-bucket","entity":"project-owners-428809690096","etag":"CAE=","id":"prober-test-bucket/project-owners-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-owners-428809690096"},
+              {"bucket":"prober-test-bucket","entity":"project-viewers-428809690096","etag":"CAE=","id":"prober-test-bucket/project-viewers-428809690096","kind":"storage#bucketAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER","selfLink":"https://www.googleapis.com/storage/v1/b/prober-test-bucket/acl/project-viewers-428809690096"}]'
+            defaultObjectAcl: '[{"entity":"project-editors-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"editors"},"role":"OWNER"},
+              {"entity":"project-owners-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"owners"},"role":"OWNER"},
+              {"entity":"project-viewers-428809690096","etag":"CAE=","kind":"storage#objectAccessControl","projectTeam":{"projectNumber":"428809690096","team":"viewers"},"role":"READER"}]'
+            etag: CAE=
+            iamConfiguration: '{"bucketPolicyOnly":{"enabled":false}}'
+            id: prober-test-bucket
+            kind: storage#bucket
+            location: US
+            metageneration: 1
+            name: prober-test-bucket
+            owner: '{"entity":"project-owners-428809690096"}'
+            projectNumber: '428809690096'
+            selfLink: https://www.googleapis.com/storage/v1/b/prober-test-bucket
+            storageClass: MULTI_REGIONAL
+            timeCreated: 1536779133294
+            updated: 1536779133294
+          securityCenterProperties:
+            resourceName: //storage.googleapis.com/prober-test-bucket
+            resourceOwners:
+            - user:riskdashboard.prober@cscc-prober-org.joonix.net
+            resourceParent: //cloudresourcemanager.googleapis.com/projects/428809690096
+            resourceProject: //cloudresourcemanager.googleapis.com/projects/428809690096
+            resourceType: google.cloud.storage.Bucket
+          securityMarks:
+            name: organizations/345840165995/assets/4285038039734670702/securityMarks
+          updateTime: '2018-12-05T02:21:32.285Z'
+        state: ACTIVE
+        stateChange: ACTIVE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      config set scc/organization 345840165995
+    events:
+    - expect_stderr: |
+        Updated property [scc/organization].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      scc assets list --order-by="resource_properties.sort_prop ASC" --compare-duration="100000s"
     events:
     - api_call:
         expect_request:

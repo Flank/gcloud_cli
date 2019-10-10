@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -230,7 +230,33 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     # This message doesn't display with an explicit gcloudignore file
     self.AssertErrNotContains('Some files were not included')
     self.AssertErrNotContains('Check the gcloud log')
-    self.AssertLogContains('Using .gcloudignore file')
+    self.AssertLogContains('Using ignore file')
+
+  def testCopyTarballToGcs_ignorefile(self):
+    object_ = resources.REGISTRY.Create(collection='storage.objects',
+                                        bucket='bucket', object='object')
+    fake_storage_client = FakeStorageClient()
+
+    proj = self.CreateTempDir('project')  # Directory to snapshot.
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'file_to_ignore'), 'empty')
+    self._writeFile(os.path.join(proj, '.custom_ignore_file'),
+                    '.custom_ignore_file\nfile_to_ignore')
+
+    source_snapshot = snapshot.Snapshot(proj, ignore_file='.custom_ignore_file')
+    tf_data = source_snapshot.CopyTarballToGCS(fake_storage_client,
+                                               object_,
+                                               ignore_file=
+                                               '.custom_ignore_file')
+    tf = tarfile.open(fileobj=BytesIO(tf_data), mode='r:*')
+    self.assertEqual(len(tf.getmembers()), 1)
+    self.assertEqual(tf.getmember('Dockerfile').size, 5)
+    tf.close()
+
+    # This message doesn't display with an explicit gcloudignore file
+    self.AssertErrNotContains('Some files were not included')
+    self.AssertErrNotContains('Check the gcloud log')
+    self.AssertLogContains('Using ignore file')
 
   def testCopyTarballToGcs_NoIgnoredFiles(self):
     object_ = resources.REGISTRY.Create(collection='storage.objects',

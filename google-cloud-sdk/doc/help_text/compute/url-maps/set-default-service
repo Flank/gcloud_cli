@@ -3,7 +3,7 @@ NAME
         default bucket of a URL map
 
 SYNOPSIS
-    gcloud compute url-maps set-default-service URL_MAP_NAME
+    gcloud compute url-maps set-default-service URL_MAP
         (--default-backend-bucket=DEFAULT_BACKEND_BUCKET
           | --default-service=DEFAULT_SERVICE) [GCLOUD_WIDE_FLAG ...]
 
@@ -14,7 +14,7 @@ DESCRIPTION
     map.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS

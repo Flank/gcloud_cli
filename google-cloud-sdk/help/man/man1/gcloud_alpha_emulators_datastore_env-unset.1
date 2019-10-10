@@ -37,7 +37,11 @@ $ gcloud info \-\-format='get(config.paths.global_config_dir)'
 
 .TP 2m
 \fB\-\-legacy\fR
-Set to use the legacy emulator which supports Cloud Datastore API v1beta2.
+(DEPRECATED) Set to use the legacy emulator which supports Cloud Datastore API
+v1beta2.
+
+This flag is deprecated due to the legacy Datastore emulator no longer being
+supported. It will be removed in early October 2019.
 
 
 .RE
@@ -68,9 +72,8 @@ $ gcloud alpha emulators datastore env\-unset \-\-data\-dir DATA\-DIR
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
 
 .RS 2m
 $ gcloud beta emulators datastore env\-unset

@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud spanner databases execute-sql (DATABASE : --instance=INSTANCE)
         --sql=SQL [--enable-partitioned-dml]
-        [--query-mode=QUERY_MODE; default="NORMAL"] [GCLOUD_WIDE_FLAG ...]
+        [--query-mode=QUERY_MODE; default="NORMAL"]
+        [--timeout=TIMEOUT; default="10m"] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Executes a SQL query against a Cloud Spanner database.
@@ -48,6 +49,10 @@ OPTIONAL FLAGS
          PROFILE
             Returns both the query plan and the execution statistics along with
             the result rows.
+
+     --timeout=TIMEOUT; default="10m"
+        Maximum time to wait for the SQL query to complete. See $ gcloud topic
+        datetimes for information on duration formats.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

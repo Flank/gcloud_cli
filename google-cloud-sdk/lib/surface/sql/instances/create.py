@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ from googlecloudsdk.api_lib.sql import operations
 from googlecloudsdk.api_lib.sql import validate
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib.kms import resource_args as kms_resource_args
 from googlecloudsdk.command_lib.sql import flags
 from googlecloudsdk.command_lib.sql import instances as command_util
 from googlecloudsdk.command_lib.sql import validate as command_validate
@@ -35,6 +36,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_lex
 from googlecloudsdk.core.resource import resource_property
+import six
 
 
 def AddBaseArgs(parser):
@@ -43,7 +45,7 @@ def AddBaseArgs(parser):
   base.ASYNC_FLAG.AddToParser(parser)
   parser.display_info.AddFormat(flags.GetInstanceListFormat())
   flags.AddActivationPolicy(parser)
-  flags.AddAssignIp(parser, show_negated_in_help=False)
+  flags.AddAssignIp(parser)
   flags.AddAuthorizedGAEApps(parser)
   flags.AddAuthorizedNetworks(parser)
   flags.AddAvailabilityType(parser)
@@ -99,9 +101,10 @@ def AddBaseArgs(parser):
       help=('Regional location (e.g. asia-east1, us-east1). See the full '
             'list of regions at '
             'https://cloud.google.com/sql/docs/instance-locations.'))
-  flags.AddZone(location_group, help_text=(
-      'Preferred Compute Engine zone (e.g. us-central1-a, '
-      'us-central1-b, etc.).'))
+  flags.AddZone(
+      location_group,
+      help_text=('Preferred Compute Engine zone (e.g. us-central1-a, '
+                 'us-central1-b, etc.).'))
   parser.add_argument(
       '--replica-type',
       choices=['READ', 'FAILOVER'],
@@ -137,8 +140,7 @@ def RunBaseCreateCommand(args, release_track):
   """Creates a new Cloud SQL instance.
 
   Args:
-    args: argparse.Namespace, The arguments that this command was invoked
-        with.
+    args: argparse.Namespace, The arguments that this command was invoked with.
     release_track: base.ReleaseTrack, the release track that this was run under.
 
   Returns:
@@ -173,7 +175,7 @@ def RunBaseCreateCommand(args, release_track):
               instance=master_instance_ref.instance))
     except apitools_exceptions.HttpError as error:
       # TODO(b/64292220): Remove once API gives helpful error message.
-      log.debug('operation : %s', str(master_instance_ref))
+      log.debug('operation : %s', six.text_type(master_instance_ref))
       exc = exceptions.HttpException(error)
       if resource_property.Get(exc.payload.content,
                                resource_lex.ParseKey('error.errors[0].reason'),
@@ -188,6 +190,16 @@ def RunBaseCreateCommand(args, release_track):
       args.database_version = master_instance_resource.databaseVersion
     if not args.IsSpecified('tier') and master_instance_resource.settings:
       args.tier = master_instance_resource.settings.tier
+    # Check for CMEK usage; warn the user about replica inheriting the setting.
+    if master_instance_resource.diskEncryptionConfiguration:
+      command_util.ShowCmekWarning('replica', 'the master instance')
+
+  # --root-password is required when creating SQL Server instances
+  if args.IsSpecified('database_version') and args.database_version.startswith(
+      'SQLSERVER') and not args.IsSpecified('root_password'):
+    raise exceptions.RequiredArgumentException(
+        '--root-password',
+        '`--root-password` is required when creating SQL Server instances.')
 
   instance_resource = (
       command_util.InstancesV1Beta4.ConstructCreateInstanceFromArgs(
@@ -209,7 +221,8 @@ def RunBaseCreateCommand(args, release_track):
   if args.pricing_plan == 'PACKAGE':
     console_io.PromptContinue(
         'Charges will begin accruing immediately. Really create Cloud '
-        'SQL instance?', cancel_on_no=True)
+        'SQL instance?',
+        cancel_on_no=True)
 
   operation_ref = None
   try:
@@ -220,16 +233,19 @@ def RunBaseCreateCommand(args, release_track):
         operation=result_operation.name,
         project=instance_ref.project)
 
-    if args.async:
+    if args.async_:
       if not args.IsSpecified('format'):
         args.format = 'default'
       return sql_client.operations.Get(
           sql_messages.SqlOperationsGetRequest(
-              project=operation_ref.project,
-              operation=operation_ref.operation))
+              project=operation_ref.project, operation=operation_ref.operation))
 
     operations.OperationsV1Beta4.WaitForOperation(
-        sql_client, operation_ref, 'Creating Cloud SQL instance')
+        sql_client,
+        operation_ref,
+        'Creating Cloud SQL instance',
+        # TODO(b/138403566): Remove the override once we improve creation times.
+        max_wait_seconds=680)
 
     log.CreatedResource(instance_ref)
 
@@ -238,14 +254,13 @@ def RunBaseCreateCommand(args, release_track):
             project=instance_ref.project, instance=instance_ref.instance))
     return new_resource
   except apitools_exceptions.HttpError as error:
-    log.debug('operation : %s', str(operation_ref))
+    log.debug('operation : %s', six.text_type(operation_ref))
     exc = exceptions.HttpException(error)
     if resource_property.Get(exc.payload.content,
                              resource_lex.ParseKey('error.errors[0].reason'),
                              None) == 'errorMaxInstancePerLabel':
       msg = resource_property.Get(exc.payload.content,
-                                  resource_lex.ParseKey('error.message'),
-                                  None)
+                                  resource_lex.ParseKey('error.message'), None)
       raise exceptions.HttpException(msg)
     raise
 
@@ -264,7 +279,7 @@ class Create(base.Command):
     flags.AddDatabaseVersion(parser)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(base.Command):
   """Creates a new Cloud SQL instance."""
 
@@ -277,3 +292,33 @@ class CreateBeta(base.Command):
     AddBaseArgs(parser)
     AddBetaArgs(parser)
     flags.AddDatabaseVersion(parser, restrict_choices=False)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(base.Command):
+  """Creates a new Cloud SQL instance."""
+
+  def Run(self, args):
+    return RunBaseCreateCommand(args, self.ReleaseTrack())
+
+  @staticmethod
+  def Args(parser):
+    """Args is called by calliope to gather arguments for this command."""
+    AddBaseArgs(parser)
+    AddBetaArgs(parser)
+    flags.AddDatabaseVersion(parser, restrict_choices=False)
+    kms_flag_overrides = {
+        'kms-key': '--disk-encryption-key',
+        'kms-keyring': '--disk-encryption-key-keyring',
+        'kms-location': '--disk-encryption-key-location',
+        'kms-project': '--disk-encryption-key-project'
+    }
+    permission_info = (
+        'Please ensure that you have the '
+        '`resourcemanager.projects.setIamPolicy` permission for the project '
+        'associated with the key')
+    kms_resource_args.AddKmsKeyResourceArg(
+        parser,
+        'instance',
+        flag_overrides=kms_flag_overrides,
+        permission_info=permission_info)

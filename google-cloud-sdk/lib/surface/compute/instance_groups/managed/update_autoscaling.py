@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ class UpdateAutoscaling(base.Command):
     instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG.AddArgument(
         parser)
     mig_utils.GetModeFlag().AddToParser(parser)
+    mig_utils.AddScaleDownControlFlag(parser)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -64,6 +65,10 @@ class UpdateAutoscaling(base.Command):
     if args.IsSpecified('mode'):
       mode = mig_utils.ParseModeString(args.mode, client.messages)
       new_autoscaler.autoscalingPolicy.mode = mode
+
+    new_autoscaler.autoscalingPolicy.scaleDownControl = \
+      mig_utils.BuildScaleDown(args, client.messages)
+
     return autoscalers_client.Patch(igm_ref, new_autoscaler)
 
 

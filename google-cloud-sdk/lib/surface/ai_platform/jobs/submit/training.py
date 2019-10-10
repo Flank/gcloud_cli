@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ from googlecloudsdk.command_lib.ml_engine import jobs_util
 from googlecloudsdk.command_lib.util.args import labels_util
 
 
-def _AddSubmitTrainingArgs(parser, supports_container=False):
+def _AddSubmitTrainingArgs(parser):
   """Add arguments for `jobs submit training` command."""
   flags.JOB_NAME.AddToParser(parser)
   flags.PACKAGE_PATH.AddToParser(parser)
   flags.PACKAGES.AddToParser(parser)
-  flags.GetModuleNameFlag(required=not supports_container).AddToParser(parser)
+  flags.GetModuleNameFlag(required=False).AddToParser(parser)
   compute_flags.AddRegionFlag(parser, 'machine learning training job',
                               'submit')
   flags.CONFIG.AddToParser(parser)
@@ -46,7 +46,7 @@ def _AddSubmitTrainingArgs(parser, supports_container=False):
   # TODO(b/36195821): Use the flag deprecation machinery when it supports the
   # store_true action
   sync_group.add_argument(
-      '--async', action='store_true', help=(
+      '--async', action='store_true', dest='async_', help=(
           '(DEPRECATED) Display information about the operation in progress '
           'without waiting for the operation to complete. '
           'Enabled by default and can be omitted; use `--stream-logs` to run '
@@ -66,28 +66,25 @@ def _AddSubmitTrainingArgs(parser, supports_container=False):
 class Train(base.Command):
   """Submit an AI Platform training job."""
 
-  @staticmethod
-  def Args(parser):
+  _SUPPORT_TPU_TF_VERSION = False
+
+  @classmethod
+  def Args(cls, parser):
     _AddSubmitTrainingArgs(parser)
+    flags.AddCustomContainerFlags(
+        parser, support_tpu_tf_version=cls._SUPPORT_TPU_TF_VERSION)
     parser.display_info.AddFormat(jobs_util.JOB_FORMAT)
 
   def Run(self, args):
-    return self._Run(args)
-
-  def _Run(self, args, supports_container_training=False,
-           supports_custom_container=False):
-    stream_logs = jobs_util.GetStreamLogs(args.async, args.stream_logs)
+    stream_logs = jobs_util.GetStreamLogs(args.async_, args.stream_logs)
     scale_tier = jobs_util.ScaleTierFlagMap().GetEnumForChoice(args.scale_tier)
     scale_tier_name = scale_tier.name if scale_tier else None
     jobs_client = jobs.JobsClient()
     labels = jobs_util.ParseCreateLabels(jobs_client, args)
-    if supports_custom_container:
-      custom_container_config = (
-          jobs_util.TrainingCustomInputServerConfig.FromArgs(args))
-      custom_container_config.ValidateConfig()
-    else:
-      custom_container_config = None
-
+    custom_container_config = (
+        jobs_util.TrainingCustomInputServerConfig.FromArgs(
+            args, self._SUPPORT_TPU_TF_VERSION))
+    custom_container_config.ValidateConfig()
     job = jobs_util.SubmitTraining(
         jobs_client, args.job,
         job_dir=args.job_dir,
@@ -102,7 +99,6 @@ class Train(base.Command):
         labels=labels,
         stream_logs=stream_logs,
         user_args=args.user_args,
-        supports_container_training=supports_container_training,
         custom_train_server_config=custom_container_config)
     # If the job itself failed, we will return a failure status.
     if stream_logs and job.state is not job.StateValueValuesEnum.SUCCEEDED:
@@ -111,18 +107,10 @@ class Train(base.Command):
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class TrainAlpha(Train):
+class TrainAlphaBeta(Train):
   """Submit an AI Platform training job."""
 
-  @staticmethod
-  def Args(parser):
-    _AddSubmitTrainingArgs(parser, supports_container=True)
-    flags.AddCustomContainerFlags(parser)
-    parser.display_info.AddFormat(jobs_util.JOB_FORMAT)
-
-  def Run(self, args):
-    return self._Run(args, supports_container_training=True,
-                     supports_custom_container=True)
+  _SUPPORT_TPU_TF_VERSION = True
 
 
 _DETAILED_HELP = {

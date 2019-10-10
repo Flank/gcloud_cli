@@ -11,7 +11,7 @@ gcloud beta ml speech recognize\-long\-running \- get transcripts of longer audi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-additional\-language\-codes\fR=[\fILANGUAGE_CODE\fR,...]] [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-confidence\fR] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fB\-\-enable\-speaker\-diarization\fR\ :\ \fB\-\-diarization\-speaker\-count\fR=\fIDIARIZATION_SPEAKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,15 +80,22 @@ supported language codes.
 
 .RS 2m
 .TP 2m
+\fB\-\-additional\-language\-codes\fR=[\fILANGUAGE_CODE\fR,...]
+The BCP\-47 language tags of other languages that the speech may be in. Up to 3
+can be provided.
+
+If alternative languages are listed, recognition result will contain recognition
+in the most likely language detected including the main language\-code.
+
+.TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-encoding\fR=\fIENCODING\fR; default="encoding\-unspecified"
 The type of encoding of the file. Required if the file format is not WAV or
 FLAC. \fIENCODING\fR must be one of: \fBamr\fR, \fBamr\-wb\fR,
-\fBencoding\-unspecified\fR, \fBflac\fR, \fBlinear16\fR, \fBmulaw\fR,
+\fBencoding\-unspecified\fR, \fBflac\fR, \fBlinear16\fR, \fBmp3\fR, \fBmulaw\fR,
 \fBogg\-opus\fR, \fBspeex\-with\-header\-byte\fR.
 
 .TP 2m
@@ -104,6 +111,10 @@ accuracy for specific words and phrases, for example, if specific commands are
 typically spoken by the user. This can also be used to add additional words to
 the vocabulary of the recognizer. See
 https://cloud.google.com/speech/limits#content.
+
+.TP 2m
+\fR\-\-include\-word\-confidence\fB
+Include a list of words and the confidence for those words in the top result.
 
 .TP 2m
 \fR\-\-include\-word\-time\-offsets\fB
@@ -123,6 +134,15 @@ The sample rate in Hertz. For best results, set the sampling rate of the audio
 source to 16000 Hz. If that's not possible, use the native sample rate of the
 audio source (instead of re\-sampling).
 
+.TP 2m
+\fR\-\-enable\-speaker\-diarization\fB
+Enable speaker detection for each recognized word in the top alternative of the
+recognition result using an integer speaker_tag provided in the WordInfo.
+
+.TP 2m
+\fR\-\-diarization\-speaker\-count\fB=\fIDIARIZATION_SPEAKER_COUNT\fR
+Estimated number of speakers in the conversation being recognized.
+
 
 \fR
 .RE
@@ -140,8 +160,8 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBspeech/v1\fR API. The full documentation for this API
-can be found at:
+This command uses the \fBspeech/v1p1beta1\fR API. The full documentation for
+this API can be found at:
 https://cloud.google.com/speech\-to\-text/docs/quickstart\-protocol
 
 

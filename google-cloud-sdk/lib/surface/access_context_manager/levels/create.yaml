@@ -13,6 +13,7 @@
     collection: accesscontextmanager.accessPolicies.accessLevels
     modify_request_hooks:
     - googlecloudsdk.command_lib.util.hooks.request_modifiers:SetFieldFromRelativeName:api_field=accessLevel.name
+    - googlecloudsdk.command_lib.accesscontextmanager.policies:ValidateAccessPolicyArg
 
   async:
     collection: accesscontextmanager.operations
@@ -51,7 +52,7 @@
 
             ```
              - ipSubnetworks:
-               - 192.168.100.14/24
+               - 162.222.181.197/24
                - 2001:db8::/48
              - members
                - user:user@example.com

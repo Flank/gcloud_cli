@@ -2,7 +2,7 @@ NAME
     gcloud beta data-catalog - manage Cloud Data Catalog resources
 
 SYNOPSIS
-    gcloud beta data-catalog GROUP [GCLOUD_WIDE_FLAG ...]
+    gcloud beta data-catalog GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Manage Cloud Data Catalog resources.
@@ -19,6 +19,21 @@ GROUPS
 
      entries
         (BETA) Manage entries in Cloud Data Catalog.
+
+     entry-groups
+        (BETA) Manage entry groups in Cloud Data Catalog.
+
+     tag-templates
+        (BETA) Manage tag templates in Cloud Data Catalog.
+
+     tags
+        (BETA) Manage tags in Cloud Data Catalog.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     search
+        (BETA) Search Cloud Data Catalog for resources that match a query.
 
 NOTES
     This command is currently in BETA and may change without notice. This

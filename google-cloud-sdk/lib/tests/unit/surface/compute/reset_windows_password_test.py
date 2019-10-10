@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -285,9 +285,9 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
             fingerprint=b'my-fingerprint',
             items=metadata_items),
         status=messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-1'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1'))
     return instance_message
 
@@ -364,7 +364,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
     windows_key_entry = self.windows_key_entry.format(
         EMAIL, self.expire_on, EXPONENT, MODULUS, USERNAME)
 
-    self.Run('compute reset-windows-password https://www.googleapis.com/'
+    self.Run('compute reset-windows-password https://compute.googleapis.com/'
              'compute/v1/projects/project-1/zones/zone-1/instances/instance-1')
 
     self.CheckRequests(

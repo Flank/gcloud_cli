@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ from googlecloudsdk.command_lib.kms import flags
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class GetPublicKey(base.DescribeCommand):
   r"""Get the public key for a given version.
 
@@ -41,10 +40,10 @@ class GetPublicKey(base.DescribeCommand):
   to '/tmp/my/pem.file':
 
     $ {command} 2 \
-    --key frodo \
-    --keyring fellowship \
-    --location us-east1 \
-    --output-file /tmp/my/pem.file
+    --key=frodo \
+    --keyring=fellowship \
+    --location=us-east1 \
+    --output-file=/tmp/my/pem.file
   """
 
   @staticmethod
@@ -66,7 +65,6 @@ class GetPublicKey(base.DescribeCommand):
         CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetPublicKeyRequest(  # pylint: disable=line-too-long
             name=version_ref.RelativeName()))
 
-    # TODO(b/72555857): Revisit this when we pull this into trunk.
     log.WriteToFileOrStdout(
         args.output_file if args.output_file else '-',
         resp.pem,

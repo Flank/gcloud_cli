@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import external_vpn_gateways_test_base
 
 
-class ExternalVpnGatewayDescribeBetaTest(
+class ExternalVpnGatewayDescribeGaTest(
     external_vpn_gateways_test_base.ExternalVpnGatewaysTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDescribeNonCustomProfile(self):
     interface_list = []
@@ -50,6 +50,12 @@ class ExternalVpnGatewayDescribeBetaTest(
     response = self.Run(
         'compute external-vpn-gateways describe {}'.format(name))
     self.assertEqual(response, external_vpn_gateway_result)
+
+
+class ExternalVpnGatewayDescribeBetaTest(ExternalVpnGatewayDescribeGaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ExternalVpnGatewayDescribeAlphaTest(ExternalVpnGatewayDescribeBetaTest):

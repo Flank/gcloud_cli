@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,22 +46,31 @@ class Update(base.Command):
 
   @staticmethod
   def Args(parser):
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddRegionArg(managed_group)
+    flags.AddServiceAccountFlag(managed_group)
+    # Flags specific to CRoGKE
+    gke_group = flags.GetGkeArgGroup(parser)
+    concept_parsers.ConceptParser([resource_args.CLUSTER_PRESENTATION
+                                  ]).AddToParser(gke_group)
+    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
+    kubernetes_group = flags.GetKubernetesArgGroup(parser)
+    flags.AddKubeconfigFlags(kubernetes_group)
+    # Flags not specific to any platform
     service_presentation = presentation_specs.ResourcePresentationSpec(
         '--service',
         resource_args.GetServiceResourceSpec(prompt=True),
         'Service to update the configuration of.',
         required=True,
         prefixes=False)
-    flags.AddRegionArg(parser)
+    flags.AddPlatformArg(parser)
     flags.AddMutexEnvVarsFlags(parser)
     flags.AddMemoryFlag(parser)
     flags.AddConcurrencyFlag(parser)
     flags.AddTimeoutFlag(parser)
-    flags.AddServiceAccountFlag(parser)
     flags.AddAsyncFlag(parser)
-    concept_parsers.ConceptParser([
-        resource_args.CLUSTER_PRESENTATION,
-        service_presentation]).AddToParser(parser)
+    concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
 
   def Run(self, args):
     pass

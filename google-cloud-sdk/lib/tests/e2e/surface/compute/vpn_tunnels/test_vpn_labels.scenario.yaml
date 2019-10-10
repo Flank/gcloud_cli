@@ -6,7 +6,7 @@ summary:
   - command: compute networks create --range 10.120.0.0/16 --subnet-mode LEGACY $$network$$
       --format "text(name)"
   - stderr: |+
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$\].
       WARNING: Some requests generated warnings:
        - Creation of legacy mode networks is deprecated. Please consider using subnet mode networks instead.
 
@@ -17,32 +17,32 @@ summary:
   - command: compute target-vpn-gateways create --region $$my-region$$ --network $$network$$
       $$vpn-gateway$$ --format "text(name,network,region)"
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$\].
   - stdout: |
       ---
       name:    $$vpn-gateway$$
-      network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
-      region:  https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
+      network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+      region:  https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
 - execute:
   - command: compute addresses create --region $$my-region$$ $$address$$
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$\].
 - execute:
   - command: compute forwarding-rules create --region $$my-region$$ --ip-protocol
       ESP --address $$address$$ --target-vpn-gateway $$vpn-gateway$$ $$fwd-rule-esp$$
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$\].
 - execute:
   - command: compute forwarding-rules create --region $$my-region$$ --ip-protocol
       UDP --ports 500 --address $$address$$ --target-vpn-gateway $$vpn-gateway$$ $$fwd-rule-udp500$$
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$\].
 - execute:
   - command: compute forwarding-rules create --region $$my-region$$ --ip-protocol
       UDP --ports 4500 --address $$address$$ --target-vpn-gateway $$vpn-gateway$$
       $$fwd-rule-udp4500$$
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$\].
 - execute:
   - command: compute vpn-tunnels create --region $$my-region$$ --peer-address 8.8.8.8
       --shared-secret 'whatever' --target-vpn-gateway $$vpn-gateway$$ $$vpn-tunnel$$
@@ -53,16 +53,16 @@ summary:
   - stdout: |
       ---
       name:   $$vpn-tunnel$$
-      region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
+      region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
 - execute:
   - command: compute routes create --next-hop-vpn-tunnel-region $$my-region$$ --network
       $$network$$ --next-hop-vpn-tunnel $$vpn-tunnel$$ --destination-range 192.168.100.0/24
       $$route$$ --format "text(route,network)"
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$\].
   - stdout: |
       ---
-      network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+      network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
 - execute:
   - command: compute vpn-tunnels update $$vpn-tunnel$$ --region $$my-region$$ --update-labels
       x=y,abc=xyz
@@ -92,7 +92,7 @@ summary:
 - execute:
   - command: compute routes delete $$route$$ --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$\].
 - execute:
   - command: compute vpn-tunnels delete $$vpn-tunnel$$ --region $$my-region$$ --quiet
   - progress_tracker:
@@ -102,34 +102,31 @@ summary:
   - command: compute forwarding-rules delete $$fwd-rule-esp$$ --region $$my-region$$
       --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$\].
 - execute:
   - command: compute forwarding-rules delete $$fwd-rule-udp500$$ --region $$my-region$$
       --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$\].
 - execute:
   - command: compute forwarding-rules delete $$fwd-rule-udp4500$$ --region $$my-region$$
       --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$\].
 - execute:
   - command: compute addresses delete $$address$$ --region $$my-region$$ --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$\].
 - execute:
   - command: compute target-vpn-gateways delete $$vpn-gateway$$ --region $$my-region$$
       --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$\].
 - execute:
   - command: compute networks delete $$network$$ --quiet
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$\].
 actions:
-- define_reference:
-    reference: compute-uri
-    value: www.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
@@ -178,10 +175,11 @@ actions:
       --format "text(name)"
     validation_only: true
     events:
-    - expect_stderr: |+
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
-        WARNING: Some requests generated warnings:
-         - Creation of legacy mode networks is deprecated. Please consider using subnet mode networks instead.
+    - expect_stderr:
+        matches: |+
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$\].
+          WARNING: Some requests generated warnings:
+           - Creation of legacy mode networks is deprecated. Please consider using subnet mode networks instead.
 
     - expect_stdout: |
         ---
@@ -193,21 +191,23 @@ actions:
       $$vpn-gateway$$ --format "text(name,network,region)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$\].
     - expect_stdout: |
         ---
         name:    $$vpn-gateway$$
-        network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
-        region:  https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
+        network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+        region:  https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
     - expect_exit:
         code: 0
 - execute_command:
     command: compute addresses create --region $$my-region$$ $$address$$
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -215,8 +215,9 @@ actions:
       ESP --address $$address$$ --target-vpn-gateway $$vpn-gateway$$ $$fwd-rule-esp$$
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -224,8 +225,9 @@ actions:
       UDP --ports 500 --address $$address$$ --target-vpn-gateway $$vpn-gateway$$ $$fwd-rule-udp500$$
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -234,86 +236,24 @@ actions:
       $$fwd-rule-udp4500$$
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute vpn-tunnels create --region $$my-region$$ --peer-address 8.8.8.8
       --shared-secret 'whatever' --target-vpn-gateway $$vpn-gateway$$ $$vpn-tunnel$$
       --format "text(name,region,gateway)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: $$vpn-tunnel$$
-              peerIp: 8.8.8.8
-              sharedSecret: whatever
-              targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '877'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '7616583670771612933'
-            name: operation-1556890601961-587fbd748b7e3-07e8d600-03a49c5c
-            operationType: insert
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            targetId: '1321660146105056517'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:36:42.925-07:00'
-            startTime: '2019-05-03T06:36:42.947-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890601961-587fbd748b7e3-07e8d600-03a49c5c
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
     - expect_progress_tracker:
         message: Creating VPN tunnel
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '950'
-            content-type: application/json; charset=UTF-8
-            etag: '"f7iyze8FzK2YMuHhbf3Nw2_UKv0=/bDrdIptJgX0Ft2SIjU-2Fri5sss="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: WAITING_FOR_FULL_CONFIG
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Waiting for route configuration.
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labelFingerprint: 42WmSpB8rSM=
     - expect_stdout: |
         ---
         name:   $$vpn-tunnel$$
-        region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
+        region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
     - expect_exit:
         code: 0
 - execute_command:
@@ -322,159 +262,29 @@ actions:
       $$route$$ --format "text(route,network)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$\].
     - expect_stdout: |
         ---
-        network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+        network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
     - expect_exit:
         code: 0
 - execute_command:
     command: compute vpn-tunnels update $$vpn-tunnel$$ --region $$my-region$$ --update-labels
       x=y,abc=xyz
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '933'
-            content-type: application/json; charset=UTF-8
-            etag: '"793sjoDbyUOifW8Rl0nZXxBXcOU=/MwkTz4o1XzvjVt7CqZnJwPCJjiU="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: REJECTED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Cannot send packets to peer IP
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labelFingerprint: 42WmSpB8rSM=
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: 42WmSpB8rSM=
-              labels:
-                abc: xyz
-                x: y
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '924'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '6727339270847199971'
-            name: operation-1556890635646-587fbd94ab7e7-042d5d5e-8af0e4d6
-            operationType: setLabels
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            targetId: '1321660146105056517'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2019-05-03T06:37:16.426-07:00'
-            startTime: '2019-05-03T06:37:16.430-07:00'
-            endTime: '2019-05-03T06:37:16.430-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890635646-587fbd94ab7e7-042d5d5e-8af0e4d6
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of VPN tunnel [$$vpn-tunnel$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '977'
-            content-type: application/json; charset=UTF-8
-            etag: '"LzdR8LljUZoPCCJ9dVnedDtgmkI=/i6MhEPpZRbgMar_Nerk-CCPCfRI="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: REJECTED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Cannot send packets to peer IP
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
     - expect_exit:
         code: 0
 - execute_command:
     command: compute vpn-tunnels describe $$vpn-tunnel$$ --region $$my-region$$ --format
       "text(name,labels)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '977'
-            content-type: application/json; charset=UTF-8
-            etag: '"LmgR1emgawcvykPenpehF7uUBmY=/k-BvHNGLMj3yNeKhM2-FHoPuyys="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: REJECTED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Cannot send packets to peer IP
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
     - expect_stdout: |
         labels.abc: xyz
         labels.x:   y
@@ -484,152 +294,18 @@ actions:
 - execute_command:
     command: compute vpn-tunnels update $$vpn-tunnel$$ --region $$my-region$$ --update-labels
       x=a,abc=xyz,t123=t7890 --remove-labels abc
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '977'
-            content-type: application/json; charset=UTF-8
-            etag: '"as8VED0jzmeWYxtyuypLQJQvc2w=/1IzXFHMaaZmyOfexV6q04ehRayE="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: REJECTED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Cannot send packets to peer IP
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labels:
-              abc: xyz
-              x: y
-            labelFingerprint: ecVX6WS0TtA=
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$/setLabels?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              labelFingerprint: ecVX6WS0TtA=
-              labels:
-                t123: t7890
-                x: a
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '924'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '1979230187562334975'
-            name: operation-1556890639464-587fbd984f932-cd635421-d827f9bd
-            operationType: setLabels
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            targetId: '1321660146105056517'
-            status: DONE
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 100
-            insertTime: '2019-05-03T06:37:20.431-07:00'
-            startTime: '2019-05-03T06:37:20.435-07:00'
-            endTime: '2019-05-03T06:37:20.435-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890639464-587fbd984f932-cd635421-d827f9bd
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
     - expect_progress_tracker:
         message: Updating labels of VPN tunnel [$$vpn-tunnel$$]
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '980'
-            content-type: application/json; charset=UTF-8
-            etag: '"VXgL46Al9HqlE38RVzO8dnu88-M=/le0bTbVo0dEbdlef7gz7aoqZczM="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: REJECTED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Cannot send packets to peer IP
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labels:
-              t123: t7890
-              x: a
-            labelFingerprint: KCoiqxISIcU=
     - expect_exit:
         code: 0
 - execute_command:
     command: compute vpn-tunnels describe $$vpn-tunnel$$ --region $$my-region$$ --format
       "text(name,labels)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '980'
-            content-type: application/json; charset=UTF-8
-            etag: '"Z0kAxssDeMvkJ-aMaToXa-rQ9IU=/0qiJAABBRyOATWEycE3vR0IKlv4="'
-            status: '200'
-          body:
-            kind: compute#vpnTunnel
-            id: '1321660146105056517'
-            creationTimestamp: '2019-05-03T06:36:42.919-07:00'
-            name: $$vpn-tunnel$$
-            description: ''
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-            targetVpnGateway: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            peerIp: 8.8.8.8
-            sharedSecret: '*************'
-            sharedSecretHash: AFwDUhYZNGrBfcHyEHc2Li4gOAJq
-            status: REJECTED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            ikeVersion: 2
-            detailedStatus: Cannot send packets to peer IP
-            localTrafficSelector:
-            - 10.120.0.0/16
-            labels:
-              t123: t7890
-              x: a
-            labelFingerprint: KCoiqxISIcU=
     - expect_stdout: |
         labels.t123: t7890
         labels.x:    a
@@ -639,69 +315,18 @@ actions:
 - execute_command:
     command: compute routes delete $$route$$ --quiet
     cleanup_for: route
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '734'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '3375555533307247355'
-            name: operation-1556890643781-587fbd9c6d789-647c3afe-ca559601
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$
-            targetId: '8385214789045058838'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:37:24.223-07:00'
-            startTime: '2019-05-03T06:37:24.232-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1556890643781-587fbd9c6d789-647c3afe-ca559601
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$route$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute vpn-tunnels delete $$vpn-tunnel$$ --region $$my-region$$ --quiet
     cleanup_for: vpn-tunnel
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '877'
-            content-type: application/json; charset=UTF-8
-            pragma: no-cache
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '7596620585470393055'
-            name: operation-1556890671487-587fbdb6d9ba4-b4263b70-fac0ac61
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/vpnTunnels/$$vpn-tunnel$$
-            targetId: '1321660146105056517'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:37:52.086-07:00'
-            startTime: '2019-05-03T06:37:52.099-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890671487-587fbdb6d9ba4-b4263b70-fac0ac61
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
     - expect_progress_tracker:
         message: Deleting VPN tunnel
         status: SUCCESS
@@ -711,212 +336,63 @@ actions:
     command: compute forwarding-rules delete $$fwd-rule-esp$$ --region $$my-region$$
       --quiet
     cleanup_for: fwd-rule-esp
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '882'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '3071981463799986898'
-            name: operation-1556890684661-587fbdc369fb6-f39ad896-62ceaab6
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$
-            targetId: '2723224029101161772'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:38:05.532-07:00'
-            startTime: '2019-05-03T06:38:05.554-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890684661-587fbdc369fb6-f39ad896-62ceaab6
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-esp$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute forwarding-rules delete $$fwd-rule-udp500$$ --region $$my-region$$
       --quiet
     cleanup_for: fwd-rule-udp500
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '882'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '3683010999119641253'
-            name: operation-1556890697441-587fbdcf99f9e-f6e71a61-dfa0a322
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$
-            targetId: '6381524412732144959'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:38:18.323-07:00'
-            startTime: '2019-05-03T06:38:18.339-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890697441-587fbdcf99f9e-f6e71a61-dfa0a322
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp500$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute forwarding-rules delete $$fwd-rule-udp4500$$ --region $$my-region$$
       --quiet
     cleanup_for: fwd-rule-udp4500
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '882'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '5263952121058949816'
-            name: operation-1556890710919-587fbddc74a4b-14b043a1-3d92eeab
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$
-            targetId: '6283077268317273393'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:38:31.402-07:00'
-            startTime: '2019-05-03T06:38:31.419-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890710919-587fbddc74a4b-14b043a1-3d92eeab
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/forwardingRules/$$fwd-rule-udp4500$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute addresses delete $$address$$ --region $$my-region$$ --quiet
     cleanup_for: address
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '876'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '1235074661979650694'
-            name: operation-1556890728521-587fbded3de83-98036039-75e8f1bc
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$
-            targetId: '5398408885463809366'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:38:49.061-07:00'
-            startTime: '2019-05-03T06:38:49.077-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890728521-587fbded3de83-98036039-75e8f1bc
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute target-vpn-gateways delete $$vpn-gateway$$ --region $$my-region$$
       --quiet
     cleanup_for: vpn-gateway
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '884'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '1500572798435850910'
-            name: operation-1556890736720-587fbdf50f9ce-27ddfc8d-d35dc173
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$
-            targetId: '4323831106209185118'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:38:57.260-07:00'
-            startTime: '2019-05-03T06:38:57.273-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/operations/operation-1556890736720-587fbdf50f9ce-27ddfc8d-d35dc173
-            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/$$my-region$$/targetVpnGateways/$$vpn-gateway$$\].
     - expect_exit:
         code: 0
 - execute_command:
     command: compute networks delete $$network$$ --quiet
     cleanup_for: network
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '735'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '927249279223986839'
-            name: operation-1556890744534-587fbdfc835ca-7832c9ca-e6eb4ec1
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$
-            targetId: '3209853087982419323'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-05-03T06:39:04.891-07:00'
-            startTime: '2019-05-03T06:39:04.900-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1556890744534-587fbdfc835ca-7832c9ca-e6eb4ec1
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network$$\].
     - expect_exit:
         code: 0

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.core import log
+
 from six.moves import filter  # pylint: disable=redefined-builtin
 
 
@@ -32,3 +34,10 @@ def _IsPublicVersion(operation):
 
 def FilterListResponse(response, unused_args):
   return list(filter(_IsPublicVersion, response))
+
+
+def LogCanceledOperation(response, args):
+  operation = args.CONCEPTS.operation.Parse()
+  log.status.Print(
+      'Cancellation in progress for [{}].'.format(operation.Name()))
+  return response

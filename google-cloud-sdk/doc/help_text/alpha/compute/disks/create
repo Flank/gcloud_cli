@@ -5,13 +5,15 @@ NAME
 SYNOPSIS
     gcloud alpha compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
+        [--erase-windows-vss-signature]
         [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
         [--licenses=[LICENSE,...]] [--multi-writer]
         [--physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"]
         [--replica-zones=ZONE,ZONE] [--no-require-csek-key-create]
         [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
-          | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
+          | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT
+          | --source-disk=SOURCE_DISK --source-disk-zone=SOURCE_DISK_ZONE]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -53,6 +55,11 @@ FLAGS
 
      --description=DESCRIPTION
         An optional, textual description for the disks being created.
+
+     --erase-windows-vss-signature
+        Specifies whether the disk restored from a source snapshot should erase
+        Windows specific VSS signature. See
+        https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#--guest-flush
 
      --guest-os-features=[GUEST_OS_FEATURE,...]
         This parameter enables one or more features for VM instances that use
@@ -182,6 +189,43 @@ FLAGS
           large as the snapshot size. Use --size to adjust the size of the
           disks.
 
+       Source disk options
+
+         --source-disk=SOURCE_DISK
+            Source disk used to create the disks. It is safe to delete a source
+            disk after a disk has been created from the source disk. To get a
+            list of disks in your current project, run gcloud compute disks
+            list. This flag is mutually exclusive with --image and
+            --source-snapshot.
+
+            When using this option, the size of the disks must be at least as
+            large as the source disk size. Use --size to adjust the size of the
+            disks.
+
+            The value for this option can be the name of a disk with the zone
+            specified via --source-disk-zone flag.
+
+         --source-disk-zone=SOURCE_DISK_ZONE
+            Zone of the source disk to operate on. If not specified and the
+            compute/zone property isn't set, you may be prompted to select a
+            zone.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/zone property:
+
+                $ gcloud config set compute/zone ZONE
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/zone
+
+            Alternatively, the zone can be stored in the environment variable
+            CLOUDSDK_COMPUTE_ZONE.
+
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to
      specify the attributes of this resource.
@@ -252,9 +296,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute disks create
         $ gcloud beta compute disks create

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,11 +30,8 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   """Add a NAT to a Google Compute Engine router."""
-
-  with_logging = False
 
   @classmethod
   def Args(cls, parser):
@@ -46,8 +43,7 @@ class Create(base.CreateCommand):
     compute_flags.AddRegionFlag(parser, 'NAT', operation_type='create')
 
     nats_flags.AddNatNameArg(parser, operation_type='create')
-    nats_flags.AddCommonNatArgs(
-        parser, for_create=True, with_logging=cls.with_logging)
+    nats_flags.AddCommonNatArgs(parser, for_create=True)
 
   def Run(self, args):
     """See base.CreateCommand."""
@@ -61,8 +57,7 @@ class Create(base.CreateCommand):
     request_type = messages.ComputeRoutersGetRequest
     replacement = service.Get(request_type(**router_ref.AsDict()))
 
-    nat = nats_utils.CreateNatMessage(
-        args, holder, with_logging=self.with_logging)
+    nat = nats_utils.CreateNatMessage(args, holder)
 
     replacement.nats.append(nat)
 
@@ -81,7 +76,7 @@ class Create(base.CreateCommand):
             'region': router_ref.region,
         })
 
-    if args.async:
+    if args.async_:
       log.CreatedResource(
           operation_ref,
           kind='nat [{0}] in router [{1}]'.format(nat.name, router_ref.Name()),
@@ -103,13 +98,6 @@ class Create(base.CreateCommand):
         operation_poller,
         operation_ref, 'Creating NAT [{0}] in router [{1}]'.format(
             nat.name, router_ref.Name()))
-
-
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
-class CreateBeta(Create):
-  """Add a NAT to a Google Compute Engine router."""
-
-  with_logging = True
 
 
 Create.detailed_help = {

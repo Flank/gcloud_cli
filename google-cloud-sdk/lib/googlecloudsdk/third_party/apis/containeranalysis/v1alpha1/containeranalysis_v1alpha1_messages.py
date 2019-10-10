@@ -92,74 +92,6 @@ class AttestationAuthorityHint(_messages.Message):
   humanReadableName = _messages.StringField(1)
 
 
-class AuditConfig(_messages.Message):
-  r"""Specifies the audit configuration for a service. The configuration
-  determines which permission types are logged, and what identities, if any,
-  are exempted from logging. An AuditConfig must have one or more
-  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
-  specific service, the union of the two AuditConfigs is used for that
-  service: the log_types specified in each AuditConfig are enabled, and the
-  exempted_members in each AuditLogConfig are exempted.  Example Policy with
-  multiple AuditConfigs:      {       "audit_configs": [         {
-  "service": "allServices"           "audit_log_configs": [             {
-  "log_type": "DATA_READ",               "exempted_members": [
-  "user:foo@gmail.com"               ]             },             {
-  "log_type": "DATA_WRITE",             },             {
-  "log_type": "ADMIN_READ",             }           ]         },         {
-  "service": "fooservice.googleapis.com"           "audit_log_configs": [
-  {               "log_type": "DATA_READ",             },             {
-  "log_type": "DATA_WRITE",               "exempted_members": [
-  "user:bar@gmail.com"               ]             }           ]         }
-  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
-  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
-  and bar@gmail.com from DATA_WRITE logging.
-
-  Fields:
-    auditLogConfigs: The configuration for logging of each type of permission.
-    service: Specifies a service that will be enabled for audit logging. For
-      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-      `allServices` is a special value that covers all services.
-  """
-
-  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
-  service = _messages.StringField(2)
-
-
-class AuditLogConfig(_messages.Message):
-  r"""Provides the configuration for logging a type of permissions. Example:
-  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
-  "exempted_members": [             "user:foo@gmail.com"           ]
-  },         {           "log_type": "DATA_WRITE",         }       ]     }
-  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-  foo@gmail.com from DATA_READ logging.
-
-  Enums:
-    LogTypeValueValuesEnum: The log type that this config enables.
-
-  Fields:
-    exemptedMembers: Specifies the identities that do not cause logging for
-      this type of permission. Follows the same format of Binding.members.
-    logType: The log type that this config enables.
-  """
-
-  class LogTypeValueValuesEnum(_messages.Enum):
-    r"""The log type that this config enables.
-
-    Values:
-      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
-      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
-      DATA_WRITE: Data writes. Example: CloudSQL Users create
-      DATA_READ: Data reads. Example: CloudSQL Users list
-    """
-    LOG_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    DATA_WRITE = 2
-    DATA_READ = 3
-
-  exemptedMembers = _messages.StringField(1, repeated=True)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
-
-
 class Basis(_messages.Message):
   r"""Basis describes the base image portion (Note) of the DockerImage
   relationship.  Linked occurrences are derived from this or an equivalent
@@ -190,9 +122,9 @@ class Binding(_messages.Message):
       with or without a Google account.  * `allAuthenticatedUsers`: A special
       identifier that represents anyone    who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
-      represents a specific Google    account. For example, `alice@gmail.com`
-      .   * `serviceAccount:{emailid}`: An email address that represents a
-      service    account. For example, `my-other-
+      represents a specific Google    account. For example,
+      `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
+      that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
       * `domain:{domain}`: The G Suite domain (primary) that represents all
@@ -625,6 +557,7 @@ class ContaineranalysisProjectsOccurrencesListRequest(_messages.Message):
       DEPLOYABLE: <no description>
       DISCOVERY: <no description>
       ATTESTATION_AUTHORITY: <no description>
+      UPGRADE: <no description>
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -634,6 +567,7 @@ class ContaineranalysisProjectsOccurrencesListRequest(_messages.Message):
     DEPLOYABLE = 5
     DISCOVERY = 6
     ATTESTATION_AUTHORITY = 7
+    UPGRADE = 8
 
   filter = _messages.StringField(1)
   kind = _messages.EnumField('KindValueValuesEnum', 2)
@@ -993,8 +927,7 @@ class Detail(_messages.Message):
     isObsolete: Whether this Detail is obsolete. Occurrences are expected not
       to point to obsolete details.
     maxAffectedVersion: The max version of the package in which the
-      vulnerability exists. This field can be used as a filter in list
-      requests.
+      vulnerability exists.
     minAffectedVersion: The min version of the package in which the
       vulnerability exists.
     package: The name of the package where the vulnerability was found. This
@@ -1030,6 +963,7 @@ class Discovered(_messages.Message):
       LocalizedMessage under details to show to the user. The LocalizedMessage
       output only and populated by the API.
     continuousAnalysis: Whether the resource is continuously analyzed.
+    cpe: The CPE of the resource being scanned.
     operation: Output only. An operation that indicates the status of the
       current scan. This field is deprecated, do not use.
   """
@@ -1068,7 +1002,8 @@ class Discovered(_messages.Message):
   analysisStatus = _messages.EnumField('AnalysisStatusValueValuesEnum', 1)
   analysisStatusError = _messages.MessageField('Status', 2)
   continuousAnalysis = _messages.EnumField('ContinuousAnalysisValueValuesEnum', 3)
-  operation = _messages.MessageField('Operation', 4)
+  cpe = _messages.StringField(4)
+  operation = _messages.MessageField('Operation', 5)
 
 
 class Discovery(_messages.Message):
@@ -1102,6 +1037,7 @@ class Discovery(_messages.Message):
         a resource.
       ATTESTATION_AUTHORITY: This represents a logical "role" that can attest
         to artifacts.
+      UPGRADE: This represents an available software upgrade.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -1111,6 +1047,7 @@ class Discovery(_messages.Message):
     DEPLOYABLE = 5
     DISCOVERY = 6
     ATTESTATION_AUTHORITY = 7
+    UPGRADE = 8
 
   analysisKind = _messages.EnumField('AnalysisKindValueValuesEnum', 1)
 
@@ -1221,7 +1158,28 @@ class Fingerprint(_messages.Message):
 
 
 class GetIamPolicyRequest(_messages.Message):
-  r"""Request message for `GetIamPolicy` method."""
+  r"""Request message for `GetIamPolicy` method.
+
+  Fields:
+    options: OPTIONAL: A `GetPolicyOptions` object for specifying options to
+      `GetIamPolicy`. This field is only used by Cloud IAM.
+  """
+
+  options = _messages.MessageField('GetPolicyOptions', 1)
+
+
+class GetPolicyOptions(_messages.Message):
+  r"""Encapsulates settings provided to GetIamPolicy.
+
+  Fields:
+    requestedPolicyVersion: Optional. The policy format version to be
+      returned.  Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.  Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
+  """
+
+  requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class GetVulnzOccurrencesSummaryResponse(_messages.Message):
@@ -1584,12 +1542,13 @@ class Note(_messages.Message):
       specified. This field can be used as a filter in list requests.
     longDescription: A detailed description of this `Note`.
     name: The name of the note in the form
-      "providers/{provider_id}/notes/{NOTE_ID}"
+      "projects/{provider_project_id}/notes/{NOTE_ID}"
     package: A note describing a package hosted by various package managers.
     relatedUrl: URLs associated with this note
     shortDescription: A one sentence description of this `Note`.
     updateTime: Output only. The time this note was last updated. This field
       can be used as a filter in list requests.
+    upgrade: A note describing an upgrade.
     vulnerabilityType: A package vulnerability type of note.
   """
 
@@ -1610,6 +1569,7 @@ class Note(_messages.Message):
         a resource.
       ATTESTATION_AUTHORITY: This represents a logical "role" that can attest
         to artifacts.
+      UPGRADE: This represents an available software upgrade.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -1619,6 +1579,7 @@ class Note(_messages.Message):
     DEPLOYABLE = 5
     DISCOVERY = 6
     ATTESTATION_AUTHORITY = 7
+    UPGRADE = 8
 
   attestationAuthority = _messages.MessageField('AttestationAuthority', 1)
   baseImage = _messages.MessageField('Basis', 2)
@@ -1634,7 +1595,8 @@ class Note(_messages.Message):
   relatedUrl = _messages.MessageField('RelatedUrl', 12, repeated=True)
   shortDescription = _messages.StringField(13)
   updateTime = _messages.StringField(14)
-  vulnerabilityType = _messages.MessageField('VulnerabilityType', 15)
+  upgrade = _messages.MessageField('UpgradeNote', 15)
+  vulnerabilityType = _messages.MessageField('VulnerabilityType', 16)
 
 
 class Occurrence(_messages.Message):
@@ -1666,12 +1628,13 @@ class Occurrence(_messages.Message):
       filter in list requests.
     remediation: A description of actions that can be taken to remedy the
       `Note`
-    resource: The resource for which the `Occurrence` applies.
+    resource:  The resource for which the `Occurrence` applies.
     resourceUrl: The unique URL of the image or the container for which the
       `Occurrence` applies. For example,
       https://gcr.io/project/image@sha256:foo This field can be used as a
       filter in list requests.
     updateTime: Output only. The time this `Occurrence` was last updated.
+    upgrade: Describes an upgrade.
     vulnerabilityDetails: Details of a security vulnerability note.
   """
 
@@ -1692,6 +1655,7 @@ class Occurrence(_messages.Message):
         a resource.
       ATTESTATION_AUTHORITY: This represents a logical "role" that can attest
         to artifacts.
+      UPGRADE: This represents an available software upgrade.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -1701,6 +1665,7 @@ class Occurrence(_messages.Message):
     DEPLOYABLE = 5
     DISCOVERY = 6
     ATTESTATION_AUTHORITY = 7
+    UPGRADE = 8
 
   attestation = _messages.MessageField('Attestation', 1)
   buildDetails = _messages.MessageField('BuildDetails', 2)
@@ -1716,7 +1681,8 @@ class Occurrence(_messages.Message):
   resource = _messages.MessageField('Resource', 12)
   resourceUrl = _messages.StringField(13)
   updateTime = _messages.StringField(14)
-  vulnerabilityDetails = _messages.MessageField('VulnerabilityDetails', 15)
+  upgrade = _messages.MessageField('UpgradeOccurrence', 15)
+  vulnerabilityDetails = _messages.MessageField('VulnerabilityDetails', 16)
 
 
 class Operation(_messages.Message):
@@ -1921,27 +1887,37 @@ class PgpSignedAttestation(_messages.Message):
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.   A `Policy`
-  consists of a list of `bindings`. A `binding` binds a list of `members` to a
-  `role`, where the members can be user accounts, Google groups, Google
-  domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **JSON Example**      {       "bindings": [         {
-  "role": "roles/owner",           "members": [
+  is a collection of `bindings`. A `binding` binds one or more `members` to a
+  single `role`. Members can be user accounts, service accounts, Google
+  groups, and domains (such as G Suite). A `role` is a named list of
+  permissions (defined by IAM or configured by users). A `binding` can
+  optionally specify a `condition`, which is a logic expression that further
+  constrains the role binding based on attributes about the request and/or
+  target resource.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
-  "domain:google.com",             "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com"           ]         },         {
-  "role": "roles/viewer",           "members": ["user:sean@example.com"]
-  }       ]     }  **YAML Example**      bindings:     - members:       -
-  user:mike@example.com       - group:admins@example.com       -
-  domain:google.com       - serviceAccount:my-other-
-  app@appspot.gserviceaccount.com       role: roles/owner     - members:
-  - user:sean@example.com       role: roles/viewer   For a description of IAM
-  and its features, see the [IAM developer's
+  "domain:google.com",             "serviceAccount:my-project-
+  id@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/resourcemanager.organizationViewer",           "members":
+  ["user:eve@example.com"],           "condition": {             "title":
+  "expirable access",             "description": "Does not grant access after
+  Sep 2020",             "expression": "request.time <
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
+  **YAML Example**      bindings:     - members:       - user:mike@example.com
+  - group:admins@example.com       - domain:google.com       - serviceAccount
+  :my-project-id@appspot.gserviceaccount.com       role:
+  roles/resourcemanager.organizationAdmin     - members:       -
+  user:eve@example.com       role: roles/resourcemanager.organizationViewer
+  condition:         title: expirable access         description: Does not
+  grant access after Sep 2020         expression: request.time <
+  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
+  features, see the [IAM developer's
   guide](https://cloud.google.com/iam/docs).
 
   Fields:
-    auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. `bindings` with no
-      members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally may
+      specify a `condition` that determines when binding is in effect.
+      `bindings` with no members will result in an error.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1950,14 +1926,23 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
       policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten blindly.
-    version: Deprecated.
+      the existing policy is overwritten. Due to blind-set semantics of an
+      etag-less policy, 'setIamPolicy' will not fail even if either of
+      incoming or stored policy does not meet the version requirements.
+    version: Specifies the format of the policy.  Valid values are 0, 1, and
+      3. Requests specifying an invalid value will be rejected.  Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.  If no etag is provided in the call to
+      `setIamPolicy`, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
-  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
-  bindings = _messages.MessageField('Binding', 2, repeated=True)
-  etag = _messages.BytesField(3)
-  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  bindings = _messages.MessageField('Binding', 1, repeated=True)
+  etag = _messages.BytesField(2)
+  version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class RelatedUrl(_messages.Message):
@@ -1992,7 +1977,7 @@ class RepoSource(_messages.Message):
 
 
 class Resource(_messages.Message):
-  r"""Resource is an entity that can have metadata. E.g., a Docker image.
+  r""" Resource is an entity that can have metadata. E.g., a Docker image.
 
   Fields:
     contentHash: The hash of the resource content. E.g., the Docker digest.
@@ -2035,14 +2020,9 @@ class SetIamPolicyRequest(_messages.Message):
       size of the policy is limited to a few 10s of KB. An empty policy is a
       valid policy but certain Cloud Platform services (such as Projects)
       might reject them.
-    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
-      modify. Only the fields in the mask will be modified. If no mask is
-      provided, the following default mask is used: paths: "bindings, etag"
-      This field is only used by Cloud IAM.
   """
 
   policy = _messages.MessageField('Policy', 1)
-  updateMask = _messages.StringField(2)
 
 
 class SeverityCount(_messages.Message):
@@ -2212,37 +2192,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -2338,6 +2291,64 @@ class UpdateOperationRequest(_messages.Message):
 
   operation = _messages.MessageField('Operation', 1)
   updateMask = _messages.StringField(2)
+
+
+class UpgradeDistribution(_messages.Message):
+  r"""The Upgrade Distribution represents metadata about the Upgrade for each
+  operating system (CPE). Some distributions have additional metadata around
+  updates, classifying them into various categories and severities.
+
+  Fields:
+    classification: The operating system classification of this Upgrade, as
+      specified by the upstream operating system upgrade feed.
+    cpeUri: Required - The specific operating system this metadata applies to.
+      See https://cpe.mitre.org/specification/.
+    cve: The cve that would be resolved by this upgrade.
+    severity: The severity as specified by the upstream operating system.
+  """
+
+  classification = _messages.StringField(1)
+  cpeUri = _messages.StringField(2)
+  cve = _messages.StringField(3, repeated=True)
+  severity = _messages.StringField(4)
+
+
+class UpgradeNote(_messages.Message):
+  r"""An Upgrade Note represents a potential upgrade of a package to a given
+  version. For each package version combination (i.e. bash 4.0, bash 4.1, bash
+  4.1.2), there will be a Upgrade Note.
+
+  Fields:
+    distributions: Metadata about the upgrade for each specific operating
+      system.
+    package: Required - The package this Upgrade is for.
+    version: Required - The version of the package in machine + human readable
+      form.
+  """
+
+  distributions = _messages.MessageField('UpgradeDistribution', 1, repeated=True)
+  package = _messages.StringField(2)
+  version = _messages.MessageField('Version', 3)
+
+
+class UpgradeOccurrence(_messages.Message):
+  r"""An Upgrade Occurrence represents that a specific resource_url could
+  install a specific upgrade. This presence is supplied via local sources
+  (i.e. it is present in the mirror and the running system has noticed its
+  availability).
+
+  Fields:
+    distribution: Metadata about the upgrade for available for the specific
+      operating system for the resource_url. This allows efficient filtering,
+      as well as making it easier to use the occurrence.
+    package: Required - The package this Upgrade is for.
+    parsedVersion: Required - The version of the package in a machine + human
+      readable form.
+  """
+
+  distribution = _messages.MessageField('UpgradeDistribution', 1)
+  package = _messages.StringField(2)
+  parsedVersion = _messages.MessageField('Version', 3)
 
 
 class Version(_messages.Message):

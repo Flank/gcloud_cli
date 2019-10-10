@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import re
+
+from googlecloudsdk.core.util import encoding
 
 PARTITION_TRACEBACK_PATTERN = (
     r'(?P<stacktrace>'
@@ -71,7 +73,7 @@ def RemovePrivateInformationFromTraceback(traceback):
   # Last line will be the exception type followed by message.
   # Remove the message since it could contain PII.
   exception_line = remove_path_stacktrace_list[-1]
-  exception_line = exception_line.split(':', 1)[0]
+  exception_line = encoding.Decode(exception_line).split(':', 1)[0]
   remove_path_stacktrace_list[-1] = exception_line
 
   formatted_stacktrace = '\n'.join(

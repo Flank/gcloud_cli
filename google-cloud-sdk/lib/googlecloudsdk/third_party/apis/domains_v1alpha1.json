@@ -164,7 +164,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -189,25 +189,33 @@
         }
       }
     },
-    "CheckDomainAvailabilityResponse": {
-      "id": "CheckDomainAvailabilityResponse",
+    "SearchDomainAvailabilityResponse": {
+      "id": "SearchDomainAvailabilityResponse",
+      "description": "Response for the `SearchDomainAvailability` method.",
       "type": "object",
       "properties": {
         "availability": {
-          "$ref": "DomainAvailability"
+          "description": "Information about availability of domains with names similar to the query.",
+          "type": "array",
+          "items": {
+            "$ref": "DomainAvailability"
+          }
         }
       }
     },
     "DomainAvailability": {
       "id": "DomainAvailability",
+      "description": "Provides information of domain availability. Output only.",
       "type": "object",
       "properties": {
         "domainName": {
+          "description": "The domain name. Unicode domain names are converted to Punycode.",
           "type": "string"
         },
         "available": {
+          "description": "Availability of the domain.",
           "enumDescriptions": [
-            "The system might return AVAILABILITY_UNSPECIFIED if something prevents\nthe service from being able to determine availability.",
+            "The system might return AVAILABILITY_UNSPECIFIED if something prevents\nthe service from being able to determine domain availability.",
             "Domain is available for registration.",
             "Domain is not available for registration, e.g. it is registered by\nsomeone else.",
             "Domain is not supported by Cloud Domains, but may be available elsewhere."
@@ -220,15 +228,14 @@
             "UNSUPPORTED"
           ]
         },
-        "registrationPrice": {
-          "$ref": "Money"
-        },
-        "renewalPrice": {
+        "yearlyPrice": {
+          "description": "Yearly price to register or renew the domain.",
           "$ref": "Money"
         },
         "supportedWhoisPrivacy": {
+          "description": "Supported whois privacy settings.",
           "enumDescriptions": [
-            "",
+            "The Privacy settings are undefined.",
             "All the data from WHOIS config is publicly available (not supported yet).",
             "Your contact info won't be available to the public. To help protect your\ninfo and prevent spam, a third party provides alternate contact info for\nyour domain in the WHOIS directory at no extra cost.",
             "Limited personal info will be available to the public. The actual\ninformation redacted depends on the domain."
@@ -245,8 +252,9 @@
           }
         },
         "notices": {
+          "description": "Notices about special properties of certain domains.",
           "enumDescriptions": [
-            "",
+            "The notice is undefined.",
             "HSTS_PRELOADED indicates that the domain is preloaded on the HTTP Strict\nTransport Security list in browsers.\nServing a website on such domain will require an SSL certificate.\nSee https:\/\/support.google.com\/domains\/answer\/7638036 for details."
           ],
           "type": "array",
@@ -281,66 +289,58 @@
         }
       }
     },
-    "SearchDomainAvailabilityResponse": {
-      "id": "SearchDomainAvailabilityResponse",
+    "CheckDomainAvailabilityResponse": {
+      "id": "CheckDomainAvailabilityResponse",
+      "description": "Response for the `CheckDomainAvailability` method.",
       "type": "object",
       "properties": {
         "availability": {
-          "type": "array",
-          "items": {
-            "$ref": "DomainAvailability"
-          }
-        }
-      }
-    },
-    "ListRegistrationsResponse": {
-      "id": "ListRegistrationsResponse",
-      "type": "object",
-      "properties": {
-        "registrations": {
-          "type": "array",
-          "items": {
-            "$ref": "Registration"
-          }
-        },
-        "nextPageToken": {
-          "type": "string"
+          "description": "Information about domain availability.",
+          "$ref": "DomainAvailability"
         }
       }
     },
     "Registration": {
       "id": "Registration",
+      "description": "Defines a domain registration.",
       "type": "object",
       "properties": {
         "name": {
+          "description": "Output only. Name of the Registration resource. It matches pattern\n`projects\/*\/locations\/*\/registrations\/<domain_name>`.",
           "type": "string"
         },
         "domainName": {
+          "description": "Required. Immutable. The domain name in ASCII-only format, without a dot at the end.\nUnicode domain names have to be converted to Punycode.",
           "type": "string"
         },
         "createTime": {
+          "description": "Output only. The creation timestamp of the Registration.",
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
+          "description": "Output only. The update timestamp of the Registration.",
           "type": "string",
           "format": "google-datetime"
         },
         "expireTime": {
+          "description": "Output only. The expiration timestamp of the Registration. For\nregistrations in state DETACHED this is the expiration timestamp at detach\ntime.",
           "type": "string",
           "format": "google-datetime"
         },
         "detachTime": {
+          "description": "Output only. The detach timestamp of the Registration. Set only for\nRegistrations in state DETACHED.",
           "type": "string",
           "format": "google-datetime"
         },
         "state": {
+          "description": "Output only. The State of the Registration.",
           "enumDescriptions": [
-            "",
+            "The state is undefined.",
             "The registration operation is not yet completed.",
-            "The domain is registered and operational. It will automatically renew\naround expire_time.",
-            "The registration is suspended and the domain is inaccessible. This\nprobably means that the registrant email has not been verified. Check the\nemails received from the registrar and follow the provided steps.",
-            "The registration has been detached from Cloud and transferred directly to\nGoogle Domains for individual management.\nThe domain will remain valid until it expires and during that\nperiod you'll be able to reclaim it at https:\/\/domains.google.com\/ using\nWHOIS contact information. For more information, see\nhttps:\/\/support.google.com\/domains\/answer\/6339340."
+            "The domain is registered and operational. It will automatically renew\naround expire_time. Check the outstanding_issues list to see if there are\nany unresolved issues with the registration.",
+            "The registration is suspended and the domain is inaccessible.\nThis may mean e.g. that the registrant email has not been verified for\ntoo long. Check the outstanding_issues list to learn the exact problem.\nCheck emails received from the registrar and follow the provided steps to\nresolve the problem.",
+            "The registration has been detached from Cloud and moved directly to\nGoogle Domains for individual management.\nThe domain will remain valid until it expires and during that\nperiod you'll be able to reclaim it at https:\/\/domains.google.com\/ using\nWHOIS contact information. For more information, see\nhttps:\/\/support.google.com\/domains\/answer\/6339340."
           ],
           "type": "string",
           "enum": [
@@ -348,25 +348,28 @@
             "PROVISIONING",
             "ACTIVE",
             "SUSPENDED",
-            "TRANSFERRED"
+            "DETACHED"
           ]
         },
         "dnsConfig": {
+          "description": "DNS configuration of the Registration.",
           "$ref": "DnsConfig"
         },
         "whoisConfig": {
+          "description": "Required. Whois configuration of the Registration.",
           "$ref": "WhoisConfig"
         },
         "labels": {
+          "description": "Set of labels associated with the Registration.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "notices": {
-          "description": "[Create only] List of accepted Notices about the domain.\nNeeded e.g. for accepting the HSTS notice when registering .app domains.\nThe list of notices for each domain can be retrieved with\nCheckDomainAvailability call.",
+          "description": "Input only. Create only. List of accepted Notices about the domain.\nNeeded e.g. for accepting the HSTS notice when registering .app domains.\nThe list of notices for each domain can be retrieved with\nCheckDomainAvailability call.",
           "enumDescriptions": [
-            "",
+            "The notice is undefined.",
             "HSTS_PRELOADED indicates that the domain is preloaded on the HTTP Strict\nTransport Security list in browsers.\nServing a website on such domain will require an SSL certificate.\nSee https:\/\/support.google.com\/domains\/answer\/7638036 for details."
           ],
           "type": "array",
@@ -378,21 +381,51 @@
             ]
           }
         },
-        "registrationPrice": {
-          "description": "[Create only] Registration price. Required for confirmation of the price\nwhen creating new registration.\nPrice that should be put here can be obtained from CheckAvailability or\nSearchAvailability calls.",
-          "$ref": "Money"
-        },
-        "renewalPrice": {
-          "description": "[Create only] Renewal price. Required for confirmation of the price\nwhen creating new registration.\nRenewal price that should be put here can be obtained from\nCheckAvailability or SearchAvailability calls.",
+        "yearlyPrice": {
+          "description": "Required. Input only. Create only. Yearly price to register or renew the domain.\nUsed for confirmation of the price when creating a new registration.\nYearly price that should be put here can be obtained from\nCheckAvailability or SearchAvailability calls.",
           "$ref": "Money"
         }
       }
     },
     "DnsConfig": {
       "id": "DnsConfig",
+      "description": "Defines DNS configuration of the Registration.",
       "type": "object",
       "properties": {
         "nameServers": {
+          "description": "Name servers that store the configuration of the domain.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "glueRecords": {
+          "description": "A list of glue records this registration has.",
+          "type": "array",
+          "items": {
+            "$ref": "GlueRecord"
+          }
+        }
+      }
+    },
+    "GlueRecord": {
+      "id": "GlueRecord",
+      "description": "Defines a GlueRecord. Glue Records or \"Registered Hosts\" are a way of\nmaking the IP address of the name server known when it is a subdomain of\nthe domain for which it serves. For example, If your domain is example.com\nand your name servers are ns1.example.com, ns2.example.com,\nns3.example.com, and ns4.example.com, you would create four registered host\nrecords linking each name server to its IP address. Use glue records when\nyour name servers are subdomains of your domain.",
+      "type": "object",
+      "properties": {
+        "hostName": {
+          "description": "Required. Fully qualified host name, from least to most significant order, e.g.\n\"subdomain.domain.com\".",
+          "type": "string"
+        },
+        "ipv4Addresses": {
+          "description": "List of IPv4 addresses corresponding to this host. At least one of\nipv4_address and ipv6_address must be set.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ipv6Addresses": {
+          "description": "List of IPv6 addresses corresponding to this host. At least one of\nipv4_address and ipv6_address must be set.",
           "type": "array",
           "items": {
             "type": "string"
@@ -402,11 +435,13 @@
     },
     "WhoisConfig": {
       "id": "WhoisConfig",
+      "description": "Defines Whois configuration of the Registration.",
       "type": "object",
       "properties": {
         "privacy": {
+          "description": "Required. Whois privacy settings of the Registration.",
           "enumDescriptions": [
-            "",
+            "The Privacy settings are undefined.",
             "All the data from WHOIS config is publicly available (not supported yet).",
             "Your contact info won't be available to the public. To help protect your\ninfo and prevent spam, a third party provides alternate contact info for\nyour domain in the WHOIS directory at no extra cost.",
             "Limited personal info will be available to the public. The actual\ninformation redacted depends on the domain."
@@ -420,28 +455,33 @@
           ]
         },
         "registrantContact": {
+          "description": "Required. Registrant whois contact of the Registration.",
           "$ref": "WhoisContact"
         }
       }
     },
     "WhoisContact": {
       "id": "WhoisContact",
+      "description": "Defines Whois contact details of the Registration.",
       "type": "object",
       "properties": {
         "postalAddress": {
+          "description": "Postal address associated with the Registration.",
           "$ref": "PostalAddress"
         },
         "email": {
+          "description": "Email address associated with the Registration.",
           "type": "string"
         },
         "phoneNumber": {
+          "description": "Phone number associated with the Registration.",
           "type": "string"
         }
       }
     },
     "PostalAddress": {
       "id": "PostalAddress",
-      "description": "Represents a postal address, e.g. for postal delivery or payments addresses.\nGiven a postal address, a postal service can deliver items to a premise, P.O.\nBox or similar.\nIt is not intended to model geographical locations (roads, towns,\nmountains).\n\nIn typical usage an address would be created via user input or from importing\nexisting data, depending on the type of process.\n\nAdvice on address input \/ editing:\n - Use an i18n-ready address widget such as\n   https:\/\/github.com\/googlei18n\/libaddressinput)\n- Users should not be presented with UI elements for input or editing of\n  fields outside countries where that field is used.\n\nFor more guidance on how to use this schema, please see:\nhttps:\/\/support.google.com\/business\/answer\/6397478",
+      "description": "Represents a postal address, e.g. for postal delivery or payments addresses.\nGiven a postal address, a postal service can deliver items to a premise, P.O.\nBox or similar.\nIt is not intended to model geographical locations (roads, towns,\nmountains).\n\nIn typical usage an address would be created via user input or from importing\nexisting data, depending on the type of process.\n\nAdvice on address input \/ editing:\n - Use an i18n-ready address widget such as\n   https:\/\/github.com\/google\/libaddressinput)\n- Users should not be presented with UI elements for input or editing of\n  fields outside countries where that field is used.\n\nFor more guidance on how to use this schema, please see:\nhttps:\/\/support.google.com\/business\/answer\/6397478",
       "type": "object",
       "properties": {
         "revision": {
@@ -497,8 +537,45 @@
         }
       }
     },
+    "ListRegistrationsResponse": {
+      "id": "ListRegistrationsResponse",
+      "description": "Response for the `ListRegistrations` method.",
+      "type": "object",
+      "properties": {
+        "registrations": {
+          "description": "List of Registrations.",
+          "type": "array",
+          "items": {
+            "$ref": "Registration"
+          }
+        },
+        "nextPageToken": {
+          "description": "If there might be more results than those appearing in this response, then\n`next_page_token` is included. To get the next set of results, call this\nmethod again using the value of `next_page_token` as `page_token`.",
+          "type": "string"
+        }
+      }
+    },
     "DetachRegistrationRequest": {
       "id": "DetachRegistrationRequest",
+      "description": "Request for the `DetachRegistration` method.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "AuthorizationCode": {
+      "id": "AuthorizationCode",
+      "description": "Defines an authorization code. Output only.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "The Authorization Code in ASCII. It can be used to e.g. transfer the domain\nto another registrar.",
+          "type": "string"
+        }
+      }
+    },
+    "ResetAuthorizationCodeRequest": {
+      "id": "ResetAuthorizationCodeRequest",
+      "description": "Request for the `ResetAuthorizationCode` method.",
       "type": "object",
       "properties": {
       }
@@ -573,16 +650,16 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles\/owner\n    - members:\n      - user:sean@example.com\n      role: roles\/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
       "type": "object",
       "properties": {
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and\/or stored policy is skipped.",
           "type": "integer",
           "format": "int32"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
           "type": "array",
           "items": {
             "$ref": "Binding"
@@ -603,7 +680,7 @@
           }
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten blindly.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
           "type": "string",
           "format": "byte"
         },
@@ -622,7 +699,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -659,7 +736,7 @@
     },
     "AuditConfig": {
       "id": "AuditConfig",
-      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:foo@gmail.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"fooservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:bar@gmail.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts foo@gmail.com from DATA_READ logging, and\nbar@gmail.com from DATA_WRITE logging.",
+      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
       "type": "object",
       "properties": {
         "service": {
@@ -683,7 +760,7 @@
     },
     "AuditLogConfig": {
       "id": "AuditLogConfig",
-      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:foo@gmail.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\nfoo@gmail.com from DATA_READ logging.",
+      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
       "type": "object",
       "properties": {
         "logType": {
@@ -708,6 +785,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "ignoreChildExemptions": {
+          "type": "boolean"
         }
       }
     },
@@ -790,7 +870,7 @@
             "The principal (even if an authority selector is present), which\nmust only be used for attribution, not authorization.",
             "Any of the security realms in the IAMContext (go\/security-realms).\nWhen used with IN, the condition indicates \"any of the request's realms\nmatch one of the given values; with NOT_IN, \"none of the realms match\nany of the given values\". Note that a value can be:\n - 'self' (i.e., allow connections from clients that are in the same\n security realm)\n - a realm (e.g., 'campus-abc')\n - a realm group (e.g., 'realms-for-borg-cell-xx', see: go\/realm-groups)\nA match is determined by a realm group\nmembership check performed by a RealmAclRep object (go\/realm-acl-howto).\nIt is not permitted to grant access based on the *absence* of a realm, so\nrealm conditions can only be used in a \"positive\" context (e.g., ALLOW\/IN\nor DENY\/NOT_IN).",
             "An approver (distinct from the requester) that has authorized this\nrequest.\nWhen used with IN, the condition indicates that one of the approvers\nassociated with the request matches the specified principal, or is a\nmember of the specified group. Approvers can only grant additional\naccess, and are thus only used in a strictly positive context\n(e.g. ALLOW\/IN or DENY\/NOT_IN).",
-            "What types of justifications have been supplied with this request.\nString values should match enum names from tech.iam.JustificationType,\ne.g. \"MANUAL_STRING\". It is not permitted to grant access based on\nthe *absence* of a justification, so justification conditions can only\nbe used in a \"positive\" context (e.g., ALLOW\/IN or DENY\/NOT_IN).\n\nMultiple justifications, e.g., a Buganizer ID and a manually-entered\nreason, are normal and supported.",
+            "What types of justifications have been supplied with this request.\nString values should match enum names from\nsecurity.credentials.JustificationType, e.g. \"MANUAL_STRING\". It is not\npermitted to grant access based on the *absence* of a justification, so\njustification conditions can only be used in a \"positive\" context\n(e.g., ALLOW\/IN or DENY\/NOT_IN).\n\nMultiple justifications, e.g., a Buganizer ID and a manually-entered\nreason, are normal and supported.",
             "What type of credentials have been supplied with this request.\nString values should match enum names from\nsecurity_loas_l2.CredentialsType - currently, only CREDS_TYPE_EMERGENCY\nis supported.\nIt is not permitted to grant access based on the *absence* of a\ncredentials type, so the conditions can only be used in a \"positive\"\ncontext (e.g., ALLOW\/IN or DENY\/NOT_IN)."
           ],
           "type": "string",
@@ -885,6 +965,28 @@
         },
         "field": {
           "description": "The field value to attribute.",
+          "type": "string"
+        },
+        "customFields": {
+          "description": "Custom fields.",
+          "type": "array",
+          "items": {
+            "$ref": "CustomField"
+          }
+        }
+      }
+    },
+    "CustomField": {
+      "id": "CustomField",
+      "description": "Custom fields.\nThese can be used to create a counter with arbitrary field\/value\npairs.\nSee: go\/rpcsp-custom-fields.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name is the field name.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Value is the field value. It is important that in contrast to the\nCounterOptions.field, the value here is a constant that is not\nderived from the IAMContext.",
           "type": "string"
         }
       }
@@ -988,33 +1090,33 @@
     },
     "OperationMetadata": {
       "id": "OperationMetadata",
-      "description": "Represents the metadata of the long-running operation.",
+      "description": "Represents the metadata of the long-running operation. Output only.",
       "type": "object",
       "properties": {
         "createTime": {
-          "description": "Output only. The time the operation was created.",
+          "description": "The time the operation was created.",
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
-          "description": "Output only. The time the operation finished running.",
+          "description": "The time the operation finished running.",
           "type": "string",
           "format": "google-datetime"
         },
         "target": {
-          "description": "Output only. Server-defined resource path for the target of the operation.",
+          "description": "Server-defined resource path for the target of the operation.",
           "type": "string"
         },
         "verb": {
-          "description": "Output only. Name of the verb executed by the operation.",
+          "description": "Name of the verb executed by the operation.",
           "type": "string"
         },
         "statusDetail": {
-          "description": "Output only. Human-readable status of the operation, if any.",
+          "description": "Human-readable status of the operation, if any.",
           "type": "string"
         },
         "apiVersion": {
-          "description": "Output only. API version used to start the operation.",
+          "description": "API version used to start the operation.",
           "type": "string"
         }
       }
@@ -1166,34 +1268,6 @@
             },
             "registrations": {
               "methods": {
-                "checkAvailability": {
-                  "id": "domains.projects.locations.registrations.checkAvailability",
-                  "path": "v1alpha1/{+parent}/registrations:checkAvailability",
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations:checkAvailability",
-                  "httpMethod": "GET",
-                  "parameters": {
-                    "parent": {
-                      "location": "path",
-                      "required": true,
-                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
-                      "type": "string"
-                    },
-                    "domainName": {
-                      "location": "query",
-                      "type": "string"
-                    }
-                  },
-                  "parameterOrder": [
-                    "parent"
-                  ],
-                  "response": {
-                    "$ref": "CheckDomainAvailabilityResponse"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "description": "Checks for availability of the given domain_name."
-                },
                 "searchAvailability": {
                   "id": "domains.projects.locations.registrations.searchAvailability",
                   "path": "v1alpha1/{+parent}/registrations:searchAvailability",
@@ -1201,12 +1275,14 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
+                      "description": "Required. The parent resource of the Registration. Must be in the\nformat `projects\/*\/locations\/*`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "type": "string"
                     },
                     "query": {
+                      "description": "Required. Nonempty string used to search for available domain names.",
                       "location": "query",
                       "type": "string"
                     }
@@ -1220,30 +1296,23 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Searches availabile domains similar to the given query.\nReturned domain availability allows some staleness."
+                  "description": "Searches available domains similar to the given query.\nReturned domain availability allows some staleness."
                 },
-                "list": {
-                  "id": "domains.projects.locations.registrations.list",
-                  "path": "v1alpha1/{+parent}/registrations",
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations",
+                "checkAvailability": {
+                  "id": "domains.projects.locations.registrations.checkAvailability",
+                  "path": "v1alpha1/{+parent}/registrations:checkAvailability",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations:checkAvailability",
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
+                      "description": "Required. The parent resource of the Registration. Must be in the\nformat `projects\/*\/locations\/*`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "type": "string"
                     },
-                    "pageSize": {
-                      "location": "query",
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "pageToken": {
-                      "location": "query",
-                      "type": "string"
-                    },
-                    "filter": {
+                    "domainName": {
+                      "description": "Required. The domain name in ASCII-only format, without a dot at the end.\nUnicode domain names have to be converted to Punycode.",
                       "location": "query",
                       "type": "string"
                     }
@@ -1252,36 +1321,12 @@
                     "parent"
                   ],
                   "response": {
-                    "$ref": "ListRegistrationsResponse"
+                    "$ref": "CheckDomainAvailabilityResponse"
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Lists Registrations in a given project."
-                },
-                "get": {
-                  "id": "domains.projects.locations.registrations.get",
-                  "path": "v1alpha1/{+name}",
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations/{registrationsId}",
-                  "httpMethod": "GET",
-                  "parameters": {
-                    "name": {
-                      "location": "path",
-                      "required": true,
-                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
-                      "type": "string"
-                    }
-                  },
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "response": {
-                    "$ref": "Registration"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "description": "Gets details of a single Registration."
+                  "description": "Checks for availability of the given domain name."
                 },
                 "create": {
                   "id": "domains.projects.locations.registrations.create",
@@ -1290,6 +1335,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
+                      "description": "Required. The parent resource of the Registration. Must be in the\nformat `projects\/*\/locations\/*`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1313,7 +1359,73 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Creates a new Registration in a given project and location."
+                  "description": "Creates a new Registration, i.e. attempts to register the domain, in a\ngiven project and location"
+                },
+                "list": {
+                  "id": "domains.projects.locations.registrations.list",
+                  "path": "v1alpha1/{+parent}/registrations",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The project and location from which the Registrations should be\nlisted, specified in the format `projects\/*\/locations\/*`.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "Maximum number of Registrations to return per call.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "pageToken": {
+                      "description": "The value returned by the last `ListRegistrationsResponse`.\nIndicates that this is a continuation of a prior `ListRegistrations` call,\nand that the system should return the next page of data.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "filter": {
+                      "description": "Filter expression to restrict the Registrations returned. For details see\nhttps:\/\/cloud.google.com\/sdk\/gcloud\/reference\/topic\/filters.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListRegistrationsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists Registrations in a given project."
+                },
+                "get": {
+                  "id": "domains.projects.locations.registrations.get",
+                  "path": "v1alpha1/{+name}",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations/{registrationsId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. A name of the Registration to get. Must be in the format\n`projects\/*\/locations\/*\/registrations\/*`.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Registration"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets details of a single Registration."
                 },
                 "patch": {
                   "id": "domains.projects.locations.registrations.patch",
@@ -1322,13 +1434,14 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
+                      "description": "Output only. Name of the Registration resource. It matches pattern\n`projects\/*\/locations\/*\/registrations\/<domain_name>`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "The update mask applies to the resource. For the `FieldMask` definition,\nsee\nhttps:\/\/developers.google.com\/protocol-buffers\/docs\/reference\/google.protobuf#fieldmask\nRequired.",
+                      "description": "Required. The update mask applies to the resource. For the `FieldMask`\ndefinition, see\nhttps:\/\/developers.google.com\/protocol-buffers\/docs\/reference\/google.protobuf#fieldmask",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -1360,6 +1473,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
+                      "description": "Required. A name of the Registration to detach. Must be in the format\n`projects\/*\/locations\/*\/registrations\/*`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
@@ -1378,7 +1492,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Detach a Registration from Cloud Domains management."
+                  "description": "Detach a Registration from Cloud Domains management, leaving it registered\nat Google Domains registrar."
                 },
                 "delete": {
                   "id": "domains.projects.locations.registrations.delete",
@@ -1387,6 +1501,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
+                      "description": "Required. A name of the Registration to delete. Must be in the format\n`projects\/*\/locations\/*\/registrations\/*`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
@@ -1402,7 +1517,32 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Deletes a single Registration.\nCan only be called on Registrations in state TRANSFERRED with expire_time\nin the past."
+                  "description": "Deletes a single Registration.\nCan only be called on Registrations in state DETACHED with expire_time\nin the past."
+                },
+                "getAuthorizationCode": {
+                  "id": "domains.projects.locations.registrations.getAuthorizationCode",
+                  "path": "v1alpha1/{+name}/authorizationCode",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations/{registrationsId}/authorizationCode",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. A name of the Registration to get Authorization Code for. Must be\nin the format `projects\/*\/locations\/*\/registrations\/*`.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "AuthorizationCode"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets Authorization Code of a Registration.\nCan only be called after 60 days have elapsed since initial registration."
                 },
                 "setIamPolicy": {
                   "id": "domains.projects.locations.registrations.setIamPolicy",
@@ -1430,7 +1570,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
+                  "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"
                 },
                 "getIamPolicy": {
                   "id": "domains.projects.locations.registrations.getIamPolicy",
@@ -1444,6 +1584,12 @@
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
                       "type": "string"
+                    },
+                    "options.requestedPolicyVersion": {
+                      "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
                     }
                   },
                   "parameterOrder": [
@@ -1484,6 +1630,41 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Returns permissions that a caller has on the specified resource.\nIf the resource does not exist, this will return an empty set of\npermissions, not a NOT_FOUND error.\n\nNote: This operation is designed to be used for building permission-aware\nUIs and command-line tools, not for authorization checking. This operation\nmay \"fail open\" without warning."
+                }
+              }
+              ,
+              "resources": {
+                "authorizationCode": {
+                  "methods": {
+                    "reset": {
+                      "id": "domains.projects.locations.registrations.authorizationCode.reset",
+                      "path": "v1alpha1/{+name}/authorizationCode:reset",
+                      "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/registrations/{registrationsId}/authorizationCode:reset",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. A name of the Registration to reset Authorization Code for. Must\nbe in the format `projects\/*\/locations\/*\/registrations\/*`.",
+                          "location": "path",
+                          "required": true,
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/registrations\/[^\/]+$",
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "ResetAuthorizationCodeRequest"
+                      },
+                      "response": {
+                        "$ref": "AuthorizationCode"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Resets the Authorization Code of the registration.\nCan only be called after 60 days have elapsed since initial registration."
+                    }
+                  }
                 }
               }
             }

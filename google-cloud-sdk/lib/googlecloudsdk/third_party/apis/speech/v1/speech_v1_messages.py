@@ -48,8 +48,8 @@ class LongRunningRecognizeRequest(_messages.Message):
   method.
 
   Fields:
-    audio: *Required* The audio data to be recognized.
-    config: *Required* Provides information to the recognizer that specifies
+    audio: Required. The audio data to be recognized.
+    config: Required. Provides information to the recognizer that specifies
       how to process the request.
   """
 
@@ -65,8 +65,8 @@ class LongRunningRecognizeResponse(_messages.Message):
   `google::longrunning::Operations` service.
 
   Fields:
-    results: Output only. Sequential list of transcription results
-      corresponding to sequential portions of audio.
+    results: Sequential list of transcription results corresponding to
+      sequential portions of audio.
   """
 
   results = _messages.MessageField('SpeechRecognitionResult', 1, repeated=True)
@@ -184,11 +184,11 @@ class RecognitionAudio(_messages.Message):
   r"""Contains audio data in the encoding specified in the
   `RecognitionConfig`. Either `content` or `uri` must be supplied. Supplying
   both or neither returns google.rpc.Code.INVALID_ARGUMENT. See [content
-  limits](/speech-to-text/quotas#content).
+  limits](https://cloud.google.com/speech-to-text/quotas#content).
 
   Fields:
     content: The audio data bytes encoded as specified in `RecognitionConfig`.
-      Note: as with all bytes fields, protobuffers use a pure binary
+      Note: as with all bytes fields, proto buffers use a pure binary
       representation, whereas JSON representations use base64.
     uri: URI that points to a file that contains audio data bytes as specified
       in `RecognitionConfig`. The file must not be compressed (for example,
@@ -214,19 +214,26 @@ class RecognitionConfig(_messages.Message):
       AudioEncoding.
 
   Fields:
-    audioChannelCount: *Optional* The number of channels in the input audio
-      data. ONLY set this for MULTI-CHANNEL recognition. Valid values for
-      LINEAR16 and FLAC are `1`-`8`. Valid values for OGG_OPUS are '1'-'254'.
-      Valid value for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only
-      `1`. If `0` or omitted, defaults to one channel (mono). Note: We only
-      recognize the first channel by default. To perform independent
-      recognition on each channel set
-      `enable_separate_recognition_per_channel` to 'true'.
-    enableAutomaticPunctuation: *Optional* If 'true', adds punctuation to
-      recognition result hypotheses. This feature is only available in select
-      languages. Setting this for requests in other languages has no effect at
-      all. The default 'false' value does not add punctuation to result
-      hypotheses. Note: This is currently offered as an experimental service,
+    audioChannelCount: The number of channels in the input audio data. ONLY
+      set this for MULTI-CHANNEL recognition. Valid values for LINEAR16 and
+      FLAC are `1`-`8`. Valid values for OGG_OPUS are '1'-'254'. Valid value
+      for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only `1`. If `0` or
+      omitted, defaults to one channel (mono). Note: We only recognize the
+      first channel by default. To perform independent recognition on each
+      channel set `enable_separate_recognition_per_channel` to 'true'.
+    diarizationConfig: Config to enable speaker diarization and set additional
+      parameters to make diarization better suited for your application. Note:
+      When this is enabled, we send all the words from the beginning of the
+      audio for the top alternative in every consecutive STREAMING responses.
+      This is done in order to improve our speaker tags as our models learn to
+      identify the speakers in the conversation over time. For non-streaming
+      requests, the diarization results will be provided only in the top
+      alternative of the FINAL SpeechRecognitionResult.
+    enableAutomaticPunctuation: If 'true', adds punctuation to recognition
+      result hypotheses. This feature is only available in select languages.
+      Setting this for requests in other languages has no effect at all. The
+      default 'false' value does not add punctuation to result hypotheses.
+      Note: This is currently offered as an experimental service,
       complimentary to all users. In the future this may be exclusively
       available as a premium feature.
     enableSeparateRecognitionPerChannel: This needs to be set to `true`
@@ -236,29 +243,30 @@ class RecognitionConfig(_messages.Message):
       only recognize the first channel. The request is billed cumulatively for
       all channels recognized: `audio_channel_count` multiplied by the length
       of the audio.
-    enableWordTimeOffsets: *Optional* If `true`, the top result includes a
-      list of words and the start and end time offsets (timestamps) for those
-      words. If `false`, no word-level time offset information is returned.
-      The default is `false`.
+    enableWordTimeOffsets: If `true`, the top result includes a list of words
+      and the start and end time offsets (timestamps) for those words. If
+      `false`, no word-level time offset information is returned. The default
+      is `false`.
     encoding: Encoding of audio data sent in all `RecognitionAudio` messages.
       This field is optional for `FLAC` and `WAV` audio files and required for
       all other audio formats. For details, see AudioEncoding.
-    languageCode: *Required* The language of the supplied audio as a
+    languageCode: Required. The language of the supplied audio as a
       [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
-      Example: "en-US". See [Language Support](/speech-to-text/docs/languages)
-      for a list of the currently supported language codes.
-    maxAlternatives: *Optional* Maximum number of recognition hypotheses to be
-      returned. Specifically, the maximum number of
-      `SpeechRecognitionAlternative` messages within each
-      `SpeechRecognitionResult`. The server may return fewer than
-      `max_alternatives`. Valid values are `0`-`30`. A value of `0` or `1`
-      will return a maximum of one. If omitted, will return a maximum of one.
-    metadata: *Optional* Metadata regarding this request.
-    model: *Optional* Which model to select for the given request. Select the
-      model best suited to your domain to get best results. If a model is not
-      explicitly specified, then we auto-select a model based on the
-      parameters in the RecognitionConfig. <table>   <tr>
-      <td><b>Model</b></td>     <td><b>Description</b></td>   </tr>   <tr>
+      Example: "en-US". See [Language Support](https://cloud.google.com
+      /speech-to-text/docs/languages) for a list of the currently supported
+      language codes.
+    maxAlternatives: Maximum number of recognition hypotheses to be returned.
+      Specifically, the maximum number of `SpeechRecognitionAlternative`
+      messages within each `SpeechRecognitionResult`. The server may return
+      fewer than `max_alternatives`. Valid values are `0`-`30`. A value of `0`
+      or `1` will return a maximum of one. If omitted, will return a maximum
+      of one.
+    metadata: Metadata regarding this request.
+    model: Which model to select for the given request. Select the model best
+      suited to your domain to get best results. If a model is not explicitly
+      specified, then we auto-select a model based on the parameters in the
+      RecognitionConfig. <table>   <tr>     <td><b>Model</b></td>
+      <td><b>Description</b></td>   </tr>   <tr>
       <td><code>command_and_search</code></td>     <td>Best for short queries
       such as voice commands or voice search.</td>   </tr>   <tr>
       <td><code>phone_call</code></td>     <td>Best for audio that originated
@@ -271,9 +279,9 @@ class RecognitionConfig(_messages.Message):
       <td>Best for audio that is not one of the specific audio models.
       For example, long-form audio. Ideally the audio is high-fidelity,
       recorded at a 16khz or greater sampling rate.</td>   </tr> </table>
-    profanityFilter: *Optional* If set to `true`, the server will attempt to
-      filter out profanities, replacing all but the initial character in each
-      filtered word with asterisks, e.g. "f***". If set to `false` or omitted,
+    profanityFilter: If set to `true`, the server will attempt to filter out
+      profanities, replacing all but the initial character in each filtered
+      word with asterisks, e.g. "f***". If set to `false` or omitted,
       profanities won't be filtered out.
     sampleRateHertz: Sample rate in Hertz of the audio data sent in all
       `RecognitionAudio` messages. Valid values are: 8000-48000. 16000 is
@@ -282,20 +290,16 @@ class RecognitionConfig(_messages.Message):
       audio source (instead of re-sampling). This field is optional for FLAC
       and WAV audio files, but is required for all other audio formats. For
       details, see AudioEncoding.
-    speechContexts: *Optional* array of SpeechContext. A means to provide
-      context to assist the speech recognition. For more information, see
-      [Phrase Hints](/speech-to-text/docs/basics#phrase-hints).
-    useEnhanced: *Optional* Set to true to use an enhanced model for speech
-      recognition. If `use_enhanced` is set to true and the `model` field is
-      not set, then an appropriate enhanced model is chosen if: 1. project is
-      eligible for requesting enhanced models 2. an enhanced model exists for
-      the audio  If `use_enhanced` is true and an enhanced version of the
+    speechContexts: Array of SpeechContext. A means to provide context to
+      assist the speech recognition. For more information, see [speech
+      adaptation](https://cloud.google.com/speech-to-text/docs/context-
+      strength).
+    useEnhanced: Set to true to use an enhanced model for speech recognition.
+      If `use_enhanced` is set to true and the `model` field is not set, then
+      an appropriate enhanced model is chosen if an enhanced model exists for
+      the audio.  If `use_enhanced` is true and an enhanced version of the
       specified model does not exist, then the speech is recognized using the
-      standard version of the specified model.  Enhanced speech models require
-      that you opt-in to data logging using instructions in the [documentation
-      ](/speech-to-text/docs/enable-data-logging). If you set `use_enhanced`
-      to true and you have not enabled audio logging, then you will receive an
-      error.
+      standard version of the specified model.
   """
 
   class EncodingValueValuesEnum(_messages.Enum):
@@ -344,18 +348,19 @@ class RecognitionConfig(_messages.Message):
     SPEEX_WITH_HEADER_BYTE = 7
 
   audioChannelCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  enableAutomaticPunctuation = _messages.BooleanField(2)
-  enableSeparateRecognitionPerChannel = _messages.BooleanField(3)
-  enableWordTimeOffsets = _messages.BooleanField(4)
-  encoding = _messages.EnumField('EncodingValueValuesEnum', 5)
-  languageCode = _messages.StringField(6)
-  maxAlternatives = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  metadata = _messages.MessageField('RecognitionMetadata', 8)
-  model = _messages.StringField(9)
-  profanityFilter = _messages.BooleanField(10)
-  sampleRateHertz = _messages.IntegerField(11, variant=_messages.Variant.INT32)
-  speechContexts = _messages.MessageField('SpeechContext', 12, repeated=True)
-  useEnhanced = _messages.BooleanField(13)
+  diarizationConfig = _messages.MessageField('SpeakerDiarizationConfig', 2)
+  enableAutomaticPunctuation = _messages.BooleanField(3)
+  enableSeparateRecognitionPerChannel = _messages.BooleanField(4)
+  enableWordTimeOffsets = _messages.BooleanField(5)
+  encoding = _messages.EnumField('EncodingValueValuesEnum', 6)
+  languageCode = _messages.StringField(7)
+  maxAlternatives = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  metadata = _messages.MessageField('RecognitionMetadata', 9)
+  model = _messages.StringField(10)
+  profanityFilter = _messages.BooleanField(11)
+  sampleRateHertz = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  speechContexts = _messages.MessageField('SpeechContext', 13, repeated=True)
+  useEnhanced = _messages.BooleanField(14)
 
 
 class RecognitionMetadata(_messages.Message):
@@ -492,8 +497,8 @@ class RecognizeRequest(_messages.Message):
   r"""The top-level message sent by the client for the `Recognize` method.
 
   Fields:
-    audio: *Required* The audio data to be recognized.
-    config: *Required* Provides information to the recognizer that specifies
+    audio: Required. The audio data to be recognized.
+    config: Required. Provides information to the recognizer that specifies
       how to process the request.
   """
 
@@ -507,11 +512,33 @@ class RecognizeResponse(_messages.Message):
   messages.
 
   Fields:
-    results: Output only. Sequential list of transcription results
-      corresponding to sequential portions of audio.
+    results: Sequential list of transcription results corresponding to
+      sequential portions of audio.
   """
 
   results = _messages.MessageField('SpeechRecognitionResult', 1, repeated=True)
+
+
+class SpeakerDiarizationConfig(_messages.Message):
+  r"""Config to enable speaker diarization.
+
+  Fields:
+    enableSpeakerDiarization: If 'true', enables speaker detection for each
+      recognized word in the top alternative of the recognition result using a
+      speaker_tag provided in the WordInfo.
+    maxSpeakerCount: Maximum number of speakers in the conversation. This
+      range gives you more flexibility by allowing the system to automatically
+      determine the correct number of speakers. If not set, the default value
+      is 6.
+    minSpeakerCount: Minimum number of speakers in the conversation. This
+      range gives you more flexibility by allowing the system to automatically
+      determine the correct number of speakers. If not set, the default value
+      is 2.
+  """
+
+  enableSpeakerDiarization = _messages.BooleanField(1)
+  maxSpeakerCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  minSpeakerCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class SpeechContext(_messages.Message):
@@ -519,12 +546,17 @@ class SpeechContext(_messages.Message):
   phrases in the results.
 
   Fields:
-    phrases: *Optional* A list of strings containing words and phrases "hints"
-      so that the speech recognition is more likely to recognize them. This
-      can be used to improve the accuracy for specific words and phrases, for
+    phrases: A list of strings containing words and phrases "hints" so that
+      the speech recognition is more likely to recognize them. This can be
+      used to improve the accuracy for specific words and phrases, for
       example, if specific commands are typically spoken by the user. This can
       also be used to add additional words to the vocabulary of the
-      recognizer. See [usage limits](/speech-to-text/quotas#content).
+      recognizer. See [usage limits](https://cloud.google.com/speech-to-
+      text/quotas#content).  List items can also be set to classes for groups
+      of words that represent common concepts that occur in natural language.
+      For example, rather than providing phrase hints for every month of the
+      year, using the $MONTH class improves the likelihood of correctly
+      transcribing audio that includes months.
   """
 
   phrases = _messages.StringField(1, repeated=True)
@@ -582,32 +614,21 @@ class SpeechProjectsLocationsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
-class SpeechProjectsOperationsManualRecognitionTasksGetRequest(_messages.Message):
-  r"""A SpeechProjectsOperationsManualRecognitionTasksGetRequest object.
-
-  Fields:
-    name: The name of the operation resource.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
 class SpeechRecognitionAlternative(_messages.Message):
   r"""Alternative hypotheses (a.k.a. n-best list).
 
   Fields:
-    confidence: Output only. The confidence estimate between 0.0 and 1.0. A
-      higher number indicates an estimated greater likelihood that the
-      recognized words are correct. This field is set only for the top
-      alternative of a non-streaming result or, of a streaming result where
-      `is_final=true`. This field is not guaranteed to be accurate and users
-      should not rely on it to be always provided. The default of 0.0 is a
-      sentinel value indicating `confidence` was not set.
-    transcript: Output only. Transcript text representing the words that the
-      user spoke.
-    words: Output only. A list of word-specific information for each
-      recognized word. Note: When `enable_speaker_diarization` is true, you
-      will see all the words from the beginning of the audio.
+    confidence: The confidence estimate between 0.0 and 1.0. A higher number
+      indicates an estimated greater likelihood that the recognized words are
+      correct. This field is set only for the top alternative of a non-
+      streaming result or, of a streaming result where `is_final=true`. This
+      field is not guaranteed to be accurate and users should not rely on it
+      to be always provided. The default of 0.0 is a sentinel value indicating
+      `confidence` was not set.
+    transcript: Transcript text representing the words that the user spoke.
+    words: A list of word-specific information for each recognized word. Note:
+      When `enable_speaker_diarization` is true, you will see all the words
+      from the beginning of the audio.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -619,10 +640,10 @@ class SpeechRecognitionResult(_messages.Message):
   r"""A speech recognition result corresponding to a portion of the audio.
 
   Fields:
-    alternatives: Output only. May contain one or more recognition hypotheses
-      (up to the maximum specified in `max_alternatives`). These alternatives
-      are ordered in terms of accuracy, with the top (first) alternative being
-      the most probable, as ranked by the recognizer.
+    alternatives: May contain one or more recognition hypotheses (up to the
+      maximum specified in `max_alternatives`). These alternatives are ordered
+      in terms of accuracy, with the top (first) alternative being the most
+      probable, as ranked by the recognizer.
     channelTag: For multi-channel audio, this is the channel number
       corresponding to the recognized result for the audio from that channel.
       For audio_channel_count = N, its output values can range from '1' to
@@ -699,37 +720,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -778,21 +772,26 @@ class WordInfo(_messages.Message):
   r"""Word-specific information for recognized words.
 
   Fields:
-    endTime: Output only. Time offset relative to the beginning of the audio,
-      and corresponding to the end of the spoken word. This field is only set
-      if `enable_word_time_offsets=true` and only in the top hypothesis. This
-      is an experimental feature and the accuracy of the time offset can vary.
-    startTime: Output only. Time offset relative to the beginning of the
-      audio, and corresponding to the start of the spoken word. This field is
-      only set if `enable_word_time_offsets=true` and only in the top
-      hypothesis. This is an experimental feature and the accuracy of the time
-      offset can vary.
-    word: Output only. The word corresponding to this set of information.
+    endTime: Time offset relative to the beginning of the audio, and
+      corresponding to the end of the spoken word. This field is only set if
+      `enable_word_time_offsets=true` and only in the top hypothesis. This is
+      an experimental feature and the accuracy of the time offset can vary.
+    speakerTag: A distinct integer value is assigned for every speaker within
+      the audio. This field specifies which one of those speakers was detected
+      to have spoken this word. Value ranges from '1' to
+      diarization_speaker_count. speaker_tag is set if
+      enable_speaker_diarization = 'true' and only in the top alternative.
+    startTime: Time offset relative to the beginning of the audio, and
+      corresponding to the start of the spoken word. This field is only set if
+      `enable_word_time_offsets=true` and only in the top hypothesis. This is
+      an experimental feature and the accuracy of the time offset can vary.
+    word: The word corresponding to this set of information.
   """
 
   endTime = _messages.StringField(1)
-  startTime = _messages.StringField(2)
-  word = _messages.StringField(3)
+  speakerTag = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  startTime = _messages.StringField(3)
+  word = _messages.StringField(4)
 
 
 encoding.AddCustomJsonFieldMapping(

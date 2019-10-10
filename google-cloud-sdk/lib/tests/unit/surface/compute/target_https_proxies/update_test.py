@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -253,6 +253,9 @@ class TargetHTTPSProxiesUpdateBetaTest(TargetHTTPSProxiesUpdateGATest):
     self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
     self._target_https_proxies_api = self.compute.targetHttpsProxies
 
+  def RunUpdate(self, command):
+    self.Run('compute target-https-proxies update --global ' + command)
+
 
 class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
 
@@ -264,15 +267,15 @@ class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
     self.Run('compute target-https-proxies update --global ' + command)
 
 
-class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
+class RegionTargetHTTPSProxiesUpdateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'beta'
     self.SelectApi(self._api)
     self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
 
   def RunUpdate(self, command):
-    self.Run('alpha compute target-https-proxies update --region us-west-1 ' +
+    self.Run('beta compute target-https-proxies update --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -303,16 +306,16 @@ class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
             region='us-west-1',
             targetHttpsProxy='target-https-proxy-1',
             urlMapReference=self.messages.UrlMapReference(
-                urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                         'my-project/regions/us-west-1/urlMaps/my-map' % {
                             'api': self._api
                         }))))],)
 
   def testUriSupport(self):
     self.RunUpdate("""
-          https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpsProxies/target-https-proxy-1
-          --ssl-certificates https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/sslCertificates/my-cert
-          --url-map https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
+          https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpsProxies/target-https-proxy-1
+          --ssl-certificates https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/sslCertificates/my-cert
+          --url-map https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
         """ % {'api': self._api})
 
     self.CheckRequests([(
@@ -334,7 +337,7 @@ class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
             region='us-west-1',
             targetHttpsProxy='target-https-proxy-1',
             urlMapReference=self.messages.UrlMapReference(
-                urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                         'my-project/regions/us-west-1/urlMaps/my-map' % {
                             'api': self._api
                         }))))],)
@@ -374,7 +377,7 @@ class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
              region='us-west-1',
              targetHttpsProxy='target-https-proxy-1',
              urlMapReference=self.messages.UrlMapReference(
-                 urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                 urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                          'my-project/regions/us-west-1/urlMaps/my-map' % {
                              'api': self._api
                          })))),
@@ -396,6 +399,19 @@ class RegionTargetHTTPSProxiesUpdateTest(test_base.BaseTest):
                             '/projects/my-project/global/sslPolicies/'
                             'my-ssl-policy')))),
     ])
+
+
+class RegionTargetHTTPSProxiesUpdateAlphaTest(
+    RegionTargetHTTPSProxiesUpdateBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_https_proxies_api = self.compute.regionTargetHttpsProxies
+
+  def RunUpdate(self, command):
+    self.Run('alpha compute target-https-proxies update --region us-west-1 ' +
+             command)
 
 
 if __name__ == '__main__':

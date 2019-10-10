@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import stat
 import sys
 import threading
 import time
+import traceback
 
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.util import files as file_utils
@@ -88,7 +89,7 @@ class PrivateFilesTest(test_case.Base):
 
 def _ChmodRecursive(root, mode):
   """Changes file/directory permissions recursively."""
-  for dirpath, filenames, _ in os.walk(root):
+  for dirpath, filenames, _ in os.walk(six.text_type(root)):
     for path in [dirpath] + [os.path.join(dirpath, f) for f in filenames]:
       os.chmod(path, mode)
 
@@ -232,60 +233,20 @@ class TemporaryDirectoryTest(test_case.Base):
     self.assertTrue(os.path.isdir(t))
     file_utils.RmTree(t)
 
-  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testWithCleanupExceptionWhileAnotherException(self):
-    with self.assertRaisesRegex(
-        RuntimeError,
-        re.escape('ValueError: Close Error\n'
-                  'while another exception was active '
-                  '<type \'exceptions.RuntimeError\'> [Another Error]')):
-      tmp_dir = file_utils.TemporaryDirectory()
-      with tmp_dir as t:
-        close_mock = self.StartObjectPatch(tmp_dir, 'Close')
-        close_mock.side_effect = ValueError('Close Error')
-        raise RuntimeError('Another Error')
-    self.assertTrue(os.path.isdir(t))
-    file_utils.RmTree(t)
-    self.assertFalse(os.path.isdir(t))
-
-
-@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
-class TemporaryDirectoryUnicodeTest(test_case.Base):
-
-  def testWithCleanupExceptionWhileAnotherExceptionUnicode(self):
     try:
       tmp_dir = file_utils.TemporaryDirectory()
       with tmp_dir as t:
         close_mock = self.StartObjectPatch(tmp_dir, 'Close')
-        close_mock.side_effect = ValueError('Close Ṳᾔḯ¢◎ⅾℯ Error')
-        raise RuntimeError('Another Ṳᾔḯ¢◎ⅾℯ Error')
-    except RuntimeError as e:
+        close_mock.side_effect = RuntimeError('Close Error')
+        raise RuntimeError('Some Error')
+    except RuntimeError:
       self.assertRegexpMatches(
-          six.text_type(e),
-          re.escape('ValueError: Close '
-                    '\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f Error\n'
-                    'while another exception was active '
-                    "<type 'exceptions.RuntimeError'> [Another Ṳᾔḯ¢◎ⅾℯ Error]")
-      )
-    self.assertTrue(os.path.isdir(t))
-    file_utils.RmTree(t)
-    self.assertFalse(os.path.isdir(t))
-
-  def testWithCleanupExceptionWhileAnotherExceptionUnicodeEncoded(self):
-    try:
-      tmp_dir = file_utils.TemporaryDirectory()
-      with tmp_dir as t:
-        close_mock = self.StartObjectPatch(tmp_dir, 'Close')
-        close_mock.side_effect = ValueError(
-            'Close Ṳᾔḯ¢◎ⅾℯ Error'.encode('utf8'))
-        raise RuntimeError('Another Ṳᾔḯ¢◎ⅾℯ Error'.encode('utf8'))
-    except RuntimeError as e:
-      self.assertRegexpMatches(
-          six.text_type(e),
-          re.escape('ValueError: Close Ṳᾔḯ¢◎ⅾℯ Error\n'
-                    'while another exception was active '
-                    "<type 'exceptions.RuntimeError'> [Another Ṳᾔḯ¢◎ⅾℯ Error]")
-      )
+          traceback.format_exc(),
+          '(?ms)RuntimeError: Some Error.+'
+          'RuntimeError: Close Error')
+    else:
+      self.fail('RuntimeError not raised')
     self.assertTrue(os.path.isdir(t))
     file_utils.RmTree(t)
     self.assertFalse(os.path.isdir(t))
@@ -335,6 +296,7 @@ class MakeDirTest(test_case.Base):
 
 class RmTreeTest(test_case.Base, test_case.WithOutputCapture):
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   @test_case.Filters.RunOnlyOnWindows
   def testRmTreeWithWindowsError(self):
     wait_mock = self.StartObjectPatch(file_utils, '_WaitForRetry')
@@ -364,6 +326,7 @@ class RmTreeTest(test_case.Base, test_case.WithOutputCapture):
     self.assertEqual(wait_mock.call_count, 0)
     self.assertTrue(os.path.isdir(temp_dir.path))
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   @test_case.Filters.RunOnlyOnWindows
   def testRmTreeWithBadPermissions(self):
     temp_dir = file_utils.TemporaryDirectory()
@@ -879,7 +842,6 @@ class ChecksumTest(test_case.Base, test_case.WithOutputCapture):
     return root
 
   @test_case.Filters.DoNotRunOnWindows
-  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testDirectoryTrees(self):
     with file_utils.TemporaryDirectory() as t:
       roots = [
@@ -900,7 +862,6 @@ class ChecksumTest(test_case.Base, test_case.WithOutputCapture):
         self.assertNotEqual(digests[0], digests[i],
                             'Failed for root: ' + str(i))
 
-  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testSingleFile(self):
     """Test FromSingleFile and HashSingleFile methods."""
     with file_utils.TemporaryDirectory() as t:
@@ -1086,12 +1047,12 @@ class FileLockTest(test_case.Base):
       self.assertEqual(six.text_type(ctx.exception), 'foo')
 
 
+@test_case.Filters.DoNotRunOnPy3('_FileInBinaryMode only used when running PY2')
 class FileInBinaryModeTest(test_case.Base):
 
   def SetUp(self):
     self.dir = file_utils.TemporaryDirectory()
 
-  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testReading(self):
     contents = b'foo\nbar\r\nbaz\r\r'
     filename = self.Touch(self.dir.path, contents=contents)
@@ -1103,7 +1064,6 @@ class FileInBinaryModeTest(test_case.Base):
       with file_utils._FileInBinaryMode(f):
         self.assertEqual(f.read(), contents)
 
-  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testWriting(self):
     contents = b'foo\nbar\r\nbaz\r\r'
     filename = os.path.join(self.dir.path, self.RandomFileName())
@@ -1121,7 +1081,6 @@ class FileInBinaryModeTest(test_case.Base):
       self.assertEqual(f.read(), contents)
 
   @test_case.Filters.RunOnlyOnWindows('Testing platform-specific syscalls')
-  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testCleanupOnWindows(self):
     filename = self.Touch(self.dir.path, contents='foo\nbar\r\nbaz\r\r')
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# TODO(b/140557440) Break up file to prevent linter deadline.
 
 """Tests for the backend services alpha create command."""
 
@@ -1140,31 +1142,34 @@ class RegionalTest(test_base.BaseTest):
                 --load-balancing-scheme internal
                 --region alaska --health-checks my-health-check-1
                 --global-health-checks
+                --network default
                 --connection-draining-timeout 120""")
 
-    self.CheckRequests([(
-        self.compute.regionBackendServices, 'Insert',
-        messages.ComputeRegionBackendServicesInsertRequest(
-            backendService=messages.BackendService(
-                backends=[],
-                healthChecks=[
-                    (self.compute_uri + '/projects/'
-                     'my-project/global/healthChecks/my-health-check-1'),
-                ],
-                name='backend-service-1',
-                description='cheesecake',
-                loadBalancingScheme=(
-                    messages.BackendService.LoadBalancingSchemeValueValuesEnum
-                    .INTERNAL),
-                protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
-                connectionDraining=messages.ConnectionDraining(
-                    drainingTimeoutSec=120),
-                timeoutSec=30,
-            ),
-            project='my-project',
-            region='alaska',
-        )
-    )],)
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1'),
+                 ],
+                 name='backend-service-1',
+                 description='cheesecake',
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                     .INTERNAL),
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/default',
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 connectionDraining=messages.ConnectionDraining(
+                     drainingTimeoutSec=120),
+                 timeoutSec=30,
+             ),
+             project='my-project',
+             region='alaska',
+         ))
+    ],)
 
   def testInternalManagedWithAllValidFlags(self):
     messages = self.messages
@@ -1341,32 +1346,11 @@ class WithLogConfigApiTest(CreateTestBase):
             enable=False,
             sampleRate=0.0))
 
-  def testCannotSpecifyLogConfigForRegionalBackendService(self):
-    self.assertRaisesRegex(
-        exceptions.InvalidArgumentException,
-        '^Invalid value for \\[--region\\]: cannot specify logging options'
-        ' for regional backend services.', self.Run,
-        'compute backend-services create backend-service-1'
-        ' --http-health-checks my-health-check-1'
-        ' --description "My backend service"'
-        ' --region us-central1'
-        ' --enable-logging')
-
-  def testInvalidLoadBalancingSchemeWithLogConfig(self):
-    self.assertRaisesRegex(
-        exceptions.InvalidArgumentException,
-        '^Invalid value for \\[--load-balancing-scheme\\]: can only specify '
-        '--enable-logging or --logging-sample-rate if the '
-        'load balancing scheme is EXTERNAL.', self.Run,
-        self._create_service_cmd_line +
-        ' --load-balancing-scheme internal_self_managed' +
-        ' --enable-logging')
-
   def testInvalidProtocolWithLogConfig(self):
     self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--protocol\\]: can only specify --enable-logging'
-        ' or --logging-sample-rate if the protocol is HTTP/HTTPS.',
+        ' or --logging-sample-rate if the protocol is HTTP/HTTPS/HTTP2.',
         self.Run,
         self._create_service_cmd_line + ' --load-balancing-scheme external' +
         ' --protocol TCP' + ' --enable-logging')

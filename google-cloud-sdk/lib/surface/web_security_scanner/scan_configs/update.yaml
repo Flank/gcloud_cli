@@ -1,4 +1,4 @@
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,4 +45,5 @@
     - !REF googlecloudsdk.command_lib.web_security_scanner.flags:user_agent
     - !REF googlecloudsdk.command_lib.web_security_scanner.flags:blacklist_patterns
     - !REF googlecloudsdk.command_lib.web_security_scanner.flags:export_to_security_center
+    - !REF googlecloudsdk.command_lib.web_security_scanner.flags:risk_level
     additional_arguments_hook: googlecloudsdk.command_lib.web_security_scanner.auth:AuthFlags

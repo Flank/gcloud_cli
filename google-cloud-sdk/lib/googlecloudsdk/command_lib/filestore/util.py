@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ PARENT_TEMPLATE = 'projects/{}/locations/{}'
 LOCATION_WILDCARD = '-'
 
 
-def AddDefaultRegionToListRequest(ref, args, req):
+def AddDefaultLocationToListRequest(ref, args, req):
   """Python hook for yaml commands to wildcard the region in list requests."""
   del ref
   project = properties.VALUES.core.project.Get(required=True)
-  location = args.region or LOCATION_WILDCARD
+  location = args.region or args.zone or LOCATION_WILDCARD
   req.parent = PARENT_TEMPLATE.format(project, location)
   return req

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -204,6 +204,80 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
              '{} {}'.format(self.location_flag, self.location))
 
     self.CheckRequests(*self.expected_requests)
+
+  def testUpdateScaleDownNumbers(self, track, scope):
+    self._SetUpForTrack(track)
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    self._ExpectPatchAutoscalers(self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scaleDownControl=self.messages.AutoscalingPolicyScaleDownControl(
+                maxScaledDownReplicas=self.messages.FixedOrPercent(
+                    fixed=5
+                ),
+                timeWindowSec=30
+            )
+        )
+    ))
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--scale-down-control max-scaled-down-replicas=5,time-window=30 '
+             '{} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testUpdateScaleDownPercents(self, track, scope):
+    self._SetUpForTrack(track)
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    self._ExpectPatchAutoscalers(self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scaleDownControl=self.messages.AutoscalingPolicyScaleDownControl(
+                maxScaledDownReplicas=self.messages.FixedOrPercent(
+                    percent=5
+                ),
+                timeWindowSec=30
+            )
+        )
+    ))
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    self.Run('compute instance-groups managed update-autoscaling group-1 '
+             '--scale-down-control max-scaled-down-replicas-percent=5,'
+             'time-window=30 {} {}'.format(self.location_flag, self.location))
+
+    self.CheckRequests(*self.expected_requests)
+
+  def testScaleDownErrorBothSpecified(self, track, scope):
+    self._SetUpForTrack(track)
+    self._SetUpForScope(scope)
+    self._ExpectGetManagedInstanceGroup()
+    self._ExpectListAutoscalers()
+    self._ExpectPatchAutoscalers(self.messages.Autoscaler(
+        name='autoscaler-1',
+        autoscalingPolicy=self.messages.AutoscalingPolicy(
+            scaleDownControl=self.messages.AutoscalingPolicyScaleDownControl(
+                maxScaledDownReplicas=self.messages.FixedOrPercent(
+                    percent=5
+                ),
+                timeWindowSec=30
+            )
+        )
+    ))
+    self.make_requests.side_effect = iter(self.expected_responses)
+
+    with self.AssertRaisesExceptionMatches(
+        expected_message='mutually exclusive, you can\'t specify both',
+        expected_exception=managed_instance_groups_utils.InvalidArgumentError):
+      self.Run('compute instance-groups managed update-autoscaling group-1 '
+               '--scale-down-control max-scaled-down-replicas-percent=5,'
+               'max-scaled-down-replicas=5,'
+               'time-window=30 {} {}'.format(self.location_flag, self.location))
 
 if __name__ == '__main__':
   test_case.main()

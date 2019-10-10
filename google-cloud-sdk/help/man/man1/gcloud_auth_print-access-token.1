@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud auth print\-access\-token \- print an access token for the active account
+gcloud auth print\-access\-token \- print an access token for the specified account
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud auth print\-access\-token\fR [\fIACCOUNT\fR] [\fB\-\-force\-auth\-refresh\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud auth print\-access\-token\fR [\fIACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-Print an access token for the active account.
+Print an access token for the specified account.
 
 
 
@@ -26,19 +26,8 @@ Print an access token for the active account.
 .RS 2m
 .TP 2m
 [\fIACCOUNT\fR]
-The account to get the access token for. Leave empty for the active account.
-
-
-.RE
-.sp
-
-.SH "FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-force\-auth\-refresh\fR
-Force a refresh of the credentials even if they have not expired yet. By
-default, credentials will only be refreshed when necessary.
+Account to get the access token for. If not specified, the current active
+account will be used.
 
 
 .RE

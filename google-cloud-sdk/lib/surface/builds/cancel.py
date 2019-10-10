@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.builds import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+import six
 
 
 class Cancel(base.Command):
@@ -61,6 +62,6 @@ class Cancel(base.Command):
       cancelled_build = client.projects_builds.Cancel(
           messages.CloudbuildProjectsBuildsCancelRequest(
               projectId=build_ref.projectId, id=build_ref.id))
-      log.status.write('Cancelled [{r}].\n'.format(r=str(build_ref)))
+      log.status.write('Cancelled [{r}].\n'.format(r=six.text_type(build_ref)))
       cancelled.append(cancelled_build)
     return cancelled

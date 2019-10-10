@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ def _AddArgsCommon(parser, messages):
   labels_util.AddCreateLabelsFlags(parser)
   flags.GetManagedZoneNetworksArg().AddToParser(parser)
   flags.GetManagedZoneVisibilityArg().AddToParser(parser)
+  flags.GetForwardingTargetsArg().AddToParser(parser)
 
 
 def _MakeDnssecConfig(args, messages):
@@ -126,6 +127,12 @@ class Create(base.CreateCommand):
       visibility_config = messages.ManagedZonePrivateVisibilityConfig(
           networks=network_configs)
 
+    if args.forwarding_targets:
+      forward_config = command_util.ParseManagedZoneForwardingConfig(
+          args.forwarding_targets, messages)
+    else:
+      forward_config = None
+
     dnssec_config = _MakeDnssecConfig(args, messages)
 
     labels = labels_util.ParseCreateArgs(args, messages.ManagedZone.LabelsValue)
@@ -137,6 +144,7 @@ class Create(base.CreateCommand):
         dnssecConfig=dnssec_config,
         labels=labels,
         visibility=visibility,
+        forwardingConfig=forward_config,
         privateVisibilityConfig=visibility_config)
 
     result = dns.managedZones.Create(
@@ -170,7 +178,6 @@ class CreateBeta(base.CreateCommand):
     messages = apis.GetMessagesModule('dns', 'v1beta2')
     _AddArgsCommon(parser, messages)
     parser.display_info.AddCacheUpdater(flags.ManagedZoneCompleter)
-    flags.GetForwardingTargetsArg().AddToParser(parser)
     flags.GetDnsPeeringArgs().AddToParser(parser)
 
   def Run(self, args):
@@ -191,9 +198,10 @@ class CreateBeta(base.CreateCommand):
           have NO network binding.
           """))
 
-    dns = apis.GetClientInstance('dns', 'v1beta2')
-    messages = apis.GetMessagesModule('dns', 'v1beta2')
-    registry = util.GetRegistry('v1beta2')
+    api_version = util.GetApiFromTrack(self.ReleaseTrack())
+    dns = apis.GetClientInstance('dns', api_version)
+    messages = apis.GetMessagesModule('dns', api_version)
+    registry = util.GetRegistry(api_version)
 
     zone_ref = registry.Parse(
         args.dns_zone,
@@ -255,3 +263,30 @@ class CreateBeta(base.CreateCommand):
                                               project=zone_ref.project))
     log.CreatedResource(zone_ref)
     return [result]
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(CreateBeta):
+  r"""Create a Cloud DNS managed-zone.
+
+  This command creates a Cloud DNS managed-zone.
+
+  ## EXAMPLES
+
+  To create a managed-zone, run:
+
+    $ {command} my_zone --dns-name=my.zone.com. --description="My zone!"
+
+  To create a managed-zone with DNSSEC, run:
+
+    $ {command} my_zone_2 --description="Signed Zone" \
+        --dns-name=myzone.example \
+        --dnssec-state=on
+  """
+
+  @staticmethod
+  def Args(parser):
+    messages = apis.GetMessagesModule('dns', 'v1alpha2')
+    _AddArgsCommon(parser, messages)
+    parser.display_info.AddCacheUpdater(flags.ManagedZoneCompleter)
+    flags.GetDnsPeeringArgs().AddToParser(parser)

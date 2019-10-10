@@ -36,6 +36,8 @@ class DlpV2(base_api.BaseApiClient):
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
     self.infoTypes = self.InfoTypesService(self)
+    self.locations_infoTypes = self.LocationsInfoTypesService(self)
+    self.locations = self.LocationsService(self)
     self.organizations_deidentifyTemplates = self.OrganizationsDeidentifyTemplatesService(self)
     self.organizations_inspectTemplates = self.OrganizationsInspectTemplatesService(self)
     self.organizations_storedInfoTypes = self.OrganizationsStoredInfoTypesService(self)
@@ -46,6 +48,8 @@ class DlpV2(base_api.BaseApiClient):
     self.projects_image = self.ProjectsImageService(self)
     self.projects_inspectTemplates = self.ProjectsInspectTemplatesService(self)
     self.projects_jobTriggers = self.ProjectsJobTriggersService(self)
+    self.projects_locations_content = self.ProjectsLocationsContentService(self)
+    self.projects_locations = self.ProjectsLocationsService(self)
     self.projects_storedInfoTypes = self.ProjectsStoredInfoTypesService(self)
     self.projects = self.ProjectsService(self)
 
@@ -79,13 +83,61 @@ learn more.
         method_id=u'dlp.infoTypes.list',
         ordered_params=[],
         path_params=[],
-        query_params=[u'filter', u'languageCode'],
+        query_params=[u'filter', u'languageCode', u'location'],
         relative_path=u'v2/infoTypes',
         request_field='',
         request_type_name=u'DlpInfoTypesListRequest',
         response_type_name=u'GooglePrivacyDlpV2ListInfoTypesResponse',
         supports_download=False,
     )
+
+  class LocationsInfoTypesService(base_api.BaseApiService):
+    """Service class for the locations_infoTypes resource."""
+
+    _NAME = u'locations_infoTypes'
+
+    def __init__(self, client):
+      super(DlpV2.LocationsInfoTypesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def List(self, request, global_params=None):
+      r"""Returns a list of the sensitive information types that the DLP API.
+supports. See https://cloud.google.com/dlp/docs/infotypes-reference to
+learn more.
+
+      Args:
+        request: (DlpLocationsInfoTypesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GooglePrivacyDlpV2ListInfoTypesResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dlp.locations.infoTypes.list',
+        ordered_params=[u'location'],
+        path_params=[u'location'],
+        query_params=[u'filter', u'languageCode'],
+        relative_path=u'v2/locations/{location}/infoTypes',
+        request_field='',
+        request_type_name=u'DlpLocationsInfoTypesListRequest',
+        response_type_name=u'GooglePrivacyDlpV2ListInfoTypesResponse',
+        supports_download=False,
+    )
+
+  class LocationsService(base_api.BaseApiService):
+    """Service class for the locations resource."""
+
+    _NAME = u'locations'
+
+    def __init__(self, client):
+      super(DlpV2.LocationsService, self).__init__(client)
+      self._upload_configs = {
+          }
 
   class OrganizationsDeidentifyTemplatesService(base_api.BaseApiService):
     """Service class for the organizations_deidentifyTemplates resource."""
@@ -1361,6 +1413,125 @@ See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more.
         response_type_name=u'GooglePrivacyDlpV2JobTrigger',
         supports_download=False,
     )
+
+  class ProjectsLocationsContentService(base_api.BaseApiService):
+    """Service class for the projects_locations_content resource."""
+
+    _NAME = u'projects_locations_content'
+
+    def __init__(self, client):
+      super(DlpV2.ProjectsLocationsContentService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Deidentify(self, request, global_params=None):
+      r"""De-identifies potentially sensitive info from a ContentItem.
+This method has limits on input size and output size.
+See https://cloud.google.com/dlp/docs/deidentify-sensitive-data to
+learn more.
+
+When no InfoTypes or CustomInfoTypes are specified in this request, the
+system will automatically choose what detectors to run. By default this may
+be all types, but may change over time as detectors are updated.
+
+      Args:
+        request: (DlpProjectsLocationsContentDeidentifyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GooglePrivacyDlpV2DeidentifyContentResponse) The response message.
+      """
+      config = self.GetMethodConfig('Deidentify')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Deidentify.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/projects/{projectsId}/locations/{location}/content:deidentify',
+        http_method=u'POST',
+        method_id=u'dlp.projects.locations.content.deidentify',
+        ordered_params=[u'parent', u'location'],
+        path_params=[u'location', u'parent'],
+        query_params=[],
+        relative_path=u'v2/{+parent}/locations/{location}/content:deidentify',
+        request_field=u'googlePrivacyDlpV2DeidentifyContentRequest',
+        request_type_name=u'DlpProjectsLocationsContentDeidentifyRequest',
+        response_type_name=u'GooglePrivacyDlpV2DeidentifyContentResponse',
+        supports_download=False,
+    )
+
+    def Inspect(self, request, global_params=None):
+      r"""Finds potentially sensitive info in content.
+This method has limits on input size, processing time, and output size.
+
+When no InfoTypes or CustomInfoTypes are specified in this request, the
+system will automatically choose what detectors to run. By default this may
+be all types, but may change over time as detectors are updated.
+
+For how to guides, see https://cloud.google.com/dlp/docs/inspecting-images
+and https://cloud.google.com/dlp/docs/inspecting-text,
+
+      Args:
+        request: (DlpProjectsLocationsContentInspectRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GooglePrivacyDlpV2InspectContentResponse) The response message.
+      """
+      config = self.GetMethodConfig('Inspect')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Inspect.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/projects/{projectsId}/locations/{location}/content:inspect',
+        http_method=u'POST',
+        method_id=u'dlp.projects.locations.content.inspect',
+        ordered_params=[u'parent', u'location'],
+        path_params=[u'location', u'parent'],
+        query_params=[],
+        relative_path=u'v2/{+parent}/locations/{location}/content:inspect',
+        request_field=u'googlePrivacyDlpV2InspectContentRequest',
+        request_type_name=u'DlpProjectsLocationsContentInspectRequest',
+        response_type_name=u'GooglePrivacyDlpV2InspectContentResponse',
+        supports_download=False,
+    )
+
+    def Reidentify(self, request, global_params=None):
+      r"""Re-identifies content that has been de-identified.
+See
+https://cloud.google.com/dlp/docs/pseudonymization#re-identification_in_free_text_code_example
+to learn more.
+
+      Args:
+        request: (DlpProjectsLocationsContentReidentifyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GooglePrivacyDlpV2ReidentifyContentResponse) The response message.
+      """
+      config = self.GetMethodConfig('Reidentify')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Reidentify.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/projects/{projectsId}/locations/{location}/content:reidentify',
+        http_method=u'POST',
+        method_id=u'dlp.projects.locations.content.reidentify',
+        ordered_params=[u'parent', u'location'],
+        path_params=[u'location', u'parent'],
+        query_params=[],
+        relative_path=u'v2/{+parent}/locations/{location}/content:reidentify',
+        request_field=u'googlePrivacyDlpV2ReidentifyContentRequest',
+        request_type_name=u'DlpProjectsLocationsContentReidentifyRequest',
+        response_type_name=u'GooglePrivacyDlpV2ReidentifyContentResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsService(base_api.BaseApiService):
+    """Service class for the projects_locations resource."""
+
+    _NAME = u'projects_locations'
+
+    def __init__(self, client):
+      super(DlpV2.ProjectsLocationsService, self).__init__(client)
+      self._upload_configs = {
+          }
 
   class ProjectsStoredInfoTypesService(base_api.BaseApiService):
     """Service class for the projects_storedInfoTypes resource."""

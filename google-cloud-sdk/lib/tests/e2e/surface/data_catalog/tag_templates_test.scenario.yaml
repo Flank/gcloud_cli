@@ -1,0 +1,359 @@
+title: Create, describe, and update a Data Catalog tag template.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog tag-templates create $$my-tag-template$$ --location=$$location$$
+      --display-name="Display name" --field=id=dbl_field,display_name=double_field,type=double
+      --field=id=str_field,display_name=string_field,type=string --field=id=bool_field,display_name=boolean_field,type=bool
+      --field=id=ts_field,display_name=timestamp_field,type=timestamp --field=id=enum_field,display_name=enums_field,type=enum(A|B)
+  - stderr: |
+      Created tag template [$$my-tag-template$$].
+- execute:
+  - command: data-catalog tag-templates describe $$my-tag-template$$ --location=$$location$$
+  - stdout: |
+      displayName: Display name
+      fields:
+        bool_field:
+          displayName: boolean_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+          type:
+            primitiveType: BOOL
+        dbl_field:
+          displayName: double_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+          type:
+            primitiveType: DOUBLE
+        enum_field:
+          displayName: enums_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+          type:
+            enumType:
+              allowedValues:
+              - displayName: A
+              - displayName: B
+        str_field:
+          displayName: string_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+          type:
+            primitiveType: STRING
+        ts_field:
+          displayName: timestamp_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+          type:
+            primitiveType: TIMESTAMP
+      iamPolicyNamespace: DATA_CATALOG
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+- execute:
+  - command: data-catalog tag-templates update $$my-tag-template$$ --location=$$location$$
+      --display-name="New display name"
+  - stderr: |
+      Updated tag template [$$my-tag-template$$].
+  - stdout: |
+      displayName: New display name
+      fields:
+        bool_field:
+          displayName: boolean_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+          type:
+            primitiveType: BOOL
+        dbl_field:
+          displayName: double_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+          type:
+            primitiveType: DOUBLE
+        enum_field:
+          displayName: enums_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+          type:
+            enumType:
+              allowedValues:
+              - displayName: A
+              - displayName: B
+        str_field:
+          displayName: string_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+          type:
+            primitiveType: STRING
+        ts_field:
+          displayName: timestamp_field
+          name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+          type:
+            primitiveType: TIMESTAMP
+      iamPolicyNamespace: DATA_CATALOG
+      name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+- execute:
+  - command: data-catalog tag-templates delete $$my-tag-template$$ --location=$$location$$
+      --force --quiet
+  - stderr: |
+      Deleted tag template [$$my-tag-template$$].
+actions:
+- define_reference:
+    reference: location
+    value: us-central1
+- generate_resource_id:
+    reference: my-tag-template
+    prefix: datacatalog
+    delimiter: _
+- execute_command:
+    command: data-catalog tag-templates create $$my-tag-template$$ --location=$$location$$
+      --display-name="Display name" --field=id=dbl_field,display_name=double_field,type=double
+      --field=id=str_field,display_name=string_field,type=string --field=id=bool_field,display_name=boolean_field,type=bool
+      --field=id=ts_field,display_name=timestamp_field,type=timestamp --field=id=enum_field,display_name=enums_field,type=enum(A|B)
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates?alt=json&tagTemplateId=$$my-tag-template$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: Display name
+              fields:
+                bool_field:
+                  displayName: boolean_field
+                  type:
+                    primitiveType: BOOL
+                dbl_field:
+                  displayName: double_field
+                  type:
+                    primitiveType: DOUBLE
+                enum_field:
+                  displayName: enums_field
+                  type:
+                    enumType:
+                      allowedValues:
+                      - displayName: A
+                      - displayName: B
+                str_field:
+                  displayName: string_field
+                  type:
+                    primitiveType: STRING
+                ts_field:
+                  displayName: timestamp_field
+                  type:
+                    primitiveType: TIMESTAMP
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1692'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+            displayName: Display name
+            fields:
+              bool_field:
+                displayName: boolean_field
+                type:
+                  primitiveType: BOOL
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+              enum_field:
+                displayName: enums_field
+                type:
+                  enumType:
+                    allowedValues:
+                    - displayName: A
+                    - displayName: B
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+              ts_field:
+                displayName: timestamp_field
+                type:
+                  primitiveType: TIMESTAMP
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+              dbl_field:
+                displayName: double_field
+                type:
+                  primitiveType: DOUBLE
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+              str_field:
+                displayName: string_field
+                type:
+                  primitiveType: STRING
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+            iamPolicyNamespace: DATA_CATALOG
+    - expect_stderr: |
+        Created tag template [$$my-tag-template$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates describe $$my-tag-template$$ --location=$$location$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1692'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+            displayName: Display name
+            fields:
+              str_field:
+                displayName: string_field
+                type:
+                  primitiveType: STRING
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+              bool_field:
+                displayName: boolean_field
+                type:
+                  primitiveType: BOOL
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+              enum_field:
+                displayName: enums_field
+                type:
+                  enumType:
+                    allowedValues:
+                    - displayName: A
+                    - displayName: B
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+              ts_field:
+                displayName: timestamp_field
+                type:
+                  primitiveType: TIMESTAMP
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+              dbl_field:
+                displayName: double_field
+                type:
+                  primitiveType: DOUBLE
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+            iamPolicyNamespace: DATA_CATALOG
+    - expect_stdout: |
+        displayName: Display name
+        fields:
+          bool_field:
+            displayName: boolean_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+            type:
+              primitiveType: BOOL
+          dbl_field:
+            displayName: double_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+            type:
+              primitiveType: DOUBLE
+          enum_field:
+            displayName: enums_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+            type:
+              enumType:
+                allowedValues:
+                - displayName: A
+                - displayName: B
+          str_field:
+            displayName: string_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+            type:
+              primitiveType: STRING
+          ts_field:
+            displayName: timestamp_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+            type:
+              primitiveType: TIMESTAMP
+        iamPolicyNamespace: DATA_CATALOG
+        name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates update $$my-tag-template$$ --location=$$location$$
+      --display-name="New display name"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$?alt=json&updateMask=displayName
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              displayName: New display name
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1696'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+            displayName: New display name
+            fields:
+              dbl_field:
+                displayName: double_field
+                type:
+                  primitiveType: DOUBLE
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+              str_field:
+                displayName: string_field
+                type:
+                  primitiveType: STRING
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+              bool_field:
+                displayName: boolean_field
+                type:
+                  primitiveType: BOOL
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+              enum_field:
+                displayName: enums_field
+                type:
+                  enumType:
+                    allowedValues:
+                    - displayName: A
+                    - displayName: B
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+              ts_field:
+                displayName: timestamp_field
+                type:
+                  primitiveType: TIMESTAMP
+                name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+            iamPolicyNamespace: DATA_CATALOG
+    - expect_stderr: |
+        Updated tag template [$$my-tag-template$$].
+    - expect_stdout: |
+        displayName: New display name
+        fields:
+          bool_field:
+            displayName: boolean_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/bool_field
+            type:
+              primitiveType: BOOL
+          dbl_field:
+            displayName: double_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/dbl_field
+            type:
+              primitiveType: DOUBLE
+          enum_field:
+            displayName: enums_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/enum_field
+            type:
+              enumType:
+                allowedValues:
+                - displayName: A
+                - displayName: B
+          str_field:
+            displayName: string_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/str_field
+            type:
+              primitiveType: STRING
+          ts_field:
+            displayName: timestamp_field
+            name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$/fields/ts_field
+            type:
+              primitiveType: TIMESTAMP
+        iamPolicyNamespace: DATA_CATALOG
+        name: projects/cloud-sdk-integration-testing/locations/$$location$$/tagTemplates/$$my-tag-template$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog tag-templates delete $$my-tag-template$$ --location=$$location$$
+      --force --quiet
+    validation_only: true
+    cleanup_for: my-tag-template
+    events:
+    - expect_stderr: |
+        Deleted tag template [$$my-tag-template$$].
+    - expect_exit:
+        code: 0

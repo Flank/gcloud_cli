@@ -1,12 +1,12 @@
 NAME
-    gcloud beta dataflow - manage Google Cloud Dataflow jobs
+    gcloud beta dataflow - manage Google Cloud Dataflow resources
 
 SYNOPSIS
     gcloud beta dataflow GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) The gcloud dataflow command group lets you manage Google Cloud
-    Dataflow jobs.
+    Dataflow resources.
 
     Cloud Dataflow is a unified programming model and a managed service for
     developing and executing a wide range of data processing patterns including

@@ -66,8 +66,7 @@ the range [1, 1000].
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 
 .RE
@@ -91,12 +90,24 @@ https://developers.google.com/compute/docs/reference/latest/
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To update a given Compute Enginer reservation with 500 VM instances, run:
 
 .RS 2m
+$ gcloud beta compute reservations update my\-reservation \e
+    \-\-zone=ZONE \-\-vm\-count=500
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute reservations update
 $ gcloud alpha compute reservations update
 .RE
 

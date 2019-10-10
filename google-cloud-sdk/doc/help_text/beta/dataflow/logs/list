@@ -32,7 +32,8 @@ FLAGS
         be one of: debug, detailed, warning, error.
 
      --region=REGION_ID
-        The region ID of the job's regional endpoint.
+        The region ID of the job's regional endpoint. Defaults to
+        'us-central1'.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

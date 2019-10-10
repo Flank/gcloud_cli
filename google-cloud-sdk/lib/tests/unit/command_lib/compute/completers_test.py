@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -319,7 +319,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     completer = self.Completer(completers.HealthChecksCompleter,
                                command_resources=_COMMAND_RESOURCES)
     self.assertEqual(
-        5,
+        6,
         len(completer.Complete('', self.parameter_info)))
     self.assertCountEqual(
         [
@@ -328,6 +328,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
             'health-check-https:my-project',
             'health-check-ssl:my-project',
             'health-check-tcp:my-project',
+            'health-check-http2:my-project',
         ],
         completer.Complete('', self.parameter_info))
     self.assertCountEqual(
@@ -472,7 +473,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     completer = self.Completer(completers.SearchHealthChecksCompleter,
                                search_resources=_SEARCH_RESOURCES)
     self.assertEqual(
-        5,
+        6,
         len(completer.Complete('', self.parameter_info)))
     self.assertCountEqual(
         [
@@ -481,6 +482,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
             'health-check-https:my-project',
             'health-check-ssl:my-project',
             'health-check-tcp:my-project',
+            'health-check-http2:my-project',
         ],
         completer.Complete('', self.parameter_info))
     self.assertCountEqual(

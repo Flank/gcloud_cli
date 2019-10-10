@@ -7,7 +7,7 @@ summary:
   - stderr: |
       Request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [reimage] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stdout: |
       done: true
@@ -49,7 +49,7 @@ actions:
             done: true
             name: $$operation$$
     - expect_progress_tracker:
-        message: Waiting for operation [reimage] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stdout: |
         done: true

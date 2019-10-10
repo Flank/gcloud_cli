@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -145,9 +145,9 @@ def FormatDuration(duration):
   Args:
     duration (int): The duration in seconds.
   Returns:
-    str: The formatted duration.
+    unicode: The formatted duration.
   """
-  return str(duration) + 's'
+  return six.text_type(duration) + 's'
 
 
 def ParseAttributes(attribute_dict, messages=None):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py.testing import mock as api_mock
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -115,7 +112,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Simulating maintenance on instance(s) '
-        '[https://www.googleapis.com/compute/{}/projects/fake-project/'
+        '[https://compute.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-1]'.format(self.api_version))
 
   def testAsync(self):
@@ -129,7 +126,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
          self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
     ])
 
-    result = self.Run("""
+    self.Run("""
         compute instances simulate-maintenance-event instance-1
           --zone zone-2
           --async
@@ -139,7 +136,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for gce instance [instance-1] '
-        '[https://www.googleapis.com/compute/{}/'
+        '[https://compute.googleapis.com/compute/{}/'
         'projects/fake-project/zones/zone-2/operations/operation-1] '
         'Use [gcloud compute operations describe] command to check the status '
         'of this operation.\n'.format(self.api_version))
@@ -176,13 +173,13 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Simulating maintenance on instance(s) '
-        '[https://www.googleapis.com/compute/{}/projects/fake-project/'
+        '[https://compute.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-0,'
         ' '
-        'https://www.googleapis.com/compute/{}/projects/fake-project/'
+        'https://compute.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-1,'
         ' '
-        'https://www.googleapis.com/compute/{}/projects/fake-project/'
+        'https://compute.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-2]'.format(
             self.api_version, self.api_version, self.api_version))
 
@@ -211,12 +208,13 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     expected_err = ''
     for c in range(n_instances):
-      expected_err += ('Update in progress for gce instance [instance-{inum}] '
-                       '[https://www.googleapis.com/compute/{track}/projects/'
-                       'fake-project/zones/zone-2/operations/operation-{onum}]'
-                       ' Use [gcloud compute operations describe] command to '
-                       'check the status of this operation.\n').format(
-                           inum=c, onum=c, track=self.api_version)
+      expected_err += (
+          'Update in progress for gce instance [instance-{inum}] '
+          '[https://compute.googleapis.com/compute/{track}/projects/'
+          'fake-project/zones/zone-2/operations/operation-{onum}]'
+          ' Use [gcloud compute operations describe] command to '
+          'check the status of this operation.\n').format(
+              inum=c, onum=c, track=self.api_version)
     self.AssertErrEquals(expected_err)
 
   def testScopePrompt(self):
@@ -240,7 +238,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
 
     self.WriteInput('2\n')
 
-    result = self.Run("""
+    self.Run("""
           compute instances simulate-maintenance-event instance-1
             --async --format=disable
           """)

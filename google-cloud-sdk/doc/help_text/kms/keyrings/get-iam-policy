@@ -57,7 +57,7 @@ EXAMPLES
     the location us-central1:
 
         $ gcloud kms keyrings get-iam-policy fellowship \
-            --location us-central1
+            --location=us-central1
 
 NOTES
     These variants are also available:

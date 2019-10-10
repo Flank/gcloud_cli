@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,9 +92,9 @@ class ForwardingRulesDescribeTest(test_base.BaseTest,
             IPProtocol: TCP
             name: forwarding-rule-1
             portRange: 1-65535
-            region: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-            target: https://www.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/targetInstances/target-1
+            region: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+            target: https://compute.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/targetInstances/target-1
             """.format(api=self.api)))
 
   def testWithGlobalFlag(self):
@@ -119,8 +119,8 @@ class ForwardingRulesDescribeTest(test_base.BaseTest,
             IPProtocol: TCP
             name: global-forwarding-rule-1
             portRange: 1-65535
-            selfLink: https://www.googleapis.com/compute/{api}/projects/my-project/global/forwardingRules/global-forwarding-rule-1
-            target: https://www.googleapis.com/compute/{api}/projects/my-project/global/targetHttpProxies/proxy-1
+            selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/global/forwardingRules/global-forwarding-rule-1
+            target: https://compute.googleapis.com/compute/{api}/projects/my-project/global/targetHttpProxies/proxy-1
             """.format(api=self.api)))
 
   def testWithRegionFlag(self):
@@ -146,9 +146,9 @@ class ForwardingRulesDescribeTest(test_base.BaseTest,
             IPProtocol: TCP
             name: forwarding-rule-1
             portRange: 1-65535
-            region: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
-            target: https://www.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/targetInstances/target-1
+            region: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+            target: https://compute.googleapis.com/compute/{api}/projects/my-project/zones/zone-1/targetInstances/target-1
             """.format(api=self.api)))
 
   def testUriSupportForRegionalForwardingRules(self):
@@ -158,7 +158,7 @@ class ForwardingRulesDescribeTest(test_base.BaseTest,
 
     self.Run("""
         compute forwarding-rules describe
-          https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
+          https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-1
         """.format(api=self.api))
 
     self.CheckRequests(
@@ -201,7 +201,7 @@ class ForwardingRulesDescribeBetaTest(ForwardingRulesDescribeTest):
     SetUp(self, 'beta')
 
   def _MakeForwardingRuleWithFlexPort(self):
-    prefix = 'https://www.googleapis.com/compute/'+self.api
+    prefix = 'https://compute.googleapis.com/compute/'+self.api
     return self.messages.ForwardingRule(
         name='forwarding-rule-flex-port',
         IPAddress='162.222.178.84',
@@ -236,11 +236,11 @@ class ForwardingRulesDescribeBetaTest(ForwardingRulesDescribeTest):
             IPAddress: 162.222.178.84
             IPProtocol: TCP
             allPorts: true
-            backendService: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/backendServices/bs-1
+            backendService: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/backendServices/bs-1
             loadBalancingScheme: INTERNAL
             name: forwarding-rule-flex-port
-            region: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-flex-port
+            region: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/regions/region-1/forwardingRules/forwarding-rule-flex-port
             """.format(api=self.api)))
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ class Update(base.Command):
         env_ref,
         field_mask,
         patch,
-        args.async,
+        args.async_,
         release_track=self.ReleaseTrack())
 
 
@@ -117,7 +117,7 @@ class UpdateBeta(Update):
         env_ref,
         field_mask,
         patch,
-        args.async,
+        args.async_,
         release_track=self.ReleaseTrack())
 
 

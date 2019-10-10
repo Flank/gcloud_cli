@@ -11,7 +11,7 @@ gcloud beta compute network\-endpoint\-groups update \- updates a Google Compute
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute network\-endpoint\-groups update\fR \fINAME\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]\ |\ \fB\-\-remove\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute network\-endpoint\-groups update\fR \fINAME\fR (\fB\-\-add\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]\ |\ \fB\-\-remove\-endpoint\fR=[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]) [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,41 +26,13 @@ Name of the network endpoint group to operate on.
 .RE
 .sp
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
 
 .RS 2m
 .TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-Zone of the network endpoint group to operate on. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
-zone.
 
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/zone ZONE
-.RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
-
-.TP 2m
-
-These flags can be specified multiple times to add/remove multiple endpoints. At
-most one of these may be specified:
+These flags can be specified multiple times to add/remove multiple endpoints.
+Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
@@ -129,6 +101,41 @@ type is \f5GCE_VM_IP_PORT\fR.
 .sp
 
 
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the network endpoint group to operate on. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
 
 .SH "GCLOUD WIDE FLAGS"
 

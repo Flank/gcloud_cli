@@ -11,7 +11,7 @@ gcloud beta compute commitments create \- create Google Compute Engine commitmen
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR (\fB\-\-resources\fR=[\fIlocal\-ssd\fR=\fILOCAL\-SSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR]\ :\ \fB\-\-resources\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]) [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR\ |\ [\fB\-\-reservation\fR=\fIRESERVATION\fR\ :\ \fB\-\-reservation\-zone\fR=\fIRESERVATION_ZONE\fR\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-reservation\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR (\fB\-\-resources\fR=[\fIlocal\-ssd\fR=\fILOCAL\-SSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR]\ \fB\-\-resources\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]) [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-type\fR=\fITYPE\fR;\ default="general\-purpose"] [\fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR\ |\ [\fB\-\-reservation\fR=\fIRESERVATION\fR\ :\ \fB\-\-reservation\-zone\fR=\fIRESERVATION_ZONE\fR\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-reservation\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,12 +42,13 @@ Duration of the commitment. \fIPLAN\fR must be one of: \fB12\-month\fR,
 
 .TP 2m
 
-Manage the commitment for particular resources. This must be specified.
+Manage the commitment for particular resources. At least one of these must be
+specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-resources\fR=[\fIlocal\-ssd\fR=\fILOCAL\-SSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR]
-Resources to be included in the commitment, the ratio between number of vCPU
+Resources to be included in the commitment. The ratio between the number of vCPU
 cores and memory must conform to limits described at:
 https://cloud.google.com/compute/docs/instances/creating\-instance\-with\-custom\-machine\-type#specifications.
 .TP 2m
@@ -59,9 +60,7 @@ are specified, GB is assumed.
 The number of the vCPU cores.
 .TP 2m
 \fBlocal\-ssd\fR
-The size of local SSD. This flag must be specified if any of the other arguments
-in this group are specified.
-
+The size of local SSD.
 .TP 2m
 \fB\-\-resources\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
 Manage the configuration of the type and number of accelerator cards to include
@@ -108,6 +107,13 @@ $ gcloud config unset compute/region
 
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR; default="general\-purpose"
+Type of commitment. \f5memory\-optimized\fR indicates that the commitment is for
+memory\-optimized VMs. \fITYPE\fR must be one of: \fBcompute\-optimized\fR,
+\fBgeneral\-purpose\fR, \fBgeneral\-purpose\-e2\fR, \fBgeneral\-purpose\-n2\fR,
+\fBgeneral\-purpose\-n2d\fR, \fBmemory\-optimized\fR.
 
 .TP 2m
 

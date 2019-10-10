@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class ListCommandTests(yaml_command_base.CommandTestsBase):
     cli.Execute(['command', '--project', 'p', '--zone', 'z', '--uri'])
     self.AssertOutputEquals(
         """
-https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-1
-https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-2
+https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-1
+https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-2
 """.lstrip('\n'),
         normalize_space=True)

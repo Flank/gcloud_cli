@@ -26,7 +26,8 @@ EXAMPLES
         $ gcloud dns project-info describe
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns project-info
         $ gcloud beta dns project-info
 

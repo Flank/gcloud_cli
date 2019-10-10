@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class InstantiateFromFile(base.CreateCommand):
     operation = \
       dataproc.client.projects_regions_workflowTemplates.InstantiateInline(
           request)
-    if args.async:
+    if args.async_:
       log.status.Print('Instantiating with operation [{0}].'.format(
           operation.name))
       return
@@ -118,7 +118,7 @@ class InstantiateFromFileBeta(base.CreateCommand):
     operation = \
       dataproc.client.projects_regions_workflowTemplates.InstantiateInline(
           request)
-    if args.async:
+    if args.async_:
       log.status.Print('Instantiating with operation [{0}].'.format(
           operation.name))
       return

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -168,6 +168,7 @@ class TransformManifestsTest(test_case.TestCase):
     # There should be no microseconds
     self.assertEqual(dt.microsecond, 0)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   @test_case.Filters.DoNotRunInDebPackage('overflow does not occur here')
   @test_case.Filters.DoNotRunInRpmPackage('overflow does not occur here')
   def testTimeStampTransformation_ConversionErrorReturnsNone(self):

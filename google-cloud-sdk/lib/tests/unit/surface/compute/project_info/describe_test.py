@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class ProjectInfoDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
                 value: d
             creationTimestamp: '2013-09-06T17:54:10.636-07:00'
             name: my-project
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/
             """))
 
 

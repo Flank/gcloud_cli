@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -340,20 +340,9 @@ class CreateAlpha(CreateBeta):
   @staticmethod
   def _CreateStatefulPolicy(args, client):
     if args.stateful_disk:
-      disks = [
-          client.messages.StatefulPolicyPreservedDisk(
-              deviceName=stateful_disk.get('device-name'))
-          for stateful_disk in args.stateful_disk
-      ]
       return client.messages.StatefulPolicy(
-          preservedResources=client.messages.StatefulPolicyPreservedResources(
-              disks=disks),
           preservedState=CreateAlpha._MakePreservedStateWithDisks(
               client, args.stateful_disk))
-    # Create empty stateful policy in case --stateful-names flag is specified to
-    # make MIG stateful nevertheless.
-    if args.stateful_names:
-      return client.messages.StatefulPolicy()
     return None
 
   def _CreateInstanceGroupManager(

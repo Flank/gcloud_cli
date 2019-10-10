@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ from tests.lib.surface.compute import e2e_test_base
 
 # Setup instructions for the required static resource is at
 # go/os-inventory-cloud-sdk-test-resource-setup.
-class ListInstancesTestAlpha(e2e_test_base.BaseTest):
+class ListInstancesTestGA(e2e_test_base.BaseTest):
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testListInstancesWithInventoryFilter(self):
     # Hostname should contain "os-inventory"
@@ -47,6 +47,18 @@ class ListInstancesTestAlpha(e2e_test_base.BaseTest):
              '--os-shortname="debian"')
     self.AssertNewOutputContains(
         'do-not-delete-compute-instances-os-inventory-test')
+
+
+class ListInstancesTestBeta(ListInstancesTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListInstancesTestAlpha(ListInstancesTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

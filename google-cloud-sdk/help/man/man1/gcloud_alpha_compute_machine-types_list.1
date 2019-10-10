@@ -53,10 +53,7 @@ instead.
 
 .TP 2m
 \fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]
-(DEPRECATED) If provided, only resources from the given zones are queried.
-
-Flag \f5\-\-zones\fR is deprecated. Use \f5\-\-filter="zone:( ZONE ... )"\fR
-instead. For example \-\-filter="zone:( europe\-west1\-b europe\-west1\-c )".
+If provided, only resources from the given zones are queried.
 
 
 .RE
@@ -140,9 +137,8 @@ $ gcloud alpha compute machine\-types list \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute machine\-types list

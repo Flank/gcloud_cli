@@ -3,18 +3,27 @@ NAME
         associated with the specified resource
 
 SYNOPSIS
-    gcloud beta resource-manager org-policies list [--folder=FOLDER_ID]
-        [--organization=ORGANIZATION_ID] [--show-unset] [--filter=EXPRESSION]
+    gcloud beta resource-manager org-policies list
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [--show-unset] [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
+REQUIRED FLAGS
+     Resource that is associated with the organization policy. Exactly one of
+     these must be specified:
+
+       --folder=FOLDER_ID
+          Folder ID.
+
+       --organization=ORGANIZATION_ID
+          Organization ID.
+
+       --project=PROJECT_ID
+          Project ID. Overrides the default core/project property value for
+          this command invocation.
+
 FLAGS
-     --folder=FOLDER_ID
-        Folder ID for Org Policies.
-
-     --organization=ORGANIZATION_ID
-        Organization ID for Org Policies.
-
      --show-unset
         Show available constraints. For more information about constraints, see
         https://cloud.google.com/resource-manager/docs/organization-policy/understanding-constraints

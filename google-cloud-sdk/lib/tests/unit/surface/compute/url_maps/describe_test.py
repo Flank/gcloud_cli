@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class URLMapsDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/default-service
+            defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/default-service
             hostRules:
             - hosts:
               - '*.google.com'
@@ -72,40 +72,40 @@ class URLMapsDescribeTest(test_base.BaseTest,
               pathMatcher: youtube
             name: url-map-1
             pathMatchers:
-            - defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/www-default
+            - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/www-default
               name: www
               pathRules:
               - paths:
                 - /search
                 - /search/*
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/search
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/search
               - paths:
                 - /search/ads
                 - /search/ads/*
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/ads
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/ads
               - paths:
                 - /images
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/images
-            - defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-default
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/images
+            - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-default
               name: youtube
               pathRules:
               - paths:
                 - /search
                 - /search/*
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-search
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-search
               - paths:
                 - /watch
                 - /view
                 - /preview
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-watch
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-1
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-watch
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-1
             tests:
             - host: www.google.com
               path: /search/ads/inline?q=flowers
-              service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/ads
+              service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/ads
             - host: youtube.com
               path: /watch/this
-              service: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-default
+              service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/youtube-default
             """ % {'api': self._api}))
 
   def testSimpleBackendBucketCase(self):
@@ -127,9 +127,9 @@ class URLMapsDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/default-bucket
+            defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/default-bucket
             name: url-map-4
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-4
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-4
             """ % {'api': self._api}))
 
   def testDescribeCompletion(self):
@@ -147,30 +147,18 @@ class URLMapsDescribeTest(test_base.BaseTest,
     self.RunCompletion('compute url-maps describe ', uri_list)
 
 
-class URLMapsDescribeBetaTest(URLMapsDescribeTest):
+class URLMapsDescribeBetaTest(test_base.BaseTest,
+                              completer_test_base.CompleterBase,
+                              test_case.WithOutputCapture):
 
   def SetUp(self):
     self.SelectApi('beta')
     self._api = 'beta'
-    self._url_maps_api = self.compute_beta.urlMaps
-    self._url_maps = test_resources.URL_MAPS_BETA
+    self._url_maps_api = self.compute_beta.regionUrlMaps
+    self._url_maps = test_resources.REGION_URL_MAPS_BETA
 
   def RunDescribe(self, command):
-    self.Run('beta compute url-maps describe ' + command)
-
-
-class URLMapsDescribeAlphaTest(test_base.BaseTest,
-                               completer_test_base.CompleterBase,
-                               test_case.WithOutputCapture):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self._api = 'alpha'
-    self._url_maps_api = self.compute_alpha.regionUrlMaps
-    self._url_maps = test_resources.REGION_URL_MAPS_ALPHA
-
-  def RunDescribe(self, command):
-    self.Run('alpha compute url-maps describe --region us-west-1 ' + command)
+    self.Run('beta compute url-maps describe --region us-west-1 ' + command)
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -188,7 +176,7 @@ class URLMapsDescribeAlphaTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/default-service
+            defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/default-service
             hostRules:
             - hosts:
               - '*.google.com'
@@ -201,40 +189,40 @@ class URLMapsDescribeAlphaTest(test_base.BaseTest,
               pathMatcher: youtube
             name: url-map-1
             pathMatchers:
-            - defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/www-default
+            - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/www-default
               name: www
               pathRules:
               - paths:
                 - /search
                 - /search/*
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/search
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/search
               - paths:
                 - /search/ads
                 - /search/ads/*
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/ads
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/ads
               - paths:
                 - /images
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/images
-            - defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-default
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/images
+            - defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-default
               name: youtube
               pathRules:
               - paths:
                 - /search
                 - /search/*
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-search
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-search
               - paths:
                 - /watch
                 - /view
                 - /preview
-                service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-watch
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/url-map-1
+                service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-watch
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/url-map-1
             tests:
             - host: www.google.com
               path: /search/ads/inline?q=flowers
-              service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/ads
+              service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/ads
             - host: youtube.com
               path: /watch/this
-              service: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-default
+              service: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/backendServices/youtube-default
             """ % {'api': self._api}))
 
   def testSimpleBackendBucketCase(self):
@@ -253,10 +241,22 @@ class URLMapsDescribeAlphaTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/default-bucket
+            defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendBuckets/default-bucket
             name: url-map-4
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/url-map-4
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/url-map-4
             """ % {'api': self._api}))
+
+
+class URLMapsDescribeAlphaTest(URLMapsDescribeBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self._url_maps = test_resources.REGION_URL_MAPS_ALPHA
+
+  def RunDescribe(self, command):
+    self.Run('alpha compute url-maps describe --region us-west-1 ' + command)
 
 
 if __name__ == '__main__':

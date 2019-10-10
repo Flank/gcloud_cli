@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -360,7 +360,7 @@ class ExecuteCommandActionTests(sdk_test_base.WithOutputCapture,
         _Run, execution_mode=session.ExecutionMode.REMOTE, update_modes=[])
     # Disabling validation makes API calls just pass through.
     request_mock = self.StartPatch('httplib2.Http.request')
-    request_mock.return_value = ({'status': '200'}, None)
+    request_mock.return_value = ({'status': '200'}, b'')
 
     data = {'execute_command': {
         'command': 'some command',

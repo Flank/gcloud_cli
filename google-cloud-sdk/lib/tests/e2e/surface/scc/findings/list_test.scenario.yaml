@@ -5,93 +5,65 @@ summary:
 - execute:
   - command: |
       scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time '2019-03-13T22:15:01.900Z'
+      --format "text(finding.name,finding.category,finding.externalUri,finding.name,finding.parent,finding.resourceName,finding.securityMarks,finding.sourceProperties)"
   - stdout: |
       ---
-      finding:
-        category: CAT3
-        createTime: '2019-03-12T23:45:08.062Z'
-        eventTime: '2018-01-12T07:03:00Z'
-        externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
-        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-        parent: organizations/345840165995/sources/2948230327750090626
-        resourceName: http://somedistinctresource1
-        securityMarks:
-          marks:
-            mark_key1: mark_val1
-            mark_key2: mark_val2
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
-        sourceProperties:
-          pKey1: pVal1
-          pKey2: pVal2
-        state: ACTIVE
+      finding.category:                      CAT3
+      finding.externalUri:                   ftp://ftp.is.co.za/rfc/rfc1808.txt
+      finding.name:                          organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+      finding.parent:                        organizations/345840165995/sources/2948230327750090626
+      finding.resourceName:                  http://somedistinctresource1
+      finding.securityMarks.marks.mark_key1: mark_val1
+      finding.securityMarks.marks.mark_key2: mark_val2
+      finding.securityMarks.name:            organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+      finding.sourceProperties.pKey1:        pVal1
+      finding.sourceProperties.pKey2:        pVal2
       ---
-      finding:
-        category: CAT3
-        createTime: '2019-03-12T23:43:27.816Z'
-        eventTime: '1970-01-01T00:00:00Z'
-        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
-        parent: organizations/345840165995/sources/2948230327750090626
-        resourceName: http://somearbitresource
-        securityMarks:
-          marks:
-            mark_key1: mark_val1
-            mark_key2: mark_val2
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
-        sourceProperties:
-          pKey1: pVal1
-          pKey2: pVal2
-        state: ACTIVE
+      finding.category:                      CAT3
+      finding.name:                          organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+      finding.parent:                        organizations/345840165995/sources/2948230327750090626
+      finding.resourceName:                  http://somearbitresource
+      finding.securityMarks.marks.mark_key1: mark_val1
+      finding.securityMarks.marks.mark_key2: mark_val2
+      finding.securityMarks.name:            organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+      finding.sourceProperties.pKey1:        pVal1
+      finding.sourceProperties.pKey2:        pVal2
       ---
-      finding:
-        createTime: '2018-12-13T23:47:59.398Z'
-        eventTime: '2018-12-17T18:32:33Z'
-        name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
-        parent: organizations/345840165995/sources/2948230327750090626
-        securityMarks:
-          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
-        state: ACTIVE
+      finding.name:               organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+      finding.parent:             organizations/345840165995/sources/2948230327750090626
+      finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
 - execute:
   - command: |
       scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resourceName"
+      --format "text(finding.name,finding.category,finding.externalUri,finding.name,finding.parent,finding.resourceName,finding.securityMarks,finding.sourceProperties)"
   - stdout: |
       ---
-      finding:
-        createTime: '1970-01-01T00:00:00Z'
-        eventTime: '1970-01-01T00:00:00Z'
-        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-        parent: organizations/345840165995/sources/2948230327750090626
-        resourceName: http://somedistinctresource1
-        securityMarks:
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+      finding.name:               organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+      finding.parent:             organizations/345840165995/sources/2948230327750090626
+      finding.resourceName:       http://somedistinctresource1
+      finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
       ---
-      finding:
-        createTime: '1970-01-01T00:00:00Z'
-        eventTime: '1970-01-01T00:00:00Z'
-        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
-        parent: organizations/345840165995/sources/2948230327750090626
-        resourceName: http://somearbitresource
-        securityMarks:
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+      finding.name:               organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+      finding.parent:             organizations/345840165995/sources/2948230327750090626
+      finding.resourceName:       http://somearbitresource
+      finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
       ---
-      finding:
-        createTime: '1970-01-01T00:00:00Z'
-        eventTime: '1970-01-01T00:00:00Z'
-        name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
-        parent: organizations/345840165995/sources/2948230327750090626
-        securityMarks:
-          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+      finding.name:               organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+      finding.parent:             organizations/345840165995/sources/2948230327750090626
+      finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
 actions:
 - execute_command:
     # Retrieve all attributes/properties for the matched finding.
     command: |
       scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time '2019-03-13T22:15:01.900Z'
+      --format "text(finding.name,finding.category,finding.externalUri,finding.name,finding.parent,finding.resourceName,finding.securityMarks,finding.sourceProperties)"
     events:
     - api_call:
         expect_request:
           uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&orderBy=resourceName+desc&readTime=2019-03-13T22%3A15%3A01.900Z
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -115,7 +87,7 @@ actions:
                   marks:
                     mark_key1: mark_val1
                     mark_key2: mark_val2
-                eventTime: '2018-01-12T07:03:00Z'
+                eventTime: '2019-01-12T07:03:00Z'
                 createTime: '2019-03-12T23:45:08.062Z'
             - finding:
                 name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
@@ -145,62 +117,44 @@ actions:
             totalSize: 3
     - expect_stdout: |
         ---
-        finding:
-          category: CAT3
-          createTime: '2019-03-12T23:45:08.062Z'
-          eventTime: '2018-01-12T07:03:00Z'
-          externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-          parent: organizations/345840165995/sources/2948230327750090626
-          resourceName: http://somedistinctresource1
-          securityMarks:
-            marks:
-              mark_key1: mark_val1
-              mark_key2: mark_val2
-            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
-          sourceProperties:
-            pKey1: pVal1
-            pKey2: pVal2
-          state: ACTIVE
+        finding.category:                      CAT3
+        finding.externalUri:                   ftp://ftp.is.co.za/rfc/rfc1808.txt
+        finding.name:                          organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+        finding.parent:                        organizations/345840165995/sources/2948230327750090626
+        finding.resourceName:                  http://somedistinctresource1
+        finding.securityMarks.marks.mark_key1: mark_val1
+        finding.securityMarks.marks.mark_key2: mark_val2
+        finding.securityMarks.name:            organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        finding.sourceProperties.pKey1:        pVal1
+        finding.sourceProperties.pKey2:        pVal2
         ---
-        finding:
-          category: CAT3
-          createTime: '2019-03-12T23:43:27.816Z'
-          eventTime: '1970-01-01T00:00:00Z'
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
-          parent: organizations/345840165995/sources/2948230327750090626
-          resourceName: http://somearbitresource
-          securityMarks:
-            marks:
-              mark_key1: mark_val1
-              mark_key2: mark_val2
-            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
-          sourceProperties:
-            pKey1: pVal1
-            pKey2: pVal2
-          state: ACTIVE
+        finding.category:                      CAT3
+        finding.name:                          organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        finding.parent:                        organizations/345840165995/sources/2948230327750090626
+        finding.resourceName:                  http://somearbitresource
+        finding.securityMarks.marks.mark_key1: mark_val1
+        finding.securityMarks.marks.mark_key2: mark_val2
+        finding.securityMarks.name:            organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+        finding.sourceProperties.pKey1:        pVal1
+        finding.sourceProperties.pKey2:        pVal2
         ---
-        finding:
-          createTime: '2018-12-13T23:47:59.398Z'
-          eventTime: '2018-12-17T18:32:33Z'
-          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
-          parent: organizations/345840165995/sources/2948230327750090626
-          securityMarks:
-            name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
-          state: ACTIVE
+        finding.name:               organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+        finding.parent:             organizations/345840165995/sources/2948230327750090626
+        finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
     - expect_exit:
         code: 0
 - execute_command:
     # Only retrieve specific attributes/properties based on camelCase field-mask values.
     command: |
       scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resourceName"
+      --format "text(finding.name,finding.category,finding.externalUri,finding.name,finding.parent,finding.resourceName,finding.securityMarks,finding.sourceProperties)"
     events:
     - api_call:
         expect_request:
           uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&fieldMask=finding.resourceName&orderBy=resourceName+desc&readTime=2019-03-13T22%3A15%3A01.900Z
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -236,30 +190,18 @@ actions:
             totalSize: 3
     - expect_stdout: |
         ---
-        finding:
-          createTime: '1970-01-01T00:00:00Z'
-          eventTime: '1970-01-01T00:00:00Z'
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
-          parent: organizations/345840165995/sources/2948230327750090626
-          resourceName: http://somedistinctresource1
-          securityMarks:
-            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        finding.name:               organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+        finding.parent:             organizations/345840165995/sources/2948230327750090626
+        finding.resourceName:       http://somedistinctresource1
+        finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
         ---
-        finding:
-          createTime: '1970-01-01T00:00:00Z'
-          eventTime: '1970-01-01T00:00:00Z'
-          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
-          parent: organizations/345840165995/sources/2948230327750090626
-          resourceName: http://somearbitresource
-          securityMarks:
-            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+        finding.name:               organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        finding.parent:             organizations/345840165995/sources/2948230327750090626
+        finding.resourceName:       http://somearbitresource
+        finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
         ---
-        finding:
-          createTime: '1970-01-01T00:00:00Z'
-          eventTime: '1970-01-01T00:00:00Z'
-          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
-          parent: organizations/345840165995/sources/2948230327750090626
-          securityMarks:
-            name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+        finding.name:               organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+        finding.parent:             organizations/345840165995/sources/2948230327750090626
+        finding.securityMarks.name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
     - expect_exit:
         code: 0

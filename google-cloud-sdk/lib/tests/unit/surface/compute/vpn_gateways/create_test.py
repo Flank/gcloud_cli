@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface.compute import vpn_gateways_test_base
 
 
-class VpnGatewaysCreateBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
+class VpnGatewaysCreateGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testSimpleCase(self):
     name = 'my-vpn-gateway'
@@ -95,6 +95,12 @@ class VpnGatewaysCreateBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
         'argument --network: Must be specified.'):
       self.Run('compute vpn-gateways create {} --region {} '.format(
           name, self.REGION))
+
+
+class VpnGatewaysCreateBetaTest(VpnGatewaysCreateGaTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class VpnGatewaysCreateAlphaTest(VpnGatewaysCreateBetaTest):

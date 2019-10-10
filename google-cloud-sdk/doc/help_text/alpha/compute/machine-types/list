@@ -32,11 +32,7 @@ FLAGS
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
 
      --zones=ZONE,[ZONE,...]
-        (DEPRECATED) If provided, only resources from the given zones are
-        queried.
-
-        Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
-        For example --filter="zone:( europe-west1-b europe-west1-c )".
+        If provided, only resources from the given zones are queried.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -92,9 +88,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute machine-types list
         $ gcloud beta compute machine-types list

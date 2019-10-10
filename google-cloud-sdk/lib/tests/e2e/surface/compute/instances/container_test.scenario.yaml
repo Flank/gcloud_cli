@@ -6,7 +6,7 @@ summary:
   - command: compute instances create-with-container $$instance1$$ --container-image=gcr.io/google-containers/busybox
       --zone us-central1-f --format 'text(name,zone)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$\].
   - stdout: |
       ---
       name: $$instance1$$
@@ -33,11 +33,11 @@ summary:
 - execute:
   - command: compute instances delete $$instance1$$ --zone us-central1-f --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: instance1
     prefix: gcloud-compute-container
@@ -5330,7 +5330,7 @@ actions:
                 boot: true
                 mode: READ_WRITE
                 type: PERSISTENT
-              machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
               metadata:
                 items:
                 - key: gce-container-declaration
@@ -5358,7 +5358,7 @@ actions:
               - accessConfigs:
                 - name: external-nat
                   type: ONE_TO_ONE_NAT
-                network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                network: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/default
               scheduling:
                 automaticRestart: true
               serviceAccounts:
@@ -5383,8 +5383,9 @@ actions:
             insertTime: '2018-09-21T12:39:28.657-07:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537558756464-57666cb801580-299bc56f-3e8e6643
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$?alt=json
@@ -6091,7 +6092,8 @@ actions:
     cleanup_for: instance1
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance1$$\].
     - expect_exit:
         code: 0

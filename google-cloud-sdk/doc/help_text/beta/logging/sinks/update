@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud beta logging sinks update SINK_NAME [DESTINATION]
         [--log-filter=LOG_FILTER]
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
-          | --organization=ORGANIZATION_ID] [GCLOUD_WIDE_FLAG ...]
+          | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Changes the [destination] or --log-filter associated with a sink.
@@ -36,6 +37,20 @@ FLAGS
 
        --organization=ORGANIZATION_ID
           Update a sink associated with this organization.
+
+       --project=PROJECT_ID
+          Update a sink associated with this project.
+
+          The Google Cloud Platform project name to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

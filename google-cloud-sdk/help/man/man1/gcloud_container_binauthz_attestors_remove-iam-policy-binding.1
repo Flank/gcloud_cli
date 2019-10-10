@@ -1,0 +1,122 @@
+
+.TH "GCLOUD_CONTAINER_BINAUTHZ_ATTESTORS_REMOVE\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container binauthz attestors remove\-iam\-policy\-binding \- remove IAM policy binding of a Binary Authorization attestor
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container binauthz attestors remove\-iam\-policy\-binding\fR \fIATTESTOR\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Remove an IAM policy binding of a Binary Authorization attestor.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Attestor resource \- The Binary Authorization attestor for which to add IAM
+policy binding to. This represents a Cloud resource. (NOTE) Some attributes are
+not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [attestor] on the command line with a
+fully specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIATTESTOR\fR
+ID of the attestor or fully qualified identifier for the attestor.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to remove the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+The role to remove the member from.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbinaryauthorization/v1alpha2\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/binary\-authorization/
+
+
+
+.SH "EXAMPLES"
+
+To Remove an IAM policy binding for the role of
+\'roles/binaryauthorization.attestorsEditor' for the user 'test\-user@gmail.com'
+on attesttor 'my_attestor', run:
+
+.RS 2m
+$ gcloud container binauthz attestors remove\-iam\-policy\-binding \e
+    my_attestor \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/binaryauthorization.attestorsEditor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors remove\-iam\-policy\-binding
+$ gcloud beta container binauthz attestors remove\-iam\-policy\-binding
+.RE
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import logging
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
+from tests.lib import sdk_test_base
 from tests.lib.sdk_test_base import Retry
 from tests.lib.surface.compute import e2e_test_base
 
@@ -30,28 +31,29 @@ class SubnetworksTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.network_name = next(e2e_utils.GetResourceNameGenerator(
-        prefix='subnets-test-network'))
-    self.subnetwork_name = next(e2e_utils.GetResourceNameGenerator(
-        prefix='subnets-test-subnet'))
+    self.network_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='subnets-test-network'))
+    self.subnetwork_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='subnets-test-subnet'))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')
-    self.CleanUpResource(self.subnetwork_name, 'networks subnets',
-                         scope=e2e_test_base.REGIONAL)
-    self.CleanUpResource(self.network_name, 'networks',
-                         scope=e2e_test_base.GLOBAL)
+    self.CleanUpResource(
+        self.subnetwork_name, 'networks subnets', scope=e2e_test_base.REGIONAL)
+    self.CleanUpResource(
+        self.network_name, 'networks', scope=e2e_test_base.GLOBAL)
 
+  @sdk_test_base.SdkBase.SetDirsSizeLimit(1 << 23)  # 8mb for large logs
   def testSubnetworks(self):
-    self.Run('compute networks create {0} --subnet-mode custom'
-             .format(self.network_name))
+    self.Run('compute networks create {0} --subnet-mode custom'.format(
+        self.network_name))
     self.AssertNewOutputContains(self.network_name)
     self.Run('compute networks subnets create {0} --network {1} '
-             '--region {2} --range 10.11.12.0/24'
-             .format(self.subnetwork_name, self.network_name, self.region))
+             '--region {2} --range 10.11.12.0/24'.format(
+                 self.subnetwork_name, self.network_name, self.region))
     self.AssertNewOutputContains(self.subnetwork_name)
-    self.Run('compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('name: {0}'.format(self.subnetwork_name))
 
     # Do not assert the output to avoid flakiness, because it depends on Ncon
@@ -59,15 +61,15 @@ class SubnetworksTest(e2e_test_base.BaseTest):
     # control of Arcus.
     self.Run('alpha compute networks subnets list-usable')
 
-    self.Run('compute networks subnets delete {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets delete {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
 
     cmd = 'compute networks delete {0}'.format(self.network_name)
     Retry(lambda: self.Run(cmd))
 
   def testSubnetworksPrivateIpGoogleAccess(self):
-    self.Run('compute networks create {0} --subnet-mode custom'
-             .format(self.network_name))
+    self.Run('compute networks create {0} --subnet-mode custom'.format(
+        self.network_name))
     self.AssertNewOutputContains(self.network_name)
 
     # First create a subnetwork without privateIpGoogleAccess enabled.
@@ -75,51 +77,52 @@ class SubnetworksTest(e2e_test_base.BaseTest):
              '--region {2} --range 10.11.12.0/24'.format(
                  self.subnetwork_name, self.network_name, self.region))
     self.AssertNewOutputContains(self.subnetwork_name)
-    self.Run('beta compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('beta compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('privateIpGoogleAccess: false')
 
     # Set --enable-private-ip-google-access.
     self.Run('beta compute networks subnets update {0} --region {1} '
-             '--enable-private-ip-google-access'.format(
-                 self.subnetwork_name, self.region))
-    self.Run('beta compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+             '--enable-private-ip-google-access'.format(self.subnetwork_name,
+                                                        self.region))
+    self.Run('beta compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('privateIpGoogleAccess: true')
 
     # Turn it off again.
     self.Run('beta compute networks subnets update {0} --region {1} '
              '--no-enable-private-ip-google-access'.format(
                  self.subnetwork_name, self.region))
-    self.Run('beta compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('beta compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('privateIpGoogleAccess: false')
 
     # Delete the subnet.
-    self.Run('compute networks subnets delete {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets delete {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
 
     # Create the subnet again but with --private-ip-google-access enabled this
     # time.
     self.Run('beta compute networks subnets create {0} --network {1} '
              '--region {2} --range 10.11.12.0/24 '
-             '--enable-private-ip-google-access'.format(
-                 self.subnetwork_name, self.network_name, self.region))
+             '--enable-private-ip-google-access'.format(self.subnetwork_name,
+                                                        self.network_name,
+                                                        self.region))
     self.AssertNewOutputContains(self.subnetwork_name)
-    self.Run('beta compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('beta compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('privateIpGoogleAccess: true')
 
     # Delete the subnet.
-    self.Run('compute networks subnets delete {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets delete {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
 
     cmd = 'compute networks delete {0}'.format(self.network_name)
     Retry(lambda: self.Run(cmd))
 
   def testSubnetworksAddRemoveSecondaryRange(self):
-    self.Run('compute networks create {0} --subnet-mode custom'
-             .format(self.network_name))
+    self.Run('compute networks create {0} --subnet-mode custom'.format(
+        self.network_name))
     self.AssertNewOutputContains(self.network_name)
 
     # First create a subnetwork with no secondary ranges.
@@ -127,8 +130,8 @@ class SubnetworksTest(e2e_test_base.BaseTest):
              '--region {2} --range 10.11.12.0/24'.format(
                  self.subnetwork_name, self.network_name, self.region))
     self.AssertNewOutputContains(self.subnetwork_name)
-    self.Run('compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('privateIpGoogleAccess: false')
     self.AssertNewOutputNotContains('10.11.13.0/24')
 
@@ -137,8 +140,8 @@ class SubnetworksTest(e2e_test_base.BaseTest):
              '--add-secondary-ranges range1=10.11.13.0/24'.format(
                  self.subnetwork_name, self.region))
     self.ClearOutput()
-    self.Run('compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputContains('10.11.13.0/24')
 
     # Remove it.
@@ -146,13 +149,81 @@ class SubnetworksTest(e2e_test_base.BaseTest):
              '--remove-secondary-ranges range1'.format(self.subnetwork_name,
                                                        self.region))
     self.ClearOutput()
-    self.Run('compute networks subnets describe {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
     self.AssertNewOutputNotContains('10.11.13.0/24')
 
     # Delete the subnet.
-    self.Run('compute networks subnets delete {0} --region {1}'
-             .format(self.subnetwork_name, self.region))
+    self.Run('compute networks subnets delete {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
+
+    cmd = 'compute networks delete {0}'.format(self.network_name)
+    Retry(lambda: self.Run(cmd))
+
+  def testSubnetworksFlowLogs(self):
+    self.Run('compute networks create {0} --subnet-mode custom'.format(
+        self.network_name))
+    self.AssertNewOutputContains(self.network_name)
+
+    # First create a subnetwork with flow logs disabled.
+    self.Run('compute networks subnets create {0} --network {1} '
+             '--region {2} --range 10.11.12.0/24'.format(
+                 self.subnetwork_name, self.network_name, self.region))
+    self.AssertNewOutputContains(self.subnetwork_name)
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
+    self.AssertNewOutputNotContains('logConfig')
+
+    # Enable flow logs and set aggregation and sampling options.
+    self.Run('compute networks subnets update {0} --region {1} '
+             '--enable-flow-logs '
+             '--logging-aggregation-interval interval-10-min '
+             '--logging-flow-sampling 0.7 '
+             '--logging-metadata exclude-all'.format(
+                 self.subnetwork_name, self.region))
+    self.ClearOutput()
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
+    self.AssertNewOutputContains('logConfig:', reset=False)
+    self.AssertNewOutputContains('  enable: true', reset=False)
+    self.AssertNewOutputContains(
+        '  aggregationInterval: INTERVAL_10_MIN', reset=False)
+    self.AssertNewOutputContains('  flowSampling: 0.7', reset=False)
+    self.AssertNewOutputContains(
+        '  metadata: EXCLUDE_ALL_METADATA', reset=False)
+
+    # Disable flow logs.
+    self.Run('compute networks subnets update {0} --region {1} '
+             '--no-enable-flow-logs'.format(self.subnetwork_name, self.region))
+    self.ClearOutput()
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
+    self.AssertNewOutputContains('logConfig:', reset=False)
+    self.AssertNewOutputContains('  enable: false', reset=False)
+    self.AssertNewOutputContains(
+        '  aggregationInterval: INTERVAL_10_MIN', reset=False)
+    self.AssertNewOutputContains('  flowSampling: 0.7', reset=False)
+    self.AssertNewOutputContains(
+        '  metadata: EXCLUDE_ALL_METADATA', reset=False)
+
+    # Delete the subnet.
+    self.Run('compute networks subnets delete {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
+
+    # Create the subnetwork again with flow logs enabled.
+    self.Run('compute networks subnets create {0} --network {1} '
+             '--region {2} --range 10.11.12.0/24 '
+             '--enable-flow-logs'.format(self.subnetwork_name,
+                                         self.network_name, self.region))
+    self.AssertNewOutputContains(self.subnetwork_name)
+    self.Run('compute networks subnets describe {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
+    self.AssertNewOutputContains('logConfig:', reset=False)
+    self.AssertNewOutputContains('  enable: true')
+
+    # Delete the subnet.
+    self.Run('compute networks subnets delete {0} --region {1}'.format(
+        self.subnetwork_name, self.region))
 
     cmd = 'compute networks delete {0}'.format(self.network_name)
     Retry(lambda: self.Run(cmd))

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -137,9 +137,10 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
         self.storage_client.client.objects,
         'Get')
     stream = io.StringIO()
-    object_info = self.MakeObject()
+    mock_object_size = 42
+    object_info = self.MakeObject(size=mock_object_size)
 
-    self.storage_client.BuildObjectStream(stream, object_info)
+    download = self.storage_client.BuildObjectStream(stream, object_info)
 
     # Check the correctness of the Get request.
     get_object_mock.assert_called_once_with(
@@ -152,6 +153,8 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
         get_object_mock.call_args_list[0][1]['download'].stream)
     self.assertFalse(
         get_object_mock.call_args_list[0][1]['download'].auto_transfer)
+    # Check the metadata of the returned download.
+    self.assertEqual(download.total_size, mock_object_size)
 
   # StorageObjectSeriesStream tests
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,5 +65,8 @@ def CreateNetworkResourceFromArgs(messages, network_ref, network_args):
     network.routingConfig.routingMode = (
         messages.NetworkRoutingConfig.RoutingModeValueValuesEnum(
             network_args.bgp_routing_mode.upper()))
+
+  if hasattr(network_args, 'mtu') and network_args.mtu is not None:
+    network.mtu = network_args.mtu
 
   return network

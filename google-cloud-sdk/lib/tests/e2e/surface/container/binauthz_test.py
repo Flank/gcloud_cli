@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ class BinauthzTest(
   def SetUp(self):
     # We don't get our track from the base binauthz test because `CliTestBase`
     # clobbers it in its SetUp.
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     # CliTestBase sets this to True in its SetUp, but we only need to consume
     # the result of calling self.Run in their structured format.
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -158,7 +158,7 @@ class BinauthzTest(
         'add',
         '--attestor',
         attestor_id,
-        '--public-key-file',
+        '--pgp-public-key-file',
         pgp_key_path
     ])
     self.RunBinauthz([
@@ -177,7 +177,7 @@ class BinauthzTest(
         attestor_id,
         '--pgp-public-key-file',
         pgp_key_path
-    ], track=calliope_base.ReleaseTrack.ALPHA)
+    ], track=calliope_base.ReleaseTrack.BETA)
     self.RunBinauthz([
         'attestors',
         'public-keys',
@@ -187,7 +187,7 @@ class BinauthzTest(
         '--keyversion',
         ('projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
          .format(proj=self.Project())),
-    ], track=calliope_base.ReleaseTrack.ALPHA)
+    ], track=calliope_base.ReleaseTrack.BETA)
     self.RunBinauthz([
         'attestors',
         'public-keys',
@@ -200,7 +200,7 @@ class BinauthzTest(
         'ecdsa-p256-sha256',
         '--public-key-id-override',
         '//example.com'
-    ], track=calliope_base.ReleaseTrack.ALPHA)
+    ], track=calliope_base.ReleaseTrack.BETA)
 
   def GetOccurrence(self, occurrence_name):
     return self.ca_client.projects_occurrences.Get(
@@ -222,7 +222,7 @@ class BinauthzTest(
         artifact_url,
         '--attestor',
         attestor_ref,
-        '--pgp-key-fingerprint',
+        '--public-key-id',
         pgp_key_fingerprint,
         '--signature-file',
         signature_path,
@@ -244,8 +244,12 @@ class BinauthzTest(
         'attestors',
         'describe',
         self.attestor_id,
-    ], track=calliope_base.ReleaseTrack.ALPHA)
-    self.assertEqual(len(attestor.userOwnedDrydockNote.publicKeys), 3)
+    ], track=calliope_base.ReleaseTrack.BETA)
+    try:
+      num_keys = len(attestor.userOwnedGrafeasNote.publicKeys)
+    except AttributeError:
+      num_keys = len(attestor.userOwnedDrydockNote.publicKeys)
+    self.assertEqual(num_keys, 3)
 
     attestation = self.CreateAttestation(
         attestor_ref=self.attestor_relative_name,
@@ -257,11 +261,13 @@ class BinauthzTest(
     # Verify the generated Occurrence.
     occurrence = self.GetOccurrence(attestation.name)
     self.assertEqual(
-        occurrence.attestation.attestation.pgpSignedAttestation.pgpKeyId,
+        (occurrence.attestation.attestation.genericSignedAttestation
+         .signatures[0].publicKeyId),
         'bogus_pk_id')
     self.assertEqual(
-        occurrence.attestation.attestation.pgpSignedAttestation.signature,
-        'bogus_sig')
+        (occurrence.attestation.attestation.genericSignedAttestation
+         .signatures[0].signature),
+        b'bogus_sig')
 
     # Create an attestation with a different artifact URL.
     artifact_url2 = self.GenerateArtifactUrl()
@@ -284,7 +290,7 @@ class BinauthzTest(
         '--keyversion',
         ('projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
          .format(proj=self.Project())),
-    ], track=calliope_base.ReleaseTrack.ALPHA)
+    ], track=calliope_base.ReleaseTrack.BETA)
     self.AddEarlyCleanup(self.CleanUpAttestation,
                          occurrence_name=occurrence.name)
 
@@ -323,11 +329,13 @@ class BinauthzTest(
         ]))
     self.assertEqual(1, len(occurrences))
     self.assertEqual(
-        occurrences[0].attestation.attestation.pgpSignedAttestation.pgpKeyId,
+        (occurrences[0].attestation.attestation.genericSignedAttestation
+         .signatures[0].publicKeyId),
         'bogus_pk_id')
     self.assertEqual(
-        occurrences[0].attestation.attestation.pgpSignedAttestation.signature,
-        'bogus_sig')
+        (occurrences[0].attestation.attestation.genericSignedAttestation
+         .signatures[0].signature),
+        b'bogus_sig')
     occurrences = list(self.RunAndUnwindWithRetry(
         [
             'container',
@@ -343,11 +351,20 @@ class BinauthzTest(
         ]))
     self.assertEqual(1, len(occurrences))
     self.assertEqual(
-        (occurrences[0].attestation.attestation.genericSignedAttestation.
-         signatures[0].publicKeyId),
+        (occurrences[0].attestation.attestation.genericSignedAttestation
+         .signatures[0].publicKeyId),
         ('//cloudkms.googleapis.com/v1/projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
          .format(proj=self.Project())),
     )
+
+
+# TODO(b/112087150): Re-enable when quota is more forgiving.
+# class BinauthzBetaTest(BinauthzTest):
+#
+#   def SetUp(self):
+#     # We don't get our track from the base binauthz test because `CliTestBase`
+#     # clobbers it in its SetUp.
+#     self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

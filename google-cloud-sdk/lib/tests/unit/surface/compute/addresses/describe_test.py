@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ class AddressesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
         textwrap.dedent("""\
             address: 23.251.134.124
             name: address-1
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
             status: IN_USE
             """))
 
@@ -92,7 +92,7 @@ class AddressesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
         textwrap.dedent("""\
             address: 23.251.134.126
             name: global-address-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
             status: IN_USE
             """))
 
@@ -117,8 +117,8 @@ class AddressesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
         textwrap.dedent("""\
             address: 23.251.134.124
             name: address-1
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
             status: IN_USE
             """))
 
@@ -129,7 +129,7 @@ class AddressesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
     self.Run("""
         compute addresses describe
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
         """)
 
     self.CheckRequests(
@@ -147,7 +147,7 @@ class AddressesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
     self.Run("""
         compute addresses describe
-          https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
         """)
 
     self.CheckRequests(
@@ -162,7 +162,7 @@ class AddressesDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
         resources.WrongResourceCollectionException, r'.*compute\.networks.*'):
       self.Run("""
           compute addresses describe
-            https://www.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
           """)
 
     self.CheckRequests()

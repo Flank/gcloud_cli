@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -123,6 +123,24 @@ class UrlMapsSetDefaultServiceTest(test_base.BaseTest):
     self.CheckRequests()
 
 
+class UrlMapsSetDefaultServiceBetaTest(UrlMapsSetDefaultServiceTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._url_maps_api = self.compute_beta.urlMaps
+    self._backend_buckets_uri_prefix = (
+        self.compute_uri + '/projects/my-project/global/backendBuckets/')
+    self._backend_services_uri_prefix = (
+        self.compute_uri + '/projects/my-project/global/backendServices/')
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
+    )
+
+  def RunSetDefaultService(self, command):
+    self.Run('beta compute url-maps set-default-service --global ' + command)
+
+
 class UrlMapsSetDefaultServiceAlphaTest(UrlMapsSetDefaultServiceTest):
 
   def SetUp(self):
@@ -140,11 +158,11 @@ class UrlMapsSetDefaultServiceAlphaTest(UrlMapsSetDefaultServiceTest):
     self.Run('alpha compute url-maps set-default-service --global' + command)
 
 
-class RegionUrlMapsSetDefaultServiceTest(test_base.BaseTest):
+class RegionUrlMapsSetDefaultServiceBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._url_maps_api = self.compute_beta.regionUrlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
     self._backend_services_uri_prefix = (
@@ -156,7 +174,7 @@ class RegionUrlMapsSetDefaultServiceTest(test_base.BaseTest):
     )
 
   def RunSetDefaultService(self, command):
-    self.Run('alpha compute url-maps set-default-service --region us-west-1' +
+    self.Run('beta compute url-maps set-default-service --region us-west-1' +
              command)
 
   def _MakeExpectedUrlMapGetRequest(self):
@@ -252,21 +270,25 @@ class RegionUrlMapsSetDefaultServiceTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class UrlMapsSetDefaultServiceBetaTest(UrlMapsSetDefaultServiceTest):
+class RegionUrlMapsSetDefaultServiceAlphaTest(
+    RegionUrlMapsSetDefaultServiceBetaTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._url_maps_api = self.compute_beta.urlMaps
+    self.SelectApi('alpha')
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
     self._backend_buckets_uri_prefix = (
         self.compute_uri + '/projects/my-project/global/backendBuckets/')
     self._backend_services_uri_prefix = (
-        self.compute_uri + '/projects/my-project/global/backendServices/')
+        self.compute_uri + '/projects/my-project/regions/us-west-1/'
+        'backendServices/')
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
-        defaultService=self._backend_buckets_uri_prefix + 'default-bucket',)
+        defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
+    )
 
   def RunSetDefaultService(self, command):
-    self.Run('beta compute url-maps set-default-service ' + command)
+    self.Run('alpha compute url-maps set-default-service --region us-west-1' +
+             command)
 
 
 if __name__ == '__main__':

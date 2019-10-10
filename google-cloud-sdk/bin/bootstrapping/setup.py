@@ -52,14 +52,12 @@ if 'google' in sys.modules:
 
 
 # pylint: disable=g-import-not-at-top
-from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import platforms
 
 
 # Add more methods to this list for universal checks that need to be performed
 def DoAllRequiredChecks():
-  if not platforms.PythonVersion().IsCompatible(
-      properties.VALUES.core.allow_py3.GetBool()):
+  if not platforms.PythonVersion().IsCompatible():
     sys.exit(1)
 
 

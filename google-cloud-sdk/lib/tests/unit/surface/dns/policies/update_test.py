@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ from __future__ import unicode_literals
 
 from tests.lib import test_case
 from tests.lib.surface.dns import base
-from tests.lib.surface.dns import util_beta
+from tests.lib.surface.dns import util
 
 
-class UpdateTest(base.DnsMockBetaTest):
+class UpdateTest(base.DnsMockTest):
 
   def _ExpectUpdate(self,
                     description=None,
@@ -31,8 +31,8 @@ class UpdateTest(base.DnsMockBetaTest):
                     networks=None,
                     forwarding=None,
                     logging=None):
-    get_output = util_beta.GetPolicies(networks=[], num=1).pop()
-    expected_output = util_beta.GetPolicies(networks=[], num=1).pop()
+    get_output = util.GetPolicies(networks=[], num=1).pop()
+    expected_output = util.GetPolicies(networks=[], num=1).pop()
     get_req = self.messages.DnsPoliciesGetRequest(
         project=self.Project(), policy='mypolicy0')
     self.client.policies.Get.Expect(request=get_req, response=get_output)
@@ -40,11 +40,11 @@ class UpdateTest(base.DnsMockBetaTest):
       expected_output.description = 'New Description'
 
     if networks:
-      expected_output.networks = util_beta.GetPolicyNetworks(networks)
+      expected_output.networks = util.GetPolicyNetworks(networks)
 
     if name_servers:
       expected_output.alternativeNameServerConfig = (
-          util_beta.GetAltNameServerConfig(name_servers))
+          util.GetAltNameServerConfig(name_servers))
 
     if forwarding is not None:
       expected_output.enableInboundForwarding = forwarding
@@ -119,11 +119,11 @@ class UpdateTest(base.DnsMockBetaTest):
                              '--alternative-name-servers 1.0.1.1,1.0.1.2 '
                              '--networks networka,networkb '
                              '--enable-inbound-forwarding '
-                             '--enable-logging')
+                             '--enable-logging ')
     self.assertEqual(expected_response.policy, actual_output)
 
   def testUpdateNone(self):
-    expected_output = util_beta.GetPolicies(networks=[], num=1).pop()
+    expected_output = util.GetPolicies(networks=[], num=1).pop()
     get_req = self.messages.DnsPoliciesGetRequest(
         project=self.Project(), policy='mypolicy0')
     self.client.policies.Get.Expect(request=get_req, response=expected_output)

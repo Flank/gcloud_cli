@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -242,7 +242,8 @@ class ConfigTest(cli_test_base.CliTestBase):
           'config {0} acc'.format(verb), ['account', 'accessibility/'])
       self.RunCompletion(
           'config {0} dis'.format(verb),
-          ['disable_color', 'disable_prompts', 'disable_usage_reporting'])
+          ['disable_color', 'disable_file_logging', 'disable_prompts',
+           'disable_usage_reporting'])
 
       # Complete both sections and properties.
       self.RunCompletion('config {0} a'.format(verb),
@@ -250,7 +251,8 @@ class ConfigTest(cli_test_base.CliTestBase):
 
       # Complete only sections.
       self.RunCompletion('config {0} co'.format(verb), [
-          'component_manager/', 'composer/', 'compute/', 'container/', 'core/'
+          'component_manager/', 'composer/', 'compute/', 'container/',
+          'context_aware/', 'core/'
       ])
 
       # Complete properties under a section.

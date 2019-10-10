@@ -125,6 +125,10 @@
         "inspectTemplateName": {
           "description": "Optional template to use. Any configuration directly specified in\ninspect_config will override those set in the template. Singular fields\nthat are set in this request will replace their corresponding fields in the\ntemplate. Repeated fields are appended. Singular sub-messages and groups\nare recursively merged.",
           "type": "string"
+        },
+        "location": {
+          "description": "The geographic location to process content inspection. Reserved for future\nextensions.",
+          "type": "string"
         }
       }
     },
@@ -134,7 +138,7 @@
       "type": "object",
       "properties": {
         "infoTypes": {
-          "description": "Restricts what info_types to look for. The values must correspond to\nInfoType values returned by ListInfoTypes or listed at\nhttps:\/\/cloud.google.com\/dlp\/docs\/infotypes-reference.\n\nWhen no InfoTypes or CustomInfoTypes are specified in a request, the\nsystem may automatically choose what detectors to run. By default this may\nbe all types, but may change over time as detectors are updated.\n\nThe special InfoType name \"ALL_BASIC\" can be used to trigger all detectors,\nbut may change over time as new InfoTypes are added. If you need precise\ncontrol and predictability as to what detectors are run you should specify\nspecific InfoTypes listed in the reference.",
+          "description": "Restricts what info_types to look for. The values must correspond to\nInfoType values returned by ListInfoTypes or listed at\nhttps:\/\/cloud.google.com\/dlp\/docs\/infotypes-reference.\n\nWhen no InfoTypes or CustomInfoTypes are specified in a request, the\nsystem may automatically choose what detectors to run. By default this may\nbe all types, but may change over time as detectors are updated.\n\nIf you need precise control and predictability as to what detectors are\nrun you should specify specific InfoTypes listed in the reference,\notherwise a default list will be used, which may change over time.",
           "type": "array",
           "items": {
             "$ref": "GooglePrivacyDlpV2InfoType"
@@ -404,7 +408,7 @@
     },
     "GooglePrivacyDlpV2DetectionRule": {
       "id": "GooglePrivacyDlpV2DetectionRule",
-      "description": "Rule for modifying a CustomInfoType to alter behavior under certain\ncircumstances, depending on the specific details of the rule. Not supported\nfor the `surrogate_type` custom info type.",
+      "description": "Deprecated; use `InspectionRuleSet` instead. Rule for modifying a\n`CustomInfoType` to alter behavior under certain circumstances, depending\non the specific details of the rule. Not supported for the `surrogate_type`\ncustom infoType.",
       "type": "object",
       "properties": {
         "hotwordRule": {
@@ -744,6 +748,7 @@
             "",
             "",
             "",
+            "",
             ""
           ],
           "type": "string",
@@ -754,7 +759,8 @@
             "IMAGE_BMP",
             "IMAGE_PNG",
             "IMAGE_SVG",
-            "TEXT_UTF8"
+            "TEXT_UTF8",
+            "AVRO"
           ]
         },
         "data": {
@@ -1288,6 +1294,10 @@
         "deidentifyTemplateName": {
           "description": "Optional template to use. Any configuration directly specified in\ndeidentify_config will override those set in the template. Singular fields\nthat are set in this request will replace their corresponding fields in the\ntemplate. Repeated fields are appended. Singular sub-messages and groups\nare recursively merged.",
           "type": "string"
+        },
+        "location": {
+          "description": "The geographic location to process de-identification. Reserved for future\nextensions.",
+          "type": "string"
         }
       }
     },
@@ -1686,7 +1696,7 @@
           "$ref": "GooglePrivacyDlpV2CryptoKey"
         },
         "surrogateInfoType": {
-          "description": "The custom info type to annotate the surrogate with.\nThis annotation will be applied to the surrogate by prefixing it with\nthe name of the custom info type followed by the number of\ncharacters comprising the surrogate. The following scheme defines the\nformat: <info type name>(<surrogate character count>):<surrogate>\n\nFor example, if the name of custom info type is 'MY_TOKEN_INFO_TYPE' and\nthe surrogate is 'abc', the full replacement value\nwill be: 'MY_TOKEN_INFO_TYPE(3):abc'\n\nThis annotation identifies the surrogate when inspecting content using the\ncustom info type 'Surrogate'. This facilitates reversal of the\nsurrogate when it occurs in free text.\n\nIn order for inspection to work properly, the name of this info type must\nnot occur naturally anywhere in your data; otherwise, inspection may either\n\n- reverse a surrogate that does not correspond to an actual identifier\n- be unable to parse the surrogate and result in an error\n\nTherefore, choose your custom info type name carefully after considering\nwhat your data looks like. One way to select a name that has a high chance\nof yielding reliable detection is to include one or more unicode characters\nthat are highly improbable to exist in your data.\nFor example, assuming your data is entered from a regular ASCII keyboard,\nthe symbol with the hex code point 29DD might be used like so:\n\u29DDMY_TOKEN_TYPE",
+          "description": "The custom info type to annotate the surrogate with.\nThis annotation will be applied to the surrogate by prefixing it with\nthe name of the custom info type followed by the number of\ncharacters comprising the surrogate. The following scheme defines the\nformat: <info type name>(<surrogate character count>):<surrogate>\n\nFor example, if the name of custom info type is 'MY_TOKEN_INFO_TYPE' and\nthe surrogate is 'abc', the full replacement value\nwill be: 'MY_TOKEN_INFO_TYPE(3):abc'\n\nThis annotation identifies the surrogate when inspecting content using the\ncustom info type 'Surrogate'. This facilitates reversal of the\nsurrogate when it occurs in free text.\n\nNote: For record transformations where the entire cell in a table is being\ntransformed, surrogates are optional to use. Surrogates are used to denote\nthe location of the token and are necessary for re-identification in free\nform text.\n\nIn order for inspection to work properly, the name of this info type must\nnot occur naturally anywhere in your data; otherwise, inspection may either\n\n- reverse a surrogate that does not correspond to an actual identifier\n- be unable to parse the surrogate and result in an error\n\nTherefore, choose your custom info type name carefully after considering\nwhat your data looks like. One way to select a name that has a high chance\nof yielding reliable detection is to include one or more unicode characters\nthat are highly improbable to exist in your data.\nFor example, assuming your data is entered from a regular ASCII keyboard,\nthe symbol with the hex code point 29DD might be used like so:\n\u29DDMY_TOKEN_TYPE.",
           "$ref": "GooglePrivacyDlpV2InfoType"
         },
         "context": {
@@ -1947,7 +1957,7 @@
       "type": "object",
       "properties": {
         "reidentifyConfig": {
-          "description": "Configuration for the re-identification of the content item.\nThis field shares the same proto message type that is used for\nde-identification, however its usage here is for the reversal of the\nprevious de-identification. Re-identification is performed by examining\nthe transformations used to de-identify the items and executing the\nreverse. This requires that only reversible transformations\nbe provided here. The reversible transformations are:\n\n - `CryptoReplaceFfxFpeConfig`",
+          "description": "Configuration for the re-identification of the content item.\nThis field shares the same proto message type that is used for\nde-identification, however its usage here is for the reversal of the\nprevious de-identification. Re-identification is performed by examining\nthe transformations used to de-identify the items and executing the\nreverse. This requires that only reversible transformations\nbe provided here. The reversible transformations are:\n\n - `CryptoDeterministicConfig`\n - `CryptoReplaceFfxFpeConfig`",
           "$ref": "GooglePrivacyDlpV2DeidentifyConfig"
         },
         "inspectConfig": {
@@ -1964,6 +1974,10 @@
         },
         "reidentifyTemplateName": {
           "description": "Optional template to use. References an instance of `DeidentifyTemplate`.\nAny configuration directly specified in `reidentify_config` or\n`inspect_config` will override those set in the template. Singular fields\nthat are set in this request will replace their corresponding fields in the\ntemplate. Repeated fields are appended. Singular sub-messages and groups\nare recursively merged.",
+          "type": "string"
+        },
+        "location": {
+          "description": "The geographic location to process content reidentification.  Reserved for\nfuture extensions.",
           "type": "string"
         }
       }
@@ -2225,7 +2239,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Unique resource name for the triggeredJob, assigned by the service when the\ntriggeredJob is created, for example\n`projects\/dlp-test-project\/triggeredJobs\/53234423`.",
+          "description": "Unique resource name for the triggeredJob, assigned by the service when the\ntriggeredJob is created, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
           "type": "string"
         },
         "displayName": {
@@ -2384,7 +2398,8 @@
             "Includes all files.",
             "Includes all file extensions not covered by text file types.",
             "Included file extensions:\n  asc, brf, c, cc, cpp, csv, cxx, c++, cs, css, dart, eml, go, h, hh, hpp,\n  hxx, h++, hs, html, htm, shtml, shtm, xhtml, lhs, ini, java, js, json,\n  ocaml, md, mkd, markdown, m, ml, mli, pl, pm, php, phtml, pht, py, pyw,\n  rb, rbw, rs, rc, scala, sh, sql, tex, txt, text, tsv, vcard, vcs, wml,\n  xml, xsl, xsd, yml, yaml.",
-            "Included file extensions:\n  bmp, gif, jpg, jpeg, jpe, png.\nbytes_limit_per_file has no effect on image files."
+            "Included file extensions:\n  bmp, gif, jpg, jpeg, jpe, png.\nbytes_limit_per_file has no effect on image files.",
+            "Included file extensions:\n  avro"
           ],
           "type": "array",
           "items": {
@@ -2393,7 +2408,8 @@
               "FILE_TYPE_UNSPECIFIED",
               "BINARY_FILE",
               "TEXT_FILE",
-              "IMAGE"
+              "IMAGE",
+              "AVRO"
             ]
           }
         },
@@ -2521,7 +2537,7 @@
           "format": "google-datetime"
         },
         "timestampField": {
-          "description": "Specification of the field containing the timestamp of scanned items.\nUsed for data sources like Datastore or BigQuery.\nIf not specified for BigQuery, table last modification timestamp\nis checked against given time span.\nThe valid data types of the timestamp field are:\nfor BigQuery - timestamp, date, datetime;\nfor Datastore - timestamp.\nDatastore entity will be scanned if the timestamp property does not exist\nor its value is empty or invalid.",
+          "description": "Specification of the field containing the timestamp of scanned items.\nUsed for data sources like Datastore and BigQuery.\n\nFor BigQuery:\nRequired to filter out rows based on the given start and\nend times. If not specified and the table was modified between the given\nstart and end times, the entire table will be scanned.\nThe valid data types of the timestamp field are: `INTEGER`, `DATE`,\n`TIMESTAMP`, or `DATETIME` BigQuery column.\n\nFor Datastore.\nValid data types of the timestamp field are: `TIMESTAMP`.\nDatastore entity will be scanned if the timestamp property does not\nexist or its value is empty or invalid.",
           "$ref": "GooglePrivacyDlpV2FieldId"
         },
         "enableAutoPopulationOfTimespanConfig": {
@@ -2546,6 +2562,10 @@
         "publishSummaryToCscc": {
           "description": "Publish summary to Cloud Security Command Center (Alpha).",
           "$ref": "GooglePrivacyDlpV2PublishSummaryToCscc"
+        },
+        "publishFindingsToCloudDataCatalog": {
+          "description": "Publish findings to Cloud Datahub.",
+          "$ref": "GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog"
         },
         "jobNotificationEmails": {
           "description": "Enable email notification to project owners and editors on job's\ncompletion\/failure.",
@@ -2596,7 +2616,7 @@
     },
     "GooglePrivacyDlpV2PublishToPubSub": {
       "id": "GooglePrivacyDlpV2PublishToPubSub",
-      "description": "Publish the results of a DlpJob to a pub sub channel.\nCompatible with: Inspect, Risk",
+      "description": "Publish a message into given Pub\/Sub topic when DlpJob has completed. The\nmessage contains a single field, `DlpJobName`, which is equal to the\nfinished job's\n[`DlpJob.name`](\/dlp\/docs\/reference\/rest\/v2\/projects.dlpJobs#DlpJob).\nCompatible with: Inspect, Risk",
       "type": "object",
       "properties": {
         "topic": {
@@ -2608,6 +2628,13 @@
     "GooglePrivacyDlpV2PublishSummaryToCscc": {
       "id": "GooglePrivacyDlpV2PublishSummaryToCscc",
       "description": "Publish the result summary of a DlpJob to the Cloud Security\nCommand Center (CSCC Alpha).\nThis action is only available for projects which are parts of\nan organization and whitelisted for the alpha Cloud Security Command\nCenter.\nThe action will publish count of finding instances and their info types.\nThe summary of findings will be persisted in CSCC and are governed by CSCC\nservice-specific policy, see https:\/\/cloud.google.com\/terms\/service-terms\nOnly a single instance of this action can be specified.\nCompatible with: Inspect",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog": {
+      "id": "GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog",
+      "description": "Publish findings of a DlpJob to Cloud Data Catalog. Labels summarizing the\nresults of the DlpJob will be applied to the entry for the resource scanned\nin Cloud Data Catalog. Any labels previously written by another DlpJob will\nbe deleted. InfoType naming patterns are strictly enforced when using this\nfeature. Note that the findings will be persisted in Cloud Data Catalog\nstorage and are governed by Data Catalog service-specific policy, see\nhttps:\/\/cloud.google.com\/terms\/service-terms\nOnly a single instance of this action can be specified and only allowed if\nall resources being scanned are BigQuery tables.\nCompatible with: Inspect",
       "type": "object",
       "properties": {
       }
@@ -2662,7 +2689,7 @@
     },
     "GoogleRpcStatus": {
       "id": "GoogleRpcStatus",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -3733,6 +3760,33 @@
           "items": {
             "$ref": "GooglePrivacyDlpV2Error"
           }
+        },
+        "stats": {
+          "description": "Statistics about this storedInfoType version.",
+          "$ref": "GooglePrivacyDlpV2StoredInfoTypeStats"
+        }
+      }
+    },
+    "GooglePrivacyDlpV2StoredInfoTypeStats": {
+      "id": "GooglePrivacyDlpV2StoredInfoTypeStats",
+      "description": "Statistics for a StoredInfoType.",
+      "type": "object",
+      "properties": {
+        "largeCustomDictionary": {
+          "description": "StoredInfoType where findings are defined by a dictionary of phrases.",
+          "$ref": "GooglePrivacyDlpV2LargeCustomDictionaryStats"
+        }
+      }
+    },
+    "GooglePrivacyDlpV2LargeCustomDictionaryStats": {
+      "id": "GooglePrivacyDlpV2LargeCustomDictionaryStats",
+      "description": "Summary statistics of a custom dictionary.",
+      "type": "object",
+      "properties": {
+        "approxNumPhrases": {
+          "description": "Approximate number of distinct phrases in the dictionary.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -3859,6 +3913,119 @@
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
               "description": "Re-identifies content that has been de-identified.\nSee\nhttps:\/\/cloud.google.com\/dlp\/docs\/pseudonymization#re-identification_in_free_text_code_example\nto learn more."
+            }
+          }
+        },
+        "locations": {
+          "resources": {
+            "content": {
+              "methods": {
+                "inspect": {
+                  "id": "dlp.projects.locations.content.inspect",
+                  "path": "v2/{+parent}/locations/{location}/content:inspect",
+                  "flatPath": "v2/projects/{projectsId}/locations/{location}/content:inspect",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "The parent resource name, for example projects\/my-project-id.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "location": {
+                      "description": "The geographic location to process content inspection. Reserved for future\nextensions.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent",
+                    "location"
+                  ],
+                  "request": {
+                    "$ref": "GooglePrivacyDlpV2InspectContentRequest"
+                  },
+                  "response": {
+                    "$ref": "GooglePrivacyDlpV2InspectContentResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Finds potentially sensitive info in content.\nThis method has limits on input size, processing time, and output size.\n\nWhen no InfoTypes or CustomInfoTypes are specified in this request, the\nsystem will automatically choose what detectors to run. By default this may\nbe all types, but may change over time as detectors are updated.\n\nFor how to guides, see https:\/\/cloud.google.com\/dlp\/docs\/inspecting-images\nand https:\/\/cloud.google.com\/dlp\/docs\/inspecting-text,"
+                },
+                "deidentify": {
+                  "id": "dlp.projects.locations.content.deidentify",
+                  "path": "v2/{+parent}/locations/{location}/content:deidentify",
+                  "flatPath": "v2/projects/{projectsId}/locations/{location}/content:deidentify",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "The parent resource name, for example projects\/my-project-id.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "location": {
+                      "description": "The geographic location to process de-identification. Reserved for future\nextensions.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent",
+                    "location"
+                  ],
+                  "request": {
+                    "$ref": "GooglePrivacyDlpV2DeidentifyContentRequest"
+                  },
+                  "response": {
+                    "$ref": "GooglePrivacyDlpV2DeidentifyContentResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "De-identifies potentially sensitive info from a ContentItem.\nThis method has limits on input size and output size.\nSee https:\/\/cloud.google.com\/dlp\/docs\/deidentify-sensitive-data to\nlearn more.\n\nWhen no InfoTypes or CustomInfoTypes are specified in this request, the\nsystem will automatically choose what detectors to run. By default this may\nbe all types, but may change over time as detectors are updated."
+                },
+                "reidentify": {
+                  "id": "dlp.projects.locations.content.reidentify",
+                  "path": "v2/{+parent}/locations/{location}/content:reidentify",
+                  "flatPath": "v2/projects/{projectsId}/locations/{location}/content:reidentify",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "The parent resource name.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "location": {
+                      "description": "The geographic location to process content reidentification.  Reserved for\nfuture extensions.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent",
+                    "location"
+                  ],
+                  "request": {
+                    "$ref": "GooglePrivacyDlpV2ReidentifyContentRequest"
+                  },
+                  "response": {
+                    "$ref": "GooglePrivacyDlpV2ReidentifyContentResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Re-identifies content that has been de-identified.\nSee\nhttps:\/\/cloud.google.com\/dlp\/docs\/pseudonymization#re-identification_in_free_text_code_example\nto learn more."
+                }
+              }
             }
           }
         },
@@ -4424,7 +4591,7 @@
                   "type": "string"
                 },
                 "filter": {
-                  "description": "Optional. Allows filtering.\n\nSupported syntax:\n\n* Filter expressions are made up of one or more restrictions.\n* Restrictions can be combined by `AND` or `OR` logical operators. A\nsequence of restrictions implicitly uses `AND`.\n* A restriction has the form of `<field> <operator> <value>`.\n* Supported fields\/values for inspect jobs:\n    - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED\n    - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY\n    - `trigger_name` - The resource name of the trigger that created job.\n* Supported fields for risk analysis jobs:\n    - `state` - RUNNING|CANCELED|FINISHED|FAILED\n* The operator must be `=` or `!=`.\n\nExamples:\n\n* inspected_storage = cloud_storage AND state = done\n* inspected_storage = cloud_storage OR inspected_storage = bigquery\n* inspected_storage = cloud_storage AND (state = done OR state = canceled)\n\nThe length of this field should be no more than 500 characters.",
+                  "description": "Optional. Allows filtering.\n\nSupported syntax:\n\n* Filter expressions are made up of one or more restrictions.\n* Restrictions can be combined by `AND` or `OR` logical operators. A\nsequence of restrictions implicitly uses `AND`.\n* A restriction has the form of `<field> <operator> <value>`.\n* Supported fields\/values for inspect jobs:\n    - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED\n    - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY\n    - `trigger_name` - The resource name of the trigger that created job.\n    - 'end_time` - Corresponds to time the job finished.\n    - 'start_time` - Corresponds to time the job finished.\n* Supported fields for risk analysis jobs:\n    - `state` - RUNNING|CANCELED|FINISHED|FAILED\n    - 'end_time` - Corresponds to time the job finished.\n    - 'start_time` - Corresponds to time the job finished.\n* The operator must be `=` or `!=`.\n\nExamples:\n\n* inspected_storage = cloud_storage AND state = done\n* inspected_storage = cloud_storage OR inspected_storage = bigquery\n* inspected_storage = cloud_storage AND (state = done OR state = canceled)\n* end_time > \\\"2017-12-12T00:00:00+00:00\\\"\n\nThe length of this field should be no more than 500 characters.",
                   "location": "query",
                   "type": "string"
                 },
@@ -4716,6 +4883,11 @@
               "description": "Optional filter to only return infoTypes supported by certain parts of the\nAPI. Defaults to supported_by=INSPECT.",
               "location": "query",
               "type": "string"
+            },
+            "location": {
+              "description": "The geographic location to list info types. Reserved for future\nextensions.",
+              "location": "query",
+              "type": "string"
             }
           },
           "parameterOrder": [
@@ -4727,6 +4899,48 @@
             "https://www.googleapis.com/auth/cloud-platform"
           ],
           "description": "Returns a list of the sensitive information types that the DLP API\nsupports. See https:\/\/cloud.google.com\/dlp\/docs\/infotypes-reference to\nlearn more."
+        }
+      }
+    },
+    "locations": {
+      "resources": {
+        "infoTypes": {
+          "methods": {
+            "list": {
+              "id": "dlp.locations.infoTypes.list",
+              "path": "v2/locations/{location}/infoTypes",
+              "flatPath": "v2/locations/{location}/infoTypes",
+              "httpMethod": "GET",
+              "parameters": {
+                "location": {
+                  "description": "The geographic location to list info types. Reserved for future\nextensions.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "languageCode": {
+                  "description": "Optional BCP-47 language code for localized infoType friendly\nnames. If omitted, or if localized strings are not available,\nen-US strings will be returned.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "filter": {
+                  "description": "Optional filter to only return infoTypes supported by certain parts of the\nAPI. Defaults to supported_by=INSPECT.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "location"
+              ],
+              "response": {
+                "$ref": "GooglePrivacyDlpV2ListInfoTypesResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Returns a list of the sensitive information types that the DLP API\nsupports. See https:\/\/cloud.google.com\/dlp\/docs\/infotypes-reference to\nlearn more."
+            }
+          }
         }
       }
     },

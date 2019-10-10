@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,15 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import files
 from tests.lib import e2e_utils
 from tests.lib import parameterized
 from tests.lib.scenario import assertions
+from tests.lib.scenario import schema
 from tests.lib.scenario import session
 from tests.lib.scenario import test_base
+from tests.lib.scenario import updates
 
 import six
 
@@ -229,6 +233,43 @@ class TestBaseSkipTests(test_base.ScenarioTestBase, parameterized.TestCase):
     skipped_test = test_base.SkipIfSkipped(skip_data, execution_mode)(Test)
     is_skipped = Test != skipped_test
     self.assertEqual(expected_is_skipped, is_skipped)
+
+
+class TestBaseFileUpdateTests(test_base.ScenarioTestBase):
+  """Tests that the scenario file is still valid after updating the scenario.
+
+  The tests here check that the scenario updater doesn't mangle the file or
+  invalidate the schema. This is done by running the scenario in update mode and
+  then attempting to re-run it.
+  """
+
+  def _ReRunScenario(self, data):
+    spec_path = self.Touch(self.temp_path, contents=data)
+    self.RunScenario(
+        spec_path, calliope_base.ReleaseTrack.GA, session.ExecutionMode.LOCAL,
+        [updates.Mode.UX, updates.Mode.RESULT])
+    try:
+      self.RunScenario(
+          spec_path, calliope_base.ReleaseTrack.GA, session.ExecutionMode.LOCAL,
+          [updates.Mode.UX, updates.Mode.RESULT])
+    except (yaml.YAMLParseError, schema.ValidationError) as e:
+      # For debugging purposes it's useful to be able to see what the updated
+      # file actually looks like if it gets mangled.
+      error_info = '{}\n\nUpdated scenario file contents:\n\n{}'.format(
+          e, files.ReadFileContents(spec_path))
+      self.fail(error_info)
+
+  def testNoSummary(self):
+    """Test action that doesn't generate a summary."""
+    data = """\
+title: my scenario
+release_tracks: [GA]
+actions:
+- define_reference:
+    reference: foo
+    value: bar
+    """
+    self._ReRunScenario(data)
 
 
 if __name__ == '__main__':

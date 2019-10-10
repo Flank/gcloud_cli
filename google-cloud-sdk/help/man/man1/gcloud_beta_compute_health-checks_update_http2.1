@@ -11,7 +11,7 @@ gcloud beta compute health\-checks update http2 \- update a HTTP2 health check
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute health\-checks update http2\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR] [\fB\-\-port\fR=\fIPORT\fR\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute health\-checks update http2\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\fR=\fIPORT\fR\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -103,6 +103,44 @@ marked as unhealthy.
 
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the HTTP2 health check is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the HTTP2 health check to update. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.RE
+.sp
+.TP 2m
+
 These flags configure the port that the health check monitors. If both
 \f5\-\-port\fR and \f5\-\-port\-name\fR are specified, \f5\-\-port\fR takes
 precedence.
@@ -145,12 +183,24 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To update health check interval to 10s, run:
 
 .RS 2m
+$ gcloud beta compute health\-checks update http2 \e
+    my\-health\-check\-name \-\-check\-interval=10s
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute health\-checks update http2
 $ gcloud alpha compute health\-checks update http2
 .RE
 

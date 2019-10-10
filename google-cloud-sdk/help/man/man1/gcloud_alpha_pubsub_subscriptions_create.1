@@ -11,7 +11,7 @@ gcloud alpha pubsub subscriptions create \- creates one or more Cloud Pub/Sub su
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-enable\-message\-ordering\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fB\-\-dead\-letter\-topic\fR=\fIDEAD_LETTER_TOPIC\fR\ \fB\-\-max\-delivery\-attempts\fR=\fIMAX_DELIVERY_ATTEMPTS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,12 @@ The number of seconds the system will wait for a subscriber to acknowledge
 receiving a message before re\-attempting delivery.
 
 .TP 2m
+\fB\-\-enable\-message\-ordering\fR
+Whether or not to receive messages with the same ordering key in order. If true,
+messages with the same ordering key will by sent to subscribers in the order in
+which they were received by Cloud Pub/Sub.
+
+.TP 2m
 \fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR
 The subscription will expire if it is inactive for the given period. Valid
 values are strings of the form INTEGER[UNIT], where UNIT is one of "s", "m",
@@ -126,7 +132,27 @@ Whether or not to retain acknowledged messages. If true, messages are not
 expunged from the subscription's backlog until they fall out of the
 \-\-message\-retention\-duration window.
 
+.TP 2m
 
+Dead Letter Queue Options
+
+.RS 2m
+.TP 2m
+\fB\-\-dead\-letter\-topic\fR=\fIDEAD_LETTER_TOPIC\fR
+Name of the topic to which dead letter messages should be published. Format is
+\f5projects/{project}/topics/{topic}\fR. The Cloud Pub/Sub service account
+associated with the enclosing subscription's parent project (i.e.,
+service\-{project_number}@gcp\-sa\-pubsub.iam.gserviceaccount.com) must have
+permission to Publish() to this topic and Acknowledge() messages on this
+subscription.
+
+.TP 2m
+\fB\-\-max\-delivery\-attempts\fR=\fIMAX_DELIVERY_ATTEMPTS\fR
+Maximum number of delivery attempts for any message. The value must be between 5
+and 100. Defaults to 5. \f5\-\-dead\-letter\-topic\fR must also be specified.
+
+
+.RE
 .RE
 .sp
 
@@ -144,9 +170,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud pubsub subscriptions create

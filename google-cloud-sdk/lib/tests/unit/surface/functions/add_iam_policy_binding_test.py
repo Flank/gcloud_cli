@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +19,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.functions import base
 
 
-class AddIamPolicyBindingTest(base.FunctionsTestBase):
+class AddIamPolicyBindingBetaTest(base.FunctionsTestBase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def test_add_iam_policy_binding(self):
     function_ref_name = 'projects/{}/locations/{}/functions/my-function'.format(
@@ -61,10 +65,16 @@ class AddIamPolicyBindingTest(base.FunctionsTestBase):
         set_request,
         response=expected_updated_policy)
     actual_updated_policy = self.Run("""
-        alpha functions add-iam-policy-binding my-function \
+        functions add-iam-policy-binding my-function \
         --role={0} --member={1}
         """.format(new_role, new_user))
     self.assertEqual(expected_updated_policy, actual_updated_policy)
+
+
+class AddIamPolicyBindingAlphaTest(AddIamPolicyBindingBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

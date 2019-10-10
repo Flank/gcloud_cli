@@ -15,12 +15,6 @@ gcloud beta container binauthz attestors delete \- delete an Attestor
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Delete an Attestor.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -53,12 +47,23 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To delete an existing Attestor \f5my_attestor\fR:
 
 .RS 2m
+$ gcloud beta container binauthz attestors delete my_attestor
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container binauthz attestors delete
 $ gcloud alpha container binauthz attestors delete
 .RE
 

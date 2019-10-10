@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ class ScpBaseTest(test_base.BaseSSHTest):
             name='instance-1',
             networkInterfaces=[
                 self.messages.NetworkInterface(
-                    name='nic0',
                     networkIP='10.240.0.52',
                     accessConfigs=[
                         self.messages.AccessConfig(natIP='23.251.133.1'),
@@ -60,10 +59,7 @@ class ScpBaseTest(test_base.BaseSSHTest):
             id=22222,
             name='instance-2',
             networkInterfaces=[
-                self.messages.NetworkInterface(
-                    name='nic0',
-                    networkIP='10.240.0.53',
-                ),
+                self.messages.NetworkInterface(networkIP='10.240.0.53'),
             ],
             status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
             selfLink=(self.compute_uri + '/projects/my-project/'
@@ -81,6 +77,11 @@ class ScpTest(ScpBaseTest):
     self.remote = ssh.Remote.FromArg('me@23.251.133.1')
     self.remote_file = ssh.FileReference('~/remote-file', remote=self.remote)
     self.local_dir = ssh.FileReference('~/local-dir')
+
+    datetime_patcher = mock.patch('datetime.datetime',
+                                  test_base.FakeDateTimeWithTimeZone)
+    self.addCleanup(datetime_patcher.stop)
+    datetime_patcher.start()
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -322,7 +323,155 @@ class ScpTest(ScpBaseTest):
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         remote=remote,
         identity_file=self.private_key_file,
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        extra_flags=None,
+        iap_tunnel_args=None)
+    self.poller_poll.assert_called_once()
+
+    # SCP Command
+    self.scp_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        [remote_file],
+        self.local_dir,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        port=None,
+        recursive=False,
+        compress=False,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
+
+    self.scp_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        self.env, force_connect=True)
+
+  def testWithRelativeExpiration(self):
+    project_resource = self.messages.Project(
+        name='my-project',
+    )
+    self.make_requests.side_effect = iter([
+        [self.instance],
+        [project_resource],
+        [],
+    ])
+
+    self.Run("""\
+        compute scp
+          instance-1:~/remote-file
+          ~/local-dir --zone zone-1
+          --ssh-key-expire-after 1d
+        """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute.projects,
+          'SetCommonInstanceMetadata',
+          self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.messages.Metadata(
+                  items=[
+                      self.messages.Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value=('me:{0} google-ssh {{"userName":"me",'
+                                 '"expireOn":'
+                                 '"2014-01-03T03:04:05+0000"}}').format(
+                                     self.pubkey.ToEntry())),
+                  ]),
+
+              project='my-project'))],
+    )
+
+    remote = ssh.Remote(self.remote.host, user='me')
+    remote_file = ssh.FileReference('~/remote-file', remote=remote)
+    # Polling
+    self.poller_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHPoller),
+        remote=remote,
+        identity_file=self.private_key_file,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        extra_flags=None,
+        iap_tunnel_args=None)
+    self.poller_poll.assert_called_once()
+
+    # SCP Command
+    self.scp_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        [remote_file],
+        self.local_dir,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        port=None,
+        recursive=False,
+        compress=False,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
+
+    self.scp_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SCPCommand),
+        self.env, force_connect=True)
+
+  def testWithAbsoluteExpiration(self):
+    project_resource = self.messages.Project(
+        name='my-project',
+    )
+    self.make_requests.side_effect = iter([
+        [self.instance],
+        [project_resource],
+        [],
+    ])
+
+    self.Run("""\
+        compute scp
+          instance-1:~/remote-file
+          ~/local-dir --zone zone-1
+          --ssh-key-expiration 2015-01-23T12:34:56+0000
+        """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute.projects,
+          'SetCommonInstanceMetadata',
+          self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.messages.Metadata(
+                  items=[
+                      self.messages.Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value=('me:{0} google-ssh {{"userName":"me",'
+                                 '"expireOn":'
+                                 '"2015-01-23T12:34:56+0000"}}').format(
+                                     self.pubkey.ToEntry())),
+                  ]),
+
+              project='my-project'))],
+    )
+
+    remote = ssh.Remote(self.remote.host, user='me')
+    remote_file = ssh.FileReference('~/remote-file', remote=remote)
+    # Polling
+    self.poller_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHPoller),
+        remote=remote,
+        identity_file=self.private_key_file,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options, HostKeyAlias='compute.11111'),
         extra_flags=None,
         iap_tunnel_args=None)
@@ -394,7 +543,7 @@ class ScpTest(ScpBaseTest):
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         remote=remote,
         identity_file=self.private_key_file,
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options, HostKeyAlias='compute.11111'),
         extra_flags=None,
         iap_tunnel_args=None)
@@ -417,7 +566,8 @@ class ScpTest(ScpBaseTest):
       self.Run("""\
           compute scp
             instance-2:~/remote-file
-            ~/local-dir --zone zone-1
+             ~/local-dir
+            --zone zone-1 --no-tunnel-through-iap
           """)
 
     self.CheckRequests(
@@ -669,9 +819,9 @@ class ScpOsloginTest(test_base.BaseSSHTest):
             ),
         ],
         status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-1'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1'))
 
   @mock.patch(
@@ -744,12 +894,13 @@ class SCPPrivateIpTest(test_base.BaseSSHTest, parameterized.TestCase):
             self.messages.NetworkInterface(networkIP='10.240.0.52'),
         ],
         status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/{}/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/{}/projects/my-project/'
                   'zones/zone-1/instances/instance-3').format(api_version),
-        zone=('https://www.googleapis.com/compute/{}/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/{}/projects/my-project/'
               'zones/zone-1').format(api_version))
 
   @parameterized.named_parameters(
+      ('GA', calliope_base.ReleaseTrack.GA, 'v1'),
       ('Beta', calliope_base.ReleaseTrack.BETA, 'beta'),
       ('Alpha', calliope_base.ReleaseTrack.ALPHA, 'alpha'),
   )
@@ -803,25 +954,27 @@ class SCPPrivateIpTest(test_base.BaseSSHTest, parameterized.TestCase):
         any_order=True)
 
 
-class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
+class ScpTunnelThroughIapTestGA(ScpBaseTest, parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi(self.track.prefix)
+    self.SelectApi('v1' if self.track.prefix is None else self.track.prefix)
 
-  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
-                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
-  def testSimpleCase(self, test_instance_key):
+  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY, True),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY, True),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY, False))
+  def testSimpleCase(self, test_instance_key, explicit_flag):
     test_instance = self.instances[test_instance_key]
     self.make_requests.side_effect = iter([
         [test_instance],
         [self.project_resource],
     ])
 
-    self.Run('compute scp {}:~/remote-file ~/local-dir --zone zone-1 '
-             '--tunnel-through-iap'.format(test_instance.name))
+    self.Run('compute scp {}:~/remote-file ~/local-dir --zone zone-1{}'.format(
+        test_instance.name,
+        ' --tunnel-through-iap' if explicit_flag else ''))
 
     self.CheckRequests(
         [(self.compute.instances,
@@ -848,7 +1001,6 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = test_instance.name
-    expected_tunnel_args.interface = 'nic0'
 
     # SCP Command
     remote_file = ssh.FileReference(
@@ -887,7 +1039,6 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
 
     self.Run('compute scp hapoo@{}:~/remote-file ~/local-dir '
              '--zone zone-1 --tunnel-through-iap'.format(test_instance.name))
-
     self.CheckRequests(
         [(self.compute.instances,
           'Get',
@@ -917,7 +1068,6 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = test_instance.name
-    expected_tunnel_args.interface = 'nic0'
 
     # Polling
     remote = ssh.Remote.FromArg('hapoo@compute.%s' % test_instance.id)
@@ -925,7 +1075,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         remote=remote,
         identity_file=self.private_key_file,
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options,
                      HostKeyAlias='compute.%s' % test_instance.id),
         extra_flags=None,
@@ -999,7 +1149,6 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = test_instance.name
-    expected_tunnel_args.interface = 'nic0'
 
     # Polling
     remote = ssh.Remote.FromArg('hapoo@compute.%s' % test_instance.id)
@@ -1007,7 +1156,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         remote=remote,
         identity_file=self.private_key_file,
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options,
                      HostKeyAlias='compute.%s' % test_instance.id),
         extra_flags=None,
@@ -1015,6 +1164,12 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
     self.poller_poll.assert_called_once()
 
     self.scp_run.assert_not_called()
+
+
+class ScpTunnelThroughIapTestBeta(ScpTunnelThroughIapTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ScpTunnelThroughIapTestAlpha(ScpTunnelThroughIapTestBeta):

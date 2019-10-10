@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ from tests.lib.surface.compute import test_resources
 class WaitInfoTest(test_case.TestCase):
 
   def _CreateInstanceGroupManager(
-      self, api_version, current_operations=0, pending_operations=0):
+      self, api_version, current_operations=0):
     return test_resources.MakeInstanceGroupManagersWithActions(
         api_version, current_operations)
 

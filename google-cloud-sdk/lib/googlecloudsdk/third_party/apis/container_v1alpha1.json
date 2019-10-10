@@ -307,9 +307,17 @@
           "description": "Release channel configuration.",
           "$ref": "ReleaseChannel"
         },
+        "tierSettings": {
+          "description": "Cluster tier settings.",
+          "$ref": "TierSettings"
+        },
         "workloadIdentityConfig": {
           "description": "Configuration for the use of k8s Service Accounts in GCP IAM policies.",
           "$ref": "WorkloadIdentityConfig"
+        },
+        "costManagementConfig": {
+          "description": "Configuration for the fine-grained cost management feature.",
+          "$ref": "CostManagementConfig"
         },
         "selfLink": {
           "description": "[Output only] Server-defined URL for the resource.",
@@ -445,7 +453,7 @@
           "type": "string"
         },
         "metadata": {
-          "description": "The metadata key\/value pairs assigned to instances in the cluster.\n\nKeys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes\nin length. These are reflected as part of a URL in the metadata server.\nAdditionally, to avoid ambiguity, keys must not conflict with any other\nmetadata keys for the project or be one of the reserved keys:\n \"cluster-location\"\n \"cluster-name\"\n \"cluster-uid\"\n \"configure-sh\"\n \"containerd-configure-sh\"\n \"enable-os-login\"\n \"gci-update-strategy\"\n \"gci-ensure-gke-docker\"\n \"instance-template\"\n \"kube-env\"\n \"startup-script\"\n \"user-data\"\n\nValues are free-form strings, and only have meaning as interpreted by\nthe image running in the instance. The only restriction placed on them is\nthat each value's size must be less than or equal to 32 KB.\n\nThe total size of all keys and values must be less than 512 KB.",
+          "description": "The metadata key\/value pairs assigned to instances in the cluster.\n\nKeys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes\nin length. These are reflected as part of a URL in the metadata server.\nAdditionally, to avoid ambiguity, keys must not conflict with any other\nmetadata keys for the project or be one of the reserved keys:\n \"cluster-location\"\n \"cluster-name\"\n \"cluster-uid\"\n \"configure-sh\"\n \"containerd-configure-sh\"\n \"enable-os-login\"\n \"gci-update-strategy\"\n \"gci-ensure-gke-docker\"\n \"instance-template\"\n \"kube-env\"\n \"startup-script\"\n \"user-data\"\n \"disable-address-manager\"\n \"windows-startup-script-ps1\"\n \"common-psm1\"\n \"k8s-node-setup-psm1\"\n \"install-ssh-psm1\"\n \"user-profile-psm1\"\n \"serial-port-logging-enable\"\nValues are free-form strings, and only have meaning as interpreted by\nthe image running in the instance. The only restriction placed on them is\nthat each value's size must be less than or equal to 32 KB.\n\nThe total size of all keys and values must be less than 512 KB.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -467,7 +475,7 @@
           }
         },
         "localSsdCount": {
-          "description": "The number of local SSD disks to be attached to the node.\n\nThe limit for this value is dependant upon the maximum number of\ndisks available on a machine per zone. See:\nhttps:\/\/cloud.google.com\/compute\/docs\/disks\/local-ssd#local_ssd_limits\nfor more information.",
+          "description": "The number of local SSD disks to be attached to the node.\n\nThe limit for this value is dependent upon the maximum number of\ndisks available on a machine per zone. See:\nhttps:\/\/cloud.google.com\/compute\/docs\/disks\/local-ssd\nfor more information.",
           "type": "integer",
           "format": "int32"
         },
@@ -534,6 +542,14 @@
         "linuxNodeConfig": {
           "description": "Parameters that can be configured on Linux nodes.",
           "$ref": "LinuxNodeConfig"
+        },
+        "kubeletConfig": {
+          "description": "Node kubelet configs.",
+          "$ref": "NodeKubeletConfig"
+        },
+        "bootDiskKmsKey": {
+          "description": "\nThe Customer Managed Encryption Key used to encrypt the boot disk attached\nto each node in the node pool. This should be of the form\nprojects\/[KEY_PROJECT_ID]\/locations\/[LOCATION]\/keyRings\/[RING_NAME]\/cryptoKeys\/[KEY_NAME].\nFor more information about protecting resources with Cloud KMS Keys please\nsee:\nhttps:\/\/cloud.google.com\/compute\/docs\/disks\/customer-managed-encryption",
+          "type": "string"
         }
       }
     },
@@ -567,7 +583,7 @@
           "format": "int64"
         },
         "acceleratorType": {
-          "description": "The accelerator type resource name. List of supported accelerators\n[here](\/compute\/docs\/gpus\/#Introduction)",
+          "description": "The accelerator type resource name. List of supported accelerators\n[here](\/compute\/docs\/gpus)",
           "type": "string"
         }
       }
@@ -664,6 +680,18 @@
         "sandboxType": {
           "description": "Type of the sandbox to use for the node (e.g. 'gvisor')",
           "type": "string"
+        },
+        "type": {
+          "description": "Type of the sandbox to use for the node.",
+          "enumDescriptions": [
+            "Default value. This should not be used.",
+            "Run sandbox using gvisor."
+          ],
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "GVISOR"
+          ]
         }
       }
     },
@@ -730,6 +758,25 @@
         }
       }
     },
+    "NodeKubeletConfig": {
+      "id": "NodeKubeletConfig",
+      "description": "Node kubelet configs.\nNOTE: This is an Alpha only API.",
+      "type": "object",
+      "properties": {
+        "cpuManagerPolicy": {
+          "description": "Control the CPU management policy on the node.\nSee\nhttps:\/\/kubernetes.io\/docs\/tasks\/administer-cluster\/cpu-management-policies\/\n\nThe following values are allowed.\n  - \"none\": the default, which represents the existing scheduling behavior.\n  - \"static\": allows pods with certain resource characteristics to be\n              granted increased CPU affinity and exclusivity on the node.",
+          "type": "string"
+        },
+        "cpuCfsQuota": {
+          "description": "Enable CPU CFS quota enforcement for containers that specify CPU limits.\n\nIf this option is enabled, kubelet uses CFS quota\n(https:\/\/www.kernel.org\/doc\/Documentation\/scheduler\/sched-bwc.txt) to\nenforce container CPU limits. Otherwise, CPU limits will not be enforced at\nall.\n\nDisable this option to mitigate CPU throttling problems while still having\nyour pods to be in Guaranteed QoS class by specifying the CPU limits.\n\nThe default value is 'true' if unspecified.",
+          "type": "boolean"
+        },
+        "cpuCfsQuotaPeriod": {
+          "description": "Set the CPU CFS quota period value 'cpu.cfs_period_us'.\n\nThe string must be a sequence of decimal numbers, each with optional\nfraction and a unit suffix, such as \"300ms\".\nValid time units are \"ns\", \"us\" (or \"\u00B5s\"), \"ms\", \"s\", \"m\", \"h\".\nThe value must be a positive duration.",
+          "type": "string"
+        }
+      }
+    },
     "MasterAuth": {
       "id": "MasterAuth",
       "description": "The authentication information for accessing the master endpoint.\nAuthentication can be done using HTTP basic auth or using client\ncertificates.",
@@ -786,7 +833,7 @@
           "$ref": "HorizontalPodAutoscaling"
         },
         "kubernetesDashboard": {
-          "description": "Configuration for the Kubernetes Dashboard.",
+          "description": "Configuration for the Kubernetes Dashboard.\nThis addon is deprecated, and will be disabled in 1.15. It is recommended\nto use the Cloud Console to manage and monitor your Kubernetes clusters,\nworkloads and applications. For more information, see:\nhttps:\/\/cloud.google.com\/kubernetes-engine\/docs\/concepts\/dashboards",
           "$ref": "KubernetesDashboard"
         },
         "networkPolicyConfig": {
@@ -797,10 +844,6 @@
           "description": "Configuration for Istio, an open platform to connect, manage, and secure\nmicroservices.",
           "$ref": "IstioConfig"
         },
-        "serverlessConfig": {
-          "description": "Deprecated: use CloudRunConfig instead (same behavior).",
-          "$ref": "ServerlessConfig"
-        },
         "cloudRunConfig": {
           "description": "Configuration for the Cloud Run addon. The `IstioConfig` addon must be\nenabled in order to enable Cloud Run. This option can only be enabled at\ncluster creation time.",
           "$ref": "CloudRunConfig"
@@ -808,6 +851,22 @@
         "dnsCacheConfig": {
           "description": "Configuration for NodeLocalDNS, a dns cache running on cluster nodes",
           "$ref": "DnsCacheConfig"
+        },
+        "configConnectorConfig": {
+          "description": "Configuration for the ConfigConnector add-on, a Kubernetes\nextension to manage hosted GCP services through the Kubernetes API",
+          "$ref": "ConfigConnectorConfig"
+        },
+        "gcePersistentDiskCsiDriverConfig": {
+          "description": "Configuration for the GCE PD CSI driver. This option can only be enabled\nat cluster creation time.",
+          "$ref": "GcePersistentDiskCsiDriverConfig"
+        },
+        "kalmConfig": {
+          "description": "Configuration for the KALM addon, which manages the lifecycle of k8s\napplications.",
+          "$ref": "KalmConfig"
+        },
+        "cloudBuildConfig": {
+          "description": "Configuration for the Cloud Build addon.",
+          "$ref": "CloudBuildConfig"
         }
       }
     },
@@ -882,17 +941,6 @@
         }
       }
     },
-    "ServerlessConfig": {
-      "id": "ServerlessConfig",
-      "description": "Configuration options for the serverless feature.",
-      "type": "object",
-      "properties": {
-        "disabled": {
-          "description": "Whether serverless is enabled for this cluster.",
-          "type": "boolean"
-        }
-      }
-    },
     "CloudRunConfig": {
       "id": "CloudRunConfig",
       "description": "Configuration options for the Cloud Run feature.",
@@ -911,6 +959,50 @@
       "properties": {
         "enabled": {
           "description": "Whether NodeLocal DNSCache is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "ConfigConnectorConfig": {
+      "id": "ConfigConnectorConfig",
+      "description": "Configuration options for the Config Connector add-on.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether Cloud Connector is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GcePersistentDiskCsiDriverConfig": {
+      "id": "GcePersistentDiskCsiDriverConfig",
+      "description": "Configuration for the GCE PD CSI driver. This option can only be enabled\nat cluster creation time.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether the GCE PD CSI driver is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "KalmConfig": {
+      "id": "KalmConfig",
+      "description": "Configuration options for the KALM addon.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether KALM is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "CloudBuildConfig": {
+      "id": "CloudBuildConfig",
+      "description": "Configuration options for the Cloud Build addon.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether the Cloud Build addon is enabled for this cluster.",
           "type": "boolean"
         }
       }
@@ -1010,7 +1102,7 @@
           "type": "string"
         },
         "upgradeSettings": {
-          "description": "Upgrade settings (disruption budget and speed).",
+          "description": "Upgrade settings control disruption and speed of the upgrade.",
           "$ref": "UpgradeSettings"
         }
       }
@@ -1098,7 +1190,8 @@
             "GCE_STOCKOUT indicates a Google Compute Engine stockout.",
             "GKE_SERVICE_ACCOUNT_DELETED indicates that the user deleted their robot\nservice account.",
             "Google Compute Engine quota was exceeded.",
-            "Cluster state was manually changed by an SRE due to a system logic error.\nMore codes TBA"
+            "Cluster state was manually changed by an SRE due to a system logic error.",
+            "Unable to perform an encrypt operation against the CloudKMS key used for\netcd level encryption.\nMore codes TBA"
           ],
           "type": "string",
           "enum": [
@@ -1106,7 +1199,8 @@
             "GCE_STOCKOUT",
             "GKE_SERVICE_ACCOUNT_DELETED",
             "GCE_QUOTA_EXCEEDED",
-            "SET_BY_OPERATOR"
+            "SET_BY_OPERATOR",
+            "CLOUD_KMS_KEY_ERROR"
           ]
         },
         "message": {
@@ -1117,16 +1211,16 @@
     },
     "UpgradeSettings": {
       "id": "UpgradeSettings",
-      "description": "Upgrade settings. When provided, enables Cluster API on the pool.\nMirrors the fields and defaults of MachineRollingUpdateDeployment\nhttps:\/\/github.com\/kubernetes-sigs\/cluster-api\/blob\/302479ecef8149c5a05e0a4955b0871f85b7d991\/pkg\/apis\/cluster\/v1alpha1\/machinedeployment_types.go#L93",
+      "description": "These upgrade settings control the level of parallelism and the level of\ndisruption caused by an upgrade.\n\nmaxUnavailable controls the number of nodes that can be simultaneously\nunavailable.\n\nmaxSurge controls the number of additional nodes that can be added to the\nnode pool temporarily for the time of the upgrade to increase the number of\navailable nodes.\n\n(maxUnavailable + maxSurge) determines the level of parallelism (how many\nnodes are being upgraded at the same time).\n\nNote: upgrades inevitably introduce some disruption since workloads need to\nbe moved from old nodes to new, upgraded ones. Even if maxUnavailable=0,\nthis holds true. (Disruption stays within the limits of\nPodDisruptionBudget, if it is configured.)\n\n  For example, a 5-node pool is created with maxSurge set to 2 and\nmaxUnavailable set to 1. During an upgrade, GKE creates 2 upgraded nodes,\nthen brings down up to 3 existing nodes after the upgraded nodes are ready.\nGKE will only bring down 1 node at a time.",
       "type": "object",
       "properties": {
         "maxSurge": {
-          "description": "Disruption budget: how many machines to create before upgrading a node.",
+          "description": "The maximum number of nodes that can be created beyond the current size\nof the node pool during the upgrade process.",
           "type": "integer",
           "format": "int32"
         },
         "maxUnavailable": {
-          "description": "Speed\/concurrency: how many nodes at a time to upgrade.",
+          "description": "The maximum number of nodes that can be simultaneously unavailable during\nthe upgrade process. A node is considered available if its status is\nReady.",
           "type": "integer",
           "format": "int32"
         }
@@ -1270,6 +1364,10 @@
         "window": {
           "description": "Specifies the maintenance window in which maintenance may be performed.",
           "$ref": "MaintenanceWindow"
+        },
+        "resourceVersion": {
+          "description": "A hash identifying the version of this policy, so that updates to fields of\nthe policy won't accidentally undo intermediate changes (and so that users\nof the API unaware of some fields won't accidentally remove other fields).\nMake a <code>get()<\/code> request to the cluster to get the current\nresource version and include it with requests to set the policy.",
+          "type": "string"
         }
       }
     },
@@ -1281,6 +1379,17 @@
         "dailyMaintenanceWindow": {
           "description": "DailyMaintenanceWindow specifies a daily maintenance operation window.",
           "$ref": "DailyMaintenanceWindow"
+        },
+        "recurringWindow": {
+          "description": "RecurringWindow specifies some number of recurring time periods for\nmaintenance to occur. The time windows may be overlapping. If no\nmaintenance windows are set, maintenance can occur at any time.",
+          "$ref": "RecurringTimeWindow"
+        },
+        "maintenanceExclusions": {
+          "description": "Exceptions to maintenance window. Non-emergency maintenance should not\noccur in these windows.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "TimeWindow"
+          }
         }
       }
     },
@@ -1296,6 +1405,38 @@
         "duration": {
           "description": "[Output only] Duration of the time window, automatically chosen to be\nsmallest possible in the given scenario.",
           "type": "string"
+        }
+      }
+    },
+    "RecurringTimeWindow": {
+      "id": "RecurringTimeWindow",
+      "description": "Represents an arbitrary window of time that recurs.",
+      "type": "object",
+      "properties": {
+        "window": {
+          "description": "The window of the first recurrence.",
+          "$ref": "TimeWindow"
+        },
+        "recurrence": {
+          "description": "An RRULE (https:\/\/tools.ietf.org\/html\/rfc5545#section-3.8.5.3) for how\nthis window reccurs. They go on for the span of time between the start and\nend time.\n\nFor example, to have something repeat every weekday, you'd use:\n  <code>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR<\/code>\nTo repeat some window daily (equivalent to the DailyMaintenanceWindow):\n  <code>FREQ=DAILY<\/code>\nFor the first weekend of every month:\n  <code>FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU<\/code>\nThis specifies how frequently the window starts. Eg, if you wanted to have\na 9-5 UTC-4 window every weekday, you'd use something like:\n<code>\n  start time = 2019-01-01T09:00:00-0400\n  end time = 2019-01-01T17:00:00-0400\n  recurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\n<\/code>\nWindows can span multiple days. Eg, to make the window encompass every\nweekend from midnight Saturday till the last minute of Sunday UTC:\n<code>\n  start time = 2019-01-05T00:00:00Z\n  end time = 2019-01-07T23:59:00Z\n  recurrence = FREQ=WEEKLY;BYDAY=SA\n<\/code>\nNote the start and end time's specific dates are largely arbitrary except\nto specify duration of the window and when it first starts.\nThe FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.",
+          "type": "string"
+        }
+      }
+    },
+    "TimeWindow": {
+      "id": "TimeWindow",
+      "description": "Represents an arbitrary window of time.",
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "description": "The time that the window first starts.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "The time that the window ends. The end time should take place after the\nstart time.",
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -1340,18 +1481,27 @@
         "autoscalingProfile": {
           "description": "Defines autoscaling behaviour.",
           "enumDescriptions": [
-            "Use default (balanced) autoscaling configuration.",
-            "Prioritize optimizing utilization of resources."
+            "No change to autoscaling configuration.",
+            "Prioritize optimizing utilization of resources.",
+            "Use default (balanced) autoscaling configuration."
           ],
           "type": "string",
           "enum": [
             "PROFILE_UNSPECIFIED",
-            "OPTIMIZE_UTILIZATION"
+            "OPTIMIZE_UTILIZATION",
+            "BALANCED"
           ]
         },
         "autoprovisioningNodePoolDefaults": {
           "description": "AutoprovisioningNodePoolDefaults contains defaults for a node pool\ncreated by NAP.",
           "$ref": "AutoprovisioningNodePoolDefaults"
+        },
+        "autoprovisioningLocations": {
+          "description": "The list of Google Compute Engine [zones](\/compute\/docs\/zones#available)\nin which the NodePool's nodes can be created by NAP.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1412,7 +1562,7 @@
           "type": "boolean"
         },
         "enableCloudNat": {
-          "description": "Whether GKE Cloud NAT is enabled for this cluster. Requires that the\ncluster has already set IPAllocationPolicy.use_ip_aliases to true.",
+          "description": "Whether GKE Cloud NAT is enabled for this cluster. Requires that the\ncluster has already set IPAllocationPolicy.use_ip_aliases to true.\nDeprecated: use disable_default_snat instead.",
           "type": "boolean"
         },
         "enablePrivateIpv6Access": {
@@ -1421,6 +1571,10 @@
         },
         "enableIntraNodeVisibility": {
           "description": "Whether Intra-node visibility is enabled for this cluster.\nThis enables flow logs for same node pod to pod traffic.",
+          "type": "boolean"
+        },
+        "disableDefaultSnat": {
+          "description": "Whether the cluster disables default in-node sNAT rules. In-node sNAT rules\nwill be disabled when this flag is true. When set to false, default IP\nmasquerade rules will be applied to the nodes to prevent sNAT on cluster\ninternal traffic.",
           "type": "boolean"
         }
       }
@@ -1539,6 +1693,10 @@
         "enablePeeringRouteSharing": {
           "description": "Whether to enable route sharing over the network peering.",
           "type": "boolean"
+        },
+        "peeringName": {
+          "description": "Output only. The peering name in the customer VPC used by this cluster.",
+          "type": "string"
         }
       }
     },
@@ -1591,19 +1749,44 @@
     },
     "ReleaseChannel": {
       "id": "ReleaseChannel",
-      "description": "ReleaseChannel indicates which release channel a cluster is\nsubscribed to. Release channels are arranged in order of risk and\nfrequency of updates; RAPID channel clusters are the first to\nreceive the latest releases of Kubernetes and other components.\n\nWhen a cluster is subscribed to a release channel, Google maintains\nboth the master version and the node version. Node auto-upgrade\ndefaults to true and cannot be disabled. Updates to version related\nfields (e.g. current_master_version) return an error.",
+      "description": "ReleaseChannel indicates which release channel a cluster is\nsubscribed to. Release channels are arranged in order of risk and\nfrequency of updates.\n\nWhen a cluster is subscribed to a release channel, Google maintains\nboth the master version and the node version. Node auto-upgrade\ndefaults to true and cannot be disabled. Updates to version related\nfields (e.g. current_master_version) return an error.",
       "type": "object",
       "properties": {
         "channel": {
-          "description": "channel specified which release channel the cluster is subscribed to.",
+          "description": "channel specifies which release channel the cluster is subscribed to.",
           "enumDescriptions": [
             "No channel specified.",
-            "Clusters subscribed to RAPID receive the latest qualified\ncomponents, before any other channel."
+            "RAPID channel is offered on an early access basis for customers who want\nto test new releases before they are qualified for production use or\ngeneral availability. New upgrades will occur roughly weekly.\n\nWARNING: Versions available in the RAPID Channel may be subject to\nunresolved issues with no known workaround and are not for use with\nproduction workloads or subject to any SLAs.",
+            "Clusters subscribed to REGULAR receive versions that are considered GA\nquality. REGULAR is intended for production users who want to take\nadvantage of new features. New upgrades will occur roughly every few\nweeks.",
+            "Clusters subscribed to STABLE receive versions that are known to be\nstable and reliable in production. STABLE is intended for production\nusers who need stability above all else, or for whom frequent upgrades\nare too risky. New upgrades will occur roughly every few months."
           ],
           "type": "string",
           "enum": [
             "UNSPECIFIED",
-            "RAPID"
+            "RAPID",
+            "REGULAR",
+            "STABLE"
+          ]
+        }
+      }
+    },
+    "TierSettings": {
+      "id": "TierSettings",
+      "description": "Cluster tier settings.",
+      "type": "object",
+      "properties": {
+        "tier": {
+          "description": "Cluster tier.",
+          "enumDescriptions": [
+            "TIER_UNSPECIFIED is the default value. If this value is set during create\nor update, it defaults to the project level tier setting.",
+            "Represents the standard tier or base Google Kubernetes Engine offering.",
+            "Represents the advanced tier."
+          ],
+          "type": "string",
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "STANDARD",
+            "ADVANCED"
           ]
         }
       }
@@ -1616,6 +1799,17 @@
         "identityNamespace": {
           "description": "IAM Identity Namespace to attach all k8s Service Accounts to.",
           "type": "string"
+        }
+      }
+    },
+    "CostManagementConfig": {
+      "id": "CostManagementConfig",
+      "description": "Configuration for fine-grained cost management feature.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether the feature is enabled or not.",
+          "type": "boolean"
         }
       }
     },
@@ -1874,7 +2068,7 @@
           "type": "string"
         },
         "desiredMonitoringService": {
-          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\/kubernetes\" - the Google Cloud Monitoring\nservice with Kubernetes-native resource model in Stackdriver\n* \"monitoring.googleapis.com\" - the Google Cloud Monitoring service\n* \"none\" - no metrics will be exported from the cluster",
+          "description": "The monitoring service the cluster should use to write metrics.\nCurrently available options:\n\n* \"monitoring.googleapis.com\/kubernetes\" - the Google Cloud Monitoring\nservice with Kubernetes-native resource model\n* \"monitoring.googleapis.com\" - the Google Cloud Monitoring service\n* \"none\" - no metrics will be exported from the cluster",
           "type": "string"
         },
         "desiredAddonsConfig": {
@@ -1917,12 +2111,12 @@
           "$ref": "BinaryAuthorization"
         },
         "concurrentNodeCount": {
-          "description": "Controls how many nodes to upgrade in parallel. A maximum of 20 concurrent\nnodes is allowed.",
+          "description": "Controls how many nodes to upgrade in parallel. A maximum of 20 concurrent\nnodes is allowed.\nDeprecated. This feature will be replaced by an equivalent new feature that\ngives better control over concurrency. It is not planned to propagate this\nfield to GA and it will be eventually removed from the API.",
           "type": "integer",
           "format": "int32"
         },
         "desiredLoggingService": {
-          "description": "The logging service the cluster should use to write metrics.\nCurrently available options:\n\n* \"logging.googleapis.com\/kubernetes\" - the Google Cloud Logging\nservice with Kubernetes-native resource model in Stackdriver\n* \"logging.googleapis.com\" - the Google Cloud Logging service\n* \"none\" - no logs will be exported from the cluster",
+          "description": "The logging service the cluster should use to write metrics.\nCurrently available options:\n\n* \"logging.googleapis.com\/kubernetes\" - the Google Cloud Logging\nservice with Kubernetes-native resource model\n* \"logging.googleapis.com\" - the Google Cloud Logging service\n* \"none\" - no logs will be exported from the cluster",
           "type": "string"
         },
         "securityProfile": {
@@ -1938,7 +2132,7 @@
           "$ref": "VerticalPodAutoscaling"
         },
         "desiredCloudNatStatus": {
-          "description": "The desired status of Cloud NAT for this cluster.",
+          "description": "The desired status of Cloud NAT for this cluster.\nDeprecated: use desired_default_snat_status instead.",
           "$ref": "CloudNatStatus"
         },
         "desiredPrivateIpv6Access": {
@@ -1952,6 +2146,10 @@
         "desiredIntraNodeVisibilityConfig": {
           "description": "The desired config of Intra-node visibility.",
           "$ref": "IntraNodeVisibilityConfig"
+        },
+        "desiredDefaultSnatStatus": {
+          "description": "The desired status of whether to disable default sNAT for this cluster.",
+          "$ref": "DefaultSnatStatus"
         },
         "desiredMasterVersion": {
           "description": "The Kubernetes version to change the master to.\n\nUsers may specify either explicit versions offered by\nKubernetes Engine or version aliases, which have the following behavior:\n\n- \"latest\": picks the highest valid Kubernetes version\n- \"1.X\": picks the highest valid patch+gke.N patch in the 1.X version\n- \"1.X.Y\": picks the highest valid gke.N patch in the 1.X.Y version\n- \"1.X.Y-gke.N\": picks an explicit Kubernetes version\n- \"-\": picks the default Kubernetes version",
@@ -1976,6 +2174,10 @@
         "desiredShieldedNodes": {
           "description": "Configuration for Shielded Nodes.",
           "$ref": "ShieldedNodes"
+        },
+        "desiredCostManagementConfig": {
+          "description": "The desired configuration for the fine-grained cost management feature.",
+          "$ref": "CostManagementConfig"
         }
       }
     },
@@ -2008,6 +2210,17 @@
       "properties": {
         "enabled": {
           "description": "Enables intra node visibility for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "DefaultSnatStatus": {
+      "id": "DefaultSnatStatus",
+      "description": "DefaultSnatStatus contains the desired state of whether default sNAT should\nbe disabled on the cluster.",
+      "type": "object",
+      "properties": {
+        "disabled": {
+          "description": "Disables cluster default sNAT rules.",
           "type": "boolean"
         }
       }
@@ -2067,6 +2280,10 @@
         "workloadMetadataConfig": {
           "description": "The desired image type for the node pool.",
           "$ref": "WorkloadMetadataConfig"
+        },
+        "upgradeSettings": {
+          "description": "Upgrade settings control disruption and speed of the upgrade.",
+          "$ref": "UpgradeSettings"
         }
       }
     },
@@ -2366,6 +2583,143 @@
           "items": {
             "type": "string"
           }
+        },
+        "premiumConfig": {
+          "description": "Premium configuration for the service.",
+          "$ref": "PremiumConfig"
+        },
+        "channels": {
+          "description": "List of release channel configurations.",
+          "type": "array",
+          "items": {
+            "$ref": "ReleaseChannelConfig"
+          }
+        }
+      }
+    },
+    "PremiumConfig": {
+      "id": "PremiumConfig",
+      "description": "PremiumConfig is the configuration for all premium features and tiers.",
+      "type": "object",
+      "properties": {
+        "tiers": {
+          "description": "The tiers that are part of the premium offering.",
+          "type": "array",
+          "items": {
+            "$ref": "TierConfig"
+          }
+        },
+        "features": {
+          "description": "The features that GKE provides.",
+          "type": "array",
+          "items": {
+            "$ref": "FeatureConfig"
+          }
+        }
+      }
+    },
+    "TierConfig": {
+      "id": "TierConfig",
+      "description": "TierConfig is the configuration for a tier offering.  For example the GKE\nstandard or advanced offerings which contain different levels of\nfunctionality and possibly cost.",
+      "type": "object",
+      "properties": {
+        "parent": {
+          "description": "The tier from which the tier being configured inherits.  The configured\ntier will inherit all the features from its parent tier.",
+          "enumDescriptions": [
+            "TIER_UNSPECIFIED is the default value. If this value is set during create\nor update, it defaults to the project level tier setting.",
+            "Represents the standard tier or base Google Kubernetes Engine offering.",
+            "Represents the advanced tier."
+          ],
+          "type": "string",
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "STANDARD",
+            "ADVANCED"
+          ]
+        },
+        "tier": {
+          "description": "The tier that is being configured with this value.",
+          "enumDescriptions": [
+            "TIER_UNSPECIFIED is the default value. If this value is set during create\nor update, it defaults to the project level tier setting.",
+            "Represents the standard tier or base Google Kubernetes Engine offering.",
+            "Represents the advanced tier."
+          ],
+          "type": "string",
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "STANDARD",
+            "ADVANCED"
+          ]
+        }
+      }
+    },
+    "FeatureConfig": {
+      "id": "FeatureConfig",
+      "description": "FeatureConfig is the configuration for a specific feature including the\ndefinition of the feature as well as the tier in which it resides.",
+      "type": "object",
+      "properties": {
+        "feature": {
+          "description": "The feature that is being configured with this value.",
+          "enumDescriptions": [
+            "DEFAULT_FEATURE is the default zero value of the Feature.  This value is\nvalid.",
+            "The vertical pod autoscaling feature.",
+            "The node auto provisioning feature.",
+            "The binary authorization feature.",
+            "The resource labels feature.",
+            "The GKE usage metering feature.",
+            "The Cloud Run on GKE feature."
+          ],
+          "type": "string",
+          "enum": [
+            "DEFAULT_FEATURE",
+            "VERTICAL_POD_AUTOSCALER",
+            "NODE_AUTO_PROVISIONING",
+            "BINARY_AUTHORIZATION",
+            "RESOURCE_LABELS",
+            "USAGE_METERING",
+            "CLOUD_RUN_ON_GKE"
+          ]
+        },
+        "tier": {
+          "description": "The tier in which the configured feature resides.",
+          "enumDescriptions": [
+            "TIER_UNSPECIFIED is the default value. If this value is set during create\nor update, it defaults to the project level tier setting.",
+            "Represents the standard tier or base Google Kubernetes Engine offering.",
+            "Represents the advanced tier."
+          ],
+          "type": "string",
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "STANDARD",
+            "ADVANCED"
+          ]
+        }
+      }
+    },
+    "ReleaseChannelConfig": {
+      "id": "ReleaseChannelConfig",
+      "description": "ReleaseChannelConfig exposes configuration for a release channel.",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "description": "The release channel this configuration applies to.",
+          "enumDescriptions": [
+            "No channel specified.",
+            "RAPID channel is offered on an early access basis for customers who want\nto test new releases before they are qualified for production use or\ngeneral availability. New upgrades will occur roughly weekly.\n\nWARNING: Versions available in the RAPID Channel may be subject to\nunresolved issues with no known workaround and are not for use with\nproduction workloads or subject to any SLAs.",
+            "Clusters subscribed to REGULAR receive versions that are considered GA\nquality. REGULAR is intended for production users who want to take\nadvantage of new features. New upgrades will occur roughly every few\nweeks.",
+            "Clusters subscribed to STABLE receive versions that are known to be\nstable and reliable in production. STABLE is intended for production\nusers who need stability above all else, or for whom frequent upgrades\nare too risky. New upgrades will occur roughly every few months."
+          ],
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "RAPID",
+            "REGULAR",
+            "STABLE"
+          ]
+        },
+        "defaultVersion": {
+          "description": "The default version for newly created clusters on the channel.",
+          "type": "string"
         }
       }
     },
@@ -2416,6 +2770,30 @@
           "items": {
             "type": "string"
           }
+        },
+        "cacheHeader": {
+          "description": "OnePlatform automagically extracts this field and uses it to set the HTTP\nCache-Control header.",
+          "$ref": "HttpCacheControlResponseHeader"
+        }
+      }
+    },
+    "HttpCacheControlResponseHeader": {
+      "id": "HttpCacheControlResponseHeader",
+      "description": "RFC-2616: cache control support",
+      "type": "object",
+      "properties": {
+        "directive": {
+          "description": "14.9 request and response directives",
+          "type": "string"
+        },
+        "age": {
+          "description": "14.6 response cache age, in seconds since the response is generated",
+          "type": "string",
+          "format": "int64"
+        },
+        "expires": {
+          "description": "14.21 response cache expires, in RFC 1123 date format",
+          "type": "string"
         }
       }
     },
@@ -2430,6 +2808,10 @@
           "items": {
             "$ref": "Jwk"
           }
+        },
+        "cacheHeader": {
+          "description": "OnePlatform automagically extracts this field and uses it to set the HTTP\nCache-Control header.",
+          "$ref": "HttpCacheControlResponseHeader"
         }
       }
     },
@@ -2785,23 +3167,23 @@
     },
     "GoogleIamV1Policy": {
       "id": "GoogleIamV1Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles\/owner\n    - members:\n      - user:sean@example.com\n      role: roles\/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
       "type": "object",
       "properties": {
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and\/or stored policy is skipped.",
           "type": "integer",
           "format": "int32"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
           "type": "array",
           "items": {
             "$ref": "GoogleIamV1Binding"
           }
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten blindly.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
           "type": "string",
           "format": "byte"
         }
@@ -2817,7 +3199,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -2857,6 +3239,22 @@
       "description": "Request message for `GetIamPolicy` method.",
       "type": "object",
       "properties": {
+        "options": {
+          "description": "OPTIONAL: A `GetPolicyOptions` object for specifying options to\n`GetIamPolicy`. This field is only used by Cloud IAM.",
+          "$ref": "GoogleIamV1GetPolicyOptions"
+        }
+      }
+    },
+    "GoogleIamV1GetPolicyOptions": {
+      "id": "GoogleIamV1GetPolicyOptions",
+      "description": "Encapsulates settings provided to GetIamPolicy.",
+      "type": "object",
+      "properties": {
+        "requestedPolicyVersion": {
+          "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
+          "type": "integer",
+          "format": "int32"
+        }
       }
     },
     "GoogleIamV1TestIamPermissionsRequest": {

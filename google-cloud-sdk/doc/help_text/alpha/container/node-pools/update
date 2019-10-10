@@ -4,10 +4,14 @@ NAME
 
 SYNOPSIS
     gcloud alpha container node-pools update NAME
-        (--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+        (--node-locations=ZONE,[ZONE,...]
+          | --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
           | --enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
-          | --enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
-        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+          | --enable-autorepair --enable-autoupgrade
+          | --max-surge-upgrade=MAX_SURGE_UPGRADE
+          --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE)
+        [--cluster=CLUSTER] [--region=REGION | --zone=ZONE, -z ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha container node-pools update updates a node pool in a
@@ -20,12 +24,24 @@ POSITIONAL ARGUMENTS
 REQUIRED FLAGS
      Exactly one of these must be specified:
 
+       --node-locations=ZONE,[ZONE,...]
+          Set of zones in which the node pool's nodes should be located.
+          Changing the locations for a node pool will result in nodes being
+          either created or removed from the node pool, depending on whether
+          locations are being added or removed.
+
+          Multiple locations can be specified, separated by commas. For
+          example:
+
+              $ gcloud alpha container node-pools update node-pool-1 \
+                  --node-locations=us-central1-a,us-central1-b
+
        --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-          Type of metadata server available to pods running in the nodepool.
+          Type of metadata server available to pods running in the node pool.
           WORKLOAD_METADATA_FROM_NODE must be one of:
 
            EXPOSED
-              Pods running in this nodepool have access to the node's
+              Pods running in this node pool have access to the node's
               underlying Compute Engine Metadata Server.
            GKE_METADATA_SERVER
               Run the Kubernetes Engine Metadata Server on this node. The
@@ -70,7 +86,7 @@ REQUIRED FLAGS
        Node management
 
          --enable-autorepair
-            Enable node autorepair feature for a node-pool.
+            Enable node autorepair feature for a node pool.
 
                 $ gcloud alpha container node-pools update node-pool-1 \
                     --cluster=example-cluster --enable-autorepair
@@ -80,7 +96,7 @@ REQUIRED FLAGS
             for more info.
 
          --enable-autoupgrade
-            Sets autoupgrade feature for a node-pool.
+            Sets autoupgrade feature for a node pool.
 
                 $ gcloud alpha container node-pools update node-pool-1 \
                     --cluster=example-cluster --enable-autoupgrade
@@ -88,6 +104,34 @@ REQUIRED FLAGS
             See
             https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
             for more info.
+
+       Upgrade settings
+
+         --max-surge-upgrade=MAX_SURGE_UPGRADE
+            Number of extra (surge) nodes to be created on each upgrade of the
+            node pool.
+
+            Specifies the number of extra (surge) nodes to be created during
+            this node pool's upgrades. For example, running the following
+            command will result in creating an extra node each time the node
+            pool is upgraded:
+
+                $ gcloud alpha container node-pools update node-pool-1 \
+                    --cluster=example-cluster --max-surge-upgrade 1
+
+         --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE
+            Number of nodes that can be unavailable at the same time on each
+            upgrade of the node pool.
+
+            Specifies the number of nodes that can be unavailable at the same
+            time during this node pool's upgrades. For example, running the
+            following command will result in having 3 nodes being upgraded in
+            parallel (1 + 2), but keeping always at least 3 (5 - 2) available
+            each time the node pool is upgraded:
+
+                $ gcloud alpha container node-pools update node-pool-1 \
+                    --cluster=example-cluster --num-nodes=5 --max-surge-upgrade 1 \
+                    --max-unavailable-upgrade=2
 
 OPTIONAL FLAGS
      --cluster=CLUSTER
@@ -120,9 +164,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud container node-pools update
         $ gcloud beta container node-pools update

@@ -6,9 +6,9 @@ summary:
 - execute:
   - command: compute instances resume z1 z2 z3 --zone us-central1-a --async
   - stderr: |
-      Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830].
-      Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04].
-      Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d].
+      Resume instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830].
+      Resume instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04].
+      Resume instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d].
       Use [gcloud compute operations describe URI] command to check the status of the operation(s).
 actions:
 - execute_command:
@@ -17,7 +17,7 @@ actions:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1/resume?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1/resume?alt=json
           method: POST
           body: null
         return_response:
@@ -31,16 +31,16 @@ actions:
             name: operation-1511823999663-55efef4767b99-eb031282-db3dd830
             operationType: resume
             progress: 100
-            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830
             startTime: '2017-11-27T15:06:39.912-08:00'
             status: DONE
             targetId: '6870764064443804325'
-            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3
-            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+            targetLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3
+            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2/resume?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2/resume?alt=json
           method: POST
           headers: {}
           body: null
@@ -55,16 +55,16 @@ actions:
             name: operation-1511823999663-55efef4767b9a-e0394411-41385d04
             operationType: resume
             progress: 100
-            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04
             startTime: '2017-11-27T15:06:39.894-08:00'
             status: DONE
             targetId: '9119179864806599333'
-            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2
-            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+            targetLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2
+            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3/resume?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3/resume?alt=json
           method: POST
           headers: {}
           body: null
@@ -79,16 +79,16 @@ actions:
             name: operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d
             operationType: resume
             progress: 100
-            selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d
             startTime: '2017-11-27T15:06:39.895-08:00'
             status: DONE
             targetId: '7014533340148607708'
-            targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1
-            zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+            targetLink: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1
+            zone: https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
     - expect_stderr: |
-        Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830].
-        Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04].
-        Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d].
+        Resume instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b99-eb031282-db3dd830].
+        Resume instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9a-e0394411-41385d04].
+        Resume instance in progress for [https://compute.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511823999663-55efef4767b9b-c4f08f18-aa57175d].
         Use [gcloud compute operations describe URI] command to check the status of the operation(s).
     - expect_exit:
         code: 0

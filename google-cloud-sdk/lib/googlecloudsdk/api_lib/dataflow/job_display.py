@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,8 +93,12 @@ class DisplayInfo(object):
     state_value_enum = apis.GetMessagesModule().Job.CurrentStateValueValuesEnum
     value_map = {
         state_value_enum.JOB_STATE_CANCELLED: 'Cancelled',
+        state_value_enum.JOB_STATE_CANCELLING: 'Cancelling',
         state_value_enum.JOB_STATE_DONE: 'Done',
+        state_value_enum.JOB_STATE_DRAINED: 'Drained',
+        state_value_enum.JOB_STATE_DRAINING: 'Draining',
         state_value_enum.JOB_STATE_FAILED: 'Failed',
+        state_value_enum.JOB_STATE_PENDING: 'Pending',
         state_value_enum.JOB_STATE_QUEUED: 'Queued',
         state_value_enum.JOB_STATE_RUNNING: 'Running',
         state_value_enum.JOB_STATE_STOPPED: 'Stopped',

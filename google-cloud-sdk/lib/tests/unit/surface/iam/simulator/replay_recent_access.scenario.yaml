@@ -1,0 +1,71 @@
+title: iam simulator replay-recent-access scenario test
+release_tracks: [ALPHA]
+
+actions:
+
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "bindings": [
+            {
+             "role": "roles/owner",
+             "members": ["user:testuser@google.com"]
+            },
+          ],
+         "etag": "ACAB"
+      }
+
+# troubleshoot iam policy without a condition
+- execute_command:
+    command: iam simulator replay-recent-access my-resource-path policy.json
+
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iamassist.googleapis.com/v1alpha2/simulator:replayRecentAccesses?alt=json
+          method: POST
+          body: [
+            "policyOverlay": [
+              {
+                "my-resource-path": [
+                  "version": 1,
+                  "etag": "ACAB",
+                  "bindings": [{
+                    "role": "roles/owner",
+                    "members": ["user:testuser@google.com"]
+                  }]
+                ]
+              }
+            ]
+          ]
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "simulator-fake-operation-id"
+            }
+    - api_call:
+        expect_request:
+          uri: https://iamassist.googleapis.com/v1alpha2/operations/simulator-fake-operation-id?alt=json
+          method: GET
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "operations/simulator-fake-operation-id",
+              "done": true,
+              "response": {}
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [simulator-fake-operation-id] to complete
+        status: SUCCESS
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

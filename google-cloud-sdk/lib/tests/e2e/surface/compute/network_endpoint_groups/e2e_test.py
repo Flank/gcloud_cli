@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,9 @@ import logging
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_utils
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
-@test_case.Filters.skipAlways('Leaking resources', 'b/126521287')
 class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
   """Network endpoint groups tests."""
 
@@ -147,18 +145,7 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
         self.network_name, 'networks', scope=e2e_test_base.GLOBAL)
 
 
-@test_case.Filters.skipAlways('Leaking resources', 'b/126521287')
-class NetworkEndpointGroupsBetaTest(NetworkEndpointGroupsTest):
-  """Network endpoint groups alpha tests."""
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.registry = resources.REGISTRY.Clone()
-    self.registry.RegisterApiByName('compute', 'beta')
-    self.SetupCommon()
-
-
-class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsBetaTest):
+class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsTest):
   """Network endpoint groups alpha tests."""
 
   def SetUp(self):

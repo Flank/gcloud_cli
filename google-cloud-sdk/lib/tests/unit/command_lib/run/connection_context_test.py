@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 
 import ssl
 
+from googlecloudsdk.api_lib.container import kubeconfig
 from googlecloudsdk.api_lib.run import gke
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
@@ -51,23 +52,65 @@ class ConnectionContextTest(test_case.TestCase):
     self.get_client_instance_internal = self.StartObjectPatch(
         apis_internal, '_GetClientInstance')
 
-  def testConnectToCluster(self):
+  def testConnectToGKECluster(self):
     cluster_ref = mock.Mock()
     with connection_context._GKEConnectionContext(cluster_ref):
       if six.PY3:
-        self.assertEquals(
+        self.assertEqual(
             properties.VALUES.api_endpoint_overrides.run.Get(),
             'https://1.1.1.2/')
       else:
-        self.assertEquals(
+        self.assertEqual(
             properties.VALUES.api_endpoint_overrides.run.Get(),
             'https://kubernetes.default/')
 
   def testConnectToRegion(self):
     with connection_context._RegionalConnectionContext('us-central1'):
-      self.assertEquals(
+      self.assertEqual(
           properties.VALUES.api_endpoint_overrides.run.Get(),
           'https://us-central1-run.googleapis.com/')
+
+  def testConnectToKubeconfigClusterWithCurrentContext(self):
+    config = kubeconfig.Kubeconfig.Default()
+    cluster = kubeconfig.Cluster(
+        'cluster1', 'https://2.2.2.2:443', ca_data='=')
+    user = kubeconfig.User('user', cert_data='aGF0',
+                           key_data='c2FsYWQ=')
+    context = kubeconfig.Context('context', 'cluster1', 'user')
+    config.clusters['cluster1'] = cluster
+    config.users['user'] = user
+    config.contexts['context'] = context
+    config.SetCurrentContext('context')
+    with connection_context._KubeconfigConnectionContext(config):
+      if six.PY3:
+        self.assertEqual(
+            properties.VALUES.api_endpoint_overrides.run.Get(),
+            'https://2.2.2.2/')
+      else:
+        self.assertEqual(
+            properties.VALUES.api_endpoint_overrides.run.Get(),
+            'https://kubernetes.default/')
+
+  def testConnectToKubeconfigClusterWithSpecifiedContext(self):
+    config = kubeconfig.Kubeconfig.Default()
+    cluster = kubeconfig.Cluster(
+        'cluster1', 'https://2.2.2.2', ca_data='=')
+    user = kubeconfig.User('user', cert_data='aGF0',
+                           key_data='c2FsYWQ=')
+    context = kubeconfig.Context('context', 'cluster1', 'user')
+    config.clusters['cluster1'] = cluster
+    config.users['user'] = user
+    config.contexts['context'] = context
+    config.SetCurrentContext('some_other_context')
+    with connection_context._KubeconfigConnectionContext(config, 'context'):
+      if six.PY3:
+        self.assertEqual(
+            properties.VALUES.api_endpoint_overrides.run.Get(),
+            'https://2.2.2.2/')
+      else:
+        self.assertEqual(
+            properties.VALUES.api_endpoint_overrides.run.Get(),
+            'https://kubernetes.default/')
 
 
 class TLSSupportCheckTest(test_case.TestCase):

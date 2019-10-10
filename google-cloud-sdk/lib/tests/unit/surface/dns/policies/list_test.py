@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.dns import base
-from tests.lib.surface.dns import util_beta
+from tests.lib.surface.dns import util
 
 
-class ListTest(base.DnsMockBetaTest):
+class ListTest(base.DnsMockTest):
 
   def testListPolicies(self):
     properties.VALUES.core.user_output_enabled.Set(False)
-    expected_output = util_beta.GetPolicies(networks=['1.0.1.1', '1.0.1.2'])
+    expected_output = util.GetPolicies(networks=['1.0.1.1', '1.0.1.2'])
     list_request = self.messages.DnsPoliciesListRequest(project=self.Project())
     self.client.policies.List.Expect(
         request=list_request,
@@ -40,11 +40,11 @@ class ListTest(base.DnsMockBetaTest):
     properties.VALUES.core.user_output_enabled.Set(True)
     list_request = self.messages.DnsPoliciesListRequest(project=self.Project())
     test_networks = [
-        util_beta.GetNetworkURI('default', self.Project()),
-        util_beta.GetNetworkURI('network1', self.Project())
+        util.GetNetworkURI('default', self.Project()),
+        util.GetNetworkURI('network1', self.Project())
     ]
-    name_servers = util_beta.GetAltNameServerConfig(['2.0.1.1', '2.0.1.2'])
-    expected_output = util_beta.GetPolicies(
+    name_servers = util.GetAltNameServerConfig(['2.0.1.1', '2.0.1.2'])
+    expected_output = util.GetPolicies(
         name_server_config=name_servers,
         networks=test_networks,
         forwarding=True,

@@ -7,6 +7,7 @@ SYNOPSIS
         --display-name=DISPLAY_NAME --starting-urls=[STARTING_URLS,...]
         [--blacklist-patterns=[BLACKLIST_PATTERNS,...]]
         [--no-export-to-security-center] [--max-qps=MAX_QPS]
+        [--risk-level=RISK_LEVEL; default="normal"]
         [--target-platforms=[TARGET_PLATFORMS,...];
           default="app_engine,compute"] [--user-agent=USER_AGENT]
         [--auth-password=AUTH_PASSWORD
@@ -39,6 +40,10 @@ OPTIONAL FLAGS
      --max-qps=MAX_QPS
         Maximum queries per second (QPS) of the scanners. Defaults to 15, with
         a maximum of 20.
+
+     --risk-level=RISK_LEVEL; default="normal"
+        The risk level selected for the scan. Defaults to normal scanning.
+        RISK_LEVEL must be one of: low, normal.
 
      --target-platforms=[TARGET_PLATFORMS,...]; default="app_engine,compute"
         List of platforms the site is running on. Defaults to
@@ -101,7 +106,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

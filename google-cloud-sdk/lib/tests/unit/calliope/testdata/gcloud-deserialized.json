@@ -270,7 +270,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -560,7 +560,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -601,7 +601,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud internal internal-command\n  $ gcloud beta internal internal-command"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud internal internal-command\n  $ gcloud beta internal internal-command"
               }
             }
           },
@@ -850,7 +850,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -1140,7 +1140,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -1166,7 +1166,7 @@
           "release": "ALPHA",
           "sections": {
             "DESCRIPTION": "*(ALPHA)*  Internal gcloud commands.",
-            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud internal\n  $ gcloud beta internal"
+            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud internal\n  $ gcloud beta internal"
           }
         },
         "sdk": {
@@ -1420,7 +1420,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -1710,7 +1710,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -1737,7 +1737,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests subgroup.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
               }
             },
             "hidden-command": {
@@ -1988,7 +1988,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -2278,7 +2278,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -2305,7 +2305,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests hidden command.",
-                "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+                "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
               }
             },
             "hiddengroup": {
@@ -2559,7 +2559,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -2849,7 +2849,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -2877,7 +2877,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests hidden command.",
-                    "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+                    "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
                   }
                 },
                 "hidden-command-a": {
@@ -3128,7 +3128,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -3418,7 +3418,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -3446,7 +3446,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests hidden command.",
-                    "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+                    "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
                   }
                 }
               },
@@ -3695,7 +3695,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -3985,7 +3985,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -4012,7 +4012,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests hidden subgroup.",
-                "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+                "NOTES": "This command is an internal implementation detail and may change or disappear without notice.\nThis command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
               }
             },
             "ordered-choices": {
@@ -4282,7 +4282,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -4591,7 +4591,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -4618,7 +4618,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  A command with required flags.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk ordered-choices\n  $ gcloud beta sdk ordered-choices"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk ordered-choices\n  $ gcloud beta sdk ordered-choices"
               }
             },
             "second-level-command-1": {
@@ -4869,7 +4869,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -5159,7 +5159,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -5186,7 +5186,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk second-level-command-1\n  $ gcloud beta sdk second-level-command-1"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk second-level-command-1\n  $ gcloud beta sdk second-level-command-1"
               }
             },
             "second-level-command-b": {
@@ -5437,7 +5437,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -5727,7 +5727,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -5754,7 +5754,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk second-level-command-b\n  $ gcloud beta sdk second-level-command-b"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk second-level-command-b\n  $ gcloud beta sdk second-level-command-b"
               }
             },
             "subgroup": {
@@ -6008,7 +6008,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -6298,7 +6298,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -6326,7 +6326,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
+                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
                   }
                 },
                 "subgroup-command-a": {
@@ -6672,7 +6672,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -7022,7 +7022,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -7064,7 +7064,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
+                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
                   }
                 }
               },
@@ -7313,7 +7313,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -7603,7 +7603,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -7630,7 +7630,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests subgroup.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
               }
             },
             "xyzzy": {
@@ -7961,7 +7961,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -8364,7 +8364,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -8436,7 +8436,7 @@
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  Nothing Happens.",
                 "EXAMPLES": "Try these:\n$ echo one\n$ gcloud components list\n",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk xyzzy\n  $ gcloud beta sdk xyzzy"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk xyzzy\n  $ gcloud beta sdk xyzzy"
               }
             }
           },
@@ -8685,7 +8685,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -8975,7 +8975,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -9001,7 +9001,7 @@
           "release": "ALPHA",
           "sections": {
             "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests second level group.",
-            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
+            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
           }
         },
         "version": {
@@ -9252,7 +9252,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -9542,7 +9542,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -9568,7 +9568,7 @@
           "release": "ALPHA",
           "sections": {
             "DESCRIPTION": "*(ALPHA)*  Print installation version information.",
-            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud version\n  $ gcloud beta version"
+            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud version\n  $ gcloud beta version"
           }
         }
       },
@@ -9817,7 +9817,7 @@
               "none"
             ],
             "default": "warning",
-            "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+            "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
             "is_global": true,
             "is_group": false,
             "is_hidden": false,
@@ -10107,7 +10107,7 @@
             "none"
           ],
           "default": "warning",
-          "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+          "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
           "is_global": true,
           "is_group": false,
           "is_hidden": false,
@@ -10132,7 +10132,7 @@
       "release": "ALPHA",
       "sections": {
         "DESCRIPTION": "*(ALPHA)*  Alpha versions of gcloud commands.",
-        "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+        "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
       }
     },
     "beta": {
@@ -10402,7 +10402,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -10692,7 +10692,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -10982,7 +10982,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -11272,7 +11272,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -11583,7 +11583,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -11888,7 +11888,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -12196,7 +12196,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -12501,7 +12501,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -12830,7 +12830,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -13170,7 +13170,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -13462,7 +13462,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -13767,7 +13767,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -14045,7 +14045,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -14335,7 +14335,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -14616,7 +14616,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -14906,7 +14906,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -15185,7 +15185,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -15475,7 +15475,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -15752,7 +15752,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -16042,7 +16042,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -16339,7 +16339,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -16648,7 +16648,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -16926,7 +16926,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -17216,7 +17216,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -17494,7 +17494,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -17784,7 +17784,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -18065,7 +18065,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -18355,7 +18355,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -18729,7 +18729,7 @@
                           "none"
                         ],
                         "default": "warning",
-                        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                         "is_global": true,
                         "is_group": false,
                         "is_hidden": false,
@@ -19079,7 +19079,7 @@
                         "none"
                       ],
                       "default": "warning",
-                      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                       "is_global": true,
                       "is_group": false,
                       "is_hidden": false,
@@ -19370,7 +19370,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -19660,7 +19660,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -20018,7 +20018,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -20421,7 +20421,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -20742,7 +20742,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -21032,7 +21032,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -21309,7 +21309,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -21599,7 +21599,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -21874,7 +21874,7 @@
               "none"
             ],
             "default": "warning",
-            "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+            "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
             "is_global": true,
             "is_group": false,
             "is_hidden": false,
@@ -22164,7 +22164,7 @@
             "none"
           ],
           "default": "warning",
-          "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+          "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
           "is_global": true,
           "is_group": false,
           "is_hidden": false,
@@ -22456,7 +22456,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -22746,7 +22746,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -23035,7 +23035,7 @@
               "none"
             ],
             "default": "warning",
-            "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+            "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
             "is_global": true,
             "is_group": false,
             "is_hidden": false,
@@ -23325,7 +23325,7 @@
             "none"
           ],
           "default": "warning",
-          "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+          "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
           "is_global": true,
           "is_group": false,
           "is_hidden": false,
@@ -23604,7 +23604,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -23894,7 +23894,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -24174,7 +24174,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -24464,7 +24464,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -24742,7 +24742,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -25032,7 +25032,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -25308,7 +25308,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -25598,7 +25598,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -25894,7 +25894,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -26203,7 +26203,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -26480,7 +26480,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -26770,7 +26770,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -27047,7 +27047,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -27337,7 +27337,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -27617,7 +27617,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -27907,7 +27907,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -28280,7 +28280,7 @@
                       "none"
                     ],
                     "default": "warning",
-                    "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                    "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                     "is_global": true,
                     "is_group": false,
                     "is_hidden": false,
@@ -28630,7 +28630,7 @@
                     "none"
                   ],
                   "default": "warning",
-                  "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                  "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                   "is_global": true,
                   "is_group": false,
                   "is_hidden": false,
@@ -28920,7 +28920,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -29210,7 +29210,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -29567,7 +29567,7 @@
                   "none"
                 ],
                 "default": "warning",
-                "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+                "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
                 "is_global": true,
                 "is_group": false,
                 "is_hidden": false,
@@ -29970,7 +29970,7 @@
                 "none"
               ],
               "default": "warning",
-              "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+              "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
               "is_global": true,
               "is_group": false,
               "is_hidden": false,
@@ -30290,7 +30290,7 @@
               "none"
             ],
             "default": "warning",
-            "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+            "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
             "is_global": true,
             "is_group": false,
             "is_hidden": false,
@@ -30580,7 +30580,7 @@
             "none"
           ],
           "default": "warning",
-          "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+          "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
           "is_global": true,
           "is_group": false,
           "is_hidden": false,
@@ -30856,7 +30856,7 @@
               "none"
             ],
             "default": "warning",
-            "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+            "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
             "is_global": true,
             "is_group": false,
             "is_hidden": false,
@@ -31146,7 +31146,7 @@
             "none"
           ],
           "default": "warning",
-          "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+          "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
           "is_global": true,
           "is_group": false,
           "is_hidden": false,
@@ -31420,7 +31420,7 @@
           "none"
         ],
         "default": "warning",
-        "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+        "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
         "is_global": true,
         "is_group": false,
         "is_hidden": false,
@@ -31725,7 +31725,7 @@
         "none"
       ],
       "default": "warning",
-      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
       "is_global": true,
       "is_group": false,
       "is_hidden": false,

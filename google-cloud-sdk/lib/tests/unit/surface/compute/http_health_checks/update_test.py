@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class HttpHealthChecksUpdateTest(test_base.BaseTest,
 
     self.Run("""
         compute http-health-checks update
-          https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check
           --host www.google.com
         """)
 

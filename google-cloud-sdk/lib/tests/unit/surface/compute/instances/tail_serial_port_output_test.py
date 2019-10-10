@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ class InstancesGetSerialPortOutputTest(test_base.BaseTest,
     with self.AssertRaisesToolExceptionMatches('raise_after_second_request'):
       self.Run("""
           compute instances tail-serial-port-output
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/instance-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/instance-1
           """)
 
     self.CheckRequests(

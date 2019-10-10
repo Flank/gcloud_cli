@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,12 +24,52 @@ DOCS_URL = 'https://cloud.google.com/video-intelligence/docs/'
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
-  OPERATIONS = (
-      'operations',
+  OPERATIONS_PROJECTS = (
+      'operations.projects',
+      'operations/projects/{projectsId}',
+      {},
+      [u'projectsId'],
+      True
+  )
+  OPERATIONS_PROJECTS_LOCATIONS = (
+      'operations.projects.locations',
+      'operations/projects/{projectsId}/locations/{locationsId}',
+      {},
+      [u'projectsId', u'locationsId'],
+      True
+  )
+  OPERATIONS_PROJECTS_LOCATIONS_OPERATIONS = (
+      'operations.projects.locations.operations',
       'operations/{+name}',
       {
           '':
+              'operations/projects/{projectsId}/locations/{locationsId}/'
               'operations/{operationsId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS = (
+      'projects',
+      'projects/{projectsId}',
+      {},
+      [u'projectsId'],
+      True
+  )
+  PROJECTS_LOCATIONS = (
+      'projects.locations',
+      'projects/{projectsId}/locations/{locationsId}',
+      {},
+      [u'projectsId', u'locationsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_OPERATIONS = (
+      'projects.locations.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/operations/'
+              '{operationsId}',
       },
       [u'name'],
       True

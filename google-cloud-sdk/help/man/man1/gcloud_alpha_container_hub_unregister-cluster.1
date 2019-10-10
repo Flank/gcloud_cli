@@ -11,7 +11,7 @@ gcloud alpha container hub unregister\-cluster \- unregisters a cluster from Goo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container hub unregister\-cluster\fR \fB\-\-context\fR=\fICONTEXT\fR [\fB\-\-kubeconfig\-file\fR=\fIKUBECONFIG_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container hub unregister\-cluster\fR \fB\-\-context\fR=\fICONTEXT\fR [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,7 +38,7 @@ The context in the kubeconfig file that specifies the cluster.
 
 .RS 2m
 .TP 2m
-\fB\-\-kubeconfig\-file\fR=\fIKUBECONFIG_FILE\fR
+\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
 The kubeconfig file containing an entry for the cluster. Defaults to $KUBECONFIG
 if it is set in the environment, otherwise defaults to to $HOME/.kube/config.
 
@@ -69,7 +69,7 @@ Unregister a cluster referenced from a specific kubeconfig file:
 
 .RS 2m
 $ gcloud alpha container hub unregister\-cluster \e
-    \-\-kubeconfig\-file=/home/user/custom_kubeconfig \e
+    \-\-kubeconfig=/home/user/custom_kubeconfig \e
     \-\-context=my\-cluster\-context
 .RE
 
@@ -79,7 +79,10 @@ $ gcloud alpha container hub unregister\-cluster \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta container hub unregister\-cluster
+.RE
 

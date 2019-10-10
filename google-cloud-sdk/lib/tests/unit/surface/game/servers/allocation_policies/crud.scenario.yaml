@@ -1,0 +1,1825 @@
+title: Cloud Game Services allocationPolicies crud test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers allocation-policies create my-policy --location global --priority 50
+      --weight 20 --match-clusters=label_a=value1,label_b=value2
+      --schedule=^::^cron-spec="10 0 1-7 5,12 *"::cron-job-duration=3600s::start-time=2019-10-01T10:00:00Z::end-time=2020-10-01T10:00:00Z
+      --schedule start-time=2021-09-25T10:11:00Z --labels a=x,b=y
+  - stderr: |
+      Create request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created allocation policy [my-policy].
+- execute:
+  - command: |
+      game servers allocation-policies create my-policy --location global --priority 50 --weight 20
+      --schedule=^::^cron-spec="10 0 1-7 5,12 *"::cron-job-duration=3600s::start-time=2019-10-01T10:00:00Z::end-time=2020-10-01T10:00:00Z
+      --schedule start-time=2021-09-25T10:11:00Z --labels a=x,b=y
+  - stderr: |
+      Create request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created allocation policy [my-policy].
+- execute:
+  - command: |
+      game servers allocation-policies create my-policy --location global --priority 50
+      --weight 20 --match-clusters=label_a=value1,label_b=value2 --match-clusters=label_c=value3
+  - stderr: |
+      Create request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created allocation policy [my-policy].
+- execute:
+  - command: |
+      game servers allocation-policies describe my-policy --location global
+  - stdout: |
+      clusterSelectors:
+      - labels:
+          label_a: value1
+          label_b: value2
+      createTime: '2019-05-25T00:04:16.538552853Z'
+      labels:
+        a: x
+        b: y
+      name: projects/fake-project0/locations/global/allocationPolicies/my-policy
+      priority: 50
+      schedules:
+      - startTime: '2021-09-25T10:11:00Z'
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      updateTime: '2019-05-25T00:04:16.676911471Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies update my-policy --location global --priority 30
+  - stderr: |
+      Request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated allocation policy [my-policy].
+  - stdout: |
+      clusterSelectors:
+      - labels:
+          label_a: value1
+          label_b: value2
+      createTime: '2019-06-17T17:23:01.872363533Z'
+      name: projects/fake-project/locations/global/allocationPolicies/my-policy
+      priority: 30
+      schedules:
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      - startTime: '2021-09-25T10:11:00Z'
+      updateTime: '2019-06-17T17:32:20.531596844Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies update my-policy --location global --match-clusters=label_a=value_a,label_b=value_b --match-clusters=label_c=value3
+  - stderr: |
+      Request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated allocation policy [my-policy].
+  - stdout: |
+      clusterSelectors:
+      - labels:
+          label_c: value3
+      createTime: '2019-06-17T17:23:01.872363533Z'
+      name: projects/fake-project/locations/global/allocationPolicies/my-policy
+      priority: 50
+      schedules:
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      - startTime: '2021-09-25T10:11:00Z'
+      updateTime: '2019-06-17T17:32:20.531596844Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies update my-policy --location global --clear-match-clusters --match-clusters=label_a=value_a,label_b=value_b --match-clusters=label_c=value3
+  - stderr: |
+      Request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated allocation policy [my-policy].
+  - stdout: |
+      clusterSelectors:
+      - labels:
+          label_c: value3
+      createTime: '2019-06-17T17:23:01.872363533Z'
+      name: projects/fake-project/locations/global/allocationPolicies/my-policy
+      priority: 50
+      schedules:
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      - startTime: '2021-09-25T10:11:00Z'
+      updateTime: '2019-06-17T17:32:20.531596844Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies update my-policy --location global --clear-match-clusters
+  - stderr: |
+      Request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated allocation policy [my-policy].
+  - stdout: |
+      createTime: '2019-06-17T17:23:01.872363533Z'
+      name: projects/fake-project/locations/global/allocationPolicies/my-policy
+      priority: 50
+      schedules:
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      - startTime: '2021-09-25T10:11:00Z'
+      updateTime: '2019-06-17T17:32:20.531596844Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies update my-policy --location global --update-labels "key1=val1"
+  - stderr: |
+      Request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated allocation policy [my-policy].
+  - stdout: |
+      clusterSelectors:
+      - labels:
+          label_a: value1
+          label_b: value2
+      createTime: '2019-06-17T17:23:01.872363533Z'
+      labels:
+        key1: val1
+      name: projects/fake-project/locations/global/allocationPolicies/my-policy
+      priority: 50
+      schedules:
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      - startTime: '2021-09-25T10:11:00Z'
+      updateTime: '2019-06-17T17:32:20.531596844Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies update my-policy --location global --update-labels "key1=val1" --clear-match-clusters
+  - stderr: |
+      Request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated allocation policy [my-policy].
+  - stdout: |
+      createTime: '2019-06-17T17:23:01.872363533Z'
+      labels:
+        key1: val1
+      name: projects/fake-project/locations/global/allocationPolicies/my-policy
+      priority: 50
+      schedules:
+      - cronJobDuration: 3600s
+        cronSpec: 10 0 1-7 5,12 *
+        endTime: '2020-10-01T10:00:00Z'
+        startTime: '2019-10-01T10:00:00Z'
+      - startTime: '2021-09-25T10:11:00Z'
+      updateTime: '2019-06-17T17:32:20.531596844Z'
+      weight: 20
+- execute:
+  - command: |
+      game servers allocation-policies list --location global
+  - stdout: |
+      NAME         LOCATION  DESCRIPTION  CREATE_TIME  UPDATE_TIME  PRIORITY  WEIGHT  MATCH_CLUSTERS  SCHEDULES  LABELS
+      my-policy-1  global                                           1
+      my-policy-2  global                                           2
+      my-policy-3  global                                           3
+      my-policy-4  global                                           4
+      my-policy-5  global                                           5
+- execute:
+  - command: |
+      game servers allocation-policies list
+  - stdout: |
+      NAME         LOCATION  DESCRIPTION  CREATE_TIME  UPDATE_TIME  PRIORITY  WEIGHT  MATCH_CLUSTERS  SCHEDULES  LABELS
+      my-policy-1  global                                           1
+      my-policy-2  global                                           2
+      my-policy-3  global                                           3
+      my-policy-4  global                                           4
+      my-policy-5  global                                           5
+- execute:
+  - command: |
+      game servers allocation-policies delete my-policy --location global
+  - prompt:
+    - message: You are about to delete allocation policy [my-policy]
+    - input: y
+  - stderr: |
+      Delete request issued for: [my-policy]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted allocation policy [my-policy].
+actions:
+- execute_command:
+    command: |
+      game servers allocation-policies create my-policy --location global --priority 50
+      --weight 20 --match-clusters=label_a=value1,label_b=value2
+      --schedule=^::^cron-spec="10 0 1-7 5,12 *"::cron-job-duration=3600s::start-time=2019-10-01T10:00:00Z::end-time=2020-10-01T10:00:00Z
+      --schedule start-time=2021-09-25T10:11:00Z --labels a=x,b=y
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies?allocationPolicyId=my-policy&alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              clusterSelectors:
+              - labels:
+                  label_a: value1
+                  label_b: value2
+              labels:
+                a: x
+                b: y
+              priority: 50
+              schedules:
+              - cronJobDuration: 3600s
+                cronSpec: 10 0 1-7 5,12 *
+                endTime: '2020-10-01T10:00:00Z'
+                startTime: '2019-10-01T10:00:00Z'
+              - startTime: '2021-09-25T10:11:00Z'
+              weight: 20
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Create request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:23:02.033617660Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:23:02.062648371Z",
+                "priority": 50,
+                "weight": 20,
+                "clusterSelectors": [
+                  {
+                    "labels": {
+                      "label_a": "value1",
+                      "label_b": "value2"
+                    }
+                  }
+                ],
+                "labels": {
+                  "a": "x",
+                  "b": "y"
+                },
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:23:02.825344038Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_a": "value1",
+                    "label_b": "value2"
+                  }
+                }
+              ],
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created allocation policy [my-policy].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies create my-policy --location global --priority 50 --weight 20
+      --schedule=^::^cron-spec="10 0 1-7 5,12 *"::cron-job-duration=3600s::start-time=2019-10-01T10:00:00Z::end-time=2020-10-01T10:00:00Z
+      --schedule start-time=2021-09-25T10:11:00Z --labels a=x,b=y
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies?allocationPolicyId=my-policy&alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              labels:
+                a: x
+                b: y
+              priority: 50
+              schedules:
+              - cronJobDuration: 3600s
+                cronSpec: 10 0 1-7 5,12 *
+                endTime: '2020-10-01T10:00:00Z'
+                startTime: '2019-10-01T10:00:00Z'
+              - startTime: '2021-09-25T10:11:00Z'
+              weight: 20
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Create request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:23:02.033617660Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:23:02.062648371Z",
+                "priority": 50,
+                "weight": 20,
+                "labels": {
+                  "a": "x",
+                  "b": "y"
+                },
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:23:02.825344038Z",
+              "priority": 50,
+              "weight": 20,
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created allocation policy [my-policy].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies create my-policy --location global --priority 50
+      --weight 20 --match-clusters=label_a=value1,label_b=value2 --match-clusters=label_c=value3
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies?allocationPolicyId=my-policy&alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              clusterSelectors:
+              - labels:
+                  label_a: value1
+                  label_b: value2
+              - labels:
+                  label_c: value3
+              priority: 50
+              weight: 20
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Create request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:23:02.033617660Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:23:02.062648371Z",
+                "priority": 50,
+                "weight": 20,
+                "clusterSelectors": [
+                  {
+                    "labels": {
+                      "label_a": "value1",
+                      "label_b": "value2"
+                    },
+                    "labels": {
+                      "label_3": "value3"
+                    }
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:23:02.825344038Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_a": "value1",
+                    "label_b": "value2"
+                  },
+                  "labels": {
+                    "label_c": "value3"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created allocation policy [my-policy].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies describe my-policy --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-05-25T00:04:16.538552853Z",
+              "updateTime": "2019-05-25T00:04:16.676911471Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_a": "value1",
+                    "label_b": "value2"
+                  }
+                }
+              ],
+              "labels": {
+                "a": "x",
+                "b": "y"
+              },
+              "schedules": [
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                },
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                }
+              ]
+            }
+    - expect_stdout: |
+        clusterSelectors:
+        - labels:
+            label_a: value1
+            label_b: value2
+        createTime: '2019-05-25T00:04:16.538552853Z'
+        labels:
+          a: x
+          b: y
+        name: projects/fake-project0/locations/global/allocationPolicies/my-policy
+        priority: 50
+        schedules:
+        - startTime: '2021-09-25T10:11:00Z'
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        updateTime: '2019-05-25T00:04:16.676911471Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies update my-policy --location global --priority 30
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json&updateMask=priority
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              priority: 30
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:32:20.521003447Z",
+                "endTime": "2019-06-17T17:32:20.983129956Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:32:20.531596844Z",
+                "priority": 30,
+                "weight": 20,
+                "clusterSelectors": [
+                  {
+                    "labels": {
+                      "label_b": "value2",
+                      "label_a": "value1"
+                    }
+                  }
+                ],
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 30,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated allocation policy [my-policy].
+    - expect_stdout: |
+        clusterSelectors:
+        - labels:
+            label_a: value1
+            label_b: value2
+        createTime: '2019-06-17T17:23:01.872363533Z'
+        name: projects/fake-project/locations/global/allocationPolicies/my-policy
+        priority: 30
+        schedules:
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        - startTime: '2021-09-25T10:11:00Z'
+        updateTime: '2019-06-17T17:32:20.531596844Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies update my-policy --location global --match-clusters=label_a=value_a,label_b=value_b --match-clusters=label_c=value3
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json&updateMask=cluster_selectors
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              clusterSelectors:
+              - labels:
+                  label_a: value_a
+                  label_b: value_b
+              - labels:
+                  label_c: value3
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:32:20.521003447Z",
+                "endTime": "2019-06-17T17:32:20.983129956Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:32:20.531596844Z",
+                "priority": 50,
+                "weight": 20,
+                "clusterSelectors": [
+                  {
+                    "labels": {
+                      "label_b": "value2",
+                      "label_a": "value1"
+                    }
+                  }
+                ],
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value_b",
+                    "label_a": "value_a"
+                  },
+                  "labels": {
+                    "label_c": "value3"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated allocation policy [my-policy].
+    - expect_stdout: |
+        clusterSelectors:
+        - labels:
+            label_c: value3
+        createTime: '2019-06-17T17:23:01.872363533Z'
+        name: projects/fake-project/locations/global/allocationPolicies/my-policy
+        priority: 50
+        schedules:
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        - startTime: '2021-09-25T10:11:00Z'
+        updateTime: '2019-06-17T17:32:20.531596844Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies update my-policy --location global --clear-match-clusters --match-clusters=label_a=value_a,label_b=value_b --match-clusters=label_c=value3
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json&updateMask=cluster_selectors
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              clusterSelectors:
+              - labels:
+                  label_a: value_a
+                  label_b: value_b
+              - labels:
+                  label_c: value3
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:32:20.521003447Z",
+                "endTime": "2019-06-17T17:32:20.983129956Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:32:20.531596844Z",
+                "priority": 50,
+                "weight": 20,
+                "clusterSelectors": [
+                  {
+                    "labels": {
+                      "label_b": "value2",
+                      "label_a": "value1"
+                    }
+                  }
+                ],
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value_b",
+                    "label_a": "value_a"
+                  },
+                  "labels": {
+                    "label_c": "value3"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated allocation policy [my-policy].
+    - expect_stdout: |
+        clusterSelectors:
+        - labels:
+            label_c: value3
+        createTime: '2019-06-17T17:23:01.872363533Z'
+        name: projects/fake-project/locations/global/allocationPolicies/my-policy
+        priority: 50
+        schedules:
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        - startTime: '2021-09-25T10:11:00Z'
+        updateTime: '2019-06-17T17:32:20.531596844Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies update my-policy --location global --clear-match-clusters
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json&updateMask=cluster_selectors
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              createTime: '2019-06-17T17:23:01.872363533Z'
+              name: projects/fake-project/locations/global/allocationPolicies/my-policy
+              priority: 50
+              schedules:
+              - cronJobDuration: 3600s
+                cronSpec: 10 0 1-7 5,12 *
+                endTime: '2020-10-01T10:00:00Z'
+                startTime: '2019-10-01T10:00:00Z'
+              - startTime: '2021-09-25T10:11:00Z'
+              updateTime: '2019-06-17T17:32:20.531596844Z'
+              weight: 20
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:32:20.521003447Z",
+                "endTime": "2019-06-17T17:32:20.983129956Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:32:20.531596844Z",
+                "priority": 50,
+                "weight": 20,
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project0/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated allocation policy [my-policy].
+    - expect_stdout: |
+        createTime: '2019-06-17T17:23:01.872363533Z'
+        name: projects/fake-project/locations/global/allocationPolicies/my-policy
+        priority: 50
+        schedules:
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        - startTime: '2021-09-25T10:11:00Z'
+        updateTime: '2019-06-17T17:32:20.531596844Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies update my-policy --location global --update-labels "key1=val1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": true
+            }
+        repeatable: true
+    - expect_stderr: |
+        Request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:32:20.521003447Z",
+                "endTime": "2019-06-17T17:32:20.983129956Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:32:20.531596844Z",
+                "priority": 50,
+                "weight": 20,
+                "clusterSelectors": [
+                  {
+                    "labels": {
+                      "label_b": "value2",
+                      "label_a": "value1"
+                    }
+                  }
+                ],
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+               "labels": {
+                "key1": "val1"
+              },
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated allocation policy [my-policy].
+    - expect_stdout: |
+        clusterSelectors:
+        - labels:
+            label_a: value1
+            label_b: value2
+        createTime: '2019-06-17T17:23:01.872363533Z'
+        labels:
+          key1: val1
+        name: projects/fake-project/locations/global/allocationPolicies/my-policy
+        priority: 50
+        schedules:
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        - startTime: '2021-09-25T10:11:00Z'
+        updateTime: '2019-06-17T17:32:20.531596844Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies update my-policy --location global --update-labels "key1=val1" --clear-match-clusters
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "clusterSelectors": [
+                {
+                  "labels": {
+                    "label_b": "value2",
+                    "label_a": "value1"
+                  }
+                }
+              ],
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json&updateMask=labels%2Ccluster_selectors
+          method: PATCH
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": true
+            }
+        repeatable: true
+    - expect_stderr: |
+        Request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:32:20.521003447Z",
+                "endTime": "2019-06-17T17:32:20.983129956Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.AllocationPolicy",
+                "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "createTime": "2019-06-17T17:23:01.872363533Z",
+                "updateTime": "2019-06-17T17:32:20.531596844Z",
+                "priority": 50,
+                "weight": 20,
+                "schedules": [
+                  {
+                    "startTime": "2019-10-01T10:00:00Z",
+                    "endTime": "2020-10-01T10:00:00Z",
+                    "cronJobDuration": "3600s",
+                    "cronSpec": "10 0 1-7 5,12 *"
+                  },
+                  {
+                    "startTime": "2021-09-25T10:11:00Z"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+              "createTime": "2019-06-17T17:23:01.872363533Z",
+               "labels": {
+                "key1": "val1"
+              },
+              "updateTime": "2019-06-17T17:32:20.531596844Z",
+              "priority": 50,
+              "weight": 20,
+              "schedules": [
+                {
+                  "startTime": "2019-10-01T10:00:00Z",
+                  "endTime": "2020-10-01T10:00:00Z",
+                  "cronJobDuration": "3600s",
+                  "cronSpec": "10 0 1-7 5,12 *"
+                },
+                {
+                  "startTime": "2021-09-25T10:11:00Z"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated allocation policy [my-policy].
+    - expect_stdout: |
+        createTime: '2019-06-17T17:23:01.872363533Z'
+        labels:
+          key1: val1
+        name: projects/fake-project/locations/global/allocationPolicies/my-policy
+        priority: 50
+        schedules:
+        - cronJobDuration: 3600s
+          cronSpec: 10 0 1-7 5,12 *
+          endTime: '2020-10-01T10:00:00Z'
+          startTime: '2019-10-01T10:00:00Z'
+        - startTime: '2021-09-25T10:11:00Z'
+        updateTime: '2019-06-17T17:32:20.531596844Z'
+        weight: 20
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies list --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            allocationPolicies:
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-1
+              priority: 1
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-2
+              priority: 2
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-3
+              priority: 3
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-4
+              priority: 4
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-5
+              priority: 5
+    - expect_stdout: |
+        NAME         LOCATION  DESCRIPTION  CREATE_TIME  UPDATE_TIME  PRIORITY  WEIGHT  MATCH_CLUSTERS  SCHEDULES  LABELS
+        my-policy-1  global                                           1
+        my-policy-2  global                                           2
+        my-policy-3  global                                           3
+        my-policy-4  global                                           4
+        my-policy-5  global                                           5
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/-/allocationPolicies?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            allocationPolicies:
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-1
+              priority: 1
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-2
+              priority: 2
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-3
+              priority: 3
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-4
+              priority: 4
+            - name: projects/fake-project/locations/global/allocationPolicies/my-policy-5
+              priority: 5
+    - expect_stdout: |
+        NAME         LOCATION  DESCRIPTION  CREATE_TIME  UPDATE_TIME  PRIORITY  WEIGHT  MATCH_CLUSTERS  SCHEDULES  LABELS
+        my-policy-1  global                                           1
+        my-policy-2  global                                           2
+        my-policy-3  global                                           3
+        my-policy-4  global                                           4
+        my-policy-5  global                                           5
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers allocation-policies delete my-policy --location global
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete allocation policy [my-policy]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/allocationPolicies/my-policy?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa",
+              "done": true
+             }
+    - expect_stderr: |
+        Delete request issued for: [my-policy]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aaf",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:12:16.623096375Z",
+                "target": "projects/fake-project/locations/global/allocationPolicies/my-policy",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true
+
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1558742656533-589ab0e56c425-e8213bbe-2096b5aa]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted allocation policy [my-policy].
+    - expect_exit:
+        code: 0

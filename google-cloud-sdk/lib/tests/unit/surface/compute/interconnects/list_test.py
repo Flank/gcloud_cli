@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -118,8 +118,8 @@ class InterconnectsListGATest(sdk_test_base.WithFakeAuth,
           """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-          https://www.googleapis.com/compute/v1/projects/fake-project/global/interconnects/my-interconnect1
-          https://www.googleapis.com/compute/v1/projects/fake-project/global/interconnects/my-interconnect2
+          https://compute.googleapis.com/compute/v1/projects/fake-project/global/interconnects/my-interconnect1
+          https://compute.googleapis.com/compute/v1/projects/fake-project/global/interconnects/my-interconnect2
           """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -260,8 +260,8 @@ class InterconnectsListBetaTest(sdk_test_base.WithFakeAuth,
           """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-          https://www.googleapis.com/compute/beta/projects/fake-project/global/interconnects/my-interconnect1
-          https://www.googleapis.com/compute/beta/projects/fake-project/global/interconnects/my-interconnect2
+          https://compute.googleapis.com/compute/beta/projects/fake-project/global/interconnects/my-interconnect1
+          https://compute.googleapis.com/compute/beta/projects/fake-project/global/interconnects/my-interconnect2
           """),
         normalize_space=True)
     self.AssertErrEquals('')

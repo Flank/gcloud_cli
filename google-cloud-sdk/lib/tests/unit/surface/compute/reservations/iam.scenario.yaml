@@ -1,0 +1,252 @@
+title: compute reservations IAM commands test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute reservations get-iam-policy my-reservation --zone=my-zone
+  - stdout: |
+      etag: ACAB
+- execute:
+  - command: compute reservations add-iam-policy-binding my-reservation --zone=my-zone
+      --member=user:adc@google.com --role=roles/compute.admin
+  - stderr: |
+      Updated IAM policy for reservation [my-reservation].
+  - stdout: |
+      bindings:
+      - members:
+        - user:adc@google.com
+        role: roles/compute.admin
+      etag: BwWLivG1FbE=
+      version: 1
+- execute:
+  - command: compute reservations get-iam-policy my-reservation --zone=my-zone
+  - stdout: |
+      bindings:
+      - members:
+        - user:adc@google.com
+        role: roles/compute.admin
+      etag: BwWLivG1FbE=
+      version: 1
+- execute:
+  - command: compute reservations remove-iam-policy-binding my-reservation --zone=my-zone
+      --member=user:adc@google.com --role=roles/compute.admin
+  - stderr: |
+      Updated IAM policy for reservation [my-reservation].
+  - stdout: |
+      etag: BwWLmmU-xhQ=
+      version: 1
+- execute:
+  - command: compute reservations set-iam-policy my-reservation policy.json --zone=my-zone
+  - stderr: |
+      Updated IAM policy for reservation [my-reservation].
+  - stdout: |
+      bindings:
+      - members:
+        - user:abb@google.com
+        role: roles/compute.admin
+      etag: BwWLivG1FbE=
+      version: 1
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+- define_reference:
+    reference: query-params
+    track_values:
+      GA: alt=json
+      BETA: alt=json&optionsRequestedPolicyVersion=3
+      ALPHA: alt=json&optionsRequestedPolicyVersion=3
+- define_reference:
+    reference: policy-version
+    track_values:
+      GA: '1'
+      BETA: '3'
+      ALPHA: '3'
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "bindings": [
+            {
+             "role": "roles/owner",
+             "members": ["user:abb@google.com"]
+            }],
+         "etag": "ACAB"
+      }
+- execute_command:
+    command: compute reservations get-iam-policy my-reservation --zone=my-zone
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: {etag: ACAB}
+    - expect_stdout: |
+        etag: ACAB
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute reservations add-iam-policy-binding my-reservation --zone=my-zone
+      --member=user:adc@google.com --role=roles/compute.admin
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:adc@google.com
+                  role: roles/compute.admin
+        return_response:
+          headers:
+            status: '200'
+          body:
+            version: 1
+            bindings:
+            - role: roles/compute.admin
+              members:
+              - user:adc@google.com
+            etag: BwWLivG1FbE=
+    - expect_stderr: |
+        Updated IAM policy for reservation [my-reservation].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:adc@google.com
+          role: roles/compute.admin
+        etag: BwWLivG1FbE=
+        version: 1
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute reservations get-iam-policy my-reservation --zone=my-zone
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            version: 1
+            bindings:
+            - role: roles/compute.admin
+              members:
+              - user:adc@google.com
+            etag: BwWLivG1FbE=
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:adc@google.com
+          role: roles/compute.admin
+        etag: BwWLivG1FbE=
+        version: 1
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute reservations remove-iam-policy-binding my-reservation --zone=my-zone
+      --member=user:adc@google.com --role=roles/compute.admin
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/getIamPolicy?$$query-params$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            version: 1
+            bindings:
+            - role: roles/compute.admin
+              members:
+              - user:adc@google.com
+            etag: BwWLivG1FbE=
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            text: |-
+              {"policy": {"etag": "BwWLivG1FbE=", "version": $$policy-version$$}}
+        return_response:
+          headers:
+            status: '200'
+          body: {version: 1, etag: BwWLmmU-xhQ=}
+    - expect_stderr: |
+        Updated IAM policy for reservation [my-reservation].
+    - expect_stdout: |
+        etag: BwWLmmU-xhQ=
+        version: 1
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute reservations set-iam-policy my-reservation policy.json --zone=my-zone
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:abb@google.com
+                  role: roles/owner
+                etag: ACAB
+                version: 3
+        return_response:
+          headers:
+            status: '200'
+          body:
+            version: 1
+            bindings:
+            - role: roles/compute.admin
+              members:
+              - user:abb@google.com
+            etag: BwWLivG1FbE=
+    - expect_stderr: |
+        Updated IAM policy for reservation [my-reservation].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:abb@google.com
+          role: roles/compute.admin
+        etag: BwWLivG1FbE=
+        version: 1
+    - expect_exit:
+        code: 0

@@ -36,6 +36,9 @@ GROUPS
      operations
         Manage your Cloud DNS operations.
 
+     policies
+        Manage your Cloud DNS policies.
+
      project-info
         View Cloud DNS related information for a project.
 
@@ -56,7 +59,8 @@ EXAMPLES
         $ gcloud dns project-info describe --help
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns
         $ gcloud beta dns
 

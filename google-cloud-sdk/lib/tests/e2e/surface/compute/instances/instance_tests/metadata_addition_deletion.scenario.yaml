@@ -6,7 +6,7 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format="value(id)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |
       $$instance-id$$
 - execute:
@@ -18,7 +18,7 @@ summary:
   - command: compute instances add-metadata $$instance$$ --zone us-central1-f --metadata="apple=a
       day" --format="text(metadata)"
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |
       ---
       metadata.fingerprint:    LEEnWmK6yr4=
@@ -35,7 +35,7 @@ summary:
 - execute:
   - command: compute instances remove-metadata $$instance$$ --zone us-central1-f --keys=apple
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(metadata)"
   - stdout: |
@@ -49,11 +49,11 @@ summary:
          - [$$instance$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-test
@@ -127,17 +127,17 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-9
                 mode: READ_WRITE
                 type: PERSISTENT
-              machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
               metadata: {}
               name: $$instance$$
               networkInterfaces:
               - accessConfigs:
                 - name: external-nat
                   type: ONE_TO_ONE_NAT
-                network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                network: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/default
               scheduling:
                 automaticRestart: true
               serviceAccounts:
@@ -176,8 +176,9 @@ actions:
             reference: instance-id
           body:
             json: {}
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
@@ -441,8 +442,9 @@ actions:
             insertTime: '2018-09-07T10:37:15.738-07:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341834885-5754b7552678b-355582d4-d04d7a84
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
@@ -717,8 +719,9 @@ actions:
             insertTime: '2018-09-07T10:37:33.939-07:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341853521-5754b766ec468-fafcaa06-4d31477d
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
@@ -907,8 +910,9 @@ actions:
             insertTime: '2018-09-07T10:37:42.547-07:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536341862138-5754b76f24091-4243062a-ce2037f4
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
     cleanup_for: instance

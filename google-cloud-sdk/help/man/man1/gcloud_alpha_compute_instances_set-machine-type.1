@@ -11,7 +11,7 @@ gcloud alpha compute instances set\-machine\-type \- set machine type for Google
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances set\-machine\-type\fR \fIINSTANCE_NAME\fR [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances set\-machine\-type\fR \fIINSTANCE_NAME\fR [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR\ \fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -61,12 +61,12 @@ machine types, run 'gcloud compute machine\-types list'. Either this flag,
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-Zone of the instance to operate on. If not specified, you may be prompted to
-select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
-resources in your project. If the zone cannot be determined, you will then be
-prompted with all Google Cloud Platform zones.
+Zone of the instance to operate on. If not specified, the user may be prompted
+to select a zone. \f5gcloud\fR will attempt to identify the zone by searching
+for resources in the user's project. If the zone cannot be determined, the user
+will then be prompted with all Google Cloud Platform zones.
 
-To avoid prompting when this flag is omitted, you can set the
+To avoid prompting when this flag is omitted, the user can set the
 \f5\fIcompute/zone\fR\fR property:
 
 .RS 2m
@@ -110,6 +110,14 @@ arguments in this group are specified.
 \fB\-\-custom\-extensions\fR
 Use the extended custom machine type.
 
+.TP 2m
+\fB\-\-custom\-vm\-type\fR=\fICUSTOM_VM_TYPE\fR
+Specifies VM type. n1 \- VMs with CPU platforms Skylake and older, n2 \- VMs
+with CPU platform Cascade Lake. n2 offers flexible sizing from 2 to 80 vCPUs,
+and 1 to 640GBs of memory. It also features a number of performance enhancements
+including exposing a more accurate NUMA topology to the guest OS. The default is
+\f5n1\fR.
+
 
 .RE
 .RE
@@ -129,9 +137,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute instances set\-machine\-type

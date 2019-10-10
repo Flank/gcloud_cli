@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ from tests.lib.surface.compute import test_base
 class HealthChecksCreateHttp2Test(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def RunCreate(self, command):
     self.Run('compute health-checks create http2 ' + command)
@@ -71,7 +71,7 @@ class HealthChecksCreateHttp2Test(test_base.BaseTest, parameterized.TestCase):
   def testUriSupport(self):
     self.Run("""
           compute health-checks create http2
-          https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/my-health-check
     """)
 
     self.CheckRequests(
@@ -411,7 +411,18 @@ class HealthChecksCreateHttp2Test(test_base.BaseTest, parameterized.TestCase):
       """.format(flag, flag_value))
 
 
-class HealthChecksCreateHttp2AlphaTest(HealthChecksCreateHttp2Test,
+class HealthChecksCreateHttp2BetaTest(HealthChecksCreateHttp2Test,
+                                      parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+
+  def RunCreate(self, command):
+    self.Run('compute health-checks create http2 --global ' + command)
+
+
+class HealthChecksCreateHttp2AlphaTest(HealthChecksCreateHttp2BetaTest,
                                        parameterized.TestCase):
 
   def SetUp(self):
@@ -422,12 +433,12 @@ class HealthChecksCreateHttp2AlphaTest(HealthChecksCreateHttp2Test,
     self.Run('compute health-checks create http2 --global ' + command)
 
 
-class RegionHealthChecksCreateHttp2Test(test_base.BaseTest,
-                                        parameterized.TestCase):
+class RegionHealthChecksCreateHttp2BetaTest(test_base.BaseTest,
+                                            parameterized.TestCase):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def RunCreate(self, command):
     self.Run('compute health-checks create http2 --region us-west-1 ' + command)
@@ -472,7 +483,7 @@ class RegionHealthChecksCreateHttp2Test(test_base.BaseTest,
   def testUriSupport(self):
     self.Run("""
           compute health-checks create http2
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
     """)
 
     self.CheckRequests(
@@ -740,6 +751,14 @@ class RegionHealthChecksCreateHttp2Test(test_base.BaseTest,
                   unhealthyThreshold=2),
               project='my-project',
               region='us-west-1'))])
+
+
+class RegionHealthChecksCreateHttp2AlphaTest(
+    RegionHealthChecksCreateHttp2BetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

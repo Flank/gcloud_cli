@@ -11,7 +11,7 @@ gcloud beta compute url\-maps set\-default\-service \- change the default servic
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute url\-maps set\-default\-service\fR \fIURL_MAP_NAME\fR (\fB\-\-default\-backend\-bucket\fR=\fIDEFAULT_BACKEND_BUCKET\fR\ |\ \fB\-\-default\-service\fR=\fIDEFAULT_SERVICE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute url\-maps set\-default\-service\fR \fIURL_MAP\fR (\fB\-\-default\-backend\-bucket\fR=\fIDEFAULT_BACKEND_BUCKET\fR\ |\ \fB\-\-default\-service\fR=\fIDEFAULT_SERVICE\fR) [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -28,7 +28,7 @@ in the URL map.
 
 .RS 2m
 .TP 2m
-\fIURL_MAP_NAME\fR
+\fIURL_MAP\fR
 Name of the URL map to operate on.
 
 
@@ -52,6 +52,50 @@ mappings.
 \fB\-\-default\-service\fR=\fIDEFAULT_SERVICE\fR
 A backend service that will be used for requests for which this URL map has no
 mappings.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the URL map is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the URL map to operate on. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 
 .RE

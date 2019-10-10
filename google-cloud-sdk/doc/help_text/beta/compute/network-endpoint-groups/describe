@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute network-endpoint-groups describe - describes a Google
+    gcloud beta compute network-endpoint-groups describe - describe a Google
         Compute Engine network endpoint group
 
 SYNOPSIS

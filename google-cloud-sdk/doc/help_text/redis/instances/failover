@@ -31,8 +31,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --data-protection-mode=DATA_PROTECTION_MODE
         Data protection mode to use for the failover. If not specified,

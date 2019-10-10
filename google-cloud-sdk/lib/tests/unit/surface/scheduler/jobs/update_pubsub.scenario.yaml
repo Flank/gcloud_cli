@@ -1,0 +1,426 @@
+title: Update PubSub Jobs Test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: test update schedule
+  - command: |
+      scheduler jobs update pubsub my-job --schedule "every friday"
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every friday
+      timeZone: Etc/UTC
+- execute:
+  - label: test update time zone and description
+  - command: |
+      scheduler jobs update pubsub my-job --time-zone "US/Pacific" --description "Left coast job"
+  - stdout: |
+      description: Left coast job
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: US/Pacific
+- execute:
+  - label: test update all arguments
+  - command: |
+      scheduler jobs update pubsub my-job --schedule "every thursday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 5 --max-retry-duration 2h --min-backoff 0.2s
+      --max-backoff 10s --max-doublings 2
+      --topic projects/other-project/topics/my-topic
+      --update-attributes key1=value
+      --remove-attributes key2
+      --message-body-from-file payload_file
+  - stdout: |
+      description: Left coast job
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: US/Pacific
+- execute:
+  - label: test clear-max-retry-attempts
+  - command: |
+      scheduler jobs update pubsub my-job --clear-max-retry-attempts
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: US/Pacific
+- execute:
+  - label: test clear-time-zone and update max-retry-attempts
+  - command: |
+      scheduler jobs update pubsub my-job --clear-time-zone --max-retry-attempts 4
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test all clear flags
+  - command: |
+      scheduler jobs update pubsub my-job --clear-time-zone --clear-max-retry-attempts --clear-max-retry-duration --clear-min-backoff --clear-max-backoff --clear-max-doublings
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test clear attributes
+  - command: |
+      scheduler jobs update pubsub my-job --clear-attributes
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test update and remove attributes
+  - command: |
+      scheduler jobs update pubsub my-job --update-attributes key1=value --remove-attributes key2
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      pubsubTarget:
+        data: bXktcGF5bG9hZC0y
+        topicName: projects/other-project/topics/my-topic
+      schedule: every tuesday
+      timeZone: Etc/UTC
+actions:
+- write_file:
+    path: payload_file
+    contents: my-payload-2
+- execute_command:
+    label: test update schedule
+    command: |
+      scheduler jobs update pubsub my-job --schedule "every friday"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations?alt=json&pageSize=2
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=schedule
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              schedule: every friday
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every friday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every friday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update time zone and description
+    command: |
+      scheduler jobs update pubsub my-job --time-zone "US/Pacific" --description "Left coast job"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=description%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              timeZone: US/Pacific
+              description: Left coast job
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: US/Pacific
+            description: Left coast job
+    - expect_stdout: |
+        description: Left coast job
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: US/Pacific
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update all arguments
+    command: |
+      scheduler jobs update pubsub my-job --schedule "every thursday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 5 --max-retry-duration 2h --min-backoff 0.2s
+      --max-backoff 10s --max-doublings 2
+      --topic projects/other-project/topics/my-topic
+      --update-attributes key1=value
+      --remove-attributes key2
+      --message-body-from-file payload_file
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=description%2CpubsubTarget.attributes%2CpubsubTarget.data%2CpubsubTarget.topicName%2CretryConfig.maxBackoffDuration%2CretryConfig.maxDoublings%2CretryConfig.maxRetryDuration%2CretryConfig.minBackoffDuration%2CretryConfig.retryCount%2Cschedule%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: my super cool job
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              pubsubTarget:
+                data: bXktcGF5bG9hZC0y
+                topicName: projects/other-project/topics/my-topic
+              retryConfig:
+                maxBackoffDuration: 10s
+                maxDoublings: 2
+                maxRetryDuration: 7200s
+                minBackoffDuration: 0.2s
+                retryCount: 5
+              schedule: every thursday
+              timeZone: America/New_York
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: US/Pacific
+            description: Left coast job
+    - expect_stdout: |
+        description: Left coast job
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: US/Pacific
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test clear-max-retry-attempts
+    command: |
+      scheduler jobs update pubsub my-job --clear-max-retry-attempts
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=retryConfig.retryCount
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: US/Pacific
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: US/Pacific
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test clear-time-zone and update max-retry-attempts
+    command: |
+      scheduler jobs update pubsub my-job --clear-time-zone --max-retry-attempts 4
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=retryConfig.retryCount%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 4
+              timeZone: Etc/UTC
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test all clear flags
+    command: |
+      scheduler jobs update pubsub my-job --clear-time-zone --clear-max-retry-attempts --clear-max-retry-duration --clear-min-backoff --clear-max-backoff --clear-max-doublings
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=retryConfig.maxBackoffDuration%2CretryConfig.maxDoublings%2CretryConfig.maxRetryDuration%2CretryConfig.minBackoffDuration%2CretryConfig.retryCount%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+                maxRetryDuration: null
+                minBackoffDuration: 5s
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test clear attributes
+    command: |
+      scheduler jobs update pubsub my-job --clear-attributes
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=pubsubTarget.attributes
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              pubsubTarget:
+                attributes: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update and remove attributes
+    command: |
+      scheduler jobs update pubsub my-job --update-attributes key1=value --remove-attributes key2
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=pubsubTarget.attributes
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              pubsubTarget:
+                attributes:
+                  key1: value
+                  key2: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            pubsubTarget:
+              data: bXktcGF5bG9hZC0y
+              topicName: projects/other-project/topics/my-topic
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        pubsubTarget:
+          data: bXktcGF5bG9hZC0y
+          topicName: projects/other-project/topics/my-topic
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0

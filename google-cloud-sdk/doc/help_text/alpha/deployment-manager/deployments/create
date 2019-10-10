@@ -65,9 +65,8 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --async
-          Return immediately and print information about the Operation in
-          progress rather than waiting for the Operation to complete.
-          (default=False)
+          Return immediately, without waiting for the operation in progress to
+          complete.
 
        --automatic-rollback-on-error
           If the create request results in a deployment with resource errors,
@@ -113,9 +112,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud deployment-manager deployments create
         $ gcloud beta deployment-manager deployments create

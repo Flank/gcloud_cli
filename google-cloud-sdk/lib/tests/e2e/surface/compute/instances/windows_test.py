@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,13 +22,11 @@ import json
 import logging
 
 from tests.lib import e2e_utils
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 WINDOWS_IMAGE_ALIAS = 'windows-2012-r2'
 
 
-@test_case.Filters.SkipOnPy3('They are broken', 'b/116339073')
 class WindowsInstancesTest(e2e_test_base.BaseTest):
 
   def SetUp(self):

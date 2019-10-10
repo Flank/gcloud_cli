@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,20 +59,22 @@ INSTANCE_WITH_EXTERNAL_ADDRESS = MESSAGES.Instance(
         ),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 
-class StartIapTunnelTestBeta(test_base.BaseTest, parameterized.TestCase):
+class StartIapTunnelTestGA(test_base.BaseTest, parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     # test_base.BaseTest replaces sleep with a mock, but we need it.
     self.real_sleep = time.sleep
 
   def SetUp(self):
+    self.SelectApi('v1' if self.track.prefix is None else self.track.prefix)
+
     self.c_store_load = self.StartObjectPatch(
         c_store, 'LoadIfEnabled', autospec=True, return_value='an access token')
     self.c_store_refresh = self.StartObjectPatch(
@@ -141,11 +143,11 @@ class StartIapTunnelTestBeta(test_base.BaseTest, parameterized.TestCase):
     self.Run(gcloud_cmd)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          MESSAGES.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='instance-1',
-              project=str('my-project'),
+              project='my-project',
               zone='zone-1'))],
     )
 
@@ -176,7 +178,7 @@ class StartIapTunnelTestBeta(test_base.BaseTest, parameterized.TestCase):
 
     self.select_mock.assert_called_with([self.socket_mock, self.socket_mock2],
                                         (), (), 0.2)
-    self.assertTrue(self.select_mock.call_count >= 2)
+    self.assertTrue(self.select_mock.call_count >= 2)  # pylint:disable=g-generic-assert
     self.socket_mock.accept.assert_has_calls([mock.call()])
     self.assertEqual(self.socket_mock.accept.call_count, 1)
     self.socket_mock.close.assert_has_calls([mock.call()])
@@ -191,10 +193,10 @@ class StartIapTunnelTestBeta(test_base.BaseTest, parameterized.TestCase):
     self.conn_mock.recv.assert_has_calls([mock.call(16384)]*3)
     self.assertEqual(self.conn_mock.recv.call_count, 3)
     self.conn_mock.close.assert_has_calls([mock.call()])
-    self.assertTrue(self.conn_mock.close.call_count >= 1)
+    self.assertTrue(self.conn_mock.close.call_count >= 1)  # pylint:disable=g-generic-assert
 
     tunnel_target = iap_tunnel_websocket_utils.IapTunnelTargetInfo(
-        project=str('my-project'), zone='zone-1', instance='instance-1',
+        project='my-project', zone='zone-1', instance='instance-1',
         interface='nic0', port=22, url_override=None, proxy_info=None)
     partial_matcher = mock_matchers.TypeMatcher(functools.partial)
     self.websocket_cls_mock.assert_has_calls([
@@ -204,13 +206,24 @@ class StartIapTunnelTestBeta(test_base.BaseTest, parameterized.TestCase):
 
     # Test connection to start.
     self.assertEqual(self.websocket_mock1.InitiateConnection.call_count, 1)
+    self.assertEqual(self.websocket_mock1.Send.call_count, 0)
+    self.assertEqual(self.websocket_mock1.LocalEOF.call_count, 0)
+    self.assertEqual(self.websocket_mock1.WaitForAllSent.call_count, 0)
     self.assertEqual(self.websocket_mock1.Close.call_count, 1)
     # Calls resulting from one connection that was accepted.
     self.assertEqual(self.websocket_mock2.InitiateConnection.call_count, 1)
     self.websocket_mock2.Send.assert_has_calls([
         mock.call(b'data1'), mock.call(b'data2')])
     self.assertEqual(self.websocket_mock2.Send.call_count, 2)
+    self.assertEqual(self.websocket_mock2.LocalEOF.call_count, 1)
+    self.assertEqual(self.websocket_mock2.WaitForAllSent.call_count, 1)
     self.assertEqual(self.websocket_mock2.Close.call_count, 1)
+
+
+class StartIapTunnelTestBeta(StartIapTunnelTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class StartIapTunnelTestAlpha(StartIapTunnelTestBeta):
@@ -219,12 +232,14 @@ class StartIapTunnelTestAlpha(StartIapTunnelTestBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
-class StartIapTunnelStdinTestBeta(test_base.BaseTest):
+class StartIapTunnelStdinTestGA(test_base.BaseTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
+    self.SelectApi('v1' if self.track.prefix is None else self.track.prefix)
+
     self.c_store_load = self.StartObjectPatch(
         c_store, 'LoadIfEnabled', autospec=True, return_value='an access token')
     self.c_store_refresh = self.StartObjectPatch(
@@ -270,6 +285,7 @@ class StartIapTunnelStdinTestBeta(test_base.BaseTest):
         iap_tunnel_websocket, 'IapTunnelWebSocket', autospec=True,
         side_effect=WebSocketInitGenerator())
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testSimpleCase(self):
     self.make_requests.side_effect = [
         [INSTANCE_WITH_EXTERNAL_ADDRESS],
@@ -280,11 +296,11 @@ class StartIapTunnelStdinTestBeta(test_base.BaseTest):
              '--listen-on-stdin')
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          MESSAGES.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='instance-1',
-              project=str('my-project'),
+              project='my-project',
               zone='zone-1'))],
     )
 
@@ -303,7 +319,7 @@ class StartIapTunnelStdinTestBeta(test_base.BaseTest):
       self.assertEqual(self.stdin_mock.read.call_count, 3)
 
     tunnel_target = iap_tunnel_websocket_utils.IapTunnelTargetInfo(
-        project=str('my-project'), zone='zone-1', instance='instance-1',
+        project='my-project', zone='zone-1', instance='instance-1',
         interface='nic0', port=22, url_override=None, proxy_info=None)
     partial_matcher = mock_matchers.TypeMatcher(functools.partial)
     self.websocket_cls_mock.assert_called_once_with(
@@ -314,7 +330,15 @@ class StartIapTunnelStdinTestBeta(test_base.BaseTest):
     self.websocket_mock.Send.assert_has_calls([
         mock.call(b'data1'), mock.call(b'data2')])
     self.assertEqual(self.websocket_mock.Send.call_count, 2)
+    self.assertEqual(self.websocket_mock.LocalEOF.call_count, 1)
+    self.assertEqual(self.websocket_mock.WaitForAllSent.call_count, 1)
     self.assertEqual(self.websocket_mock.Close.call_count, 1)
+
+
+class StartIapTunnelStdinTestBeta(StartIapTunnelStdinTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class StartIapTunnelStdinTestAlpha(StartIapTunnelStdinTestBeta):

@@ -11,7 +11,7 @@ gcloud alpha access\-context\-manager perimeters create \- create a new service 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-resources\fR=[\fIRESOURCES\fR,...] \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-resources\fR=[\fIRESOURCES\fR,...] \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-enable\-vpc\-service\-restriction\fR\ \fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,8 +72,7 @@ intra\-perimeter request must satisfy to be allowed.
 
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -109,6 +108,16 @@ A project may belong to at most one regular service perimeter.
 Comma\-separated list of services to which the perimeter boundary \fBdoes\fR
 apply (for example, \f5storage.googleapis.com\fR).
 
+.TP 2m
+\fB\-\-enable\-vpc\-service\-restriction\fR
+Whether to restrict API calls within the perimeter to those in the
+vpc\-allowed\-services list.
+
+.TP 2m
+\fB\-\-vpc\-allowed\-services\fR=[\fIVPC_SERVICE\fR,...]
+Comma\-separated list of APIs accessible from within the Service Perimeter.
+Requires vpc\-service\-restriction be enabled.
+
 
 .RE
 .sp
@@ -135,9 +144,8 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud access\-context\-manager perimeters create

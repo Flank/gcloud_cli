@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,16 +26,16 @@ from tests.lib.surface.compute import test_base
 EXPECED_OUTPUT = """\
     description: Nvidia Tesla K80
     name: nvidia-tesla-k80
-    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/accelerator-types/nvidia-tesla-k80
-    zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+    selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/accelerator-types/nvidia-tesla-k80
+    zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
     description: Nvidia Grid K2
     name: nvidia-grid-k2
-    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-2/accelerator-types/nvidia-grid-k2
-    zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-2
+    selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-2/accelerator-types/nvidia-grid-k2
+    zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-2
     description: Nvidia Grid K2
     name: nvidia-grid-k2
-    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/accelerator-types/nvidia-grid-k2
-    zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+    selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/accelerator-types/nvidia-grid-k2
+    zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
     """
 # pylint: enable=line-too-long
 
@@ -52,7 +52,7 @@ class AcceleratorTypesDescribeTest(test_base.BaseTest):
     Returns:
       A list of message objects representing accelerator types.
     """
-    prefix = 'https://www.googleapis.com/compute/' + api
+    prefix = 'https://compute.googleapis.com/compute/' + api
     return [
         msgs.AcceleratorType(
             name='nvidia-tesla-k80',

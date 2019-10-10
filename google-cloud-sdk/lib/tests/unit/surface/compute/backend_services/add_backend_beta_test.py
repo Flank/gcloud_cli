@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -140,7 +140,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._connection,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxConnections=100),
@@ -174,7 +174,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
 
     backend = messages.Backend(
         balancingMode=self._connection,
-        group=('https://www.googleapis.com/compute/beta/projects/my-project/'
+        group=('https://compute.googleapis.com/compute/beta/projects/my-project/'
                'zones/us-central1-a/{}/my-group'.format(resource_type)))
     if rate_flag_suffix == 'instance':
       backend.maxConnectionsPerInstance = 5
@@ -206,7 +206,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'beta/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -234,7 +234,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'beta/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -324,7 +324,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
 
     backend = messages.Backend(
         balancingMode=self._rate,
-        group=('https://www.googleapis.com/compute/beta/projects/my-project/'
+        group=('https://compute.googleapis.com/compute/beta/projects/my-project/'
                'zones/us-central1-a/{}/my-group'.format(resource_type)))
     if rate_flag_suffix == 'instance':
       backend.maxRatePerInstance = 0.9
@@ -429,7 +429,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxRatePerInstance=0.5,
@@ -475,7 +475,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxConnections=200),

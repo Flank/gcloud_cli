@@ -77,31 +77,32 @@ To export record\-sets into a yaml file, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets export records.yaml \e
-    \-\-zone examplezonename
+    \-\-zone=examplezonename
 .RE
 
 To export record\-sets into a BIND zone formatted file instead, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets export pathto.zonefile \e
-    \-\-zone examplezonename \-\-zone\-file\-format
+    \-\-zone=examplezonename \-\-zone\-file\-format
 .RE
 
 Similarly, to import record\-sets into a BIND zone formatted zone file, run:
 
 .RS 2m
 $ gcloud dns record\-sets import pathto.zonefile \-\-zone\-file\-format \e
-  \-\-zone examplezonename
+  \-\-zone=examplezonename
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets export
+$ gcloud alpha dns record\-sets export
 .RE
 

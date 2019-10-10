@@ -3,10 +3,8 @@ NAME
         cache invalidations for a URL map
 
 SYNOPSIS
-    gcloud alpha compute url-maps list-cdn-cache-invalidations URL_MAP_NAME
-        [--global | --region=REGION] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute url-maps list-cdn-cache-invalidations URL_MAP
+        [--limit=LIMIT] [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List Cloud CDN cache invalidations for a URL map. A cache
@@ -14,10 +12,13 @@ DESCRIPTION
     invalidations to check which have completed.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to describe.
 
 FLAGS
+     --limit=LIMIT
+        The maximum number of invalidations to list.
+
      At most one of these may be specified:
 
        --global
@@ -43,35 +44,6 @@ FLAGS
           Alternatively, the region can be stored in the environment variable
           CLOUDSDK_COMPUTE_REGION.
 
-LIST COMMAND FLAGS
-     --filter=EXPRESSION
-        Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True, then that item is listed. For more
-        details and examples of filter expressions, run $ gcloud topic filters.
-        This flag interacts with other flags that are applied in this order:
-        --flatten, --sort-by, --filter, --limit.
-
-     --limit=LIMIT
-        Maximum number of resources to list. The default is unlimited. This
-        flag interacts with other flags that are applied in this order:
-        --flatten, --sort-by, --filter, --limit.
-
-     --page-size=PAGE_SIZE
-        Some services group resource list output into pages. This flag
-        specifies the maximum number of resources per page. The default is
-        determined by the service if it supports paging, otherwise it is
-        unlimited (no paging). Paging may be applied before or after --filter
-        and --limit depending on the service.
-
-     --sort-by=[FIELD,...]
-        Comma-separated list of resource field key names to sort by. The
-        default order is ascending. Prefix a field with ``~'' for descending
-        order on that field. This flag interacts with other flags that are
-        applied in this order: --flatten, --sort-by, --filter, --limit.
-
-     --uri
-        Print a list of resource URIs instead of the default output.
-
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -82,9 +54,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute url-maps list-cdn-cache-invalidations
         $ gcloud beta compute url-maps list-cdn-cache-invalidations

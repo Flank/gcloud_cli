@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ class CreateTestGA(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Create in progress for router [my-router] '
-        '[https://www.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
@@ -230,13 +230,6 @@ class CreateTestBeta(CreateTestGA):
         normalize_space=True)
     self.AssertErrContains('Creating router [my-router]')
 
-
-class CreateTestAlpha(CreateTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-
   def testCreateWithKeepaliveInterval(self):
     self.SelectApi(self.track, self.api_version)
 
@@ -264,6 +257,13 @@ class CreateTestAlpha(CreateTestBeta):
         """,
         normalize_space=True)
     self.AssertErrContains('Creating router [my-router]')
+
+
+class CreateTestAlpha(CreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests that exercise 'gcloud alpha kms keys versions get-public-key'."""
+"""Tests that exercise 'gcloud kms keys versions get-public-key'."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -39,12 +39,12 @@ EXPECTED_PEM = """-----BEGIN PUBLIC KEY-----
   -----END PUBLIC KEY-----"""
 
 
-class KeysVersionsGetPublicKeyTest(base.KmsMockTest):
+class KeysVersionsGetPublicKeyTestGa(base.KmsMockTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key/')
-    self.version_name = self.key_name.Descendant('3')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.key_name = self.project_name.CryptoKey('global/my_kr/my_key/')
+    self.version_name = self.key_name.Version('3')
 
   def testGetPublicKeySuccess(self):
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
@@ -90,6 +90,18 @@ class KeysVersionsGetPublicKeyTest(base.KmsMockTest):
         'Invalid value for [version]: version id must be non-empty.'):
       self.Run('kms keys versions get-public-key {}/cryptoKeyVersions/'.format(
           self.key_name.RelativeName()))
+
+
+class KeysVersionsGetPublicKeyTestBeta(KeysVersionsGetPublicKeyTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class KeysVersionsGetPublicKeyTestAlpha(KeysVersionsGetPublicKeyTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

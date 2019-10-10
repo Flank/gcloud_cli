@@ -6,22 +6,22 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instance-groups unmanaged create $$ig$$ --zone us-central1-f
       --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute health-checks create tcp $$hc$$ --global --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
 - execute:
   - command: compute backend-services create $$bs$$ --region us-central1 --health-checks
       $$hc$$ --global-health-checks --load-balancing-scheme INTERNAL --protocol TCP
       --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
 - execute:
   - command: compute backend-services describe $$bs$$ --region us-central1 --format
       'text(name,loadBalancingScheme)'
@@ -32,17 +32,17 @@ summary:
   - command: compute instance-groups unmanaged add-instances $$ig$$ --instances $$instance$$
       --zone us-central1-f
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Updated [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute backend-services add-backend $$bs$$ --instance-group $$ig$$ --instance-group-zone
       us-central1-f --failover --region us-central1 --format 'text(name,backends)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Updated [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       backends[0].balancingMode: CONNECTION
       backends[0].failover:      True
-      backends[0].group:         https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+      backends[0].group:         https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
       name:                      $$bs$$
 - execute:
   - command: compute backend-services delete $$bs$$ --region us-central1
@@ -52,7 +52,7 @@ summary:
          - [$$bs$$] in [us-central1]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
 - execute:
   - command: compute health-checks delete $$hc$$ --global
   - prompt:
@@ -61,7 +61,7 @@ summary:
          - [$$hc$$]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
 - execute:
   - command: compute instance-groups unmanaged delete $$ig$$ --zone us-central1-f
   - prompt:
@@ -70,7 +70,7 @@ summary:
          - [$$ig$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f
   - prompt:
@@ -79,13 +79,13 @@ summary:
          - [$$instance$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 
 
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 
 - generate_resource_id:
     reference: instance
@@ -94,8 +94,9 @@ actions:
     command: compute instances create $$instance$$ --zone us-central1-f --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 
@@ -108,8 +109,9 @@ actions:
       --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -121,8 +123,9 @@ actions:
     command: compute health-checks create tcp $$hc$$ --global --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
     - expect_exit:
         code: 0
 
@@ -136,8 +139,9 @@ actions:
       --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - expect_exit:
         code: 0
 
@@ -159,8 +163,9 @@ actions:
       --zone us-central1-f
     validation_only: true
     events:
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -206,7 +211,7 @@ actions:
             json:
               backends:
               - failover: true
-                group: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+                group: https://compute.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
               connectionDraining:
                 drainingTimeoutSec: 0
               description: ''
@@ -238,8 +243,9 @@ actions:
             region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -292,8 +298,9 @@ actions:
           The following region backend services will be deleted:
            - [$$bs$$] in [us-central1]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - expect_exit:
         code: 0
 
@@ -308,8 +315,9 @@ actions:
           The following health checks will be deleted:
            - [$$hc$$]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
     - expect_exit:
         code: 0
 
@@ -324,8 +332,9 @@ actions:
           The following instance groups will be deleted:
            - [$$ig$$] in [us-central1-f]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -340,7 +349,8 @@ actions:
           The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
            - [$$instance$$] in [us-central1-f]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0

@@ -14,7 +14,7 @@ summary:
       numBytes: '0'
       numLongTermBytes: '0'
       numRows: '0'
-      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table
+      selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table
       tableReference:
         datasetId: my_dataset
         projectId: fake-project
@@ -26,7 +26,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
           method: GET
           headers: {}
           body: null
@@ -38,7 +38,7 @@ actions:
               "kind": "bigquery#table",
               "etag": "HWw8vcYm6Eu38ZO0c5dY/Q==",
               "id": "fake-project:my_dataset.my_table",
-              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
+              "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table",
               "tableReference": {
                 "projectId": "fake-project",
                 "datasetId": "my_dataset",
@@ -62,7 +62,7 @@ actions:
         numBytes: '0'
         numLongTermBytes: '0'
         numRows: '0'
-        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table
+        selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table
         tableReference:
           datasetId: my_dataset
           projectId: fake-project

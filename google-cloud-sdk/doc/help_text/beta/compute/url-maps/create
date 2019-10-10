@@ -2,10 +2,10 @@ NAME
     gcloud beta compute url-maps create - create a URL map
 
 SYNOPSIS
-    gcloud beta compute url-maps create URL_MAP_NAME
+    gcloud beta compute url-maps create URL_MAP
         (--default-backend-bucket=DEFAULT_BACKEND_BUCKET
           | --default-service=DEFAULT_SERVICE) [--description=DESCRIPTION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute url-maps create is used to create URL maps which
@@ -25,7 +25,7 @@ DESCRIPTION
     url-maps add-path-matcher and gcloud compute url-maps add-host-rule.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to create.
 
 REQUIRED FLAGS
@@ -44,6 +44,31 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the URL map.
+
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to create. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

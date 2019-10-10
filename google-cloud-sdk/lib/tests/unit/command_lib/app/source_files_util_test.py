@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import re
 
 from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.api_lib.app import util
+from googlecloudsdk.command_lib.app import exceptions
 from googlecloudsdk.command_lib.app import source_files_util
 from googlecloudsdk.command_lib.util import gcloudignore
 from googlecloudsdk.core.util import files
@@ -33,7 +34,7 @@ import mock
 
 
 class GcloudIgnoreRegistryTest(parameterized.TestCase, test_case.TestCase):
-  """Sanity check on the gcloudignore registry."""
+  """Sanity check on the ignore file registry."""
 
   def SetUp(self):
     self.reg = source_files_util._GetGcloudignoreRegistry()
@@ -124,6 +125,51 @@ class GetSourceFilesTest(test_case.TestCase):
     self.file_chooser_mock.assert_not_called()
     self.file_iterator_mock.assert_not_called()
 
+  def testNotInRegistry_IgnoreFileExists(self):
+    """Skip files specified in ignore-file."""
+    exists = self.StartObjectPatch(os.path, 'exists', return_value=True)
+    ignore_file = '.gcloudignore-testing-config1'
+    source_files_util.GetSourceFiles(
+        self.upload_dir, self.skip_files, False, 'fake-runtime', 'fake-env',
+        self.source_dir, ignore_file)
+    exists.assert_called_once_with(
+        os.path.join(self.source_dir, ignore_file))
+    self.file_chooser_mock.assert_called_once_with(self.source_dir,
+                                                   ignore_file=ignore_file)
+    self.file_iterator_mock.assert_not_called()
+
+  def testNotInRegistry_ExplicitSkipFiles_IgnorefileExists(self):
+    """Skip files never allowed in conjunction with gcloudignore."""
+    exists = self.StartObjectPatch(os.path, 'exists', return_value=True)
+    ignore_file = '.gcloudignore-testing-config1'
+    with self.assertRaisesRegexp(
+        source_files_util.SkipFilesError,
+        r'Cannot have both an ignore file {0} and skip_files'
+        .format(ignore_file)):
+      source_files_util.GetSourceFiles(
+          self.upload_dir, self.skip_files, True, 'fake-runtime', 'fake-env',
+          self.source_dir, ignore_file)
+    exists.assert_called_once_with(
+        os.path.join(self.source_dir, ignore_file))
+    self.file_chooser_mock.assert_not_called()
+    self.file_iterator_mock.assert_not_called()
+
+  def testIgnorefileNotExist(self):
+    """Raise error if user specified ignore-file does not exist."""
+    exists = self.StartObjectPatch(os.path, 'exists', return_value=False)
+    ignore_file = '.gcloudignore-testing-config1'
+    with self.assertRaisesRegexp(
+        exceptions.FileNotFoundError,
+        'File {0} referenced by --ignore-file does not exist.'
+        .format(ignore_file)):
+      source_files_util.GetSourceFiles(
+          self.upload_dir, self.skip_files, True, 'fake-runtime', 'fake-env',
+          self.source_dir, ignore_file)
+    exists.assert_called_once_with(
+        os.path.join(self.source_dir, ignore_file))
+    self.file_chooser_mock.assert_not_called()
+    self.file_iterator_mock.assert_not_called()
+
   def testNotInRegistry_ExplicitSkipFiles_GcloudignoreExists(self):
     """Skip files never allowed in conjunction with gcloudignore."""
     exists = self.StartObjectPatch(os.path, 'exists', return_value=True)
@@ -169,6 +215,8 @@ class SourceFilesIntegrationTest(test_case.Base, parameterized.TestCase):
     # May or may not be written depending on test
     self.gcloudignore_path = os.path.join(
         self.source_dir.path, '.gcloudignore')
+    self.ignore_file_path = os.path.join(
+        self.source_dir.path, '.gcloudignore-testing-config1')
 
     self.skip_files = re.compile(r'.*\.pyc')
 
@@ -216,3 +264,21 @@ class SourceFilesIntegrationTest(test_case.Base, parameterized.TestCase):
         sorted(it), [os.path.join('__pycache__', 'cached-file'), 'main.py'])
     self.AssertFileNotExists(self.gcloudignore_path)
 
+  def testExistingIgnorefile(self):
+    """Existing ignore-file overrides .gcloudignore.
+
+    This is an imaginary scenario where the user wants to upload
+    pre-compiled *.pyc files only, and hence ignores *.py files.
+
+    This behavior is independent of whether there is a
+    registry entry or not for the runtime.
+    """
+    ignore_file = '.gcloudignore-testing-config1'
+    self.Touch(self.source_dir.path, ignore_file, '*.py')
+    it = source_files_util.GetSourceFiles(
+        self.upload_dir.path,
+        self.skip_files, False, 'python27', env.STANDARD,
+        self.source_dir.path, ignore_file)
+    self.assertListEqual(
+        sorted(it), [os.path.join('__pycache__', 'cached-file'), 'main.pyc'])
+    self.AssertFileEquals('*.py', self.ignore_file_path)

@@ -31,7 +31,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Return immediately, without waiting for operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

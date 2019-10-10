@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -29,7 +30,10 @@ class InstancesMinCpuPlatformTest(
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.zone = 'us-central1-a'  # Only this zone supports minimum CPU platform
+    self.zone = 'us-central1-a'
+    # N1 VMs (including n1-standard-1, the default machine type used here)
+    # cannot specify the Cascade Lake platform. Omit it.
+    self._blacklist_platforms = frozenset(['Intel Cascade Lake'])
 
   def GetCpuPlatforms(self):
     result = self.Run(
@@ -38,7 +42,8 @@ class InstancesMinCpuPlatformTest(
 
   def testInstanceWithMinCpuPlatform(self):
     self.GetInstanceName()
-    cpu_platforms = self.GetCpuPlatforms()
+    cpu_platforms = [platform for platform in self.GetCpuPlatforms()
+                     if platform not in self._blacklist_platforms]
     self.assertGreater(len(cpu_platforms), 1,
                        msg='Zone has less than 2 CPU platforms available')
     instance = list(self.Run(

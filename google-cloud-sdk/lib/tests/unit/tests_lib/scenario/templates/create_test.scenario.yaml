@@ -83,12 +83,12 @@ actions:
               port: 8470
               serviceAccount: 695311740377-compute@developer.gserviceaccount.com
               createTime: 2018-05-02T16:29:04.181523Z
-              greenVmSelflink: https://www.googleapis.com/compute/v1/projects/vf93a4a324c653cc3-tp/zones/us-central1-b/instances/n-ff0a1bac-w-0
+              greenVmSelflink: https://compute.googleapis.com/compute/v1/projects/vf93a4a324c653cc3-tp/zones/us-central1-b/instances/n-ff0a1bac-w-0
               greenVmInstanceId: 8864118958434048393
               networkEndpoints:
               - ipAddress: 10.143.0.2
                 port: 8470
-                greenVmSelflink: https://www.googleapis.com/compute/v1/projects/vf93a4a324c653cc3-tp/zones/us-central1-b/instances/n-ff0a1bac-w-0
+                greenVmSelflink: https://compute.googleapis.com/compute/v1/projects/vf93a4a324c653cc3-tp/zones/us-central1-b/instances/n-ff0a1bac-w-0
                 greenVmInstanceId: 8864118958434048393
               health: HEALTHY
     - expect_progress_tracker:

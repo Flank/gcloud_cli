@@ -1,0 +1,87 @@
+NAME
+    gcloud alpha game servers deployments create - create a Deployment
+
+SYNOPSIS
+    gcloud alpha game servers deployments create
+        (DEPLOYMENT : --location=LOCATION) [--async] [--labels=[KEY=VALUE,...]]
+        [--description=DESCRIPTION
+          --spec-file=SPEC_FILE --template-id=TEMPLATE_ID]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a Cloud Game Server Deployment.
+
+POSITIONAL ARGUMENTS
+     Deployment resource - Cloud Game Server Deployment to create. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [deployment] on the command line with a fully specified name; set
+     the property [core/project]; provide the argument [--project] on the
+     command line. This must be specified.
+
+       DEPLOYMENT
+          ID of the deployment or fully qualified identifier for the
+          deployment. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          Google Cloud location.
+
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     Game server template for a new rollout. In order to start a new rollout,
+     you should first add a game server template that includes the game server
+     spec that will be sent to Agones during rollout. The spec file is a path
+     to a JSON or YAML file that contains game server spec. The game server
+     spec follows the format of the spec field in Agones GameServer custom
+     resource. Please see https://agones.dev/site/docs/reference/gameserver/
+     for more details.
+
+       --description=DESCRIPTION
+          Description of the game server template.
+
+       --spec-file=SPEC_FILE
+          Path to a JSON or YAML file that contains game server spec which is
+          sent to Agones. The game server spec follows the format of the spec
+          field in Agones GameServer custom resource. Please see
+          https://github.com/googleforgames/agones/blob/master/examples/simple-udp/gameserver.yaml
+          for example and
+          https://github.com/googleforgames/agones/blob/master/pkg/apis/agones/v1/gameserver.go
+          for GameServerTemplateSpec definition. Required when template-id is
+          specified. This flag must be specified if any of the other arguments
+          in this group are specified.
+
+       --template-id=TEMPLATE_ID
+          ID of the game server template. Required when spec-file is specified.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the gameservices/v1alpha API. The full documentation for
+    this API can be found at: https://cloud.google.com/solutions/gaming/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

@@ -4,12 +4,16 @@ NAME
 
 SYNOPSIS
     gcloud beta ml speech recognize-long-running AUDIO
-        --language-code=LANGUAGE_CODE [--async]
+        --language-code=LANGUAGE_CODE
+        [--additional-language-codes=[LANGUAGE_CODE,...]] [--async]
         [--encoding=ENCODING; default="encoding-unspecified"]
-        [--filter-profanity] [--hints=[HINTS,...]]
+        [--filter-profanity] [--hints=[HINTS,...]] [--include-word-confidence]
         [--include-word-time-offsets]
         [--max-alternatives=MAX_ALTERNATIVES; default=1]
-        [--sample-rate=SAMPLE_RATE] [GCLOUD_WIDE_FLAG ...]
+        [--sample-rate=SAMPLE_RATE]
+        [--enable-speaker-diarization
+          : --diarization-speaker-count=DIARIZATION_SPEAKER_COUNT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Get a transcript of audio up to 80 minutes in length. If the audio
@@ -48,14 +52,22 @@ REQUIRED FLAGS
         of the currently supported language codes.
 
 OPTIONAL FLAGS
+     --additional-language-codes=[LANGUAGE_CODE,...]
+        The BCP-47 language tags of other languages that the speech may be in.
+        Up to 3 can be provided.
+
+        If alternative languages are listed, recognition result will contain
+        recognition in the most likely language detected including the main
+        language-code.
+
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --encoding=ENCODING; default="encoding-unspecified"
         The type of encoding of the file. Required if the file format is not
         WAV or FLAC. ENCODING must be one of: amr, amr-wb,
-        encoding-unspecified, flac, linear16, mulaw, ogg-opus,
+        encoding-unspecified, flac, linear16, mp3, mulaw, ogg-opus,
         speex-with-header-byte.
 
      --filter-profanity
@@ -70,6 +82,10 @@ OPTIONAL FLAGS
         specific commands are typically spoken by the user. This can also be
         used to add additional words to the vocabulary of the recognizer. See
         https://cloud.google.com/speech/limits#content.
+
+     --include-word-confidence
+        Include a list of words and the confidence for those words in the top
+        result.
 
      --include-word-time-offsets
         If True, the top result includes a list of words with the start and end
@@ -86,6 +102,14 @@ OPTIONAL FLAGS
         the audio source to 16000 Hz. If that's not possible, use the native
         sample rate of the audio source (instead of re-sampling).
 
+     --enable-speaker-diarization
+        Enable speaker detection for each recognized word in the top
+        alternative of the recognition result using an integer speaker_tag
+        provided in the WordInfo.
+
+     --diarization-speaker-count=DIARIZATION_SPEAKER_COUNT
+        Estimated number of speakers in the conversation being recognized.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -94,8 +118,8 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the speech/v1 API. The full documentation for this API
-    can be found at:
+    This command uses the speech/v1p1beta1 API. The full documentation for this
+    API can be found at:
     https://cloud.google.com/speech-to-text/docs/quickstart-protocol
 
 NOTES

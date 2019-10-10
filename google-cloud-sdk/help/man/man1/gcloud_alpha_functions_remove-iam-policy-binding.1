@@ -94,11 +94,26 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To remove the iam policy binding for \f5FUNCTION\-1\fR from role \f5ROLE\-1\fR
+for member \f5MEMBER\-1\fR run:
+
+.RS 2m
+$ gcloud alpha functions remove\-iam\-policy\-binding FUNCTION\-1 \e
+    \-\-member=MEMBER\-1 \-\-role=ROLE\-1
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta functions remove\-iam\-policy\-binding
+.RE
 

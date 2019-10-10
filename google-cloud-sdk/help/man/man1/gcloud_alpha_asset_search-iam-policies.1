@@ -1,0 +1,89 @@
+
+.TH "GCLOUD_ALPHA_ASSET_SEARCH\-IAM\-POLICIES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha asset search\-iam\-policies \- searches accessible IAM policies that match a query
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha asset search\-iam\-policies\fR \fB\-\-query\fR=\fIQUERY\fR [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Searches accessible IAM policies that match a query.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-query\fR=\fIQUERY\fR
+The query statement.
+
+Examples: To find all Cloud IAM policies in your organization that contain
+amy@mycompany.com: 'policy:amy@mydomain.com'
+
+To find all Cloud IAM policies in your organization that contain owners role:
+\'policy : "roles/owner"'
+
+To find all Cloud IAM policies in your organization which have
+myuser@mycompany.com in the owners role:
+\'policy."roles/owner":myuser@mycompany.com'
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+The page size for search result pagination. The number of matching results may
+be fewer than requested based on the query. The maximum page size is 2000. If
+page\-size is not given the back end will pick an appropriate default page size.
+
+.TP 2m
+\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR
+If present, retrieve the next batch of results from the preceding call to this
+method. \f5page_token\fR must be the value of \f5next_page_token\fR from the
+previous response. The values of all other method parameters must be identical
+to those in the previous call.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudasset/v1p1alpha1\fR API. The full documentation
+for this API can be found at:
+https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/quickstart\-cloud\-asset\-inventory
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

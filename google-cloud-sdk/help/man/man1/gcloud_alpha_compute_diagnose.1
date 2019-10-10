@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_DIAGNOSE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute diagnose \- debugging tools for Google Compute Engine virtual machine instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute diagnose\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Debugging tools for Google Compute Engine virtual machine
+instances.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBexport\-logs\fR
+\fB(ALPHA)\fR Triggers instance to gather logs and upload them to a Cloud
+Storage Bucket.
+
+.TP 2m
+\fBroutes\fR
+\fB(ALPHA)\fR Routes to/from Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBsosreport\fR
+\fB(ALPHA)\fR Sosreport run from a Google Compute Engine VM.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud compute diagnose
+$ gcloud beta compute diagnose
+.RE
+

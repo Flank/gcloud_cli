@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -196,12 +196,26 @@ class Update(base.UpdateCommand):
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
-    flags.AddLoggingServiceFlag(group, enable_kubernetes=False)
-    flags.AddMonitoringServiceFlag(group, enable_kubernetes=False)
-    flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
+    flags.AddEnableIntraNodeVisibilityFlag(group)
+    group_logging_monitoring = group.add_group()
+    flags.AddLoggingServiceFlag(group_logging_monitoring)
+    flags.AddMonitoringServiceFlag(group_logging_monitoring)
+    flags.AddEnableBinAuthzFlag(group)
+    flags.AddEnableStackdriverKubernetesFlag(group)
+    flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
+    flags.AddResourceUsageExportFlags(group, is_update=True)
+    flags.AddVerticalPodAutoscalingFlag(group, hidden=True)
 
   def ParseUpdateOptions(self, args, locations):
-    return container_command_util.ParseUpdateOptionsBase(args, locations)
+    opts = container_command_util.ParseUpdateOptionsBase(args, locations)
+    opts.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
+    opts.clear_resource_usage_bigquery_dataset = \
+        args.clear_resource_usage_bigquery_dataset
+    opts.enable_network_egress_metering = args.enable_network_egress_metering
+    opts.enable_resource_consumption_metering = \
+        args.enable_resource_consumption_metering
+    opts.enable_intra_node_visibility = args.enable_intra_node_visibility
+    return opts
 
   def Run(self, args):
     """This is what gets called when the user runs this command.
@@ -220,6 +234,7 @@ class Update(base.UpdateCommand):
     cluster_name = args.name
     cluster_node_count = None
     cluster_zone = cluster_ref.zone
+    cluster_is_required = self.IsClusterRequired(args)
     try:
       # Attempt to get cluster for better prompts and to validate args.
       # Error is a warning but not fatal. Should only exit with a failure on
@@ -230,6 +245,8 @@ class Update(base.UpdateCommand):
       cluster_zone = cluster.zone
     except (exceptions.HttpException, apitools_exceptions.HttpForbiddenError,
             util.Error) as error:
+      if cluster_is_required:
+        raise
       log.warning(('Problem loading details of cluster to update:\n\n{}\n\n'
                    'You can still attempt updates to the cluster.\n').format(
                        console_attr.SafeText(error)))
@@ -367,8 +384,39 @@ to completion."""
         raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
     elif args.maintenance_window is not None:
       try:
-        op_ref = adapter.SetMaintenanceWindow(cluster_ref,
-                                              args.maintenance_window)
+        op_ref = adapter.SetDailyMaintenanceWindow(cluster_ref,
+                                                   cluster.maintenancePolicy,
+                                                   args.maintenance_window)
+      except apitools_exceptions.HttpError as error:
+        raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
+    elif getattr(args, 'maintenance_window_start', None) is not None:
+      try:
+        op_ref = adapter.SetRecurringMaintenanceWindow(
+            cluster_ref, cluster.maintenancePolicy,
+            args.maintenance_window_start, args.maintenance_window_end,
+            args.maintenance_window_recurrence)
+      except apitools_exceptions.HttpError as error:
+        raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
+    elif getattr(args, 'clear_maintenance_window', None):
+      try:
+        op_ref = adapter.RemoveMaintenanceWindow(cluster_ref,
+                                                 cluster.maintenancePolicy)
+      except apitools_exceptions.HttpError as error:
+        raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
+    elif getattr(args, 'add_maintenance_exclusion_end', None) is not None:
+      try:
+        op_ref = adapter.AddMaintenanceExclusion(
+            cluster_ref, cluster.maintenancePolicy,
+            args.add_maintenance_exclusion_name,
+            args.add_maintenance_exclusion_start,
+            args.add_maintenance_exclusion_end)
+      except apitools_exceptions.HttpError as error:
+        raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
+    elif getattr(args, 'remove_maintenance_exclusion', None) is not None:
+      try:
+        op_ref = adapter.RemoveMaintenanceExclusion(
+            cluster_ref, cluster.maintenancePolicy,
+            args.remove_maintenance_exclusion)
       except apitools_exceptions.HttpError as error:
         raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
     else:
@@ -379,10 +427,9 @@ to completion."""
         options = self.ParseUpdateOptions(args, locations)
         op_ref = adapter.UpdateCluster(cluster_ref, options)
 
-    if not args.async:
-      adapter.WaitForOperation(op_ref,
-                               'Updating {0}'.format(cluster_ref.clusterId),
-                               timeout_s=1800)
+    if not args.async_:
+      adapter.WaitForOperation(
+          op_ref, 'Updating {0}'.format(cluster_ref.clusterId), timeout_s=1800)
 
       log.UpdatedResource(cluster_ref)
       cluster_url = util.GenerateClusterUrl(cluster_ref)
@@ -396,6 +443,14 @@ to completion."""
           util.ClusterConfig.Persist(cluster, cluster_ref.projectId)
         except kconfig.MissingEnvVarError as error:
           log.warning(error)
+
+  def IsClusterRequired(self, args):
+    """Returns if getting the cluster should be an error for the flags."""
+    return bool(
+        getattr(args, 'add_maintenance_exclusion_end', False) or
+        getattr(args, 'clear_maintenance_window', False) or
+        getattr(args, 'add_maintenance_exclusion_end', False) or
+        getattr(args, 'remove_maintenance_exclusion', False))
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -412,10 +467,9 @@ class UpdateBeta(Update):
     _AddAdditionalZonesArg(group_locations, deprecated=True)
     flags.AddNodeLocationsFlag(group_locations)
     group_logging_monitoring = group.add_group()
-    flags.AddLoggingServiceFlag(
-        group_logging_monitoring, enable_kubernetes=True)
-    flags.AddMonitoringServiceFlag(
-        group_logging_monitoring, enable_kubernetes=True)
+    flags.AddLoggingServiceFlag(group_logging_monitoring)
+    flags.AddMonitoringServiceFlag(group_logging_monitoring)
+    flags.AddEnableStackdriverKubernetesFlag(group)
     flags.AddMasterAuthorizedNetworksFlags(
         parser, enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -426,40 +480,48 @@ class UpdateBeta(Update):
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
-    flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
+    flags.AddDailyMaintenanceWindowFlag(
+        group, add_unset_text=True, add_emw_text=True)
+    flags.AddRecurringMaintenanceWindowFlags(
+        group, hidden=False, is_update=True)
     flags.AddPodSecurityPolicyFlag(group)
     flags.AddEnableBinAuthzFlag(group)
     flags.AddAutoprovisioningFlags(group)
     flags.AddVerticalPodAutoscalingFlag(group)
-    flags.AddResourceUsageExportFlags(group, add_clear_flag=True)
+    flags.AddResourceUsageExportFlags(group, is_update=True)
     flags.AddIstioConfigFlag(parser)
     flags.AddEnableIntraNodeVisibilityFlag(group)
     flags.AddWorkloadIdentityFlags(group)
     flags.AddWorkloadIdentityUpdateFlags(group)
     flags.AddEnableShieldedNodesFlags(group)
+    flags.AddDatabaseEncryptionFlag(group)
+    flags.AddDisableDatabaseEncryptionFlag(group)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
     opts.enable_pod_security_policy = args.enable_pod_security_policy
-    opts.enable_binauthz = args.enable_binauthz
     opts.enable_autoprovisioning = args.enable_autoprovisioning
     opts.autoprovisioning_config_file = args.autoprovisioning_config_file
     opts.autoprovisioning_service_account = args.autoprovisioning_service_account
     opts.autoprovisioning_scopes = args.autoprovisioning_scopes
+    opts.autoprovisioning_locations = args.autoprovisioning_locations
     opts.min_cpu = args.min_cpu
     opts.max_cpu = args.max_cpu
     opts.min_memory = args.min_memory
     opts.max_memory = args.max_memory
     opts.min_accelerator = args.min_accelerator
     opts.max_accelerator = args.max_accelerator
-    opts.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
     opts.istio_config = args.istio_config
     opts.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
     opts.enable_intra_node_visibility = args.enable_intra_node_visibility
     opts.clear_resource_usage_bigquery_dataset = \
         args.clear_resource_usage_bigquery_dataset
     opts.enable_network_egress_metering = args.enable_network_egress_metering
+    opts.enable_resource_consumption_metering = args.enable_resource_consumption_metering
     flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
+    opts.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
+    opts.database_encryption_key = args.database_encryption_key
+    opts.disable_database_encryption = args.disable_database_encryption
 
     # Top-level update options are automatically forced to be
     # mutually-exclusive, so we don't need special handling for these two.
@@ -484,10 +546,9 @@ class UpdateAlpha(Update):
     _AddAdditionalZonesArg(group_locations, deprecated=True)
     flags.AddNodeLocationsFlag(group_locations)
     group_logging_monitoring = group.add_group()
-    flags.AddLoggingServiceFlag(
-        group_logging_monitoring, enable_kubernetes=True)
-    flags.AddMonitoringServiceFlag(
-        group_logging_monitoring, enable_kubernetes=True)
+    flags.AddLoggingServiceFlag(group_logging_monitoring)
+    flags.AddMonitoringServiceFlag(group_logging_monitoring)
+    flags.AddEnableStackdriverKubernetesFlag(group)
     flags.AddMasterAuthorizedNetworksFlags(
         parser, enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
@@ -500,10 +561,13 @@ class UpdateAlpha(Update):
     flags.AddNetworkPolicyFlags(group)
     flags.AddAutoprovisioningFlags(group, hidden=False)
     flags.AddAutoscalingProfilesFlag(group, hidden=True)
-    flags.AddMaintenanceWindowFlag(group, add_unset_text=True)
+    flags.AddDailyMaintenanceWindowFlag(
+        group, add_unset_text=True, add_emw_text=True)
+    flags.AddRecurringMaintenanceWindowFlags(
+        group, hidden=False, is_update=True)
     flags.AddPodSecurityPolicyFlag(group)
     flags.AddEnableBinAuthzFlag(group)
-    flags.AddResourceUsageExportFlags(group, add_clear_flag=True)
+    flags.AddResourceUsageExportFlags(group, is_update=True)
     flags.AddVerticalPodAutoscalingFlag(group)
     flags.AddSecurityProfileForUpdateFlag(group)
     flags.AddIstioConfigFlag(parser)
@@ -512,6 +576,10 @@ class UpdateAlpha(Update):
     flags.AddWorkloadIdentityFlags(group)
     flags.AddWorkloadIdentityUpdateFlags(group)
     flags.AddEnableShieldedNodesFlags(group)
+    flags.AddDisableDefaultSnatFlag(group, for_cluster_create=False)
+    flags.AddDatabaseEncryptionFlag(group)
+    flags.AddDisableDatabaseEncryptionFlag(group)
+    flags.AddCostManagementConfigFlag(group, is_update=True)
 
   def ParseUpdateOptions(self, args, locations):
     opts = container_command_util.ParseUpdateOptionsBase(args, locations)
@@ -519,6 +587,7 @@ class UpdateAlpha(Update):
     opts.autoprovisioning_config_file = args.autoprovisioning_config_file
     opts.autoprovisioning_service_account = args.autoprovisioning_service_account
     opts.autoprovisioning_scopes = args.autoprovisioning_scopes
+    opts.autoprovisioning_locations = args.autoprovisioning_locations
     opts.min_cpu = args.min_cpu
     opts.max_cpu = args.max_cpu
     opts.min_memory = args.min_memory
@@ -527,22 +596,26 @@ class UpdateAlpha(Update):
     opts.max_accelerator = args.max_accelerator
     opts.autoscaling_profile = args.autoscaling_profile
     opts.enable_pod_security_policy = args.enable_pod_security_policy
-    opts.enable_binauthz = args.enable_binauthz
     opts.resource_usage_bigquery_dataset = args.resource_usage_bigquery_dataset
     opts.clear_resource_usage_bigquery_dataset = \
         args.clear_resource_usage_bigquery_dataset
-    opts.enable_vertical_pod_autoscaling = args.enable_vertical_pod_autoscaling
     opts.security_profile = args.security_profile
     opts.istio_config = args.istio_config
     opts.enable_intra_node_visibility = args.enable_intra_node_visibility
     opts.enable_network_egress_metering = args.enable_network_egress_metering
+    opts.enable_resource_consumption_metering = args.enable_resource_consumption_metering
     flags.ValidateIstioConfigUpdateArgs(args.istio_config, args.disable_addons)
     opts.enable_peering_route_sharing = args.enable_peering_route_sharing
+    opts.enable_stackdriver_kubernetes = args.enable_stackdriver_kubernetes
+    opts.database_encryption_key = args.database_encryption_key
+    opts.disable_database_encryption = args.disable_database_encryption
 
     # Top-level update options are automatically forced to be
     # mutually-exclusive, so we don't need special handling for these two.
     opts.identity_namespace = args.identity_namespace
     opts.disable_workload_identity = args.disable_workload_identity
     opts.enable_shielded_nodes = args.enable_shielded_nodes
+    opts.disable_default_snat = args.disable_default_snat
+    opts.enable_cost_management = args.enable_cost_management
 
     return opts

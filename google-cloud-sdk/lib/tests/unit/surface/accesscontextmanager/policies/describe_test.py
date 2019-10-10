@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class PoliciesDescribeTestGA(accesscontextmanager.Base):
@@ -42,16 +43,13 @@ class PoliciesDescribeTestGA(accesscontextmanager.Base):
     m = self.messages
     request_type = m.AccesscontextmanagerAccessPoliciesGetRequest
     self.client.accessPolicies.Get.Expect(
-        request_type(
-            name=policy.name,
-        ),
-        policy)
+        request_type(name=policy.name,), policy)
 
   def testDescribe(self):
     self.SetUpForTrack(self.track)
     organization_id = '12345'
-    policy = self._MakePolicy('MY_POLICY',
-                              parent='organizations/' + organization_id)
+    policy = self._MakePolicy(
+        'MY_POLICY', parent='organizations/' + organization_id)
     self._ExpectGet(policy)
 
     result = self.Run('access-context-manager policies describe MY_POLICY')
@@ -63,17 +61,28 @@ class PoliciesDescribeTestGA(accesscontextmanager.Base):
     properties.VALUES.core.user_output_enabled.Set(True)
 
     organization_id = '12345'
-    policy = self._MakePolicy('MY_POLICY',
-                              parent='organizations/' + organization_id)
+    policy = self._MakePolicy(
+        'MY_POLICY', parent='organizations/' + organization_id)
     self._ExpectGet(policy)
 
     self.Run('access-context-manager policies describe MY_POLICY')
 
-    self.AssertOutputEquals("""\
+    self.AssertOutputEquals(
+        """\
         name: accessPolicies/MY_POLICY
         parent: organizations/12345
         title: My Policy
-        """, normalize_space=True)
+        """,
+        normalize_space=True)
+
+  def test_InvalidPolicyFormatFromProperty(self):
+    self.SetUpForTrack(self.track)
+
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      policy_string = 'accessPolicies/789'
+      properties.VALUES.access_context_manager.policy.Set(policy_string)
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class PoliciesDescribeTestBeta(PoliciesDescribeTestGA):
@@ -86,6 +95,7 @@ class PoliciesDescribeTestAlpha(PoliciesDescribeTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

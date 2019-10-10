@@ -11,6 +11,7 @@ SYNOPSIS
         [--request-path=REQUEST_PATH; default="/"] [--response=RESPONSE]
         [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
+        [--global | --region=REGION]
         [--port=PORT; default=80 --port-name=PORT_NAME --use-serving-port]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -75,6 +76,31 @@ FLAGS
      --unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2
         The number of consecutive health check failures before a healthy
         instance is marked as unhealthy. The default is 2.
+
+     At most one of these may be specified:
+
+       --global
+          If set, the HTTP health check is global.
+
+       --region=REGION
+          Region of the HTTP health check to create. If not specified, you may
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
 
      These flags configure the port that the health check monitors. If none is
      specified, the default port of 80 is used; if both --port and --port-name

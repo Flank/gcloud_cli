@@ -4,8 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud beta app deploy [DEPLOYABLES ...] [--bucket=BUCKET] [--no-cache]
-        [--image-url=IMAGE_URL] [--no-promote] [--no-stop-previous-version]
-        [--version=VERSION, -v VERSION] [GCLOUD_WIDE_FLAG ...]
+        [--ignore-file=IGNORE_FILE] [--image-url=IMAGE_URL] [--no-promote]
+        [--no-stop-previous-version] [--version=VERSION, -v VERSION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) This command is used to deploy both code and configuration to the
@@ -16,10 +17,13 @@ DESCRIPTION
     https://cloud.google.com/appengine/docs/standard/python/configuration-files
     or
     https://cloud.google.com/appengine/docs/flexible/python/configuration-files).
-    Note, for Java Standard apps, you must add the path to the
+    Note, for Java8 Standard apps, you must add the path to the
     appengine-web.xml file inside the WEB-INF directory. gcloud beta app deploy
     skips files specified in the .gcloudignore file (see gcloud topic
-    gcloudignore for more information).
+    gcloudignore for more information). For Java11 Standard, you can either use
+    the yaml file, or, if the application is a single self-contained jar, you
+    can give the path to the jar and a simple service configuration will be
+    generated.
 
 POSITIONAL ARGUMENTS
      [DEPLOYABLES ...]
@@ -37,6 +41,9 @@ FLAGS
      --no-cache
         Skip caching mechanisms involved in the deployment process, in
         particular do not use cached dependencies during the build step.
+
+     --ignore-file=IGNORE_FILE
+        Override the .gcloudignore file and use the specified file instead.
 
      --image-url=IMAGE_URL
         Deploy with a specific Docker image. Docker url must be from one of the
@@ -77,9 +84,13 @@ EXAMPLES
 
         $ gcloud beta app deploy ~/my_app/app.yaml
 
-    To deploy an App Engine Standard Java service, run:
+    To deploy an App Engine Standard Java8 service, run:
 
         $ gcloud beta app deploy ~/my_app/WEB-INF/appengine-web.xml
+
+    To deploy an App Engine Standard Java11 single jar, run:
+
+        $ gcloud beta app deploy ~/my_app/my_jar.jar
 
     By default, the service is deployed the current project configured via:
 

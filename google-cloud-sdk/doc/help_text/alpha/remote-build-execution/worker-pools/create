@@ -6,9 +6,12 @@ SYNOPSIS
     gcloud alpha remote-build-execution worker-pools create
         (WORKERPOOL : --instance=INSTANCE) --worker-count=WORKER_COUNT
         [--async] [--disk-size=DISK_SIZE; default=200]
+        [--labels=[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE; default="n1-standard-2"]
-        [--min-cpu-platform=MIN_CPU_PLATFORM] [--reserved]
-        [GCLOUD_WIDE_FLAG ...]
+        [--min-cpu-platform=MIN_CPU_PLATFORM]
+        [--network-access=NETWORK_ACCESS; default="public"] [--reserved]
+        [--accelerator-count=ACCELERATOR_COUNT
+          --accelerator-type=ACCELERATOR_TYPE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a worker pool in the specified instance.
@@ -36,11 +39,19 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --disk-size=DISK_SIZE; default=200
         Size of the disk, in Gb, for each worker. Defaults to 200Gb.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --machine-type=MACHINE_TYPE; default="n1-standard-2"
         Type of VM to use for each worker. To get a list of valid machine
@@ -52,9 +63,31 @@ OPTIONAL FLAGS
         Minimum CPU platform for the workers. For more information see
         https://cloud.google.com/compute/docs/cpu-platforms.
 
+     --network-access=NETWORK_ACCESS; default="public"
+        Level of network access available to the pool. NETWORK_ACCESS must be
+        one of:
+
+         private
+            Workers can only connect to Google APIs and services.
+
+         public
+            Workers can connect to the public internet.
+
+         restricted-private
+            Workers can only connect to Google APIs that are reachable through
+            restricted.googleapis.com (199.36.153.4/30).
+
      --reserved
         Determines the type of VM to use. If set then reserved VMs are used,
         otherwise preemptable VMs are used.
+
+     --accelerator-count=ACCELERATOR_COUNT
+        Number of the guest accelerator cards attached to each VM in the pool.
+
+     --accelerator-type=ACCELERATOR_TYPE
+        Type of accelerator to attach to each VM in the pool, e.g.
+        'nvidia-tesla-k80' for nVidia Tesla K80. Run gcloud compute
+        accelerator-types list to learn about all available accelerator types.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -87,7 +120,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

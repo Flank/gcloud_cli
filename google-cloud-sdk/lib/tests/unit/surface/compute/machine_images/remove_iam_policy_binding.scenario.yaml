@@ -16,7 +16,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/machineImages/my-image/getIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/machineImages/my-image/getIamPolicy?alt=json&optionsRequestedPolicyVersion=3
           method: GET
           headers: {}
           body: null
@@ -37,13 +37,14 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/machineImages/my-image/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/alpha/projects/fake-project/global/machineImages/my-image/setIamPolicy?alt=json
           method: POST
           headers: {}
           body:
             json:
               policy:
                 etag: BwWG4sUwNDk=
+                version: 3
         return_response:
           headers:
             status: '200'

@@ -28,7 +28,7 @@ summary:
         location: US
         projectId: fake-project
       kind: bigquery#job
-      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
       statistics:
         creationTime: '1545436678290'
         startTime: '1545436678436'
@@ -61,7 +61,7 @@ summary:
         location: US
         projectId: fake-project
       kind: bigquery#job
-      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
       statistics:
         creationTime: '1545436678290'
         startTime: '1545436678436'
@@ -94,7 +94,7 @@ summary:
         location: US
         projectId: fake-project
       kind: bigquery#job
-      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
       statistics:
         creationTime: '1545436678290'
         startTime: '1545436678436'
@@ -128,7 +128,7 @@ summary:
         location: US
         projectId: fake-project
       kind: bigquery#job
-      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+      selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
       statistics:
         creationTime: '1545436678290'
         startTime: '1545436678436'
@@ -167,7 +167,7 @@ summary:
         - mode: NULLABLE
           name: field3
           type: BOOLEAN
-      selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2
+      selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2
       tableReference:
         datasetId: mydataset
         projectId: fake-project
@@ -182,7 +182,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -208,7 +208,7 @@ actions:
              "kind": "bigquery#job",
              "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
              "id": "fake-project:US.gcloud-bq-test",
-             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
              "jobReference": {
               "projectId": "fake-project",
               "jobId": "gcloud-bq-test",
@@ -259,7 +259,7 @@ actions:
           location: US
           projectId: fake-project
         kind: bigquery#job
-        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
         statistics:
           creationTime: '1545436678290'
           startTime: '1545436678436'
@@ -276,7 +276,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -302,7 +302,7 @@ actions:
              "kind": "bigquery#job",
              "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
              "id": "fake-project:US.gcloud-bq-test",
-             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
              "jobReference": {
               "projectId": "fake-project",
               "jobId": "gcloud-bq-test",
@@ -353,7 +353,7 @@ actions:
           location: US
           projectId: fake-project
         kind: bigquery#job
-        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
         statistics:
           creationTime: '1545436678290'
           startTime: '1545436678436'
@@ -370,7 +370,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -396,7 +396,7 @@ actions:
              "kind": "bigquery#job",
              "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
              "id": "fake-project:US.gcloud-bq-test",
-             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
              "jobReference": {
               "projectId": "fake-project",
               "jobId": "gcloud-bq-test",
@@ -448,7 +448,7 @@ actions:
           location: US
           projectId: fake-project
         kind: bigquery#job
-        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
         statistics:
           creationTime: '1545436678290'
           startTime: '1545436678436'
@@ -466,7 +466,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -493,7 +493,7 @@ actions:
              "kind": "bigquery#job",
              "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
              "id": "fake-project:US.gcloud-bq-test",
-             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
              "jobReference": {
               "projectId": "fake-project",
               "jobId": "gcloud-bq-test",
@@ -544,7 +544,7 @@ actions:
           location: US
           projectId: fake-project
         kind: bigquery#job
-        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
+        selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US
         statistics:
           creationTime: '1545436678290'
           startTime: '1545436678436'
@@ -562,7 +562,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -588,7 +588,7 @@ actions:
              "kind": "bigquery#job",
              "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
              "id": "fake-project:US.gcloud-bq-test",
-             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
              "jobReference": {
               "projectId": "fake-project",
               "jobId": "gcloud-bq-test",
@@ -620,7 +620,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?alt=json
           method: GET
           headers: {}
           body: null
@@ -632,7 +632,7 @@ actions:
              "kind": "bigquery#job",
              "etag": "\"NSrA2TwvIwFWwcdeSRqwLw1CVp4/ADW3dHEm72ZzGUjunoA5ryt1sh8\"",
              "id": "fake-project:US.gcloud-bq-test",
-             "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
+             "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/jobs/gcloud-bq-test?location=US",
              "jobReference": {
               "projectId": "fake-project",
               "jobId": "gcloud-bq-test",
@@ -667,7 +667,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2?alt=json
           method: GET
           headers: {}
           body: null
@@ -679,7 +679,7 @@ actions:
               "kind": "bigquery#table",
               "etag": "ZCHgCFBXQ1YyfYn9svDbUQ==",
               "id": "fake-project:mydataset.my_table_2",
-              "selfLink": "https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2",
+              "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2",
               "tableReference": {
                 "projectId": "fake-project",
                 "datasetId": "mydataset",
@@ -735,7 +735,7 @@ actions:
           - mode: NULLABLE
             name: field3
             type: BOOLEAN
-        selfLink: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2
+        selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/mydataset/tables/my_table_2
         tableReference:
           datasetId: mydataset
           projectId: fake-project

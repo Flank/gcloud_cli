@@ -11,9 +11,9 @@ DESCRIPTION
 FLAGS
      --host-port=HOST_PORT
         The host:port to which the emulator should be bound. Can take the form
-        of a single address (hostname, IPv4, or IPv6) and port:
+        of a single address (hostname, IPv4, or IPv6) and/or port:
 
-            ADDRESS[:PORT]
+            [ADDRESS][:PORT]
 
         In this format you must enclose IPv6 addresses in square brackets: e.g.
 
@@ -39,9 +39,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
 
         $ gcloud beta emulators firestore start
 

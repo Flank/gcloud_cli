@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,14 +40,14 @@ YAML_FILE_CONTENTS_HEADER = textwrap.dedent("""\
 YAML_FILE_CONTENTS_WORKSPACE = textwrap.dedent("""\
     backends:
     - balancingMode: RATE
-      group: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/instanceGroups/group-1
+      group: https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/instanceGroups/group-1
       maxRate: 123
     - balancingMode: RATE
-      group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instanceGroups/group-2
+      group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instanceGroups/group-2
       maxRate: 456
     description: The best backend service
     healthChecks:
-    - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/health-check
+    - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/health-check
     port: 80
     portName: http
     protocol: HTTP
@@ -60,20 +60,20 @@ YAML_FILE_CONTENTS_EXAMPLE = textwrap.dedent("""\
     #
     #   backends:
     #   - balancingMode: RATE
-    #     group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/group-1
+    #     group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/group-1
     #     maxRate: 100
     #   - balancingMode: RATE
-    #     group: https://www.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/group-2
+    #     group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/group-2
     #     maxRate: 150
     #   description: My backend service
     #   healthChecks:
-    #   - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check-1
-    #   - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check-2
+    #   - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check-1
+    #   - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check-2
     #   name: backend-service
     #   port: 80
     #   portName: http
     #   protocol: HTTP
-    #   selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/backendServices/backend-service
+    #   selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/backendServices/backend-service
     #   timeoutSec: 30
     #
     # Original resource:
@@ -83,19 +83,19 @@ YAML_FILE_CONTENTS_EXAMPLE = textwrap.dedent("""\
 YAML_FILE_CONTENTS_ORIGINAL = textwrap.dedent("""\
     #   backends:
     #   - balancingMode: RATE
-    #     group: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/instanceGroups/group-1
+    #     group: https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1/instanceGroups/group-1
     #     maxRate: 123
     #   - balancingMode: RATE
-    #     group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instanceGroups/group-2
+    #     group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instanceGroups/group-2
     #     maxRate: 456
     #   description: The best backend service
     #   healthChecks:
-    #   - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/health-check
+    #   - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/health-check
     #   name: my-backend-service
     #   port: 80
     #   portName: http
     #   protocol: HTTP
-    #   selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/backendServices/backend-service
+    #   selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/backendServices/backend-service
     #   timeoutSec: 15
     """)
 YAML_FILE_CONTENTS = (YAML_FILE_CONTENTS_HEADER + YAML_FILE_CONTENTS_WORKSPACE +

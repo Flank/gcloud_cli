@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ class UpdateStatefulIgmZonalAlphaTest(
         additional_disks=['disk1', 'disk2', 'disk3'])
     igm_name = self.CreateInstanceGroupManagerStateful(
         instance_template_name,
-        stateful_names=True,
         stateful_disks=['disk1', 'disk3'])
     return igm_name, instance_template_name
 

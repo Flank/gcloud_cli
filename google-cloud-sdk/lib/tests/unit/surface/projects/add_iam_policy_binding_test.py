@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,11 +44,16 @@ class ProjectsAddIamPolicyBindingTestGA(base.ProjectsUnitTestBase):
     start_policy = copy.deepcopy(test_util.GetTestIamPolicy())
     new_policy = copy.deepcopy(start_policy)
     new_policy.bindings[0].members.append(new_user)
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
     resource_name = test_project.projectId
 
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=resource_name),
+            resource=resource_name,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
         start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
@@ -114,10 +119,17 @@ class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
             members=['user:owner@google.com'],
             role='roles/another-non-primitive',
             condition=new_condition))
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
+
     self.WriteInput('1')
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
@@ -145,11 +157,18 @@ class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
             members=['user:owner@google.com'],
             role='roles/another-non-primitive',
             condition=new_condition))
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
+
     self.WriteInput('3')
     self.WriteInput('expression=expr,title=title,description=descr')
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
@@ -174,7 +193,12 @@ class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
     self.WriteInput('expression=expr,title=title,description=descr')
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
 
     with self.AssertRaisesExceptionRegexp(
         iam_util.IamPolicyBindingInvalidError,
@@ -192,7 +216,12 @@ class ProjectsAddIamPolicyBindingTestAlpha(ProjectsAddIamPolicyBindingTestBeta):
     start_policy = self.test_iam_policy_with_condition
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
 
     with self.AssertRaisesExceptionRegexp(
         iam_util.IamPolicyBindingIncompleteError,

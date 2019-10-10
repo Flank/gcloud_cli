@@ -1,0 +1,370 @@
+title: Execute a deployment to a GKE cluster
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: container/use_application_default_credentials True
+- execute:
+  - command: storage buckets create $$bucket$$
+  - stderr: |
+      Created bucket [$$bucket$$].
+- execute:
+  - command: container clusters create $$cluster$$ --zone=$$location$$ -q --num-nodes=1
+      --timeout=1080 --no-enable-basic-auth --no-issue-client-certificate --verbosity="none"
+  - stderr: |
+      This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
+  - progress_tracker:
+    - message: Creating cluster $$cluster$$ in $$location$$
+    - status: SUCCESS
+  - write_file: ~/.kube/config
+  - write_file: ~/.kube/config
+  - stderr: |
+      Created [https://container.googleapis.com/v1alpha1/projects/$$project$$/zones/$$location$$/clusters/$$cluster$$].
+      To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/$$location$$/$$cluster$$?project=$$project$$
+      kubeconfig entry generated for $$cluster$$.
+  - stdout: .*$$cluster$$\s+$$location$$.*RUNNING.*$
+- execute:
+  - command: builds deploy gke --cluster=$$cluster$$ --location=$$location$$ --image=gcr.io/google-containers/nginx
+      --app-name=my-nginx --app-version=1.0.0 --namespace=my-namespace --expose=80
+      --gcs-staging-dir=gs://$$bucket$$/deploy --timeout=4m -q
+  - stderr: |-
+      Starting Cloud Build to build and deploy to the target Google Kubernetes Engine cluster...
+
+      Created \[https://cloudbuild.googleapis.com/v1/projects/$$project$$/builds/.*\].
+      Logs are available at \[https://console.cloud.google.com/gcr/builds/.*?project=.*\].
+      $
+  - stdout: |-
+      .*DONE
+      .*
+      $
+  - stderr: |-
+      Successfully deployed to your Google Kubernetes Engine cluster.
+
+      You can find the configuration files of the deployed Kubernetes objects stored at gs://$$bucket$$/deploy/config/.*/expanded.
+
+      You can also find suggested base Kubernetes configuration files at gs://$$bucket$$/deploy/config/.*/suggested.
+      $
+- execute:
+  - command: storage delete gs://$$bucket$$ --recursive
+  - stderr: |
+      WARNING: Deleting a bucket is irreversible and makes that bucket name available for others to claim.
+  - prompt:
+    - message: |-
+        This command will delete the following buckets:
+          $$bucket$$
+    - input: y
+  - prompt:
+    - input: y
+  - progress_bar:
+    - message: Deleting Files
+  - stderr: |2-
+
+      Deleted \[.*\] files.
+      Deleted bucket \[gs://$$bucket$$\].
+      $
+- execute:
+  - command: container clusters delete $$cluster$$ --zone=$$location$$ --async
+  - prompt:
+    - message: |
+        The following clusters will be deleted.
+         - [$$cluster$$] in [$$location$$]
+    - input: y
+actions:
+- define_reference:
+    reference: project
+    value: cloud-sdk-integration-testing
+
+- define_reference:
+    reference: location
+    value: us-east1-b
+
+- generate_resource_id:
+    reference: cluster
+    prefix: builds-deploy-gke
+
+- generate_resource_id:
+    reference: bucket
+    prefix: builds-deploy-gke
+
+- set_property:
+    # This is needed to create a cluster
+    container/use_application_default_credentials: true
+
+- execute_command:
+    command: storage buckets create $$bucket$$
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created bucket [$$bucket$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: container clusters create $$cluster$$ --zone=$$location$$ -q --num-nodes=1
+      --timeout=1080 --no-enable-basic-auth --no-issue-client-certificate --verbosity="none"
+    validation_only: true
+    events:
+    - expect_stderr: |
+        This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
+    - expect_progress_tracker:
+        message: Creating cluster $$cluster$$ in $$location$$
+        status: SUCCESS
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*clusters: \[\].*'
+        is_private: true
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*name: gke_$$project$$_$$location$$_$$cluster$$.*'
+        is_private: true
+    - expect_stderr: |
+        Created [https://container.googleapis.com/v1alpha1/projects/$$project$$/zones/$$location$$/clusters/$$cluster$$].
+        To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/$$location$$/$$cluster$$?project=$$project$$
+        kubeconfig entry generated for $$cluster$$.
+    - expect_stdout:
+        matches: .*$$cluster$$\s+$$location$$.*RUNNING.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: builds deploy gke --cluster=$$cluster$$ --location=$$location$$ --image=gcr.io/google-containers/nginx
+      --app-name=my-nginx --app-version=1.0.0 --namespace=my-namespace --expose=80
+      --gcs-staging-dir=gs://$$bucket$$/deploy --timeout=4m -q
+    validate_remote_api_calls: false
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://cloudbuild.googleapis.com/v1/projects/$$project$$/builds?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              steps:
+              - args:
+                - prepare
+                - --image=gcr.io/google-containers/nginx
+                - --namespace=my-namespace
+                - --output=output
+                - --annotation=gcb-build-id=$BUILD_ID
+                - --app=my-nginx
+                - --version=1.0.0
+                - --expose=80
+                id: Prepare deploy
+                name: gcr.io/cloud-builders/gke-deploy:stable
+              - args:
+                - -c
+                - |2
+
+                  set -e
+
+                  gsutil cp -r output/suggested gs://$$bucket$$/deploy/config/$BUILD_ID/suggested
+                  echo "Copied suggested base configs to gs://$$bucket$$/deploy/config/$BUILD_ID/suggested"
+                  gsutil cp -r output/expanded gs://$$bucket$$/deploy/config/$BUILD_ID/expanded
+                  echo "Copied expanded configs to gs://$$bucket$$/deploy/config/$BUILD_ID/expanded"
+                entrypoint: sh
+                id: Save configs
+                name: gcr.io/cloud-builders/gsutil
+              - args:
+                - apply
+                - --filename=output/expanded
+                - --namespace=my-namespace
+                - --cluster=$$cluster$$
+                - --location=$$location$$
+                - --timeout=240s
+                id: Apply deploy
+                name: gcr.io/cloud-builders/gke-deploy:stable
+              tags:
+              - gcp-cloud-build-deploy
+              - gcp-cloud-build-deploy-gcloud
+              - my-nginx
+              timeout: 240s
+        return_response:
+          headers:
+            status: '200'
+          body:
+            name: operations/build/$$project$$/ODM0ZGM0NWItMWJiOC00YWE1LWE5N2YtYjgzNjY1NjIyNWRl
+            metadata:
+              build:
+                createTime: '2019-0-12T17:15:58.818297772Z'
+                steps:
+                - args:
+                  - prepare
+                  - --image=gcr.io/google-containers/nginx
+                  - --namespace=my-namespace
+                  - --output=output
+                  - --annotation=gcb-build-id=$BUILD_ID
+                  - --app=my-nginx
+                  - --version=1.0.0
+                  - --expose=80
+                  id: Prepare deploy
+                  name: gcr.io/cloud-builders/gke-deploy:stable
+                - args:
+                  - -c
+                  - |2
+
+                    set -e
+
+                    gsutil cp -r output/suggested gs://$$bucket$$/deploy/config/$BUILD_ID/suggested
+                    echo "Copied suggested base configs to gs://$$bucket$$/deploy/config/$BUILD_ID/suggested"
+                    gsutil cp -r output/expanded gs://$$bucket$$/deploy/config/$BUILD_ID/expanded
+                    echo "Copied expanded configs to gs://$$bucket$$/deploy/config/$BUILD_ID/expanded"
+                  entrypoint: sh
+                  id: Save configs
+                  name: gcr.io/cloud-builders/gsutil
+                - args:
+                  - apply
+                  - --filename=output/expanded
+                  - --namespace=my-namespace
+                  - --cluster=$$cluster$$
+                  - --location=$$location$$
+                  - --timeout=240s
+                  id: Apply deploy
+                  name: gcr.io/cloud-builders/gke-deploy:stable
+                logUrl: https://console.cloud.google.com/gcr/builds/834dc45b-1bb8-4aa5-a97f-b836656225de?project=601677740
+                timeout: 240s
+                projectId: $$project$$
+                status: QUEUED
+                id: 834dc45b-1bb8-4aa5-a97f-b836656225de
+                logsBucket: gs://601677740.cloudbuild-logs.googleusercontent.com
+                options:
+                  logging: LEGACY
+                tags:
+                - gcp-cloud-build-deploy
+                - gcp-cloud-build-deploy-gcloud
+                - my-nginx
+    - expect_stderr:
+        matches: |
+          Starting Cloud Build to build and deploy to the target Google Kubernetes Engine cluster...
+
+          Created \[https://cloudbuild.googleapis.com/v1/projects/$$project$$/builds/.*\].
+          Logs are available at \[https://console.cloud.google.com/gcr/builds/.*?project=.*\].
+    - api_call:
+        expect_request:
+          uri: https://cloudbuild.googleapis.com/v1/projects/$$project$$/builds/834dc45b-1bb8-4aa5-a97f-b836656225de?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            createTime: '2019-0-12T17:15:58.818297772Z'
+            steps:
+            - args:
+              - run
+              - --image=gcr.io/google-containers/nginx
+              - --namespace=my-namespace
+              - --output=output
+              - --annotation=gcb-build-id=$BUILD_ID
+              - --app=my-nginx
+              - --version=1.0.0
+              - --expose=80
+              id: Prepare deploy
+              name: gcr.io/cloud-builders/gke-deploy:stable
+            - args:
+              - -c
+              - |2
+
+                set -e
+
+                gsutil cp -r output/suggested gs://$$bucket$$/deploy/config/$BUILD_ID/suggested
+                echo "Copied suggested base configs to gs://$$bucket$$/deploy/config/$BUILD_ID/suggested"
+                gsutil cp -r output/expanded gs://$$bucket$$/deploy/config/$BUILD_ID/expanded
+                echo "Copied expanded configs to gs://$$bucket$$/deploy/config/$BUILD_ID/expanded"
+              entrypoint: sh
+              id: Save configs
+              name: gcr.io/cloud-builders/gsutil
+            - args:
+              - apply
+              - --filename=output/expanded
+              - --namespace=my-namespace
+              - --cluster=$$cluster$$
+              - --location=$$location$$
+              - --timeout=240s
+              id: Apply deploy
+              name: gcr.io/cloud-builders/gke-deploy:stable
+            logUrl: https://console.cloud.google.com/gcr/builds/834dc45b-1bb8-4aa5-a97f-b836656225de?project=601677740
+            timeout: 240s
+            projectId: $$project$$
+            status: SUCCESS
+            id: 834dc45b-1bb8-4aa5-a97f-b836656225de
+            logsBucket: gs://601677740.cloudbuild-logs.googleusercontent.com
+            options:
+              logging: LEGACY
+            tags:
+            - gcp-cloud-build-deploy
+            - gcp-cloud-build-deploy-gcloud
+            - my-nginx
+    - api_call:
+        expect_request:
+          uri: https://storage.googleapis.com/601677740.cloudbuild-logs.googleusercontent.com/log-834dc45b-1bb8-4aa5-a97f-b836656225de.txt
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            DONE
+    - expect_stdout:
+        matches: |
+          .*DONE
+          .*
+    - expect_stderr:
+        matches: |
+          Successfully deployed to your Google Kubernetes Engine cluster.
+
+          You can find the configuration files of the deployed Kubernetes objects stored at gs://$$bucket$$/deploy/config/.*/expanded.
+
+          You can also find suggested base Kubernetes configuration files at gs://$$bucket$$/deploy/config/.*/suggested.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: storage delete gs://$$bucket$$ --recursive
+    validation_only: true
+    cleanup_for: bucket
+    events:
+    - expect_stderr: |
+        WARNING: Deleting a bucket is irreversible and makes that bucket name available for others to claim.
+    - expect_prompt_continue:
+        message: |-
+          This command will delete the following buckets:
+            $$bucket$$
+        user_input: y
+    - expect_prompt_continue:
+        user_input: y
+    - expect_progress_bar:
+        message: Deleting Files
+    - expect_stderr:
+        matches: |2
+
+          Deleted \[.*\] files.
+          Deleted bucket \[gs://$$bucket$$\].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: container clusters delete $$cluster$$ --zone=$$location$$ --async
+    validation_only: true
+    cleanup_for: cluster
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following clusters will be deleted.
+           - [$$cluster$$] in [$$location$$]
+        user_input: y
+    - expect_exit:
+        code: 0

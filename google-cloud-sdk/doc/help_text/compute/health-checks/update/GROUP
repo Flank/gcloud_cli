@@ -21,6 +21,9 @@ COMMANDS
      http
         Update a HTTP health check.
 
+     http2
+        Update a HTTP2 health check.
+
      https
         Update a HTTPS health check.
 

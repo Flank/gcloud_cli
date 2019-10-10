@@ -34,9 +34,10 @@ REQUIRED FLAGS
             Partner interconnect. Only available to approved partners.
 
      --link-type=LINK_TYPE
-        Type of the link for the interconnect. LINK_TYPE must be (currently
-        only one value is supported):
+        Type of the link for the interconnect. LINK_TYPE must be one of:
 
+         LINK_TYPE_ETHERNET_100G_LR
+            100Gbps Ethernet, LR Optics.
          LINK_TYPE_ETHERNET_10G_LR
             10Gbps Ethernet, LR Optics.
 

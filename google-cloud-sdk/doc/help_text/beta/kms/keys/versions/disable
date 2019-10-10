@@ -35,8 +35,8 @@ EXAMPLES
     The following command disables version 3 of key frodo within keyring
     fellowship and location us-east1:
 
-        $ gcloud beta kms keys versions disable 3 --location us-east1 \
-            --keyring fellowship --key frodo
+        $ gcloud beta kms keys versions disable 3 --location=us-east1 \
+            --keyring=fellowship --key=frodo
 
 NOTES
     This command is currently in BETA and may change without notice. These

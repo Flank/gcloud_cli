@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import encoding
+from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.api_lib.app import build as app_build
+from googlecloudsdk.api_lib.app import service_util
+from googlecloudsdk.api_lib.app import version_util
 from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.api_lib.cloudbuild import logs as cloudbuild_logs
 from googlecloudsdk.api_lib.util import apis
@@ -331,6 +334,102 @@ class AppEngineApiClientVersionTests(AppEngineApiClientTestBase):
             name=version_name),
         self.messages.Operation(done=True))
     self.client.DeleteVersion('my-service', 'my-version')
+
+  def testListInstancesWhenDeletedRaceCondition(self):
+    """Test ListInstances when a version is deleted midway."""
+    # Versions can be deleted between getting the list of versions, and
+    # requesting their instance information. If this happens, we should
+    # gracefully remove the version from the list.
+    version_1 = version_util.Version.FromResourcePath(
+        'fake-project/fake-svc/fake-ver1')
+    version_2 = version_util.Version.FromResourcePath(
+        'fake-project/fake-svc/fake-ver2')
+    version_3 = version_util.Version.FromResourcePath(
+        'fake-project/fake-svc/fake-ver3')
+    versions = [version_1, version_2, version_3]
+
+    self.mocked_client.apps_services_versions_instances.List.Expect(
+        request=self.messages.AppengineAppsServicesVersionsInstancesListRequest(
+            parent='apps/fake-project/services/fake-svc/versions/fake-ver1',
+            pageSize=100),
+        response=self.messages.ListInstancesResponse(instances=[
+            self.messages.Instance(
+                name='apps/fake-project/services/fake-svc/versions/fake-ver1/instances/fake-inst1'
+            ),
+            self.messages.Instance(
+                name='apps/fake-project/services/fake-svc/versions/fake-ver1/instances/fake-inst2'
+            )
+        ]))
+    self.mocked_client.apps_services_versions_instances.List.Expect(
+        request=self.messages.AppengineAppsServicesVersionsInstancesListRequest(
+            parent='apps/fake-project/services/fake-svc/versions/fake-ver2',
+            pageSize=100),
+        exception=apitools_exceptions.HttpNotFoundError(None, None, None))
+    self.mocked_client.apps_services_versions_instances.List.Expect(
+        request=self.messages.AppengineAppsServicesVersionsInstancesListRequest(
+            parent='apps/fake-project/services/fake-svc/versions/fake-ver3',
+            pageSize=100),
+        response=self.messages.ListInstancesResponse(instances=[
+            self.messages.Instance(
+                name='apps/fake-project/services/fake-svc/versions/fake-ver3/instances/fake-inst1'
+            ),
+            self.messages.Instance(
+                name='apps/fake-project/services/fake-svc/versions/fake-ver3/instances/fake-inst2'
+            )
+        ]))
+    expected_instances = [
+        'apps/fake-project/services/fake-svc/versions/fake-ver1/instances/fake-inst1',
+        'apps/fake-project/services/fake-svc/versions/fake-ver1/instances/fake-inst2',
+        'apps/fake-project/services/fake-svc/versions/fake-ver3/instances/fake-inst1',
+        'apps/fake-project/services/fake-svc/versions/fake-ver3/instances/fake-inst2'
+    ]
+
+    instances = self.client.ListInstances(versions)
+    readable_instances = [instance.instance.name for instance in instances]
+    self.assertEqual(readable_instances, expected_instances)
+
+  def testListVersionsWhenDeletedRaceCondition(self):
+    """Test ListVersions when a service is deleted midway."""
+    # Services can be deleted between getting the list of services, and
+    # requesting their version information. If this happens, we should
+    # gracefully remove the service from the list.
+    service_1 = service_util.Service.FromResourcePath('fake-project/fake-svc1')
+    service_2 = service_util.Service.FromResourcePath('fake-project/fake-svc2')
+    service_3 = service_util.Service.FromResourcePath('fake-project/fake-svc3')
+    services = [service_1, service_2, service_3]
+
+    self.mocked_client.apps_services_versions.List.Expect(
+        request=self.messages.AppengineAppsServicesVersionsListRequest(
+            parent='apps/fake-project/services/fake-svc1', pageSize=100),
+        response=self.messages.ListVersionsResponse(versions=[
+            self.messages.Version(
+                name='apps/fake-project/services/fake-svc1/versions/fake-ver1'),
+            self.messages.Version(
+                name='apps/fake-project/services/fake-svc1/versions/fake-ver2')
+        ]))
+    self.mocked_client.apps_services_versions.List.Expect(
+        request=self.messages.AppengineAppsServicesVersionsListRequest(
+            parent='apps/fake-project/services/fake-svc2', pageSize=100),
+        exception=apitools_exceptions.HttpNotFoundError(None, None, None))
+    self.mocked_client.apps_services_versions.List.Expect(
+        request=self.messages.AppengineAppsServicesVersionsListRequest(
+            parent='apps/fake-project/services/fake-svc3', pageSize=100),
+        response=self.messages.ListVersionsResponse(versions=[
+            self.messages.Version(
+                name='apps/fake-project/services/fake-svc3/versions/fake-ver1'),
+            self.messages.Version(
+                name='apps/fake-project/services/fake-svc3/versions/fake-ver2')
+        ]))
+    expected_versions = [
+        'apps/fake-project/services/fake-svc1/versions/fake-ver1',
+        'apps/fake-project/services/fake-svc1/versions/fake-ver2',
+        'apps/fake-project/services/fake-svc3/versions/fake-ver1',
+        'apps/fake-project/services/fake-svc3/versions/fake-ver2'
+    ]
+
+    versions = self.client.ListVersions(services)
+    readable_versions = [version.version.name for version in versions]
+    self.assertEqual(readable_versions, expected_versions)
 
 
 class AppEngineApiClientPatchTests(AppEngineApiClientTestBase):

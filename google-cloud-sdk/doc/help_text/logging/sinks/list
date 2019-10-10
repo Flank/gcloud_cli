@@ -4,8 +4,9 @@ NAME
 SYNOPSIS
     gcloud logging sinks list
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
-          | --organization=ORGANIZATION_ID] [--filter=EXPRESSION]
-        [--limit=LIMIT] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+          | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--sort-by=[FIELD,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Lists the defined sinks.
@@ -21,6 +22,20 @@ FLAGS
 
        --organization=ORGANIZATION_ID
           List sinks associated with this organization.
+
+       --project=PROJECT_ID
+          List sinks associated with this project.
+
+          The Google Cloud Platform project name to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

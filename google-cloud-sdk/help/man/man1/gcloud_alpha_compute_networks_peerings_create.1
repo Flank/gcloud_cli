@@ -11,7 +11,7 @@ gcloud alpha compute networks peerings create \- create a Google Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-async\fR] [\fB\-\-auto\-create\-routes\fR] [\fB\-\-export\-custom\-routes\fR] [\fB\-\-import\-custom\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-async\fR] [\fB\-\-auto\-create\-routes\fR] [\fB\-\-export\-custom\-routes\fR] [\fB\-\-export\-subnet\-routes\-with\-public\-ip\fR] [\fB\-\-import\-custom\-routes\fR] [\fB\-\-import\-subnet\-routes\-with\-public\-ip\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,8 +53,7 @@ The name of the network to be peered with the current network.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-auto\-create\-routes\fR
@@ -71,9 +70,21 @@ If set, the network will export custom routes to peer network. Use
 \-\-no\-export\-custom\-routes to disable it.
 
 .TP 2m
+\fB\-\-export\-subnet\-routes\-with\-public\-ip\fR
+If set, the network will export subnet routes with addresses in the public IP
+ranges to peer network. Use \-\-no\-export\-subnet\-routes\-with\-public\-ip to
+disable it.
+
+.TP 2m
 \fB\-\-import\-custom\-routes\fR
 If set, the network will import custom routes from peer network. Use
 \-\-no\-import\-custom\-routes to disable it.
+
+.TP 2m
+\fB\-\-import\-subnet\-routes\-with\-public\-ip\fR
+If set, the network will import subnet routes with addresses in the public IP
+ranges from peer network. Use \-\-no\-import\-subnet\-routes\-with\-public\-ip
+to disable it.
 
 .TP 2m
 \fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR
@@ -98,9 +109,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute networks peerings create

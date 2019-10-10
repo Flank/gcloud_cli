@@ -69,6 +69,7 @@ class LoggingV2(base_api.BaseApiClient):
     self.projects_sinks = self.ProjectsSinksService(self)
     self.projects = self.ProjectsService(self)
     self.sinks = self.SinksService(self)
+    self.v2 = self.V2Service(self)
 
   class BillingAccountsBucketsService(base_api.BaseApiService):
     """Service class for the billingAccounts_buckets resource."""
@@ -290,7 +291,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
+      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty and locked, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
 
       Args:
         request: (LoggingBillingAccountsLocationsBucketsDeleteRequest) input message
@@ -344,7 +345,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
+      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.If the bucket has a LifecycleState of DELETE_REQUESTED, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
 
       Args:
         request: (LoggingBillingAccountsLocationsBucketsPatchRequest) input message
@@ -436,7 +437,7 @@ class LoggingV2(base_api.BaseApiClient):
         method_id=u'logging.billingAccounts.logs.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
+        query_params=[u'pageSize', u'pageToken', u'resourceNames'],
         relative_path=u'v2/{+parent}/logs',
         request_field='',
         request_type_name=u'LoggingBillingAccountsLogsListRequest',
@@ -691,7 +692,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
+      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.If the bucket has a LifecycleState of DELETE_REQUESTED, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
 
       Args:
         request: (LoggingBucketsPatchRequest) input message
@@ -1107,7 +1108,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
+      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty and locked, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
 
       Args:
         request: (LoggingFoldersLocationsBucketsDeleteRequest) input message
@@ -1188,7 +1189,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
+      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.If the bucket has a LifecycleState of DELETE_REQUESTED, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
 
       Args:
         request: (LoggingFoldersLocationsBucketsPatchRequest) input message
@@ -1280,7 +1281,7 @@ class LoggingV2(base_api.BaseApiClient):
         method_id=u'logging.folders.logs.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
+        query_params=[u'pageSize', u'pageToken', u'resourceNames'],
         relative_path=u'v2/{+parent}/logs',
         request_field='',
         request_type_name=u'LoggingFoldersLogsListRequest',
@@ -1508,7 +1509,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
+      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty and locked, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
 
       Args:
         request: (LoggingLocationsBucketsDeleteRequest) input message
@@ -1600,7 +1601,7 @@ class LoggingV2(base_api.BaseApiClient):
         method_id=u'logging.logs.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
+        query_params=[u'pageSize', u'pageToken', u'resourceNames'],
         relative_path=u'v2/{+parent}/logs',
         request_field='',
         request_type_name=u'LoggingLogsListRequest',
@@ -1827,7 +1828,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
+      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty and locked, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
 
       Args:
         request: (LoggingOrganizationsLocationsBucketsDeleteRequest) input message
@@ -1908,7 +1909,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
+      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.If the bucket has a LifecycleState of DELETE_REQUESTED, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
 
       Args:
         request: (LoggingOrganizationsLocationsBucketsPatchRequest) input message
@@ -2000,7 +2001,7 @@ class LoggingV2(base_api.BaseApiClient):
         method_id=u'logging.organizations.logs.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
+        query_params=[u'pageSize', u'pageToken', u'resourceNames'],
         relative_path=u'v2/{+parent}/logs',
         request_field='',
         request_type_name=u'LoggingOrganizationsLogsListRequest',
@@ -2190,6 +2191,60 @@ class LoggingV2(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def GetCmekSettings(self, request, global_params=None):
+      r"""Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+
+      Args:
+        request: (LoggingOrganizationsGetCmekSettingsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (CmekSettings) The response message.
+      """
+      config = self.GetMethodConfig('GetCmekSettings')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetCmekSettings.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/organizations/{organizationsId}/cmekSettings',
+        http_method=u'GET',
+        method_id=u'logging.organizations.getCmekSettings',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v2/{+name}/cmekSettings',
+        request_field='',
+        request_type_name=u'LoggingOrganizationsGetCmekSettingsRequest',
+        response_type_name=u'CmekSettings',
+        supports_download=False,
+    )
+
+    def UpdateCmekSettings(self, request, global_params=None):
+      r"""Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information.
+
+      Args:
+        request: (LoggingOrganizationsUpdateCmekSettingsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (CmekSettings) The response message.
+      """
+      config = self.GetMethodConfig('UpdateCmekSettings')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateCmekSettings.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/organizations/{organizationsId}/cmekSettings',
+        http_method=u'PATCH',
+        method_id=u'logging.organizations.updateCmekSettings',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'v2/{+name}/cmekSettings',
+        request_field=u'cmekSettings',
+        request_type_name=u'LoggingOrganizationsUpdateCmekSettingsRequest',
+        response_type_name=u'CmekSettings',
+        supports_download=False,
+    )
+
   class ProjectsExclusionsService(base_api.BaseApiService):
     """Service class for the projects_exclusions resource."""
 
@@ -2373,7 +2428,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
+      r"""Deletes a bucket. All views and logs in the bucket are deleted. If the bucket is non-empty and locked, FAILED_PRECONDITION will be returned. If the bucket has a sink in the same project pointing to it, FAILED_PRECONDITION will be returned.
 
       Args:
         request: (LoggingProjectsLocationsBucketsDeleteRequest) input message
@@ -2454,7 +2509,7 @@ class LoggingV2(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
+      r"""Updates a bucket. This method replaces the following fields in the existing bucket with values from the new bucket: retention_periodIf the retention period is decreased and the bucket is locked, FAILED_PRECONDITION will be returned.If the bucket has a LifecycleState of DELETE_REQUESTED, FAILED_PRECONDITION will be returned.A buckets region may not be modified after it is created.
 
       Args:
         request: (LoggingProjectsLocationsBucketsPatchRequest) input message
@@ -2546,7 +2601,7 @@ class LoggingV2(base_api.BaseApiClient):
         method_id=u'logging.projects.logs.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
+        query_params=[u'pageSize', u'pageToken', u'resourceNames'],
         relative_path=u'v2/{+parent}/logs',
         request_field='',
         request_type_name=u'LoggingProjectsLogsListRequest',
@@ -3023,5 +3078,69 @@ class LoggingV2(base_api.BaseApiClient):
         request_field=u'logSink',
         request_type_name=u'LoggingSinksUpdateRequest',
         response_type_name=u'LogSink',
+        supports_download=False,
+    )
+
+  class V2Service(base_api.BaseApiService):
+    """Service class for the v2 resource."""
+
+    _NAME = u'v2'
+
+    def __init__(self, client):
+      super(LoggingV2.V2Service, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetCmekSettings(self, request, global_params=None):
+      r"""Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+
+      Args:
+        request: (LoggingGetCmekSettingsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (CmekSettings) The response message.
+      """
+      config = self.GetMethodConfig('GetCmekSettings')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetCmekSettings.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/{v2Id}/{v2Id1}/cmekSettings',
+        http_method=u'GET',
+        method_id=u'logging.getCmekSettings',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v2/{+name}/cmekSettings',
+        request_field='',
+        request_type_name=u'LoggingGetCmekSettingsRequest',
+        response_type_name=u'CmekSettings',
+        supports_download=False,
+    )
+
+    def UpdateCmekSettings(self, request, global_params=None):
+      r"""Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information.
+
+      Args:
+        request: (LoggingUpdateCmekSettingsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (CmekSettings) The response message.
+      """
+      config = self.GetMethodConfig('UpdateCmekSettings')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateCmekSettings.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v2/{v2Id}/{v2Id1}/cmekSettings',
+        http_method=u'PATCH',
+        method_id=u'logging.updateCmekSettings',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'v2/{+name}/cmekSettings',
+        request_field=u'cmekSettings',
+        request_type_name=u'LoggingUpdateCmekSettingsRequest',
+        response_type_name=u'CmekSettings',
         supports_download=False,
     )

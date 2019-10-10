@@ -11,7 +11,7 @@ gcloud alpha remote\-build\-execution worker\-pools create \- create a worker po
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-reserved\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR;\ default="public"] [\fB\-\-reserved\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -66,12 +66,20 @@ Number of workers that should be in the worker pool.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR; default=200
 Size of the disk, in Gb, for each worker. Defaults to 200Gb.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR; default="n1\-standard\-2"
@@ -86,9 +94,42 @@ Minimum CPU platform for the workers. For more information see
 https://cloud.google.com/compute/docs/cpu\-platforms.
 
 .TP 2m
+\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR; default="public"
+Level of network access available to the pool. \fINETWORK_ACCESS\fR must be one
+of:
+
+.RS 2m
+.TP 2m
+\fBprivate\fR
+Workers can only connect to Google APIs and services.
+
+.TP 2m
+\fBpublic\fR
+Workers can connect to the public internet.
+
+.TP 2m
+\fBrestricted\-private\fR
+Workers can only connect to Google APIs that are reachable through
+\f5restricted.googleapis.com\fR (\f5199.36.153.4/30\fR).
+
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-reserved\fR
 Determines the type of VM to use. If set then reserved VMs are used, otherwise
 preemptable VMs are used.
+
+.TP 2m
+\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR
+Number of the guest accelerator cards attached to each VM in the pool.
+
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR
+Type of accelerator to attach to each VM in the pool, e.g. 'nvidia\-tesla\-k80'
+for nVidia Tesla K80. Run \f5gcloud compute accelerator\-types list\fR to learn
+about all available accelerator types.
 
 
 .RE
@@ -139,7 +180,6 @@ $ gcloud alpha remote\-build\-execution worker\-pools create \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

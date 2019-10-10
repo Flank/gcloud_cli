@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute commitments create COMMITMENT --plan=PLAN
         (--resources=[local-ssd=LOCAL-SSD],[memory=MEMORY],[vcpu=VCPU]
-          : --resources-accelerator=[count=COUNT],[type=TYPE])
-        [--region=REGION]
+          --resources-accelerator=[count=COUNT],[type=TYPE]) [--region=REGION]
+        [--type=TYPE; default="general-purpose"]
         [--reservations-from-file=RESERVATIONS_FROM_FILE
           | [--reservation=RESERVATION : --reservation-zone=RESERVATION_ZONE
           --accelerator=[count=COUNT],[type=TYPE]
@@ -26,11 +26,12 @@ REQUIRED FLAGS
      --plan=PLAN
         Duration of the commitment. PLAN must be one of: 12-month, 36-month.
 
-     Manage the commitment for particular resources. This must be specified.
+     Manage the commitment for particular resources. At least one of these must
+     be specified:
 
        --resources=[local-ssd=LOCAL-SSD],[memory=MEMORY],[vcpu=VCPU]
-          Resources to be included in the commitment, the ratio between number
-          of vCPU cores and memory must conform to limits described at:
+          Resources to be included in the commitment. The ratio between the
+          number of vCPU cores and memory must conform to limits described at:
           https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#specifications.
        memory
           The size of the memory, should include units (e.g. 3072MB or 9GB). If
@@ -38,9 +39,7 @@ REQUIRED FLAGS
        vcpu
           The number of the vCPU cores.
        local-ssd
-          The size of local SSD. This flag must be specified if any of the
-          other arguments in this group are specified.
-
+          The size of local SSD.
        --resources-accelerator=[count=COUNT],[type=TYPE]
           Manage the configuration of the type and number of accelerator cards
           to include in the commitment.
@@ -71,6 +70,12 @@ OPTIONAL FLAGS
 
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
+
+     --type=TYPE; default="general-purpose"
+        Type of commitment. memory-optimized indicates that the commitment is
+        for memory-optimized VMs. TYPE must be one of: compute-optimized,
+        general-purpose, general-purpose-e2, general-purpose-n2,
+        general-purpose-n2d, memory-optimized.
 
      Manage the reservations to be created with the commitment. At most one of
      these may be specified:

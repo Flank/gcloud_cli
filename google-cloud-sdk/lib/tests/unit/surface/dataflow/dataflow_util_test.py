@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,12 +22,22 @@ from googlecloudsdk.api_lib.dataflow import exceptions
 from googlecloudsdk.command_lib.dataflow import dataflow_util
 from tests.lib import test_case
 from tests.lib.apitools import http_error
+from tests.lib.calliope import util
 from tests.lib.surface.dataflow import base
 
 ERROR = http_error.MakeHttpError(404, 'Not Found')
 
 
-class DataflowUtilTest(base.DataflowMockingTestBase):
+class _BaseDataflowHelpersTest(base.DataflowMockingTestBase):
+
+  def SetUp(self):
+    parser = util.ArgumentParser()
+    parser.add_argument(
+        '--region', help='The region ID of the job\'s regional endpoint.')
+    self.parser = parser
+
+
+class DataflowUtilTest(_BaseDataflowHelpersTest):
 
   def testGetErrorMessage(self):
     self.assertEqual('Not Found', dataflow_util.GetErrorMessage(ERROR))
@@ -99,6 +109,14 @@ class DataflowUtilTest(base.DataflowMockingTestBase):
         exceptions.ServiceException,
         'Failed operation: Not Found'):
       next(wrapper)
+
+  def testGetRegion(self):
+    args = self.parser.parse_args(['--region=not-us-central1'])
+    self.assertEqual('not-us-central1', dataflow_util.GetRegion(args))
+
+  def testGetRegionEmpty(self):
+    args = self.parser.parse_args(['--region='])
+    self.assertEqual('us-central1', dataflow_util.GetRegion(args))
 
 
 if __name__ == '__main__':

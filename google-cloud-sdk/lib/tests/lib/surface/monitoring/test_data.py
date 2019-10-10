@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
 # limitations under the License.
 """`gcloud monitoring policies update` command."""
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
+
 ALERT_POLICY = """\
 {
     "displayName": "Instance health",
@@ -35,6 +38,27 @@ ALERT_POLICY = """\
                         "perSeriesAligner": "ALIGN_MEAN"
                     }
                 ],
+                "comparison": "COMPARISON_GT",
+                "duration": "900s",
+                "filter": 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"',
+                "thresholdValue": 0.9,
+                "trigger": {
+                    "count": 1
+                }
+            }
+        }
+    ],
+}
+"""
+
+ALERT_POLICY_NO_AGGREGATIONS = """\
+{
+    "displayName": "Instance health",
+    "combiner": "OR",
+    "conditions": [
+        {
+            "displayName": "CPU usage is extremely high",
+            "conditionThreshold": {
                 "comparison": "COMPARISON_GT",
                 "duration": "900s",
                 "filter": 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"',

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,15 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from collections import OrderedDict
+import collections
 
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 
-# TODO(b/130816096): Clean up when large IA bandwidth API is promoted to Beta
-_BANDWIDTH_CHOICES_ALPHA = OrderedDict([
+_BANDWIDTH_CHOICES = collections.OrderedDict([
     ('50m', '50 Mbit/s'),
     ('100m', '100 Mbit/s'),
     ('200m', '200 Mbit/s'),
@@ -39,33 +38,6 @@ _BANDWIDTH_CHOICES_ALPHA = OrderedDict([
     ('10g', '10 Gbit/s'),
     ('20g', '20 Gbit/s'),
     ('50g', '50 Gbit/s'),
-])
-
-# TODO(b/130817246): Clean up when large IA bandwidth API is promoted to GA
-_BANDWIDTH_CHOICES_BETA = OrderedDict([
-    ('50m', '50 Mbit/s'),
-    ('100m', '100 Mbit/s'),
-    ('200m', '200 Mbit/s'),
-    ('300m', '300 Mbit/s'),
-    ('400m', '400 Mbit/s'),
-    ('500m', '500 Mbit/s'),
-    ('1g', '1 Gbit/s'),
-    ('2g', '2 Gbit/s'),
-    ('5g', '5 Gbit/s'),
-    ('10g', '10 Gbit/s'),
-])
-
-_BANDWIDTH_CHOICES_GA = OrderedDict([
-    ('50m', '50 Mbit/s'),
-    ('100m', '100 Mbit/s'),
-    ('200m', '200 Mbit/s'),
-    ('300m', '300 Mbit/s'),
-    ('400m', '400 Mbit/s'),
-    ('500m', '500 Mbit/s'),
-    ('1g', '1 Gbit/s'),
-    ('2g', '2 Gbit/s'),
-    ('5g', '5 Gbit/s'),
-    ('10g', '10 Gbit/s'),
 ])
 
 _EDGE_AVAILABILITY_DOMAIN_CHOICES = {
@@ -151,22 +123,16 @@ def AddAdminEnabled(parser, default_behavior=True, update=False):
       '--enable-admin', action='store_true', default=None, help=help_text)
 
 
-def AddBandwidth(parser, required, track):
+def AddBandwidth(parser, required):
   """Adds bandwidth flag to the argparse.ArgumentParser."""
   help_text = """\
       Provisioned capacity of the attachment.
       """
-  if track == base.ReleaseTrack.ALPHA:
-    choices = _BANDWIDTH_CHOICES_ALPHA
-  elif track == base.ReleaseTrack.BETA:
-    choices = _BANDWIDTH_CHOICES_BETA
-  else:
-    choices = _BANDWIDTH_CHOICES_GA
+  choices = _BANDWIDTH_CHOICES
 
   base.ChoiceArgument(
       '--bandwidth',
       # TODO(b/80311900): use arg_parsers.BinarySize()
-      # and deprecate the proto enum names
       choices=choices,
       required=required,
       help_str=help_text).AddToParser(parser)
@@ -278,3 +244,24 @@ def AddCandidateSubnets(parser):
       one of the candidate subnets. The request will fail if all /29s within the
       candidate subnets are in use at Google's edge.""",
       default=[])
+
+
+def AddDryRun(parser):
+  """Adds dry-run flag to the argparse.ArgumentParser."""
+  parser.add_argument(
+      '--dry-run',
+      default=None,
+      action='store_true',
+      help='If supplied, validates the attachment without creating it.')
+
+
+def AddMtu(parser):
+  """Adds mtu flag to the argparse.ArgumentParser."""
+  parser.add_argument(
+      '--mtu',
+      type=int,
+      help="""\
+      Maximum transmission unit(MTU) is the size of the largest frame passing
+      through this interconnect attachment. Only 1440 and 1500 are allowed.
+      If not specified, the value will default to 1440.
+      """)

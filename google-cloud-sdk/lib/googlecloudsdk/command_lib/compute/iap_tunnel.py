@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,7 +87,6 @@ class SshTunnelArgs(object):
     project: str, the project id (string with dashes).
     zone: str, the zone name.
     instance: str, the instance name.
-    interface: str, the interface name.
     pass_through_args: [str], additional args to be passed to the inner gcloud.
   """
 
@@ -96,12 +95,10 @@ class SshTunnelArgs(object):
     self.project = ''
     self.zone = ''
     self.instance = ''
-    self.interface = ''
     self.pass_through_args = []
 
   @staticmethod
-  def FromArgs(args, track, instance_ref, internal_interface,
-               external_interface):
+  def FromArgs(args, track, instance_ref, external_interface):
     """Construct an SshTunnelArgs from command line args and values.
 
     Args:
@@ -109,7 +106,6 @@ class SshTunnelArgs(object):
         AddSshTunnelArgs called.
       track: ReleaseTrack, The currently running release track.
       instance_ref: The target instance reference object.
-      internal_interface: The internal interface of target resource object.
       external_interface: The external interface of target resource object, if
         available, otherwise None.
     Returns:
@@ -141,7 +137,6 @@ class SshTunnelArgs(object):
     res.project = instance_ref.project
     res.zone = instance_ref.zone
     res.instance = instance_ref.instance
-    res.interface = internal_interface.name
 
     # The tunnel_through_iap attribute existed, so these must too.
     if args.IsSpecified('iap_tunnel_url_override'):
@@ -158,7 +153,6 @@ class SshTunnelArgs(object):
         self.project,
         self.zone,
         self.instance,
-        self.interface,
         self.pass_through_args,
     )
 
@@ -265,18 +259,20 @@ class _StdinSocket(object):
     """Receives data from stdin.
 
     Blocks until at least 1 byte is available.
-    This will not be unblocked by close(). To unblock this have a signal handler
-    trigger an exception.
+    On Unix (but not Windows) this is unblocked by close() and shutdown(RD).
+    On all platforms a signal handler triggering an exception will unblock this.
     This cannot be called by multiple threads at the same time.
     This function performs cleanups before returning, so killing gcloud while
     this is running should be avoided. Specifically RaisesKeyboardInterrupt
-    should be in effect so that ctrl+c causes a clean exit with an exception
+    should be in effect so that ctrl-c causes a clean exit with an exception
     instead of triggering gcloud's default os.kill().
 
     Args:
       bufsize: The maximum number of bytes to receive. Must be positive.
     Returns:
       The bytes received. EOF is indicated by b''.
+    Raises:
+      IOError: On low level errors.
     """
     if platforms.OperatingSystem.IsWindows():
       return self._RecvWindows(bufsize)
@@ -302,6 +298,8 @@ class _StdinSocket(object):
       bufsize: The maximum number of bytes to receive. Must be positive.
     Returns:
       The bytes received. EOF is indicated by b''.
+    Raises:
+      socket.error: On low level errors.
     """
     # On Windows the way to quickly read without unnecessary blocking is
     # to directly call ReadFile().
@@ -327,6 +325,8 @@ class _StdinSocket(object):
     Returns:
       The bytes received. EOF is indicated by b''. Once EOF has been indicated,
       will always indicate EOF.
+    Raises:
+      IOError: On low level errors.
     """
     # On Unix, the way to quickly read bytes without unnecessary blocking
     # is to make stdin non-blocking. To ensure at least 1 byte is received, we
@@ -351,6 +351,7 @@ class _StdinSocket(object):
       The bytes read. b'' means no data is available.
     Raises:
       _StdinSocket._EOFError: to indicate EOF.
+      IOError: On low level errors.
     """
     # In python 3, we need to read stdin in a binary way, not a text way to
     # read bytes instead of str. In python 2, binary mode vs text mode only
@@ -405,6 +406,7 @@ class _BaseIapTunnelHelper(object):
     self._port = port
     self._iap_tunnel_url_override = args.iap_tunnel_url_override
     self._ignore_certs = args.iap_tunnel_insecure_disable_websocket_cert_check
+    # Means that a ctrl-c was seen in server mode (never true in Stdin mode).
     self._shutdown = False
 
   def _InitiateWebSocketConnection(self, local_conn, get_access_token_callback):
@@ -446,6 +448,11 @@ class _BaseIapTunnelHelper(object):
       while not self._shutdown:
         data = conn.recv(utils.SUBPROTOCOL_MAX_DATA_FRAME_SIZE)
         if not data:
+          # When we recv an EOF, we notify the websocket_conn of it, then we
+          # wait for all data to send before returning.
+          websocket_conn.LocalEOF()
+          if not websocket_conn.WaitForAllSent():
+            log.warning('Failed to send all data from [%s].', socket_address)
           break
         websocket_conn.Send(data)
     finally:
@@ -477,7 +484,7 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
     self._connections = []
 
   def __del__(self):
-    self._CloseServerSocket()
+    self._CloseServerSockets()
 
   def StartProxyServer(self):
     """Start accepting connections."""
@@ -493,7 +500,7 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
     except KeyboardInterrupt:
       log.info('Keyboard interrupt received.')
     finally:
-      self._CloseServerSocket()
+      self._CloseServerSockets()
 
     self._shutdown = True
     self._CloseClientConnections()
@@ -507,9 +514,9 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
 
   def _AcceptNewConnection(self):
     """Accept a new socket connection and start a new WebSocket tunnel."""
-    # Python socket accept() on Windows does not get interrupted by ctrl-C
+    # Python socket accept() on Windows does not get interrupted by ctrl-c
     # To work around that, use select() with a timeout before the accept()
-    # which allows for the ctrl-C to be noticed and abort the process as
+    # which allows for the ctrl-c to be noticed and abort the process as
     # expected.
     ready_sockets = [()]
     while not ready_sockets[0]:
@@ -524,7 +531,7 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
     new_thread.start()
     return new_thread, conn
 
-  def _CloseServerSocket(self):
+  def _CloseServerSockets(self):
     log.debug('Stopping server.')
     try:
       for server_socket in self._server_sockets:
@@ -550,7 +557,8 @@ class IapTunnelProxyServerHelper(_BaseIapTunnelHelper):
     try:
       self._RunReceiveLocalData(conn, repr(socket_address))
     except EnvironmentError as e:
-      log.info('Socket error [%s] while receiving from client.', str(e))
+      log.info('Socket error [%s] while receiving from client.',
+               six.text_type(e))
     except:  # pylint: disable=bare-except
       log.exception('Error while receiving from client.')
 

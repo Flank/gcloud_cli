@@ -6,7 +6,7 @@ summary:
 - execute:
   - command: compute project-info update --default-network-tier STANDARD
   - stderr: |
-      Updated [https://www.googleapis.com/compute/beta/projects/fake-project].
+      Updated [https://compute.googleapis.com/compute/beta/projects/fake-project].
 actions:
 - execute_command:
     command: compute project-info update --default-network-tier STANDARD
@@ -14,7 +14,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/setDefaultNetworkTier?alt=json
+          uri: https://compute.googleapis.com/compute/beta/projects/fake-project/setDefaultNetworkTier?alt=json
           method: POST
           body:
             json:
@@ -31,17 +31,17 @@ actions:
                 "name": "operation-1508278439883-55bc570a1b0fd-cdc6e1ac-c5f2fa05",
                 "operationType": "compute.projects.setDefaultNetworkTier",
                 "progress": 100,
-                "selfLink": "https://www.googleapis.com/compute/beta/projects/fake-project/global/operations/operation-1508278439883-55bc570a1b0fd-cdc6e1ac-c5f2fa05",
+                "selfLink": "https://compute.googleapis.com/compute/beta/projects/fake-project/global/operations/operation-1508278439883-55bc570a1b0fd-cdc6e1ac-c5f2fa05",
                 "startTime": "2017-10-17T15:14:00.105-07:00",
                 "status": "DONE",
                 "targetId": "516046939781",
-                "targetLink": "https://www.googleapis.com/compute/beta/projects/fake-project"
+                "targetLink": "https://compute.googleapis.com/compute/beta/projects/fake-project"
             }
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/beta/projects/fake-project].
+        Updated [https://compute.googleapis.com/compute/beta/projects/fake-project].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project?alt=json
+          uri: https://compute.googleapis.com/compute/beta/projects/fake-project?alt=json
           method: GET
           body: null
         return_response:
@@ -56,7 +56,7 @@ actions:
              "commonInstanceMetadata": {
                 "kind": "compute#metadata",
                 "fingerprint": "NYm9a8kE_8o="},
-             "selfLink": "https://www.googleapis.com/compute/beta/projects/fake-project",
+             "selfLink": "https://compute.googleapis.com/compute/beta/projects/fake-project",
              "xpnProjectStatus": "UNSPECIFIED_XPN_PROJECT_STATUS",
              "sdefaultNetworkTier": "STANDARD"
             }

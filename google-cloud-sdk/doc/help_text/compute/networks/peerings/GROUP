@@ -27,6 +27,9 @@ COMMANDS
      list
         List Google Compute Engine peerings.
 
+     update
+        Update a Google Compute Engine network peering.
+
 NOTES
     These variants are also available:
 

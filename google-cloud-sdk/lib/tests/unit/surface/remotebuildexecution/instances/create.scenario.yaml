@@ -8,7 +8,7 @@ summary:
   - stderr: |
       Create request issued for: [new_instance]
   - progress_tracker:
-    - message: Waiting for operation [create_operation_id]
+    - message: Waiting for operation [projects/fake-project/operations/create_operation_id]
         to complete
     - status: SUCCESS
   - stderr: |
@@ -62,7 +62,7 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [create_operation_id]
+        message: Waiting for operation [projects/fake-project/operations/create_operation_id]
           to complete
         status: SUCCESS
     - api_call:

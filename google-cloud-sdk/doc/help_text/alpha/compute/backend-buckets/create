@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha compute backend-buckets create BACKEND_BUCKET_NAME
         --gcs-bucket-name=GCS_BUCKET_NAME [--description=DESCRIPTION]
-        [--enable-cdn] [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
+        [--[no-]enable-cdn]
+        [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -26,10 +27,10 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the backend bucket.
 
-     --enable-cdn
+     --[no-]enable-cdn
         Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP
         responses from a backend bucket at the edge of the network, close to
-        users.
+        users. Use --enable-cdn to enable and --no-enable-cdn to disable.
 
      --signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE
         The amount of time up to which the response to a signed URL request
@@ -56,9 +57,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute backend-buckets create
         $ gcloud beta compute backend-buckets create

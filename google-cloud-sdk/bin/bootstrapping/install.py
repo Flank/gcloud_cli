@@ -106,15 +106,18 @@ def Prompts(usage_reporting):
         print("""
 To help improve the quality of this product, we collect anonymized usage data
 and anonymized stacktraces when crashes are encountered; additional information
-is available at <https://cloud.google.com/sdk/usage-statistics>. You may choose
-to opt out of this collection now (by choosing 'N' at the below prompt), or at
-any time in the future by running the following command:
+is available at <https://cloud.google.com/sdk/usage-statistics>. This data is
+handled in accordance with our privacy policy
+<https://policies.google.com/privacy>. You may choose to opt out of this
+collection now (by choosing 'N' at the below prompt), or at any time in the
+future by running the following command:
 
     gcloud config set disable_usage_reporting true
 """)
 
         usage_reporting = console_io.PromptContinue(
-            prompt_string='Do you want to help improve the Google Cloud SDK')
+            prompt_string='Do you want to help improve the Google Cloud SDK',
+            default=False)
   properties.PersistProperty(
       properties.VALUES.core.disable_usage_reporting, not usage_reporting,
       scope=properties.Scope.INSTALLATION)

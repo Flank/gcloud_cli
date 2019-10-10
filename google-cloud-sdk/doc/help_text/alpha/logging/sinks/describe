@@ -4,7 +4,8 @@ NAME
 SYNOPSIS
     gcloud alpha logging sinks describe SINK_NAME
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
-          | --organization=ORGANIZATION_ID] [GCLOUD_WIDE_FLAG ...]
+          | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Displays information about a sink.
@@ -25,6 +26,20 @@ FLAGS
        --organization=ORGANIZATION_ID
           Describe a sink associated with this organization.
 
+       --project=PROJECT_ID
+          Describe a sink associated with this project.
+
+          The Google Cloud Platform project name to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -35,9 +50,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud logging sinks describe
         $ gcloud beta logging sinks describe

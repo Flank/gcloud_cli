@@ -44,6 +44,12 @@ COMMANDS
      describe
         (BETA) Show metadata for a service account from a project.
 
+     disable
+        (BETA) Disable an IAM service account.
+
+     enable
+        (BETA) Enable an IAM service account.
+
      get-iam-policy
         (BETA) Get the IAM policy for a service account.
 
@@ -61,6 +67,9 @@ COMMANDS
 
      sign-jwt
         (BETA) Sign a JWT with a managed service account key.
+
+     undelete
+        (BETA) Undelete a service account for a project.
 
      update
         (BETA) Update an IAM service account.

@@ -11,7 +11,7 @@ gcloud alpha builds triggers create cloud\-source\-repositories \- create a buil
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds triggers create cloud\-source\-repositories\fR (\fB\-\-trigger_config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\fR=\fIREPO\fR\ (\fB\-\-branch_pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag_pattern\fR=\fIREGEX\fR)\ (\fB\-\-build_config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile_dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile_image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-ignored_files\fR=[\fIGLOB\fR,...]\ \fB\-\-included_files\fR=[\fIGLOB\fR,...]]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds triggers create cloud\-source\-repositories\fR (\fB\-\-trigger\-config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\fR=\fIREPO\fR\ (\fB\-\-branch\-pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag\-pattern\fR=\fIREGEX\fR)\ (\fB\-\-build\-config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile\-dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile\-image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-ignored\-files\fR=[\fIGLOB\fR,...]\ \fB\-\-included\-files\fR=[\fIGLOB\fR,...]]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,7 +30,7 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-trigger_config\fR=\fIPATH\fR
+\fB\-\-trigger\-config\fR=\fIPATH\fR
 Path to a YAML or JSON file containing the trigger configuration.
 
 For more details, see:
@@ -57,11 +57,15 @@ ID of the repo or fully qualified identifier for the repo.
 .RE
 .sp
 .TP 2m
-\fB\-\-ignored_files\fR=[\fIGLOB\fR,...]
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Build trigger description.
+
+.TP 2m
+\fB\-\-ignored\-files\fR=[\fIGLOB\fR,...]
 Glob filter. Changes only affecting ignored files won't trigger builds.
 
 .TP 2m
-\fB\-\-included_files\fR=[\fIGLOB\fR,...]
+\fB\-\-included\-files\fR=[\fIGLOB\fR,...]
 Glob filter. Changes affecting at least one included file will trigger builds.
 
 .TP 2m
@@ -70,7 +74,7 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-branch_pattern\fR=\fIREGEX\fR
+\fB\-\-branch\-pattern\fR=\fIREGEX\fR
 A regular expression specifying which git branches to match.
 
 This pattern is used as a regex search for any incoming pushes. For example,
@@ -81,7 +85,7 @@ The syntax of the regular expressions accepted is the syntax accepted by RE2 and
 described at https://github.com/google/re2/wiki/Syntax.
 
 .TP 2m
-\fB\-\-tag_pattern\fR=\fIREGEX\fR
+\fB\-\-tag\-pattern\fR=\fIREGEX\fR
 A regular expression specifying which git tags to match.
 
 This pattern is used as a regex search for any incoming pushes. For example,
@@ -104,7 +108,7 @@ Build file configuration flags
 
 .RS 2m
 .TP 2m
-\fB\-\-build_config\fR=\fIPATH\fR
+\fB\-\-build\-config\fR=\fIPATH\fR
 Path to a YAML or JSON file containing the build configuration in the
 repository.
 
@@ -150,13 +154,13 @@ specified file.
 The filename is relative to the Dockerfile directory.
 
 .TP 2m
-\fB\-\-dockerfile_dir\fR=\fIDOCKERFILE_DIR\fR; default="/"
+\fB\-\-dockerfile\-dir\fR=\fIDOCKERFILE_DIR\fR; default="/"
 Location of the directory containing the Dockerfile in the repository.
 
 The directory will also be used as the Docker build context.
 
 .TP 2m
-\fB\-\-dockerfile_image\fR=\fIDOCKERFILE_IMAGE\fR
+\fB\-\-dockerfile\-image\fR=\fIDOCKERFILE_IMAGE\fR
 Docker image name to build.
 
 If not specified, gcr.io/PROJECT/github.com/REPO_OWNER/REPO_NAME:$COMMIT_SHA
@@ -183,11 +187,26 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To create a push trigger for all branches:
+
+.RS 2m
+$ gcloud alpha builds triggers create cloud\-source\-repositories \e
+    \-\-repo="my\-repo" \-\-branch\-pattern=".*" \e
+    \-\-build\-config="cloudbuild.yaml"
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta builds triggers create cloud\-source\-repositories
+.RE
 

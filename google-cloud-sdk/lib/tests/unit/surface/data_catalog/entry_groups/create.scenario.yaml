@@ -1,0 +1,60 @@
+title: Data Catalog create entry group scenario test.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog entry-groups create group1 --location=us-central1
+  - stderr: |
+      Created entry group [group1].
+- execute:
+  - command: data-catalog entry-groups create group1 --location=us-central1 --display-name="group
+      1" --description="description 1"
+  - stderr: |
+      Created entry group [group1].
+actions:
+- execute_command:
+    command: data-catalog entry-groups create group1 --location=us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups?alt=json&entryGroupId=group1
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            dataCatalogTimestamps:
+              createTime: '2019-03-10T19:29:15.376Z'
+              updateTime: '2019-03-10T19:29:15.376Z'
+    - expect_stderr: |
+        Created entry group [group1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog entry-groups create group1 --location=us-central1 --display-name="group
+      1" --description="description 1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/entryGroups?alt=json&entryGroupId=group1
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: description 1
+              displayName: group 1
+        return_response:
+          headers:
+            status: '200'
+          body:
+            dataCatalogTimestamps:
+              createTime: '2019-03-10T19:31:41.877Z'
+              updateTime: '2019-03-10T19:31:41.877Z'
+            description: description 1
+            displayName: group 1
+    - expect_stderr: |
+        Created entry group [group1].
+    - expect_exit:
+        code: 0

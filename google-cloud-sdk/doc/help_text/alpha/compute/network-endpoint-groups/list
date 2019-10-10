@@ -3,16 +3,47 @@ NAME
         Engine network endpoint groups
 
 SYNOPSIS
-    gcloud alpha compute network-endpoint-groups list [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute network-endpoint-groups list [NAME ...]
+        [--regexp=REGEXP, -r REGEXP] [--global | --zones=[ZONE,...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute network-endpoint-groups list displays all
     Google Compute Engine network endpoint groups in a project.
 
-    By default, network endpoint groups from all zones are listed. The results
-    can be narrowed down using a filter: --filter="zone:( ZONE ... )".
+    By default, global network endpoint groups and network endpoint groups from
+    all zones are listed. The results can be narrowed down by providing the
+    --global or --zones flag.
+
+POSITIONAL ARGUMENTS
+     [NAME ...]
+        (DEPRECATED) If provided, show details for the specified names and/or
+        URIs of resources.
+
+        Argument NAME is deprecated. Use --filter="name=( 'NAME' ... )"
+        instead.
+
+FLAGS
+     --regexp=REGEXP, -r REGEXP
+        (DEPRECATED) Regular expression to filter the names of the results on.
+        Any names that do not match the entire regular expression will be
+        filtered out.
+
+        Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, only global resources are shown.
+
+       --zones=[ZONE,...]
+          (DEPRECATED) If provided, only zonal resources are shown. If
+          arguments are provided, only resources from the given zones are
+          shown.
+
+          Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
+          For example --filter="zone:( europe-west1-b europe-west1-c )".
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -59,18 +90,21 @@ EXAMPLES
 
         $ gcloud alpha compute network-endpoint-groups list --uri
 
-    To list all network endpoint groups in the us-central1-b and europe-west1-d
-    zones, run:
+    To list all global network endpoint groups in a project, run:
+
+        $ gcloud alpha compute network-endpoint-groups list --global
+
+    To list all network endpoint groups in zones us-central1-b and
+    europe-west1-d, given they are zonal resources, run:
 
         $ gcloud alpha compute network-endpoint-groups list \
-            --filter="zone:( us-central1-b europe-west1-d )"
+            --filter="zone:( europe-west1-d us-central1-b )"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute network-endpoint-groups list
         $ gcloud beta compute network-endpoint-groups list

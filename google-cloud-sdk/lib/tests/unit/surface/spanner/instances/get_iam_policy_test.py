@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,25 +19,21 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class GetIamPolicyTest(base.SpannerTestBase):
+class GetIamPolicyTestGA(base.SpannerTestBase):
 
   def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
     self.instance_ref = resources.REGISTRY.Parse(
         'insId',
         params={'projectsId': self.Project()},
         collection='spanner.projects.instances')
 
-  def testGetIamPolicy(self, track):
-    self.track = track
+  def testGetIamPolicy(self):
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
@@ -50,14 +46,17 @@ class GetIamPolicyTest(base.SpannerTestBase):
         version=1)
     self.client.projects_instances.GetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesGetIamPolicyRequest(
-            resource=self.instance_ref.RelativeName()),
+            resource=self.instance_ref.RelativeName(),
+            getIamPolicyRequest=self.msgs.GetIamPolicyRequest(
+                options=self.msgs.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
         response=test_iam_policy)
     get_policy_request = self.Run(
         'spanner instances get-iam-policy insId')
     self.assertEqual(get_policy_request, test_iam_policy)
 
-  def testListCommandFilter(self, track):
-    self.track = track
+  def testListCommandFilter(self):
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
@@ -70,7 +69,11 @@ class GetIamPolicyTest(base.SpannerTestBase):
         version=1)
     self.client.projects_instances.GetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesGetIamPolicyRequest(
-            resource=self.instance_ref.RelativeName()),
+            resource=self.instance_ref.RelativeName(),
+            getIamPolicyRequest=self.msgs.GetIamPolicyRequest(
+                options=self.msgs.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
         response=test_iam_policy)
     self.Run("""
         spanner instances get-iam-policy insId
@@ -79,3 +82,16 @@ class GetIamPolicyTest(base.SpannerTestBase):
         --format=table[no-heading](bindings.members:sort=1)
         """)
     self.AssertOutputEquals('user:admin@foo.com\n')
+
+
+class GetIamPolicyTestBeta(GetIamPolicyTestGA):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class GetIamPolicyTestAlpha(GetIamPolicyTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+

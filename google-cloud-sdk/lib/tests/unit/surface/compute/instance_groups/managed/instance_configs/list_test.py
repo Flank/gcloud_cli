@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,19 +54,10 @@ class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
     return self.messages.PreservedState.MetadataValue.AdditionalProperty(
         key=key, value=value)
 
-  def MakePerInstanceConfig(self, instance, override_disks, override_metadata,
-                            override_origin):
-    disk_overrides = []
+  def MakePerInstanceConfig(self, name, preserved_disks,
+                            preserved_metadata):
     preserved_state_disks = []
-    for override_disk in override_disks:
-      disk_overrides.append(
-          self.messages.ManagedInstanceOverrideDiskOverride(
-              deviceName=override_disk['device_name'],
-              source=override_disk['source'],
-              mode=self.messages.ManagedInstanceOverrideDiskOverride\
-              .ModeValueValuesEnum(override_disk['mode']),
-          )
-      )
+    for override_disk in preserved_disks:
       preserved_state_disks.append(
           self._MakePreservedStateDiskMapEntry(
               device_name=override_disk['device_name'],
@@ -74,25 +65,13 @@ class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
               mode=override_disk['mode']
           )
       )
-    metadata_overrides = [
-        self.messages.ManagedInstanceOverride.MetadataValueListEntry(
-            key=metadata['key'], value=metadata['value'])
-        for metadata in override_metadata
-    ]
     preserved_state_metadata = [
         self._MakePreservedStateMetadataMapEntry(
             key=metadata['key'], value=metadata['value'])
-        for metadata in override_metadata
+        for metadata in preserved_metadata
     ]
     return self.messages.PerInstanceConfig(
-        instance=instance,
-        name=instance.rsplit('/', 1)[-1],
-        override=self.messages.ManagedInstanceOverride(
-            disks=disk_overrides,
-            metadata=metadata_overrides,
-            origin=self.messages.ManagedInstanceOverride.OriginValueValuesEnum(
-                override_origin),
-        ),
+        name=name,
         preservedState=self.messages.PreservedState(
             disks=self.messages.PreservedState.DisksValue(
                 additionalProperties=preserved_state_disks
@@ -120,7 +99,7 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
     prefix = '{0}/projects/my-project/'.format(self.compute_uri)
     return [
         self.MakePerInstanceConfig(
-            prefix + 'zones/us-central1-a/instances/inst-0001', [
+            'inst-0001', [
                 {
                     'device_name': 'my-disk-1',
                     'source': prefix + 'zones/us-central1-a/disks/inst-0001-1',
@@ -140,9 +119,13 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
                     'key': 'key-foo',
                     'value': 'value foo'
                 },
-            ], 'AUTO_GENERATED'),
+                {
+                    'key': 'key3',
+                    'value': 'value3'
+                },
+            ]),
         self.MakePerInstanceConfig(
-            prefix + 'zones/us-central1-a/instances/inst-0002', [
+            'inst-0002', [
                 {
                     'device_name': 'my-disk-1',
                     'source': prefix + 'zones/us-central1-a/disks/inst-0002-1',
@@ -153,9 +136,9 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
                     'source': prefix + 'zones/us-central1-a/disks/inst-0002-2',
                     'mode': 'READ_ONLY'
                 },
-            ], [], 'AUTO_GENERATED'),
+            ], []),
         self.MakePerInstanceConfig(
-            prefix + 'zones/us-central1-a/instances/custom-inst-0003', [
+            'custom-inst-0003', [
                 {
                     'device_name':
                         'my-custom-disk-1',
@@ -164,7 +147,7 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
                     'mode':
                         'READ_ONLY'
                 },
-            ], [], 'USER_PROVIDED'),
+            ], []),
     ]
 
   def testListInstanceConfigs(self):
@@ -183,39 +166,25 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
     self.AssertOutputMatches(
         """\
         ---
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
         name: inst-0001
-        override:
-          disks:
-          - deviceName: my-disk-1
-            mode: READ_WRITE
-            source: {compute_uri}/projects/my-project/zones/us-central1-a/disks/inst-0001-1
-          - deviceName: my-disk-2
-            mode: READ_ONLY
-            source: {compute_uri}/projects/my-project/zones/us-central1-a/disks/inst-0001-2
-          metadata:
-          - key: key-BAR
-            value: value BAR
-          - key: key-foo
-            value: value foo
-          origin: AUTO_GENERATED
         preservedState:
           disks:
             my-disk-1:
               autoDelete: NEVER
               mode: READ_WRITE
-              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
+              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
             my-disk-2:
               autoDelete: NEVER
               mode: READ_ONLY
-              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
+              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
           metadata:
             key-BAR: value BAR
             key-foo: value foo
+            key3: value3
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0002
+        name: inst-0002
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/custom-inst-0003
+        name: custom-inst-0003
         .*
         """.format(compute_uri=self.compute_uri),
         normalize_space=True)
@@ -234,38 +203,19 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
                          'ListPerInstanceConfigs', request)])
 
     self.AssertOutputContains("""\
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
+        name: inst-0001
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains("""\
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0002
+        name: inst-0002
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains("""\
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/custom-inst-0003
-        """.format(compute_uri=self.compute_uri), normalize_space=True)
-
-  def testListInstanceConfigsUriOutput(self):
-    self.Run("""
-        compute instance-groups managed instance-configs list
-        group-a --zone us-central1-a --uri
-        """)
-    request = (
-        self.messages.ComputeInstanceGroupManagersListPerInstanceConfigsRequest(
-            instanceGroupManager='group-a',
-            project='my-project',
-            zone='us-central1-a'))
-    self.CheckRequests([(self.compute.instanceGroupManagers,
-                         'ListPerInstanceConfigs', request)])
-
-    self.AssertOutputEquals("""\
-        {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
-        {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0002
-        {compute_uri}/projects/my-project/zones/us-central1-a/instances/custom-inst-0003
+        name: custom-inst-0003
         """.format(compute_uri=self.compute_uri), normalize_space=True)
 
   def testListInstanceConfigsSortedOutput(self):
     self.Run("""
         compute instance-groups managed instance-configs list
-        group-a --zone us-central1-a --sort-by ~instance
+        group-a --zone us-central1-a --sort-by ~name
         """)
     request = (
         self.messages.ComputeInstanceGroupManagersListPerInstanceConfigsRequest(
@@ -277,18 +227,18 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
 
     self.AssertOutputMatches("""\
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0002
+        name: inst-0002
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
+        name: inst-0001
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/custom-inst-0003
+        name: custom-inst-0003
         .*
         """.format(compute_uri=self.compute_uri), normalize_space=True)
 
   def testListInstanceConfigsWithFilter(self):
     self.Run("""
         compute instance-groups managed instance-configs list
-        group-a --zone us-central1-a --filter "override.origin = USER_PROVIDED"
+        group-a --zone us-central1-a --filter "preservedState.metadata.key3 = value3"
         """)
     request = (
         self.messages.ComputeInstanceGroupManagersListPerInstanceConfigsRequest(
@@ -299,12 +249,11 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
                          'ListPerInstanceConfigs', request)])
 
     self.AssertOutputMatches("""\
-        ---
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/custom-inst-0003
+        metadata:
         .*
-        origin: USER_PROVIDED
+        key3: value3
         """.format(compute_uri=self.compute_uri), normalize_space=True)
-    self.AssertOutputNotContains('origin: AUTO_GENERATED', normalize_space=True)
+    self.AssertOutputNotContains('metadata: {}', normalize_space=True)
 
   @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
          'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
@@ -334,7 +283,7 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
     prefix = '{0}/projects/my-project/'.format(self.compute_uri)
     return [
         self.MakePerInstanceConfig(
-            prefix + 'zones/us-central1-a/instances/inst-0001', [
+            'inst-0001', [
                 {
                     'device_name': 'my-disk-1',
                     'source': prefix + 'zones/us-central1-a/disks/inst-0001-1',
@@ -354,9 +303,13 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
                     'key': 'key-foo',
                     'value': 'value foo'
                 },
-            ], 'AUTO_GENERATED'),
+                {
+                    'key': 'key3',
+                    'value': 'value3'
+                },
+            ]),
         self.MakePerInstanceConfig(
-            prefix + 'zones/us-central1-b/instances/inst-0002', [
+            'inst-0002', [
                 {
                     'device_name': 'my-disk-1',
                     'source': prefix + 'zones/us-central1-b/disks/inst-0002-1',
@@ -367,9 +320,9 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
                     'source': prefix + 'zones/us-central1-b/disks/inst-0002-2',
                     'mode': 'READ_ONLY'
                 },
-            ], [], 'AUTO_GENERATED'),
+            ], []),
         self.MakePerInstanceConfig(
-            prefix + 'zones/us-central1-b/instances/custom-inst-0003', [
+            'custom-inst-0003', [
                 {
                     'device_name':
                         'my-custom-disk-1',
@@ -378,7 +331,7 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
                     'mode':
                         'READ_ONLY'
                 },
-            ], [], 'USER_PROVIDED'),
+            ], []),
     ]
 
   def testListInstanceConfigs(self):
@@ -397,39 +350,24 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
 
     self.AssertOutputMatches("""\
         ---
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
         name: inst-0001
-        override:
-          disks:
-          - deviceName: my-disk-1
-            mode: READ_WRITE
-            source: {compute_uri}/projects/my-project/zones/us-central1-a/disks/inst-0001-1
-          - deviceName: my-disk-2
-            mode: READ_ONLY
-            source: {compute_uri}/projects/my-project/zones/us-central1-a/disks/inst-0001-2
-          metadata:
-          - key: key-BAR
-            value: value BAR
-          - key: key-foo
-            value: value foo
-          origin: AUTO_GENERATED
         preservedState:
           disks:
             my-disk-1:
               autoDelete: NEVER
               mode: READ_WRITE
-              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
+              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
             my-disk-2:
               autoDelete: NEVER
               mode: READ_ONLY
-              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
+              source: https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
           metadata:
             key-BAR: value BAR
             key-foo: value foo
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/inst-0002
+        name: inst-0002
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/custom-inst-0003
+        name: custom-inst-0003
         .*
         """.format(compute_uri=self.compute_uri), normalize_space=True)
 
@@ -448,40 +386,19 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
                          'ListPerInstanceConfigs', request)])
 
     self.AssertOutputContains("""\
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
         name: inst-0001
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains("""\
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/inst-0002
+        name: inst-0002
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains("""\
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/custom-inst-0003
-        """.format(compute_uri=self.compute_uri), normalize_space=True)
-
-  def testListInstanceConfigsUriOutput(self):
-    self.Run("""
-        compute instance-groups managed instance-configs list
-        group-a --region us-central1 --uri
-        """)
-    request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersListPerInstanceConfigsRequest(
-            instanceGroupManager='group-a',
-            project='my-project',
-            region='us-central1'))
-    self.CheckRequests([(self.compute.regionInstanceGroupManagers,
-                         'ListPerInstanceConfigs', request)])
-
-    self.AssertOutputEquals("""\
-        {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
-        {compute_uri}/projects/my-project/zones/us-central1-b/instances/inst-0002
-        {compute_uri}/projects/my-project/zones/us-central1-b/instances/custom-inst-0003
+        name: custom-inst-0003
         """.format(compute_uri=self.compute_uri), normalize_space=True)
 
   def testListInstanceConfigsSortedOutput(self):
     self.Run("""
         compute instance-groups managed instance-configs list
-        group-a --region us-central1 --sort-by ~instance
+        group-a --region us-central1 --sort-by ~name
         """)
     request = (
         self.messages.
@@ -494,18 +411,18 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
 
     self.AssertOutputMatches("""\
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/inst-0002
+        name: inst-0002
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/custom-inst-0003
+        name: inst-0001
         .*
-        instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
+        name: custom-inst-0003
         .*
         """.format(compute_uri=self.compute_uri), normalize_space=True)
 
   def testListInstanceConfigsWithFilter(self):
     self.Run("""
         compute instance-groups managed instance-configs list
-        group-a --region us-central1 --filter "override.origin = USER_PROVIDED"
+        group-a --region us-central1 --filter "preservedState.metadata.key3 = value3"
         """)
     request = (
         self.messages.
@@ -517,12 +434,11 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
                          'ListPerInstanceConfigs', request)])
 
     self.AssertOutputMatches("""\
-        ---
-        instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/custom-inst-0003
+        metadata:
         .*
-        origin: USER_PROVIDED
+        key3: value3
         """.format(compute_uri=self.compute_uri), normalize_space=True)
-    self.AssertOutputNotContains('origin: AUTO_GENERATED', normalize_space=True)
+    self.AssertOutputNotContains('metadata: {}', normalize_space=True)
 
 
 if __name__ == '__main__':

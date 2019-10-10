@@ -27,7 +27,7 @@ COMMANDS
         Describe a route.
 
      list
-        List Google Compute Engine routes.
+        List non-dynamic Google Compute Engine routes.
 
 NOTES
     These variants are also available:

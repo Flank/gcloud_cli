@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,11 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
+from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.pubsub import base
@@ -305,6 +308,24 @@ Created subscription [{}].
 Created subscription [{}].
 """.format(sub_refs[0].RelativeName(), sub_refs[1].RelativeName()))
 
+  def testSubscriptionsCreateLabels(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    labels = self.msgs.Subscription.LabelsValue(additionalProperties=[
+        self.msgs.Subscription.LabelsValue.AdditionalProperty(
+            key='key1', value='value1')])
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        labels=labels)
+
+    result = self.ExpectCreatedSubscriptions(
+        'pubsub subscriptions create subs1 --topic topic1 --labels key1=value1',
+        [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+
 
 class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
 
@@ -408,47 +429,6 @@ class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
     self.AssertErrEquals(
         'Created subscription [{}].\n'.format(sub_ref.RelativeName()))
 
-
-class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testPullSubscriptionsCreateWithLegacyOutput(self):
-    properties.VALUES.pubsub.legacy_output.Set(True)
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    req_subscription = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        ackDeadlineSeconds=180,
-        topic=topic_ref.RelativeName())
-
-    result = self.ExpectCreatedSubscriptions(
-        'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
-        [req_subscription])
-
-    self.assertEqual(result[0]['subscriptionId'], sub_ref.RelativeName())
-    self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
-    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
-
-  def testSubscriptionsCreateLabels(self):
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    labels = self.msgs.Subscription.LabelsValue(additionalProperties=[
-        self.msgs.Subscription.LabelsValue.AdditionalProperty(
-            key='key1', value='value1')])
-    req_subscription = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        topic=topic_ref.RelativeName(),
-        labels=labels)
-
-    result = self.ExpectCreatedSubscriptions(
-        'pubsub subscriptions create subs1 --topic topic1 --labels key1=value1',
-        [req_subscription])
-
-    self.assertEqual(result[0].name, sub_ref.RelativeName())
-    self.assertEqual(result[0].topic, topic_ref.RelativeName())
-
   def testSubscriptionsCreateAuthenticatedPush(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     topic_ref = util.ParseTopic('topic1', self.Project())
@@ -500,10 +480,95 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
     self.assertEqual(result[0].pushConfig.oidcToken.audience, None)
 
 
-class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest):
+class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testPullSubscriptionsCreateWithLegacyOutput(self):
+    properties.VALUES.pubsub.legacy_output.Set(True)
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        ackDeadlineSeconds=180,
+        topic=topic_ref.RelativeName())
+
+    result = self.ExpectCreatedSubscriptions(
+        'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
+        [req_subscription])
+
+    self.assertEqual(result[0]['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
+
+
+class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest,
+                                   parameterized.TestCase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  @parameterized.parameters((' --enable-message-ordering', True),
+                            (' --no-enable-message-ordering', False))
+  def testOrderedPullSubscriptionsCreate(self, ordering_flag,
+                                         ordering_property):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        enableMessageOrdering=ordering_property,
+        topic=topic_ref.RelativeName())
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1' + ordering_flag),
+        [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].enableMessageOrdering, ordering_property)
+
+  @parameterized.parameters(
+      (' --dead-letter-topic topic2 --max-delivery-attempts 5', 'topic2', 5),
+      (' --dead-letter-topic topic2 --max-delivery-attempts 100', 'topic2',
+       100), (' --dead-letter-topic topic2', 'topic2', None))
+  def testDeadLetterPolicyPullSubscriptionsCreate(self, dead_letter_flags,
+                                                  dead_letter_topic,
+                                                  max_delivery_attempts):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    dead_letter_policy = self.msgs.DeadLetterPolicy(
+        deadLetterTopic=dead_letter_topic,
+        maxDeliveryAttempts=max_delivery_attempts)
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        deadLetterPolicy=dead_letter_policy)
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1' +
+         dead_letter_flags), [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].deadLetterPolicy, dead_letter_policy)
+
+  @parameterized.parameters(
+      (' --dead-letter-topic topic2 --max-delivery-attempts 4',
+       cli_test_base.MockArgumentError,
+       'argument --max-delivery-attempts: Value must be greater than or equal '
+       'to 5; received: 4'),
+      (' --dead-letter-topic topic2 --max-delivery-attempts 101',
+       cli_test_base.MockArgumentError,
+       'argument --max-delivery-attempts: Value must be less than or equal to '
+       '100; received: 101'),
+      (' --max-delivery-attempts 5', exceptions.RequiredArgumentException,
+       'Missing required argument [DEAD_LETTER_TOPIC]: --dead-letter-topic'))
+  def testDeadLetterPolicyExceptionPullSubscriptionsCreate(
+      self, dead_letter_flags, exception, exception_message):
+    with self.AssertRaisesExceptionMatches(exception, exception_message):
+      self.Run('pubsub subscriptions create subs1 --topic topic1' +
+               dead_letter_flags)
 
 
 if __name__ == '__main__':

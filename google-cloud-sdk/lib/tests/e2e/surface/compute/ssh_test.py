@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,6 +61,15 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase):
     # TODO(b/33475433): The serial port host doesn't seem to be reachable
     # self._TestConnectToSerialPort()
 
+  def testSSHIapTunnel(self):
+    self._TestInstanceCreation()
+    self._TestUpdateMetadata()
+    self._TestSSHCommandIapTunnel()
+
+  def testSSHHostKeyPublishing(self):
+    self._TestInstanceCreation(metadata={'enable-guest-attributes': 'true'})
+    self._TestSSHCommandStrictHostKeyChecking()
+
   def _TestUpdateMetadata(self):
     # Store SSH keys in instance metadata, to minimize contention in the
     # project metadata.
@@ -81,14 +90,30 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase):
     # --strict-host-key-checking=yes here and have the command succeed. (On
     # Windows, --strict-host-key-checking=yes is a noop.)
     self.Run('compute ssh --quiet {0} --zone {1} '
-             '--strict-host-key-checking=yes --command "echo qwerty" '
+             '--strict-host-key-checking=yes --command "expr 12300 + 45"'
              .format(self.instance_name, self.zone))
 
-    self.AssertFileContains('qwerty', self.stdout_capture_path)
+    self.AssertFileContains('12345', self.stdout_capture_path)
 
-    # Update output seek values
-    self.GetNewOutput()
-    self.GetNewErr()
+    # If any stdout/err, delete it in case future code looks at stdout/err
+    self.ClearOutput()
+    self.ClearErr()
+
+  @sdk_test_base.Retry(why=('ESv2 provides no SLO, thus AMDC and AP are not '
+                            'completely reliable, and retrying might help '
+                            'tolerate errors.'),
+                       max_retrials=12, sleep_ms=5000)
+  def _TestSSHCommandIapTunnel(self):
+    self.Run('compute ssh --quiet {0} --zone {1} --tunnel-through-iap '
+             '--command "expr 12300 + 45"'
+             .format(self.instance_name, self.zone))
+
+    # The output path is random on each test, so it's fine to reuse 12345 value
+    self.AssertFileContains('12345', self.stdout_capture_path)
+
+    # If any stdout/err, delete it in case future code looks at stdout/err
+    self.ClearOutput()
+    self.ClearErr()
 
   def _TestSSHKeyManagement(self):
     self.assertTrue(os.path.exists(self.private_key_file))
@@ -108,13 +133,34 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase):
     self.Run('compute connect-to-serial-port {0} --zone {1} --quiet '
              '--port 2'.format(self.instance_name, self.zone))
 
+    # Note, this function doesn't exist since cl/201700759
     self.AssertCommandOutputContains(
         'serialport: Connected to {0}.{1}.{2} port 2'.format(
             self.Project(), self.zone, self.instance_name))
 
-    # Update output seek values
-    self.GetNewOutput()
-    self.GetNewErr()
+    # If any stdout/err, delete it in case future code looks at stdout/err
+    self.ClearOutput()
+    self.ClearErr()
+
+  def _TestSSHCommandStrictHostKeyChecking(self):
+    # Make sure that we can connect to the instance using
+    # --strict-host-key-checking=yes on the first connection, since the keys
+    # should have been delivered via the guest attributes.
+    message = 'Finished running startup scripts.'
+    booted = self.WaitForBoot(self.instance_name, message, retries=10,
+                              polling_interval=10)
+    self.assertTrue(booted, msg='Instance failed to boot before timeout.')
+    self.Run('compute ssh --quiet {0} --zone {1} '
+             '--strict-host-key-checking=yes --command "expr 12300 + 45"'
+             .format(self.instance_name, self.zone))
+
+    self.AssertFileContains('12345', self.stdout_capture_path)
+
+    self.AssertNewErrContains('Writing 3 keys to ')
+
+    # If any stdout/err, delete it in case future code looks at stdout/err
+    self.ClearOutput()
+    self.ClearErr()
 
 
 if __name__ == '__main__':

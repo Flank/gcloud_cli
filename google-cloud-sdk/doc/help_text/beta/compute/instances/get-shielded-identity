@@ -18,12 +18,12 @@ POSITIONAL ARGUMENTS
 FLAGS
      --zone=ZONE
         Zone of the instance to describe the Shielded identity of. If not
-        specified, you may be prompted to select a zone. gcloud will attempt to
-        identify the zone by searching for resources in your project. If the
-        zone cannot be determined, you will then be prompted with all Google
-        Cloud Platform zones.
+        specified, the user may be prompted to select a zone. gcloud will
+        attempt to identify the zone by searching for resources in the user's
+        project. If the zone cannot be determined, the user will then be
+        prompted with all Google Cloud Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE

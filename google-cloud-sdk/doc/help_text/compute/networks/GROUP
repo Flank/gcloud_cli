@@ -24,6 +24,9 @@ GROUPS
      subnets
         List, describe, and delete Google Compute Engine subnetworks.
 
+     vpc-access
+        Manage VPC Access Service resources.
+
 COMMANDS
     COMMAND is one of the following:
 

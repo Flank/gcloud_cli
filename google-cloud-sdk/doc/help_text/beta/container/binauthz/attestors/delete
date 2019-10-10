@@ -5,9 +5,6 @@ SYNOPSIS
     gcloud beta container binauthz attestors delete ATTESTOR
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) Delete an Attestor.
-
 POSITIONAL ARGUMENTS
      Attestor resource - The attestor to be deleted. This represents a Cloud
      resource. (NOTE) Some attributes are not given arguments in this group but
@@ -26,9 +23,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To delete an existing Attestor my_attestor:
 
+        $ gcloud beta container binauthz attestors delete my_attestor
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud container binauthz attestors delete
         $ gcloud alpha container binauthz attestors delete
 

@@ -1,10 +1,19 @@
-- help_text:
+- release_tracks: [ALPHA, BETA]
+
+  help_text:
     brief: List Cloud Healthcare API operations.
     description: List Cloud Healthcare API operations.
+    examples: |
+      To list the operations in the dataset 'test-dataset', run:
+
+        $ {command} --dataset=test-dataset
 
   request:
     collection: healthcare.projects.locations.datasets.operations
-    api_version: v1alpha2
+    ALPHA:
+      api_version: v1alpha2
+    BETA:
+      api_version: v1beta1
 
   response:
     id_field: name

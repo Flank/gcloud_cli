@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instances create-with-container subcommand."""
+
+# TODO(b/140557440) Break up file to prevent linter deadline.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -28,7 +30,7 @@ from tests.lib.surface.compute import test_base
 
 
 def _AcceleratorTypeOf(api_version, name):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/'
           'zones/central2-a/acceleratorTypes/{name}'.format(
               ver=api_version, name=name))
 
@@ -785,6 +787,7 @@ class InstancesCreateWithContainerTest(InstancesCreateWithContainerTestBase,
           --zone central2-a
           --custom-cpu 10
           --custom-memory 1000MiB
+          --custom-vm-type n1
           --container-image=gcr.io/my-docker/test-image
         """)
     self.CheckRequests(
@@ -792,7 +795,7 @@ class InstancesCreateWithContainerTest(InstancesCreateWithContainerTestBase,
         [(self.compute.machineTypes,
           'Get',
           m.ComputeMachineTypesGetRequest(
-              machineType='custom-10-1000',
+              machineType='n1-custom-10-1000',
               project='my-project',
               zone='central2-a'))],
         self.cos_images_list_request,
@@ -804,7 +807,7 @@ class InstancesCreateWithContainerTest(InstancesCreateWithContainerTestBase,
                   disks=[self.default_attached_disk],
                   labels=self.default_labels,
                   machineType=('{0}/projects/my-project/zones/central2-a/'
-                               'machineTypes/custom-10-1000'
+                               'machineTypes/n1-custom-10-1000'
                                .format(self.compute_uri)),
                   metadata=self.default_metadata,
                   name='instance-1',

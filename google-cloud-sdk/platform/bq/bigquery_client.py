@@ -1,15 +1,18 @@
 #!/usr/bin/env python
+# Lint as: python2, python3
+# pylint: disable=g-unknown-interpreter
 # Copyright 2012 Google Inc. All Rights Reserved.
 
 """Bigquery Client library for Python."""
 
-__author__ = 'craigcitro@google.com (Craig Citro)'
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import abc
 import collections
 import datetime
 import hashlib
-import httplib
 import itertools
 import json
 import logging
@@ -28,13 +31,17 @@ from googleapiclient import discovery
 from googleapiclient import http as http_request
 from googleapiclient import model
 import httplib2
-
-
-# To configure apiclient logging.
-import gflags as flags
+import six
+from six.moves import map
+from six.moves import range
+from six.moves import zip
+import six.moves.http_client
 
 # pylint: disable=unused-import
 import bq_flags
+
+# To configure apiclient logging.
+import gflags as flags
 
 
 
@@ -48,6 +55,7 @@ _MAX_RESULTS = 100000
 
 
 _GCS_SCHEME_PREFIX = 'gs://'
+
 
 
 
@@ -81,8 +89,8 @@ def _ApplyParameters(config, **kwds):
   Args:
     config: A configuration dict.
   """
-  config.update((_ToLowerCamel(k), v) for k, v in kwds.iteritems()
-                if v is not None)
+  config.update(
+      (_ToLowerCamel(k), v) for k, v in six.iteritems(kwds) if v is not None)
 
 
 def _OverwriteCurrentLine(s, previous_token=None):
@@ -115,7 +123,7 @@ def _OverwriteCurrentLine(s, previous_token=None):
 def _FormatLabels(labels):
   """Format a resource's labels for printing."""
   result_lines = []
-  for key, value in labels.iteritems():
+  for key, value in six.iteritems(labels):
     label_str = '%s:%s' % (key, value)
     result_lines.extend([label_str])
   return '\n'.join(result_lines)
@@ -411,8 +419,8 @@ def _ParseConnectionIdentifier(identifier):
   Args:
     identifier: String specifying the connection identifier in the format
     "connection_id",
-    "project_id:connection_id",
-    "project_id:location.connection_id"
+    "location.connection_id",
+    "project_id.location.connection_id"
 
   Returns:
     A tuple of four elements: containing project_id, location, connection_id
@@ -422,21 +430,18 @@ def _ParseConnectionIdentifier(identifier):
     BigqueryError: if the identifier could not be parsed.
   """
 
-  pattern = re.compile(
-      r"""
-  ^((?P<project_id>[\w:\-.]*[\w:\-]+):)?
-  ((?P<location>[\w\-]+)\.)?
-  (?P<connection_id>[\w\-\/]*)$
-  """, re.X)
+  if not identifier:
+    raise BigqueryError('Empty connection identifier')
 
-  match = re.search(pattern, identifier)
-  if not match:
+  tokens = identifier.split('.')
+  num_tokens = len(tokens)
+  if num_tokens > 4:
     raise BigqueryError(
         'Could not parse connection identifier: %s' % identifier)
+  connection_id = tokens[num_tokens-1]
+  location = tokens[num_tokens-2] if num_tokens > 1 else None
+  project_id = '.'.join(tokens[:num_tokens-2]) if num_tokens > 2 else None
 
-  project_id = match.groupdict().get('project_id', None)
-  location = match.groupdict().get('location', None)
-  connection_id = match.groupdict().get('connection_id', None)
   return (project_id, location, connection_id)
 
 
@@ -527,7 +532,7 @@ def JsonToInsertEntry(insert_id, json_string):
     if not isinstance(row, dict):
       raise BigqueryClientError('Value is not a JSON object')
     return InsertEntry(insert_id, row)
-  except ValueError, e:
+  except ValueError as e:
     raise BigqueryClientError('Could not parse object: %s' % (str(e),))
 
 
@@ -536,12 +541,16 @@ def EncodeForPrinting(o):
   # Not all file objects provide an encoding attribute, so we make sure to
   # handle the case where the attribute is completely absent.
   encoding = getattr(sys.stdout, 'encoding', None) or 'ascii'
-  try:
-    s = unicode(o)
-  except UnicodeDecodeError:
-    # Try an encoding that has a mapping for every byte value.
-    s = str(o).decode('latin-1')
-  return s.encode(encoding, 'backslashreplace')
+  # We want to prevent conflicts in python2 between formatting
+  # a str type with a unicode type, e.g. b'abc%s' % (u'[unicode]',)
+  # where the byte type will be auto decoded as ascii thus causing
+  # an error.
+  # Thus we only want to encode the object if it's passed in as a
+  # unicode type and the unicode type is not a str type.
+  if isinstance(o, type(u'')) and not isinstance(o, str):
+    return o.encode(encoding, 'backslashreplace')
+  else:
+    return str(o)
 
 
 class BigqueryError(Exception):
@@ -573,19 +582,17 @@ class BigqueryError(Exception):
     if new_errors:
       message += '\nFailure details:\n'
     wrap_error_message = True
+    new_error_messages = [
+        ': '.join(filter(
+            None, [err.get('location'), err.get('message')]))
+        for err in new_errors
+    ]
     if wrap_error_message:
       message += '\n'.join(
-          textwrap.fill(
-              ': '.join(filter(None, [
-                  err.get('location', None), err.get('message', '')])),
-              initial_indent=' - ',
-              subsequent_indent='   ')
-          for err in new_errors)
+          textwrap.fill(msg, initial_indent=' - ', subsequent_indent='   ')
+          for msg in new_error_messages)
     else:
-      error_message = '\n'.join(
-          ': '.join(filter(None, [
-              err.get('location', None), err.get('message', '')]))
-          for err in new_errors)
+      error_message = '\n'.join(new_error_messages)
       if error_message:
         message += '- ' + error_message
 
@@ -773,18 +780,20 @@ class BigqueryHttp(http_request.HttpRequest):
   def execute(self, **kwds):  # pylint: disable=g-bad-name
     try:
       return super(BigqueryHttp, self).execute(**kwds)
-    except googleapiclient.errors.HttpError, e:
+    except googleapiclient.errors.HttpError as e:
       # TODO(user): Remove this when apiclient supports logging
       # of error responses.
       self._model._log_response(e.resp, e.content)  # pylint: disable=protected-access
       BigqueryHttp.RaiseErrorFromHttpError(e)
-    except (httplib2.HttpLib2Error, IOError), e:
+    except (httplib2.HttpLib2Error, IOError) as e:
       BigqueryHttp.RaiseErrorFromNonHttpError(e)
 
 
-class JobIdGenerator(object):
+class JobIdGenerator(six.with_metaclass(abc.ABCMeta, object)):
   """Base class for job id generators."""
-  __metaclass__ = abc.ABCMeta
+
+  def __init__(self):
+    pass
 
   @abc.abstractmethod
   def Generate(self, job_configuration):
@@ -802,8 +811,8 @@ class JobIdGeneratorRandom(JobIdGenerator):
   """Generates random job ids."""
 
   def Generate(self, unused_config):
-    return 'bqjob_r%08x_%016x' % (random.SystemRandom().randint(0, sys.maxint),
-                                  int(time.time() * 1000))
+    return 'bqjob_r%08x_%016x' % (random.SystemRandom().randint(
+        0, sys.maxsize), int(time.time() * 1000))
 
 
 class JobIdGeneratorFingerprint(JobIdGenerator):
@@ -811,7 +820,7 @@ class JobIdGeneratorFingerprint(JobIdGenerator):
 
   def _Hash(self, config, sha1):
     """Computes the sha1 hash of a dict."""
-    keys = config.keys()
+    keys = list(config.keys())
     # Python dict enumeration ordering is random. Sort the keys
     # so that we will visit them in a stable order.
     keys.sort()
@@ -841,6 +850,7 @@ class JobIdGeneratorIncrementing(JobIdGenerator):
   """Generates job ids that increment each time we're asked."""
 
   def __init__(self, inner):
+    super(JobIdGeneratorIncrementing, self).__init__()
     self._inner = inner
     self._retry = 0
 
@@ -923,7 +933,7 @@ class BigqueryClient(object):
       ValueError: if keywords are missing or incorrectly specified.
     """
     super(BigqueryClient, self).__init__()
-    for key, value in kwds.iteritems():
+    for key, value in six.iteritems(kwds):
       setattr(self, key, value)
     self._apiclient = None
     self._routines_apiclient = None
@@ -932,6 +942,7 @@ class BigqueryClient(object):
     self._op_bi_reservation_client = None
     self._models_apiclient = None
     self._op_connection_service_client = None
+    self._iam_policy_apiclient = None
     for required_flag in ('api', 'api_version'):
       if required_flag not in kwds:
         raise ValueError('Missing required flag: %s' % (required_flag,))
@@ -939,6 +950,7 @@ class BigqueryClient(object):
         'project_id': '',
         'dataset_id': '',
         'discovery_document': _DEFAULT,
+        'iam_policy_discovery_document': _DEFAULT,
         'job_property': '',
         'trace': None,
         'sync': True,
@@ -948,7 +960,7 @@ class BigqueryClient(object):
         'transfer_path': None,
         'connection_service_path': None,
     }
-    for flagname, default in default_flag_values.iteritems():
+    for flagname, default in six.iteritems(default_flag_values):
       if not hasattr(self, flagname):
         setattr(self, flagname, default)
 
@@ -1022,54 +1034,56 @@ class BigqueryClient(object):
         if iterations > 0:
           # Wait briefly before retrying with exponentially increasing wait.
           time.sleep(2 ** iterations)
+        iterations += 1
         try:
           if discovery_url is None:
             discovery_url = self.GetDiscoveryUrl().format(
                 api='bigquery', apiVersion=self.api_version)
           logging.info('Requesting discovery document from %s', discovery_url)
           response_metadata, discovery_document = http.request(discovery_url)
-          if response_metadata.get('status') >= '400':
+          discovery_document = discovery_document.decode('utf-8')
+          if int(response_metadata.get('status')) >= 400:
             msg = 'Got %s response from discovery url: %s' % (
                 response_metadata.get('status'), discovery_url)
             logging.error('%s:\n%s', msg, discovery_document)
             raise BigqueryCommunicationError(msg)
         except (httplib2.HttpLib2Error, googleapiclient.errors.HttpError,
-                httplib.HTTPException), e:
+                six.moves.http_client.HTTPException) as e:
           # We can't find the specified server. This can be thrown for
           # multiple reasons, so inspect the error.
           if hasattr(e, 'content'):
-            if iterations == max_retries - 1:
+            if iterations == max_retries:
               raise BigqueryCommunicationError(
                   'Cannot contact server. Please try again.\nError: %r'
                   '\nContent: %s' % (e, e.content))
           else:
-            if iterations == max_retries - 1:
+            if iterations == max_retries:
               raise BigqueryCommunicationError(
                   'Cannot contact server. Please try again.\n'
                   'Traceback: %s' % (traceback.format_exc(),))
-        except IOError, e:
-          if iterations == max_retries - 1:
+        except IOError as e:
+          if iterations == max_retries:
             raise BigqueryCommunicationError(
                 'Cannot contact server. Please try again.\nError: %r' % (e,))
-        except googleapiclient.errors.UnknownApiNameOrVersion, e:
+        except googleapiclient.errors.UnknownApiNameOrVersion as e:
           # We can't resolve the discovery url for the given server.
           # Don't retry in this case.
           raise BigqueryCommunicationError(
               'Invalid API name or version: %s' % (str(e),))
-        iterations += 1
     try:
-      return discovery.build_from_document(
+      built_client = discovery.build_from_document(
           discovery_document,
           http=http,
           model=bigquery_model,
           requestBuilder=bigquery_http)
+      return built_client
     except Exception:
       logging.error('Error building from discovery document: %s',
                     discovery_document)
       raise
 
-  def BuildModelsApiClient(self):
-    """Builds and returns BigQuery Models API client from discovery document."""
+  def BuildDiscoveryNextApiClient(self):
+    """Builds and returns BigQuery API client from discovery_next document."""
     http = self.credentials.authorize(self.GetHttp())
     bigquery_model = BigqueryModel(
         trace=self.trace)
@@ -1082,7 +1096,7 @@ class BigqueryClient(object):
           'bigquery_client',
           'discovery_next/bigquery.json')
     except IOError:
-      logging.error('Failed to build models discovery document')
+      logging.error('Failed to build discovery_next document')
       raise
     try:
       return discovery.build_from_document(
@@ -1095,58 +1109,31 @@ class BigqueryClient(object):
                     models_discovery_document)
       raise
 
-  def BuildRoutinesApiClient(self):
-    """Builds and returns BigQuery Routines client from discovery document."""
+  def BuildIAMPolicyApiClient(self):
+    """Builds and returns IAM policy API client from discovery document."""
     http = self.credentials.authorize(self.GetHttp())
     bigquery_model = BigqueryModel(
         trace=self.trace)
     bigquery_http = BigqueryHttp.Factory(
         bigquery_model,
     )
-    routines_discovery_document = None
+    iam_policy_discovery_document = None
     try:
-      routines_discovery_document = pkgutil.get_data(
+      iam_policy_discovery_document = pkgutil.get_data(
           'bigquery_client',
-          'discovery_next/routines-discovery.json')
+          'discovery_next/iam-policy.json')
     except IOError:
-      logging.error('Failed to build routines discovery document')
+      logging.error('Failed to build iam policy discovery document')
       raise
     try:
       return discovery.build_from_document(
-          routines_discovery_document,
+          iam_policy_discovery_document,
           http=http,
           model=bigquery_model,
           requestBuilder=bigquery_http)
     except Exception:
-      logging.error('Error building from routines document: %s',
-                    routines_discovery_document)
-      raise
-
-  def BuildConnectionV1ApiClient(self):
-    """Builds and returns BigQuery Connection client from discovery document."""
-    http = self.credentials.authorize(self.GetHttp())
-    bigquery_model = BigqueryModel(
-        trace=self.trace)
-    bigquery_http = BigqueryHttp.Factory(
-        bigquery_model,
-    )
-    connection_discovery_document = None
-    try:
-      connection_discovery_document = pkgutil.get_data(
-          'bigquery_client',
-          'discovery_next/bigqueryconnection-discovery.json')
-    except IOError:
-      logging.error('Failed to build bigqueryconnection discovery document')
-      raise
-    try:
-      return discovery.build_from_document(
-          connection_discovery_document,
-          http=http,
-          model=bigquery_model,
-          requestBuilder=bigquery_http)
-    except Exception:
-      logging.error('Error building from bigqueryconnection document: %s',
-                    connection_discovery_document)
+      logging.error('Error building from iam policy document: %s',
+                    iam_policy_discovery_document)
       raise
 
 
@@ -1160,14 +1147,20 @@ class BigqueryClient(object):
   def GetModelsApiClient(self):
     """Returns the apiclient attached to self."""
     if self._models_apiclient is None:
-      self._models_apiclient = self.BuildModelsApiClient()
+      self._models_apiclient = self.BuildDiscoveryNextApiClient()
     return self._models_apiclient
 
   def GetRoutinesApiClient(self):
     """Return the apiclient attached to self."""
     if self._routines_apiclient is None:
-      self._routines_apiclient = self.BuildRoutinesApiClient()
+      self._routines_apiclient = self.BuildDiscoveryNextApiClient()
     return self._routines_apiclient
+
+  def GetIAMPolicyApiClient(self):
+    """Return the apiclient attached to self."""
+    if self._iam_policy_apiclient is None:
+      self._iam_policy_apiclient = self.BuildIAMPolicyApiClient()
+    return self._iam_policy_apiclient
 
   def GetInsertApiClient(self):
     """Return the apiclient that supports insert operation."""
@@ -1200,7 +1193,7 @@ class BigqueryClient(object):
     if path is None:
       path = 'https://bigqueryreservation.googleapis.com'
     if not self._op_reservation_client:
-      discovery_url = (path + '/$discovery/rest?version=v1alpha1')
+      discovery_url = (path + '/$discovery/rest?version=v1alpha2')
       self._op_reservation_client = self.BuildApiClient(
       discovery_url=discovery_url)
     return self._op_reservation_client
@@ -1217,10 +1210,16 @@ class BigqueryClient(object):
       discovery_url=discovery_url)
     return self._op_bi_reservation_client
 
-  def GetConnectionV1ApiClient(self):
-    """Return the apiclient attached to self."""
+  def GetConnectionV1ApiClient(self, connection_service_address=None):
+    """Return the apiclient that supports connections operations."""
+    path = connection_service_address
+
+    if path is None:
+      path = 'https://bigqueryconnection.googleapis.com'
     if not self._op_connection_service_client:
-      self._op_connection_service_client = self.BuildConnectionV1ApiClient()
+      discovery_url = (path + '/$discovery/rest?version=v1beta1')
+      self._op_connection_service_client = self.BuildApiClient(
+      discovery_url=discovery_url)
     return self._op_connection_service_client
 
   #################################
@@ -1244,10 +1243,10 @@ class BigqueryClient(object):
                                                  view.get('tableId')))
       else:
         role = entry.pop('role', None)
-        if not role or len(entry.values()) != 1:
+        if not role or len(list(entry.values())) != 1:
           raise BigqueryInterfaceError(
               'Invalid ACL returned by server: %s' % acl, {}, [])
-        acl_entries[role].extend(entry.itervalues())
+        acl_entries[role].extend(six.itervalues(entry))
     # Show a couple things first.
     original_roles = [
         ('OWNER', 'Owners'),
@@ -1261,7 +1260,7 @@ class BigqueryClient(object):
         result_lines.append('%s:' % name)
         result_lines.append(',\n'.join('  %s' % m for m in sorted(members)))
     # Show everything else.
-    for role, members in sorted(acl_entries.iteritems()):
+    for role, members in sorted(six.iteritems(acl_entries)):
       result_lines.append('%s:' % role)
       result_lines.append(',\n'.join('  %s' % m for m in sorted(members)))
     return '\n'.join(result_lines)
@@ -1318,7 +1317,8 @@ class BigqueryClient(object):
 
     dataset_parts = dataset_id.split('.')
     if dataset_parts[-1] != 'INFORMATION_SCHEMA' or table_id in (
-        'SCHEMATA', 'SCHEMATA_OPTIONS'):
+        'SCHEMATA',
+        'SCHEMATA_OPTIONS'):
       # We don't shift unless INFORMATION_SCHEMA is present and table_id is for
       # a dataset qualified table.
       return dataset_id, table_id
@@ -1514,12 +1514,20 @@ class BigqueryClient(object):
     """Determine a ReservationReference from an identifier and location."""
     project_id, location, reservation_id = _ParseReservationIdentifier(
         identifier)
+    if project_id and self.project_id and project_id != self.project_id:
+      raise BigqueryError(
+          'Specified project should be the same as the project of the '
+          'reservation.')
     project_id = project_id or self.project_id
     if not project_id:
       raise BigqueryError('Project id not specified.')
     location = location or default_location
     if not location:
       raise BigqueryError('Location not specified.')
+    if default_location and location != default_location:
+      raise BigqueryError(
+          'Specified location should be the same as the location of the '
+          'reservation.')
     reservation_id = reservation_id or default_reservation_id
     if not reservation_id:
       raise BigqueryError('Reservation name not specified.')
@@ -1581,8 +1589,6 @@ class BigqueryClient(object):
       (project_id, location,
        reservation_grant_id) = _ParseReservationGrantPath(path)
     project_id = project_id or self.project_id
-    if not project_id:
-      raise BigqueryError('Project id not specified.')
     location = location or default_location
     if not location:
       raise BigqueryError('Location not specified.')
@@ -1622,7 +1628,7 @@ class BigqueryClient(object):
     # Projects are handled separately, because we only have
     # bigquery.projects.list.
     if isinstance(reference, ApiClientHelper.ProjectReference):
-      projects = self.ListProjects()
+      projects = self.ListProjects(max_results=1000)
       for project in projects:
         if BigqueryClient.ConstructObjectReference(project) == reference:
           project['kind'] = 'bigquery#project'
@@ -1677,10 +1683,11 @@ class BigqueryClient(object):
         encoded['insertId'] = insert.insert_id
       return encoded
     op = self.GetInsertApiClient().tabledata().insertAll(
-        body=dict(skipInvalidRows=skip_invalid_rows,
-                  ignoreUnknownValues=ignore_unknown_values,
-                  templateSuffix=template_suffix,
-                  rows=map(_EncodeInsert, inserts)),
+        body=dict(
+            skipInvalidRows=skip_invalid_rows,
+            ignoreUnknownValues=ignore_unknown_values,
+            templateSuffix=template_suffix,
+            rows=list(map(_EncodeInsert, inserts))),
         **table_dict)
     return op.execute()
 
@@ -1814,7 +1821,7 @@ class BigqueryClient(object):
       is GB. The specified reservation size may only contain digits, optionally
       followed by G, g, GB, gb, gB, or Gb.""")
 
-    reservation_size = long(reservation_digits) * 1024 * 1024 * 1024
+    reservation_size = int(reservation_digits) * 1024 * 1024 * 1024
 
     if reservation_size == 0:
       client.projects().locations().reservations().delete(
@@ -1889,26 +1896,32 @@ class BigqueryClient(object):
     return client.projects().locations().reservations().slotPools().get(
         name=reference.path()).execute()
 
-  def DeleteSlotPool(self, reference):
+  def DeleteSlotPool(self, reference, force=None):
     """Deletes a slot pool with the given slot pool reference.
 
     Arguments:
       reference: Slot pool to delete.
+      force: Force delete slot pool, ignoring commitment end time.
     """
     client = self.GetReservationApiClient()
     client.projects().locations().reservations().slotPools().delete(
-        name=reference.path()).execute()
+        name=reference.path(), force=force).execute()
 
-  def CreateReservationGrant(self, reference, reservation_id, job_type):
-    """Creates a reservation grant for given project, location, job_type.
+  def PrepareReservationGrantForCreation(self, reference, reservation_id,
+                                         job_type, grantee_type, grantee_id):
+    """Prepare ReservationGrant and parent for CreateReservationGrant.
 
     Arguments:
-      reference: Reference to the project and location to create the grant.
+      reference: Reference to the project reservation is granted. Location must
+        be the same location as the reservation.
       reservation_id: Reference to reservation for the grant.
       job_type: Type of jobs for this grant.
+      grantee_type: Type of grantees for the reservation grant.
+      grantee_id: Project/folder/organization ID, to which the reservation is
+        granted.
 
     Returns:
-      ReservationGrant object that was created.
+      ReservationGrant and parent that will be used for creation.
 
     Raises:
       BigqueryError: if grant cannot be created.
@@ -1922,9 +1935,39 @@ class BigqueryClient(object):
     if not job_type:
       raise BigqueryError('job_type not specified.')
     reservation_grant['job_type'] = job_type
+    if not grantee_type:
+      raise BigqueryError('grantee_type not specified.')
+    # grantee_type is singular, that's why we need additional 's' inside
+    # format string for grantee below.
+    reservation_grant['grantee'] = '%ss/%s' % (grantee_type.lower(), grantee_id)
+    parent = 'projects/%s/locations/%s' % (reservation_reference.projectId,
+                                           reservation_reference.location)
+    return (reservation_grant, parent)
+
+  def CreateReservationGrant(self, reference, reservation_id, job_type,
+                             grantee_type, grantee_id):
+    """Creates a reservation grant for a given project/folder/organization.
+
+    Arguments:
+      reference: Reference to the project reservation is granted. Location must
+        be the same location as the reservation.
+      reservation_id: Reference to reservation for the grant.
+      job_type: Type of jobs for this grant.
+      grantee_type: Type of grantees for the reservation grant.
+      grantee_id: Project/folder/organization ID, to which the reservation is
+        granted.
+
+    Returns:
+      ReservationGrant object that was created.
+
+    Raises:
+      BigqueryError: if grant cannot be created.
+    """
+    (reservation_grant,
+     parent) = self.PrepareReservationGrantForCreation(reference,
+                                                       reservation_id, job_type,
+                                                       grantee_type, grantee_id)
     client = self.GetReservationApiClient()
-    parent = 'projects/%s/locations/%s' % (reference.projectId,
-                                           reference.location)
     return client.projects().locations().reservationGrants().create(
         parent=parent, body=reservation_grant).execute()
 
@@ -1949,30 +1992,11 @@ class BigqueryClient(object):
     Returns:
       list of ReservationGrant objects.
     """
-    parent = 'projects/%s/locations/%s' % (
-        reference.projectId,
-        reference.location
-        )
+    parent = 'projects/%s/locations/%s' % (reference.projectId,
+                                           reference.location)
     client = self.GetReservationApiClient()
     return client.projects().locations().reservationGrants().list(
         parent=parent, pageSize=page_size, pageToken=page_token).execute()
-
-  def ListReservationGrantsForReservation(
-      self, reference, page_size, page_token):
-    """Lists reservations grants for given reservation.
-
-    Arguments:
-      reference: Reference to the reservation.
-      page_size: Number of results to show.
-      page_token: Token to retrieve the next page of results.
-
-    Returns:
-      list of ReservationGrant objects.
-    """
-    client = self.GetReservationApiClient()
-    return client.projects().locations().reservations().listReservationGrants(
-        name=reference.path(), pageSize=page_size,
-        pageToken=page_token).execute()
 
   def GetConnection(self, reference):
     """Gets connection with the given connection reference.
@@ -1987,13 +2011,16 @@ class BigqueryClient(object):
     return client.projects().locations().connections().get(
         name=reference.path()).execute()
 
-  def CreateConnection(self, reference, connection_type, properties):
+  def CreateConnection(self, project_id, location,
+                       connection_type, properties, connection_id=None):
     """Create a connection with the given connection reference.
 
     Arguments:
-      reference: Connection to create.
+      project_id: Project ID.
+      location: Location of connection.
       connection_type: Type of connection, allowed values: ['CLOUD_SQL']
-      properties: Connection properties
+      properties: Connection properties in JSON format.
+      connection_id: Optional connection ID.
 
     Returns:
       Connection object that was created.
@@ -2003,24 +2030,40 @@ class BigqueryClient(object):
     if connection_type == 'CLOUD_SQL':
       connection['cloudSql'] = json.loads(properties)
 
-    request = {}
-    request['connection'] = connection
+    client = self.GetConnectionV1ApiClient()
+    parent = 'projects/%s/locations/%s' % (project_id, location)
+    return client.projects().locations().connections().create(
+        parent=parent, connectionId=connection_id, body=connection).execute()
+
+  def UpdateConnection(self, reference, connection_type, properties):
+    """Update connection with the given connection reference.
+
+    Arguments:
+      reference: Connection to update
+      connection_type: Type of connection, allowed values: ['CLOUD_SQL']
+      properties: Connection properties
+
+    Returns:
+      Connection object that was created.
+    """
+
+    connection = {}
+    update_mask = []
+    if connection_type == 'CLOUD_SQL':
+      cloudsql_properties = json.loads(properties)
+      connection['cloudSql'] = cloudsql_properties
+      if cloudsql_properties.get('instanceId'):
+        update_mask.append('cloudSql.instanceId')
+      if cloudsql_properties.get('database'):
+        update_mask.append('cloudSql.database')
+      if cloudsql_properties.get('type'):
+        update_mask.append('cloudSql.type')
+
     client = self.GetConnectionV1ApiClient()
 
-    if '/' in reference.connectionId:
-      path = reference.path()
-      pos = path.rfind('/')
-      parent = path[:pos]
-      connection_id = path[pos + 1:]
-      request['connectionId'] = connection_id
-      return client.projects().locations().connections().createConnection(
-          parent=parent, body=request).execute()
-    else:
-      parent = 'projects/%s/locations/%s' % (reference.projectId,
-                                             reference.location)
-      request['connectionId'] = reference.connectionId
-      return client.projects().locations().connections().create(
-          parent=parent, body=request).execute()
+    return client.projects().locations().connections().patch(
+        name=reference.path(), updateMask=','.join(update_mask),
+        body=connection).execute()
 
   def DeleteConnection(self, reference):
     """Delete a connection with the given connection reference.
@@ -2032,19 +2075,19 @@ class BigqueryClient(object):
     client.projects().locations().connections().delete(
         name=reference.path()).execute()
 
-  def ListConnections(self, reference, max_results, page_token):
+  def ListConnections(self, project_id, location, max_results, page_token):
     """List connections in the project and location for the given reference.
 
     Arguments:
-      reference: Connection reference containing project and location.
+      project_id: Project ID.
+      location: Location.
       max_results: Number of results to show.
       page_token: Token to retrieve the next page of results.
 
     Returns:
       List of connnection objects
     """
-    parent = 'projects/%s/locations/%s' % (reference.projectId,
-                                           reference.location)
+    parent = 'projects/%s/locations/%s' % (project_id, location)
     client = self.GetConnectionV1ApiClient()
     return client.projects().locations().connections().list(
         parent=parent, maxResults=max_results, pageToken=page_token).execute()
@@ -2059,18 +2102,16 @@ class BigqueryClient(object):
       credential_json: Connection type specific credential in JSON format.
     """
 
-    request = {}
     credential = {}
 
     if connection_type == 'CLOUD_SQL':
       credential['cloud_sql'] = json.loads(credential_json)
-    request['credential'] = credential
 
     name = reference.path() + '/credential'
 
     client = self.GetConnectionV1ApiClient()
     client.projects().locations().connections().updateCredential(
-        name=name, body=request).execute()
+        name=name, body=credential).execute()
 
   def ReadSchemaAndRows(self, table_dict, start_row=None, max_rows=None,
                         selected_fields=None):
@@ -2163,6 +2204,8 @@ class BigqueryClient(object):
       if print_format == 'show':
         formatter.AddColumns(('Last modified', 'ACLs',))
         formatter.AddColumns(('Labels',))
+        if 'defaultEncryptionConfiguration' in object_info:
+          formatter.AddColumns(('kmsKeyName',))
     elif reference_type == ApiClientHelper.TransferConfigReference:
       if print_format == 'list':
         formatter.AddColumns(('name',))
@@ -2199,6 +2242,8 @@ class BigqueryClient(object):
         formatter.AddColumns(('Id', 'Model Type', 'Feature Columns',
                               'Label Columns', 'Labels', 'Creation Time',
                               'Expiration Time'))
+        if 'encryptionConfiguration' in object_info:
+          formatter.AddColumns(('kmsKeyName',))
     elif reference_type == ApiClientHelper.RoutineReference:
       if print_format == 'list':
         formatter.AddColumns(('Id', 'Routine Type', 'Language', 'Creation Time',
@@ -2210,7 +2255,8 @@ class BigqueryClient(object):
     elif reference_type == ApiClientHelper.TableReference:
       if print_format == 'list':
         formatter.AddColumns(('tableId', 'Type',))
-        formatter.AddColumns(('Labels', 'Time Partitioning'))
+        formatter.AddColumns(('Labels', 'Time Partitioning',
+                              'Clustered Fields'))
       if print_format == 'show':
         use_default = True
         if object_info is not None:
@@ -2225,7 +2271,8 @@ class BigqueryClient(object):
         if use_default:
           formatter.AddColumns(('Last modified', 'Schema',
                                 'Total Rows', 'Total Bytes',
-                                'Expiration', 'Time Partitioning'))
+                                'Expiration', 'Time Partitioning',
+                                'Clustered Fields'))
         formatter.AddColumns(('Labels',))
         if 'encryptionConfiguration' in object_info:
           formatter.AddColumns(('kmsKeyName',))
@@ -2234,14 +2281,14 @@ class BigqueryClient(object):
       if print_format == 'materialized_view':
         formatter.AddColumns(('Query',))
     elif reference_type == ApiClientHelper.EncryptionServiceAccount:
-      formatter.AddColumns(object_info.keys())
+      formatter.AddColumns(list(object_info.keys()))
     elif reference_type == ApiClientHelper.ReservationReference:
       formatter.AddColumns(('name', 'slotCapacity', 'useParentReservation'))
     elif reference_type == ApiClientHelper.SlotPoolReference:
       formatter.AddColumns(('name', 'slotCount', 'plan', 'state',
                             'commitmentEndTime'))
     elif reference_type == ApiClientHelper.ReservationGrantReference:
-      formatter.AddColumns(('name', 'reservation', 'jobType'))
+      formatter.AddColumns(('name', 'reservation', 'jobType', 'grantee'))
     elif reference_type == ApiClientHelper.ConnectionReference:
       formatter.AddColumns(('name', 'friendlyName', 'description',
                             'Last modified', 'type', 'properties'))
@@ -2368,7 +2415,7 @@ class BigqueryClient(object):
       with open(schema) as f:
         try:
           loaded_json = json.load(f)
-        except ValueError, e:
+        except ValueError as e:
           raise BigquerySchemaError(
               ('Error decoding JSON schema from file %s: %s\n'
                'To specify a one-column schema, use "name:string".') % (
@@ -2523,6 +2570,8 @@ class BigqueryClient(object):
     if 'labelColumns' in model_info:
       result['Label Columns'] = _FormatStandardSqlFields(
           model_info['labelColumns'])
+    if 'encryptionConfiguration' in model_info:
+      result['kmsKeyName'] = model_info['encryptionConfiguration']['kmsKeyName']
     return result
 
   @staticmethod
@@ -2560,11 +2609,18 @@ class BigqueryClient(object):
     Returns:
       A formatted string.
     """
-    data_type = BigqueryClient.FormatRoutineDataType(argument['dataType'])
+    if 'dataType' in argument:
+      display_type = BigqueryClient.FormatRoutineDataType(argument['dataType'])
+    elif argument.get('argumentKind') == 'ANY_TYPE':
+      display_type = 'ANY TYPE'
+
     if 'name' in argument:
-      return '{} {}'.format(argument['name'], data_type)
+      argument_mode = ''
+      if ('mode' in argument):
+        argument_mode = argument['mode'] + ' '
+      return '{}{} {}'.format(argument_mode, argument['name'], display_type)
     else:
-      return data_type
+      return display_type
 
   @staticmethod
   def FormatRoutineInfo(routine_info):
@@ -2579,16 +2635,19 @@ class BigqueryClient(object):
     result = {}
     result['Id'] = routine_info['routineReference']['routineId']
     result['Routine Type'] = routine_info['routineType']
-    result['Language'] = routine_info['language']
+    result['Language'] = routine_info.get('language', '')
+    signature = '()'
+    return_type = routine_info.get('returnType')
     if 'arguments' in routine_info:
       argument_list = routine_info['arguments']
-      input_arguments = argument_list[:-1]
-      output_argument = argument_list[-1]
-      result['Signature'] = '({}) -> {}'.format(
-          ', '.join(
-              BigqueryClient.FormatRoutineArgumentInfo(argument)
-              for argument in input_arguments),
-          BigqueryClient.FormatRoutineArgumentInfo(output_argument))
+      signature = '({})'.format(', '.join(
+          BigqueryClient.FormatRoutineArgumentInfo(argument)
+          for argument in argument_list))
+    if return_type:
+      signature = '{} -> {}'.format(
+          signature, BigqueryClient.FormatRoutineDataType(return_type))
+    if return_type or ('arguments' in routine_info):
+      result['Signature'] = signature
     if 'definitionBody' in routine_info:
       result['Definition'] = routine_info['definitionBody']
     if 'creationTime' in routine_info:
@@ -2619,6 +2678,9 @@ class BigqueryClient(object):
       result['ACLs'] = BigqueryClient.FormatAcl(result['access'])
     if 'labels' in result:
       result['Labels'] = _FormatLabels(result['labels'])
+    if 'defaultEncryptionConfiguration' in result:
+      result['kmsKeyName'] = result['defaultEncryptionConfiguration'][
+          'kmsKeyName']
     return result
 
   @staticmethod
@@ -2651,15 +2713,20 @@ class BigqueryClient(object):
     if 'timePartitioning' in result:
       if 'type' in result['timePartitioning']:
         result['Time Partitioning'] = result['timePartitioning']['type']
-        extra_info = []
-        if 'field' in result['timePartitioning']:
-          partitioning_field = result['timePartitioning']['field']
-          extra_info.append('field: %s' % partitioning_field)
-        if 'expirationMs' in result['timePartitioning']:
-          expiration_ms = int(result['timePartitioning']['expirationMs'])
-          extra_info.append('expirationMs: %d' % (expiration_ms,))
-        if extra_info:
-          result['Time Partitioning'] += (' (%s)' % (', '.join(extra_info),))
+      else:
+        result['Time Partitioning'] = 'DAY'
+      extra_info = []
+      if 'field' in result['timePartitioning']:
+        partitioning_field = result['timePartitioning']['field']
+        extra_info.append('field: %s' % partitioning_field)
+      if 'expirationMs' in result['timePartitioning']:
+        expiration_ms = int(result['timePartitioning']['expirationMs'])
+        extra_info.append('expirationMs: %d' % (expiration_ms,))
+      if extra_info:
+        result['Time Partitioning'] += (' (%s)' % (', '.join(extra_info),))
+    if 'clustering' in result:
+      if 'fields' in result['clustering']:
+        result['Clustered Fields'] = ', '.join(result['clustering']['fields'])
     if 'type' in result:
       result['Type'] = result['type']
       if 'view' in result and 'query' in result['view']:
@@ -2687,7 +2754,7 @@ class BigqueryClient(object):
     """
 
     result = {}
-    for key, value in transfer_config_info.iteritems():
+    for key, value in six.iteritems(transfer_config_info):
       result[key] = value
 
     return result
@@ -2703,7 +2770,7 @@ class BigqueryClient(object):
       The new transfer config log.
     """
     result = {}
-    for key, value in transfer_log_info.iteritems():
+    for key, value in six.iteritems(transfer_log_info):
       result[key] = value
 
     return result
@@ -2719,7 +2786,7 @@ class BigqueryClient(object):
       The new transfer run info.
     """
     result = {}
-    for key, value in transfer_run_info.iteritems():
+    for key, value in six.iteritems(transfer_run_info):
       if key in BigqueryClient.columns_to_include_for_transfer_run:
         result[key] = value
     return result
@@ -2735,7 +2802,7 @@ class BigqueryClient(object):
       A dictionary of reservation properties.
     """
     result = {}
-    for key, value in reservation.iteritems():
+    for key, value in six.iteritems(reservation):
       if key == 'name':
         project_id, location, reservation_id = _ParseReservationPath(value)
         reference = ApiClientHelper.ReservationReference.Create(
@@ -2746,7 +2813,7 @@ class BigqueryClient(object):
       else:
         result[key] = value
     # Default values not passed along in the response.
-    if 'slotCapacity' not in result.keys():
+    if 'slotCapacity' not in list(result.keys()):
       result['slotCapacity'] = '0'
     return result
 
@@ -2761,7 +2828,7 @@ class BigqueryClient(object):
       A dictionary of slot pool properties.
     """
     result = {}
-    for key, value in slot_pool.iteritems():
+    for key, value in six.iteritems(slot_pool):
       if key == 'name':
         project_id, location, reservation_id, slot_pool_id = _ParseSlotPoolPath(
             value)
@@ -2774,7 +2841,7 @@ class BigqueryClient(object):
       else:
         result[key] = value
     # Default values not passed along in the response.
-    if 'slotCount' not in result.keys():
+    if 'slotCount' not in list(result.keys()):
       result['slotCount'] = '0'
     return result
 
@@ -2789,7 +2856,7 @@ class BigqueryClient(object):
       A dictionary of reservation_grant properties.
     """
     result = {}
-    for key, value in reservation_grant.iteritems():
+    for key, value in six.iteritems(reservation_grant):
       if key == 'name':
         project_id, location, reservation_grant_id = _ParseReservationGrantPath(
             value)
@@ -2813,7 +2880,7 @@ class BigqueryClient(object):
       A dictionary of connection properties.
     """
     result = {}
-    for key, value in connection.iteritems():
+    for key, value in six.iteritems(connection):
       if key == 'name':
         project_id, location, connection_id = _ParseConnectionPath(value)
         reference = ApiClientHelper.ConnectionReference.Create(
@@ -2959,8 +3026,9 @@ class BigqueryClient(object):
     return reference
 
   def ListJobRefs(self, **kwds):
-    return map(  # pylint: disable=g-long-lambda
-        BigqueryClient.ConstructObjectReference, self.ListJobs(**kwds))
+    return list(
+        map(  # pylint: disable=g-long-lambda
+            BigqueryClient.ConstructObjectReference, self.ListJobs(**kwds)))
 
   def ListJobs(
       self,
@@ -2970,7 +3038,8 @@ class BigqueryClient(object):
       state_filter=None,
       min_creation_time=None,
       max_creation_time=None,
-      all_users=None
+      all_users=None,
+      parent_job_id=None
   ):
     # pylint: disable=g-doc-args
     """Return a list of jobs.
@@ -2987,6 +3056,8 @@ class BigqueryClient(object):
         before or at this timestamp.
       all_users: Whether to list jobs for all users of the project. Requesting
         user must be an owner of the project to list all jobs.
+      parent_job_id: Retrieve only child jobs belonging to this parent; None to
+        retrieve top-level jobs.
     Returns:
       A list of jobs.
     """
@@ -2997,7 +3068,8 @@ class BigqueryClient(object):
         state_filter,
         min_creation_time,
         max_creation_time,
-        all_users
+        all_users,
+        parent_job_id
     )['results']
 
   def ListJobsAndToken(
@@ -3008,7 +3080,8 @@ class BigqueryClient(object):
       state_filter=None,
       min_creation_time=None,
       max_creation_time=None,
-      all_users=None
+      all_users=None,
+      parent_job_id=None
   ):
     # pylint: disable=g-doc-args
     """Return a list of jobs.
@@ -3025,6 +3098,8 @@ class BigqueryClient(object):
         before or at this timestamp.
       all_users: Whether to list jobs for all users of the project. Requesting
         user must be an owner of the project to list all jobs.
+      parent_job_id: Retrieve only child jobs belonging to this parent; None to
+        retrieve top-level jobs.
 
     Returns:
       A dict that contains enytries:
@@ -3038,7 +3113,7 @@ class BigqueryClient(object):
     request = self._PrepareListRequest(reference, max_results, page_token)
     if state_filter is not None:
       # The apiclient wants enum values as lowercase strings.
-      if isinstance(state_filter, basestring):
+      if isinstance(state_filter, six.string_types):
         state_filter = state_filter.lower()
       else:
         state_filter = [s.lower() for s in state_filter]
@@ -3046,7 +3121,8 @@ class BigqueryClient(object):
         request,
         projection='full',
         state_filter=state_filter,
-        all_users=all_users
+        all_users=all_users,
+        parent_job_id=parent_job_id
     )
     if min_creation_time is not None:
       request['minCreationTime'] = min_creation_time
@@ -3056,10 +3132,8 @@ class BigqueryClient(object):
     results = result.get('jobs', [])
     if max_results is not None:
       while 'nextPageToken' in result and len(results) < max_results:
-        request = self._PrepareListRequest(
-            reference, max_results - len(results), result['nextPageToken'])
-        _ApplyParameters(request, projection='full',
-                         state_filter=state_filter, all_users=all_users)
+        request['maxResults'] = max_results - len(results)
+        request['pageToken'] = result['nextPageToken']
         result = self.apiclient.jobs().list(**request).execute()
         results.extend(result.get('jobs', []))
     if 'nextPageToken' in result:
@@ -3195,8 +3269,9 @@ class BigqueryClient(object):
 
   def ListProjectRefs(self, **kwds):
     """List the project references this user has access to."""
-    return map(  # pylint: disable=g-long-lambda
-        BigqueryClient.ConstructObjectReference, self.ListProjects(**kwds))
+    return list(
+        map(  # pylint: disable=g-long-lambda
+            BigqueryClient.ConstructObjectReference, self.ListProjects(**kwds)))
 
   def ListProjects(self, max_results=None, page_token=None):
     """List the projects this user has access to."""
@@ -3205,8 +3280,9 @@ class BigqueryClient(object):
     return result.get('projects', [])
 
   def ListDatasetRefs(self, **kwds):
-    return map(  # pylint: disable=g-long-lambda
-        BigqueryClient.ConstructObjectReference, self.ListDatasets(**kwds))
+    return list(
+        map(  # pylint: disable=g-long-lambda
+            BigqueryClient.ConstructObjectReference, self.ListDatasets(**kwds)))
 
   def ListDatasets(self,
                    reference=None,
@@ -3228,19 +3304,16 @@ class BigqueryClient(object):
     results = result.get('datasets', [])
     if max_results is not None:
       while 'nextPageToken' in result and len(results) < max_results:
-        request = self._PrepareListRequest(reference,
-                                           max_results - len(results),
-                                           result['nextPageToken'],
-                                           filter_expression)
-        if list_all is not None:
-          request['all'] = list_all
+        request['maxResults'] = max_results - len(results)
+        request['pageToken'] = result['nextPageToken']
         result = self.apiclient.datasets().list(**request).execute()
         results.extend(result.get('datasets', []))
     return results
 
   def ListTableRefs(self, **kwds):
-    return map(  # pylint: disable=g-long-lambda
-        BigqueryClient.ConstructObjectReference, self.ListTables(**kwds))
+    return list(
+        map(  # pylint: disable=g-long-lambda
+            BigqueryClient.ConstructObjectReference, self.ListTables(**kwds)))
 
   def ListTables(self, reference, max_results=None, page_token=None):
     """List the tables associated with this reference."""
@@ -3251,8 +3324,8 @@ class BigqueryClient(object):
     results = result.get('tables', [])
     if max_results is not None:
       while 'nextPageToken' in result and len(results) < max_results:
-        request = self._PrepareListRequest(
-            reference, max_results - len(results), result['nextPageToken'])
+        request['maxResults'] = max_results - len(results)
+        request['pageToken'] = result['nextPageToken']
         result = self.apiclient.tables().list(**request).execute()
         results.extend(result.get('tables', []))
     return results
@@ -3295,28 +3368,125 @@ class BigqueryClient(object):
         maxResults=max_results,
         pageToken=page_token).execute()
 
+  def GetDatasetIAMPolicy(self, reference):
+    """Gets IAM policy for the given dataset resource.
+
+    Arguments:
+      reference: the DatasetReference for the dataset resource.
+
+    Returns:
+      The IAM policy attached to the given dataset resource.
+
+    Raises:
+      TypeError: if reference is not a DatasetReference.
+    """
+    _Typecheck(
+        reference,
+        ApiClientHelper.DatasetReference,
+        method='GetDatasetIAMPolicy')
+    formatted_resource = ('projects/%s/datasets/%s' %
+                          (reference.projectId, reference.datasetId))
+    return self.GetIAMPolicyApiClient().datasets().getIamPolicy(
+        resource=formatted_resource).execute()
+
+  def GetTableIAMPolicy(self, reference):
+    """Gets IAM policy for the given table resource.
+
+    Arguments:
+      reference: the TableReference for the table resource.
+
+    Returns:
+      The IAM policy attached to the given table resource.
+
+    Raises:
+      TypeError: if reference is not a TableReference.
+    """
+    _Typecheck(
+        reference, ApiClientHelper.TableReference, method='GetTableIAMPolicy')
+    formatted_resource = (
+        'projects/%s/datasets/%s/tables/%s' %
+        (reference.projectId, reference.datasetId, reference.tableId))
+    return self.GetIAMPolicyApiClient().tables().getIamPolicy(
+        resource=formatted_resource).execute()
+
+  def SetDatasetIAMPolicy(self, reference, policy):
+    """Sets IAM policy for the given dataset resource.
+
+    Arguments:
+      reference: the DatasetReference for the dataset resource.
+      policy: The policy string in JSON format.
+
+    Returns:
+      The updated IAM policy attached to the given dataset resource.
+
+    Raises:
+      TypeError: if reference is not a DatasetReference.
+    """
+    _Typecheck(
+        reference,
+        ApiClientHelper.DatasetReference,
+        method='SetDatasetIAMPolicy')
+    formatted_resource = ('projects/%s/datasets/%s' %
+                          (reference.projectId, reference.datasetId))
+    request = {'policy': policy}
+    return self.GetIAMPolicyApiClient().datasets().setIamPolicy(
+        body=request, resource=formatted_resource).execute()
+
+  def SetTableIAMPolicy(self, reference, policy):
+    """Sets IAM policy for the given table resource.
+
+    Arguments:
+      reference: the TableReference for the table resource.
+      policy: The policy string in JSON format.
+
+    Returns:
+      The updated IAM policy attached to the given table resource.
+
+    Raises:
+      TypeError: if reference is not a TableReference.
+    """
+    _Typecheck(
+        reference, ApiClientHelper.TableReference, method='SetTableIAMPolicy')
+    formatted_resource = (
+        'projects/%s/datasets/%s/tables/%s' %
+        (reference.projectId, reference.datasetId, reference.tableId))
+    request = {'policy': policy}
+    return self.GetIAMPolicyApiClient().tables().setIamPolicy(
+        body=request, resource=formatted_resource).execute()
+
   #################################
   ##       Transfer run
   #################################
-  def ScheduleTransferRun(self, reference, start_time, end_time):
-    """Schedule a new transfer run.
+  def StartManualTransferRuns(self, reference, start_time, end_time, run_time):
+    """Starts manual transfer runs.
 
     Args:
       reference: Transfer configuration name for the run.
-      start_time: Start time of the range of transfer run.
-      end_time: End time of the range of transfer run.
+      start_time: Start time of the range of transfer runs.
+      end_time: End time of the range of transfer runs.
+      run_time: Specific time for a transfer run.
 
     Returns:
-      The transfer run description.
+      The list of started transfer runs.
     """
     _Typecheck(reference, ApiClientHelper.TransferConfigReference,
-               method='ScheduleTransferRun')
+               method='StartManualTransferRuns')
     transfer_client = self.GetTransferV1ApiClient()
     parent = str(reference)
-    body = {'startTime': start_time, 'endTime': end_time}
-    response = transfer_client.projects().locations().transferConfigs(
-    ).scheduleRuns(
-        parent=parent, body=body).execute()
+
+    if run_time:
+      body = {'requestedRunTime': run_time}
+    else:
+      body = {
+          'requestedTimeRange': {
+              'startTime': start_time,
+              'endTime': end_time
+          }
+      }
+
+    configs_request = transfer_client.projects().locations().transferConfigs()
+    response = configs_request.startManualRuns(parent=parent, body=body).execute()
+
     return response.get('runs')
 
   #################################
@@ -3374,7 +3544,7 @@ class BigqueryClient(object):
 
     try:
       return self.ExecuteJob({'copy': copy_config}, **kwds)
-    except BigqueryDuplicateError, e:
+    except BigqueryDuplicateError as e:
       if ignore_already_exists:
         return None
       raise e
@@ -3405,6 +3575,17 @@ class BigqueryClient(object):
     except BigqueryNotFoundError:
       return False
 
+  def RoutineExists(self, reference):
+    _Typecheck(reference, ApiClientHelper.RoutineReference,
+               method='RoutineExists')
+    try:
+      return self.GetRoutinesApiClient().routines().get(
+          projectId=reference.projectId,
+          datasetId=reference.datasetId,
+          routineId=reference.routineId).execute()
+    except BigqueryNotFoundError:
+      return False
+
   def TransferExists(self, reference):
     _Typecheck(reference, ApiClientHelper.TransferConfigReference,
                method='TransferExists')
@@ -3416,17 +3597,17 @@ class BigqueryClient(object):
     except BigqueryNotFoundError:
       return False
 
-  def CreateDataset(
-      self,
-      reference,
-      ignore_existing=False,
-      description=None,
-      display_name=None,
-      acl=None,
-      default_table_expiration_ms=None,
-      default_partition_expiration_ms=None,
-      data_location=None,
-      labels=None):
+  def CreateDataset(self,
+                    reference,
+                    ignore_existing=False,
+                    description=None,
+                    display_name=None,
+                    acl=None,
+                    default_table_expiration_ms=None,
+                    default_partition_expiration_ms=None,
+                    data_location=None,
+                    labels=None,
+                    default_kms_key=None):
     """Create a dataset corresponding to DatasetReference.
 
     Args:
@@ -3444,6 +3625,9 @@ class BigqueryClient(object):
         stored. Must be either 'EU' or 'US'. If specified, the project that
         owns the dataset must be enabled for data location.
       labels: An optional dict of labels.
+      default_kms_key: An optional kms dey that will apply to all newly created
+        tables in the dataset, if no explicit key is supplied in the creating
+        request.
 
     Raises:
       TypeError: if reference is not a DatasetReference.
@@ -3464,6 +3648,8 @@ class BigqueryClient(object):
       body['defaultTableExpirationMs'] = default_table_expiration_ms
     if default_partition_expiration_ms is not None:
       body['defaultPartitionExpirationMs'] = default_partition_expiration_ms
+    if default_kms_key is not None:
+      body['defaultEncryptionConfiguration'] = {'kmsKeyName': default_kms_key}
     if data_location is not None:
       body['location'] = data_location
     if labels:
@@ -3651,6 +3837,9 @@ class BigqueryClient(object):
           options_to_copy=current_config.get('scheduleOptions'))
       update_mask.append('transfer_config.scheduleOptions,')
 
+    if authorization_code:
+      update_mask.append('authorization_code,')
+
     transfer_client.projects().locations().transferConfigs().patch(
         body=update_items,
         name=reference.transferConfigName,
@@ -3667,7 +3856,7 @@ class BigqueryClient(object):
                            params=None,
                            authorization_code=None,
                            schedule_args=None):
-    """Create a tranfer config corresponding to TransferConfigReference.
+    """Create a transfer config corresponding to TransferConfigReference.
 
     Args:
       reference: the TransferConfigReference to create.
@@ -3680,7 +3869,7 @@ class BigqueryClient(object):
         The params should be the required values needed for each data source and
         will vary.
       authorization_code: The authorization code that the user input if they
-      need credentials.
+        need credentials.
       schedule_args: Optional parameters to customize data transfer schedule.
 
     Raises:
@@ -3809,6 +3998,7 @@ class BigqueryClient(object):
       label_keys_to_remove=None,
       time_partitioning=None,
       range_partitioning=None,
+      clustering=None,
       require_partition_filter=None,
       etag=None,
       encryption_configuration=None):
@@ -3836,6 +4026,8 @@ class BigqueryClient(object):
         and configures the partitioning.
       range_partitioning: if set, enables range partitioning on the table and
         configures the partitioning.
+      clustering: if set, enables clustering on the table and configures the
+        clustering spec.
       require_partition_filter: if set, partition filter is required for
         queires over this table.
       etag: if set, checks that etag in the existing table matches.
@@ -3879,7 +4071,7 @@ class BigqueryClient(object):
     if 'labels' not in table:
       table['labels'] = {}
     if labels_to_set:
-      for label_key, label_value in labels_to_set.iteritems():
+      for label_key, label_value in six.iteritems(labels_to_set):
         table['labels'][label_key] = label_value
     if label_keys_to_remove:
       for label_key in label_keys_to_remove:
@@ -3888,6 +4080,11 @@ class BigqueryClient(object):
       table['timePartitioning'] = time_partitioning
     if range_partitioning is not None:
       table['rangePartitioning'] = range_partitioning
+    if clustering is not None:
+      if clustering == {}:  # pylint: disable=g-explicit-bool-comparison
+        table['clustering'] = None
+      else:
+        table['clustering'] = clustering
     if require_partition_filter is not None:
       table['requirePartitionFilter'] = require_partition_filter
 
@@ -3933,7 +4130,7 @@ class BigqueryClient(object):
     if 'labels' not in updated_model:
       updated_model['labels'] = {}
     if labels_to_set:
-      for label_key, label_value in labels_to_set.iteritems():
+      for label_key, label_value in six.iteritems(labels_to_set):
         updated_model['labels'][label_key] = label_value
     if label_keys_to_remove:
       for label_key in label_keys_to_remove:
@@ -3963,7 +4160,8 @@ class BigqueryClient(object):
       default_partition_expiration_ms=None,
       labels_to_set=None,
       label_keys_to_remove=None,
-      etag=None):
+      etag=None,
+      default_kms_key=None):
     """Updates a dataset.
 
     Args:
@@ -3980,6 +4178,9 @@ class BigqueryClient(object):
       label_keys_to_remove: an optional list of label keys to remove from this
         dataset.
       etag: if set, checks that etag in the existing dataset matches.
+      default_kms_key: An optional kms dey that will apply to all newly created
+        tables in the dataset, if no explicit key is supplied in the creating
+        request.
 
     Raises:
       TypeError: if reference is not a DatasetReference.
@@ -4007,10 +4208,14 @@ class BigqueryClient(object):
         dataset['defaultPartitionExpirationMs'] = None
       else:
         dataset['defaultPartitionExpirationMs'] = default_partition_expiration_ms
+    if default_kms_key is not None:
+      dataset['defaultEncryptionConfiguration'] = {
+          'kmsKeyName': default_kms_key
+      }
     if 'labels' not in dataset:
       dataset['labels'] = {}
     if labels_to_set:
-      for label_key, label_value in labels_to_set.iteritems():
+      for label_key, label_value in six.iteritems(labels_to_set):
         dataset['labels'][label_key] = label_value
     if label_keys_to_remove:
       for label_key in label_keys_to_remove:
@@ -4167,7 +4372,7 @@ class BigqueryClient(object):
     while result is None:
       try:
         status, result = request.next_chunk()
-      except googleapiclient.errors.HttpError, e:
+      except googleapiclient.errors.HttpError as e:
         logging.error('HTTP Error %d during resumable media upload', e.resp.status)
         # Log response headers, which contain debug info for GFEs.
         for key, value in e.resp.items():
@@ -4177,19 +4382,19 @@ class BigqueryClient(object):
           retriable_errors += 1
           if retriable_errors > 3:
             raise
-          print 'Error %d, retry #%d' % (e.resp.status, retriable_errors)
+          print('Error %d, retry #%d' % (e.resp.status, retriable_errors))
           time.sleep(sleep_sec)
           # Go around and try again.
         else:
           BigqueryHttp.RaiseErrorFromHttpError(e)
-      except (httplib2.HttpLib2Error, IOError), e:
+      except (httplib2.HttpLib2Error, IOError) as e:
         BigqueryHttp.RaiseErrorFromNonHttpError(e)
       if status:
         output_token = _OverwriteCurrentLine(
             'Uploaded %d%%... ' % int(status.progress() * 100),
             output_token)
     _OverwriteCurrentLine('Upload complete.', output_token)
-    print
+    print()
     return result
 
   def StartJob(self,
@@ -4494,7 +4699,7 @@ class BigqueryClient(object):
 
     def Done(self):
       if self.print_on_done:
-        print
+        print()
 
   class QuietWaitPrinter(WaitPrinterHelper):
     """A WaitPrinter that prints nothing."""
@@ -4529,7 +4734,7 @@ class BigqueryClient(object):
   def WaitJob(self,
               job_reference,
               status='DONE',
-              wait=sys.maxint,
+              wait=sys.maxsize,
               wait_printer_factory=None):
     """Poll for a job to run until it reaches the requested status.
 
@@ -4561,9 +4766,7 @@ class BigqueryClient(object):
     # times, then increase to max(3, max_wait), and then keep waiting
     # that long until we've run out of time.
     waits = itertools.chain(
-        itertools.repeat(1, 8),
-        xrange(2, 30, 3),
-        itertools.repeat(30))
+        itertools.repeat(1, 8), range(2, 30, 3), itertools.repeat(30))
     current_wait = 0
     current_status = 'UNKNOWN'
     in_error_state = False
@@ -4575,19 +4778,19 @@ class BigqueryClient(object):
         if done:
           printer.Print(job_reference.jobId, current_wait, current_status)
           break
-      except BigqueryCommunicationError, e:
+      except BigqueryCommunicationError as e:
         # Communication errors while waiting on a job are okay.
         logging.warning('Transient error during job status check: %s', e)
-      except BigqueryBackendError, e:
+      except BigqueryBackendError as e:
         # Temporary server errors while waiting on a job are okay.
         logging.warning('Transient error during job status check: %s', e)
-      except BigqueryServiceError, e:
+      except BigqueryServiceError as e:
         # Among this catch-all class, some kinds are permanent
         # errors, so we don't want to retry indefinitely, but if
         # the error is transient we'd like "wait" to get past it.
         if in_error_state: raise
         in_error_state = True
-      for _ in xrange(waits.next()):
+      for _ in range(next(waits)):
         current_wait = time.time() - start_time
         printer.Print(job_reference.jobId, current_wait, current_status)
         time.sleep(1)
@@ -4649,7 +4852,7 @@ class BigqueryClient(object):
                   use_cache=None,
                   preserve_nulls=None,
                   max_results=None,
-                  wait=sys.maxint,
+                  wait=sys.maxsize,
                   min_completion_ratio=None,
                   wait_printer_factory=None,
                   max_single_wait=None,
@@ -4722,7 +4925,7 @@ class BigqueryClient(object):
           # remaining_time may be counting down from sys.maxint.
           current_wait_ms = int(min(remaining_time, max_single_wait) * 1000)
           if current_wait_ms < 0:
-            current_wait_ms = sys.maxint
+            current_wait_ms = sys.maxsize
         if remaining_time < 0:
           raise StopIteration('Wait timed out. Query not finished.')
         if job_reference is None:
@@ -4769,10 +4972,10 @@ class BigqueryClient(object):
                        'status': status,
                        'jobReference': job_reference}
           return (schema, rows, execution)
-      except BigqueryCommunicationError, e:
+      except BigqueryCommunicationError as e:
         # Communication errors while waiting on a job are okay.
         logging.warning('Transient error during query: %s', e)
-      except BigqueryBackendError, e:
+      except BigqueryBackendError as e:
         # Temporary server errors while waiting on a job are okay.
         logging.warning('Transient error during query: %s', e)
 
@@ -4872,7 +5075,7 @@ class BigqueryClient(object):
     if destination_table:
       try:
         reference = self.GetTableReference(destination_table)
-      except BigqueryError, e:
+      except BigqueryError as e:
         raise BigqueryError('Invalid value %s for destination_table: %s' % (
             destination_table, e))
       query_config['destinationTable'] = dict(reference)
@@ -4898,8 +5101,7 @@ class BigqueryClient(object):
         min_completion_ratio=min_completion_ratio,
         range_partitioning=range_partitioning)
     request = {'query': query_config}
-    _ApplyParameters(request, dry_run=dry_run,
-                     labels=labels)
+    _ApplyParameters(request, dry_run=dry_run, labels=labels)
     return self.ExecuteJob(request, **kwds)
 
   def Load(
@@ -4927,7 +5129,7 @@ class BigqueryClient(object):
       destination_encryption_configuration=None,
       use_avro_logical_types=None,
       range_partitioning=None,
-      hive_partitioning_mode=None,
+      hive_partitioning_options=None,
       **kwds):
     """Load the given data into BigQuery.
 
@@ -4979,10 +5181,13 @@ class BigqueryClient(object):
           TIMESTAMP), instead of only using their raw types (ie. INTEGER).
       range_partitioning: Optional. Provides range partitioning specification
           for the destination table.
-      hive_partitioning_mode: (experimental) Enables hive partitioning.  AUTO
-          indicates to perform automatic type inference.  STRINGS indicates to
-          treat all hive partition keys as STRING typed.  No other values are
-          accepted.
+      hive_partitioning_options: (experimental) Options for configuring hive
+          partitioning.  'mode' determines the partitioning mode. It accepts
+          three strings: AUTO (automatic type inference), STRINGS (treat all
+          partition key types as strings) and CUSTOM (customer provided schema).
+          No other values are accepted.
+          'sourceUriPrefix' is the shared prefix after which partition encoding
+          is expected to begin across all uris.
       **kwds: Passed on to self.ExecuteJob.
 
     Returns:
@@ -5000,8 +5205,6 @@ class BigqueryClient(object):
       load_config['schema'] = {'fields': BigqueryClient.ReadSchema(schema)}
     if use_avro_logical_types is not None:
       load_config['useAvroLogicalTypes'] = use_avro_logical_types
-    if hive_partitioning_mode is not None:
-      load_config['hivePartitioningMode'] = hive_partitioning_mode
     if destination_encryption_configuration:
       load_config['destinationEncryptionConfiguration'] = (
           destination_encryption_configuration)
@@ -5024,29 +5227,38 @@ class BigqueryClient(object):
         time_partitioning=time_partitioning,
         clustering=clustering,
         autodetect=autodetect,
-        range_partitioning=range_partitioning)
+        range_partitioning=range_partitioning,
+        hive_partitioning_options=hive_partitioning_options)
     return self.ExecuteJob(configuration={'load': load_config},
                            upload_file=upload_file, **kwds)
 
-  def Extract(self, source_table, destination_uris,
-              print_header=None, field_delimiter=None,
-              destination_format=None, compression=None,
-              **kwds):
+  def Extract(
+      self,
+      reference,
+      destination_uris,
+      print_header=None,
+      field_delimiter=None,
+      destination_format=None,
+      compression=None,
+      use_avro_logical_types=None,
+      **kwds):
     """Extract the given table from BigQuery.
 
     The job will execute synchronously if sync=True is provided as an
     argument or if self.sync is true.
 
     Args:
-      source_table: TableReference to read data from.
+      reference: TableReference to read data from.
       destination_uris: String specifying one or more destination locations,
          separated by commas.
       print_header: Optional. Whether to print out a header row in the results.
       field_delimiter: Optional. Specifies the single byte field delimiter.
       destination_format: Optional. Format to extract table to. May be "CSV",
-         "AVRO", or "NEWLINE_DELIMITED_JSON".
+         "AVRO" or "NEWLINE_DELIMITED_JSON".
       compression: Optional. The compression type to use for exported files.
         Possible values include "GZIP" and "NONE". The default value is NONE.
+      use_avro_logical_types: Optional. Whether to use avro logical types for
+        applicable column types on extract jobs.
       **kwds: Passed on to self.ExecuteJob.
 
     Returns:
@@ -5055,19 +5267,26 @@ class BigqueryClient(object):
     Raises:
       BigqueryClientError: if required parameters are invalid.
     """
-    _Typecheck(source_table, ApiClientHelper.TableReference)
     uris = destination_uris.split(',')
     for uri in uris:
       if not uri.startswith(_GCS_SCHEME_PREFIX):
         raise BigqueryClientError(
             'Illegal URI: {}. Extract URI must start with "{}".'.format(
                 uri, _GCS_SCHEME_PREFIX))
-    extract_config = {'sourceTable': dict(source_table)}
+    if isinstance(reference, ApiClientHelper.TableReference):
+      extract_config = {'sourceTable': dict(reference)}
+    else:
+      raise TypeError('Type of %r should be one of %s' % (
+          reference,
+          [
+              ApiClientHelper.TableReference
+          ]))
     _ApplyParameters(
         extract_config, destination_uris=uris,
         destination_format=destination_format,
         print_header=print_header, field_delimiter=field_delimiter,
-        compression=compression)
+        compression=compression, use_avro_logical_types=use_avro_logical_types
+    )
     return self.ExecuteJob(configuration={'extract': extract_config}, **kwds)
 
 
@@ -5291,7 +5510,7 @@ class ApiClientHelper(object):
     def Create(cls, **kwds):
       """Factory method for this class."""
       args = dict((k, v)
-                  for k, v in kwds.iteritems()
+                  for k, v in six.iteritems(kwds)
                   if k in cls._required_fields.union(cls._optional_fields))
       return cls(**args)
 
@@ -5433,8 +5652,13 @@ class ApiClientHelper(object):
       return self._path_str % dict(self)
 
   class ReservationGrantReference(Reference):
-    _required_fields = frozenset((
-        'projectId', 'location', 'reservationGrantId'))
+    """Helper class to provide a reference to reservation grant."""
+    _required_fields = frozenset(('location', 'reservationGrantId'))
+    """projectId is not needed for create command, because it may be included
+
+    in ReservationReference.
+    """
+    _optional_fields = frozenset(('projectId',))
     _format_str = '%(projectId)s:%(location)s.%(reservationGrantId)s'
     _path_str = ('projects/%(projectId)s/locations/%(location)s/'
                  'reservationGrants/%(reservationGrantId)s')
@@ -5459,7 +5683,7 @@ class ApiClientHelper(object):
 
   class ConnectionReference(Reference):
     _required_fields = frozenset(('projectId', 'location', 'connectionId'))
-    _format_str = '%(projectId)s:%(location)s.%(connectionId)s'
+    _format_str = '%(projectId)s.%(location)s.%(connectionId)s'
     _path_str = 'projects/%(projectId)s/locations/%(location)s/connections/%(connectionId)s'
     typename = 'connection'
 

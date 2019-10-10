@@ -100,21 +100,21 @@ To filter results by subscription name (ie. only show subscription 'mysubs'),
 run:
 
 .RS 2m
-$ gcloud beta pubsub topics list\-subscriptions \-\-topic mytopic \e
+$ gcloud beta pubsub topics list\-subscriptions mytopic \e
     \-\-filter=subscriptionId:mysubs
 .RE
 
 To combine multiple filters (with AND or OR), run:
 
 .RS 2m
-$ gcloud beta pubsub topics list\-subscriptions \-\-topic mytopic \e
+$ gcloud beta pubsub topics list\-subscriptions mytopic \e
     \-\-filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
 .RE
 
 To filter subscriptions that match an expression:
 
 .RS 2m
-$ gcloud beta pubsub topics list\-subscriptions \-\-topic mytopic \e
+$ gcloud beta pubsub topics list\-subscriptions mytopic \e
     \-\-filter="subscriptionId:subs_*"
 .RE
 

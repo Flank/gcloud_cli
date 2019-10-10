@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,11 +63,7 @@ class Sql(base.Command):
           allowed.
     """
     import_util.AddBaseImportFlags(parser, filetype='MySQL dump')
-    flags.AddDatabase(
-        parser,
-        'Database (for example, guestbook) to which the import is'
-        ' made. If not set, it is assumed that the database is specified in'
-        ' the file to be imported.')
+    flags.AddDatabase(parser, flags.DEFAULT_DATABASE_IMPORT_HELP_TEXT)
 
   def Run(self, args):
     """Runs the command to import into the Cloud SQL instance."""

@@ -1,6 +1,7 @@
 title: scc asset group test scenario
 release_tracks: [ALPHA]
 summary:
+# This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       scc assets group 345840165995 --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z"
@@ -17,6 +18,47 @@ summary:
           security_center_properties.resource_type: google.cloud.storage.Bucket
       readTime: '2019-02-28T07:00:00Z'
       totalSize: 3
+- execute:
+  - command: |
+      scc assets group 345840165995 --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z" --compare-duration=1s --filter="update_time > 100 AND security_center_properties.resource_type=\"google.cloud.resourcemanager.Organization\""
+  - stdout: |
+      groupByResults:
+      - count: '1'
+        properties:
+          security_center_properties.resource_type: google.cloud.resourcemanager.Organization
+          state: ACTIVE
+          state_change: ACTIVE
+      readTime: '2019-02-28T07:00:00Z'
+      totalSize: 1
+- execute:
+  - command: |
+      scc assets group organizations/345840165995 --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z" --compare-duration=1s --filter="update_time > 100 AND security_center_properties.resource_type=\"google.cloud.resourcemanager.Organization\""
+  - stdout: |
+      groupByResults:
+      - count: '1'
+        properties:
+          security_center_properties.resource_type: google.cloud.resourcemanager.Organization
+          state: ACTIVE
+          state_change: ACTIVE
+      readTime: '2019-02-28T07:00:00Z'
+      totalSize: 1
+- execute:
+  - command: |
+      config set scc/organization 345840165995
+  - stderr: |
+      Updated property [scc/organization].
+- execute:
+  - command: |
+      scc assets group --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z"
+  - stdout: |
+      groupByResults:
+      - count: '1'
+        properties:
+          security_center_properties.resource_type: google.cloud.resourcemanager.Organization
+          state: ACTIVE
+          state_change: ACTIVE
+      readTime: '2019-02-28T07:00:00Z'
+      totalSize: 1
 actions:
 - execute_command:
     command: |
@@ -116,10 +158,59 @@ actions:
         totalSize: 1
     - expect_exit:
         code: 0
-# Using organization resource name
 - execute_command:
     command: |
       scc assets group organizations/345840165995 --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z" --compare-duration=1s --filter="update_time > 100 AND security_center_properties.resource_type=\"google.cloud.resourcemanager.Organization\""
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets:group?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              groupBy: security_center_properties.resource_type
+              readTime: '2019-02-28T07:00:00Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "groupByResults": [
+                {
+                  "properties": {
+                    "security_center_properties.resource_type": "google.cloud.resourcemanager.Organization",
+                    "state_change": "ACTIVE",
+                    "state": "ACTIVE"
+                  },
+                  "count": "1"
+                }
+              ],
+              "readTime": "2019-02-28T07:00:00Z",
+              "totalSize": 1
+            }
+    - expect_stdout: |
+        groupByResults:
+        - count: '1'
+          properties:
+            security_center_properties.resource_type: google.cloud.resourcemanager.Organization
+            state: ACTIVE
+            state_change: ACTIVE
+        readTime: '2019-02-28T07:00:00Z'
+        totalSize: 1
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      config set scc/organization 345840165995
+    events:
+    - expect_stderr: |
+        Updated property [scc/organization].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      scc assets group --group-by "security_center_properties.resource_type" --read-time="2019-02-28T07:00:00Z"
     events:
     - api_call:
         expect_request:

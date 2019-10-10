@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,9 +55,9 @@ class RoutesDescribeTest(test_base.BaseTest,
         textwrap.dedent("""\
             destRange: 10.0.0.0/8
             name: route-1
-            network: https://www.googleapis.com/compute/{api}/projects/my-project/network/default
+            network: https://compute.googleapis.com/compute/{api}/projects/my-project/network/default
             nextHopIp: 10.240.0.0
-            selfLink: https://www.googleapis.com/compute/{api}/projects/my-project/global/routes/route-1
+            selfLink: https://compute.googleapis.com/compute/{api}/projects/my-project/global/routes/route-1
             """.format(api=self.api)))
 
   def testDescribeCompletion(self):

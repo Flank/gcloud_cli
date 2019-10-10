@@ -47,14 +47,15 @@ Total number of workers to be created across all requested regions.
 
 Update the Cloud region or regions in which the Workerpool is located. To
 overwrite regions, use \-\-clear\-regions followed by \-\-add\-regions in the
-same command. Choices: us\-central1, us\-west1, us\-east1, and us\-east4.
+same command.
 
 
 
 .RS 2m
 .TP 2m
 \fB\-\-add\-regions\fR=[\fIREGION\fR,...]
-Add regions, separated by comma.
+Add regions, separated by comma. \fIREGION\fR must be one of:
+\fBus\-central1\fR, \fBus\-east1\fR, \fBus\-east4\fR, \fBus\-west1\fR.
 
 .TP 2m
 \fB\-\-clear\-regions\fR
@@ -62,7 +63,8 @@ Remove all regions.
 
 .TP 2m
 \fB\-\-remove\-regions\fR=[\fIREGION\fR,...]
-Remove regions, separated by comma.
+Remove regions, separated by comma. \fIREGION\fR must be one of:
+\fBus\-central1\fR, \fBus\-east1\fR, \fBus\-east4\fR, \fBus\-west1\fR.
 
 .RE
 .sp
@@ -153,7 +155,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

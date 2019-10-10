@@ -1,23 +1,17 @@
 NAME
-    gcloud auth print-access-token - print an access token for the active
+    gcloud auth print-access-token - print an access token for the specified
         account
 
 SYNOPSIS
-    gcloud auth print-access-token [ACCOUNT] [--force-auth-refresh]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud auth print-access-token [ACCOUNT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Print an access token for the active account.
+    Print an access token for the specified account.
 
 POSITIONAL ARGUMENTS
      [ACCOUNT]
-        The account to get the access token for. Leave empty for the active
-        account.
-
-FLAGS
-     --force-auth-refresh
-        Force a refresh of the credentials even if they have not expired yet.
-        By default, credentials will only be refreshed when necessary.
+        Account to get the access token for. If not specified, the current
+        active account will be used.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

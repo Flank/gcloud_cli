@@ -49,16 +49,17 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To see the list of all operations for two managed-zones, run:
 
-        $ gcloud beta dns operations list --zones zone1,zone2
+        $ gcloud beta dns operations list --zones=zone1,zone2
 
     To see the last 5 operations for two managed-zones, run:
 
-        $ gcloud beta dns operations list --zones zone1,zone2 \
-            --sort-by ~start_time --limit 5
+        $ gcloud beta dns operations list --zones=zone1,zone2 \
+            --sort-by=~start_time --limit=5
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns operations list
+        $ gcloud alpha dns operations list
 

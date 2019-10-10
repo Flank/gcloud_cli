@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha build-artifacts - manage Cloud Build Artifacts resources
+
+SYNOPSIS
+    gcloud alpha build-artifacts GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Build Artifacts resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        (ALPHA) Manage Cloud Build Artifacts long-running operations.
+
+     packages
+        (ALPHA) Manage Cloud Build Artifacts packages.
+
+     print-settings
+        (ALPHA) Print snippets to add to native tools settings files.
+
+     repositories
+        (ALPHA) Manage Cloud Build Artifacts repositories.
+
+     versions
+        (ALPHA) Manage Cloud Build Artifacts package versions.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

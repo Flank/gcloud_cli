@@ -1,0 +1,227 @@
+title: create Managed Microsoft AD domain trust
+release_tracks: [BETA, ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: active-directory domains trusts create trust.test.com --target-domain-name=prod-test.ad.com
+      --target-dns-ip-addresses=10.177.0.2 --type=EXTERNAL --direction=BIDIRECTIONAL
+      --handshake-secret=foobar --selective-authentication --async
+  - stderr: |
+      Create request issued for: [trust.test.com]
+      Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+- execute:
+  - command: active-directory domains trusts delete trust.test.com --target-domain-name=prod-test.ad.com
+      --async
+  - prompt:
+    - message: |
+        You are about to delete a trust from [trust.test.com].
+    - input: y
+  - stderr: |
+      Delete request issued for: [trust.test.com]
+      Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+- execute:
+  - command: |-
+      active-directory domains trusts update trust.test.com
+      --target-domain-name=prod-test.ad.com --target-dns-ip-addresses=10.177.0.3 --async
+  - stderr: |
+      Request issued for: [trust.test.com]
+      Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+      Updated domain [trust.test.com].
+  - stdout: |
+      done: false
+      metadata:
+        '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+        apiVersion: v1beta1
+        cancelRequested: false
+        createTime: '2018-12-14T00:23:39.481183185Z'
+        target: projects/fake-project/locations/global/domains/trust.test.com
+        verb: create
+      name: projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287
+- execute:
+  - command: active-directory domains trusts validate-state trust.test.com --target-domain-name=prod-test.ad.com
+      --async
+  - stderr: |
+      Request issued for: [trust.test.com]
+      Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+  - stdout: |
+      done: false
+      metadata:
+        '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+        apiVersion: v1beta1
+        cancelRequested: false
+        createTime: '2018-12-14T00:23:39.481183185Z'
+        target: projects/fake-project/locations/global/domains/trust.test.com
+        verb: create
+      name: projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287
+actions:
+- execute_command:
+    command: active-directory domains trusts create trust.test.com --target-domain-name=prod-test.ad.com
+      --target-dns-ip-addresses=10.177.0.2 --type=EXTERNAL --direction=BIDIRECTIONAL
+      --handshake-secret=foobar --selective-authentication --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/trust.test.com:attachTrust?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              trust:
+                selectiveAuthentication: true
+                targetDnsIpAddresses:
+                - 10.177.0.2
+                targetDomainName: prod-test.ad.com
+                trustDirection: BIDIRECTIONAL
+                trustHandshakeSecret: foobar
+                trustType: EXTERNAL
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "done": false,
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "apiVersion": "v1beta1",
+                "cancelRequested": false,
+                "createTime": "2018-12-14T00:23:39.481183185Z",
+                "target": "projects/fake-project/locations/global/domains/trust.test.com",
+                "verb": "create"
+              },
+              "name": "projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287"
+            }
+    - expect_stderr: |
+        Create request issued for: [trust.test.com]
+        Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: active-directory domains trusts delete trust.test.com --target-domain-name=prod-test.ad.com
+      --async
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to delete a trust from [trust.test.com].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/trust.test.com:detachTrust?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              trust:
+                targetDomainName: prod-test.ad.com
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "done": false,
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "apiVersion": "v1beta1",
+                "cancelRequested": false,
+                "createTime": "2018-12-14T00:23:39.481183185Z",
+                "target": "projects/fake-project/locations/global/domains/trust.test.com",
+                "verb": "create"
+              },
+              "name": "projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287"
+            }
+    - expect_stderr: |
+        Delete request issued for: [trust.test.com]
+        Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |-
+      active-directory domains trusts update trust.test.com
+      --target-domain-name=prod-test.ad.com --target-dns-ip-addresses=10.177.0.3 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/trust.test.com:reconfigureTrust?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              targetDnsIpAddresses:
+              - 10.177.0.3
+              targetDomainName: prod-test.ad.com
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "done": false,
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "apiVersion": "v1beta1",
+                "cancelRequested": false,
+                "createTime": "2018-12-14T00:23:39.481183185Z",
+                "target": "projects/fake-project/locations/global/domains/trust.test.com",
+                "verb": "create"
+              },
+              "name": "projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287"
+            }
+    - expect_stderr: |
+        Request issued for: [trust.test.com]
+        Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+        Updated domain [trust.test.com].
+    - expect_stdout: |
+        done: false
+        metadata:
+          '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+          apiVersion: v1beta1
+          cancelRequested: false
+          createTime: '2018-12-14T00:23:39.481183185Z'
+          target: projects/fake-project/locations/global/domains/trust.test.com
+          verb: create
+        name: projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: active-directory domains trusts validate-state trust.test.com --target-domain-name=prod-test.ad.com
+      --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/trust.test.com:validateTrust?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              trust:
+                targetDomainName: prod-test.ad.com
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "done": false,
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "apiVersion": "v1beta1",
+                "cancelRequested": false,
+                "createTime": "2018-12-14T00:23:39.481183185Z",
+                "target": "projects/fake-project/locations/global/domains/trust.test.com",
+                "verb": "create"
+              },
+              "name": "projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287"
+            }
+    - expect_stderr: |
+        Request issued for: [trust.test.com]
+        Check operation [projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287] for status.
+    - expect_stdout: |
+        done: false
+        metadata:
+          '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+          apiVersion: v1beta1
+          cancelRequested: false
+          createTime: '2018-12-14T00:23:39.481183185Z'
+          target: projects/fake-project/locations/global/domains/trust.test.com
+          verb: create
+        name: projects/fake-project/locations/global/operations/operation-1544747019450-57cf0715cba46-7e6db0a2-b1ba0287
+    - expect_exit:
+        code: 0

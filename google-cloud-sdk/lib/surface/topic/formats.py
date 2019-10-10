@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ class Formats(base.TopicCommand):
 
           List a nested table of the quotas of a region:
 
-            $ gcloud compute regions describe us-central1 --format="table(quotas:format="table(metric,limit,usage)")"
+            $ gcloud compute regions describe us-central1 --format="table(quotas:format='table(metric,limit,usage)')"
 
           Print a flattened list of global quotas in CSV format:
 

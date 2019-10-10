@@ -52,7 +52,8 @@ EXAMPLES
         $ gcloud dns managed-zones list
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns managed-zones
         $ gcloud beta dns managed-zones
 

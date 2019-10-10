@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class Restore(base.UpdateCommand):
   keyring `fellowship` and location `us-east1` which was previously scheduled
   for destruction:
 
-    $ {command} 9 --location us-east1 --keyring fellowship --key frodo
+    $ {command} 9 --location=us-east1 --keyring=fellowship --key=frodo
   """
 
   @staticmethod

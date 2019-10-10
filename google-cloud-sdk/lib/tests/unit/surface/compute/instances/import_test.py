@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resources import InvalidResourceException
@@ -31,17 +32,18 @@ from tests.lib.surface.compute import test_resources
 _DEFAULT_TIMEOUT = '7056s'
 
 
-class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
+class InstanceImportTest(daisy_test_base.DaisyBaseTest):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.instance_name = 'my-instance'
     self.source_uri = 'gs://31dd/source-vm.ova'
     self.https_source_disk = ('https://storage.googleapis.com/'
                               '31dd/source-vm.ova')
-    self.ovf_builder = 'gcr.io/compute-image-tools/gce_ovf_import:release'
+    self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format(
+        daisy_utils._DEFAULT_BUILDER_VERSION)
     self.os = 'ubuntu-1604'
     self.tags = ['gce-ovf-import']
     self.zone = 'us-west1-c'
@@ -52,21 +54,22 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         '-instance-names={0}'.format(instance_names or self.instance_name),
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
-        '-machine-type=n1-standard-1',
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+        '-release-track={0}'.format(self.track.id.lower()),
     ],)
 
   def GetOVFNetworkStep(self, network_args):
     return self.GetOVFImportStepForArgs([
-        '-instance-names={0}'.format(self.instance_name), '-client-id=gcloud',
-        '-ovf-gcs-path={0}'.format(
-            self.source_uri), '-machine-type=n1-standard-1'
+        '-instance-names={0}'.format(self.instance_name),
+        '-client-id=gcloud',
+        '-ovf-gcs-path={0}'.format(self.source_uri),
     ] + network_args + [
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+        '-release-track={0}'.format(self.track.id.lower()),
     ])
 
   def GetOVFImportStepForArgs(self, args):
@@ -91,14 +94,6 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2}
              """.format(self.instance_name, self.source_uri, self.os))
-
-  def testMultipleInstances(self):
-    self.PrepareMocks(
-        self.GetOVFImportStep(instance_names='instance1,instance2,instance3'))
-    self._RunAndAssertSuccess("""
-             {0} --source-uri {1} --os {2}
-             """.format('instance1 instance2 instance3', self.source_uri,
-                        self.os))
 
   def testHttpsLinkToGcsImage(self):
     """Make sure https:// URIs are converted correctly to gs:// ones.
@@ -135,10 +130,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         '-instance-names={0}'.format(self.instance_name),
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
-        '-machine-type=n1-standard-1',
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=59s'  # OVF import timeout 2% sooner than Argo.
+        '-timeout=59s',  # OVF import timeout 2% sooner than Argo.
+        '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step, timeout='60s')
     self._RunAndAssertSuccess("""
@@ -150,10 +145,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         '-instance-names={0}'.format(self.instance_name),
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
-        '-machine-type=n1-standard-1',
         '-os={0}'.format(self.os),
         '-zone={0}'.format(self.zone),
-        '-timeout=21300s'  # OVF import timeout 5min sooner than Argo.
+        '-timeout=21300s',  # OVF import timeout 5min sooner than Argo.
+        '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step, timeout='21600s')
     self._RunAndAssertSuccess("""
@@ -167,23 +162,16 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             projectId='my-project',),
         response=self.project,
     )
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
+    self._ExpectServiceUsage()
+    get_request = self.crm_v1_messages \
+        .CloudresourcemanagerProjectsGetIamPolicyRequest(
+            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+                options=self.crm_v1_messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+            resource='my-project')
     self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',),
+        request=get_request,
         response=missing_permissions,
     )
     with self.assertRaises(console_io.UnattendedPromptError):
@@ -202,16 +190,22 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
 
     # Called once for each service account role.
     for _ in range(0, len(daisy_utils.SERVICE_ACCOUNT_ROLES)):
+      get_request = self.crm_v1_messages \
+          .CloudresourcemanagerProjectsGetIamPolicyRequest(
+              getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(
+                  options=self.crm_v1_messages.GetPolicyOptions(
+                      requestedPolicyVersion=
+                      iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
+              resource='my-project')
       self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-          self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-              resource='my-project'),
+          request=get_request,
           response=self.permissions,
       )
       self.mocked_crm_v1.projects.SetIamPolicy.Expect(
           self.crm_v1_messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
               resource='my-project',
               setIamPolicyRequest=self.crm_v1_messages.SetIamPolicyRequest(
-                  policy=self.permissions,),
+                  policy=self.permissions),
           ),
           response=self.permissions,
       )
@@ -234,10 +228,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         '-instance-names={0}'.format(self.instance_name),
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
-        '-machine-type=n1-standard-1',
         '-os={0}'.format(self.os),
         '-zone={0}'.format(zone),
         '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+        '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step_with_zone)
     flags = '{0} --source-uri {1} --os {2}'
@@ -252,15 +246,9 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         'argument --source-uri: Must be specified.'):
       self._RunFlags('{0} --os {1}'.format(self.instance_name, self.os))
 
-  def testMissingOsFlag(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --os: Must be specified.'):
-      self._RunFlags('{0} --source-uri {1}'.format(self.instance_name,
-                                                   self.source_uri))
-
   def testMissingInstanceName(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument INSTANCE_NAMES [INSTANCE_NAMES ...]: Must be specified.'):
+        'argument INSTANCE_NAME: Must be specified.'):
       self._RunFlags('--source-uri {0} --os {1}'.format(self.source_uri,
                                                         self.os))
 
@@ -271,10 +259,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-no-guest-environment',
-            '-machine-type=n1-standard-1',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
 
     self._RunAndAssertSuccess("""
@@ -288,10 +276,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-can-ip-forward',
-            '-machine-type=n1-standard-1',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2} --can-ip-forward
@@ -304,10 +292,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-deletion-protection',
-            '-machine-type=n1-standard-1',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2} --deletion-protection
@@ -320,10 +308,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-description=a_desc',
-            '-machine-type=n1-standard-1',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2} --description=a_desc
@@ -336,10 +324,10 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
             '-labels=lk1=lv1,lk2=lv2',
-            '-machine-type=n1-standard-1',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2} --labels=lk1=lv1,lk2=lv2
@@ -355,6 +343,7 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2} --machine-type=n2-standard-4
@@ -370,6 +359,7 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2}
@@ -382,14 +372,15 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-instance-names={0}'.format(self.instance_name),
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
-            '-machine-type=custom-2-5120-ext',
+            '-machine-type=n1-custom-2-5120-ext',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
     self._RunAndAssertSuccess("""
              {0} --source-uri {1} --os {2}
-             --custom-cpu=2 --custom-memory=5242880KB --custom-extensions
+             --custom-vm-type n1 --custom-cpu=2 --custom-memory=5242880KB --custom-extensions
              """.format(self.instance_name, self.source_uri, self.os))
 
   def testCustomMemoryWithoutCPU(self):
@@ -471,11 +462,11 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
             '-instance-names={0}'.format(self.instance_name),
             '-client-id=gcloud',
             '-ovf-gcs-path={0}'.format(self.source_uri),
-            '-machine-type=n1-standard-1',
             '-no-restart-on-failure',
             '-os={0}'.format(self.os),
             '-zone={0}'.format(self.zone),
             '-timeout={0}'.format(_DEFAULT_TIMEOUT),
+            '-release-track={0}'.format(self.track.id.lower()),
         ]))
 
     self._RunAndAssertSuccess("""
@@ -517,16 +508,97 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         '-instance-names={0}'.format(self.instance_name),
         '-client-id=gcloud',
         '-ovf-gcs-path={0}'.format(self.source_uri),
-        '-machine-type=n1-standard-1',
         '-os={0}'.format(self.os),
         '-tags={0}'.format(tags),
         '-zone={0}'.format(self.zone),
-        '-timeout=7056s'  # OVF import timeout 2% sooner than Argo.
+        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-release-track={0}'.format(self.track.id.lower()),
     ])
     self.PrepareMocks(ovf_import_step)
     self._RunAndAssertSuccess("""
                {0} --source-uri {1} --os {2} --tags {3}
                """.format(self.instance_name, self.source_uri, self.os, tags))
+
+  def testSoleTenantNode(self):
+    ovf_import_step = self.GetOVFImportStepForArgs([
+        '-instance-names={0}'.format(self.instance_name),
+        '-client-id=gcloud',
+        '-ovf-gcs-path={0}'.format(self.source_uri),
+        '-os={0}'.format(self.os),
+        '-zone={0}'.format(self.zone),
+        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-node-affinity-label=compute.googleapis.com/node-name,IN,A_NODE',
+        '-release-track={0}'.format(self.track.id.lower()),
+    ])
+    self.PrepareMocks(ovf_import_step)
+    self._RunAndAssertSuccess("""
+               {0} --source-uri {1} --os {2} --node A_NODE
+               """.format(self.instance_name, self.source_uri, self.os))
+
+  def testSoleTenantNodeGroup(self):
+    ovf_import_step = self.GetOVFImportStepForArgs([
+        '-instance-names={0}'.format(self.instance_name),
+        '-client-id=gcloud',
+        '-ovf-gcs-path={0}'.format(self.source_uri),
+        '-os={0}'.format(self.os),
+        '-zone={0}'.format(self.zone),
+        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-node-affinity-label=compute.googleapis.com/node-group-name,IN,A_NODE_GROUP',
+        '-release-track={0}'.format(self.track.id.lower()),
+    ])
+    self.PrepareMocks(ovf_import_step)
+    self._RunAndAssertSuccess("""
+               {0} --source-uri {1} --os {2} --node-group A_NODE_GROUP
+               """.format(self.instance_name, self.source_uri, self.os))
+
+  def testSoleTenantNodeAffinityFile(self):
+    ovf_import_step = self.GetOVFImportStepForArgs([
+        '-instance-names={0}'.format(self.instance_name),
+        '-client-id=gcloud',
+        '-ovf-gcs-path={0}'.format(self.source_uri),
+        '-os={0}'.format(self.os),
+        '-zone={0}'.format(self.zone),
+        '-timeout=7056s',  # OVF import timeout 2% sooner than Argo.
+        '-node-affinity-label=key1,IN,value1,value2',
+        '-node-affinity-label=key2,NOT_IN,value3,value4,value5',
+        '-release-track={0}'.format(self.track.id.lower()),
+    ])
+    self.PrepareMocks(ovf_import_step)
+    contents = """\
+[
+  {"operator": "IN", "values": ["value1", "value2"], "key": "key1"},
+  {"operator": "NOT_IN", "values": ["value3", "value4", "value5"], "key": "key2"}
+]
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+
+    self._RunAndAssertSuccess("""
+               {0} --source-uri {1} --os {2}
+               --node-affinity-file {3}
+               """.format(self.instance_name, self.source_uri, self.os,
+                          node_affinity_file))
+
+  def testSourceFileBucketOnlyGCSPath(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        r'Invalid value for [source-uri]: must be a path to an object or a directory in Google Cloud Storage'
+    ):
+      self._RunFlags("""
+               {0} --source-uri {1} --os {2}
+               """.format(self.instance_name, 'gs://bucket', self.os))
+
+  def testDockerImageTag(self):
+    self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format(
+        daisy_utils._DEFAULT_BUILDER_VERSION)
+    self.testCommonCase()
+
+    self.ovf_builder = daisy_utils._OVF_IMPORT_BUILDER.format('latest')
+    self.PrepareMocks(self.GetOVFImportStep())
+    self._RunAndAssertSuccess("""
+             {0} --source-uri {1} --os {2}
+             --docker-image-tag latest
+             """.format(self.instance_name, self.source_uri, self.os))
 
   def _RunFlags(self, flags):
     self.Run('compute instances import {0}'.format(flags))
@@ -537,6 +609,18 @@ class InstanceImportTestAlpha(daisy_test_base.DaisyBaseTest):
         """\
         [import-ovf] output
         """, normalize_space=True)
+
+
+class InstanceImportTestBeta(InstanceImportTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceImportTestAlpha(InstanceImportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

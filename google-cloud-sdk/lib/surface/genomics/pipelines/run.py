@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -500,9 +500,8 @@ reasonable default value is used.''')
             raise exceptions.GenomicsError('Invalid --disk-size.')
 
         for disk in virtual_machine.disks:
-          size = disk_sizes[disk.name]
-          if size:
-            disk.sizeGb = size
+          if disk.name in disk_sizes:
+            disk.sizeGb = disk_sizes[disk.name]
 
       request = genomics_messages.RunPipelineRequest(
           pipeline=pipeline,

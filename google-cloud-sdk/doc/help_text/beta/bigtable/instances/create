@@ -36,7 +36,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Return immediately, without waiting for operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --cluster-num-nodes=CLUSTER_NUM_NODES
         Number of nodes to serve.

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,7 +60,8 @@ class InstancesUpdateTest(base.SpannerTestBase):
     # LRO handling in gcloud, so only test Alpha track for update.yaml.
     if self.track == calliope_base.ReleaseTrack.ALPHA:
       self.AssertErrContains('Request issued for: [insId]')
-      self.AssertErrContains('Check operation [opId] for status.')
+      self.AssertErrContains('Check operation [{}] for status.'.format(
+          self.op_ref.RelativeName()))
       self.AssertErrContains('Updated instance [insId].\n')
 
   def testSync(self, track):

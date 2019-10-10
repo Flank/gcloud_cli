@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
@@ -34,7 +35,8 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
   def SetUp(self):
     self.image_name = 'my-image'
     self.destination_uri = 'gs://31dd/my-image.tar.gz'
-    self.daisy_builder = 'gcr.io/compute-image-tools/daisy:release'
+    self.builder = daisy_utils._IMAGE_EXPORT_BUILDER.format(
+        daisy_utils._DEFAULT_BUILDER_VERSION)
     self.tags = ['gce-daisy', 'gce-daisy-image-export']
 
   def PrepareDaisyMocksForExport(self, daisy_step, timeout='7200s',
@@ -48,36 +50,41 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         async_flag=async_flag,
         is_import=True)
 
-  def GetNetworkStepForExport(self, network=None, subnet=None,
-                              include_zone=True, include_empty_network=False):
-    daisy_vars = (
-        '-variables=source_image=projects/my-project/global/images/{0},'
-        'destination={1}{2}').format(self.image_name, self.destination_uri,
-                                     '{0}')
-    return self.GetNetworkStep(
-        workflow='../workflows/export/image_export.wf.json',
-        daisy_vars=daisy_vars,
-        operation=daisy_utils.ImageOperation.EXPORT,
-        regionalized=True,
-        network=network,
-        subnet=subnet,
-        include_zone=include_zone,
-        include_empty_network=include_empty_network)
+  def GetNetworkStepForExport(
+      self, network=None, subnet=None, include_zone=True,
+      include_empty_network=False, image_project='my-project',
+      workflow='../workflows/export/image_export.wf.json',
+      image_format=''):
+    export_vars = []
+
+    if subnet:
+      daisy_utils.AppendArg(export_vars, 'subnet', subnet)
+
+    if network:
+      daisy_utils.AppendArg(export_vars, 'network', network)
+
+    if include_zone:
+      daisy_utils.AppendArg(export_vars, 'zone', 'my-region-c')
+
+    daisy_utils.AppendArg(
+        export_vars, 'scratch_bucket_gcs_path',
+        'gs://{0}/'.format(self.GetScratchBucketNameWithRegion()))
+
+    daisy_utils.AppendArg(export_vars, 'timeout',
+                          daisy_test_base._DEFAULT_TIMEOUT)
+    daisy_utils.AppendArg(export_vars, 'client_id', 'gcloud')
+    daisy_utils.AppendArg(
+        export_vars, 'source_image', 'projects/{0}/global/images/{1}'.format(
+            image_project, self.image_name))
+    daisy_utils.AppendArg(export_vars, 'destination_uri', self.destination_uri)
+    daisy_utils.AppendArg(export_vars, 'format', image_format)
+
+    return self.cloudbuild_v1_messages.BuildStep(
+        args=export_vars, name=self.builder)
 
   def testCommonCase(self):
-    export_workflow = '../workflows/export/image_export.wf.json'
-    daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=[
-            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
-            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
-            '-variables=source_image=projects/my-project/global/images/{0},'
-            'destination={1}'.format(self.image_name, self.destination_uri),
-            export_workflow,
-        ],
-        name=self.daisy_builder,
-    )
-
-    self.PrepareDaisyMocksForExport(daisy_step)
+    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0}
@@ -89,20 +96,11 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testExportFormat(self):
-    export_workflow = '../workflows/export/image_export_ext.wf.json'
-    daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=[
-            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
-            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
-            '-variables=source_image=projects/my-project/global/images/{0},'
-            'destination={1},format=vmdk'
-            .format(self.image_name, self.destination_uri),
-            export_workflow,
-        ],
-        name=self.daisy_builder,
-    )
-
-    self.PrepareDaisyMocksForExport(daisy_step)
+    build_step = self.GetNetworkStepForExport(
+        include_zone=False,
+        workflow='../workflows/export/image_export_ext.wf.json',
+        image_format='vmdk')
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0}
@@ -114,45 +112,20 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testZoneFlag(self):
-    zone = 'us-west1-c'
-    export_workflow = '../workflows/export/image_export.wf.json'
-    daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=[
-            '-zone={0}'.format(zone),
-            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
-            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
-            '-variables=source_image=projects/my-project/global/images/{0},'
-            'destination={1}'.format(self.image_name, self.destination_uri),
-            export_workflow,
-        ],
-        name=self.daisy_builder,
-    )
-
-    self.PrepareDaisyMocksForExport(daisy_step)
+    build_step = self.GetNetworkStepForExport()
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0}
              --destination-uri {1} --zone={2}
-             """.format(self.image_name, self.destination_uri, zone))
+             """.format(self.image_name, self.destination_uri, 'my-region-c'))
 
     self.AssertOutputContains("""\
         [image-export] output
         """, normalize_space=True)
 
   def testServiceNotEnabled(self):
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.servicemanagement_v1_messages.ListServicesResponse(
-            services=[
-                # Missing 'cloudbuild.googleapis.com'.
-                self.servicemanagement_v1_messages.ManagedService(
-                    serviceName='logging.googleapis.com')
-            ]
-        )
-    )
+    self._ExpectServiceUsage(build_enabled=False)
 
     self.mocked_crm_v1.projects.Get.Expect(
         self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
@@ -174,20 +147,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     self.AssertErrContains('cloudbuild.googleapis.com')
 
   def testImageProject(self):
-    export_workflow = '../workflows/export/image_export.wf.json'
-    daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=[
-            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
-            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
-            '-variables=source_image=projects/debian-cloud/global/images/{0},'
-            'destination={1}'
-            .format(self.image_name, self.destination_uri),
-            export_workflow,
-        ],
-        name=self.daisy_builder,
-    )
-
-    self.PrepareDaisyMocksForExport(daisy_step)
+    build_step = self.GetNetworkStepForExport(include_zone=False,
+                                              image_project='debian-cloud')
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0}
@@ -199,9 +161,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testNetworkFlag(self):
-    daisy_step = self.GetNetworkStepForExport(
+    build_step = self.GetNetworkStepForExport(
         network=self.network, include_zone=False)
-    self.PrepareDaisyMocksForExport(daisy_step)
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0}
@@ -227,9 +189,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
                """.format(self.image_name))
 
   def testSubnetFlag(self):
-    daisy_step = self.GetNetworkStepForExport(
+    build_step = self.GetNetworkStepForExport(
         network=self.network, subnet=self.subnet)
-    self.PrepareDaisyMocksForExport(daisy_step)
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
@@ -242,9 +204,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testSubnetFlagNetworkVariableClearedIfNetworkFlagNotSpecified(self):
-    daisy_step = self.GetNetworkStepForExport(
+    build_step = self.GetNetworkStepForExport(
         network='', include_empty_network=True, subnet=self.subnet)
-    self.PrepareDaisyMocksForExport(daisy_step)
+    self.PrepareDaisyMocksForExport(build_step)
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
@@ -255,19 +217,26 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         [image-export] output
         """, normalize_space=True)
 
+  # Subnet region logic is hosted by export cli tool, so there won't be
+  # exception thrown anymore.
   def testSubnetFlagZoneAndRegionNotSpecified(self):
-    error = r'Region or zone should be specified.'
-    with self.AssertRaisesExceptionRegexp(
-        daisy_utils.SubnetException, error):
-      self.Run("""
+    daisy_step = self.GetNetworkStepForExport(subnet=self.subnet,
+                                              include_zone=False)
+    self.PrepareDaisyMocksForExport(daisy_step)
+
+    self.Run("""
              compute images export --image {0} --destination-uri {1}
              --subnet {2}
              """.format(self.image_name, self.destination_uri, self.subnet))
 
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
   def testSubnetFlagZoneAsProperty(self):
-    daisy_step = self.GetNetworkStepForExport(
+    build_step = self.GetNetworkStepForExport(
         network=self.network, subnet=self.subnet)
-    self.PrepareDaisyMocksForExport(daisy_step)
+    self.PrepareDaisyMocksForExport(build_step)
 
     properties.VALUES.compute.zone.Set('my-region-c')
     self.Run("""
@@ -281,9 +250,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testSubnetFlagRegionAsProperty(self):
-    daisy_step = self.GetNetworkStepForExport(
+    build_step = self.GetNetworkStepForExport(
         network=self.network, subnet=self.subnet, include_zone=False)
-    self.PrepareDaisyMocksForExport(daisy_step)
+    self.PrepareDaisyMocksForExport(build_step)
 
     properties.VALUES.compute.region.Set('my-region')
     self.Run("""
@@ -296,11 +265,67 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         [image-export] output
         """, normalize_space=True)
 
+  def testScratchBucketCreatedInSourceRegion(self):
+    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.PrepareDaisyMocks(build_step)
+
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
+        response=self.storage_v1_messages.Bucket(
+            name='31dd',
+            storageClass='REGIONAL',
+            location=self.GetScratchBucketRegion()
+        ),
+    )
+
+    daisy_bucket_name = self.GetScratchBucketNameWithRegion()
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=daisy_bucket_name),
+        exception=api_exceptions.HttpNotFoundError(None, None, None))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=daisy_bucket_name,
+                location=self.GetScratchBucketRegion(),
+
+            ),
+            project='my-project',
+        ),
+        response=self.storage_v1_messages.Bucket(id=daisy_bucket_name))
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1}
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
+
 
 class ImagesExportTestBeta(ImagesExportTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testDockerImageTag(self):
+    self.builder = daisy_utils._IMAGE_EXPORT_BUILDER.format(
+        daisy_utils._DEFAULT_BUILDER_VERSION)
+    self.testCommonCase()
+
+    self.builder = daisy_utils._IMAGE_EXPORT_BUILDER.format('latest')
+    build_step = self.GetNetworkStepForExport(include_zone=False)
+    self.PrepareDaisyMocksForExport(build_step)
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1}
+             --docker-image-tag latest
+             """.format(self.image_name, self.destination_uri))
+    self.AssertOutputContains("""\
+        [image-export] output
+        """, normalize_space=True)
 
 
 class ImagesExportTestAlpha(ImagesExportTestBeta):

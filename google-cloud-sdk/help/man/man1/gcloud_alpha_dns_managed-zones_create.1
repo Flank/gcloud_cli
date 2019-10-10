@@ -1,0 +1,178 @@
+
+.TH "GCLOUD_ALPHA_DNS_MANAGED\-ZONES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dns managed\-zones create \- create a Cloud DNS managed\-zone
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dns managed\-zones create\fR \fIZONE_NAME\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-dns\-name\fR=\fIDNS_NAME\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-visibility\fR=\fIVISIBILITY\fR;\ default="public"] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command creates a Cloud DNS managed\-zone.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIZONE_NAME\fR
+The name of the managed\-zone to be created.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Short description for the managed\-zone.
+
+.TP 2m
+\fB\-\-dns\-name\fR=\fIDNS_NAME\fR
+The DNS name suffix that will be managed with the created zone.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR
+Requires DNSSEC enabled. \fIDENIAL_OF_EXISTENCE\fR must be one of: \fBnsec\fR,
+\fBnsec3\fR.
+
+.TP 2m
+\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR
+The DNSSEC state for this managed zone. \fIDNSSEC_STATE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+Disable DNSSEC for the managed zone.
+.TP 2m
+\fBon\fR
+Enable DNSSEC for the managed zone.
+.TP 2m
+\fBtransfer\fR
+Enable DNSSEC and allow transferring a signed zone in or out.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]
+List of IPv4 addresses of target name servers that the zone will forward queries
+to. Ignored for \f5public\fR visibility. Non\-RFC1918 addresses will forward to
+the target through the Internet. RFC1918 addresses will forward through the VPC.
+
+.TP 2m
+\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR
+String mnemonic specifying the DNSSEC algorithm of the key\-signing key.
+Requires DNSSEC enabled. \fIKSK_ALGORITHM\fR must be one of:
+\fBecdsap256sha256\fR, \fBecdsap384sha384\fR, \fBrsasha1\fR, \fBrsasha256\fR,
+\fBrsasha512\fR.
+
+.TP 2m
+\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR
+Length of the key\-signing key in bits. Requires DNSSEC enabled.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-networks\fR=[\fINETWORK\fR,...]
+List of networks that the zone should be visible in if the zone visibility is
+[private].
+
+.TP 2m
+\fB\-\-visibility\fR=\fIVISIBILITY\fR; default="public"
+Visibility of the zone. Public zones are visible to the public internet. Private
+zones are only visible in your internal networks denoted by the
+\f5\-\-networks\fR flag. \fIVISIBILITY\fR must be one of: \fBpublic\fR,
+\fBprivate\fR.
+
+.TP 2m
+\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR
+String mnemonic specifying the DNSSEC algorithm of the key\-signing key.
+Requires DNSSEC enabled. \fIZSK_ALGORITHM\fR must be one of:
+\fBecdsap256sha256\fR, \fBecdsap384sha384\fR, \fBrsasha1\fR, \fBrsasha256\fR,
+\fBrsasha512\fR.
+
+.TP 2m
+\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR
+Length of the zone\-signing key in bits. Requires DNSSEC enabled.
+
+.TP 2m
+\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR
+Network ID of the Google Compute Engine private network to forward queries to.
+
+.TP 2m
+\fB\-\-target\-project\fR=\fITARGET_PROJECT\fR
+Project ID of the Google Compute Engine private network to forward queries to.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a managed\-zone, run:
+
+.RS 2m
+$ gcloud alpha dns managed\-zones create my_zone \e
+    \-\-dns\-name=my.zone.com. \-\-description="My zone!"
+.RE
+
+To create a managed\-zone with DNSSEC, run:
+
+.RS 2m
+$ gcloud alpha dns managed\-zones create my_zone_2 \e
+    \-\-description="Signed Zone" \e
+    \-\-dns\-name=myzone.example \e
+    \-\-dnssec\-state=on
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud dns managed\-zones create
+$ gcloud beta dns managed\-zones create
+.RE
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,14 +39,15 @@ IOS_CATALOG_GET = (
         projectId=unit_base.TestUnitTestBase.PROJECT_ID))
 
 ALL_GA_TEST_RUN_ARGS = [
-    'async', 'device', 'network_profile', 'num_flaky_test_attempts',
+    'app', 'async_', 'device', 'network_profile', 'num_flaky_test_attempts',
     'record_video', 'results_bucket', 'results_dir', 'results_history_name',
-    'test', 'timeout', 'type', 'xcode_version', 'xctestrun_file'
+    'scenario_numbers', 'test', 'timeout', 'type', 'xcode_version',
+    'xctestrun_file'
 ]
 
 ALL_TEST_RUN_ARGS = {
     calliope_base.ReleaseTrack.GA: ALL_GA_TEST_RUN_ARGS,
-    calliope_base.ReleaseTrack.BETA: ALL_GA_TEST_RUN_ARGS + []
+    calliope_base.ReleaseTrack.BETA: ALL_GA_TEST_RUN_ARGS + ['client_details']
 }
 
 

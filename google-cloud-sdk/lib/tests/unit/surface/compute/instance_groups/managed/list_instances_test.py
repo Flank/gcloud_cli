@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
   def testListInstancesByUri(self):
     self.Run("""
         compute instance-groups managed list-instances
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroupManagers/group-1
           --zone central2-a
         """.format(API_VERSION))
     self.AssertOutputEquals(
@@ -103,10 +103,10 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
             """.format(API_VERSION)))
 
 
@@ -151,7 +151,7 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
   def testListInstancesByUri(self):
     self.Run("""
         compute instance-groups managed list-instances
-          https://www.googleapis.com/compute/{0}/projects/my-project/regions/central2/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/central2/instanceGroupManagers/group-1
           --region central2
         """.format(API_VERSION))
     self.AssertOutputEquals(
@@ -186,10 +186,10 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-4
             """.format(API_VERSION)))
 
   def testPrompting(self):

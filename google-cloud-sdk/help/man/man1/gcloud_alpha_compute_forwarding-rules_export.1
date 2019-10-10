@@ -17,8 +17,7 @@ gcloud alpha compute forwarding\-rules export \- export a forwarding rule
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Exports a forwarding rule's configuration to a file. This
-configuration can be imported at a later time.
+\fB(ALPHA)\fR Exports a forwarding rule's configuration to a file.
 
 
 
@@ -95,11 +94,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+A forwarding rule can be exported by running:
+
+.RS 2m
+$ gcloud alpha compute forwarding\-rules export NAME \e
+    \-\-destination=<path\-to\-file>
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute forwarding\-rules export
+.RE
 

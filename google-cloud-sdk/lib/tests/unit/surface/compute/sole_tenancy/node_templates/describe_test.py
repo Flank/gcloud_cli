@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,9 +48,9 @@ class NodeTemplatesDescribeTest(test_base.BaseTest):
       environment: prod
       nodeGrouping: backend
     nodeType: n1-node-96-624
-    region: https://www.googleapis.com/compute/v1/projects/my-project/regions/\
+    region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/\
 region-1
-    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/\
+    selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/\
 regions/region-1/nodeTemplates/template-2
     status: CREATING
     statusMessage: Template is being created.

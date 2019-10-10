@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,16 +53,25 @@ class ConfigureDocker(base.Command):
   """
   # pylint: enable=line-too-long
 
+  def DockerCredentialGcloudExists(self):
+    return file_utils.SearchForExecutableOnPath(
+        'docker-credential-gcloud') or file_utils.SearchForExecutableOnPath(
+            'docker-credential-gcloud.cmd')
+
+  def DockerExists(self):
+    return file_utils.SearchForExecutableOnPath(
+        'docker') or file_utils.SearchForExecutableOnPath('docker.exe')
+
   def Run(self, args):
     """Run the configure-docker command."""
-    if not file_utils.SearchForExecutableOnPath('docker-credential-gcloud'):
+    if not self.DockerCredentialGcloudExists():
       log.warning('`docker-credential-gcloud` not in system PATH.\n'
                   'gcloud\'s Docker credential helper can be configured but '
                   'it will not work until this is corrected.')
 
     current_config = cred_utils.Configuration.ReadFromDisk()
 
-    if file_utils.SearchForExecutableOnPath('docker'):
+    if self.DockerExists():
       if not current_config.SupportsRegistryHelpers():
         raise ConfigureDockerError(
             'Invalid Docker version: The version of your Docker client is '

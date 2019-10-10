@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,11 +46,12 @@ class UpdateCluster(base.UpdateCommand):
     """
     cluster_ref = args.CONCEPTS.cluster.Parse()
     operation = clusters.Update(cluster_ref, args.num_nodes)
-    if not args.async:
+    if not args.async_:
       operation_ref = util.GetOperationRef(operation)
       return util.AwaitCluster(
           operation_ref,
           'Updating bigtable cluster {0}'.format(cluster_ref.Name()))
 
-    log.UpdatedResource(cluster_ref.Name(), kind='cluster', is_async=args.async)
+    log.UpdatedResource(
+        cluster_ref.Name(), kind='cluster', is_async=args.async_)
     return None

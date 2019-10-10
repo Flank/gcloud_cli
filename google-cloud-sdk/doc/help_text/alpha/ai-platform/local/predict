@@ -11,7 +11,9 @@ DESCRIPTION
     (ALPHA) gcloud alpha ai-platform local predict performs prediction locally
     with the given instances. It requires the TensorFlow SDK be installed
     locally. The output format mirrors gcloud ai-platform predict (online
-    prediction)
+    prediction).
+
+    You cannot use this command with custom prediction routines.
 
 REQUIRED FLAGS
      --model-dir=MODEL_DIR
@@ -46,7 +48,7 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --framework=FRAMEWORK
         The ML framework used to train this version of the model. If not
-        specified, defaults to tensorflow. FRAMEWORK must be one of:
+        specified, defaults to 'tensorflow'. FRAMEWORK must be one of:
         scikit-learn, tensorflow, xgboost.
 
      --signature-name=SIGNATURE_NAME
@@ -65,9 +67,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud ai-platform local predict
         $ gcloud beta ai-platform local predict

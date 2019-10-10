@@ -9,11 +9,11 @@ SYNOPSIS
 DESCRIPTION
     (BETA) This command accepts a description of the desired policy in the form
     of a YAML-formatted file. A representation of the current policy can be
-    retrieved using the $ gcloud beta container binauthz policy describe
-    command. One method of modifying the policy is to run gcloud beta container
-    binauthz policy export, dump the contents to a file, modify them to reflect
-    the desired end-state, and provide this modifyied file to gcloud beta
-    container binauthz policy import.
+    retrieved using the $ gcloud beta container binauthz policy export command.
+    One method of modifying the policy is to run $ gcloud beta container
+    binauthz policy export, dump the contents to a file, modify the policy file
+    to reflect the desired new policy, and provide this modified file to $
+    gcloud beta container binauthz policy import.
 
 POSITIONAL ARGUMENTS
      POLICY_FILE
@@ -31,17 +31,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-EXAMPLE
-    One way of updating the current project's policy is to run:
+EXAMPLES
+    To update the current project's policy:
 
         $ gcloud beta container binauthz policy export > my_policy.yaml
         $ edit my_policy.yaml
-        $ gcloud beta container binauthz policy import \
-          --policy-file=my_policy.yaml
+        $ gcloud beta container binauthz policy import my_policy.yaml
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud container binauthz policy import
         $ gcloud alpha container binauthz policy import
 

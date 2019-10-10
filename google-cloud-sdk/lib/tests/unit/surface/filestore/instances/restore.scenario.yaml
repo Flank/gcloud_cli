@@ -13,7 +13,22 @@ summary:
   - stderr: |
       Request issued for: [inst]
   - progress_tracker:
-    - message: Waiting for operation [operation-1551489027275-583123057fb4e-308c14a6-669c24a0]
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      {}
+- execute:
+  - command: |
+      filestore instances restore inst --source-snapshot=snap --file-share=fs --zone=us-central1-b --project=fake-project
+  - prompt:
+    - message: |
+        You are about to override existing data in [inst].
+    - input: y
+  - stderr: |
+      Request issued for: [inst]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0]
         to complete
     - status: SUCCESS
   - stdout: |
@@ -103,7 +118,108 @@ actions:
             }
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [operation-1551489027275-583123057fb4e-308c14a6-669c24a0]
+        message: Waiting for operation [projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-b/instances/inst?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      filestore instances restore inst --source-snapshot=snap --file-share=fs --zone=us-central1-b --project=fake-project
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to override existing data in [inst].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-b/instances/inst:restore?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShare: fs
+              sourceSnapshot: projects/fake-project/locations/us-central1-b/snapshots/snap
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-03-02T01:10:27.293975235Z",
+                "target": "projects/fake-project/locations/us-central1-b/instances/inst",
+                "verb": "restore",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Request issued for: [inst]
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2019-03-02T01:10:27.293975235Z",
+                "endTime": "2019-03-02T01:13:40.685767154Z",
+                "target": "projects/fake-project/locations/us-central1-b/instances/inst",
+                "verb": "restore",
+                "cancelRequested": false,
+                "apiVersion": "v1p1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.filestore.v1p1alpha1.Instance",
+                "name": "projects/fake-project/locations/us-central1-b/instances/inst",
+                "state": "READY",
+                "createTime": "2019-03-02T00:20:07.854311667Z",
+                "tier": "STANDARD",
+                "fileShares": [
+                  {
+                    "name": "fs",
+                    "capacityGb": "1024",
+                    "sourceSnapshot": "projects/fake-project/locations/us-central1-b/snapshots/snap"
+                  }
+                ],
+                "networks": [
+                  {
+                    "network": "default",
+                    "reservedIpRange": "10.40.229.128/29",
+                    "ipAddresses": [
+                      "10.40.229.130"
+                    ]
+                  }
+                ]
+              }
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1-b/operations/operation-1551489027275-583123057fb4e-308c14a6-669c24a0]
           to complete
         status: SUCCESS
     - api_call:

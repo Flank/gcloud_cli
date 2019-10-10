@@ -5,7 +5,7 @@
  "name": "bigtableclusteradmin",
  "canonicalName": "Bigtable Cluster Admin",
  "version": "v1",
- "revision": "20190403",
+ "revision": "20190930",
  "title": "Cloud Bigtable Cluster Admin API",
  "description": "This is a OnePlatform service.",
  "ownerDomain": "google.com",
@@ -69,6 +69,9 @@
  "auth": {
   "oauth2": {
    "scopes": {
+    "https://www.googleapis.com/auth/bigquery.readonly": {
+     "description": "View your data in Google BigQuery"
+    },
     "https://www.googleapis.com/auth/cloud-bigtable.admin": {
      "description": "Administer your Cloud Bigtable tables and clusters"
     },
@@ -521,6 +524,7 @@
           "$ref": "Cluster"
          },
          "scopes": [
+          "https://www.googleapis.com/auth/bigquery.readonly",
           "https://www.googleapis.com/auth/cloud-bigtable.admin",
           "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
           "https://www.googleapis.com/auth/cloud-platform",

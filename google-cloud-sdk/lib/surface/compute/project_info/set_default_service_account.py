@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class SetDefaultServiceAccount(base.SilentCommand):
 
   For example,
 
-    $ {command} --email=example@developers.gserviceaccount.com
+    $ {command} --service-account=example@developers.gserviceaccount.com
     $ gcloud compute instances create instance-name
 
   will set the project's default service account as

@@ -11,7 +11,7 @@ gcloud beta container node\-pools create \- create a node pool in a running clus
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,22 +72,22 @@ one of: \fBpd\-standard\fR, \fBpd\-ssd\fR.
 
 .TP 2m
 \fB\-\-enable\-autorepair\fR
-Enable node autorepair feature for a node\-pool.
+Enable node autorepair feature for a node pool.
 
 .RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autorepair
 .RE
 
-Node autorepair is enabled by default for node pools using COS as a base image,
-use \-\-no\-enable\-autorepair to disable.
+Node autorepair is enabled by default for node pools using COS or COS_CONTAINERD
+as a base image, use \-\-no\-enable\-autorepair to disable.
 
 See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
 for more info.
 
 .TP 2m
 \fB\-\-enable\-autoupgrade\fR
-Sets autoupgrade feature for a node\-pool.
+Sets autoupgrade feature for a node pool.
 
 .RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
@@ -229,7 +229,7 @@ CPU platform selection is available only in selected zones.
 
 .TP 2m
 \fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]
-Applies the given kubernetes labels on all nodes in the new node\-pool. Example:
+Applies the given kubernetes labels on all nodes in the new node pool. Example:
 
 .RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
@@ -247,9 +247,20 @@ Kubernetes Engine labels that are used for the purpose of tracking billing and
 usage information.
 
 .TP 2m
+\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
+The set of zones in which the node pool's nodes should be located.
+
+Multiple locations can be specified, separated by commas. For example:
+
+.RS 2m
+$ gcloud beta container node\-pools create node\-pool\-1 \e
+    \-\-node\-locations=us\-central1\-a,us\-central1\-b
+.RE
+
+.TP 2m
 \fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]
-Applies the given kubernetes taints on all nodes in the new node\-pool, which
-can be used with tolerations for pod scheduling. Example:
+Applies the given kubernetes taints on all nodes in the new node pool, which can
+be used with tolerations for pod scheduling. Example:
 
 .RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
@@ -279,7 +290,7 @@ The number of nodes in the node pool in each of the cluster's zones.
 
 .TP 2m
 \fB\-\-preemptible\fR
-Create nodes using preemptible VM instances in the new nodepool.
+Create nodes using preemptible VM instances in the new node pool.
 
 .RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
@@ -292,7 +303,7 @@ for more information on how to use Preemptible VMs with Kubernetes Engine.
 
 .TP 2m
 \fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]
-Enables the requested sandbox on all nodes in the node\-pool. Example:
+Enables the requested sandbox on all nodes in the node pool. Example:
 
 .RS 2m
 $ gcloud beta container node\-pools create node\-pool\-1 \e
@@ -300,6 +311,17 @@ $ gcloud beta container node\-pools create node\-pool\-1 \e
 .RE
 
 The only supported type is 'gvisor'.
+
+.TP 2m
+\fB\-\-shielded\-integrity\-monitoring\fR
+Enables monitoring and attestation of the boot integrity of the instance. The
+attestation is performed against the integrity policy baseline. This baseline is
+initially derived from the implicitly trusted boot image when the instance is
+created.
+
+.TP 2m
+\fB\-\-shielded\-secure\-boot\fR
+The instance will boot with secure boot enabled.
 
 .TP 2m
 \fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
@@ -318,13 +340,13 @@ examples.
 
 .TP 2m
 \fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR
-Type of metadata server available to pods running in the nodepool.
+Type of metadata server available to pods running in the node pool.
 \fIWORKLOAD_METADATA_FROM_NODE\fR must be one of:
 
 .RS 2m
 .TP 2m
 \fBEXPOSED\fR
-Pods running in this nodepool have access to the node's underlying Compute
+Pods running in this node pool have access to the node's underlying Compute
 Engine Metadata Server.
 .TP 2m
 \fBGKE_METADATA_SERVER\fR

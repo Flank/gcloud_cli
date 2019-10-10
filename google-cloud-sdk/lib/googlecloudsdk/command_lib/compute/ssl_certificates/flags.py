@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,51 +71,52 @@ class RegionSslCertificatesCompleter(compute_completers.ListCommandCompleter):
         **kwargs)
 
 
-class SslCertificatesCompleterAlpha(completers.MultiResourceCompleter):
+class SslCertificatesCompleterBeta(completers.MultiResourceCompleter):
 
   def __init__(self, **kwargs):
-    super(SslCertificatesCompleterAlpha, self).__init__(
+    super(SslCertificatesCompleterBeta, self).__init__(
         completers=[
             GlobalSslCertificatesCompleter, RegionSslCertificatesCompleter
         ],
         **kwargs)
 
 
-def SslCertificateArgument(required=True, plural=False, include_alpha=False):
+def SslCertificateArgument(required=True,
+                           plural=False,
+                           include_l7_internal_load_balancing=False):
   return compute_flags.ResourceArgument(
       resource_name='SSL certificate',
-      completer=SslCertificatesCompleterAlpha
-      if include_alpha else SslCertificatesCompleter,
+      completer=SslCertificatesCompleterBeta
+      if include_l7_internal_load_balancing else SslCertificatesCompleter,
       plural=plural,
       required=required,
       global_collection='compute.sslCertificates',
       regional_collection='compute.regionSslCertificates'
-      if include_alpha else None,
+      if include_l7_internal_load_balancing else None,
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
-      if include_alpha else None)
+      if include_l7_internal_load_balancing else None)
 
 
-def SslCertificatesArgumentForOtherResource(resource,
-                                            required=True,
-                                            include_alpha=False):
+def SslCertificatesArgumentForOtherResource(
+    resource, required=True, include_l7_internal_load_balancing=False):
   return compute_flags.ResourceArgument(
       name='--ssl-certificates',
       resource_name='ssl certificate',
-      completer=SslCertificatesCompleterAlpha
-      if include_alpha else SslCertificatesCompleter,
+      completer=SslCertificatesCompleterBeta
+      if include_l7_internal_load_balancing else SslCertificatesCompleter,
       plural=True,
       required=required,
       global_collection='compute.sslCertificates',
       regional_collection='compute.regionSslCertificates'
-      if include_alpha else None,
+      if include_l7_internal_load_balancing else None,
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
-      if include_alpha else None,
+      if include_l7_internal_load_balancing else None,
       short_help=('A reference to SSL certificate resources that are used for '
                   'server-side authentication.'),
       detailed_help="""\
         References to at most 15 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is
         considered the primary SSL certificate associated with the load
-        balancer. The SSL certificate must exist and cannot be deleted while
+        balancer. The SSL certificates must exist and cannot be deleted while
         referenced by a {0}.
         """.format(resource))

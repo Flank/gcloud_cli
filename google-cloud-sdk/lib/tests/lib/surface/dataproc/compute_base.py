@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,12 +54,12 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
                                                    self.GetComputeApiVersion())
 
   def SubnetUri(self):
-    return ('https://www.googleapis.com/compute/{track}/projects/'
+    return ('https://compute.googleapis.com/compute/{track}/projects/'
             '{project}/regions/us-central1/subnetworks/test-subnetwork'.format(
                 track=self.GetComputeApiVersion(), project=self.Project()))
 
   def ImageUri(self):
-    return ('https://www.googleapis.com/compute/{track}/projects/'
+    return ('https://compute.googleapis.com/compute/{track}/projects/'
             '{project}/global/images/test-image'.format(
                 track=self.GetComputeApiVersion(), project=self.Project()))
 
@@ -68,12 +68,12 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
     return [
         self.compute_messages.Zone(
             name='us-central1-a',
-            region=('https://www.googleapis.com/compute/{track}/projects/'
+            region=('https://compute.googleapis.com/compute/{track}/projects/'
                     '{project}/regions/us-central1'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())),
             status=self.compute_messages.Zone.StatusValueValuesEnum.UP,
-            selfLink=('https://www.googleapis.com/compute/{track}/projects/'
+            selfLink=('https://compute.googleapis.com/compute/{track}/projects/'
                       '{project}/zones/us-central1-a'.format(
                           track=self.GetComputeApiVersion(),
                           project=self.Project())),
@@ -82,40 +82,40 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
                        StateValueValuesEnum.DEPRECATED),
                 deleted='2015-03-29T00:00:00.000-07:00',
                 replacement=(
-                    'https://www.googleapis.com/compute/{track}/projects/'
+                    'https://compute.googleapis.com/compute/{track}/projects/'
                     '{project}/zones/us-central1-b'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())))),
         self.compute_messages.Zone(
             name='us-central1-b',
             status=self.compute_messages.Zone.StatusValueValuesEnum.UP,
-            region=('https://www.googleapis.com/compute/{track}/projects/'
+            region=('https://compute.googleapis.com/compute/{track}/projects/'
                     '{project}/regions/us-central1'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())),
-            selfLink=('https://www.googleapis.com/compute/{track}/projects/'
+            selfLink=('https://compute.googleapis.com/compute/{track}/projects/'
                       '{project}/zones/us-central1-b'.format(
                           track=self.GetComputeApiVersion(),
                           project=self.Project()))),
         self.compute_messages.Zone(
             name='europe-west1-a',
             status=self.compute_messages.Zone.StatusValueValuesEnum.UP,
-            region=('https://www.googleapis.com/compute/{track}/projects/'
+            region=('https://compute.googleapis.com/compute/{track}/projects/'
                     '{project}/regions/europe-west1'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())),
-            selfLink=('https://www.googleapis.com/compute/{track}/projects/'
+            selfLink=('https://compute.googleapis.com/compute/{track}/projects/'
                       '{project}/zones/europe-west1-a'.format(
                           track=self.GetComputeApiVersion(),
                           project=self.Project()))),
         self.compute_messages.Zone(
             name='europe-west1-b',
             status=self.compute_messages.Zone.StatusValueValuesEnum.DOWN,
-            region=('https://www.googleapis.com/compute/{track}/projects/'
+            region=('https://compute.googleapis.com/compute/{track}/projects/'
                     '{project}/regions/europe-west1'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())),
-            selfLink=('https://www.googleapis.com/compute/{track}/projects/'
+            selfLink=('https://compute.googleapis.com/compute/{track}/projects/'
                       '{project}/zones/europe-west1-a'.format(
                           track=self.GetComputeApiVersion(),
                           project=self.Project())),
@@ -124,7 +124,7 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
                        StateValueValuesEnum.DELETED),
                 deleted='2015-03-29T00:00:00.000-07:00',
                 replacement=(
-                    'https://www.googleapis.com/compute/{track}/projects/'
+                    'https://compute.googleapis.com/compute/{track}/projects/'
                     '{project}/zones/europe-west1-a'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project()))))
@@ -146,5 +146,5 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
     def check_requests():
       self.compute_requests_patcher.assert_called_once_with(
           requests=requests, batch_url=mock.ANY, errors=mock.ANY,
-          http=mock.ANY, progress_tracker=None)
+          http=mock.ANY, progress_tracker=None, followup_overrides=None)
     self.addCleanup(check_requests)

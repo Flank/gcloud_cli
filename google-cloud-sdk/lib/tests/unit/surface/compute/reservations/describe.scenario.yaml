@@ -6,7 +6,7 @@ summary:
   - command: |
       compute reservations describe my-reservation --zone=my-zone
   - stdout: |
-      commitment: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/regions/us-central1/commitments/com-n
+      commitment: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/regions/us-central1/commitments/com-n
       creationTimestamp: '2018-09-20T01:37:17.423-07:00'
       kind: compute#allocation
       name: my-reservation
@@ -17,11 +17,12 @@ summary:
           machineType: n1-standard-1
           minCpuPlatform: Intel Skylake
       specificAllocationRequired: false
-      zone: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/my-zone
+      zone: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/my-zone
 actions:
 - define_reference:
     reference: api-version
     track_values:
+      GA: v1
       BETA: beta
       ALPHA: alpha
 - execute_command:
@@ -30,20 +31,20 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             status: '200'
-          body: {creationTimestamp: '2018-09-20T01:37:17.423-07:00', zone: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/my-zone,
-            name: my-reservation, commitment: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/regions/us-central1/commitments/com-n,
+          body: {creationTimestamp: '2018-09-20T01:37:17.423-07:00', zone: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/my-zone,
+            name: my-reservation, commitment: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/regions/us-central1/commitments/com-n,
             specificAllocationRequired: false, kind: compute#allocation, specificAllocation: {
               instanceProperties: {machineType: n1-standard-1, minCpuPlatform: Intel
                   Skylake}, count: '1', inUseCount: '0'}}
     - expect_stdout: |
-        commitment: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/regions/us-central1/commitments/com-n
+        commitment: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/regions/us-central1/commitments/com-n
         creationTimestamp: '2018-09-20T01:37:17.423-07:00'
         kind: compute#allocation
         name: my-reservation
@@ -54,6 +55,6 @@ actions:
             machineType: n1-standard-1
             minCpuPlatform: Intel Skylake
         specificAllocationRequired: false
-        zone: https://www.googleapis.com/compute/$$api-version$$/projects/my-project/zones/my-zone
+        zone: https://compute.googleapis.com/compute/$$api-version$$/projects/my-project/zones/my-zone
     - expect_exit:
         code: 0

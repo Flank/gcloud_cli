@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,15 @@ SERVICE_ROUTES_READY = 'RoutesReady'
 SERVICE_CONFIGURATIONS_READY = 'ConfigurationsReady'
 
 
+def _NewRoutingTrafficStage():
+  return progress_tracker.Stage(
+      'Routing traffic...', key=SERVICE_ROUTES_READY)
+
+
+def UpdateTrafficStages():
+  return [_NewRoutingTrafficStage()]
+
+
 # Because some terminals cannot update multiple lines of output simultaneously,
 # the order of conditions in this dictionary should match the order in which we
 # expect cloud run resources to complete deployment.
@@ -35,8 +44,7 @@ def ServiceStages(include_iam_policy_set=False):
   stages = [
       progress_tracker.Stage(
           'Creating Revision...', key=SERVICE_CONFIGURATIONS_READY),
-      progress_tracker.Stage(
-          'Routing traffic...', key=SERVICE_ROUTES_READY)]
+      _NewRoutingTrafficStage()]
   if include_iam_policy_set:
     stages.append(progress_tracker.Stage(
         'Setting IAM Policy...', key=SERVICE_IAM_POLICY_SET))
@@ -46,6 +54,5 @@ def ServiceStages(include_iam_policy_set=False):
 def ServiceDependencies():
   """Dependencies for the Service resource, for passing to ConditionPoller."""
   return {
-      SERVICE_ROUTES_READY: {SERVICE_CONFIGURATIONS_READY},
-      SERVICE_CONFIGURATIONS_READY: set()
+      SERVICE_ROUTES_READY: {SERVICE_CONFIGURATIONS_READY}
   }

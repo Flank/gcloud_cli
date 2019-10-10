@@ -11,16 +11,13 @@ gcloud alpha compute url\-maps import \- import a URL map
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute url\-maps import\fR \fIURL_MAP_NAME\fR [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute url\-maps import\fR \fIURL_MAP\fR [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR If the specified URL map already exists, it will be overwritten.
-Otherwise, a new URL map will be created. To edit a URL map you can export the
-URL map to a file, edit its configuration, and then import the new
-configuration.
+\fB(ALPHA)\fR Imports a URL map's configuration to a file.
 
 
 
@@ -28,7 +25,7 @@ configuration.
 
 .RS 2m
 .TP 2m
-\fIURL_MAP_NAME\fR
+\fIURL_MAP\fR
 Name of the URL map to import.
 
 
@@ -96,11 +93,24 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+A URL map can be imported by running:
+
+.RS 2m
+$ gcloud alpha compute url\-maps import NAME \-\-source=<path\-to\-file>
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute url\-maps import
+.RE
 

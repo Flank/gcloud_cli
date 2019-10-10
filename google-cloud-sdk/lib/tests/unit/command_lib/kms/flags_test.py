@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.kms import flags
 from tests.lib import completer_test_base
 from tests.lib.surface.kms import base
@@ -27,8 +28,8 @@ from tests.lib.surface.kms import base
 class CompletionTest(base.KmsMockTest, completer_test_base.CompleterBase):
 
   def testLocationCompletion(self):
-    glbl = self.project_name.Child('global')
-    east = self.project_name.Child('us-east1')
+    glbl = self.project_name.Location('global')
+    east = self.project_name.Location('us-east1')
 
     self.kms.projects_locations.List.Expect(
         self.messages.CloudkmsProjectsLocationsListRequest(
@@ -58,8 +59,8 @@ class CompletionTest(base.KmsMockTest, completer_test_base.CompleterBase):
     )
 
   def testKeyRingCompleterCommand(self):
-    kr_1 = self.project_name.Descendant('global/my_kr1')
-    kr_2 = self.project_name.Descendant('global/my_kr2')
+    kr_1 = self.project_name.KeyRing('global/my_kr1')
+    kr_2 = self.project_name.KeyRing('global/my_kr2')
 
     self.kms.projects_locations_keyRings.List.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsListRequest(
@@ -89,9 +90,50 @@ class CompletionTest(base.KmsMockTest, completer_test_base.CompleterBase):
         cli=self.cli,
     )
 
+  def testImportJobCompleterCommand(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+    ij_1 = self.project_name.ImportJob('global/my_kr/my_ij1')
+    ij_2 = self.project_name.ImportJob('global/my_kr/my_ij2')
+
+    self.kms.projects_locations_keyRings_importJobs.List.Expect(
+        self.messages.CloudkmsProjectsLocationsKeyRingsImportJobsListRequest(
+            pageSize=100, parent=ij_1.Parent().RelativeName()),
+        self.messages.ListImportJobsResponse(importJobs=[
+            self.messages.ImportJob(
+                name=ij_1.RelativeName(),
+                state=self.messages.ImportJob.StateValueValuesEnum.ACTIVE,
+                importMethod=self.messages.ImportJob.ImportMethodValueValuesEnum
+                .RSA_OAEP_3072_SHA1_AES_256,
+                protectionLevel=self.messages.ImportJob
+                .ProtectionLevelValueValuesEnum.HSM),
+            self.messages.ImportJob(
+                name=ij_2.RelativeName(),
+                state=self.messages.ImportJob.StateValueValuesEnum.EXPIRED,
+                importMethod=self.messages.ImportJob.ImportMethodValueValuesEnum
+                .RSA_OAEP_4096_SHA1_AES_256,
+                protectionLevel=self.messages.ImportJob
+                .ProtectionLevelValueValuesEnum.HSM)
+        ]))
+
+    self.RunCompleter(
+        flags.ImportJobCompleter,
+        expected_command=[
+            u'beta', u'kms', u'import-jobs', u'list', u'--uri', u'--quiet',
+            u'--format=disable', u'--location=global', u'--keyring=my_kr'
+        ],
+        args={
+            '--location': ij_1.location_id,
+            '--keyring': ij_1.key_ring_id,
+            '--unrelated': 'junk',
+        },
+        expected_completions=['my_ij1', 'my_ij2'],
+        cli=self.cli,
+    )
+
   def testKeyCompleterCommand(self):
-    key_1 = self.project_name.Descendant('global/my_kr/my_key1')
-    key_2 = self.project_name.Descendant('global/my_kr/my_key2/my_version2')
+    key_1 = self.project_name.CryptoKey('global/my_kr/my_key1')
+    key_2 = self.project_name.Version('global/my_kr/my_key2/my_version2')
 
     self.kms.projects_locations_keyRings_cryptoKeys.List.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysListRequest(
@@ -133,8 +175,8 @@ class CompletionTest(base.KmsMockTest, completer_test_base.CompleterBase):
     )
 
   def testKeyVersionCompleterCommand(self):
-    version_1 = self.project_name.Descendant('global/my_kr/my_key/1')
-    version_2 = self.project_name.Descendant('global/my_kr/my_key/2')
+    version_1 = self.project_name.Version('global/my_kr/my_key/1')
+    version_2 = self.project_name.Version('global/my_kr/my_key/2')
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.List.Expect(

@@ -108,7 +108,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets?alt=json
           method: POST
           headers: {}
           body:
@@ -128,7 +128,7 @@ actions:
             kind: bigquery#dataset
             etag: chMKCRjfovoqPmszO1GCXg==
             id: cloud-sdk-integration-testing:$$my_dataset$$
-            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$
+            selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$
             datasetReference:
               datasetId: $$my_dataset$$
               projectId: cloud-sdk-integration-testing
@@ -156,7 +156,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -171,7 +171,7 @@ actions:
             kind: bigquery#dataset
             etag: chMKCRjfovoqPmszO1GCXg==
             id: cloud-sdk-integration-testing:$$my_dataset$$
-            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$
+            selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$
             datasetReference:
               datasetId: $$my_dataset$$
               projectId: cloud-sdk-integration-testing
@@ -199,7 +199,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -217,7 +217,7 @@ actions:
             kind: bigquery#dataset
             etag: 59QZYk7CfA8Lzj2IsdSXkg==
             id: cloud-sdk-integration-testing:$$my_dataset$$
-            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$
+            selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$
             datasetReference:
               datasetId: $$my_dataset$$
               projectId: cloud-sdk-integration-testing
@@ -248,7 +248,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables?alt=json
           method: POST
           headers: {}
           body:
@@ -279,7 +279,7 @@ actions:
             kind: bigquery#table
             etag: EXZS8RbIun3Jkzyn7c/LpQ==
             id: cloud-sdk-integration-testing:$$my_dataset$$.$$my_table$$
-            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$
+            selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$
             tableReference:
               projectId: cloud-sdk-integration-testing
               datasetId: $$my_dataset$$
@@ -314,7 +314,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -329,7 +329,7 @@ actions:
             kind: bigquery#table
             etag: EXZS8RbIun3Jkzyn7c/LpQ==
             id: cloud-sdk-integration-testing:$$my_dataset$$.$$my_table$$
-            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$
+            selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$
             tableReference:
               projectId: cloud-sdk-integration-testing
               datasetId: $$my_dataset$$
@@ -374,7 +374,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -394,7 +394,7 @@ actions:
             kind: bigquery#table
             etag: EtVit2QJ2KcPZ0OQ2PU8kQ==
             id: cloud-sdk-integration-testing:$$my_dataset$$.$$my_table$$
-            selfLink: https://www.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$
+            selfLink: https://bigquery.googleapis.com/bigquery/v2/projects/cloud-sdk-integration-testing/datasets/$$my_dataset$$/tables/$$my_table$$
             tableReference:
               projectId: cloud-sdk-integration-testing
               datasetId: $$my_dataset$$

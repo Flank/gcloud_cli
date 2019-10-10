@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -161,13 +161,18 @@ class ClustersCreateUnitTest(
     zone = 'foo-zone'
     master_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
+    master_accelerator_type = 'foo-gpu'
+    worker_accelerator_type = 'bar-gpu'
+    preemptible_worker_accelerator_type = 'foo-bar-gpu'
+    master_min_cpu_platform = 'Intel Skylake'
+    worker_min_cpu_platform = 'Intel Haswell'
     bucket = 'foo-bucket'
     num_masters = 3
     num_workers = 7
     num_preemptible_workers = 5
     image_version = '1.7'
     network = 'foo-network'
-    network_uri = ('https://www.googleapis.com/compute/v1/projects/'
+    network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
                    'foo-project/global/networks/foo-network')
     action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
     initialization_actions = [
@@ -195,6 +200,12 @@ class ClustersCreateUnitTest(
         imageVersion=image_version,
         masterMachineTypeUri=master_machine_type,
         workerMachineTypeUri=worker_machine_type,
+        masterAcceleratorTypeUri=master_accelerator_type,
+        masterAcceleratorCount=1,
+        workerAcceleratorTypeUri=worker_accelerator_type,
+        workerAcceleratorCount=2,
+        secondaryWorkerAcceleratorTypeUri=preemptible_worker_accelerator_type,
+        secondaryWorkerAcceleratorCount=3,
         networkUri=network_uri,
         masterConfigNumInstances=num_masters,
         workerConfigNumInstances=num_workers,
@@ -214,9 +225,13 @@ class ClustersCreateUnitTest(
     self.AddEncryptionConfig(expected_request_cluster,
                              'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
     self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
+    self.AddMinCpuPlatform(expected_request_cluster, master_min_cpu_platform,
+                           worker_min_cpu_platform)
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+    self.AddMinCpuPlatform(expected_response_cluster, master_min_cpu_platform,
+                           worker_min_cpu_platform)
 
     command = (
         'clusters --project {project} create {cluster} '
@@ -226,6 +241,10 @@ class ClustersCreateUnitTest(
         '--num-workers {num_workers} '
         '--master-machine-type {master_machine_type} '
         '--worker-machine-type {worker_machine_type} '
+        '--master-accelerator type={master_accelerator_type},count=1 '
+        '--worker-accelerator type={worker_accelerator_type},count=2 '
+        '--preemptible-worker-accelerator '
+        'type={preemptible_worker_accelerator_type},count=3 '
         '--network {network} '
         '--image-version {image_version} '
         '--initialization-action-timeout 2m '
@@ -234,6 +253,8 @@ class ClustersCreateUnitTest(
         '--service-account {service_account} '
         '--scopes {scopes} '
         '--no-address '
+        '--master-min-cpu-platform="{master_min_cpu_platform}" '
+        '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
         '--properties core:com.foo=foo,hdfs:com.bar=bar '
         '--tags tag1,tag2 '
         '--metadata key1=value1,key2=value2 '
@@ -251,12 +272,69 @@ class ClustersCreateUnitTest(
         num_workers=num_workers,
         master_machine_type=master_machine_type,
         worker_machine_type=worker_machine_type,
+        master_accelerator_type=master_accelerator_type,
+        worker_accelerator_type=worker_accelerator_type,
+        preemptible_worker_accelerator_type=preemptible_worker_accelerator_type,
+        master_min_cpu_platform=master_min_cpu_platform,
+        worker_min_cpu_platform=worker_min_cpu_platform,
         network=network,
         image_version=image_version,
         actions=','.join(action_uris),
         num_preemptible=num_preemptible_workers,
         service_account=service_account,
         scopes=scope_list)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateFlagMapAppending(self):
+    """Tests that map-accepting flags correctly append."""
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    bucket = 'foo-bucket'
+    cluster_properties = collections.OrderedDict([
+        ('core:com.foo', 'foo'),
+        ('hdfs:com.bar', 'bar')])
+    cluster_metadata = collections.OrderedDict([
+        ('key1', 'value1'),
+        ('key2', 'value2')])
+    labels = collections.OrderedDict([
+        ('label1', 'value1'),
+        ('label2', 'value2')])
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        configBucket=bucket,
+        projectId=project,
+        zoneUri=zone,
+        labels=labels,
+        properties=encoding.DictToAdditionalPropertyMessage(
+            cluster_properties, self.messages.SoftwareConfig.PropertiesValue),
+        metadata=encoding.DictToAdditionalPropertyMessage(
+            cluster_metadata, self.messages.GceClusterConfig.MetadataValue))
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = (
+        'clusters --project {project} create {cluster} '
+        '--bucket {bucket} '
+        '--zone {zone} '
+        '--labels label1=value1 '
+        '--labels label2=value2 '
+        '--properties core:com.foo=foo '
+        '--properties hdfs:com.bar=bar '
+        '--metadata key1=value1 '
+        '--metadata key2=value2 '
+    ).format(
+        project=project,
+        cluster=cluster_name,
+        bucket=bucket,
+        zone=zone)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
@@ -279,6 +357,35 @@ class ClustersCreateUnitTest(
         zone=self.ZONE))
     self.AssertMessagesEqual(response_cluster, result)
 
+  def testCreateClusterWithMinCpuPlatformPreemptibleWorkers(self):
+    expected_request_cluster = self.MakeCluster(
+        secondaryWorkerConfigNumInstances=2)
+    self.AddMinCpuPlatform(expected_request_cluster, None, 'Intel Haswell')
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddMinCpuPlatform(expected_response_cluster, None, 'Intel Haswell')
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} --num-preemptible-workers=2 '
+        '--worker-min-cpu-platform="Intel Haswell"'.format(
+            name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterWithMinCpuPlatformAndWithoutPreemptibleWorkers(self):
+    expected_request_cluster = self.MakeCluster()
+    self.AddMinCpuPlatform(expected_request_cluster, None, 'Intel Haswell')
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddMinCpuPlatform(expected_response_cluster, None, 'Intel Haswell')
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} '
+        '--worker-min-cpu-platform="Intel Haswell"'.format(
+            name=self.CLUSTER_NAME, zone=self.ZONE))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
   def testCreateClustersSubnetwork(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
     request_cluster = self.MakeCluster(
@@ -298,14 +405,14 @@ class ClustersCreateUnitTest(
         networkUri=None, subnetworkUri=self.SubnetUri(), labels=labels)
     response_cluster = self.MakeRunningCluster(
         networkUri=None, subnetworkUri=self.SubnetUri(), labels=labels)
-    self.assertTrue(request_cluster.labels is not None)
-    self.assertTrue(response_cluster.labels is not None)
+    self.assertTrue(request_cluster.labels is not None)  # pylint:disable=g-generic-assert
+    self.assertTrue(response_cluster.labels is not None)  # pylint:disable=g-generic-assert
     self.ExpectCreateCalls(request_cluster=request_cluster,
                            response_cluster=response_cluster)
     result = self.RunDataproc(
         command='clusters create {0} --labels=k1=v1 --subnet {1}'.format(
             self.CLUSTER_NAME, self.SUBNET))
-    self.assertTrue(result.labels is not None)
+    self.assertTrue(result.labels is not None)  # pylint:disable=g-generic-assert
     self.assertEqual(response_cluster.labels, result.labels)
     self.AssertMessagesEqual(response_cluster, result)
 
@@ -457,19 +564,29 @@ class ClustersCreateUnitTest(
     """Tests zonal resource urls."""
     project = 'foo-project'
     cluster_name = 'foo-cluster'
-    zone_url = ('https://www.googleapis.com/compute/v1/projects/'
+    zone_url = ('https://compute.googleapis.com/compute/v1/projects/'
                 'foo-project/zones/foo-zone')
     master_machine_type_url = (
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'foo-project/zones/foo-zone/machineTypes/foo-type')
     worker_machine_type_url = (
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'foo-project/zones/foo-zone/machineTypes/bar-type')
+    master_accelerator_type_url = (
+        'https://www.googleapis.com/compute/v1/projects/'
+        'foo-project/zones/foo-zone/acceleratorTypes/foo-gpu')
+    worker_accelerator_type_url = (
+        'https://www.googleapis.com/compute/v1/projects/'
+        'foo-project/zones/foo-zone/acceleratorTypes/bar-gpu')
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         projectId=project,
         masterMachineTypeUri=master_machine_type_url,
         workerMachineTypeUri=worker_machine_type_url,
+        masterAcceleratorTypeUri=master_accelerator_type_url,
+        masterAcceleratorCount=1,
+        workerAcceleratorTypeUri=worker_accelerator_type_url,
+        workerAcceleratorCount=2,
         zoneUri=zone_url)
 
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
@@ -479,11 +596,15 @@ class ClustersCreateUnitTest(
     command = ('clusters --project {project} create {cluster} '
                '--master-machine-type {master_machine_type} '
                '--worker-machine-type {worker_machine_type} '
+               '--master-accelerator type={master_accelerator_type},count=1 '
+               '--worker-accelerator type={worker_accelerator_type},count=2 '
                '--zone {zone} ').format(
                    project=project,
                    cluster=cluster_name,
                    master_machine_type=master_machine_type_url,
                    worker_machine_type=worker_machine_type_url,
+                   master_accelerator_type=master_accelerator_type_url,
+                   worker_accelerator_type=worker_accelerator_type_url,
                    zone=zone_url)
 
     self.ExpectCreateCalls(
@@ -644,136 +765,6 @@ class ClustersCreateUnitTest(
                zone='test-zone',
                key='locations/l/keyRings/kr/cryptoKeys/k'))
 
-
-class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
-                                 base.DataprocTestBaseBeta):
-
-  def testTrack(self):
-    self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope.base.ReleaseTrack.BETA)
-
-  def testCreateClusterFlags(self):
-    """Tests flags that behave differently in Beta track."""
-    project = 'foo-project'
-    master_accelerator_type = 'foo-gpu'
-    worker_accelerator_type = 'bar-gpu'
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-    master_machine_type = 'foo-type'
-    worker_machine_type = 'bar-type'
-    master_min_cpu_platform = 'Intel Skylake'
-    worker_min_cpu_platform = 'Intel Haswell'
-    expected_request_cluster = self.MakeCluster(
-        clusterName=cluster_name,
-        projectId=project,
-        masterAcceleratorTypeUri=master_accelerator_type,
-        masterAcceleratorCount=1,
-        workerAcceleratorTypeUri=worker_accelerator_type,
-        workerAcceleratorCount=2,
-        masterMachineTypeUri=master_machine_type,
-        workerMachineTypeUri=worker_machine_type,
-        masterBootDiskSizeGb=15,
-        workerBootDiskSizeGb=30,
-        secondaryWorkerBootDiskSizeGb=42,
-        masterBootDiskType='pd-standard',
-        workerBootDiskType='pd-ssd',
-        secondaryWorkerBootDiskType='pd-standard',
-        internalIpOnly=True,
-        zoneUri=zone,
-        enableHttpPortAccess=True)
-    autoscaling_policy_uri = ('projects/foo-project/regions/foo-region/'
-                              'autoscalingPolicies/foo-policy')
-    self.AddAutoscalingConfig(expected_request_cluster, autoscaling_policy_uri)
-    self.AddMinCpuPlatform(expected_request_cluster, master_min_cpu_platform,
-                           worker_min_cpu_platform)
-    self.AddEncryptionConfig(expected_request_cluster,
-                             'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
-    self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
-    expected_response_cluster = copy.deepcopy(expected_request_cluster)
-    expected_response_cluster.status = self.messages.ClusterStatus(
-        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-    self.AddMinCpuPlatform(expected_response_cluster, master_min_cpu_platform,
-                           worker_min_cpu_platform)
-
-    command = ('clusters --project {project} create {cluster} '
-               '--master-accelerator type={master_accelerator_type},count=1 '
-               '--worker-accelerator type={worker_accelerator_type},count=2 '
-               '--master-boot-disk-size 15GB '
-               '--worker-boot-disk-size 30GB '
-               '--master-boot-disk-type pd-standard '
-               '--worker-boot-disk-type pd-ssd '
-               '--master-machine-type {master_machine_type} '
-               '--worker-machine-type {worker_machine_type} '
-               '--preemptible-worker-boot-disk-size 42GB '
-               '--preemptible-worker-boot-disk-type pd-standard '
-               '--no-address '
-               '--master-min-cpu-platform="{master_min_cpu_platform}" '
-               '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
-               '--gce-pd-kms-key-project=p '
-               '--gce-pd-kms-key-location=l '
-               '--gce-pd-kms-key-keyring=kr '
-               '--gce-pd-kms-key=k '
-               '--optional-components=anaconda,zeppelin '
-               '--zone {zone} '
-               '--autoscaling-policy {autoscaling_policy_uri} '
-               '--enable-component-gateway ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   master_accelerator_type=master_accelerator_type,
-                   worker_accelerator_type=worker_accelerator_type,
-                   master_machine_type=master_machine_type,
-                   worker_machine_type=worker_machine_type,
-                   master_min_cpu_platform=master_min_cpu_platform,
-                   worker_min_cpu_platform=worker_min_cpu_platform,
-                   zone=zone,
-                   autoscaling_policy_uri=autoscaling_policy_uri)
-
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateWithUrls(self):
-    """Tests zonal resource urls specific to Beta track."""
-    project = 'foo-project'
-    master_accelerator_type_url = (
-        'https://www.googleapis.com/compute/beta/projects/'
-        'foo-project/zones/foo-zone/acceleratorTypes/foo-gpu')
-    worker_accelerator_type_url = (
-        'https://www.googleapis.com/compute/beta/projects/'
-        'foo-project/zones/foo-zone/acceleratorTypes/bar-gpu')
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-
-    expected_request_cluster = self.MakeCluster(
-        clusterName=cluster_name,
-        projectId=project,
-        masterAcceleratorTypeUri=master_accelerator_type_url,
-        masterAcceleratorCount=1,
-        workerAcceleratorTypeUri=worker_accelerator_type_url,
-        workerAcceleratorCount=2,
-        zoneUri=zone)
-    command = ('clusters --project {project} create {cluster} '
-               '--master-accelerator type={master_accelerator_type},count=1 '
-               '--worker-accelerator type={worker_accelerator_type},count=2 '
-               '--zone {zone} ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   master_accelerator_type=master_accelerator_type_url,
-                   worker_accelerator_type=worker_accelerator_type_url,
-                   zone=zone)
-
-    expected_response_cluster = copy.deepcopy(expected_request_cluster)
-    expected_response_cluster.status = self.messages.ClusterStatus(
-        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
   def testCreateClusterWithExpirationTimeAndMaxIdle(self):
     """Tests TTL cluster related flags."""
     project = 'foo-project'
@@ -819,68 +810,6 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
               max_idle='30m',
               max_age='1h',
               expiration_time='2017-08-25T00:00:00-07:00'))
-
-  def testCreateClusterWithMinCpuPlatformPreemtibleWorkers(self):
-    expected_request_cluster = self.MakeCluster(
-        secondaryWorkerConfigNumInstances=2)
-    self.AddMinCpuPlatform(expected_request_cluster, None, 'Intel Haswell')
-    expected_response_cluster = self.MakeRunningCluster()
-    self.AddMinCpuPlatform(expected_response_cluster, None, 'Intel Haswell')
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(
-        'clusters create {name} --zone={zone} --num-preemptible-workers=2 '
-        '--worker-min-cpu-platform="Intel Haswell"'.format(
-            name=self.CLUSTER_NAME, zone=self.ZONE))
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterWithMinCpuPlatformAndWithoutPreemtibleWorkers(self):
-    expected_request_cluster = self.MakeCluster()
-    self.AddMinCpuPlatform(expected_request_cluster, None, 'Intel Haswell')
-    expected_response_cluster = self.MakeRunningCluster()
-    self.AddMinCpuPlatform(expected_response_cluster, None, 'Intel Haswell')
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(
-        'clusters create {name} --zone={zone} '
-        '--worker-min-cpu-platform="Intel Haswell"'.format(
-            name=self.CLUSTER_NAME, zone=self.ZONE))
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterReservationAffinity(self):
-    project = 'foo-project'
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-    reservation_affinity = 'specific'
-    reservation_label = 'key=name,value=test'
-    reservation_label_key = 'name'
-    reservation_label_value = 'test'
-    expected_request_cluster = self.MakeCluster(
-        clusterName=cluster_name, projectId=project, zoneUri=zone)
-    self.AddReservationAffinity(expected_request_cluster, reservation_affinity,
-                                reservation_label_key, reservation_label_value)
-
-    expected_response_cluster = copy.deepcopy(expected_request_cluster)
-    expected_response_cluster.status = self.messages.ClusterStatus(
-        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-
-    command = ('clusters --project {project} create {cluster} '
-               '--zone {zone} '
-               '--reservation-affinity {reservation_affinity} '
-               '--reservation-label {reservation_label} ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   zone=zone,
-                   reservation_affinity=reservation_affinity,
-                   reservation_label=reservation_label)
-
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(expected_response_cluster, result)
 
   def testCreateKerberosFlagsMissingKmsKey(self):
     password_uri = 'gs://my-bucket/password.encrypted'
@@ -999,6 +928,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                    'keyRings/my-key-ring/cryptoKeys/my-key')
     kdc_db_key_uri = 'gs://my-bucket/kdc_db_key.encrypted'
     tgt_lifetime_hours = 10
+    realm = 'TEST.REALM'
     keystore_uri = 'gs://my-bucket/keystore.jks'
     keystore_password_uri = 'gs://my-bucket/keystore_password.encrypted'
     key_password_uri = 'gs://my-bucket/key_password.encrypted'
@@ -1014,6 +944,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         kms_key_uri=kms_key_uri,
         kdc_db_key_uri=kdc_db_key_uri,
         tgt_lifetime_hours=tgt_lifetime_hours,
+        realm=realm,
         ssl=dict(
             keystore_uri=keystore_uri,
             keystore_password_uri=keystore_password_uri,
@@ -1037,6 +968,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         kerberosKmsKeyUri=kms_key_uri,
         kerberosKdcDbKeyUri=kdc_db_key_uri,
         kerberosTgtLifetimeHours=tgt_lifetime_hours,
+        kerberosRealm=realm,
         kerberosKeystoreUri=keystore_uri,
         kerberosKeystorePasswordUri=keystore_password_uri,
         kerberosKeyPasswordUri=key_password_uri,
@@ -1056,6 +988,7 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         kerberosKmsKeyUri=kms_key_uri,
         kerberosKdcDbKeyUri=kdc_db_key_uri,
         kerberosTgtLifetimeHours=tgt_lifetime_hours,
+        kerberosRealm=realm,
         kerberosKeystoreUri=keystore_uri,
         kerberosKeystorePasswordUri=keystore_password_uri,
         kerberosKeyPasswordUri=key_password_uri,
@@ -1112,6 +1045,149 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         .format(
             name=self.CLUSTER_NAME, zone=self.ZONE,
             policy_uri=specified_policy))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+
+class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
+                                 base.DataprocTestBaseBeta):
+
+  def testTrack(self):
+    self.assertEqual(self.messages, self._beta_messages)
+    self.assertEqual(self.track, calliope.base.ReleaseTrack.BETA)
+
+  def testCreateClusterFlags(self):
+    """Tests flags that behave differently in Beta track."""
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    master_machine_type = 'foo-type'
+    worker_machine_type = 'bar-type'
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        projectId=project,
+        masterMachineTypeUri=master_machine_type,
+        workerMachineTypeUri=worker_machine_type,
+        masterBootDiskSizeGb=15,
+        workerBootDiskSizeGb=30,
+        secondaryWorkerBootDiskSizeGb=42,
+        masterBootDiskType='pd-standard',
+        workerBootDiskType='pd-ssd',
+        secondaryWorkerBootDiskType='pd-standard',
+        internalIpOnly=True,
+        zoneUri=zone,
+        enableHttpPortAccess=True)
+    autoscaling_policy_uri = ('projects/foo-project/regions/foo-region/'
+                              'autoscalingPolicies/foo-policy')
+    self.AddAutoscalingConfig(expected_request_cluster, autoscaling_policy_uri)
+    self.AddEncryptionConfig(expected_request_cluster,
+                             'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
+    self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters --project {project} create {cluster} '
+               '--master-boot-disk-size 15GB '
+               '--worker-boot-disk-size 30GB '
+               '--master-boot-disk-type pd-standard '
+               '--worker-boot-disk-type pd-ssd '
+               '--master-machine-type {master_machine_type} '
+               '--worker-machine-type {worker_machine_type} '
+               '--preemptible-worker-boot-disk-size 42GB '
+               '--preemptible-worker-boot-disk-type pd-standard '
+               '--no-address '
+               '--gce-pd-kms-key-project=p '
+               '--gce-pd-kms-key-location=l '
+               '--gce-pd-kms-key-keyring=kr '
+               '--gce-pd-kms-key=k '
+               '--optional-components=anaconda,zeppelin '
+               '--zone {zone} '
+               '--autoscaling-policy {autoscaling_policy_uri} '
+               '--enable-component-gateway ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   master_machine_type=master_machine_type,
+                   worker_machine_type=worker_machine_type,
+                   zone=zone,
+                   autoscaling_policy_uri=autoscaling_policy_uri)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateWithUrls(self):
+    """Tests zonal resource urls specific to Beta track."""
+    project = 'foo-project'
+    master_accelerator_type_url = (
+        'https://compute.googleapis.com/compute/beta/projects/'
+        'foo-project/zones/foo-zone/acceleratorTypes/foo-gpu')
+    worker_accelerator_type_url = (
+        'https://compute.googleapis.com/compute/beta/projects/'
+        'foo-project/zones/foo-zone/acceleratorTypes/bar-gpu')
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name,
+        projectId=project,
+        masterAcceleratorTypeUri=master_accelerator_type_url,
+        masterAcceleratorCount=1,
+        workerAcceleratorTypeUri=worker_accelerator_type_url,
+        workerAcceleratorCount=2,
+        zoneUri=zone)
+    command = ('clusters --project {project} create {cluster} '
+               '--master-accelerator type={master_accelerator_type},count=1 '
+               '--worker-accelerator type={worker_accelerator_type},count=2 '
+               '--zone {zone} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   master_accelerator_type=master_accelerator_type_url,
+                   worker_accelerator_type=worker_accelerator_type_url,
+                   zone=zone)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateClusterReservationAffinity(self):
+    project = 'foo-project'
+    cluster_name = 'foo-cluster'
+    zone = 'foo-zone'
+    reservation_affinity = 'specific'
+    reservation_label = 'key=name,value=test'
+    reservation_label_key = 'name'
+    reservation_label_value = 'test'
+    expected_request_cluster = self.MakeCluster(
+        clusterName=cluster_name, projectId=project, zoneUri=zone)
+    self.AddReservationAffinity(expected_request_cluster, reservation_affinity,
+                                reservation_label_key, reservation_label_value)
+
+    expected_response_cluster = copy.deepcopy(expected_request_cluster)
+    expected_response_cluster.status = self.messages.ClusterStatus(
+        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
+
+    command = ('clusters --project {project} create {cluster} '
+               '--zone {zone} '
+               '--reservation-affinity {reservation_affinity} '
+               '--reservation-label {reservation_label} ').format(
+                   project=project,
+                   cluster=cluster_name,
+                   zone=zone,
+                   reservation_affinity=reservation_affinity,
+                   reservation_label=reservation_label)
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(command)
     self.AssertMessagesEqual(expected_response_cluster, result)
 
 

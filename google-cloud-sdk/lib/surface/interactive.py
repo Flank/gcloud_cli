@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ Tips:
 * start by typing commands to get auto-suggestions and inline help
 * use `tab`, `up-arrow`, or `down-arrow` to navigate completion dropdowns
 * use `space` or `/` to accept the highlighted dropdown item
-* run `gcloud beta interactive --help` for more info
+* run gcloud <alpha|beta> interactive --help for more info
 
 Run *$ gcloud feedback* to report bugs or request new features.
 

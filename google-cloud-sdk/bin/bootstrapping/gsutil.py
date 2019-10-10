@@ -103,7 +103,6 @@ def main():
 
 
 if __name__ == '__main__':
-  bootstrapping.DisallowPython3()
   try:
     version = bootstrapping.ReadFileContents('platform/gsutil', 'VERSION')
     bootstrapping.CommandStart('gsutil', version=version)

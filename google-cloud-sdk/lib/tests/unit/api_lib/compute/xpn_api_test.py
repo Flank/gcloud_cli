@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ class XpnApiTest(test_base.BaseTest):
     return self.messages.Project(
         name=(name or 'xpn-host'),
         creationTimestamp='2013-09-06T17:54:10.636-07:00',
-        selfLink='https://www.googleapis.com/compute/v1/projects/xpn-host/',
+        selfLink='https://compute.googleapis.com/compute/v1/projects/xpn-host/',
         xpnProjectStatus=project_status_enum.HOST)
 
   def testEnableHost(self):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,13 @@ class Collections(enum.Enum):
       [u'name'],
       True
   )
+  PROJECTS = (
+      'projects',
+      'projects/{projectsId}',
+      {},
+      [u'projectsId'],
+      True
+  )
   PROJECTS_LOCATIONS = (
       'projects.locations',
       'projects/{projectsId}/locations/{locationsId}',
@@ -59,24 +66,6 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/operations/'
               '{operationsId}',
-      },
-      [u'name'],
-      True
-  )
-  PROJECTS_OPERATIONS = (
-      'projects.operations',
-      'projects/{projectsId}',
-      {},
-      [u'projectsId'],
-      True
-  )
-  PROJECTS_OPERATIONS_MANUALRECOGNITIONTASKS = (
-      'projects.operations.manualRecognitionTasks',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/operations/manualRecognitionTasks/'
-              '{manualRecognitionTasksId}',
       },
       [u'name'],
       True

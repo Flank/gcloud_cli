@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ def AppendAssetArg():
   asset_spec_data = yaml_data.ResourceYAMLData.FromPath("scc.asset")
   arg_specs = [
       resource_args.GetResourcePresentationSpec(
-          verb="to be used for the SCC command",
+          verb="to be used for the SCC (Security Command Center) command",
           name="asset",
           required=True,
           prefixes=False,

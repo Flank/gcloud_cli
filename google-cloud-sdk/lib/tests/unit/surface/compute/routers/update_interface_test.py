@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class UpdateInterfaceTest(test_base.BaseTest):
                 name='my-if', linkedVpnTunnel='', ipRange='10.0.0.1/24')
         ],
         region='us-central1',
-        network=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        network=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                  'global/networks/default'),)
 
   def testNoUpdates(self):
@@ -170,7 +170,7 @@ class BetaUpdateInterfaceTest(UpdateInterfaceTest):
   def SetUp(self):
     self.SelectApi('beta')
     self.track = calliope_base.ReleaseTrack.BETA
-    self.network_url = ('https://www.googleapis.com/compute/beta/projects/'
+    self.network_url = ('https://compute.googleapis.com/compute/beta/projects/'
                         'my-project/global/networks/default')
 
   def GetRouter(self):
@@ -315,7 +315,7 @@ class GAUpdateInterfaceTest(BetaUpdateInterfaceTest):
   def SetUp(self):
     self.SelectApi('v1')
     self.track = calliope_base.ReleaseTrack.GA
-    self.network_url = ('https://www.googleapis.com/compute/v1/projects/'
+    self.network_url = ('https://compute.googleapis.com/compute/v1/projects/'
                         'my-project/global/networks/default')
 
 
@@ -324,7 +324,7 @@ class AlphaUpdateInterfaceTest(BetaUpdateInterfaceTest):
   def SetUp(self):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.network_url = ('https://www.googleapis.com/compute/alpha/projects/'
+    self.network_url = ('https://compute.googleapis.com/compute/alpha/projects/'
                         'my-project/global/networks/default')
 
 

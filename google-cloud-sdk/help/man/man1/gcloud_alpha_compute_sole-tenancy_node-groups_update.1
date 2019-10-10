@@ -11,7 +11,7 @@ gcloud alpha compute sole\-tenancy node\-groups update \- updates a Google Compu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute sole\-tenancy node\-groups update\fR \fINAME\fR [\fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-nodes\fR=\fIADD_NODES\fR\ |\ \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute sole\-tenancy node\-groups update\fR \fINAME\fR [\fB\-\-autoscaling\-policy\fR=[\fImax\-size\fR=\fIMAX\-SIZE\fR],[\fImin\-size\fR=\fIMIN\-SIZE\fR],[\fImode\fR=\fIMODE\fR]] [\fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-add\-nodes\fR=\fIADD_NODES\fR\ |\ \fB\-\-delete\-nodes\fR=[\fINODE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -35,6 +35,30 @@ Name of the node group to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-autoscaling\-policy\fR=[\fImax\-size\fR=\fIMAX\-SIZE\fR],[\fImin\-size\fR=\fIMIN\-SIZE\fR],[\fImode\fR=\fIMODE\fR]
+Option to specify the autoscaling policy for node groups.
+
+.RS 2m
+.TP 2m
+\fBmode\fR
+Options for mode are 'on' or 'off'. When set to 'on', the autoscaler will
+increase or decrease the size of the node group in response to capacity needs.
+If set to 'off', the autoscaler will not update the size of the node group.
+
+.TP 2m
+\fBmin\-size\fR
+The minimum size of the node group. Default is 0 and must be an integer value
+smaller than or equal to max\-size.
+
+.TP 2m
+\fBmax\-size\fR
+The maximum size of the node group. Default is 100 and must be smaller or equal
+to 100 and larger than or equal to min\-size.
+
+
+.RE
+.sp
 .TP 2m
 \fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR
 The name of the node template resource to be set for this node group.
@@ -99,9 +123,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute sole\-tenancy node\-groups update

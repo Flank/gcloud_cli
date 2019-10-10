@@ -18,7 +18,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
+          uri: https://bigquery.googleapis.com/bigquery/v2/projects/fake-project/datasets/my_dataset/tables/my_table?alt=json
           method: DELETE
           headers: {}
           body: null

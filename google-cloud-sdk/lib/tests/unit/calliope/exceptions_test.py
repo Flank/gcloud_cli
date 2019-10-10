@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     self.assertNotIn('original', self.stdout)
     self.assertNotIn('original', self.stderr)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testConvertKnownError(self):
     err = http_error.MakeHttpError(400)
     new_err, print_exc = exceptions.ConvertKnownError(err)
@@ -285,6 +286,32 @@ class RaiseExceptionInsteadOfTest(cli_test_base.CliTestBase):
     self.AssertErrEquals(
         'ERROR: (gcloud.meta.test) argument --some-flag: '
         'Must be specified.\n')
+
+
+class HandleErrorTest(cli_test_base.CliTestBase):
+
+  def testAppendMessage_MissingServicesUsePermission(self):
+    error = http_error.MakeHttpError(
+        403,
+        message=('Grant the caller the Owner or Editor role, or a custom role '
+                 'with the serviceusage.services.use permission'))
+    with self.AssertRaisesExceptionRegexp(exceptions.HttpException,
+                                          'Permission denied.*'):
+      exceptions.HandleError(error, 'gcloud.asset.export')
+    self.AssertErrContains(
+        'If you want to invoke the command from a project '
+        'different from the target resource project, use '
+        '`--billing-project` or `billing/quota_project` property.')
+
+  def testNotAppendMessage(self):
+    error = http_error.MakeHttpError(403)
+    with self.AssertRaisesExceptionRegexp(exceptions.HttpException,
+                                          'Permission denied.*'):
+      exceptions.HandleError(error, 'gcloud.asset.export')
+    self.AssertErrNotContains(
+        'If you want to invoke the command from a project '
+        'different from the target resource project, use '
+        '`--billing-project` or `billing/quota_project` property.')
 
 
 if __name__ == '__main__':

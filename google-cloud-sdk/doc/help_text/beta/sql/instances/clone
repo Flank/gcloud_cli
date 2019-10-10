@@ -25,8 +25,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --bin-log-file-name=BIN_LOG_FILE_NAME
         Represents the name of the binary log file created by the source

@@ -11,7 +11,7 @@ gcloud builds submit \- submit a build using Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud builds submit\fR [[\fISOURCE\fR]\ \fB\-\-no\-source\fR] [\fB\-\-async\fR] [\fB\-\-no\-cache\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-gcs\-log\-dir\fR=\fIGCS_LOG_DIR\fR] [\fB\-\-gcs\-source\-staging\-dir\fR=\fIGCS_SOURCE_STAGING_DIR\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-config\fR=\fICONFIG\fR;\ default="cloudbuild.yaml"\ |\ \fB\-\-tag\fR=\fITAG\fR,\ \fB\-t\fR\ \fITAG\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -40,7 +40,8 @@ At most one of these may be specified:
 The location of the source to build. The location can be a directory on a local
 disk or a gzipped archive file (.tar.gz) in Google Cloud Storage. If the source
 is a local directory, this command skips the files specified in the
-\f5.gcloudignore\fR file. If a \f5.gitignore\fR file is present in the local
+\f5\-\-ignore\-file\fR. If \f5\-\-ignore\-file\fR is not specified,
+use\f5.gcloudignore\fR file. If a \f5.gitignore\fR file is present in the local
 source directory, gcloud will use a Git\-compatible \f5.gcloudignore\fR file
 that respects your .gitignored files. The global \f5.gitignore\fR is not
 respected. For more information on \f5.gcloudignore\fR, see \f5gcloud topic
@@ -60,8 +61,7 @@ Specify that no source should be uploaded with this build.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-no\-cache\fR
@@ -86,6 +86,10 @@ created and used.
 A directory in Google Cloud Storage to copy the source used for staging the
 build. If the specified bucket does not exist, Cloud Build will create one. If
 you don't set this field, \f5gs://[PROJECT_ID]_cloudbuild/source\fR is used.
+
+.TP 2m
+\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR
+Override the \f5.gcloudignore\fR file and use the specified file instead.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR

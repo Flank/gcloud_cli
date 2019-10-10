@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,12 @@ class CreateSignaturePayload(base.Command):
   @classmethod
   def Args(cls, parser):
     binauthz_flags.AddArtifactUrlFlag(parser)
-    parser.display_info.AddFormat('json')
+    parser.display_info.AddFormat('object')
 
   def Run(self, args):
-    return binauthz_command_util.MakeSignaturePayload(args.artifact_url)
+    # Dumping a bytestring to the object formatter doesn't output the string in
+    # PY3 but rather the repr of the object. Decoding it to a unicode string
+    # achieves the desired result.
+    payload_bytes = binauthz_command_util.MakeSignaturePayload(
+        args.artifact_url)
+    return payload_bytes.decode('utf8')

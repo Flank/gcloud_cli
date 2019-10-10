@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
@@ -93,6 +92,3 @@ class VpcAccessUnitTestBase(sdk_test_base.WithFakeAuth, _VpcAccessBase):
     self.ip_cidr_range = '10.132.0.0/28'
     self.min_throughput = 200
     self.max_throughput = 1000
-    if self.track == calliope_base.ReleaseTrack.ALPHA:
-      self.type_extended = self.messages.Connector.TypeValueValuesEnum.EXTENDED
-      self.type_basic = self.messages.Connector.TypeValueValuesEnum.BASIC

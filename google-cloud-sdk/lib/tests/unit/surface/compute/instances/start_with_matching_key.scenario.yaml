@@ -9,14 +9,14 @@ summary:
     - message: Starting instance(s) z2
     - status: SUCCESS
   - stderr: |
-      Updated [https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2].
+      Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2].
 actions:
 - write_file:
     path: key.json
     contents: |
       [
         {
-        "uri": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/disks/z4",
+        "uri": "https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/disks/z4",
         "key": "acXTX3rxrKAFTF0tYVLvydU1riRZTvUNC4g5I11NY2c=",
         "key-type": "raw"
         }
@@ -26,7 +26,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2?alt=json
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2?alt=json
           method: GET
           headers: {}
           body: null
@@ -49,14 +49,14 @@ actions:
               interface: SCSI
               kind: compute#attachedDisk
               licenses:
-              - https://www.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              - https://compute.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
               mode: READ_WRITE
-              source: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2
+              source: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2
               type: PERSISTENT
             id: '5668794497172594915'
             kind: compute#instance
             labelFingerprint: 42WmSpB8rSM=
-            machineType: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
             metadata:
               fingerprint: Tewg-kYB2-A=
               kind: compute#metadata
@@ -71,13 +71,13 @@ actions:
               fingerprint: msa80dimyyw=
               kind: compute#networkInterface
               name: nic0
-              network: https://www.googleapis.com/compute/beta/projects/fake-project/global/networks/default
+              network: https://compute.googleapis.com/compute/beta/projects/fake-project/global/networks/default
               networkIP: 10.240.0.7
             scheduling:
               automaticRestart: true
               onHostMaintenance: MIGRATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+            selfLink: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
             serviceAccounts:
             - email: 341306109951-compute@developer.gserviceaccount.com
               scopes:
@@ -92,11 +92,11 @@ actions:
             status: RUNNING
             tags:
               fingerprint: 42WmSpB8rSM=
-            zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+            zone: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2/start?alt=json
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2/start?alt=json
           method: POST
           headers: {}
           body: null
@@ -111,18 +111,18 @@ actions:
             name: operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
             operationType: startWithEncryptionKey
             progress: 100
-            selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/operations/operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
+            selfLink: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/operations/operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
             startTime: '2017-11-09T15:01:30.800-08:00'
             status: DONE
             targetId: '5668794497172594915'
-            targetLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
-            zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+            targetLink: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+            zone: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
     - expect_progress_tracker:
         message: Starting instance(s) z2
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2?alt=json
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2?alt=json
           method: GET
           headers: {}
           body: null
@@ -145,14 +145,14 @@ actions:
               interface: SCSI
               kind: compute#attachedDisk
               licenses:
-              - https://www.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
+              - https://compute.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
               mode: READ_WRITE
-              source: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2
+              source: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2
               type: PERSISTENT
             id: '5668794497172594915'
             kind: compute#instance
             labelFingerprint: 42WmSpB8rSM=
-            machineType: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+            machineType: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
             metadata:
               fingerprint: Tewg-kYB2-A=
               kind: compute#metadata
@@ -167,13 +167,13 @@ actions:
               fingerprint: msa80dimyyw=
               kind: compute#networkInterface
               name: nic0
-              network: https://www.googleapis.com/compute/beta/projects/fake-project/global/networks/default
+              network: https://compute.googleapis.com/compute/beta/projects/fake-project/global/networks/default
               networkIP: 10.240.0.7
             scheduling:
               automaticRestart: true
               onHostMaintenance: MIGRATE
               preemptible: false
-            selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+            selfLink: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
             serviceAccounts:
             - email: 341306109951-compute@developer.gserviceaccount.com
               scopes:
@@ -188,8 +188,8 @@ actions:
             status: RUNNING
             tags:
               fingerprint: 42WmSpB8rSM=
-            zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+            zone: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2].
+        Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2].
     - expect_exit:
         code: 0

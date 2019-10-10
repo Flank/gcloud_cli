@@ -35,6 +35,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     autoscaling-policies
+        Create and manage Google Cloud Dataproc autoscaling policies.
+
      clusters
         Create and manage Google Cloud Dataproc clusters.
 

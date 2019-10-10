@@ -6,9 +6,6 @@ SYNOPSIS
     gcloud beta dataproc autoscaling-policies delete
         (AUTOSCALING_POLICY : --region=REGION) [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) Delete an autoscaling policy.
-
 POSITIONAL ARGUMENTS
      Autoscaling policy resource - The autoscaling policy to delete. The
      arguments in this group can be used to specify the attributes of this
@@ -40,9 +37,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    The following command deletes the autoscaling policy
+    example-autoscaling-policy:
 
+        $ gcloud beta dataproc autoscaling-policies delete \
+            example-autoscaling-policy
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud dataproc autoscaling-policies delete
         $ gcloud alpha dataproc autoscaling-policies delete
 

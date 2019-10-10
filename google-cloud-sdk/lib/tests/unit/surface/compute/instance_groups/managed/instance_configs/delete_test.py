@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class InstanceGroupManagerInstanceConfigsDeleteTestBase(
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
     self.project_uri = (
-        'https://www.googleapis.com/compute/alpha/projects/fake-project')
+        'https://compute.googleapis.com/compute/alpha/projects/fake-project')
 
 
 class InstanceGroupManagerInstanceConfigsDeleteTest(
@@ -58,10 +58,6 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
             instanceGroupManager='group-1',
             instanceGroupManagersDeletePerInstanceConfigsReq=(
                 self.messages.InstanceGroupManagersDeletePerInstanceConfigsReq)(
-                    instances=[
-                        self.project_uri + '/zones/us-central2-a/instances/foo',
-                        self.project_uri + '/zones/us-central2-a/instances/bas',
-                    ],
                     names=['foo', 'bas']
                 ),
             project='fake-project',
@@ -184,10 +180,7 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
             instanceGroupManager='group-1',
             regionInstanceGroupManagerDeleteInstanceConfigReq=(
                 self.messages.RegionInstanceGroupManagerDeleteInstanceConfigReq
-            )(instances=[
-                self.project_uri + '/zones/us-central2-a/instances/foo',
-                self.project_uri + '/zones/us-central2-a/instances/bas',],
-              names=['foo', 'bas']),
+            )(names=['foo', 'bas']),
             project='fake-project',
             region='us-central2')
     response = self.messages.Operation(

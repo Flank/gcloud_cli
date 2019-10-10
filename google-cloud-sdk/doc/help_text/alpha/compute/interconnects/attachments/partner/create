@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha compute interconnects attachments partner create NAME
         --edge-availability-domain=AVAILABILITY_DOMAIN --router=ROUTER
-        [--description=DESCRIPTION] [--enable-admin] [--region=REGION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--dry-run] [--enable-admin] [--mtu=MTU]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute interconnects attachments partner create is
@@ -47,11 +47,19 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.
 
+     --dry-run
+        If supplied, validates the attachment without creating it.
+
      --enable-admin
         Administrative status of the interconnect attachment. If not provided
         on creation, defaults to disabled. When this is enabled, the attachment
         is operational and will carry traffic. Use --no-enable-admin to disable
         it.
+
+     --mtu=MTU
+        Maximum transmission unit(MTU) is the size of the largest frame passing
+        through this interconnect attachment. Only 1440 and 1500 are allowed.
+        If not specified, the value will default to 1440.
 
      --region=REGION
         Region of the interconnect attachment to create. If not specified, you
@@ -83,9 +91,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute interconnects attachments partner create
         $ gcloud beta compute interconnects attachments partner create

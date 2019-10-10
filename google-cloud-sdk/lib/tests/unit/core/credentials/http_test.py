@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ class HttpTestBase(sdk_test_base.SdkBase):
   def SetUp(self):
     self.request_mock = self.StartObjectPatch(
         httplib2.Http, 'request',
-        return_value=(httplib2.Response({'status': 400}), ''))
+        return_value=(httplib2.Response({'status': 400}), b''))
     uuid_mock = self.StartObjectPatch(uuid, 'uuid4')
     uuid_mock.return_value = uuid.UUID('12345678123456781234567812345678')
     is_interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')

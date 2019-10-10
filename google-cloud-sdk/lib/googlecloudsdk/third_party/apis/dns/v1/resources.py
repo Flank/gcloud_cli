@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import enum
 
 
-BASE_URL = 'https://www.googleapis.com/dns/v1/'
+BASE_URL = 'https://dns.googleapis.com/dns/v1/'
 DOCS_URL = 'https://developers.google.com/cloud-dns'
 
 
@@ -50,6 +50,13 @@ class Collections(enum.Enum):
       'projects/{project}/managedZones/{managedZone}',
       {},
       [u'project', u'managedZone'],
+      True
+  )
+  POLICIES = (
+      'policies',
+      'projects/{project}/policies/{policy}',
+      {},
+      [u'project', u'policy'],
       True
   )
   PROJECTS = (

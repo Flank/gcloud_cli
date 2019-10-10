@@ -40,8 +40,8 @@ EXAMPLES
     The following command enables version 3 of CryptoKey frodo within KeyRing
     fellowship and Location us-east1:
 
-        $ gcloud kms cryptokeys versions enable 3 --location us-east1 \
-            --keyring fellowship --cryptokey frodo
+        $ gcloud kms cryptokeys versions enable 3 --location=us-east1 \
+            --keyring=fellowship --cryptokey=frodo
 
 NOTES
     This command is an internal implementation detail and may change or

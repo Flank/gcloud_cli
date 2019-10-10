@@ -50,6 +50,7 @@ class BackupConfiguration(_messages.Message):
       is disabled, binary log must be disabled as well.
     enabled: Whether this configuration is enabled.
     kind: This is always sql#backupConfiguration.
+    location: The location of the backup.
     replicationLogArchivingEnabled: Reserved for future use.
     startTime: Start time for the daily backup configuration in UTC timezone
       in the 24 hour format - HH:MM.
@@ -58,8 +59,9 @@ class BackupConfiguration(_messages.Message):
   binaryLogEnabled = _messages.BooleanField(1)
   enabled = _messages.BooleanField(2)
   kind = _messages.StringField(3, default=u'sql#backupConfiguration')
-  replicationLogArchivingEnabled = _messages.BooleanField(4)
-  startTime = _messages.StringField(5)
+  location = _messages.StringField(4)
+  replicationLogArchivingEnabled = _messages.BooleanField(5)
+  startTime = _messages.StringField(6)
 
 
 class BackupRun(_messages.Message):
@@ -68,6 +70,10 @@ class BackupRun(_messages.Message):
   Fields:
     description: The description of this run, only applicable to on-demand
       backups.
+    diskEncryptionConfiguration: Disk encryption configuration specific to a
+      backup. Applies only to Second Generation instances.
+    diskEncryptionStatus: Disk encryption status specific to a backup. Applies
+      only to Second Generation instances.
     endTime: The time the backup operation completed in UTC timezone in RFC
       3339 format, for example 2012-11-15T16:19:00.094Z.
     enqueuedTime: The time the run was enqueued in UTC timezone in RFC 3339
@@ -78,6 +84,7 @@ class BackupRun(_messages.Message):
       SQL instance.
     instance: Name of the database instance.
     kind: This is always sql#backupRun.
+    location: The location of the backup.
     selfLink: The URI of this resource.
     startTime: The time the backup operation actually started in UTC timezone
       in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
@@ -89,17 +96,20 @@ class BackupRun(_messages.Message):
   """
 
   description = _messages.StringField(1)
-  endTime = _message_types.DateTimeField(2)
-  enqueuedTime = _message_types.DateTimeField(3)
-  error = _messages.MessageField('OperationError', 4)
-  id = _messages.IntegerField(5)
-  instance = _messages.StringField(6)
-  kind = _messages.StringField(7, default=u'sql#backupRun')
-  selfLink = _messages.StringField(8)
-  startTime = _message_types.DateTimeField(9)
-  status = _messages.StringField(10)
-  type = _messages.StringField(11)
-  windowStartTime = _message_types.DateTimeField(12)
+  diskEncryptionConfiguration = _messages.MessageField('DiskEncryptionConfiguration', 2)
+  diskEncryptionStatus = _messages.MessageField('DiskEncryptionStatus', 3)
+  endTime = _message_types.DateTimeField(4)
+  enqueuedTime = _message_types.DateTimeField(5)
+  error = _messages.MessageField('OperationError', 6)
+  id = _messages.IntegerField(7)
+  instance = _messages.StringField(8)
+  kind = _messages.StringField(9, default=u'sql#backupRun')
+  location = _messages.StringField(10)
+  selfLink = _messages.StringField(11)
+  startTime = _message_types.DateTimeField(12)
+  status = _messages.StringField(13)
+  type = _messages.StringField(14)
+  windowStartTime = _message_types.DateTimeField(15)
 
 
 class BackupRunsListResponse(_messages.Message):
@@ -563,9 +573,11 @@ class ImportContext(_messages.Message):
   r"""Database instance import context.
 
   Messages:
+    BakImportOptionsValue: Import parameters specific to SQL Server .BAK files
     CsvImportOptionsValue: Options for importing data as CSV.
 
   Fields:
+    bakImportOptions: Import parameters specific to SQL Server .BAK files
     csvImportOptions: Options for importing data as CSV.
     database: The target database for the import. If fileType is SQL, this
       field is required only if the import file does not specify a database,
@@ -582,6 +594,35 @@ class ImportContext(_messages.Message):
       and read access to the file.
   """
 
+  class BakImportOptionsValue(_messages.Message):
+    r"""Import parameters specific to SQL Server .BAK files
+
+    Messages:
+      EncryptionOptionsValue: A EncryptionOptionsValue object.
+
+    Fields:
+      encryptionOptions: A EncryptionOptionsValue attribute.
+    """
+
+    class EncryptionOptionsValue(_messages.Message):
+      r"""A EncryptionOptionsValue object.
+
+      Fields:
+        certPath: Path to the Certificate (.cer) in Cloud Storage, in the form
+          gs://bucketName/fileName. The instance must have write permissions
+          to the bucket and read access to the file.
+        pvkPassword: Password that encrypts the private key
+        pvkPath: Path to the Certificate Private Key (.pvk) in Cloud Storage,
+          in the form gs://bucketName/fileName. The instance must have write
+          permissions to the bucket and read access to the file.
+      """
+
+      certPath = _messages.StringField(1)
+      pvkPassword = _messages.StringField(2)
+      pvkPath = _messages.StringField(3)
+
+    encryptionOptions = _messages.MessageField('EncryptionOptionsValue', 1)
+
   class CsvImportOptionsValue(_messages.Message):
     r"""Options for importing data as CSV.
 
@@ -594,12 +635,13 @@ class ImportContext(_messages.Message):
     columns = _messages.StringField(1, repeated=True)
     table = _messages.StringField(2)
 
-  csvImportOptions = _messages.MessageField('CsvImportOptionsValue', 1)
-  database = _messages.StringField(2)
-  fileType = _messages.StringField(3)
-  importUser = _messages.StringField(4)
-  kind = _messages.StringField(5, default=u'sql#importContext')
-  uri = _messages.StringField(6)
+  bakImportOptions = _messages.MessageField('BakImportOptionsValue', 1)
+  csvImportOptions = _messages.MessageField('CsvImportOptionsValue', 2)
+  database = _messages.StringField(3)
+  fileType = _messages.StringField(4)
+  importUser = _messages.StringField(5)
+  kind = _messages.StringField(6, default=u'sql#importContext')
+  uri = _messages.StringField(7)
 
 
 class InstancesCloneRequest(_messages.Message):
@@ -745,9 +787,11 @@ class IpMapping(_messages.Message):
     timeToRetire: The due time for this IP to be retired in RFC 3339 format,
       for example 2012-11-15T16:19:00.094Z. This field is only available when
       the IP is scheduled to be retired.
-    type: The type of this IP address. A PRIMARY address is an address that
-      can accept incoming connections. An OUTGOING address is the source
-      address of connections originating from the instance, if supported.
+    type: The type of this IP address. A PRIMARY address is a public address
+      that can accept incoming connections. A PRIVATE address is a private
+      address that can accept incoming connections. An OUTGOING address is the
+      source address of connections originating from the instance, if
+      supported.
   """
 
   ipAddress = _messages.StringField(1)
@@ -968,11 +1012,13 @@ class RestoreBackupContext(_messages.Message):
     backupRunId: The ID of the backup run to restore from.
     instanceId: The ID of the instance that the backup was taken from.
     kind: This is always sql#restoreBackupContext.
+    project: The full project ID of the source instance.
   """
 
   backupRunId = _messages.IntegerField(1)
   instanceId = _messages.StringField(2)
   kind = _messages.StringField(3, default=u'sql#restoreBackupContext')
+  project = _messages.StringField(4)
 
 
 class RotateServerCaContext(_messages.Message):
@@ -1674,7 +1720,8 @@ class SqlUsersUpdateRequest(_messages.Message):
   r"""A SqlUsersUpdateRequest object.
 
   Fields:
-    host: Host of the user in the instance.
+    host: Host of the user in the instance. For a MySQL instance, it's
+      required; For a PostgreSQL instance, it's optional.
     instance: Database instance ID. This does not include the project ID.
     name: Name of the user in the instance.
     project: Project ID of the project that contains the instance.

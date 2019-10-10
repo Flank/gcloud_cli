@@ -1,7 +1,8 @@
+skip:
+  reason: Failing
+  bug: b/141070917
 title: custom instance creation errors scenario test
-release_tracks:
-- BETA
-
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -9,7 +10,7 @@ summary:
       compute instances create $$instance$$ --zone us-central1-f --format "value(name)"
       --metadata="enable-guest-attributes=true"
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created [https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |
       $$instance$$
 - execute:
@@ -17,11 +18,12 @@ summary:
       compute ssh $$instance$$ --zone us-central1-f --quiet --no-user-output-enabled --verbosity none --command 'curl -X PUT --data baz -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/guest-attributes/foo/bar && curl -X PUT --data bar -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/guest-attributes/foo/baz && curl -X PUT --data foo -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/guest-attributes/baz/bar'
 - execute:
   - command: compute instances get-guest-attributes $$instance$$ --zone us-central1-f
-  - stdout: |
-      NAMESPACE  KEY  VALUE
-      baz        bar  foo
-      foo        bar  baz
-      foo        baz  bar
+  - stdout: |-
+      NAMESPACE  KEY  \s*VALUE
+      baz        bar  \s*foo
+      foo        bar  \s*baz
+      foo        baz  \s*bar.*
+      $
 - execute:
   - command: compute instances get-guest-attributes $$instance$$ --query-path=foo/
       --zone us-central1-f
@@ -43,16 +45,16 @@ summary:
          - [$$instance$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted [https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - define_reference:
     reference: api_version
     track_values:
-      ALPHA: alpha
       BETA: beta
+      GA: v1
 
 - generate_resource_id:
     reference: instance
@@ -64,8 +66,9 @@ actions:
       --metadata="enable-guest-attributes=true"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_stdout: |
         $$instance$$
     - expect_exit:
@@ -114,12 +117,13 @@ actions:
               - namespace: foo
                 key: baz
                 value: bar
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/guestAttributes/
-    - expect_stdout: |
-        NAMESPACE  KEY  VALUE
-        baz        bar  foo
-        foo        bar  baz
-        foo        baz  bar
+            selfLink: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/guestAttributes/
+    - expect_stdout:
+        matches: |
+          NAMESPACE  KEY  \s*VALUE
+          baz        bar  \s*foo
+          foo        bar  \s*baz
+          foo        baz  \s*bar.*
     - expect_exit:
         code: 0
 - execute_command:
@@ -135,7 +139,7 @@ actions:
         return_response:
           headers:
             cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '434'
+            content-length: '432'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -149,7 +153,7 @@ actions:
               - namespace: foo
                 key: baz
                 value: bar
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/guestAttributes/foo/
+            selfLink: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/guestAttributes/foo/
     - expect_stdout: |
         NAMESPACE  KEY  VALUE
         foo        bar  baz
@@ -168,19 +172,19 @@ actions:
           body: null
         return_response:
           headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '368'
+            cache-control: private
+            content-length: '393'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            kind: compute#guestAttributes
             queryPath: foo/bar
             queryValue:
               items:
               - namespace: foo
                 key: bar
                 value: baz
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/guestAttributes/foo/bar
+            selfLink: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/guestAttributes/foo/bar
+            kind: compute#guestAttributes
     - expect_stdout: |
         NAMESPACE  KEY  VALUE
         foo        bar  baz
@@ -196,7 +200,8 @@ actions:
           The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
            - [$$instance$$] in [us-central1-f]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0

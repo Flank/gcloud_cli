@@ -64,8 +64,8 @@ EXAMPLES
     The following command gets the IAM policy for the CryptoKey frodo within
     the KeyRing fellowship and Location global:
 
-        $ gcloud kms cryptokeys get-iam-policy frodo --keyring fellowship \
-            --location global
+        $ gcloud kms cryptokeys get-iam-policy frodo --keyring=fellowship \
+            --location=global
 
 NOTES
     This command is an internal implementation detail and may change or

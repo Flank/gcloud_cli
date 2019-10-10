@@ -18,8 +18,10 @@ gcloud alpha compute vpn\-tunnels create \- create a VPN tunnel
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute vpn\-tunnels create\fR is used to create a
-VPN tunnel between a VPN Gateway in Google Cloud Platform and an external
-gateway that is identified by \-\-peer\-address.
+Classic VPN tunnel between a target VPN gateway in Google Cloud Platform and a
+peer address; or create Highly Available VPN tunnel between HA VPN gateway and
+another HA VPN gateway, or Highly Available VPN tunnel between HA VPN gateway
+and an external VPN gateway.
 
 
 
@@ -49,9 +51,9 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-peer\-address\fR=\fIPEER_ADDRESS\fR
-Valid IP\-v4 address representing the remote tunnel endpoint, the peer address
+Valid IPV4 address representing the remote tunnel endpoint, the peer address
 must be specified when creating Classic VPN tunnels from Classic Target VPN
-Gateway
+gateway
 
 .TP 2m
 \fB\-\-peer\-external\-gateway\fR=\fIPEER_EXTERNAL_GATEWAY\fR
@@ -117,11 +119,10 @@ must be one of: \fB1\fR, \fB2\fR.
 .TP 2m
 \fB\-\-interface\fR=\fIINTERFACE\fR
 Numeric interface ID of the VPN gateway with which this VPN tunnel is
-associated. This flag is required if the tunnel is being attached to a High
-Availability VPN gateway. This option is only available for use with High
-Availability VPN gateway and must be omitted if the tunnel is going to be
-connected to a Classic VPN gateway. \fIINTERFACE\fR must be one of: \fB0\fR,
-\fB1\fR.
+associated. This flag is required if the tunnel is being attached to a Highly
+Available VPN gateway. This option is only available for use with Highly
+Available VPN gateway and must be omitted if the tunnel is going to be connected
+to a Classic VPN gateway. \fIINTERFACE\fR must be one of: \fB0\fR, \fB1\fR.
 
 .TP 2m
 \fB\-\-local\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]
@@ -134,15 +135,14 @@ Example: 192.168.0.0/16,10.0.0.0/24.
 
 Local traffic selector must be specified only for VPN tunnels that do not use
 dynamic routing with a Cloud Router. Omit this flag when creating a tunnel using
-dynamic routing, including a tunnel for a highly available VPN gateway.
+dynamic routing, including a tunnel for a Highly Available VPN gateway.
 
 .TP 2m
 \fB\-\-peer\-external\-gateway\-interface\fR=\fIPEER_EXTERNAL_GATEWAY_INTERFACE\fR
 Interface ID of the external VPN gateway to which this VPN tunnel is connected
-to. This flag is required if the tunnel is being created from a High
-Availability VPN gateway to an External Vpn Gateway.
-\fIPEER_EXTERNAL_GATEWAY_INTERFACE\fR must be one of: \fB0\fR, \fB1\fR, \fB2\fR,
-\fB3\fR.
+to. This flag is required if the tunnel is being created from a Highly Available
+VPN gateway to an External Vpn Gateway. \fIPEER_EXTERNAL_GATEWAY_INTERFACE\fR
+must be one of: \fB0\fR, \fB1\fR, \fB2\fR, \fB3\fR.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -182,7 +182,7 @@ Example: 192.168.0.0/16,10.0.0.0/24.
 
 Remote traffic selector must be specified for VPN tunnels that do not use
 dynamic routing with a Cloud Router. Omit this flag when creating a tunnel using
-dynamic routing, including a tunnel for a highly available VPN gateway.
+dynamic routing, including a tunnel for a Highly Available VPN gateway.
 
 .TP 2m
 \fB\-\-router\fR=\fIROUTER\fR
@@ -233,9 +233,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute vpn\-tunnels create

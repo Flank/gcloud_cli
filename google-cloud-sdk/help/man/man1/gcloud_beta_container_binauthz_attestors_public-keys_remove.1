@@ -11,13 +11,7 @@ gcloud beta container binauthz attestors public\-keys remove \- remove a public 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container binauthz attestors public\-keys remove\fR \fIPUBLIC_KEY_FINGERPRINT\fR \fB\-\-attestor\fR=\fIATTESTOR\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
-
-
-
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Remove a public key from an Attestor.
+\f5gcloud beta container binauthz attestors public\-keys remove\fR \fIPUBLIC_KEY_ID\fR \fB\-\-attestor\fR=\fIATTESTOR\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,8 +19,8 @@ gcloud beta container binauthz attestors public\-keys remove \- remove a public 
 
 .RS 2m
 .TP 2m
-\fIPUBLIC_KEY_FINGERPRINT\fR
-The fingerprint of the public key to remove.
+\fIPUBLIC_KEY_ID\fR
+The ID of the public key to remove.
 
 
 .RE
@@ -64,12 +58,25 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To remove a public key from the Attestor \f5my_attestor\fR:
 
 .RS 2m
+$ gcloud beta container binauthz attestors public\-keys remove \e
+    0638AADD940361EA2D7F14C58C124F0E663DA097 \e
+    \-\-attestor=my_attestor
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container binauthz attestors public\-keys remove
 $ gcloud alpha container binauthz attestors public\-keys remove
 .RE
 

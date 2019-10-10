@@ -15,16 +15,16 @@ summary:
       loadBalancingScheme: EXTERNAL
       name: rule1
       portRange: 1-65535
-      region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
-      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1/forwardingRules/rule1
-      target: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/targetInstances/foobar
+      region: https://compute.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+      selfLink: https://compute.googleapis.com/compute/v1/projects/fake-project/regions/us-central1/forwardingRules/rule1
+      target: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/targetInstances/foobar
 actions:
 - execute_command:
     command: compute forwarding-rules describe rule1 --global
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/global/forwardingRules/rule1?alt=json
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/global/forwardingRules/rule1?alt=json
           method: GET
           body: null
         return_response:
@@ -41,9 +41,9 @@ actions:
                 "loadBalancingScheme": "EXTERNAL",
                 "name": "rule1",
                 "portRange": "1-65535",
-                "region": "https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1",
-                "selfLink": "https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1/forwardingRules/rule1",
-                "target": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/targetInstances/foobar"
+                "region": "https://compute.googleapis.com/compute/v1/projects/fake-project/regions/us-central1",
+                "selfLink": "https://compute.googleapis.com/compute/v1/projects/fake-project/regions/us-central1/forwardingRules/rule1",
+                "target": "https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/targetInstances/foobar"
             }
     - expect_stdout: |
         IPAddress: 104.198.52.141
@@ -55,8 +55,8 @@ actions:
         loadBalancingScheme: EXTERNAL
         name: rule1
         portRange: 1-65535
-        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
-        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1/forwardingRules/rule1
-        target: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/targetInstances/foobar
+        region: https://compute.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        selfLink: https://compute.googleapis.com/compute/v1/projects/fake-project/regions/us-central1/forwardingRules/rule1
+        target: https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a/targetInstances/foobar
     - expect_exit:
         code: 0

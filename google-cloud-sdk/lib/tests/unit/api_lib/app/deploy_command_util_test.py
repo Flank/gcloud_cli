@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ from googlecloudsdk.api_lib.cloudbuild import build
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.services import exceptions
-from googlecloudsdk.api_lib.services import services_util
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
@@ -909,6 +908,42 @@ class HostnameTest(sdk_test_base.SdkBase, test_case.WithOutputCapture):
                                                               self.app_id))
 
 
+class NonDefaultHostnameTest(sdk_test_base.SdkBase,
+                             test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.version_id = 'versionid'  # 33 chars
+    self.service_id = 'serviceid'  # 33 chars
+    self.app_id = 'appid'  # 29 chars
+    self.messages = core_apis.GetMessagesModule(APPENGINE_API,
+                                                APPENGINE_API_VERSION)
+    self.app = self.messages.Application(
+        name='apps/{0}'.format(self.app_id),
+        id=self.app_id,
+        defaultHostname='{0}.a.b.c.com'.format(self.app_id))
+
+  def testGetAppHostname(self):
+    """Test GetAppHostname returns correct hostname."""
+    hostname = deploy_command_util.GetAppHostname(app=self.app,
+                                                  service=self.service_id,
+                                                  version=None,
+                                                  use_ssl=appinfo.SECURE_HTTP)
+    self.assertEqual(hostname,
+                     'http://{0}.{1}.a.b.c.com'.format(self.service_id,
+                                                       self.app_id))
+
+  def testGetAppHostnameWithVersion(self):
+    """Test GetAppHostname returns correct hostname when version is specified.
+    """
+    hostname = deploy_command_util.GetAppHostname(app=self.app,
+                                                  service=self.service_id,
+                                                  version=self.version_id,
+                                                  use_ssl=appinfo.SECURE_HTTP)
+    self.assertEqual(hostname,
+                     'http://{0}.{1}.{2}.a.b.c.com'.format(
+                         self.version_id, self.service_id, self.app_id))
+
+
 class DoPrepareManagedVmsTest(sdk_test_base.WithOutputCapture,
                               sdk_test_base.WithFakeAuth):
 
@@ -974,7 +1009,7 @@ class PossiblyEnableFlexTest(sdk_test_base.WithOutputCapture,
     self.enable_mock = self.StartObjectPatch(enable_api,
                                              'EnableServiceIfDisabled')
     self.enable_mock.side_effect = (
-        exceptions.ListServicesPermissionDeniedException('message'))
+        exceptions.GetServicePermissionDeniedException('message'))
     deploy_command_util.PossiblyEnableFlex(self.project)
     self.AssertErrContains(
         'Unable to verify that the Appengine Flexible API is enabled for '
@@ -994,7 +1029,7 @@ class PossiblyEnableFlexTest(sdk_test_base.WithOutputCapture,
     self.enable_mock = self.StartObjectPatch(enable_api,
                                              'EnableServiceIfDisabled')
     self.enable_mock.side_effect = (
-        exceptions.ListServicesPermissionDeniedException('message'))
+        exceptions.GetServicePermissionDeniedException('message'))
     self.StartObjectPatch(creds.CredentialType, 'FromCredentials',
                           return_value=creds.CredentialType.SERVICE_ACCOUNT)
     deploy_command_util.PossiblyEnableFlex(self.project)
@@ -1051,16 +1086,17 @@ class PossiblyEnableFlexTest(sdk_test_base.WithOutputCapture,
     api_error = http_error.MakeDetailedHttpError(
         code=400, message='Arbitrary message.',
         details=error_details)
-    sm_client = apitools_mock.Client(
-        core_apis.GetClientClass('servicemanagement', 'v1'),
+    su_client = apitools_mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1'),
         real_client=core_apis.GetClientInstance(
-            'servicemanagement', 'v1', no_http=True))
-    sm_client.Mock()
-    self.addCleanup(sm_client.Unmock)
-    request = services_util.GetEnabledListRequest('fakeproject')
-    request.pageSize = 100
-    sm_client.services.List.Expect(
-        request,
+            'serviceusage', 'v1', no_http=True))
+    su_client.Mock()
+    self.addCleanup(su_client.Unmock)
+    su_messages = core_apis.GetMessagesModule('serviceusage', 'v1')
+    su_client.services.Get.Expect(
+        su_messages.ServiceusageServicesGetRequest(
+            name='projects/fakeproject/services/appengineflex.googleapis.com',),
+        response=None,
         exception=api_error)
     regex = (r'Error \[400\] Arbitrary message.\n'
              'Detailed error information:\n'

@@ -38,7 +38,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\fR
-\fB(ALPHA)\fR Create a new Google Compute Engine High Available VPN gateway.
+\fB(ALPHA)\fR Create a new Google Compute Engine Highly Available VPN gateway.
 
 .TP 2m
 \fBdelete\fR
@@ -50,7 +50,8 @@ help\fR for details.
 
 .TP 2m
 \fBget\-status\fR
-\fB(ALPHA)\fR Get status of a Google Compute Engine VPN Gateway.
+\fB(ALPHA)\fR Get status of a Google Compute Engine Highly Available VPN
+Gateway.
 
 .TP 2m
 \fBlist\fR
@@ -68,11 +69,11 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute vpn\-gateways
 $ gcloud beta compute vpn\-gateways
 .RE
 

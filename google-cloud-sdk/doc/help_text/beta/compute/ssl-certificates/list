@@ -4,13 +4,17 @@ NAME
 
 SYNOPSIS
     gcloud beta compute ssl-certificates list [NAME ...]
-        [--regexp=REGEXP, -r REGEXP] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+        [--regexp=REGEXP, -r REGEXP] [--global | --regions=[REGION,...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute ssl-certificates list displays all Google
     Compute Engine SSL certificates in a project.
+
+    By default, global SSL certificates and SSL certificates from all regions
+    are listed. The results can be narrowed down by providing the --global or
+    --regions flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -27,6 +31,19 @@ FLAGS
         filtered out.
 
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, only global resources are shown.
+
+       --regions=[REGION,...]
+          (DEPRECATED) If provided, only regional resources are shown. If
+          arguments are provided, only resources from the given regions are
+          shown.
+
+          Flag --regions is deprecated. Use --filter="region:( REGION ... )"
+          instead. For example --filter="region:( europe-west1 europe-west2 )".
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -72,6 +89,16 @@ EXAMPLES
     To list the URIs of all SSL certificates in a project, run:
 
         $ gcloud beta compute ssl-certificates list --uri
+
+    To list all global SSL certificates in a project, run:
+
+        $ gcloud beta compute ssl-certificates list --global
+
+    To list all SSL certificates in the us-central1 and europe-west1 regions,
+    given they are regional resources, run:
+
+        $ gcloud beta compute ssl-certificates list \
+            --filter="region:( europe-west1 us-central1 )"
 
 NOTES
     This command is currently in BETA and may change without notice. These

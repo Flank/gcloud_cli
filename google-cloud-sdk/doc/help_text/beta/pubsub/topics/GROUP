@@ -47,6 +47,9 @@ COMMANDS
      set-iam-policy
         (BETA) Set IAM policy for a topic.
 
+     update
+        (BETA) Updates an existing Cloud Pub/Sub topic.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

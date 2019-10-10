@@ -1,3 +1,114 @@
+Release 4.44 (release date: 2019-10-02)
+=======================================
+New Features
+------------------
+- Added support for service account impersonation. This a new "-i" option to
+  specify a service account to impersonate.
+- Added support for members using the deleted syntax (i.e. `deleted:user:...`,
+  `deleted:group:...`, `deleted:serviceAccount:...`).
+- Added support for the new uniform bucket-level access (ubla) command
+  (currently an alias of bucketpolicyonly).
+- Added -w flag to kms command, which shows a warning rather than failing when
+  updating key permissions does not succeed.
+
+Bug Fixes
+------------------
+- Fixed regression in cp where a statement like
+  `cp my-file gs://my-bucket/non-existent-folder/` would create a file called
+  `non-existent-folder` rather than `non-existent-folder/my-file`.
+- Fixed streaming uploads for Python 3.
+
+
+Release 4.43 (release date: 2019-09-20)
+=======================================
+New Features
+------------------
+- Added support for socks proxies, including socks4 and socks5.
+
+Bug Fixes
+------------------
+- Fixed cp/mv errors that occur when  destination directory is a substring of
+  another directory. Behavior now more closely matches OS cp/mv commands.
+- Fixed issue where set IAM policy on objects threw errors.
+- Fixed issue when showing help in a pager in Python 3 environments.
+
+Other Changes
+------------------
+- Several documentation updates and clarifications.
+
+Release 4.42 (release date: 2019-08-05)
+=======================================
+ Bug Fixes
+------------------
+- Fixed some text encoding/decoding issues in certain Python 3 environments.
+- Fixed issue where bundled crcmod for macOS could not be imported and would
+  crash gsutil on Python 3.
+- Fixed issue where trying to run gsutil on an unsupported version of Python 3
+  (3.4 or below) would crash instead of presenting an informative error.
+
+Other Changes
+------------------
+- Several documentation updates and clarifications.
+
+
+Release 4.41 (release date: 2019-07-16)
+=======================================
+New Features
+------------------
+- Added HMAC key management for service accounts. This includes a new "hmac"
+  command to create/get/list/update/delete HMAC keys on service accounts.
+  Currently, your project must be whitelisted for use with this new HMAC
+  functionality. This restriction will be lifted in the near future.
+
+ Bug Fixes
+------------------
+- Fixed bug where copying files > 100MiB from GCS to S3 was hanging.
+- Fixed issue where content type was sometimes set improperly.
+
+
+Release 4.40 (release date: 2019-07-01)
+=======================================
+New Features
+------------------
+- Added support for running gsutil on Python 3.5+. Python 2 will reach its EOL
+  (End of Life) on Jan. 1, 2020, and gsutil will stop supporting Python 2.7 at
+  some point afterward (TBD).
+
+ Bug Fixes
+------------------
+- Fixed bug introduced in v4.39 where rsync would not correctly sync object/file
+  names containing some special URL-encodable characters (e.g. "+" and
+  whitespace characters).
+- Fixed the update command so that it no longer fails when it detects the
+  presence of additional top-level files that were added in the v4.39 release.
+
+ Other Changes
+------------------
+- Several documentation updates and clarifications.
+
+
+Release 4.39 (release date: 2019-06-13)
+=======================================
+New Features
+------------------
+- Compression level is now configurable by setting "gzip_compression_level"
+  under the "GSUtil" section in the boto config file. The default value is 9.
+
+ Bug Fixes
+------------------
+- Fixed bug where IAM operations failed on buckets whose names lacked any
+  letters.
+
+ Other Changes
+------------------
+- Revised contribution guidelines to direct developers to submit GitHub pull
+  requests instead of using the Rietveld code review tool.
+- Several code changes to work toward Python 3 support (coming in a subsequent
+  release).
+- Several documentation and command help improvements.
+- Various improvements to test stability and feedback.
+
+
 Release 4.38 (release date: 2019-03-25)
 =======================================
 Bug Fixes
@@ -1126,7 +1237,7 @@ Major New Gsutil Version - Backwards-Incompatible Changes
 - Downloading object names ending with '/' is no longer supported to avoid
   problems this caused for directores using the Google Cloud Console.
 - rm -r now implies rm -ra (removing all object versions recursively).
-- All commands using the global -m option or a force option (such as 
+- All commands using the global -m option or a force option (such as
   rm -f or cp -c) will now return a non-zero exit code if there are any
   failures during the operation.
 - MD5 and CRC32c values are now represented in base64 encoding instead
@@ -2234,7 +2345,7 @@ New Features
 - Support for multi-threading and recursive operation for setacl command
   (see “gsutil help setacl”).
 - Ability to use the UNIX 'file' command to do content type recognition as
-  an alternative to filename extensions. 
+  an alternative to filename extensions.
 - Introduction of new end-to-end test suite.
 - The gsutil version command now computes a checksum of the code, to detect
   corruption and local modification when assisting with technical support.

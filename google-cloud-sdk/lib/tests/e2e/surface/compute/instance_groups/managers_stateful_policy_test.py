@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,19 +31,11 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
     self.scope = e2e_test_base.ZONAL
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testCreateManageInstanceGroupWithStatefulNamesOnly(self):
-    instance_template_name = self.CreateInstanceTemplate()
-    igm_name = self.CreateInstanceGroupManagerStateful(
-        instance_template_name, stateful_names=True)
-    self.DescribeManagedInstanceGroup(igm_name)
-    self.AssertNewOutputContainsAll([igm_name, 'statefulPolicy'])
-
   def testCreateManageInstanceGroupWithStatefulDisks(self):
     instance_template_name = self.CreateInstanceTemplate(
         additional_disks=['disk1', 'disk2', 'disk3'])
     igm_name = self.CreateInstanceGroupManagerStateful(
         instance_template_name,
-        stateful_names=True,
         stateful_disks=['disk1', 'disk3'])
     self.DescribeManagedInstanceGroup(igm_name)
     self.AssertNewOutputContainsAll([
@@ -59,14 +51,6 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
         """,
     ], normalize_space=True)
     self.AssertOutputNotContains('disk2')
-
-  def testUpdateManageInstanceGroupAddingStatefulNames(self):
-    instance_template_name = self.CreateInstanceTemplate()
-    igm_name = self.CreateInstanceGroupManagerStateful(instance_template_name)
-    self.UpdateInstanceGroupManagerStateful(
-        name=igm_name, add_stateful_names=True)
-    self.DescribeManagedInstanceGroup(igm_name)
-    self.AssertNewOutputContainsAll([igm_name, 'statefulPolicy'])
 
   def testUpdateManageInstanceGroupAddingStatefulDisks(self):
     instance_template_name = self.CreateInstanceTemplate(
@@ -89,22 +73,23 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
     ], normalize_space=True)
     self.AssertOutputNotContains('disk2')
 
-  def testUpdateManageInstanceGroupRemovingStatefulNames(self):
-    instance_template_name = self.CreateInstanceTemplate()
+  def testUpdateManageInstanceGroupRemovingStatefulDisks(self):
+    instance_template_name = self.CreateInstanceTemplate(
+        additional_disks=['disk1'])
     igm_name = self.CreateInstanceGroupManagerStateful(
-        instance_template_name, stateful_names=True)
+        instance_template_name)
     self.UpdateInstanceGroupManagerStateful(
-        name=igm_name, remove_stateful_names=True)
+        name=igm_name, add_stateful_disks=['disk1'])
+    self.UpdateInstanceGroupManagerStateful(
+        name=igm_name, remove_stateful_disks=['disk1'])
     self.DescribeManagedInstanceGroup(igm_name)
     self.AssertNewOutputContains(igm_name)
-    self.AssertOutputNotContains('statefulPolicy')
 
   def testUpdateManageInstanceGroupRemovingOneStatefulDisk(self):
     instance_template_name = self.CreateInstanceTemplate(
         additional_disks=['disk1', 'disk2', 'disk3'])
     igm_name = self.CreateInstanceGroupManagerStateful(
         instance_template_name,
-        stateful_names=True,
         stateful_disks=['disk1', 'disk3'])
     self.UpdateInstanceGroupManagerStateful(
         name=igm_name, remove_stateful_disks=['disk1'])
@@ -126,7 +111,6 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
         additional_disks=['disk1', 'disk2', 'disk3'])
     igm_name = self.CreateInstanceGroupManagerStateful(
         instance_template_name,
-        stateful_names=True,
         stateful_disks=['disk1', 'disk3'])
     self.UpdateInstanceGroupManagerStateful(
         name=igm_name,

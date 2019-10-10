@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -319,7 +319,8 @@ class UpdateTest(unit_test_base.BaseTest):
         contents='title: "Viewer"\n'
                  'description: "Access to delete GCP projects."\n'
                  'stage: "alpha"')
-    with self.assertRaises(exceptions.RequiredArgumentException):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--organization | --project) must be specified.'):
       self.Run('iam roles update viewer')
 
     with self.assertRaises(exceptions.ConflictingArgumentsException):

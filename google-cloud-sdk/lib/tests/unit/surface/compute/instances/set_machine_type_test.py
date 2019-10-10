@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ _MACHINE_TYPE_TEMPLATE = ('{compute_uri}/projects/my-project/zones/central2-a/'
                           'machineTypes/{machine_type}')
 
 
-class InstancesSetSchedulingTest(test_base.BaseTest):
+class InstancesSetMachineTypeTest(test_base.BaseTest):
 
   def _MakeMachineTypeUrl(self, machine_type):
     return _MACHINE_TYPE_TEMPLATE.format(compute_uri=self.compute_uri,
@@ -135,13 +135,14 @@ class InstancesSetSchedulingTest(test_base.BaseTest):
     self.Run("""
         compute instances set-machine-type instance-1
           --zone central2-a
+          --custom-vm-type n2
           --custom-cpu 4
           --custom-memory 12
         """)
 
     self.CheckRequests(
-        [self._MakeGetMachineTypeRequest(machine_type='custom-4-12288')],
-        [self._MakeSetMachineTypeRequest(machine_type='custom-4-12288')])
+        [self._MakeGetMachineTypeRequest(machine_type='n2-custom-4-12288')],
+        [self._MakeSetMachineTypeRequest(machine_type='n2-custom-4-12288')])
 
   def testCustomCpuNoCustomMemory(self):
     with self.AssertRaisesArgumentErrorMatches(

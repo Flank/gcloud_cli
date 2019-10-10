@@ -82,8 +82,13 @@ Display detailed help.
 The Google Cloud Platform project name to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
-\f5gcloud config set project PROJECTID\fR. Overrides the default
-\fBcore/project\fR property value for this command invocation.
+\f5gcloud config set project PROJECTID\fR.
+
+\f5\-\-project\fR and its fallback \f5core/project\fR property play two roles in
+the invocation. It specifies the project of the resource to operate on. It also
+specifies the project for API enablement check, quota, and billing. To specify a
+different project for quota and billing, use \f5\-\-billing\-project\fR or
+\f5billing/quota_project\fR property.
 
 .TP 2m
 \fB\-\-quiet\fR, \fB\-q\fR
@@ -95,10 +100,10 @@ variable \f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1.
 
 .TP 2m
 \fB\-\-verbosity\fR=\fIVERBOSITY\fR; default="warning"
-Override the default verbosity for this command with any of the supported
-standard verbosity levels: \f5debug\fR, \f5info\fR, \f5warning\fR, \f5error\fR,
-\f5critical\fR, \f5none\fR. Overrides the default \fBcore/verbosity\fR property
-value for this command invocation.
+Override the default verbosity for this command. Overrides the default
+\fBcore/verbosity\fR property value for this command invocation. \fIVERBOSITY\fR
+must be one of: \fBdebug\fR, \fBinfo\fR, \fBwarning\fR, \fBerror\fR,
+\fBcritical\fR, \fBnone\fR.
 
 .TP 2m
 \fB\-\-version\fR, \fB\-v\fR
@@ -159,6 +164,10 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Manage Access Context Manager resources.
 
 .TP 2m
+\fBactive\-directory\fR
+\fB(ALPHA)\fR Manage Managed Microsoft AD resources.
+
+.TP 2m
 \fBai\-platform\fR
 \fB(ALPHA)\fR Manage AI Platform jobs and models.
 
@@ -185,6 +194,10 @@ Print user intended output to the console. Overrides the default
 .TP 2m
 \fBbq\fR
 \fB(ALPHA)\fR Interact with and manage resources in Google BigQuery.
+
+.TP 2m
+\fBbuild\-artifacts\fR
+\fB(ALPHA)\fR Manage Cloud Build Artifacts resources.
 
 .TP 2m
 \fBbuilds\fR
@@ -216,7 +229,7 @@ Print user intended output to the console. Overrides the default
 
 .TP 2m
 \fBdataflow\fR
-\fB(ALPHA)\fR Read and manipulate Google Dataflow resources.
+\fB(ALPHA)\fR Manage Google Cloud Dataflow resources.
 
 .TP 2m
 \fBdataproc\fR
@@ -237,6 +250,10 @@ Print user intended output to the console. Overrides the default
 .TP 2m
 \fBdlp\fR
 \fB(ALPHA)\fR Manage sensitive data with Cloud Data Loss Prevention.
+
+.TP 2m
+\fBdns\fR
+\fB(ALPHA)\fR Manage your Cloud DNS managed\-zones and record\-sets.
 
 .TP 2m
 \fBdomains\fR
@@ -267,6 +284,10 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Manage Google Cloud Functions.
 
 .TP 2m
+\fBgame\fR
+\fB(ALPHA)\fR Managed Cloud Game Services.
+
+.TP 2m
 \fBgenomics\fR
 \fB(ALPHA)\fR Manage Genomics resources.
 
@@ -291,6 +312,10 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Manage cryptographic keys in the cloud.
 
 .TP 2m
+\fBlocal\fR
+\fB(ALPHA)\fR Create and manage a local development environment for Cloud Run.
+
+.TP 2m
 \fBlogging\fR
 \fB(ALPHA)\fR Manage Stackdriver Logging.
 
@@ -312,12 +337,20 @@ channels.
 \fB(ALPHA)\fR Create and manage Google Cloud Platform Organizations.
 
 .TP 2m
+\fBpolicy\-troubleshoot\fR
+\fB(ALPHA)\fR Troubleshoot Google Cloud Platform Policies.
+
+.TP 2m
 \fBprojects\fR
 \fB(ALPHA)\fR Create and manage project access policies.
 
 .TP 2m
 \fBpubsub\fR
 \fB(ALPHA)\fR Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
+
+.TP 2m
+\fBrecommender\fR
+\fB(ALPHA)\fR Manage Cloud recommendations and recommendation rules.
 
 .TP 2m
 \fBredis\fR
@@ -408,7 +441,6 @@ channels.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

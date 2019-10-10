@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed set\-autoscaling \- set autoscalin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-scale\-down\-control\fR=[\fImax\-scaled\-down\-replicas\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\fR],[\fImax\-scaled\-down\-replicas\-percent\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -159,6 +159,34 @@ Autoscaler will be based on CPU utilization.
 Use autoscaling based on load balancing utilization.
 
 .TP 2m
+\fB\-\-scale\-down\-control\fR=[\fImax\-scaled\-down\-replicas\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\fR],[\fImax\-scaled\-down\-replicas\-percent\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]
+Configuration that allows slower scale down so that even if Autoscaler
+recommends an abrupt scale down of a managed instance group, it will be
+throttled as specified by the parameters.
+
+.RS 2m
+.TP 2m
+\fBmax\-scaled\-down\-replicas\fR
+Maximum allowed number of VMs that can be deducted from the peak recommendation
+during the window. Possibly all these VMs can be deleted at once so user service
+needs to be prepared to lose that many VMs in one step. Mutually exclusive with
+\'max\-scaled\-down\-replicas\-percent'.
+
+.TP 2m
+\fBmax\-scaled\-down\-replicas\-percent\fR
+Maximum allowed percent of VMs that can be deducted from the peak recommendation
+during the window. Possibly all these VMs can be deleted at once so user service
+needs to be prepared to lose that many VMs in one step. Mutually exclusive with
+\'max\-scaled\-down\-replicas'.
+
+.TP 2m
+\fBtime\-window\fR
+How long back autoscaling should look when computing recommendations to include
+directives regarding slower scale down. Measured in seconds.
+
+.RE
+.sp
+.TP 2m
 \fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR
 Expression for filtering samples used to autoscale, see
 https://cloud.google.com/monitoring/api/v3/filters.
@@ -258,9 +286,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute instance\-groups managed set\-autoscaling

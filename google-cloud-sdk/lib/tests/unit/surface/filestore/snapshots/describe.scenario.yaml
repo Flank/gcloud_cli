@@ -12,6 +12,17 @@ summary:
       sourceFileShare: my_vol
       sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst1
       state: READY
+- execute:
+  - command: |
+      filestore snapshots describe snap --zone us-central1-c
+  - stdout: |
+      createTime: '2019-02-27T00:04:52.633515884Z'
+      description: my new snapshot
+      local: true
+      name: projects/fake-project/locations/us-central1-c/snapshots/snap2
+      sourceFileShare: my_vol
+      sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst1
+      state: READY
 actions:
 - execute_command:
     command: |
@@ -39,6 +50,39 @@ actions:
         createTime: '2019-02-27T00:04:52.633515884Z'
         description: my new snapshot
         name: projects/fake-project/locations/us-central1/snapshots/snap
+        sourceFileShare: my_vol
+        sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst1
+        state: READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      filestore snapshots describe snap --zone us-central1-c
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/v1p1alpha1/projects/fake-project/locations/us-central1-c/snapshots/snap?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1-c/snapshots/snap2",
+              "description": "my new snapshot",
+              "state": "READY",
+              "createTime": "2019-02-27T00:04:52.633515884Z",
+              "sourceInstance": "projects/fake-project/locations/us-central1-c/instances/inst1",
+              "sourceFileShare": "my_vol",
+              "local": true
+            }
+    - expect_stdout: |
+        createTime: '2019-02-27T00:04:52.633515884Z'
+        description: my new snapshot
+        local: true
+        name: projects/fake-project/locations/us-central1-c/snapshots/snap2
         sourceFileShare: my_vol
         sourceInstance: projects/fake-project/locations/us-central1-c/instances/inst1
         state: READY

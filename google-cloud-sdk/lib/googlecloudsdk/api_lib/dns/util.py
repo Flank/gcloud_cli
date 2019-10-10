@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base
+
 from googlecloudsdk.core import resources
 
 
@@ -29,3 +31,12 @@ def GetRegistry(version):
   registry = resources.REGISTRY.Clone()
   registry.RegisterApiByName('dns', version)
   return registry
+
+
+def GetApiFromTrack(track):
+  if track == base.ReleaseTrack.BETA:
+    return 'v1beta2'
+  if track == base.ReleaseTrack.ALPHA:
+    return 'v1alpha2'
+  if track == base.ReleaseTrack.GA:
+    return 'v1'

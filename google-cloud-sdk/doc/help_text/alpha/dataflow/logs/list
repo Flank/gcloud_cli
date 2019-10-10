@@ -32,7 +32,8 @@ FLAGS
         be one of: debug, detailed, warning, error.
 
      --region=REGION_ID
-        The region ID of the job's regional endpoint.
+        The region ID of the job's regional endpoint. Defaults to
+        'us-central1'.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -74,9 +75,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
 
         $ gcloud beta dataflow logs list
 

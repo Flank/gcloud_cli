@@ -5,9 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha container hub register-cluster CLUSTER_NAME --context=CONTEXT
         --service-account-key-file=SERVICE_ACCOUNT_KEY_FILE
-        [--kubeconfig-file=KUBECONFIG_FILE]
-        [--manifest-output-file=MANIFEST_OUTPUT_FILE] [--proxy=PROXY]
-        [GCLOUD_WIDE_FLAG ...]
+        [--kubeconfig=KUBECONFIG] [--manifest-output-file=MANIFEST_OUTPUT_FILE]
+        [--proxy=PROXY] [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command registers a cluster referenced from a kubeconfig file
@@ -26,7 +25,7 @@ REQUIRED FLAGS
         The JSON file of a Google Cloud service account private key.
 
 OPTIONAL FLAGS
-     --kubeconfig-file=KUBECONFIG_FILE
+     --kubeconfig=KUBECONFIG
         The kubeconfig file containing an entry for the cluster. Defaults to
         $KUBECONFIG if it is set in the environment, otherwise defaults to to
         $HOME/.kube/config.
@@ -41,6 +40,10 @@ OPTIONAL FLAGS
         The proxy address in the format of http[s]://{hostname}. The proxy must
         support the HTTP CONNECT method in order for this connection to
         succeed.
+
+     --version=VERSION
+        The version of the connect agent to install/upgrade if not using the
+        latest connect version.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -70,11 +73,18 @@ EXAMPLES
             --context=my-cluster-context \
             --manifest-output-file=/tmp/manifest.yaml \
             --service-account-key-file=/tmp/keyfile.json
+    Register a cluster with a specific version of GKE Connect:
+
+        $ gcloud alpha container hub register-cluster my-cluster \
+            --context=my-cluster-context \
+            --service-account-key-file=/tmp/keyfile.json \
+            --version=gkeconnect_20190802_02_00
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta container hub register-cluster
 

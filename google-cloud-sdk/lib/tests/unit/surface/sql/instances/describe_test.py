@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class _BaseInstancesDescribeTest(object):
             region='us-central',
             serverCaCert=None,
             settings=self.messages.Settings(
-                activationPolicy='ON_DEMAND',
+                activationPolicy='NEVER',
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=False,
@@ -83,7 +83,7 @@ name: testinstance
 project: {0}
 region: us-central
 settings:
-  activationPolicy: ON_DEMAND
+  activationPolicy: NEVER
   backupConfiguration:
     binaryLogEnabled: false
     enabled: true
@@ -96,7 +96,7 @@ settings:
   replicationType: SYNCHRONOUS
   settingsVersion: '1'
   tier: D0
-state: RUNNABLE
+state: STOPPED
 """.format(self.Project()),
         normalize_space=True)
 

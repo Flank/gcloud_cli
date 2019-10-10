@@ -11,7 +11,7 @@ gcloud alpha compute networks update \- update a Google Compute Engine network
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks update\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-mtu\fR=\fIMTU\fR] [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,16 @@ Name of the network to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-mtu\fR=\fIMTU\fR
+Maximum transmission unit(MTU) is the size of the largest frame that can be
+transmitted on this network. Default value is 1460 bytes, the maximum is 1600
+bytes. The MTU advertised via DHCP to all instances attached to this network.
+
 .TP 2m
 
 At most one of these may be specified:
@@ -83,9 +93,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute networks update

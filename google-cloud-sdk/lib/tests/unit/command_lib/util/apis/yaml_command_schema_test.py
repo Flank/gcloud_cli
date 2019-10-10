@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -217,6 +217,9 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
                 },
             },
         ],
+        'labels': {
+            'api_field': 'instance.labels'
+        }
     })
 
     self.assertEqual(r.resource.group_help, 'group help')
@@ -260,6 +263,10 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(args[0].help_text, 'a-help')
     self.assertEqual(args[1].arg_name, 'b')
     self.assertEqual(args[1].help_text, 'b-help')
+
+    labels = r.labels
+    self.assertIsInstance(labels, yaml_command_schema.Labels)
+    self.assertEqual(labels.api_field, 'instance.labels')
 
   def testArgument(self):
     a = yaml_command_schema.Argument.FromData(
@@ -351,6 +358,8 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
   def testOutput(self):
     o = yaml_command_schema.Output({'format': 'asdf'})
     self.assertEqual(o.format, 'asdf')
+    o = yaml_command_schema.Output({'flatten': ['bcde']})
+    self.assertEqual(o.flatten, ['bcde'])
 
   def testCommandData(self):
     c = yaml_command_schema.CommandData(
@@ -361,21 +370,21 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
          'arguments': {'params': []},
          'input': {'confirmation_prompt': 'asdf'},
          'output': {'format': 'yaml'}})
-    self.assertEqual(c.is_hidden, False)
+    self.assertEqual(c.hidden, False)
     self.assertEqual(c.release_tracks, [])
     self.assertEqual(c.command_type, yaml_command_schema.CommandType.DESCRIBE)
     self.assertEqual(c.help_text, {})
     self.assertEqual(c.request.collection, 'foo.instances')
     self.assertEqual(c.response.result_attribute, None)
     self.assertEqual(c.response.error, None)
-    self.assertEqual(c.async, None)
+    self.assertEqual(c.async_, None)
     self.assertEqual(c.arguments.params, [])
     self.assertEqual(c.input.confirmation_prompt, 'asdf')
     self.assertEqual(c.output.format, 'yaml')
 
     c = yaml_command_schema.CommandData(
         'describe',
-        {'is_hidden': True,
+        {'hidden': True,
          'release_tracks': ['GA', 'BETA'],
          'help_text': {},
          'request': {'collection': 'foo.instances',
@@ -383,12 +392,12 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
          'async': {'collection': 'operations'},
          'arguments': {'params': []},
          'output': {'format': 'yaml'}})
-    self.assertEqual(c.is_hidden, True)
+    self.assertEqual(c.hidden, True)
     self.assertFalse(c.request.parse_resource_into_request)
     self.assertEqual(
         c.release_tracks,
         [calliope_base.ReleaseTrack.GA, calliope_base.ReleaseTrack.BETA])
-    self.assertEqual(c.async.method, 'get')
+    self.assertEqual(c.async_.method, 'get')
 
   def testCommandDataErrors(self):
     with self.assertRaisesRegex(

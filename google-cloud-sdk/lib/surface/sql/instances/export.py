@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,14 +66,7 @@ class Export(base.Command):
         'will be stored. The URI is in the form gs://bucketName/fileName. '
         'If the file already exists, the operation fails. If the filename '
         'ends with .gz, the contents are compressed.')
-    parser.add_argument(
-        '--database',
-        '-d',
-        type=arg_parsers.ArgList(min_length=1),
-        metavar='DATABASE',
-        required=False,
-        help='Database (for example, guestbook) from which the export is made.'
-        ' If unspecified, all databases are exported.')
+    flags.AddDatabaseList(parser, flags.DEFAULT_DATABASE_LIST_EXPORT_HELP_TEXT)
     parser.add_argument(
         '--table',
         '-t',
@@ -125,7 +118,7 @@ class Export(base.Command):
         operation=result_operation.name,
         project=instance_ref.project)
 
-    if args.async:
+    if args.async_:
       return sql_client.operations.Get(
           sql_messages.SqlOperationsGetRequest(
               project=operation_ref.project, operation=operation_ref.operation))

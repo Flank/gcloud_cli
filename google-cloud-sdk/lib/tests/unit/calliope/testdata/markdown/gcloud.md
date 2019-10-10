@@ -57,7 +57,7 @@ Display detailed help.
 
 *--verbosity*=_VERBOSITY_; default="warning"::
 
-Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.
+Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.
 
 *-h*::
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class Copy(base.Command):
         source_ref.Parent().Name(), source_ref.Name(),
         destination_ref.Parent().Name(), destination_ref.Name())
 
-    if not args.async:
+    if not args.async_:
       log.CreatedResource(job.id, kind='Job', details=copy_message)
       return job
 

@@ -8,8 +8,7 @@ summary:
       --language-code en-US --format "text(name)" --async
   - stderr: |
       Check operation [$$operation-name$$] for status.
-  - stdout: |
-      name: $$operation-name$$
+  - stdout: .*$$operation-name$$.*$
 actions:
 - execute_command:
     command: |
@@ -38,11 +37,11 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '46'
+            content-length: '89'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-west1.13286190935228524240
+            name: projects/462803083913/locations/us-east1/operations/13926468771736686407
         expect_response:
           extract_references:
           - field: name
@@ -51,7 +50,7 @@ actions:
             json: {}
     - expect_stderr: |
         Check operation [$$operation-name$$] for status.
-    - expect_stdout: |
-        name: $$operation-name$$
+    - expect_stdout:
+        matches: .*$$operation-name$$.*
     - expect_exit:
         code: 0

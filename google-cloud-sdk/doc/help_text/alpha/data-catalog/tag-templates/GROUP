@@ -1,0 +1,60 @@
+NAME
+    gcloud alpha data-catalog tag-templates - manage tag templates in Cloud
+        Data Catalog
+
+SYNOPSIS
+    gcloud alpha data-catalog tag-templates GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage tag templates in Cloud Data Catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     fields
+        (ALPHA) Manage tag template fields in Cloud Data Catalog.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding to a Cloud Data Catalog tag template.
+
+     create
+        (ALPHA) Create a Cloud Data Catalog tag template.
+
+     delete
+        (ALPHA) Delete a Cloud Data Catalog tag template.
+
+     describe
+        (ALPHA) Describe a Cloud Data Catalog tag template.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Cloud Data Catalog tag template.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding from a Cloud Data Catalog tag
+        template.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a Cloud Data Catalog tag template.
+
+     update
+        (ALPHA) Update a Cloud Data Catalog tag template.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta data-catalog tag-templates
+

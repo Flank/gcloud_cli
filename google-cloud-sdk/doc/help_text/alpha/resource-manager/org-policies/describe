@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha resource-manager org-policies describe ORG_POLICY_ID
-        [--effective] [--folder=FOLDER_ID] [--organization=ORGANIZATION_ID]
-        [GCLOUD_WIDE_FLAG ...]
+        (--folder=FOLDER_ID | --organization=ORGANIZATION_ID
+          | --project=PROJECT_ID) [--effective] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Describes an Organization Policy associated with the specified
@@ -15,15 +15,23 @@ POSITIONAL ARGUMENTS
      ORG_POLICY_ID
         The Org Policy constraint name.
 
-FLAGS
+REQUIRED FLAGS
+     Resource that is associated with the organization policy. Exactly one of
+     these must be specified:
+
+       --folder=FOLDER_ID
+          Folder ID.
+
+       --organization=ORGANIZATION_ID
+          Organization ID.
+
+       --project=PROJECT_ID
+          Project ID. Overrides the default core/project property value for
+          this command invocation.
+
+OPTIONAL FLAGS
      --effective
         Show the effective policy.
-
-     --folder=FOLDER_ID
-        Folder ID for Org Policies.
-
-     --organization=ORGANIZATION_ID
-        Organization ID for Org Policies.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -48,9 +56,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
 
         $ gcloud beta resource-manager org-policies describe
 

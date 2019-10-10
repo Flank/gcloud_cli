@@ -29,11 +29,12 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.compute import url_maps_test_base
 
 
-class UrlMapsImportTestAlpha(url_maps_test_base.UrlMapsTestBase):
+class UrlMapsImportTestBeta(url_maps_test_base.UrlMapsTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.ALPHA
-    self._api = 'alpha'
+    # TODO(b/135125441): Use SelectApi() instead.
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
 
   def RunImport(self, command):
     self.Run('compute url-maps import ' + command)
@@ -104,6 +105,13 @@ class UrlMapsImportTestAlpha(url_maps_test_base.UrlMapsTestBase):
         exceptions.Error, "Additional properties are not allowed "
         "('id' was unexpected)"):
       self.RunImport('url-map-1 --source {0} --global'.format(file_name))
+
+
+class UrlMapsImportTestAlpha(UrlMapsImportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
 
 
 if __name__ == '__main__':

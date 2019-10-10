@@ -29,7 +29,8 @@ EXAMPLES
         $ gcloud dns record-sets changes describe change_id
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets changes describe
         $ gcloud beta dns record-sets changes describe
 

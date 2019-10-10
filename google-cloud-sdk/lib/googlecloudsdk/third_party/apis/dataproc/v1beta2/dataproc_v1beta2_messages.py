@@ -57,9 +57,14 @@ class AutoscalingPolicy(_messages.Message):
     id: Required. The policy id.The id must contain only letters (a-z, A-Z),
       numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end
       with underscore or hyphen. Must consist of between 3 and 50 characters.
-    name: Output only. The "resource name" of the policy, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+    name: Output only. The "resource name" of the autoscaling policy, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies, the resource name of the  policy
+      has the following format:
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+      For projects.locations.autoscalingPolicies, the resource name of the
+      policy has the following format:  projects/{project_id}/locations/{locat
+      ion}/autoscalingPolicies/{policy_id}
     secondaryWorkerConfig: Optional. Describes how the autoscaler will operate
       for secondary workers.
     workerConfig: Required. Describes how the autoscaler will operate for
@@ -143,7 +148,7 @@ class Binding(_messages.Message):
       without a Google account. allAuthenticatedUsers: A special identifier
       that represents anyone  who is authenticated with a Google account or a
       service account. user:{emailid}: An email address that represents a
-      specific Google  account. For example, alice@gmail.com .
+      specific Google  account. For example, alice@example.com .
       serviceAccount:{emailid}: An email address that represents a service
       account. For example, my-other-app@appspot.gserviceaccount.com.
       group:{emailid}: An email address that represents a Google group.  For
@@ -529,6 +534,9 @@ class ClusterStatus(_messages.Message):
       DELETING: The cluster is being deleted. It cannot be used.
       UPDATING: The cluster is being updated. It continues to accept and
         process jobs.
+      STOPPING: The cluster is being stopped. It cannot be used.
+      STOPPED: The cluster is currently stopped. It is not ready for use.
+      STARTING: The cluster is being started. It is not ready for use.
     """
     UNKNOWN = 0
     CREATING = 1
@@ -536,6 +544,9 @@ class ClusterStatus(_messages.Message):
     ERROR = 3
     DELETING = 4
     UPDATING = 5
+    STOPPING = 6
+    STOPPED = 7
+    STARTING = 8
 
   class SubstateValueValuesEnum(_messages.Enum):
     r"""Output only. Additional state information that includes status
@@ -566,9 +577,12 @@ class DataprocProjectsLocationsAutoscalingPoliciesCreateRequest(_messages.Messag
   Fields:
     autoscalingPolicy: A AutoscalingPolicy resource to be passed as the
       request body.
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}.
+    parent: Required. The "resource name" of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.create, the resource name  has the
+      following format:  projects/{project_id}/regions/{region} For
+      projects.locations.autoscalingPolicies.create, the resource name  has
+      the following format:  projects/{project_id}/locations/{location}
   """
 
   autoscalingPolicy = _messages.MessageField('AutoscalingPolicy', 1)
@@ -580,9 +594,13 @@ class DataprocProjectsLocationsAutoscalingPoliciesDeleteRequest(_messages.Messag
 
   Fields:
     name: Required. The "resource name" of the autoscaling policy, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form
-      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.delete, the resource name  of the
+      policy has the following format:
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+      For projects.locations.autoscalingPolicies.delete, the resource name  of
+      the policy has the following format:  projects/{project_id}/locations/{l
+      ocation}/autoscalingPolicies/{policy_id}
   """
 
   name = _messages.StringField(1, required=True)
@@ -593,12 +611,18 @@ class DataprocProjectsLocationsAutoscalingPoliciesGetIamPolicyRequest(_messages.
   object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DataprocProjectsLocationsAutoscalingPoliciesGetRequest(_messages.Message):
@@ -606,9 +630,13 @@ class DataprocProjectsLocationsAutoscalingPoliciesGetRequest(_messages.Message):
 
   Fields:
     name: Required. The "resource name" of the autoscaling policy, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form
-      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.get, the resource name  of the
+      policy has the following format:
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+      For projects.locations.autoscalingPolicies.get, the resource name  of
+      the policy has the following format:  projects/{project_id}/locations/{l
+      ocation}/autoscalingPolicies/{policy_id}
   """
 
   name = _messages.StringField(1, required=True)
@@ -619,12 +647,16 @@ class DataprocProjectsLocationsAutoscalingPoliciesListRequest(_messages.Message)
 
   Fields:
     pageSize: Optional. The maximum number of results to return in each
-      response.
+      response. Must be less than or equal to 1000. Defaults to 100.
     pageToken: Optional. The page token, returned by a previous call, to
       request the next page of results.
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}
+    parent: Required. The "resource name" of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.list, the resource name  of the
+      region has the following format:  projects/{project_id}/regions/{region}
+      For projects.locations.autoscalingPolicies.list, the resource name  of
+      the location has the following format:
+      projects/{project_id}/locations/{location}
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -668,9 +700,13 @@ class DataprocProjectsLocationsWorkflowTemplatesCreateRequest(_messages.Message)
   r"""A DataprocProjectsLocationsWorkflowTemplatesCreateRequest object.
 
   Fields:
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}
+    parent: Required. The resource name of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates,create, the resource name of the
+      region has the following format:  projects/{project_id}/regions/{region}
+      For projects.locations.workflowTemplates.create, the resource name of
+      the location has the following format:
+      projects/{project_id}/locations/{location}
     workflowTemplate: A WorkflowTemplate resource to be passed as the request
       body.
   """
@@ -683,9 +719,14 @@ class DataprocProjectsLocationsWorkflowTemplatesDeleteRequest(_messages.Message)
   r"""A DataprocProjectsLocationsWorkflowTemplatesDeleteRequest object.
 
   Fields:
-    name: Required. The "resource name" of the workflow template, as described
-      in https://cloud.google.com/apis/design/resource_names of the form
+    name: Required. The resource name of the workflow template, as described
+      in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates.delete, the resource name of the
+      template has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates.instantiate, the resource name
+      of the template has the following format:  projects/{project_id}/locatio
+      ns/{location}/workflowTemplates/{template_id}
     version: Optional. The version of workflow template to delete. If
       specified, will only delete the template if the current server version
       matches specified version.
@@ -699,23 +740,34 @@ class DataprocProjectsLocationsWorkflowTemplatesGetIamPolicyRequest(_messages.Me
   r"""A DataprocProjectsLocationsWorkflowTemplatesGetIamPolicyRequest object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DataprocProjectsLocationsWorkflowTemplatesGetRequest(_messages.Message):
   r"""A DataprocProjectsLocationsWorkflowTemplatesGetRequest object.
 
   Fields:
-    name: Required. The "resource name" of the workflow template, as described
-      in https://cloud.google.com/apis/design/resource_names of the form
+    name: Required. The resource name of the workflow template, as described
+      in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates.get, the resource name of the
+      template has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates.get, the resource name of the
+      template has the following format:  projects/{project_id}/locations/{loc
+      ation}/workflowTemplates/{template_id}
     version: Optional. The version of workflow template to retrieve. Only
-      previously instatiated versions can be retrieved.If unspecified,
+      previously instantiated versions can be retrieved.If unspecified,
       retrieves the current version.
   """
 
@@ -729,9 +781,14 @@ class DataprocProjectsLocationsWorkflowTemplatesInstantiateInlineRequest(_messag
 
   Fields:
     instanceId: Deprecated. Please use request_id field instead.
-    parent: Required. The "resource name" of the workflow template region, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form projects/{project_id}/regions/{region}
+    parent: Required. The resource name of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates,instantiateinline, the resource  name
+      of the region has the following format:
+      projects/{project_id}/regions/{region} For
+      projects.locations.workflowTemplates.instantiateinline, the  resource
+      name of the location has the following format:
+      projects/{project_id}/locations/{location}
     requestId: Optional. A tag that prevents multiple concurrent workflow
       instances with the same tag from running. This mitigates risk of
       concurrent instances started due to retries.It is recommended to always
@@ -755,9 +812,14 @@ class DataprocProjectsLocationsWorkflowTemplatesInstantiateRequest(_messages.Mes
   Fields:
     instantiateWorkflowTemplateRequest: A InstantiateWorkflowTemplateRequest
       resource to be passed as the request body.
-    name: Required. The "resource name" of the workflow template, as described
-      in https://cloud.google.com/apis/design/resource_names of the form
+    name: Required. The resource name of the workflow template, as described
+      in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates.instantiate, the resource name of the
+      template has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates.instantiate, the resource name
+      of the template has the following format:  projects/{project_id}/locatio
+      ns/{location}/workflowTemplates/{template_id}
   """
 
   instantiateWorkflowTemplateRequest = _messages.MessageField('InstantiateWorkflowTemplateRequest', 1)
@@ -772,9 +834,13 @@ class DataprocProjectsLocationsWorkflowTemplatesListRequest(_messages.Message):
       response.
     pageToken: Optional. The page token, returned by a previous call, to
       request the next page of results.
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}
+    parent: Required. The resource name of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates,list, the resource  name of the
+      region has the following format:  projects/{project_id}/regions/{region}
+      For projects.locations.workflowTemplates.list, the  resource name of the
+      location has the following format:
+      projects/{project_id}/locations/{location}
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -819,9 +885,12 @@ class DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(_messages.Message)
   Fields:
     autoscalingPolicy: A AutoscalingPolicy resource to be passed as the
       request body.
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}.
+    parent: Required. The "resource name" of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.create, the resource name  has the
+      following format:  projects/{project_id}/regions/{region} For
+      projects.locations.autoscalingPolicies.create, the resource name  has
+      the following format:  projects/{project_id}/locations/{location}
   """
 
   autoscalingPolicy = _messages.MessageField('AutoscalingPolicy', 1)
@@ -833,9 +902,13 @@ class DataprocProjectsRegionsAutoscalingPoliciesDeleteRequest(_messages.Message)
 
   Fields:
     name: Required. The "resource name" of the autoscaling policy, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form
-      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.delete, the resource name  of the
+      policy has the following format:
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+      For projects.locations.autoscalingPolicies.delete, the resource name  of
+      the policy has the following format:  projects/{project_id}/locations/{l
+      ocation}/autoscalingPolicies/{policy_id}
   """
 
   name = _messages.StringField(1, required=True)
@@ -845,14 +918,17 @@ class DataprocProjectsRegionsAutoscalingPoliciesGetIamPolicyRequest(_messages.Me
   r"""A DataprocProjectsRegionsAutoscalingPoliciesGetIamPolicyRequest object.
 
   Fields:
-    getIamPolicyRequest: A GetIamPolicyRequest resource to be passed as the
-      request body.
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  getIamPolicyRequest = _messages.MessageField('GetIamPolicyRequest', 1)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   resource = _messages.StringField(2, required=True)
 
 
@@ -861,9 +937,13 @@ class DataprocProjectsRegionsAutoscalingPoliciesGetRequest(_messages.Message):
 
   Fields:
     name: Required. The "resource name" of the autoscaling policy, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form
-      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.get, the resource name  of the
+      policy has the following format:
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+      For projects.locations.autoscalingPolicies.get, the resource name  of
+      the policy has the following format:  projects/{project_id}/locations/{l
+      ocation}/autoscalingPolicies/{policy_id}
   """
 
   name = _messages.StringField(1, required=True)
@@ -874,12 +954,16 @@ class DataprocProjectsRegionsAutoscalingPoliciesListRequest(_messages.Message):
 
   Fields:
     pageSize: Optional. The maximum number of results to return in each
-      response.
+      response. Must be less than or equal to 1000. Defaults to 100.
     pageToken: Optional. The page token, returned by a previous call, to
       request the next page of results.
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}
+    parent: Required. The "resource name" of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.autoscalingPolicies.list, the resource name  of the
+      region has the following format:  projects/{project_id}/regions/{region}
+      For projects.locations.autoscalingPolicies.list, the resource name  of
+      the location has the following format:
+      projects/{project_id}/locations/{location}
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -995,12 +1079,18 @@ class DataprocProjectsRegionsClustersGetIamPolicyRequest(_messages.Message):
   r"""A DataprocProjectsRegionsClustersGetIamPolicyRequest object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DataprocProjectsRegionsClustersGetRequest(_messages.Message):
@@ -1127,6 +1217,64 @@ class DataprocProjectsRegionsClustersSetIamPolicyRequest(_messages.Message):
   setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
 
 
+class DataprocProjectsRegionsClustersStartRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsClustersStartRequest object.
+
+  Fields:
+    clusterName: Required. The cluster name.
+    clusterUuid: Optional. Specifying the cluster_uuid means the RPC should
+      fail (with error NOT_FOUND) if cluster with specified UUID does not
+      exist.
+    projectId: Required. The ID of the Google Cloud Platform project the
+      cluster belongs to.
+    region: Required. The Cloud Dataproc region in which to handle the
+      request.
+    requestId: Optional. A unique id used to identify the request. If the
+      server receives two StartClusterRequest requests with the same id, then
+      the second request will be ignored and the first
+      google.longrunning.Operation created and stored in the backend is
+      returned.It is recommended to always set this value to a UUID
+      (https://en.wikipedia.org/wiki/Universally_unique_identifier).The id
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+  """
+
+  clusterName = _messages.StringField(1, required=True)
+  clusterUuid = _messages.StringField(2)
+  projectId = _messages.StringField(3, required=True)
+  region = _messages.StringField(4, required=True)
+  requestId = _messages.StringField(5)
+
+
+class DataprocProjectsRegionsClustersStopRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsClustersStopRequest object.
+
+  Fields:
+    clusterName: Required. The cluster name.
+    clusterUuid: Optional. Specifying the cluster_uuid means the RPC should
+      fail (with error NOT_FOUND) if cluster with specified UUID does not
+      exist.
+    projectId: Required. The ID of the Google Cloud Platform project the
+      cluster belongs to.
+    region: Required. The Cloud Dataproc region in which to handle the
+      request.
+    requestId: Optional. A unique id used to identify the request. If the
+      server receives two StopClusterRequest requests with the same id, then
+      the second request will be ignored and the first
+      google.longrunning.Operation created and stored in the backend is
+      returned.It is recommended to always set this value to a UUID
+      (https://en.wikipedia.org/wiki/Universally_unique_identifier).The id
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+  """
+
+  clusterName = _messages.StringField(1, required=True)
+  clusterUuid = _messages.StringField(2)
+  projectId = _messages.StringField(3, required=True)
+  region = _messages.StringField(4, required=True)
+  requestId = _messages.StringField(5)
+
+
 class DataprocProjectsRegionsClustersTestIamPermissionsRequest(_messages.Message):
   r"""A DataprocProjectsRegionsClustersTestIamPermissionsRequest object.
 
@@ -1181,12 +1329,18 @@ class DataprocProjectsRegionsJobsGetIamPolicyRequest(_messages.Message):
   r"""A DataprocProjectsRegionsJobsGetIamPolicyRequest object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DataprocProjectsRegionsJobsGetRequest(_messages.Message):
@@ -1354,12 +1508,18 @@ class DataprocProjectsRegionsOperationsGetIamPolicyRequest(_messages.Message):
   r"""A DataprocProjectsRegionsOperationsGetIamPolicyRequest object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DataprocProjectsRegionsOperationsGetRequest(_messages.Message):
@@ -1422,9 +1582,13 @@ class DataprocProjectsRegionsWorkflowTemplatesCreateRequest(_messages.Message):
   r"""A DataprocProjectsRegionsWorkflowTemplatesCreateRequest object.
 
   Fields:
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}
+    parent: Required. The resource name of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates,create, the resource name of the
+      region has the following format:  projects/{project_id}/regions/{region}
+      For projects.locations.workflowTemplates.create, the resource name of
+      the location has the following format:
+      projects/{project_id}/locations/{location}
     workflowTemplate: A WorkflowTemplate resource to be passed as the request
       body.
   """
@@ -1437,9 +1601,14 @@ class DataprocProjectsRegionsWorkflowTemplatesDeleteRequest(_messages.Message):
   r"""A DataprocProjectsRegionsWorkflowTemplatesDeleteRequest object.
 
   Fields:
-    name: Required. The "resource name" of the workflow template, as described
-      in https://cloud.google.com/apis/design/resource_names of the form
+    name: Required. The resource name of the workflow template, as described
+      in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates.delete, the resource name of the
+      template has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates.instantiate, the resource name
+      of the template has the following format:  projects/{project_id}/locatio
+      ns/{location}/workflowTemplates/{template_id}
     version: Optional. The version of workflow template to delete. If
       specified, will only delete the template if the current server version
       matches specified version.
@@ -1453,23 +1622,34 @@ class DataprocProjectsRegionsWorkflowTemplatesGetIamPolicyRequest(_messages.Mess
   r"""A DataprocProjectsRegionsWorkflowTemplatesGetIamPolicyRequest object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DataprocProjectsRegionsWorkflowTemplatesGetRequest(_messages.Message):
   r"""A DataprocProjectsRegionsWorkflowTemplatesGetRequest object.
 
   Fields:
-    name: Required. The "resource name" of the workflow template, as described
-      in https://cloud.google.com/apis/design/resource_names of the form
+    name: Required. The resource name of the workflow template, as described
+      in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates.get, the resource name of the
+      template has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates.get, the resource name of the
+      template has the following format:  projects/{project_id}/locations/{loc
+      ation}/workflowTemplates/{template_id}
     version: Optional. The version of workflow template to retrieve. Only
-      previously instatiated versions can be retrieved.If unspecified,
+      previously instantiated versions can be retrieved.If unspecified,
       retrieves the current version.
   """
 
@@ -1483,9 +1663,14 @@ class DataprocProjectsRegionsWorkflowTemplatesInstantiateInlineRequest(_messages
 
   Fields:
     instanceId: Deprecated. Please use request_id field instead.
-    parent: Required. The "resource name" of the workflow template region, as
-      described in https://cloud.google.com/apis/design/resource_names of the
-      form projects/{project_id}/regions/{region}
+    parent: Required. The resource name of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates,instantiateinline, the resource  name
+      of the region has the following format:
+      projects/{project_id}/regions/{region} For
+      projects.locations.workflowTemplates.instantiateinline, the  resource
+      name of the location has the following format:
+      projects/{project_id}/locations/{location}
     requestId: Optional. A tag that prevents multiple concurrent workflow
       instances with the same tag from running. This mitigates risk of
       concurrent instances started due to retries.It is recommended to always
@@ -1509,9 +1694,14 @@ class DataprocProjectsRegionsWorkflowTemplatesInstantiateRequest(_messages.Messa
   Fields:
     instantiateWorkflowTemplateRequest: A InstantiateWorkflowTemplateRequest
       resource to be passed as the request body.
-    name: Required. The "resource name" of the workflow template, as described
-      in https://cloud.google.com/apis/design/resource_names of the form
+    name: Required. The resource name of the workflow template, as described
+      in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates.instantiate, the resource name of the
+      template has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates.instantiate, the resource name
+      of the template has the following format:  projects/{project_id}/locatio
+      ns/{location}/workflowTemplates/{template_id}
   """
 
   instantiateWorkflowTemplateRequest = _messages.MessageField('InstantiateWorkflowTemplateRequest', 1)
@@ -1526,9 +1716,13 @@ class DataprocProjectsRegionsWorkflowTemplatesListRequest(_messages.Message):
       response.
     pageToken: Optional. The page token, returned by a previous call, to
       request the next page of results.
-    parent: Required. The "resource name" of the region, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
-      projects/{project_id}/regions/{region}
+    parent: Required. The resource name of the region or location, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates,list, the resource  name of the
+      region has the following format:  projects/{project_id}/regions/{region}
+      For projects.locations.workflowTemplates.list, the  resource name of the
+      location has the following format:
+      projects/{project_id}/locations/{location}
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1591,9 +1785,8 @@ class DiskConfig(_messages.Message):
     bootDiskType: Optional. Type of the boot disk (default is "pd-standard").
       Valid values: "pd-ssd" (Persistent Disk Solid State Drive) or "pd-
       standard" (Persistent Disk Hard Disk Drive).
-    numLocalSsds: Optional. Number of attached SSDs, from 0 to 4 (default is
-      0). If SSDs are not attached, the boot disk is used to store runtime
-      logs and HDFS
+    numLocalSsds: Number of attached SSDs, from 0 to 4 (default is 0). If SSDs
+      are not attached, the boot disk is used to store runtime logs and HDFS
       (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If
       one or more SSDs are attached, this runtime bulk data is spread across
       them, and the boot disk contains only basic config and installed
@@ -1798,7 +1991,28 @@ class GceClusterConfig(_messages.Message):
 
 
 class GetIamPolicyRequest(_messages.Message):
-  r"""Request message for GetIamPolicy method."""
+  r"""Request message for GetIamPolicy method.
+
+  Fields:
+    options: OPTIONAL: A GetPolicyOptions object for specifying options to
+      GetIamPolicy. This field is only used by Cloud IAM.
+  """
+
+  options = _messages.MessageField('GetPolicyOptions', 1)
+
+
+class GetPolicyOptions(_messages.Message):
+  r"""Encapsulates settings provided to GetIamPolicy.
+
+  Fields:
+    requestedPolicyVersion: Optional. The policy format version to be
+      returned.Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
+  """
+
+  requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class HadoopJob(_messages.Message):
@@ -2007,13 +2221,12 @@ class InstanceGroupAutoscalingPolicyConfig(_messages.Message):
 
 
 class InstanceGroupConfig(_messages.Message):
-  r"""Optional. The config settings for Compute Engine resources in an
-  instance group, such as a master or worker group.
+  r"""The config settings for Compute Engine resources in an instance group,
+  such as a master or worker group.
 
   Fields:
     accelerators: Optional. The Compute Engine accelerator configuration for
-      these instances.Beta Feature: This feature is still under development.
-      It may be changed before final release.
+      these instances.
     diskConfig: Optional. Disk option config settings.
     imageUri: Optional. The Compute Engine image resource used for cluster
       instances. It can be specified or may be inferred from
@@ -2034,8 +2247,8 @@ class InstanceGroupConfig(_messages.Message):
     managedGroupConfig: Output only. The config for Compute Engine Instance
       Group Manager that manages this group. This is only used for preemptible
       instance groups.
-    minCpuPlatform: Optional. Specifies the minimum cpu platform for the
-      Instance Group. See Cloud Dataproc&rarr;Minimum CPU Platform.
+    minCpuPlatform: Specifies the minimum cpu platform for the Instance Group.
+      See Cloud Dataproc&rarr;Minimum CPU Platform.
     numInstances: Optional. The number of VM instances in the instance group.
       For master instance groups, must be set to 1.
   """
@@ -2357,6 +2570,8 @@ class KerberosConfig(_messages.Message):
       certificate.
     kmsKeyUri: Required. The uri of the KMS key used to encrypt various
       sensitive files.
+    realm: Optional. The name of the on-cluster Kerberos realm. If not
+      specified, the uppercased domain of hostnames will be the realm.
     rootPrincipalPasswordUri: Required. The Cloud Storage URI of a KMS
       encrypted file containing the root principal password.
     tgtLifetimeHours: Optional. The lifetime of the ticket granting ticket, in
@@ -2380,10 +2595,11 @@ class KerberosConfig(_messages.Message):
   keystorePasswordUri = _messages.StringField(8)
   keystoreUri = _messages.StringField(9)
   kmsKeyUri = _messages.StringField(10)
-  rootPrincipalPasswordUri = _messages.StringField(11)
-  tgtLifetimeHours = _messages.IntegerField(12, variant=_messages.Variant.INT32)
-  truststorePasswordUri = _messages.StringField(13)
-  truststoreUri = _messages.StringField(14)
+  realm = _messages.StringField(11)
+  rootPrincipalPasswordUri = _messages.StringField(12)
+  tgtLifetimeHours = _messages.IntegerField(13, variant=_messages.Variant.INT32)
+  truststorePasswordUri = _messages.StringField(14)
+  truststoreUri = _messages.StringField(15)
 
 
 class LifecycleConfig(_messages.Message):
@@ -2671,7 +2887,7 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the name should have the format of operations/some/unique/name.
+      the name should be a resource name ending with operations/{unique_id}.
     response: The normal response of the operation in case of success. If the
       original method returns no data on success, such as Delete, the response
       is google.protobuf.Empty. If the original method is standard
@@ -2936,24 +3152,36 @@ class PigJob(_messages.Message):
 
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
-  specify access control policies for Cloud Platform resources.A Policy
-  consists of a list of bindings. A binding binds a list of members to a role,
-  where the members can be user accounts, Google groups, Google domains, and
-  service accounts. A role is a named list of permissions defined by IAM.JSON
-  Example {   "bindings": [     {       "role": "roles/owner",
+  specify access control policies for Cloud Platform resources.A Policy is a
+  collection of bindings. A binding binds one or more members to a single
+  role. Members can be user accounts, service accounts, Google groups, and
+  domains (such as G Suite). A role is a named list of permissions (defined by
+  IAM or configured by users). A binding can optionally specify a condition,
+  which is a logic expression that further constrains the role binding based
+  on attributes about the request and/or target resource.JSON Example {
+  "bindings": [     {       "role": "roles/resourcemanager.organizationAdmin",
   "members": [         "user:mike@example.com",
   "group:admins@example.com",         "domain:google.com",
-  "serviceAccount:my-other-app@appspot.gserviceaccount.com"       ]     },
-  {       "role": "roles/viewer",       "members": ["user:sean@example.com"]
-  }   ] } YAML Example bindings: - members:   - user:mike@example.com   -
-  group:admins@example.com   - domain:google.com   - serviceAccount:my-other-
-  app@appspot.gserviceaccount.com   role: roles/owner - members:   -
-  user:sean@example.com   role: roles/viewer For a description of IAM and its
-  features, see the IAM developer's guide (https://cloud.google.com/iam/docs).
+  "serviceAccount:my-project-id@appspot.gserviceaccount.com"       ]     },
+  {       "role": "roles/resourcemanager.organizationViewer",       "members":
+  ["user:eve@example.com"],       "condition": {         "title": "expirable
+  access",         "description": "Does not grant access after Sep 2020",
+  "expression": "request.time <
+  timestamp('2020-10-01T00:00:00.000Z')",       }     }   ] } YAML Example
+  bindings: - members:   - user:mike@example.com   - group:admins@example.com
+  - domain:google.com   - serviceAccount:my-project-
+  id@appspot.gserviceaccount.com   role:
+  roles/resourcemanager.organizationAdmin - members:   - user:eve@example.com
+  role: roles/resourcemanager.organizationViewer   condition:     title:
+  expirable access     description: Does not grant access after Sep 2020
+  expression: request.time < timestamp('2020-10-01T00:00:00.000Z') For a
+  description of IAM and its features, see the IAM developer's guide
+  (https://cloud.google.com/iam/docs).
 
   Fields:
-    bindings: Associates a list of members to a role. bindings with no members
-      will result in an error.
+    bindings: Associates a list of members to a role. Optionally may specify a
+      condition that determines when binding is in effect. bindings with no
+      members will result in an error.
     etag: etag is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the etag in the read-
@@ -2962,8 +3190,18 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to setIamPolicy to
       ensure that their change will be applied to the same version of the
       policy.If no etag is provided in the call to setIamPolicy, then the
-      existing policy is overwritten blindly.
-    version: Deprecated.
+      existing policy is overwritten. Due to blind-set semantics of an etag-
+      less policy, 'setIamPolicy' will not fail even if either of incoming or
+      stored policy does not meet the version requirements.
+    version: Specifies the format of the policy.Valid values are 0, 1, and 3.
+      Requests specifying an invalid value will be rejected.Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.If no etag is provided in the call to
+      setIamPolicy, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
   bindings = _messages.MessageField('Binding', 1, repeated=True)
@@ -3226,6 +3464,9 @@ class SoftwareConfig(_messages.Message):
       PRESTO: <no description>
       ZEPPELIN: <no description>
       ZOOKEEPER: <no description>
+      SOLR: <no description>
+      HBASE: <no description>
+      RANGER: <no description>
     """
     COMPONENT_UNSPECIFIED = 0
     ANACONDA = 1
@@ -3236,6 +3477,9 @@ class SoftwareConfig(_messages.Message):
     PRESTO = 6
     ZEPPELIN = 7
     ZOOKEEPER = 8
+    SOLR = 9
+    HBASE = 10
+    RANGER = 11
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PropertiesValue(_messages.Message):
@@ -3274,7 +3518,11 @@ class SoftwareConfig(_messages.Message):
 
 class SparkJob(_messages.Message):
   r"""A Cloud Dataproc job for running Apache Spark (http://spark.apache.org/)
-  applications on YARN.
+  applications on YARN. The specification of the main method to call to drive
+  the job. Specify either the jar file that contains the main class or the
+  main class name. To pass both a main jar and a main class in that jar, add
+  the jar to CommonJob.jar_file_uris, and then specify the main class name in
+  main_class.
 
   Messages:
     PropertiesValue: Optional. A mapping of property names to values, used to
@@ -3556,36 +3804,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The Status type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by gRPC (https://github.com/grpc). The error model is designed to be:
-  Simple to use and understand for most users Flexible enough to meet
-  unexpected needsOverviewThe Status message contains three pieces of data:
-  error code, error message, and error details. The error code should be an
-  enum value of google.rpc.Code, but it may accept additional error codes if
-  needed. The error message should be a developer-facing English message that
-  helps developers understand and resolve the error. If a localized user-
-  facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package google.rpc that can be used for common error
-  conditions.Language mappingThe Status message is the logical representation
-  of the error model, but it is not necessarily the actual wire format. When
-  the Status message is exposed in different client libraries and different
-  wire protocols, it can be mapped differently. For example, it will likely be
-  mapped to some exceptions in Java, but more likely mapped to some error
-  codes in C.Other usesThe error model and the Status message can be used in a
-  variety of environments, either with or without APIs, to provide a
-  consistent developer experience across different environments.Example uses
-  of this error model include: Partial errors. If a service needs to return
-  partial errors to the client, it may embed the Status in the normal response
-  to indicate the partial errors. Workflow errors. A typical workflow has
-  multiple steps. Each step may have a Status message for error reporting.
-  Batch operations. If a client uses batch request and batch response, the
-  Status message should be used directly inside batch response, one for each
-  error sub-response. Asynchronous operations. If an API call embeds
-  asynchronous operation results in its response, the status of those
-  operations should be represented directly using the Status message. Logging.
-  If some API errors are stored in logs, the message Status could be used
-  directly after any stripping needed for security/privacy reasons.
+  used by gRPC (https://github.com/grpc). Each Status message contains three
+  pieces of data: error code, error message, and error details.You can find
+  out more about this error model and how to work with it in the API Design
+  Guide (https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -3761,7 +3983,14 @@ class WorkflowMetadata(_messages.Message):
       parameters.
     startTime: Output only. Workflow start time.
     state: Output only. The workflow state.
-    template: Output only. The "resource name" of the template.
+    template: Output only. The resource name of the workflow template as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates, the resource name of the  template
+      has the following format:
+      projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates, the resource name of the
+      template has the following format:  projects/{project_id}/locations/{loc
+      ation}/workflowTemplates/{template_id}
     version: Output only. The version of template at the time of workflow
       instantiation.
   """
@@ -3884,9 +4113,14 @@ class WorkflowTemplate(_messages.Message):
       empty, but, if present, must contain 1 to 63 characters, and must
       conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).No more than
       32 labels can be associated with a template.
-    name: Output only. The "resource name" of the template, as described in
-      https://cloud.google.com/apis/design/resource_names of the form
+    name: Output only. The resource name of the workflow template, as
+      described in https://cloud.google.com/apis/design/resource_names. For
+      projects.regions.workflowTemplates, the resource name of the  template
+      has the following format:
       projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+      For projects.locations.workflowTemplates, the resource name of the
+      template has the following format:  projects/{project_id}/locations/{loc
+      ation}/workflowTemplates/{template_id}
     parameters: Optional. Template parameters whose values are substituted
       into the template. Values for parameters must be provided when the
       template is instantiated.
@@ -3965,21 +4199,21 @@ class YarnApplication(_messages.Message):
   be changed before final release.
 
   Enums:
-    StateValueValuesEnum: Required. The application state.
+    StateValueValuesEnum: Output only. The application state.
 
   Fields:
-    name: Required. The application name.
-    progress: Required. The numerical progress of the application, from 1 to
-      100.
-    state: Required. The application state.
-    trackingUrl: Optional. The HTTP URL of the ApplicationMaster,
+    name: Output only. The application name.
+    progress: Output only. The numerical progress of the application, from 1
+      to 100.
+    state: Output only. The application state.
+    trackingUrl: Optional. Output only. The HTTP URL of the ApplicationMaster,
       HistoryServer, or TimelineServer that provides application-specific
       information. The URL uses the internal hostname, and requires a proxy
       server for resolution and, possibly, access.
   """
 
   class StateValueValuesEnum(_messages.Enum):
-    r"""Required. The application state.
+    r"""Output only. The application state.
 
     Values:
       STATE_UNSPECIFIED: Status is unspecified.

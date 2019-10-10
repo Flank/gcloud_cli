@@ -1,0 +1,384 @@
+title: create instance template with disk-resource-policy
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute resource-policies create snapshot-schedule  $$instance-policy$$
+      --start-time "Thu, 25 Sep 2003 10:49:41 -0300" --daily-schedule --max-retention-days 2
+      --region us-central1
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$\].
+      $
+- execute:
+  - command: |
+      compute instance-templates create $$instance-template$$
+      --create-disk "name=disk-1,size=10GB,mode=ro,type=pd-standard,description=testDescription,disk-resource-policy=$$instance-policy$$"
+      --format "text(name)"
+  - stderr: |-
+      Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+      $
+  - stdout: |
+      ---
+      name: $$instance-template$$
+- execute:
+  - command: compute instance-templates delete $$instance-template$$ -q
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+      $
+- execute:
+  - command: compute resource-policies delete $$instance-policy$$ --region us-central1
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$\].
+      $
+actions:
+- define_reference:
+    reference: compute-uri
+    value: compute.googleapis.com/compute
+- generate_resource_id:
+    reference: instance-template
+    prefix: gcloud-compute-instance-templates
+- generate_resource_id:
+    reference: instance-policy
+    prefix: gcloud-compute-resource-policy
+- execute_command:
+    command: |
+      compute resource-policies create snapshot-schedule  $$instance-policy$$
+      --start-time "Thu, 25 Sep 2003 10:49:41 -0300" --daily-schedule --max-retention-days 2
+      --region us-central1
+    validation_only: true
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$instance-policy$$
+              region: us-central1
+              snapshotSchedulePolicy:
+                retentionPolicy:
+                  maxRetentionDays: 2
+                schedule:
+                  dailySchedule:
+                    daysInCycle: 1
+                    startTime: 829
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '896'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '861404093409102696'
+            name: operation-1561998726209-58ca12b37218c-fceb5e4f-c73c8a9e
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$
+            targetId: '7863515045881678696'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-07-01T09:32:07.771-07:00'
+            startTime: '2019-07-01T09:32:07.795-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1561998726209-58ca12b37218c-fceb5e4f-c73c8a9e
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$\].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '760'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"VIrlae5hwS3npACfz0kOo3EHVss=/DEyJjwOk0F-W-ou9hCP6e1pA_8I="'
+            status: '200'
+          body:
+            kind: compute#resourcePolicy
+            id: '7863515045881678696'
+            creationTimestamp: '2019-07-01T09:32:07.759-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1
+            name: $$instance-policy$$
+            snapshotSchedulePolicy:
+              schedule:
+                dailySchedule:
+                  daysInCycle: 1
+                  startTime: 780
+                  duration: PT14400S
+              retentionPolicy:
+                maxRetentionDays: 2
+                onSourceDiskDelete: KEEP_AUTO_SNAPSHOTS
+            status: READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute instance-templates create $$instance-template$$
+      --create-disk "name=disk-1,size=10GB,mode=ro,type=pd-standard,description=testDescription,disk-resource-policy=$$instance-policy$$"
+      --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '995'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#image
+            id: '1464844176702362429'
+            creationTimestamp: '2019-06-18T16:03:47.268-07:00'
+            name: debian-9-stretch-v20190618
+            description: Debian, Debian GNU/Linux, 9 (stretch), amd64 built on 20190618
+            sourceType: RAW
+            rawDisk:
+              source: ''
+              containerType: TAR
+            status: READY
+            archiveSizeBytes: '10705167360'
+            diskSizeGb: '10'
+            licenses:
+            - https://www.googleapis.com/compute/beta/projects/debian-cloud/global/licenses/debian-9-stretch
+            family: debian-9
+            selfLink: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/debian-9-stretch-v20190618
+            labelFingerprint: 42WmSpB8rSM=
+            guestOsFeatures:
+            - type: VIRTIO_SCSI_MULTIQUEUE
+            licenseCodes:
+            - '1000205'
+            storageLocations:
+            - asia
+            - asia
+            - eu
+            - eu
+            - us
+            - asia
+            - us
+            - us
+            - eu
+            - us
+            - eu
+            - asia
+            - us
+            - us
+            - asia
+            - asia
+            - eu
+            - eu
+            - us
+            - asia
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$instance-template$$
+              properties:
+                canIpForward: false
+                disks:
+                - autoDelete: true
+                  boot: true
+                  initializeParams:
+                    sourceImage: https://$$compute-uri$$/beta/projects/debian-cloud/global/images/family/debian-9
+                  mode: READ_WRITE
+                  type: PERSISTENT
+                - autoDelete: false
+                  boot: false
+                  initializeParams:
+                    description: testDescription
+                    diskName: disk-1
+                    diskSizeGb: '10'
+                    diskType: pd-standard
+                    resourcePolicies:
+                    - $$instance-policy$$
+                  mode: READ_ONLY
+                  type: PERSISTENT
+                machineType: n1-standard-1
+                metadata: {}
+                networkInterfaces:
+                - accessConfigs:
+                  - name: external-nat
+                    type: ONE_TO_ONE_NAT
+                  network: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/networks/default
+                scheduling:
+                  automaticRestart: true
+                serviceAccounts:
+                - email: default
+                  scopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring.write
+                  - https://www.googleapis.com/auth/pubsub
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '788'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8938545604883636981'
+            name: operation-1562008601793-58ca377d8920e-5d197334-ca40b583
+            operationType: compute.instanceTemplates.insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$
+            targetId: '7645453375805842165'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-07-01T12:16:42.639-07:00'
+            startTime: '2019-07-01T12:16:42.654-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1562008601793-58ca377d8920e-5d197334-ca40b583
+        poll_operation: false
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '832'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"oXvD9rhg7cGXGPowg-yrTyNr_bU=/NGSTNAUBuBmR6VW-RzjuFUfGaEU="'
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8938545604883636981'
+            name: operation-1562008601793-58ca377d8920e-5d197334-ca40b583
+            operationType: compute.instanceTemplates.insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$
+            targetId: '7645453375805842165'
+            status: DONE
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 100
+            insertTime: '2019-07-01T12:16:42.639-07:00'
+            startTime: '2019-07-01T12:16:42.654-07:00'
+            endTime: '2019-07-01T12:16:45.162-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1562008601793-58ca377d8920e-5d197334-ca40b583
+        repeatable: true
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2320'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"dEuRHaGosa8hnzhGfLpIoq5jsUY=/F1_UHkgaryYK0W6JwwdJ8G6wgIc="'
+            status: '200'
+          body:
+            kind: compute#instanceTemplate
+            id: '7645453375805842165'
+            creationTimestamp: '2019-07-01T12:16:42.465-07:00'
+            name: $$instance-template$$
+            description: ''
+            properties:
+              machineType: n1-standard-1
+              canIpForward: false
+              networkInterfaces:
+              - kind: compute#networkInterface
+                network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/default
+                accessConfigs:
+                - kind: compute#accessConfig
+                  type: ONE_TO_ONE_NAT
+                  name: external-nat
+                  networkTier: PREMIUM
+              disks:
+              - kind: compute#attachedDisk
+                type: PERSISTENT
+                mode: READ_WRITE
+                deviceName: persistent-disk-0
+                index: 0
+                boot: true
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/beta/projects/debian-cloud/global/images/family/debian-9
+                autoDelete: true
+              - kind: compute#attachedDisk
+                type: PERSISTENT
+                mode: READ_ONLY
+                deviceName: persistent-disk-1
+                index: 1
+                boot: false
+                initializeParams:
+                  diskName: disk-1
+                  diskSizeGb: '10'
+                  diskType: pd-standard
+                  description: testDescription
+                  resourcePolicies:
+                  - $$instance-policy$$
+                autoDelete: false
+              metadata:
+                kind: compute#metadata
+                fingerprint: 4_QxQ57NQak=
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+              scheduling:
+                onHostMaintenance: MIGRATE
+                automaticRestart: true
+                preemptible: false
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$
+    - expect_stdout: |
+        ---
+        name: $$instance-template$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instance-templates delete $$instance-template$$ -q
+    cleanup_for: instance-template
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute resource-policies delete $$instance-policy$$ --region us-central1
+    cleanup_for: instance-policy
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$instance-policy$$\].
+    - expect_exit:
+        code: 0

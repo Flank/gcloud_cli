@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import exceptions
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
@@ -29,8 +30,8 @@ from tests.lib.surface.organizations import testbase
 class OrganizationsSetIamPolicyTest(testbase.OrganizationsUnitTestBase):
 
   def testSetIamPolicyOrganization(self):
-    self.mock_client.organizations.SetIamPolicy.Expect(self.DefaultRequest(),
-                                                       self._GetTestIamPolicy())
+    self.mock_client.organizations.SetIamPolicy.Expect(
+        self.DefaultRequest(), self._GetTestIamPolicy())
 
     # Setting the IAM policy yields no result, it's just a side-effect,
     # so we offload the test assertion to the mock.
@@ -41,12 +42,14 @@ class OrganizationsSetIamPolicyTest(testbase.OrganizationsUnitTestBase):
 
   def testClearBindingsAndEtagSetIamPolicyOrganization(self):
     policy = self._GetTestIamPolicy(clear_fields=['bindings', 'etag'])
+    expected_policy = self._GetTestIamPolicy(clear_fields=['bindings', 'etag'])
+    expected_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
 
     expected_request = (
         self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
             organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy,
+                policy=expected_policy,
                 updateMask='auditConfigs,version,bindings,etag')))
 
     self.mock_client.organizations.SetIamPolicy.Expect(
@@ -58,12 +61,14 @@ class OrganizationsSetIamPolicyTest(testbase.OrganizationsUnitTestBase):
 
   def testAuditConfigsPreservedSetIamPolicyOrganization(self):
     policy = self._GetTestIamPolicy(clear_fields=['auditConfigs'])
+    expected_policy = self._GetTestIamPolicy(clear_fields=['auditConfigs'])
+    expected_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
 
     expected_request = (
         self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
             organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy,
+                policy=expected_policy,
                 updateMask='bindings,etag,version')))
 
     self.mock_client.organizations.SetIamPolicy.Expect(
@@ -97,10 +102,12 @@ class OrganizationsSetIamPolicyTest(testbase.OrganizationsUnitTestBase):
       self.DoRequest(self._GetTestIamPolicy())
 
   def DefaultRequest(self):
+    expected_policy = self._GetTestIamPolicy()
+    expected_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
     return self.messages.CloudresourcemanagerOrganizationsSetIamPolicyRequest(
         organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
         setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-            policy=self._GetTestIamPolicy(),
+            policy=expected_policy,
             updateMask='auditConfigs,bindings,etag,version'))
 
   def SetupSetIamPolicyFailure(self, exception):

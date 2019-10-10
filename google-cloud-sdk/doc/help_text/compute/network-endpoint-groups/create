@@ -1,5 +1,5 @@
 NAME
-    gcloud compute network-endpoint-groups create - creates a Google Compute
+    gcloud compute network-endpoint-groups create - create a Google Compute
         Engine network endpoint group
 
 SYNOPSIS

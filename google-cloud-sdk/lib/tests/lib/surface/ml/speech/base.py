@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,7 +82,18 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
                             enable_word_confidence=None,
                             enable_speaker_diarization=None,
                             speaker_count=None,
-                            additional_language_codes=None):
+                            additional_language_codes=None,
+                            enable_punctuation=None,
+                            interaction_type=None,
+                            naics_code=None,
+                            microphone_distance=None,
+                            media_type=None,
+                            device_type=None,
+                            device_name=None,
+                            mime_type=None,
+                            audio_topic=None,
+                            audio_channel_count=None,
+                            enable_separate_recognition=None):
     request = request_type(
         audio=self.messages.RecognitionAudio(content=content,
                                              uri=uri),
@@ -97,13 +108,7 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
             profanityFilter=filter_profanity,
             maxAlternatives=max_alternatives)
     )
-
-    try:
-      # Command default value
-      request.config.enableWordConfidence = False
-      request.config.enableSpeakerDiarization = False
-    except AttributeError:
-      pass  # This is expected for some API versions
+    self._SetDefaultValues(request)
     if enable_word_confidence is not None:
       request.config.enableWordConfidence = enable_word_confidence
     if enable_speaker_diarization is not None:
@@ -112,6 +117,46 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
       request.config.diarizationSpeakerCount = speaker_count
     if additional_language_codes is not None:
       request.config.alternativeLanguageCodes = additional_language_codes
+    if enable_punctuation is not None:
+      request.config.enableAutomaticPunctuation = enable_punctuation
+    if enable_separate_recognition is not None and (
+        audio_channel_count is not None):
+      request.config.enableSeparateRecognitionPerChannel = \
+        enable_separate_recognition
+      request.config.audioChannelCount = audio_channel_count
+
+    metadata_args = [interaction_type, naics_code, microphone_distance,
+                     media_type, device_type, device_name, mime_type,
+                     audio_topic]
+    if [i for i in metadata_args if i is not None]:
+      request.config.metadata = self.messages.RecognitionMetadata()
+    if interaction_type is not None:
+      request.config.metadata.interactionType =\
+        self.messages.RecognitionMetadata.InteractionTypeValueValuesEnum(
+            interaction_type)
+    if naics_code is not None:
+      request.config.metadata.industryNaicsCodeOfAudio = naics_code
+    if microphone_distance is not None:
+      request.config.metadata.microphoneDistance = \
+        self.messages.RecognitionMetadata.MicrophoneDistanceValueValuesEnum(
+            microphone_distance
+        )
+    if media_type is not None:
+      request.config.metadata.originalMediaType = \
+        self.messages.RecognitionMetadata.OriginalMediaTypeValueValuesEnum(
+            media_type
+        )
+    if device_type is not None:
+      request.config.metadata.recordingDeviceType = \
+        self.messages.RecognitionMetadata.RecordingDeviceTypeValueValuesEnum(
+            device_type
+        )
+    if device_name is not None:
+      request.config.metadata.recordingDeviceName = device_name
+    if mime_type is not None:
+      request.config.metadata.originalMimeType = mime_type
+    if audio_topic is not None:
+      request.config.metadata.audioTopic = audio_topic
     return request
 
   def _ExpectRecognizeRequest(self,
@@ -129,13 +174,28 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
                               error=None,
                               enable_speaker_diarization=None,
                               speaker_count=None,
-                              additional_language_codes=None):
+                              additional_language_codes=None,
+                              enable_punctuation=None,
+                              interaction_type=None,
+                              naics_code=None,
+                              microphone_distance=None,
+                              media_type=None,
+                              device_type=None,
+                              device_name=None,
+                              mime_type=None,
+                              audio_topic=None,
+                              audio_channel_count=None,
+                              enable_separate_recognition=None):
     """Expect request to client.speech.Recognize method."""
+    # pylint: disable=too-many-function-args
     request = self._MakeRecognizeRequest(
         self.messages.RecognizeRequest, content, uri, enable_word_time_offsets,
         language, encoding, sample_rate, hints, max_alternatives,
         filter_profanity, enable_word_confidence, enable_speaker_diarization,
-        speaker_count, additional_language_codes)
+        speaker_count, additional_language_codes, enable_punctuation,
+        interaction_type, naics_code, microphone_distance, media_type,
+        device_type, device_name, mime_type, audio_topic, audio_channel_count,
+        enable_separate_recognition)
     if results:
       response = self.messages.RecognizeResponse(
           results=[
@@ -166,13 +226,28 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
                                          error=None,
                                          enable_speaker_diarization=None,
                                          speaker_count=None,
-                                         additional_language_codes=None):
+                                         additional_language_codes=None,
+                                         enable_punctuation=None,
+                                         interaction_type=None,
+                                         naics_code=None,
+                                         microphone_distance=None,
+                                         media_type=None,
+                                         device_type=None,
+                                         device_name=None,
+                                         mime_type=None,
+                                         audio_topic=None,
+                                         audio_channel_count=None,
+                                         enable_separate_recognition=None):
     """Expect request to client.speech.Longrunningrecognize method."""
+    # pylint: disable=too-many-function-args
     request = self._MakeRecognizeRequest(
         self.messages.LongRunningRecognizeRequest, content, uri,
         enable_word_time_offsets, language, encoding, sample_rate, hints,
         max_alternatives, filter_profanity, enable_word_confidence,
-        enable_speaker_diarization, speaker_count, additional_language_codes)
+        enable_speaker_diarization, speaker_count, additional_language_codes,
+        enable_punctuation, interaction_type, naics_code, microphone_distance,
+        media_type, device_type, device_name, mime_type, audio_topic,
+        audio_channel_count, enable_separate_recognition)
     response = self.messages.Operation(name=result) if result else None
     self.client.speech.Longrunningrecognize.Expect(
         request,
@@ -211,3 +286,13 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
     for _ in range(0, attempts - 1):
       self._ExpectGetOperationRequest(operation_id)
     self._ExpectGetOperationRequest(operation_id, results, error_json)
+
+  def _SetDefaultValues(self, request):
+    """Set default values for command flags depending on track."""
+    if self.track in [calliope_base.ReleaseTrack.ALPHA,
+                      calliope_base.ReleaseTrack.BETA]:
+      request.config.enableWordConfidence = False
+      request.config.enableSpeakerDiarization = False
+    if self.track == calliope_base.ReleaseTrack.ALPHA:
+      request.config.enableAutomaticPunctuation = False
+      request.config.enableSeparateRecognitionPerChannel = False

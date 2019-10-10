@@ -8,7 +8,6 @@ SYNOPSIS
         [--description=DESCRIPTION] [--guest-flush]
         [--no-require-csek-key-create]
         [--source-disk-csek-key=[PROPERTY=VALUE,...]]
-        [--source-disk-kms-key=[PROPERTY=VALUE,...]]
         [--source-instance-zone=SOURCE_INSTANCE_ZONE]
         [--storage-location=LOCATION]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
@@ -68,49 +67,6 @@ OPTIONAL FLAGS
 
          csek-key-file
             path to customer-supplied encryption key.
-     --source-disk-kms-key=[PROPERTY=VALUE,...]
-        KMS encryption key of the disk attached to the source instance.
-        Required if the source disk is protected by a KMS encryption key. This
-        flag may be repeated to specify multiple attached disks.
-
-         disk
-            URL of the disk attached to the source instance. This can be a full
-            or valid partial URL
-
-         kms-key
-            Fully qualified Cloud KMS cryptokey name that protects the disk.
-            This can either be the fully qualified path or the name. The fully
-            qualified Cloud KMS cryptokey name format is:
-            projects/<kms-project>/locations/<kms-location>/keyRings/<kms-keyring>/
-            cryptoKeys/<key-name>. If the value is not fully qualified then
-            kms-location, kms-keyring, and optionally kms-project are required.
-            See
-            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
-            for more details.
-
-         kms-project
-            Project that contains the Cloud KMS cryptokey that protects the
-            disk. If the project is not specified then the project where the
-            disk is being created will be used. If this flag is set then
-            key-location, kms-keyring, and kms-key are required. See
-            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
-            for more details.
-
-         kms-location
-            Location of the Cloud KMS cryptokey to be used for protecting the
-            disk. All Cloud KMS cryptokeys are reside in a 'location'. To get a
-            list of possible locations run 'gcloud kms locations list'. If this
-            flag is set then kms-keyring and kms-key are required. See
-            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
-            for more details.
-
-         kms-keyring
-            The keyring which contains the Cloud KMS cryptokey that will
-            protect the disk. If this flag is set then kms-location and kms-key
-            are required. See
-            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
-            for more details.
-
      --source-instance-zone=SOURCE_INSTANCE_ZONE
         Zone of the instance to operate on. If not specified and the
         compute/zone property isn't set, you may be prompted to select a zone.
@@ -164,7 +120,6 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

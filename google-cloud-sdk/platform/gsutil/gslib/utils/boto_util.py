@@ -20,12 +20,15 @@ tied to some of Boto's core functionality) and oauth2client.
 
 from __future__ import absolute_import
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
 
 import os
 import pkgutil
 import tempfile
 import textwrap
 
+import six
 import boto
 from boto import config
 import boto.auth
@@ -40,16 +43,20 @@ from gslib.utils import system_util
 from gslib.utils.constants import DEFAULT_GCS_JSON_API_VERSION
 from gslib.utils.constants import DEFAULT_GSUTIL_STATE_DIR
 from gslib.utils.constants import SSL_TIMEOUT_SEC
+from gslib.utils.constants import UTF8
 from gslib.utils.unit_util import HumanReadableToBytes
 from gslib.utils.unit_util import ONE_MIB
 
 import httplib2
 from oauth2client.client import HAS_CRYPTO
 
+if six.PY3:
+  long = int
+
 # Globals in this module are set according to values in the boto config.
 BOTO_IS_SECURE = config.get('Boto', 'is_secure', True)
-CERTIFICATE_VALIDATION_ENABLED = config.get(
-    'Boto', 'https_validate_certificates', True)
+CERTIFICATE_VALIDATION_ENABLED = config.get('Boto',
+                                            'https_validate_certificates', True)
 
 configured_certs_file = None  # Single certs file for use across all processes.
 temp_certs_file = None  # Temporary certs file for cleanup upon exit.
@@ -86,6 +93,7 @@ def ConfigureCertsFile():
         if not certs_data:
           raise CommandException('Certificates file not found. Please '
                                  'reinstall gsutil from scratch')
+        certs_data = six.ensure_str(certs_data)
         fd, fname = tempfile.mkstemp(suffix='.txt', prefix='gsutil-cacerts')
         f = os.fdopen(fd, 'w')
         f.write(certs_data)
@@ -99,23 +107,25 @@ def ConfigureCertsFile():
 def ConfigureNoOpAuthIfNeeded():
   """Sets up no-op auth handler if no boto credentials are configured."""
   if not HasConfiguredCredentials():
-    if (config.has_option('Credentials', 'gs_service_client_id')
-        and not HAS_CRYPTO):
+    if (config.has_option('Credentials', 'gs_service_client_id') and
+        not HAS_CRYPTO):
       if system_util.InvokedViaCloudSdk():
-        raise CommandException('\n'.join(textwrap.wrap(
-            'Your gsutil is configured with an OAuth2 service account, but '
-            'you do not have PyOpenSSL or PyCrypto 2.6 or later installed. '
-            'Service account authentication requires one of these libraries; '
-            'please reactivate your service account via the gcloud auth '
-            'command and ensure any gcloud packages necessary for '
-            'service accounts are present.')))
+        raise CommandException('\n'.join(
+            textwrap.wrap(
+                'Your gsutil is configured with an OAuth2 service account, but '
+                'you do not have PyOpenSSL or PyCrypto 2.6 or later installed. '
+                'Service account authentication requires one of these libraries; '
+                'please reactivate your service account via the gcloud auth '
+                'command and ensure any gcloud packages necessary for '
+                'service accounts are present.')))
       else:
-        raise CommandException('\n'.join(textwrap.wrap(
-            'Your gsutil is configured with an OAuth2 service account, but '
-            'you do not have PyOpenSSL or PyCrypto 2.6 or later installed. '
-            'Service account authentication requires one of these libraries; '
-            'please install either of them to proceed, or configure a '
-            'different type of credentials with "gsutil config".')))
+        raise CommandException('\n'.join(
+            textwrap.wrap(
+                'Your gsutil is configured with an OAuth2 service account, but '
+                'you do not have PyOpenSSL or PyCrypto 2.6 or later installed. '
+                'Service account authentication requires one of these libraries; '
+                'please install either of them to proceed, or configure a '
+                'different type of credentials with "gsutil config".')))
     else:
       # With no boto config file the user can still access publicly readable
       # buckets and objects.
@@ -204,11 +214,11 @@ def GetGcsJsonApiVersion():
 # in multiples of 256KiB). Overridable for testing.
 def GetJsonResumableChunkSize():
   chunk_size = config.getint('GSUtil', 'json_resumable_chunk_size',
-                             1024*1024*100L)
+                             long(1024 * 1024 * 100))
   if chunk_size == 0:
-    chunk_size = 1024*256L
-  elif chunk_size % 1024*256L != 0:
-    chunk_size += (1024*256L - (chunk_size % (1024*256L)))
+    chunk_size = long(1024 * 256)
+  elif chunk_size % long(1024 * 256) != 0:
+    chunk_size += (long(1024 * 256) - (chunk_size % (long(1024 * 256))))
   return chunk_size
 
 
@@ -226,11 +236,10 @@ def GetMaxConcurrentCompressedUploads():
   upload_chunk_size = GetJsonResumableChunkSize()
   # From apitools compression.py.
   compression_chunk_size = 16 * ONE_MIB
-  total_upload_size = (
-      upload_chunk_size + compression_chunk_size + 17 +
-      5 * (((compression_chunk_size - 1) / 16383) + 1))
-  max_concurrent_uploads = (
-      GetMaxUploadCompressionBufferSize() / total_upload_size)
+  total_upload_size = (upload_chunk_size + compression_chunk_size + 17 + 5 *
+                       (((compression_chunk_size - 1) / 16383) + 1))
+  max_concurrent_uploads = (GetMaxUploadCompressionBufferSize() /
+                            total_upload_size)
   if max_concurrent_uploads <= 0:
     max_concurrent_uploads = 1
   return max_concurrent_uploads
@@ -256,25 +265,19 @@ def GetNewHttp(http_class=httplib2.Http, **kwargs):
   Returns:
     An initialized httplib2.Http instance.
   """
-  proxy_host = config.get('Boto', 'proxy', None)
-  proxy_info = httplib2.ProxyInfo(
-      proxy_type=3,
-      proxy_host=proxy_host,
-      proxy_port=config.getint('Boto', 'proxy_port', 0),
-      proxy_user=config.get('Boto', 'proxy_user', None),
-      proxy_pass=config.get('Boto', 'proxy_pass', None),
-      proxy_rdns=config.get('Boto',
-                            'proxy_rdns',
-                            True if proxy_host else False))
 
-  if not (proxy_info.proxy_host and proxy_info.proxy_port):
-    # Fall back to using the environment variable.
-    for proxy_env_var in ['http_proxy', 'https_proxy', 'HTTPS_PROXY']:
-      if proxy_env_var in os.environ and os.environ[proxy_env_var]:
-        proxy_info = ProxyInfoFromEnvironmentVar(proxy_env_var)
-        # Assume proxy_rnds is True if a proxy environment variable exists.
-        proxy_info.proxy_rdns = config.get('Boto', 'proxy_rdns', True)
-        break
+  ##Get Proxy configuration from boto file, defaults are None, 0 and False
+  boto_proxy_config = {
+      'proxy_host': config.get('Boto', 'proxy', None),
+      'proxy_type': config.get('Boto', 'proxy_type', 'http'),
+      'proxy_port': config.getint('Boto', 'proxy_port'),
+      'proxy_user': config.get('Boto', 'proxy_user', None),
+      'proxy_pass': config.get('Boto', 'proxy_pass', None),
+      'proxy_rdns': config.get('Boto', 'proxy_rdns', None)
+  }
+
+  #Use SetProxyInfo to convert boto config to httplib2.proxyinfo object
+  proxy_info = SetProxyInfo(boto_proxy_config)
 
   # Some installers don't package a certs file with httplib2, so use the
   # one included with gsutil.
@@ -301,7 +304,7 @@ def GetTabCompletionLogFilename():
 def GetTabCompletionCacheFilename():
   tab_completion_dir = os.path.join(GetGsutilStateDir(), 'tab-completion')
   # Limit read permissions on the directory to owner for privacy.
-  system_util.CreateDirIfNeeded(tab_completion_dir, mode=0700)
+  system_util.CreateDirIfNeeded(tab_completion_dir, mode=0o700)
   return os.path.join(tab_completion_dir, 'cache')
 
 
@@ -311,8 +314,8 @@ def HasConfiguredCredentials():
                     config.has_option('Credentials', 'gs_secret_access_key'))
   has_amzn_creds = (config.has_option('Credentials', 'aws_access_key_id') and
                     config.has_option('Credentials', 'aws_secret_access_key'))
-  has_oauth_creds = (
-      config.has_option('Credentials', 'gs_oauth2_refresh_token'))
+  has_oauth_creds = (config.has_option('Credentials',
+                                       'gs_oauth2_refresh_token'))
   has_service_account_creds = (
       HAS_CRYPTO and
       config.has_option('Credentials', 'gs_service_client_id') and
@@ -324,14 +327,17 @@ def HasConfiguredCredentials():
 
   valid_auth_handler = None
   try:
-    valid_auth_handler = boto.auth.get_auth_handler(
-        GSConnection.DefaultHost, config, Provider('google'),
-        requested_capability=['s3'])
+    valid_auth_handler = boto.auth.get_auth_handler(GSConnection.DefaultHost,
+                                                    config,
+                                                    Provider('google'),
+                                                    requested_capability=['s3'])
     # Exclude the no-op auth handler as indicating credentials are configured.
     # Note we can't use isinstance() here because the no-op module may not be
     # imported so we can't get a reference to the class type.
-    if getattr(getattr(valid_auth_handler, '__class__', None),
-               '__name__', None) == 'NoOpAuth':
+    if 'NoOpAuth' == getattr(
+        getattr(valid_auth_handler, '__class__', None),
+        '__name__',
+        None):  # yapf: disable
       valid_auth_handler = None
   except NoAuthHandlerFound:
     pass
@@ -340,8 +346,7 @@ def HasConfiguredCredentials():
 
 
 def JsonResumableChunkSizeDefined():
-  chunk_size_defined = config.get('GSUtil', 'json_resumable_chunk_size',
-                                  None)
+  chunk_size_defined = config.get('GSUtil', 'json_resumable_chunk_size', None)
   return chunk_size_defined is not None
 
 
@@ -363,6 +368,7 @@ def MonkeyPatchBoto():
   # We have to do all sorts of gross things here (dynamic imports, invalid names
   # to resolve symbols in copy/pasted methods, invalid spacing from copy/pasted
   # methods, etc.), so we just disable pylint warnings for this whole method.
+  # yapf: disable
   # pylint: disable=all
 
   # This should have already been imported if this method was called in the
@@ -386,11 +392,82 @@ def MonkeyPatchBoto():
         gcs_oauth2_boto_plugin.oauth2_plugin.OAuth2ServiceAccountAuth,
         gcs_oauth2_boto_plugin.oauth2_plugin.OAuth2Auth)
     new_result = (
-        [r for r in handler_subclasses if r not in xml_oauth2_handlers] +
-        [r for r in handler_subclasses if r in xml_oauth2_handlers])
+        # We need to sort each of these to avoid inconsistent handler selection
+        # when multiple credential types are configured in Python 3.5. See
+        # https://issuetracker.google.com/issues/135709541 for specific logs.
+        sorted(
+            [r for r in handler_subclasses if r not in xml_oauth2_handlers],
+            # Types aren't sortable, so we use their names:
+            key=(lambda handler_t: handler_t.__name__),
+        ) +  # Now append XML handlers to the end (highest precedence)
+        sorted(
+            [r for r in handler_subclasses if r in xml_oauth2_handlers],
+            key=(lambda handler_t: handler_t.__name__),
+        ))
     return new_result
 
   boto.plugin.get_plugin = _PatchedGetPluginMethod
+
+  #########################################################################
+
+  # TODO(boto>2.49.0): Remove this.
+  # Fixes SSL issue where SNI was not being used for OpenSSL 1.1.1+
+  # https://github.com/boto/boto/pull/3843/files
+
+  # Import modules and resolve symbols used by our patch method.
+  import socket
+  import ssl
+  InvalidCertificateException = (
+      boto.https_connection.InvalidCertificateException)
+  ValidateCertificateHostname = (
+      boto.https_connection.ValidateCertificateHostname)
+
+  def _PatchedConnectMethod(self):
+    # The lines below were copied directly from the Boto file, so we don't lint
+    # or otherwise alter them.
+    if hasattr(self, "timeout"):
+      sock = socket.create_connection((self.host, self.port), self.timeout)
+    else:
+      sock = socket.create_connection((self.host, self.port))
+    msg = "wrapping ssl socket; "
+    if self.ca_certs:
+      msg += "CA certificate file=%s" % self.ca_certs
+    else:
+      msg += "using system provided SSL certs"
+    boto.log.debug(msg)
+    if hasattr(ssl, 'SSLContext') and getattr(ssl, 'HAS_SNI', False):
+      # Use SSLContext so we can specify server_hostname for SNI
+      # (Required for connections to storage.googleapis.com)
+      context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+      context.verify_mode = ssl.CERT_REQUIRED
+      if self.ca_certs:
+        context.load_verify_locations(self.ca_certs)
+      if self.cert_file:
+        context.load_cert_chain(self.cert_file, self.key_file)
+      self.sock = context.wrap_socket(sock, server_hostname=self.host)
+      # Add attributes only set in SSLSocket constructor without context:
+      self.sock.keyfile = self.key_file
+      self.sock.certfile = self.cert_file
+      self.sock.cert_reqs = context.verify_mode
+      self.sock.ssl_version = ssl.PROTOCOL_SSLv23
+      self.sock.ca_certs = self.ca_certs
+      self.sock.ciphers = None
+    else:
+      self.sock = ssl.wrap_socket(sock,
+                                  keyfile=self.key_file,
+                                  certfile=self.cert_file,
+                                  cert_reqs=ssl.CERT_REQUIRED,
+                                  ca_certs=self.ca_certs)
+    cert = self.sock.getpeercert()
+    hostname = self.host.split(':', 0)[0]
+    if not ValidateCertificateHostname(cert, hostname):
+      raise InvalidCertificateException(
+          hostname, cert, 'remote hostname "%s" does not match '
+          'certificate' % hostname)
+    # End `_PatchedConnectMethod` declaration.
+
+  boto.https_connection.CertValidatingHTTPSConnection.connect = (
+      _PatchedConnectMethod)
 
 
 def ProxyInfoFromEnvironmentVar(proxy_env_var):
@@ -417,7 +494,129 @@ def ResumableThreshold():
   return config.getint('GSUtil', 'resumable_threshold', 8 * ONE_MIB)
 
 
-def UsingCrcmodExtension(crcmod):
-  return (boto.config.get('GSUtil', 'test_assume_fast_crcmod', None) or
-          (getattr(crcmod, 'crcmod', None) and
-           getattr(crcmod.crcmod, '_usingExtension', None)))
+def SetProxyInfo(boto_proxy_config):
+  """Sets proxy info from boto and environment and converts to httplib2.ProxyInfo.
+
+  Args:
+    dict: Values read from the .boto file
+
+  Returns:
+    httplib2.ProxyInfo constructed from boto or environment variable string.
+  """
+  #Defining proxy_type based on httplib2 library, accounting for None entry too.
+  proxy_type_spec = {'socks4': 1, 'socks5': 2, 'http': 3, 'https': 3}
+
+  #proxy_type defaults to 'http (3)' for backwards compatibility
+  proxy_type = proxy_type_spec.get(
+      boto_proxy_config.get('proxy_type').lower(), proxy_type_spec['http'])
+  proxy_host = boto_proxy_config.get('proxy_host')
+  proxy_port = boto_proxy_config.get('proxy_port')
+  proxy_user = boto_proxy_config.get('proxy_user')
+  proxy_pass = boto_proxy_config.get('proxy_pass')
+  proxy_rdns = boto_proxy_config.get('proxy_rdns',
+                                     True if proxy_host else False)
+
+  #For proxy_info below, proxy_rdns fails for socks4 and socks5 so restricting use
+  #to http only
+  proxy_info = httplib2.ProxyInfo(proxy_host=proxy_host,
+                                  proxy_type=proxy_type,
+                                  proxy_port=proxy_port,
+                                  proxy_user=proxy_user,
+                                  proxy_pass=proxy_pass,
+                                  proxy_rdns=proxy_rdns)
+
+  #Added to force socks proxies not to use rdns
+  if not (proxy_info.proxy_type == proxy_type_spec['http']):
+    proxy_info.proxy_rdns = False
+
+  if not (proxy_info.proxy_host and proxy_info.proxy_port):
+    # Fall back to using the environment variable. Use only http proxies.
+    for proxy_env_var in ['http_proxy', 'https_proxy', 'HTTPS_PROXY']:
+      if proxy_env_var in os.environ and os.environ[proxy_env_var]:
+        proxy_info = ProxyInfoFromEnvironmentVar(proxy_env_var)
+        # Assume proxy_rnds is True if a proxy environment variable exists.
+        proxy_info.proxy_rdns = boto_proxy_config.get('proxy_rdns', True)
+        break
+
+  return proxy_info
+
+
+def UsingCrcmodExtension():
+  boto_opt = boto.config.get('GSUtil', 'test_assume_fast_crcmod', None)
+  if boto_opt is not None:
+    return boto_opt
+  # Python 3 makes this attribute tough to access due to the way the top-level
+  # crcmod package imports and (identically) names its crcmod module. The only
+  # way to get it is "from crcmod.crcmod import _usingExtension". This is the
+  # alternative form of that statement, but doesn't pollute this module's
+  # namespace with a "_usingExtension" attribute. This also works in both Python
+  # 2.7 and 3.5+.
+  nested_crcmod = __import__(
+      'crcmod.crcmod',
+      globals(),
+      locals(),
+      ['_usingExtension'],
+      0,
+  )
+  return getattr(nested_crcmod, '_usingExtension', False)
+
+
+# TODO(boto-2.49.0): Remove when we pull in the next version of Boto.
+def _PatchedShouldRetryMethod(self, response, chunked_transfer=False):
+  """Replaces boto.s3.key's should_retry() to handle KMS-encrypted objects."""
+  # We copy/pasted this from boto and slightly modified it; keep the old
+  # formatting style.
+  # yapf: disable
+  provider = self.bucket.connection.provider
+
+  if not chunked_transfer:
+    if response.status in [500, 503]:
+      # 500 & 503 can be plain retries.
+      return True
+
+    if response.getheader('location'):
+      # If there's a redirect, plain retry.
+      return True
+
+  if 200 <= response.status <= 299:
+    self.etag = response.getheader('etag')
+    md5 = self.md5
+    if isinstance(md5, bytes):
+      md5 = md5.decode(UTF8)
+
+    # If you use customer-provided encryption keys, the ETag value that
+    # Amazon S3 returns in the response will not be the MD5 of the
+    # object.
+    amz_server_side_encryption_customer_algorithm = response.getheader(
+        'x-amz-server-side-encryption-customer-algorithm', None)
+    # The same is applicable for KMS-encrypted objects in gs buckets.
+    goog_customer_managed_encryption = response.getheader(
+        'x-goog-encryption-kms-key-name', None)
+    if (amz_server_side_encryption_customer_algorithm is None and
+            goog_customer_managed_encryption is None):
+      if self.etag != '"%s"' % md5:
+        raise provider.storage_data_error(
+            'ETag from S3 did not match computed MD5. '
+            '%s vs. %s' % (self.etag, self.md5))
+
+    return True
+
+  if response.status == 400:
+    # The 400 must be trapped so the retry handler can check to
+    # see if it was a timeout.
+    # If ``RequestTimeout`` is present, we'll retry. Otherwise, bomb
+    # out.
+    body = response.read()
+    err = provider.storage_response_error(
+        response.status,
+        response.reason,
+        body
+    )
+
+    if err.error_code in ['RequestTimeout']:
+      raise boto.exception.PleaseRetryException(
+          "Saw %s, retrying" % err.error_code,
+          response=response
+      )
+
+  return False

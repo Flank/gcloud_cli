@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.dns import util as dns_util
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.core import resources
 
 
 def GetMessages(api_version="v1"):
@@ -62,6 +63,71 @@ def GetDnsVisibilityDict(version,
   return result
 
 
+def ParseManagedZoneForwardingConfig(target_servers=None, version="v1"):
+  """Parses list of forwarding nameservers into ManagedZoneForwardingConfig."""
+  if not target_servers:
+    return None
+
+  messages = GetMessages(version)
+  target_servers = [
+      messages.ManagedZoneForwardingConfigNameServerTarget(ipv4Address=name)
+      for name in target_servers
+  ]
+
+  return messages.ManagedZoneForwardingConfig(targetNameServers=target_servers)
+
+
+def GetPolicies(num=3, name_server_config=None, forwarding=False,
+                networks=None, version="v1", logging=False):
+  """Get a list of policies."""
+  m = GetMessages(version)
+  r = []
+  for i in range(num):
+    r.append(
+        m.Policy(
+            alternativeNameServerConfig=name_server_config,
+            description="My policy {}".format(i),
+            enableInboundForwarding=forwarding,
+            enableLogging=logging,
+            name="mypolicy{}".format(i),
+            networks=GetPolicyNetworks(networks, version)))
+  return r
+
+
+def GetAltNameServerConfig(target_servers=None):
+  """Get ForwardingConfig Message."""
+  if not target_servers:
+    return None
+
+  m = GetMessages()
+  if target_servers == [""]:
+    return None
+
+  target_servers = [
+      m.PolicyAlternativeNameServerConfigTargetNameServer(ipv4Address=name)
+      for name in target_servers
+  ]
+
+  return m.PolicyAlternativeNameServerConfig(targetNameServers=target_servers)
+
+
+def GetNetworkURI(network, project):
+  registry = resources.REGISTRY.Clone()
+  registry.RegisterApiByName("compute", "v1")
+  network_ref = registry.Parse(
+      network, params={"project": project}, collection="compute.networks")
+  return network_ref.SelfLink()
+
+
+def GetPolicyNetworks(urls, project="fake-project", version="v1"):
+  m = GetMessages(version)
+  if urls == [""]:
+    return []
+  return [
+      m.PolicyNetwork(networkUrl=GetNetworkURI(url, project)) for url in urls
+  ]
+
+
 def GetManagedZones(api_version="v1"):
   m = GetMessages(api_version)
   return [
@@ -96,7 +162,8 @@ def GetManagedZones(api_version="v1"):
 
 def GetManagedZoneBeforeCreation(messages,
                                  dns_sec_config=False,
-                                 visibility_dict=None):
+                                 visibility_dict=None,
+                                 forwarding_config=None,):
   """Generate a create message for a managed zone."""
   m = messages
   mzone = m.ManagedZone(
@@ -105,6 +172,7 @@ def GetManagedZoneBeforeCreation(messages,
       dnsName="zone.com.",
       kind=u"dns#managedZone",
       name="mz",
+      forwardingConfig=forwarding_config,
   )
 
   if dns_sec_config:

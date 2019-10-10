@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -270,9 +270,19 @@ class WithServiceAuth(WithServiceAccountFile):
                'config set account ' + self.Account())
 
     orig_refresh = c_store.Refresh
-    def RefreshWithRetry(creds, http=None):
-      retryer = retry.Retryer(max_retrials=3, exponential_sleep_multiplier=2)
-      retryer.RetryOnException(orig_refresh, [creds, http], sleep_ms=1000)
+
+    def RefreshWithRetry(
+        creds, http=None, is_impersonated_credential=False, include_email=False,
+        gce_token_format='standard', gce_include_license=False
+    ):
+      retryer = retry.Retryer(max_retrials=4, exponential_sleep_multiplier=2)
+      retryer.RetryOnException(orig_refresh,
+                               [
+                                   creds, http, is_impersonated_credential,
+                                   include_email,
+                                   gce_token_format, gce_include_license
+                               ],
+                               sleep_ms=2000)
 
     self.StartObjectPatch(c_store, 'Refresh').side_effect = RefreshWithRetry
 

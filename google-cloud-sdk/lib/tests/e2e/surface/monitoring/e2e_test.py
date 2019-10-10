@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ class MonitoringE2eTests(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   @contextlib.contextmanager
-  def _CreateAlertPolicy(self):
+  def _CreateAlertPolicy(self, policy_contents):
     policy_file = self.Touch(self.temp_path,
                              'my_policy.json',
-                             contents=test_data.ALERT_POLICY)
+                             contents=policy_contents)
     policy_name = None
     try:
       policy = self.Run('monitoring policies create --policy-from-file {} '
@@ -65,7 +65,7 @@ class MonitoringE2eTests(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
     condition_file = self.Touch(self.temp_path,
                                 'my_condition.json',
                                 contents=test_data.CONDITION)
-    with self._CreateAlertPolicy() as policy, \
+    with self._CreateAlertPolicy(test_data.ALERT_POLICY) as policy, \
          self._CreateNotificationChannel() as channel, \
          self._CreateNotificationChannel() as channel2:
       self.assertFalse(policy.enabled)
@@ -97,6 +97,10 @@ class MonitoringE2eTests(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
                         .format(policy.conditions[0].name))
       self.assertEqual(1, len(policy.conditions))
 
+  def testCreatePolicyWithoutAggregations(self):
+    with self._CreateAlertPolicy(test_data.ALERT_POLICY_NO_AGGREGATIONS) \
+        as policy:
+      self.assertFalse(policy.enabled)
 
 if __name__ == '__main__':
   test_case.main()

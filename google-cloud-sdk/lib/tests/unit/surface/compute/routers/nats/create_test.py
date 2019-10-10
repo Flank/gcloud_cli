@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,13 +71,13 @@ class CreateTest(router_test_base.RouterTestBase):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-3') %
                 self.version,
             ],
@@ -133,7 +133,7 @@ class CreateTest(router_test_base.RouterTestBase):
             subnetworks=[
                 self.messages.RouterNatSubnetworkToNat(
                     name=(
-                        'https://www.googleapis.com/compute/%s/projects/'
+                        'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-1')
                     % self.version,
                     sourceIpRangesToNat=[
@@ -143,7 +143,7 @@ class CreateTest(router_test_base.RouterTestBase):
                     ]),
                 self.messages.RouterNatSubnetworkToNat(
                     name=(
-                        'https://www.googleapis.com/compute/%s/projects/'
+                        'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-2')
                     % self.version,
                     sourceIpRangesToNat=[
@@ -154,7 +154,7 @@ class CreateTest(router_test_base.RouterTestBase):
                     secondaryIpRangeNames=['range-1']),
                 self.messages.RouterNatSubnetworkToNat(
                     name=(
-                        'https://www.googleapis.com/compute/%s/projects/'
+                        'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-3')
                     % self.version,
                     sourceIpRangesToNat=[
@@ -253,20 +253,10 @@ class CreateTest(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Create in progress for nat [my-nat] in router [my-router] '
-        '[https://www.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
-
-
-class BetaCreateTest(CreateTest):
-
-  def SetUp(self):
-    self.version = 'beta'
-    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
-
-    self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='beta')
 
   def testLogging(self):
     expected_router = copy.deepcopy(self.orig)
@@ -302,7 +292,17 @@ class BetaCreateTest(CreateTest):
         """)
 
 
-class AlphaCreateTest(BetaCreateTest):
+class BetaCreateTest(CreateTest):
+
+  def SetUp(self):
+    self.version = 'beta'
+    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='beta')
+
+
+class AlphaCreateTest(CreateTest):
 
   def SetUp(self):
     self.version = 'alpha'

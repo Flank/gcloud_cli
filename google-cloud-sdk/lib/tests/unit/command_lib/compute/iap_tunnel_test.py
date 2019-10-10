@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -223,12 +223,11 @@ class SSHTunnelArgsTest(compute_test_base.BaseTest, parameterized.TestCase):
     m = self.api_mock.messages
     self.external_nic = m.NetworkInterface(
         accessConfigs=[m.AccessConfig(natIP='10.0.0.0')])
-    self.internal_nic = m.NetworkInterface(networkIP='10.0.0.1', name='nic0')
 
   def _FromArgs(self, cmd_line, include_external_nic=True):
     return iap_tunnel.SshTunnelArgs.FromArgs(
         self.parser.parse_args(cmd_line), base.ReleaseTrack.BETA,
-        self.instance_ref, self.internal_nic,
+        self.instance_ref,
         self.external_nic if include_external_nic else None)
 
   def _GenExpectedTunnelArgs(self):
@@ -237,7 +236,6 @@ class SSHTunnelArgsTest(compute_test_base.BaseTest, parameterized.TestCase):
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = 'instance-2'
-    expected_tunnel_args.interface = 'nic0'
     return expected_tunnel_args
 
   @parameterized.parameters((False, False), (False, True),

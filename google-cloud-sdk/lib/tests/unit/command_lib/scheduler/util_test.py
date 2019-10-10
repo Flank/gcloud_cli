@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,11 +48,11 @@ class ResolveAppLocationTestBase(sdk_test_base.WithFakeAuth,
                                                       app_engine_api_version)
 
     self.cloud_scheduler_client = mock.Client(
-        apis.GetClientClass('cloudscheduler', 'v1beta1'))
+        apis.GetClientClass('cloudscheduler', 'v1'))
     self.cloud_scheduler_client.Mock()
     self.addCleanup(self.cloud_scheduler_client.Unmock)
     self.cloud_scheduler_messages = apis.GetMessagesModule('cloudscheduler',
-                                                           'v1beta1')
+                                                           'v1')
 
     self.project_id = 'fake-project'
     self.addCleanup(properties.VALUES.core.project.Set,

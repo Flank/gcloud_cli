@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,13 +19,18 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import configuration
+from googlecloudsdk.api_lib.run import k8s_object
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.run import base
 
 import six
 from six.moves import range
 
 
-class ConfigurationsListTest(base.ServerlessSurfaceBase):
+class ConfigurationsListTestBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.configurations = [
@@ -34,6 +39,7 @@ class ConfigurationsListTest(base.ServerlessSurfaceBase):
         for _ in range(2)]
     for i, r in enumerate(self.configurations):
       r.name = 'conf{}'.format(i)
+      r.labels[k8s_object.REGION_LABEL] = 'us-central1'
       r.metadata.creationTimestamp = '2018/01/01 00:{}0:00Z'.format(i)
       r.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/configurations/{}'.format(
           self.namespace.Name(), r.name)
@@ -53,8 +59,21 @@ class ConfigurationsListTest(base.ServerlessSurfaceBase):
     self.assertEqual(out, self.configurations)
     self.AssertOutputEquals(
         """CONFIGURATION REGION LATEST REVISION READY REVISION
-        X conf0 conf0.3 conf0.1
-        + conf1 conf1.3 conf1.1
+        X conf0 us-central1 conf0.3 conf0.1
+        + conf1 us-central1 conf1.3 conf1.1
+        """, normalize_space=True)
+
+  def testNoArgGKE(self):
+    """Two configurations are listable using the Serverless API format."""
+    out = self.Run('run configurations list --platform=gke')
+
+    self.operations.ListConfigurations.assert_called_once_with(
+        self._NamespaceRef(project='default'))
+    self.assertEqual(out, self.configurations)
+    self.AssertOutputEquals(
+        """CONFIGURATION NAMESPACE LATEST REVISION READY REVISION
+        X conf0 fake-project conf0.3 conf0.1
+        + conf1 fake-project conf1.3 conf1.1
         """, normalize_space=True)
 
   def testNoArgUri(self):
@@ -67,4 +86,10 @@ class ConfigurationsListTest(base.ServerlessSurfaceBase):
         https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/configurations/conf1
         """,
         normalize_space=True)
+
+
+class ConfigurationsListTestAlpha(ConfigurationsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 

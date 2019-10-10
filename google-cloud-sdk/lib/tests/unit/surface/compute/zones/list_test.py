@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class ZonesListTest(test_base.BaseTest):
         project='my-project',
         http=self.mock_http(),
         filter_expr=None,
-        batch_url='https://www.googleapis.com/batch/compute/v1',
+        batch_url='https://compute.googleapis.com/batch/compute/v1',
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\

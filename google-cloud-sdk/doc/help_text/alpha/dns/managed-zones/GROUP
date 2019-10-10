@@ -1,0 +1,62 @@
+NAME
+    gcloud alpha dns managed-zones - manage your Cloud DNS managed-zones
+
+SYNOPSIS
+    gcloud alpha dns managed-zones COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage your Cloud DNS managed-zones. See Managing Zones
+    (https://cloud.google.com/dns/zones/) for details.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Cloud DNS managed-zone.
+
+     delete
+        (ALPHA) Delete an empty Cloud DNS managed-zone.
+
+     describe
+        (ALPHA) View the details of a Cloud DNS managed-zone.
+
+     list
+        (ALPHA) View the list of all your managed-zones.
+
+     update
+        (ALPHA) Update an existing Cloud DNS managed-zone.
+
+EXAMPLES
+    To create a managed-zone, run:
+
+        $ gcloud alpha dns managed-zones create my_zone \
+            --description="My Zone" --dns-name="my.zone.com."
+
+    To delete a managed-zone, run:
+
+        $ gcloud alpha dns managed-zones delete my_zone
+
+    To view the details of a managed-zone, run:
+
+        $ gcloud alpha dns managed-zones describe my_zone
+
+    To see the list of all managed-zones, run:
+
+        $ gcloud alpha dns managed-zones list
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
+
+        $ gcloud dns managed-zones
+        $ gcloud beta dns managed-zones
+

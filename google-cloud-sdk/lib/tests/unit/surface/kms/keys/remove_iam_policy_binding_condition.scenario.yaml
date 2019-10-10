@@ -8,7 +8,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudkms.googleapis.com/v1/projects/test-project/locations/global/keyRings/fellowship/cryptoKeys/frodo:getIamPolicy?alt=json
+          uri: https://cloudkms.googleapis.com/v1/projects/test-project/locations/global/keyRings/fellowship/cryptoKeys/frodo:getIamPolicy?alt=json&options.requestedPolicyVersion=3
           method: GET
           body: null
         return_response:
@@ -16,7 +16,7 @@ actions:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -48,13 +48,13 @@ actions:
                     title: title
                     description: descr
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -82,6 +82,6 @@ actions:
           - user:newowner@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0

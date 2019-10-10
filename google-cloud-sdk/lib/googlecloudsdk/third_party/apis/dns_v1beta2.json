@@ -4,7 +4,7 @@
  "id": "dns:v1beta2",
  "name": "dns",
  "version": "v1beta2",
- "revision": "20190506",
+ "revision": "20191001",
  "title": "Google Cloud DNS API",
  "description": "Configures and serves authoritative DNS records.",
  "ownerDomain": "google.com",
@@ -15,9 +15,9 @@
  },
  "documentationLink": "https://developers.google.com/cloud-dns",
  "protocol": "rest",
- "baseUrl": "https://www.googleapis.com/dns/v1beta2/projects/",
+ "baseUrl": "https://dns.googleapis.com/dns/v1beta2/projects/",
  "basePath": "/dns/v1beta2/projects/",
- "rootUrl": "https://www.googleapis.com/",
+ "rootUrl": "https://dns.googleapis.com/",
  "servicePath": "dns/v1beta2/projects/",
  "batchPath": "batch/dns/v1beta2",
  "parameters": {
@@ -421,7 +421,7 @@
    "properties": {
     "defaultKeySpecs": {
      "type": "array",
-     "description": "Specifies parameters that will be used for generating initial DnsKeys for this ManagedZone. Output only while state is not OFF.",
+     "description": "Specifies parameters for generating initial DnsKeys for this ManagedZone. Can only be changed while the state is OFF.",
      "items": {
       "$ref": "DnsKeySpec"
      }
@@ -433,7 +433,7 @@
     },
     "nonExistence": {
      "type": "string",
-     "description": "Specifies the mechanism used to provide authenticated denial-of-existence responses. Output only while state is not OFF.",
+     "description": "Specifies the mechanism for authenticated denial-of-existence responses. Can only be changed while the state is OFF.",
      "enum": [
       "nsec",
       "nsec3"
@@ -538,7 +538,7 @@
    "properties": {
     "deactivateTime": {
      "type": "string",
-     "description": "If this zone has been deactivated due to a problem with the network it targeted, the time at which it was deactivated. The zone can be deactivated if, for instance, the network it targeted was deleted. If the targeted network is still present, this will be the empty string. This is in RFC3339 text format. Output only."
+     "description": "The time at which the zone was deactivated, in RFC 3339 date-time format. An empty string indicates that the peering connection is active. The producer network can deactivate a zone. The zone is automatically deactivated if the producer network that the zone targeted is deleted. Output only."
     },
     "kind": {
      "type": "string",

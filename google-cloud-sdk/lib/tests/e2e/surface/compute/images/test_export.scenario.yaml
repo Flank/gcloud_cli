@@ -34,7 +34,8 @@ actions:
           .*Created.*
     - expect_stdout:
         matches: |
-          .*\[Daisy\] Running workflow "image-export".*
+          .*Validating workflow.*
+          .*can't use image "projects\/cloud-sdk-integration-testing\/global\/images\/image-not-exist".*
     - expect_exit:
         code: 1
         message:

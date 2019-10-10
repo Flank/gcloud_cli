@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,12 +117,10 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
     # Don't run the download portion of the test as a time-saving measure
 
   @test_case.Filters.RunOnlyIf(_GSUTIL_EXECUTABLE, 'No gsutil found')
-  @test_case.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109938541')
   def testRunGsutilCommand(self):
     self.assertEqual(0, storage_util.RunGsutilCommand('help'))
 
   @test_case.Filters.RunOnlyIf(_GSUTIL_EXECUTABLE, 'No gsutil found')
-  @test_case.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109938541')
   def testGsutilCopy(self):
     file_length = 1024
     file_path = self.Touch(self.temp_path, 'test_file',

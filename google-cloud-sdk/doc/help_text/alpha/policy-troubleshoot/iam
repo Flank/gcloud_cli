@@ -1,0 +1,56 @@
+NAME
+    gcloud alpha policy-troubleshoot iam - troubleshoot the IAM Policy
+
+SYNOPSIS
+    gcloud alpha policy-troubleshoot iam RESOURCE --permission=PERMISSION
+        --principal-email=PRINCIPAL_EMAIL [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Performs a check on whether a member is granted a permission on a
+    resource and how that grant/deny is determined according to the resource's
+    effective IAM policy interpretation.
+
+POSITIONAL ARGUMENTS
+     RESOURCE
+        Full resource name that access is checked against. See:
+        https://cloud.google.com/apis/design/resource_names#full_resource_name.
+
+REQUIRED FLAGS
+     --permission=PERMISSION
+        Cloud IAM permission to check, e.g. "resourcemanager.projects.get".
+
+     --principal-email=PRINCIPAL_EMAIL
+        Principal email address of the member to check against. The format is
+        the email addresses associated with its gaia account and it must be
+        either a user account or a service account, other principal types are
+        not supported.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the policytroubleshooter/v1beta API. The full
+    documentation for this API can be found at: https://cloud.google.com/iam/
+
+EXAMPLES
+    To troubleshoot a permission of a member on a resource, run:
+
+        $ gcloud alpha policy-troubleshoot iam projects/project-id
+        --principal-email=my-iam-account@somedomain.com
+        --permission=iam.roles.list
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta policy-troubleshoot iam
+

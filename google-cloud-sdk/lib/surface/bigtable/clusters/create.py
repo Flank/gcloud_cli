@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class CreateCluster(base.CreateCommand):
     operation = clusters.Create(
         cluster_ref, args.zone, serve_nodes=args.num_nodes)
     operation_ref = util.GetOperationRef(operation)
-    if args.async:
+    if args.async_:
       log.CreatedResource(
           operation_ref,
           kind='bigtable cluster {0}'.format(cluster_ref.Name()),

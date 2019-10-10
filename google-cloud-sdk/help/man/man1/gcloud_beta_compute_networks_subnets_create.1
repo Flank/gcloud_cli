@@ -11,7 +11,7 @@ gcloud beta compute networks subnets create \- define a subnet for a network in 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -91,6 +91,21 @@ logs. Default is to include all metadata. \fILOGGING_METADATA\fR must be one of:
 \fBexclude\-all\fR, \fBinclude\-all\fR.
 
 .TP 2m
+\fB\-\-purpose\fR=\fIPURPOSE\fR
+The purpose of this subnetwork. \fIPURPOSE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBINTERNAL_HTTPS_LOAD_BALANCER\fR
+Reserved for Internal HTTP(S) Load Balancing.
+.TP 2m
+\fBPRIVATE\fR
+Regular user created or automatically created subnet.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-region\fR=\fIREGION\fR
 Region of the subnetwork to create. If not specified, you may be prompted to
 select a region.
@@ -116,6 +131,25 @@ $ gcloud config unset compute/region
 
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+The role of subnetwork. This field is only used
+whenpurpose=INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or
+BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal
+HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted
+to ACTIVE or is currently draining. \fIROLE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBACTIVE\fR
+The ACTIVE subnet that is currently used.
+.TP 2m
+\fBBACKUP\fR
+The BACKUP subnet that could be promoted to ACTIVE.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]

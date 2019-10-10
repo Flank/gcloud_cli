@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,12 @@ from tests.lib.surface import redis_test_base
 
 class InstancesUpdateUnitTestBase(redis_test_base.InstancesUnitTestBase,
                                   parameterized.TestCase):
+
+  def ExpectGet(self, instance_to_get):
+    self.instances_service.Get.Expect(
+        request=self.messages.RedisProjectsLocationsInstancesGetRequest(
+            name=instance_to_get.name),
+        response=instance_to_get)
 
   def ExpectUpdate(self,
                    instance_to_update,
@@ -128,9 +134,11 @@ class UpdateTest(InstancesUpdateUnitTestBase):
 
     self.AssertErrContains('Request issued for: [{}]'.format(self.instance_id))
     self.AssertErrContains('Check operation [{}] for status.'.format(
-        self.wait_operation_id))
+        self.wait_operation_relative_name))
 
   def testUpdate_NoOptions(self):
+    instances_to_get = self.messages.Instance(name=self.instance_relative_name)
+    self.ExpectGet(instances_to_get)
     with self.assertRaises(instances_update_util.NoFieldsSpecified):
       self.Run('redis instances update {} --region {}'.format(
           self.instance_id, self.region_id))
@@ -143,7 +151,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
         ' maxmemory-policy=volatile-lru,notify-keyspace-events=kx,'
         'activedefrag=yes,lfu-log-factor=2,lfu-decay-time=60'
         ' --update-labels a=3,b=4,c=5')
-    expected_update_mask = ('display_name,memory_size_gb,redis_configs,labels')
+    expected_update_mask = ('labels,display_name,memory_size_gb,redis_configs')
 
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
     expected_instance.displayName = 'new-display-name'
@@ -323,6 +331,7 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
   def _SetUpExpectations(self,
                          original_redis_configs,
                          new_redis_configs,
+                         expected_update_mask='redis_configs',
                          is_async=False):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
@@ -334,7 +343,7 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
     self.ExpectUpdate(
         instance_to_update,
         expected_instance,
-        'redis_configs',
+        expected_update_mask=expected_update_mask,
         is_async=is_async)
 
     self.expected_instance = expected_instance
@@ -383,7 +392,8 @@ class LabelsTest(InstancesUpdateUnitTestBase):
     original_labels = {'b': '2'}
     # Removing a non-existent label should silently have no effect.
     new_labels = {'b': '2'}
-    self._SetUpExpectations(original_labels, new_labels)
+    self._SetUpExpectations(
+        original_labels, new_labels, expected_update_mask='')
 
     actual_instance = self.Run('redis instances update {} --region {}'
                                ' --remove-labels a'.format(
@@ -436,7 +446,11 @@ class LabelsTest(InstancesUpdateUnitTestBase):
 
     self.assertEqual(actual_instance, self.expected_instance)
 
-  def _SetUpExpectations(self, original_labels, new_labels, is_async=False):
+  def _SetUpExpectations(self,
+                         original_labels,
+                         new_labels,
+                         is_async=False,
+                         expected_update_mask='labels'):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     instance_to_update.labels = self.Labels(original_labels)
@@ -445,7 +459,10 @@ class LabelsTest(InstancesUpdateUnitTestBase):
     expected_instance.labels = self.Labels(new_labels)
 
     self.ExpectUpdate(
-        instance_to_update, expected_instance, 'labels', is_async=is_async)
+        instance_to_update,
+        expected_instance,
+        expected_update_mask,
+        is_async=is_async)
 
     self.expected_instance = expected_instance
 

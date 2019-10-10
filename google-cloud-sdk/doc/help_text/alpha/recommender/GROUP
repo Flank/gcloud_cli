@@ -23,6 +23,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     insights
+        (ALPHA) Manage insights for Cloud recommendations.
+
      recommendations
         (ALPHA) Manage Cloud resource recommendations.
 
@@ -30,10 +33,10 @@ GROUPS
         (ALPHA) Manage Cloud resource recommendation rules.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta recommender
 

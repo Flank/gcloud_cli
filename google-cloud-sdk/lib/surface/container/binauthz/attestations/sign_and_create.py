@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import json
 import textwrap
 
 from googlecloudsdk.api_lib.container.binauthz import apis
 from googlecloudsdk.api_lib.container.binauthz import attestors
 from googlecloudsdk.api_lib.container.binauthz import containeranalysis
+from googlecloudsdk.api_lib.container.binauthz import containeranalysis_apis as ca_apis
 from googlecloudsdk.api_lib.container.binauthz import kms
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.binauthz import flags
@@ -34,12 +34,12 @@ from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
 class SignAndCreate(base.CreateCommand):
   r"""Sign and create a Binary Authorization Attestation using a Cloud KMS key.
 
   This command signs and creates a Binary Authorization attestation for your
-  project. The attestation is created for the specified artifact (e.g. a grc.io
+  project. The attestation is created for the specified artifact (e.g. a gcr.io
   container URL), associate with the specified attestor, and stored under the
   specified project.
 
@@ -129,8 +129,7 @@ class SignAndCreate(base.CreateCommand):
           prompt_string='Create and upload Attestation anyway?',
           cancel_on_no=True)
 
-    payload_dict = binauthz_command_util.MakeSignaturePayload(args.artifact_url)
-    payload = json.dumps(payload_dict).encode('utf8')
+    payload = binauthz_command_util.MakeSignaturePayload(args.artifact_url)
 
     kms_client = kms.Client()
     pubkey_response = kms_client.GetPublicKey(key_ref.RelativeName())
@@ -139,11 +138,25 @@ class SignAndCreate(base.CreateCommand):
         key_ref.RelativeName(),
         kms.GetAlgorithmDigestType(pubkey_response.algorithm), payload)
 
-    return containeranalysis.Client().CreateGenericAttestationOccurrence(
-        project_ref=project_ref,
-        note_ref=note_ref,
-        artifact_url=normalized_artifact_url,
-        public_key_id=key_id,
-        signature=sign_response.signature,
-        plaintext=payload,
-    )
+    ca_api_version = ca_apis.GetApiVersion(self.ReleaseTrack())
+    # TODO(b/138859339): Remove when remainder of surface migrated to V1 API.
+    if ca_api_version == ca_apis.V1:
+      return containeranalysis.Client(
+          ca_api_version).CreateAttestationOccurrence(
+              project_ref=project_ref,
+              note_ref=note_ref,
+              artifact_url=normalized_artifact_url,
+              public_key_id=key_id,
+              signature=sign_response.signature,
+              plaintext=payload,
+          )
+    else:
+      return containeranalysis.Client(
+          ca_api_version).CreateGenericAttestationOccurrence(
+              project_ref=project_ref,
+              note_ref=note_ref,
+              artifact_url=normalized_artifact_url,
+              public_key_id=key_id,
+              signature=sign_response.signature,
+              plaintext=payload,
+          )

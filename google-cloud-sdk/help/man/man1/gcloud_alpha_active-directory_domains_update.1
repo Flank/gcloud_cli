@@ -1,0 +1,199 @@
+
+.TH "GCLOUD_ALPHA_ACTIVE\-DIRECTORY_DOMAINS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha active\-directory domains update \- update a Managed Microsoft AD domain
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha active\-directory domains update\fR \fIDOMAIN\fR [\fB\-\-async\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-add\-authorized\-networks\fR=[\fIAUTH_NET1\fR,\ \fIAUTH_NET2\fR,\ ...,...]\ |\ \fB\-\-remove\-authorized\-networks\fR=[\fIAUTH_NET1\fR,\ \fIAUTH_NET2\fR,\ ...,...]] [\fB\-\-add\-region\fR=\fIADD_REGION\fR\ |\ \fB\-\-remove\-region\fR=\fIREMOVE_REGION\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update the metadata and/or configuration parameters of a managed
+Microsoft AD domain.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The AD domain specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to update the given AD domain.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Domain resource \- Name of the Managed Microsoft AD domain you want to update.
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [domain] on the command line with a fully specified name;
+set the property [core/project]; provide the argument [\-\-project] on the
+command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDOMAIN\fR
+ID of the domain or fully qualified identifier for the domain.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-authorized\-networks\fR=[\fIAUTH_NET1\fR, \fIAUTH_NET2\fR, ...,...]
+A list of URLs of additional networks to peer this domain to in the form
+projects/{project}/global/networks/{network}. Networks must belong to the
+project.
+
+.TP 2m
+\fB\-\-remove\-authorized\-networks\fR=[\fIAUTH_NET1\fR, \fIAUTH_NET2\fR, ...,...]
+A list of URLs of additional networks to unpeer this domain from in the form
+projects/{project}/global/networks/{network}. Networks must belong to the
+project.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-region\fR=\fIADD_REGION\fR
+An additional region to provision this domain in. If domain is already
+provisioned in region, nothing will be done in that region. Supported regions
+are: asia\-east1, asia\-northeast1, asia\-south1, asia\-southeast1,
+australia\-southeast1, europe\-north1, europe\-west1, europe\-west2,
+europe\-west3, europe\-west4, northamerica\-northeast1, southamerica\-east1,
+us\-central1, us\-east1, us\-east4, us\-west1, us\-west2.
+
+.TP 2m
+\fB\-\-remove\-region\fR=\fIREMOVE_REGION\fR
+A region to de\-provision this domain from. If domain is already not provisioned
+in a region, nothing will be done in that region. Domains must be left
+provisioned in at least one region. Supported regions are: asia\-east1,
+asia\-northeast1, asia\-south1, asia\-southeast1, australia\-southeast1,
+europe\-north1, europe\-west1, europe\-west2, europe\-west3, europe\-west4,
+northamerica\-northeast1, southamerica\-east1, us\-central1, us\-east1,
+us\-east4, us\-west1, us\-west2.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha active\-directory domains update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha active\-directory domains update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmanagedidentities/v1beta1\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/managed\-microsoft\-ad/
+
+
+
+.SH "EXAMPLES"
+
+The following command updates an AD domain with the name \f5my\-domain.com\fR to
+add the two labels, \f5env\fR and \f5service\fR and to add a provisioned region
+\f5us\-west1\fR:
+
+.RS 2m
+$ gcloud alpha active\-directory domains update my\-domain.com \e
+    \-\-update\-labels=env=test,service=foo \e
+\-\-add\-region=us\-west1
+.RE
+
+This peers the domain \f5my\-domain.com\fR to the network \f5my\-network\fR.
+
+.RS 2m
+$ gcloud alpha active\-directory domains update my\-domain.com
+\-\-add\-authorized\-networks=projects/my\-project/global/networks/my\-network
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta active\-directory domains update
+.RE
+

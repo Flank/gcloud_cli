@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://gkehub.googleapis.com/v1beta1/'
-DOCS_URL = 'https://cloud.google.com/gke-on-prem/docs/latest/how-to/connect/registering-a-user-cluster'
+DOCS_URL = 'https://cloud.google.com/anthos/multicluster-management/connect/registering-a-cluster'
 
 
 class Collections(enum.Enum):
@@ -41,12 +41,12 @@ class Collections(enum.Enum):
       [u'name'],
       True
   )
-  PROJECTS_LOCATIONS_GLOBAL_MEMBERSHIPS = (
-      'projects.locations.global.memberships',
+  PROJECTS_LOCATIONS_MEMBERSHIPS = (
+      'projects.locations.memberships',
       '{+name}',
       {
           '':
-              'projects/{projectsId}/locations/global/memberships/'
+              'projects/{projectsId}/locations/{locationsId}/memberships/'
               '{membershipsId}',
       },
       [u'name'],

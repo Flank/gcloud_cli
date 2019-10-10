@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -104,9 +104,9 @@ class OrganizationsE2ETestBase(e2e_base.WithServiceAuth):
 
   # See b/28400331 for reference.
   TEST_ORGANIZATION = messages.Organization(
-      name='organizations/961309089256',
-      displayName='Elysium gCloud Testing',
-      owner=messages.OrganizationOwner(directoryCustomerId='C01qz4ik7'),)
+      name='organizations/1054311078602',
+      displayName='cloudsdktest.joonix.net',
+      owner=messages.OrganizationOwner(directoryCustomerId='C03u40b5g'),)
 
   def RunOrganizations(self, *command):
     return self.Run(['organizations'] + list(command))

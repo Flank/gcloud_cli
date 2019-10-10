@@ -12,7 +12,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -24,7 +25,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -36,7 +38,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -48,7 +51,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -93,7 +97,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -107,7 +112,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -121,7 +127,8 @@ summary:
   - stderr: |
       Create request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [create] to complete
+    - message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created tpu [mytpu].
@@ -210,7 +217,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -305,7 +313,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -400,7 +409,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -496,7 +506,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -660,7 +671,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -733,7 +745,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].
@@ -806,7 +819,8 @@ actions:
             done: true
             name: projects/fake-project/locations/us-central1-c/operations/create
     - expect_progress_tracker:
-        message: Waiting for operation [create] to complete
+        message: Waiting for operation [projects/fake-project/locations/us-central1-c/operations/create]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Created tpu [mytpu].

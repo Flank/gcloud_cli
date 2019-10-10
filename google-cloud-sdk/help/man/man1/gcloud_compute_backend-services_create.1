@@ -11,7 +11,7 @@ gcloud compute backend\-services create \- create a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-[no\-]enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -97,10 +97,12 @@ $ gcloud compute backend\-services create NAME             \e
 An optional, textual description for the backend service.
 
 .TP 2m
-\fB\-\-enable\-cdn\fR
-Enable Cloud CDN for the backend service. Cloud CDN can cache HTTP responses
-from a backend service at the edge of the network, close to users. Cloud CDN is
-disabled by default.
+\fB\-\-[no\-]enable\-cdn\fR
+Enable or disable Cloud CDN for the backend service. Only available for backend
+services with \-\-load\-balancing\-scheme=EXTERNAL that use a \-\-protocol of
+HTTP, HTTPS, or HTTP2. Cloud CDN caches HTTP responses at the edge of Google's
+network. Cloud CDN is disabled by default. Use \fB\-\-enable\-cdn\fR to enable
+and \fB\-\-no\-enable\-cdn\fR to disable.
 
 .TP 2m
 \fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]
@@ -115,7 +117,8 @@ the backend service.
 
 Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
-that backend service uses instance groups. For more information, see this guide:
+that backend service uses instance groups. For more information, refer to this
+guide:
 https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
 
 .TP 2m
@@ -125,7 +128,8 @@ the backend service.
 
 Legacy health checks are not recommended for backend services. It is possible to
 use a legacy health check on a backend service for a HTTP(S) load balancer if
-that backend service uses instance groups. For more information, see this guide:
+that backend service uses instance groups. For more information, refer to this
+guide:
 https://cloud.google.com/load\-balancing/docs/health\-check\-concepts#lb_guide
 
 .TP 2m
@@ -139,8 +143,13 @@ https://cloud.google.com/iap/ for more information about this feature.
 
 .TP 2m
 \fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR; default="EXTERNAL"
-Specifies if this is internal or external load balancer.
-\fILOAD_BALANCING_SCHEME\fR must be one of: \fBINTERNAL\fR, \fBEXTERNAL\fR.
+Specifies the load balancer type. Choose EXTERNAL for load balancers that
+receive traffic from external clients. Choose INTERNAL for Internal TCP/UDP Load
+Balancing. Choose INTERNAL_MANAGED for Internal HTTP(S) Load Balancing. Choose
+INTERNAL_SELF_MANAGED for Traffic Director. For more information, refer to this
+guide: https://cloud.google.com/load\-balancing/docs/choosing\-load\-balancer.
+\fILOAD_BALANCING_SCHEME\fR must be one of: \fBINTERNAL\fR, \fBEXTERNAL\fR,
+\fBINTERNAL_SELF_MANAGED\fR.
 
 .TP 2m
 \fB\-\-port\-name\fR=\fIPORT_NAME\fR
@@ -176,18 +185,47 @@ The type of TCP session affinity to use. Not supported for UDP.
 Route requests to instances based on the hash of the client's IP address.
 .TP 2m
 \fBCLIENT_IP_PORT_PROTO\fR
-(Applicable if load\-balancing scheme is internal) Connections from the same
-client IP with the same IP protocol and port will go to the same VM in the
-backend while that VM remains healthy.
+(Applicable if \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL\fR) Connections
+from the same client IP with the same IP protocol and port will go to the same
+backend VM while that VM remains healthy.
 .TP 2m
 \fBCLIENT_IP_PROTO\fR
-(Applicable if load\-balancing scheme is internal) Connections from the same
-client IP with the same IP protocol will go to the same VM in the pool while
-that VM remains healthy.
+(Applicable if \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL\fR) Connections
+from the same client IP with the same IP protocol will go to the same backend VM
+while that VM remains healthy.
 .TP 2m
 \fBGENERATED_COOKIE\fR
-(Applicable if load\-balancing scheme is external) Route requests to instances
-based on the contents of the "GCLB" cookie set by the load balancer.
+(Applicable if \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR,
+\f5INTERNAL_SELF_MANAGED\fR, or \f5EXTERNAL\fR) If the
+\f5\-\-load\-balancing\-scheme\fR is \f5EXTERNAL\fR, routes requests to backend
+VMs or endpoints in a NEG, based on the contents of the \f5GCLB\fR cookie set by
+the load balancer. Only applicable when \f5\-\-protocol\fR is HTTP, HTTPS, or
+HTTP2. If the \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR or
+\f5INTERNAL_SELF_MANAGED\fR, routes requests to backend VMs or endpoints in a
+NEG, based on the contents of the \f5GCILB\fR cookie set by the proxy. (If no
+cookie is present, the proxy chooses a backend VM or endpoint and sends a
+\f5Set\-Cookie\fR response for future requests.) If the
+\f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL_SELF_MANAGED\fR, routes
+requests to backend VMs or endpoints in a NEG, based on the contents of a cookie
+set by Traffic Director.
+.TP 2m
+\fBHEADER_FIELD\fR
+(Applicable if \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR or
+\f5INTERNAL_SELF_MANAGED\fR) Route requests to backend VMs or endpoints in a NEG
+based on the value of the HTTP header named in the
+\f5\-\-custom\-request\-header\fR flag. This session affinity is only valid if
+the load balancing locality policy is either RING_HASH or MAGLEV and the backend
+service's consistent hash specifies the name of the HTTP header.
+.TP 2m
+\fBHTTP_COOKIE\fR
+(Applicable if \f5\-\-load\-balancing\-scheme\fR is \f5INTERNAL_MANAGED\fR or
+\f5INTERNAL_SELF_MANAGED\fR) Route requests to backend VMs or endpoints in a
+NEG, based on an HTTP cookie named in the \f5HTTP_COOKIE\fR flag (with the
+optional \f5\-\-affinity\-cookie\-ttl\fR flag). If the client has not provided
+the cookie, the proxy generates the cookie and returns it to the client in a
+\f5Set\-Cookie\fR header. This session affinity is only valid if the load
+balancing locality policy is either \f5RING_HASH\fR or \f5MAGLEV\fR and the
+backend service's consistent hash specifies the HTTP cookie.
 .TP 2m
 \fBNONE\fR
 Session affinity is disabled.
@@ -212,19 +250,27 @@ This flag only affects signed URL requests.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="30s"
-Only applicable to HTTP(S), SSL Proxy, and TCP Proxy load balancers: The amount
-of time to wait for a backend to return a full response for the request and for
-the load balancer to proxy the response to the client before considering the
-request failed.
+Applicable to all load balancers except internal TCP/UDP load balancers. For
+internal TCP/UDP load balancers (\f5\fIload\-balancing\-scheme\fR\fR INTERNAL),
+\f5\fItimeout\fR\fR is ignored.
 
-For example, specifying 10s gives instances 10 seconds to respond to requests.
-The load balancer will retry GET requests once if the backend closes the
-connection or times out before sending response headers to the proxy. If the
-backend produces any response headers, the load balancer does not retry. If the
+If the \f5\fIprotocol\fR\fR is HTTP, HTTPS, or HTTP2, \f5\fItimeout\fR\fR is a
+request/response timeout for HTTP(S) traffic, meaning the amount of time that
+the load balancer waits for a backend to return a full response to a request. If
+WebSockets traffic is supported, the \f5\fItimeout\fR\fR parameter sets the
+maximum amount of time that a WebSocket can be open (idle or not).
+
+For example, for HTTP, HTTPS, or HTTP2 traffic, specifying a \f5\fItimeout\fR\fR
+of 10s means that backends have 10 seconds to respond to the load balancer's
+requests. The load balancer retries the HTTP GET request one time if the backend
+closes the connection or times out before sending response headers to the load
+balancer. If the backend sends response headers or if the request sent to the
+backend is not an HTTP GET request, the load balancer does not retry. If the
 backend does not reply at all, the load balancer returns a 502 Bad Gateway error
-to the client. See $ gcloud topic datetimes for information on duration formats.
+to the client.
 
-This parameter has no effect if the load\-balancing\-scheme is INTERNAL.
+If the \f5\fIprotocol\fR\fR is SSL or TCP, \f5\fItimeout\fR\fR is an idle
+timeout.
 
 .TP 2m
 

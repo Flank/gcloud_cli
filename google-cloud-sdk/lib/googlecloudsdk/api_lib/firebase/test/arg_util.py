@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
+import six
 
 ANDROID_INSTRUMENTATION_TEST = 'ANDROID INSTRUMENTATION TEST'
 ANDROID_ROBO_TEST = 'ANDROID ROBO TEST'
@@ -53,6 +54,7 @@ def AddCommonTestRunArgs(parser):
       '--async',
       action='store_true',
       default=None,
+      dest='async_',
       help='Invoke a test asynchronously without waiting for test results.')
   parser.add_argument(
       '--num-flaky-test-attempts',
@@ -148,10 +150,9 @@ def AddAndroidTestArgs(parser):
       metavar='KEY=VALUE',
       help="""\
       A comma-separated, key=value map of environment variables and their
-      desired values. This flag is repeatable. The environment variables are
-      mirrored as extra options to the `am instrument -e KEY1 VALUE1 ...`
-      command and passed to your test runner (typically AndroidJUnitRunner).
-      Examples:
+      desired values. The environment variables are mirrored as extra options to
+      the `am instrument -e KEY1 VALUE1 ...` command and passed to your test
+      runner (typically AndroidJUnitRunner). Examples:
 
       Break test cases into four shards and run only the first shard:
 
@@ -334,8 +335,7 @@ def AddIosTestArgs(parser):
   parser.add_argument(
       '--type',
       category=base.COMMONLY_USED_FLAGS,
-      hidden=True,
-      choices=['xctest'],
+      choices=['xctest', 'game-loop'],
       help='The type of iOS test to run.')
   parser.add_argument(
       '--test',
@@ -396,6 +396,31 @@ def AddIosTestArgs(parser):
       'together in the Firebase console in a time-ordered test history list.')
 
 
+def AddBetaArgs(parser):
+  """Register args which are only available in the beta run commands.
+
+  Args:
+    parser: An argparse parser used to add args that follow a command.
+  """
+  parser.add_argument(
+      '--client-details',
+      type=arg_parsers.ArgDict(),
+      metavar='KEY=VALUE',
+      help="""\
+      Comma-separated, KEY=VALUE map of additional details to attach to the test
+      matrix. Arbitrary KEY=VALUE pairs may be attached to a test matrix to
+      provide additional context about the tests being run. When consuming the
+      test results, such as in Cloud Functions or a CI system, these details can
+      add additional context such as a link to the corresponding pull request.
+
+      Example:
+
+      ```
+      --client-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull-request
+      ```
+      """)
+
+
 def AddGaArgs(parser):
   """Register args which are only available in the GA run command.
 
@@ -406,7 +431,7 @@ def AddGaArgs(parser):
 
 
 def AddAndroidBetaArgs(parser):
-  """Register args which are only available in the beta run command.
+  """Register args which are only available in the Android beta run command.
 
   Args:
     parser: An argparse parser used to add args that follow a command.
@@ -456,6 +481,34 @@ def AddAndroidBetaArgs(parser):
       This flag only copies files to the device. To install files, like OBB or
       APK files, see --obb-files and --additional-apks.
       """)
+
+
+def AddIosBetaArgs(parser):
+  """Register args which are only available in the iOS beta run command.
+
+  Args:
+    parser: An argparse parser used to add args that follow a command.
+  """
+
+  # The following args are specific to iOS game-loop tests.
+
+  parser.add_argument(
+      '--scenario-numbers',
+      metavar='int',
+      type=arg_parsers.ArgList(element_type=int, min_length=1, max_length=1024),
+      help='A list of game-loop scenario numbers which will be run as part of '
+           'the test (default: scenario 1). A maximum of 1024 scenarios may be '
+           'specified in one test matrix, but the maximum number may also be '
+           'limited by the overall test *--timeout* setting. This flag is only '
+           'valid when *--type=game-loop* is also set.'
+  )
+  parser.add_argument(
+      '--app',
+      help='The path to the application archive (.ipa file) for game-loop '
+           'testing. The path may be in the local filesystem or in Google '
+           'Cloud Storage using gs:// notation. This flag is only valid when '
+           '*--type=game-loop* is also set.'
+  )
 
 
 def AddMatrixArgs(parser):
@@ -581,7 +634,7 @@ def ApplyLowerPriorityArgs(args, lower_pri_args, issue_cli_warning=False):
   for arg in lower_pri_args:
     if getattr(args, arg, None) is None:
       log.debug('Applying default {0}: {1}'
-                .format(arg, str(lower_pri_args[arg])))
+                .format(arg, six.text_type(lower_pri_args[arg])))
       setattr(args, arg, lower_pri_args[arg])
     elif issue_cli_warning and getattr(args, arg) != lower_pri_args[arg]:
       ext_name = exceptions.ExternalArgNameFrom(arg)
@@ -596,4 +649,4 @@ def _FormatArgValue(value):
   if isinstance(value, list):
     return ' '.join(value)
   else:
-    return str(value)
+    return six.text_type(value)

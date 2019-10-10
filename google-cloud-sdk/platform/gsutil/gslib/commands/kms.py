@@ -16,11 +16,14 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
 
 import getopt
 import textwrap
 
 from gslib import metrics
+from gslib.cloud_api import AccessDeniedException
 from gslib.command import Command
 from gslib.command_argument import CommandArgument
 from gslib.cs_api_map import ApiSelector
@@ -31,6 +34,7 @@ from gslib.kms_api import KmsApi
 from gslib.project_id import PopulateProjectId
 from gslib.third_party.kms_apitools.cloudkms_v1_messages import Binding
 from gslib.third_party.storage_apitools import storage_v1_messages as apitools_messages
+from gslib.utils import text_util
 from gslib.utils.constants import NO_MAX
 from gslib.utils.encryption_helper import ValidateCMEK
 
@@ -39,7 +43,7 @@ _AUTHORIZE_SYNOPSIS = """
 """
 
 _ENCRYPTION_SYNOPSIS = """
-  gsutil kms encryption [(-d|[-k kms_key])] bucket_url...
+  gsutil kms encryption [(-d|[-k kms_key])] [-w] bucket_url...
 """
 
 _SERVICEACCOUNT_SYNOPSIS = """
@@ -62,12 +66,12 @@ _AUTHORIZE_DESCRIPTION = """
   Authorize your default project to use a Cloud KMS key:
 
     gsutil kms authorize \\
-        -k projects/key-project/locations/global/keyRings/key-ring/cryptoKeys/my-key
+        -k projects/key-project/locations/us-east1/keyRings/key-ring/cryptoKeys/my-key
 
   Authorize "my-project" to use a Cloud KMS key:
 
     gsutil kms authorize -p my-project \\
-        -k projects/key-project/locations/global/keyRings/key-ring/cryptoKeys/my-key
+        -k projects/key-project/locations/us-east1/keyRings/key-ring/cryptoKeys/my-key
 """
 
 _ENCRYPTION_DESCRIPTION = """
@@ -80,7 +84,18 @@ _ENCRYPTION_DESCRIPTION = """
   Set the default KMS key for my-bucket:
 
     gsutil kms encryption \\
-        -k projects/key-project/locations/global/keyRings/key-ring/cryptoKeys/my-key \\
+        -k projects/key-project/locations/us-east1/keyRings/key-ring/cryptoKeys/my-key \\
+        gs://my-bucket
+
+  Set the default KMS key for my-bucket, but display a warning rather than failing if 
+  gsutil is unable to verify that the specified key contains the correct IAM bindings 
+  for encryption/decryption. This is useful for users that do not have getIamPolicy
+  permission but know that the key has the correct IAM policy for encryption in the  
+  user's project.
+
+    gsutil kms encryption \\
+        -k projects/key-project/locations/us-east1/keyRings/key-ring/cryptoKeys/my-key \\
+        -w \\
         gs://my-bucket
 
   Show the default KMS key for my-bucket, if one is set:
@@ -115,18 +130,17 @@ _DESCRIPTION = """
 
   The kms command has several sub-commands that deal with configuring
   Cloud Storage's integration with Cloud KMS:
-""" + (_AUTHORIZE_DESCRIPTION +
-       _ENCRYPTION_DESCRIPTION +
+""" + (_AUTHORIZE_DESCRIPTION + _ENCRYPTION_DESCRIPTION +
        _SERVICEACCOUNT_DESCRIPTION)
 
 _DETAILED_HELP_TEXT = CreateHelpText(_SYNOPSIS, _DESCRIPTION)
 
-_authorize_help_text = CreateHelpText(
-    _AUTHORIZE_SYNOPSIS, _AUTHORIZE_DESCRIPTION)
-_encryption_help_text = CreateHelpText(
-    _ENCRYPTION_SYNOPSIS, _ENCRYPTION_DESCRIPTION)
-_serviceaccount_help_text = CreateHelpText(
-    _SERVICEACCOUNT_SYNOPSIS, _SERVICEACCOUNT_DESCRIPTION)
+_authorize_help_text = CreateHelpText(_AUTHORIZE_SYNOPSIS,
+                                      _AUTHORIZE_DESCRIPTION)
+_encryption_help_text = CreateHelpText(_ENCRYPTION_SYNOPSIS,
+                                       _ENCRYPTION_DESCRIPTION)
+_serviceaccount_help_text = CreateHelpText(_SERVICEACCOUNT_SYNOPSIS,
+                                           _SERVICEACCOUNT_DESCRIPTION)
 
 
 class KmsCommand(Command):
@@ -137,7 +151,7 @@ class KmsCommand(Command):
       usage_synopsis=_SYNOPSIS,
       min_args=1,
       max_args=NO_MAX,
-      supported_sub_args='dk:p:',
+      supported_sub_args='dk:p:w',
       file_url_ok=False,
       provider_url_ok=False,
       urls_start_arg=1,
@@ -162,10 +176,11 @@ class KmsCommand(Command):
       },
   )
 
-  def _GatherSubOptions(self):
+  def _GatherSubOptions(self, subcommand_name):
     self.CheckArguments()
     self.clear_kms_key = False
     self.kms_key = None
+    self.warn_on_key_authorize_failure = False
 
     if self.sub_opts:
       for o, a in self.sub_opts:
@@ -176,6 +191,15 @@ class KmsCommand(Command):
           ValidateCMEK(self.kms_key)
         elif o == '-d':
           self.clear_kms_key = True
+        elif o == '-w':
+          self.warn_on_key_authorize_failure = True
+
+    if self.warn_on_key_authorize_failure and (
+        self.subcommand_name != 'encryption' or not self.kms_key):
+      raise CommandException('\n'.join(
+          textwrap.wrap(
+              'The "-w" option should only be specified for the "encryption" '
+              'subcommand and must be used with the "-k" option.')))
     # Determine the project (used in the serviceaccount and authorize
     # subcommands), either from the "-p" option's value or the default specified
     # in the user's Boto config file.
@@ -207,23 +231,37 @@ class KmsCommand(Command):
 
     kms_api = KmsApi(logger=self.logger)
     self.logger.debug('Getting IAM policy for %s', kms_key)
-    policy = kms_api.GetKeyIamPolicy(kms_key)
-    self.logger.debug('Current policy is %s', policy)
+    try:
+      policy = kms_api.GetKeyIamPolicy(kms_key)
+      self.logger.debug('Current policy is %s', policy)
 
-    # Check if the required binding is already present; if not, add it and
-    # update the key's IAM policy.
-    added_new_binding = False
-    binding = Binding(
-        role='roles/cloudkms.cryptoKeyEncrypterDecrypter',
-        members=['serviceAccount:%s' % service_account])
-    if binding not in policy.bindings:
-      policy.bindings.append(binding)
-      kms_api.SetKeyIamPolicy(kms_key, policy)
-      added_new_binding = True
-    return (service_account, added_new_binding)
+      # Check if the required binding is already present; if not, add it and
+      # update the key's IAM policy.
+      added_new_binding = False
+      binding = Binding(role='roles/cloudkms.cryptoKeyEncrypterDecrypter',
+                        members=['serviceAccount:%s' % service_account])
+      if binding not in policy.bindings:
+        policy.bindings.append(binding)
+        kms_api.SetKeyIamPolicy(kms_key, policy)
+        added_new_binding = True
+      return (service_account, added_new_binding)
+    except AccessDeniedException:
+      if self.warn_on_key_authorize_failure:
+        text_util.print_to_fd('\n'.join(
+            textwrap.wrap(
+                'Warning: Unable to check the IAM policy for the specified '
+                'encryption key. Check that your Cloud Platform project\'s '
+                'service account has the '
+                '"cloudkms.cryptoKeyEncrypterDecrypter" role for the '
+                'specified key. Without this role, you may not be able to '
+                'encrypt or decrypt objects using the key which will '
+                'prevent you from uploading or downloading objects.')))
+        return (service_account, False)
+      else:
+        raise
 
   def _Authorize(self):
-    self._GatherSubOptions()
+    self._GatherSubOptions('authorize')
     if not self.kms_key:
       raise CommandException('%s %s requires a key to be specified with -k' %
                              (self.command_name, self.subcommand_name))
@@ -247,15 +285,12 @@ class KmsCommand(Command):
     bucket_metadata.encryption = apitools_messages.Bucket.EncryptionValue()
     print('Clearing default encryption key for %s...' %
           str(bucket_url).rstrip('/'))
-    self.gsutil_api.PatchBucket(
-        bucket_url.bucket_name,
-        bucket_metadata,
-        fields=['encryption'],
-        provider=bucket_url.scheme)
+    self.gsutil_api.PatchBucket(bucket_url.bucket_name,
+                                bucket_metadata,
+                                fields=['encryption'],
+                                provider=bucket_url.scheme)
 
-  def _EncryptionSetKey(self,
-                        bucket_metadata,
-                        bucket_url,
+  def _EncryptionSetKey(self, bucket_metadata, bucket_url,
                         svc_acct_for_project_num):
     """Sets defaultKmsKeyName on a Cloud Storage bucket.
 
@@ -276,21 +311,20 @@ class KmsCommand(Command):
           bucket_project_number, self.kms_key)
       svc_acct_for_project_num[bucket_project_number] = service_account
     if newly_authorized:
-      print('Authorized service account %s to use key:\n%s' %
-            (service_account, self.kms_key))
+      text_util.print_to_fd('Authorized service account %s to use key:\n%s' %
+                            (service_account, self.kms_key))
 
     bucket_metadata.encryption = apitools_messages.Bucket.EncryptionValue(
         defaultKmsKeyName=self.kms_key)
-    print('Setting default KMS key for bucket %s...' %
-          str(bucket_url).rstrip('/'))
-    self.gsutil_api.PatchBucket(
-        bucket_url.bucket_name,
-        bucket_metadata,
-        fields=['encryption'],
-        provider=bucket_url.scheme)
+    text_util.print_to_fd('Setting default KMS key for bucket %s...' %
+                          str(bucket_url).rstrip('/'))
+    self.gsutil_api.PatchBucket(bucket_url.bucket_name,
+                                bucket_metadata,
+                                fields=['encryption'],
+                                provider=bucket_url.scheme)
 
   def _Encryption(self):
-    self._GatherSubOptions()
+    self._GatherSubOptions('encryption')
     # For each project, we should only make one API call to look up its
     # associated Cloud Storage-owned service account; subsequent lookups can be
     # pulled from this cache dict.
@@ -317,15 +351,14 @@ class KmsCommand(Command):
         return 0
       # "-k" flag was specified, so set the default KMS key and return.
       if self.kms_key:
-        self._EncryptionSetKey(bucket_metadata,
-                               bucket_url,
+        self._EncryptionSetKey(bucket_metadata, bucket_url,
                                svc_acct_for_project_num)
         return 0
       # Neither "-d" nor "-k" was specified, so emit the default KMS key and
       # return.
       bucket_url_string = str(bucket_url).rstrip('/')
-      if (bucket_metadata.encryption
-          and bucket_metadata.encryption.defaultKmsKeyName):
+      if (bucket_metadata.encryption and
+          bucket_metadata.encryption.defaultKmsKeyName):
         print('Default encryption key for %s:\n%s' %
               (bucket_url_string, bucket_metadata.encryption.defaultKmsKeyName))
       else:
@@ -375,7 +408,7 @@ class KmsCommand(Command):
 
   def _RunSubCommand(self, func):
     try:
-      (self.sub_opts, self.args) = getopt.getopt(
+      self.sub_opts, self.args = getopt.getopt(
           self.args, self.command_spec.supported_sub_args)
       # Commands with both suboptions and subcommands need to reparse for
       # suboptions, so we log again.
@@ -390,11 +423,12 @@ class KmsCommand(Command):
     # GetApiSelector logic will force us to use the XML API. As the XML API does
     # not support all the operations needed for kms subcommands, fail early.
     if self.gsutil_api.GetApiSelector(provider='gs') != ApiSelector.JSON:
-      raise CommandException('\n'.join(textwrap.wrap(
-          'The "%s" command can only be used with the GCS JSON API. If you '
-          'have only supplied hmac credentials in your boto file, please '
-          'instead supply a credential type that can be used with the JSON '
-          'API.' % self.command_name)))
+      raise CommandException('\n'.join(
+          textwrap.wrap(
+              'The "%s" command can only be used with the GCS JSON API. If you '
+              'have only supplied hmac credentials in your boto file, please '
+              'instead supply a credential type that can be used with the JSON '
+              'API.' % self.command_name)))
 
   def RunCommand(self):
     """Command entry point for the kms command."""
@@ -402,11 +436,12 @@ class KmsCommand(Command):
     # GetApiSelector logic will force us to use the XML API. As the XML API does
     # not support all the operations needed for kms subcommands, fail early.
     if self.gsutil_api.GetApiSelector(provider='gs') != ApiSelector.JSON:
-      raise CommandException('\n'.join(textwrap.wrap(
-          'The "%s" command can only be used with the GCS JSON API, which '
-          'cannot use HMAC credentials. Please supply a credential '
-          'type that is compatible with the JSON API (e.g. OAuth2) in your '
-          'boto config file.' % self.command_name)))
+      raise CommandException('\n'.join(
+          textwrap.wrap(
+              'The "%s" command can only be used with the GCS JSON API, which '
+              'cannot use HMAC credentials. Please supply a credential '
+              'type that is compatible with the JSON API (e.g. OAuth2) in your '
+              'boto config file.' % self.command_name)))
 
     method_for_subcommand = {
         'authorize': KmsCommand._Authorize,

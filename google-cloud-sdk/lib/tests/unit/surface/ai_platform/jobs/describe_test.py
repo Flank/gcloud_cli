@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -161,7 +161,7 @@ class DescribeTestBase(object):
     self.AssertErrContains("""\
 
 View job in the Cloud Console at:
-https://console.cloud.google.com/ml/jobs/my_job?project=fake-project
+https://console.cloud.google.com/mlengine/jobs/my_job?project=fake-project
 
 View logs at:
 https://console.cloud.google.com/logs?\

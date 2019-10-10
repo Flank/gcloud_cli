@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,16 +72,32 @@ class TargetHttpsProxiesCompleterAlpha(completers.MultiResourceCompleter):
         **kwargs)
 
 
-def TargetHttpsProxyArgument(required=True, plural=False, include_alpha=False):
+def AddProxyBind(parser, default):
+  """Adds the proxy bind argument."""
+  parser.add_argument(
+      '--proxy-bind',
+      action='store_true',
+      default=default,
+      help="""\
+      This flag only applies when the load_balancing_scheme of the associated
+      backend service is INTERNAL_SELF_MANAGED. When specified, the envoy binds
+      to the IP address and port specified by the forwarding rule. By default
+      this flag is off.
+      """)
+
+
+def TargetHttpsProxyArgument(required=True,
+                             plural=False,
+                             include_l7_internal_load_balancing=False):
   return compute_flags.ResourceArgument(
       resource_name='target HTTPS proxy',
       completer=TargetHttpsProxiesCompleterAlpha
-      if include_alpha else TargetHttpsProxiesCompleter,
+      if include_l7_internal_load_balancing else TargetHttpsProxiesCompleter,
       plural=plural,
       custom_plural='target HTTPS proxies',
       required=required,
       global_collection='compute.targetHttpsProxies',
       regional_collection='compute.regionTargetHttpsProxies'
-      if include_alpha else None,
+      if include_l7_internal_load_balancing else None,
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
-      if include_alpha else None)
+      if include_l7_internal_load_balancing else None)

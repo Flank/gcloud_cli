@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class VpnTunnelsTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   def SetUp(self):
     """Setup common test components."""
     api_name = self._GetApiName()
-    self.base_uri = 'https://www.googleapis.com/compute/{}/projects/{}'.format(
+    self.base_uri = 'https://compute.googleapis.com/compute/{}/projects/{}'.format(
         api_name, self.Project())
 
     apitools_client = api_mock.Client(

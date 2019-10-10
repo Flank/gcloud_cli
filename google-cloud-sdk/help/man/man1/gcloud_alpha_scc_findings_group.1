@@ -11,7 +11,7 @@ gcloud alpha scc findings group \- filter an organization or source's findings a
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scc findings group\fR \fIORGANIZATION\fR [\fB\-\-compare\-duration\fR=\fICOMPARE_DURATION\fR] [\fB\-\-filter\fR=\fIFILTER\fR] [\fB\-\-group\-by\fR=\fIGROUP_BY\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-read\-time\fR=\fIREAD_TIME\fR] [\fB\-\-source\fR=\fISOURCE\fR;\ default="\-"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scc findings group\fR [\fIORGANIZATION\fR] [\fB\-\-compare\-duration\fR=\fICOMPARE_DURATION\fR] [\fB\-\-filter\fR=\fIFILTER\fR] [\fB\-\-group\-by\fR=\fIGROUP_BY\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-read\-time\fR=\fIREAD_TIME\fR] [\fB\-\-source\fR=\fISOURCE\fR;\ default="\-"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,11 +27,11 @@ gcloud alpha scc findings group \- filter an organization or source's findings a
 .TP 2m
 
 Organization resource \- Refers to the organization whose findings should be
-grouped by. This represents a Cloud resource. This must be specified.
+grouped by. This represents a Cloud resource.
 
 .RS 2m
 .TP 2m
-\fIORGANIZATION\fR
+[\fIORGANIZATION\fR]
 ID of the organization or fully qualified identifier for the organization.
 
 
@@ -209,7 +209,6 @@ $ gcloud alpha scc findings group 123456 \-\-source 5678 \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

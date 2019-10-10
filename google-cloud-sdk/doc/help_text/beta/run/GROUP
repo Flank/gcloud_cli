@@ -18,17 +18,11 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
-     configurations
-        (BETA) View and manage your Cloud Run configurations.
-
      domain-mappings
         (BETA) View and manage your Cloud Run domain mappings.
 
      revisions
         (BETA) View and manage your Cloud Run revisions.
-
-     routes
-        (BETA) View your Cloud Run routes.
 
      services
         (BETA) View and manage your Cloud Run services.

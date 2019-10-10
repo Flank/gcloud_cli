@@ -1,0 +1,582 @@
+skip:
+  reason: Failing
+  bug: b/140836822
+title: serverless domain-mappings create, delete, describe, and list.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: run/platform managed
+- execute:
+  - command: run deploy --region $$region$$ --image gcr.io/knative-samples/helloworld-nodejs
+      --quiet $$service-name$$
+  - stderr: |
+      Deploying container to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [$$region$$]
+  - staged_progress_tracker:
+    - message: Deploying new service...
+    - status: SUCCESS
+    - succeeded_stages: &id001
+      - Creating Revision...
+      - Routing traffic...
+  - stderr: |
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+- set_property: run/region us-central1
+- execute:
+  - command: run domain-mappings create --service $$service-name$$ --domain $$subdomain$$.$$domain-name$$
+  - progress_tracker:
+    - message: Creating...
+    - status: SUCCESS
+  - stderr: |-
+      Waiting for certificate provisioning. You must configure your DNS records for certificate issuance to begin..*
+      $
+  - stdout: |-
+      NAME                                           RECORD TYPE  CONTENTS
+      $$subdomain$$  CNAME        ghs.googlehosted.com.?
+      $
+- execute:
+  - command: run domain-mappings describe --region $$region$$ --domain $$subdomain$$.$$domain-name$$
+      --format='text(status.conditions[].status,status.conditions[].type)'
+  - stdout: |
+      status.conditions[0].status: Unknown
+      status.conditions[0].type:   Ready
+      status.conditions[1].status: True
+      status.conditions[1].type:   DomainRoutable
+      status.conditions[2].status: Unknown
+      status.conditions[2].type:   CertificateProvisioned
+- execute:
+  - command: run domain-mappings delete --region $$region$$ --domain $$subdomain$$.$$domain-name$$
+  - stderr: |
+      Mappings to [$$subdomain$$.$$domain-name$$] now have been deleted.
+- execute:
+  - command: run services delete $$service-name$$ --region $$region$$ --quiet
+  - stderr: |
+      Deleted service [$$service-name$$].
+actions:
+- set_property:
+    run/platform: managed
+- generate_resource_id:
+    reference: service-name
+    prefix: service-name
+# The domain name needs to be verified with the service account running the tests
+- define_reference:
+    reference: domain-name
+    value: abcdefghi.com
+- generate_resource_id:
+    reference: subdomain
+    prefix: e2e-domain-mappings-test
+- define_reference:
+    reference: region
+    value: us-central1
+
+- execute_command:
+    # Create test service for working with
+    command: run deploy --region $$region$$ --image gcr.io/knative-samples/helloworld-nodejs
+      --quiet $$service-name$$
+    events:
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '228'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Resource '$$service-name$$' of kind 'SERVICE' in region '$$region$$'
+                in project 'cloud-sdk-integration-testing' does not exist.
+              status: NOT_FOUND
+    - api_call:
+        expect_request:
+          uri: https://run.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/us-central1/services/$$service-name$$:testIamPermissions?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              permissions:
+              - run.services.setIamPolicy
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '116'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            permissions:
+            - run.services.setIamPolicy
+    - expect_stderr: |
+        Deploying container to Cloud Run service [$$service-name$$] in project [cloud-sdk-integration-testing] region [$$region$$]
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '228'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Resource '$$service-name$$' of kind 'SERVICE' in region '$$region$$'
+                in project 'cloud-sdk-integration-testing' does not exist.
+              status: NOT_FOUND
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                  run.googleapis.com/client-name: gcloud
+                initializers: {}
+                labels: {}
+                name: $$service-name$$
+                namespace: cloud-sdk-integration-testing
+              spec:
+                runLatest:
+                  configuration:
+                    revisionTemplate:
+                      metadata:
+                        annotations: {}
+                        initializers: {}
+                        labels: {}
+                      spec:
+                        container:
+                          image: gcr.io/knative-samples/helloworld-nodejs
+              status:
+                address: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1459'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: $$service-name$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              generation: 1
+              labels:
+                cloud.googleapis.com/location: $$region$$
+              annotations:
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-07-23T18:13:29Z'
+            spec:
+              traffic:
+              - percent: 100
+                latestRevision: true
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+            status: {}
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2546'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: $$service-name$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              generation: 1
+              labels:
+                cloud.googleapis.com/location: $$region$$
+              annotations:
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-07-23T18:13:29Z'
+            spec:
+              traffic:
+              - percent: 100
+                latestRevision: true
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              domain: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+              address:
+                hostname: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+                url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+              url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 1
+              traffic:
+              - revisionName: $$service-name$$-rev01
+                percent: 100
+              latestReadyRevisionName: $$service-name$$-rev01
+              latestCreatedRevisionName: $$service-name$$-rev01
+        repeatable: true
+    - expect_staged_progress_tracker:
+        message: Deploying new service...
+        status: SUCCESS
+        succeeded_stages: *id001
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '2546'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              name: $$service-name$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              generation: 1
+              labels:
+                cloud.googleapis.com/location: $$region$$
+              annotations:
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-07-23T18:13:29Z'
+            spec:
+              traffic:
+              - percent: 100
+                latestRevision: true
+              template:
+                metadata:
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+            status:
+              conditions:
+              - type: Ready
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: ConfigurationsReady
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: RoutesReady
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              domain: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+              address:
+                hostname: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+                url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+              url: https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+              observedGeneration: 1
+              traffic:
+              - revisionName: $$service-name$$-rev01
+                percent: 100
+              latestReadyRevisionName: $$service-name$$-rev01
+              latestCreatedRevisionName: $$service-name$$-rev01
+        expect_response:
+          extract_references:
+          - field: status.latestCreatedRevisionName
+            reference: service-revision-name
+          body:
+            json: {}
+    - expect_stderr: |
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at https://$$service-name$$-ixwc4imo7a-uc.a.run.app
+    - expect_exit:
+        code: 0
+- set_property:
+    run/region: us-central1
+- execute_command:
+    command: run domain-mappings create --service $$service-name$$ --domain $$subdomain$$.$$domain-name$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://run.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/$$region$$/authorizeddomains?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '260'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            domains:
+            - name: apps/x4abe1b565b3c10f5-tp/authorizedDomains/$$domain-name$$
+              id: $$domain-name$$
+            - name: apps/x4abe1b565b3c10f5-tp/authorizedDomains/testappeng19.com
+              id: testappeng19.com
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiVersion: domains.cloudrun.com/v1alpha1
+              kind: DomainMapping
+              metadata:
+                annotations: {}
+                initializers: {}
+                labels: {}
+                name: $$subdomain$$.$$domain-name$$
+                namespace: cloud-sdk-integration-testing
+              spec:
+                routeName: $$service-name$$
+              status: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '984'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: domains.cloudrun.com/v1alpha1
+            kind: DomainMapping
+            metadata:
+              name: $$subdomain$$.$$domain-name$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings/$$subdomain$$.$$domain-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              generation: 1
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              labels:
+                cloud.googleapis.com/location: $$region$$
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            spec:
+              routeName: $$service-name$$
+            status: {}
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings/$$subdomain$$.$$domain-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1926'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: domains.cloudrun.com/v1alpha1
+            kind: DomainMapping
+            metadata:
+              name: $$subdomain$$.$$domain-name$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings/$$subdomain$$.$$domain-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              generation: 1
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              labels:
+                run.googleapis.com/overrideAt: '2019-08-15T23:12:28.581Z'
+                cloud.googleapis.com/location: $$region$$
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            spec:
+              routeName: $$service-name$$
+            status:
+              conditions:
+              - type: Ready
+                status: Unknown
+                reason: CertificatePending
+                message: Waiting for certificate provisioning. You must configure
+                  your DNS records for certificate issuance to begin.
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: DomainRoutable
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: CertificateProvisioned
+                status: Unknown
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              observedGeneration: 1
+              resourceRecords:
+              - name: $$subdomain$$
+                rrdata: ghs.googlehosted.com.
+                type: CNAME
+              mappedRouteName: $$service-name$$
+        repeatable: true
+    - expect_progress_tracker:
+        message: Creating...
+        status: SUCCESS
+    - expect_stderr:
+        matches: |
+          Waiting for certificate provisioning. You must configure your DNS records for certificate issuance to begin..*
+    - expect_stdout:
+        matches: |
+          NAME                                           RECORD TYPE  CONTENTS
+          $$subdomain$$  CNAME        ghs.googlehosted.com.?
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: run domain-mappings describe --region $$region$$ --domain $$subdomain$$.$$domain-name$$
+      --format='text(status.conditions[].status,status.conditions[].type)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings/$$subdomain$$.$$domain-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1926'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            apiVersion: domains.cloudrun.com/v1alpha1
+            kind: DomainMapping
+            metadata:
+              name: $$subdomain$$.$$domain-name$$
+              namespace: cloud-sdk-integration-testing
+              selfLink: /apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings/$$subdomain$$.$$domain-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              generation: 1
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              labels:
+                run.googleapis.com/overrideAt: '2019-08-15T23:12:28.581Z'
+                cloud.googleapis.com/location: $$region$$
+              annotations:
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            spec:
+              routeName: $$service-name$$
+            status:
+              conditions:
+              - type: Ready
+                status: Unknown
+                reason: CertificatePending
+                message: Waiting for certificate provisioning. You must configure
+                  your DNS records for certificate issuance to begin.
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: DomainRoutable
+                status: 'True'
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              - type: CertificateProvisioned
+                status: Unknown
+                lastTransitionTime: '2019-07-23T20:10:28Z'
+              observedGeneration: 1
+              resourceRecords:
+              - name: $$subdomain$$
+                rrdata: ghs.googlehosted.com.
+                type: CNAME
+              mappedRouteName: $$service-name$$
+    - expect_stdout: |
+        status.conditions[0].status: Unknown
+        status.conditions[0].type:   Ready
+        status.conditions[1].status: True
+        status.conditions[1].type:   DomainRoutable
+        status.conditions[2].status: Unknown
+        status.conditions[2].type:   CertificateProvisioned
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Clean up the domain name
+    command: run domain-mappings delete --region $$region$$ --domain $$subdomain$$.$$domain-name$$
+    cleanup_for: subdomain
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/domains.cloudrun.com/v1alpha1/namespaces/cloud-sdk-integration-testing/domainmappings/$$subdomain$$.$$domain-name$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Mappings to [$$subdomain$$.$$domain-name$$] now have been deleted.
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Clean up the test service
+    command: run services delete $$service-name$$ --region $$region$$ --quiet
+    cleanup_for: service-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$region$$-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/cloud-sdk-integration-testing/services/$$service-name$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted service [$$service-name$$].
+    - expect_exit:
+        code: 0

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,14 +77,14 @@ class TargetPoolsListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
             """))
 
   def testPositionalArgsWithUri(self):
     self.Run("""
         compute target-pools list
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
           --uri
         """)
     self.mock_get_regional_resources.assert_called_once_with(
@@ -97,13 +97,13 @@ class TargetPoolsListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
             """))
 
   def testPositionalArgsWithUriAndSimpleName(self):
     self.Run("""
         compute target-pools list
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
           pool-3
           --uri
         """)
@@ -117,8 +117,8 @@ class TargetPoolsListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-3
             """))
 
   def testPositionalArgsWithSimpleNamesAndRegionFlag(self):
@@ -138,15 +138,15 @@ class TargetPoolsListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
             """))
 
   def testPositionalArgsWithSimpleNameAndUriAndRegionFlag(self):
     self.Run("""
         compute target-pools list
           pool-1
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-3
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-3
           --regions region-1
           --uri
         """)
@@ -160,8 +160,8 @@ class TargetPoolsListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
-            https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-3
             """))
 
   def testTargetPoolsCompleter(self):

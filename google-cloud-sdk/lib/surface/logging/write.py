@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class Write(base.SilentCommand):
         choices=Write.SEVERITY_ENUM, default='DEFAULT',
         help='Severity level of the log entry.')
 
-    util.AddNonProjectArgs(parser, 'Write log entries')
+    util.AddParentArgs(parser, 'Write log entries')
 
   def Run(self, args):
     """This is what gets called when the user runs this command.

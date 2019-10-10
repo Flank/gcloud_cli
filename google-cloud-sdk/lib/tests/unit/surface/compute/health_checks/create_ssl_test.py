@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ class HealthChecksCreateSslTest(test_base.BaseTest, parameterized.TestCase):
   def testUriSupport(self):
     self.Run("""
         compute health-checks create ssl
-          https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
         """)
 
     self.CheckRequests(
@@ -389,20 +389,20 @@ class HealthChecksCreateSslBetaTest(HealthChecksCreateSslTest):
     self.SelectApi(self.track.prefix)
     self._health_check_api = self.compute_beta.healthChecks
 
+  def RunCreate(self, command):
+    self.Run('compute health-checks create ssl --global ' + command)
 
-class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslTest):
+
+class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
     self._health_check_api = self.compute_alpha.healthChecks
 
-  def RunCreate(self, command):
-    self.Run('compute health-checks create ssl --global ' + command)
 
-
-class RegionHealthChecksCreateSslTest(test_base.BaseTest,
-                                      parameterized.TestCase):
+class RegionHealthChecksCreateSslBetaTest(test_base.BaseTest,
+                                          parameterized.TestCase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -438,7 +438,7 @@ class RegionHealthChecksCreateSslTest(test_base.BaseTest,
   def testUriSupport(self):
     self.Run("""
         compute health-checks create ssl
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
         """)
 
     self.CheckRequests(
@@ -719,6 +719,14 @@ class RegionHealthChecksCreateSslTest(test_base.BaseTest,
                   unhealthyThreshold=2),
               project='my-project',
               region='us-west-1'))],)
+
+
+class RegionHealthChecksCreateSslAlphaTest(RegionHealthChecksCreateSslBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self._health_check_api = self.compute_alpha.regionHealthChecks
 
 
 if __name__ == '__main__':

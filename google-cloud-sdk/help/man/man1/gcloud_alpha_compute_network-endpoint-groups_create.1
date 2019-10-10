@@ -5,19 +5,13 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute network\-endpoint\-groups create \- creates a Google Compute Engine network endpoint group
+gcloud alpha compute network\-endpoint\-groups create \- create a Google Compute Engine network endpoint group
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute network\-endpoint\-groups create\fR \fINAME\fR [\fB\-\-default\-port\fR=\fIDEFAULT_PORT\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
-
-
-
-.SH "DESCRIPTION"
-
-\fB(ALPHA)\fR Creates a Google Compute Engine network endpoint group.
+\f5gcloud alpha compute network\-endpoint\-groups create\fR \fINAME\fR [\fB\-\-default\-port\fR=\fIDEFAULT_PORT\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-endpoint\-type\fR=\fINETWORK_ENDPOINT_TYPE\fR;\ default="gce\-vm\-ip\-port"] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-global\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,11 +43,25 @@ Name of the network in which the NEG is created. \f5default\fR project network
 is used if unspecified.
 
 .TP 2m
+\fB\-\-network\-endpoint\-type\fR=\fINETWORK_ENDPOINT_TYPE\fR; default="gce\-vm\-ip\-port"
+The network endpoint type. \fINETWORK_ENDPOINT_TYPE\fR must be one of:
+\fBgce\-vm\-ip\-port\fR, \fBinternet\-ip\-port\fR, \fBinternet\-fqdn\-port\fR.
+
+.TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
 Name of the subnet to which all network endpoints belong.
 
 If not specified, network endpoints may belong to any subnetwork in the region
 where the network endpoint group is created.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the network endpoint group is global.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -85,6 +93,7 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -97,13 +106,24 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To create a network endpoint group:
+
+.RS 2m
+$ gcloud alpha compute network\-endpoint\-groups create my\-neg \e
+    \-\-zone=us\-central1\-a \-\-network=my\-network \e
+\-\-subnet=my\-subnetwork
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute network\-endpoint\-groups create

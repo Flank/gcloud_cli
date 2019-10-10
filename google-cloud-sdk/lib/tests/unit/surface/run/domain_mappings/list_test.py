@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,16 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import domain_mapping
 from googlecloudsdk.api_lib.run import k8s_object
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.run import base
 
+import six
 
-class DomainMappingListTest(base.ServerlessSurfaceBase):
+
+class DomainMappingListTestBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.domain_mappings = [
@@ -32,6 +38,11 @@ class DomainMappingListTest(base.ServerlessSurfaceBase):
         for _ in range(2)]
     for i, d in enumerate(self.domain_mappings):
       d.name = 'www.example{}.com'.format(i)
+      d.status.conditions = [
+          self.serverless_messages.DomainMappingCondition(
+              type='Ready',
+              status=six.text_type(bool(i % 2)))
+      ]
       d.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/domainmappings/{}'.format(
           self.namespace.Name(), d.name)
       d.labels[k8s_object.REGION_LABEL] = 'us-central1'
@@ -47,9 +58,9 @@ class DomainMappingListTest(base.ServerlessSurfaceBase):
     self.operations.ListDomainMappings.assert_called_once_with(self.namespace)
     self.assertEqual(out, self.domain_mappings)
     self.AssertOutputEquals(
-        """DOMAIN SERVICE REGION
-           www.example0.com d0 us-central1
-           www.example1.com d1 us-central1
+        """  DOMAIN SERVICE REGION
+           X www.example0.com d0 us-central1
+           + www.example1.com d1 us-central1
         """, normalize_space=True)
 
   def testDomainMappingsListUri(self):
@@ -62,3 +73,9 @@ class DomainMappingListTest(base.ServerlessSurfaceBase):
         https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/domainmappings/www.example1.com
         """,
         normalize_space=True)
+
+
+class DomainMappingListTestAlpha(DomainMappingListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

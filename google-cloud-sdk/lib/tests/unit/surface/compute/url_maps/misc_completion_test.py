@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,14 +37,14 @@ class UrlMapsCompletionTests(test_base.BaseTest,
         autospec=True)
     lister_mock.return_value = resource_projector.MakeSerializable(
         test_resources.URL_MAPS)
-    self.RunCompletion('beta compute url-maps invalidate-cdn-cache u',
+    self.RunCompletion('compute url-maps invalidate-cdn-cache u',
                        ['url-map-1', 'url-map-2', 'url-map-3', 'url-map-4'])
 
 
 class RegionUrlMapsCompletionTests(test_base.BaseTest,
                                    completer_test_base.CompleterBase):
 
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
 
   def SetUp(self):
     self.SelectApi('alpha')

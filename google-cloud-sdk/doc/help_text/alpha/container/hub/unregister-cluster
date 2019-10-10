@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha container hub unregister-cluster --context=CONTEXT
-        [--kubeconfig-file=KUBECONFIG_FILE] [GCLOUD_WIDE_FLAG ...]
+        [--kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command unregisters a cluster referenced from a kubeconfig
@@ -16,7 +16,7 @@ REQUIRED FLAGS
         The context in the kubeconfig file that specifies the cluster.
 
 OPTIONAL FLAGS
-     --kubeconfig-file=KUBECONFIG_FILE
+     --kubeconfig=KUBECONFIG
         The kubeconfig file containing an entry for the cluster. Defaults to
         $KUBECONFIG if it is set in the environment, otherwise defaults to to
         $HOME/.kube/config.
@@ -37,13 +37,14 @@ EXAMPLES
     Unregister a cluster referenced from a specific kubeconfig file:
 
         $ gcloud alpha container hub unregister-cluster \
-            --kubeconfig-file=/home/user/custom_kubeconfig \
+            --kubeconfig=/home/user/custom_kubeconfig \
             --context=my-cluster-context
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta container hub unregister-cluster
 

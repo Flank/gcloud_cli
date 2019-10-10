@@ -17,10 +17,8 @@ gcloud alpha compute backend\-services import \- import a backend service
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR If the specified backend service already exists, it will be
-overwritten. Otherwise, a new backend service will be created. To edit a backend
-service you can export the backend service to a file, edit its configuration,
-and then import the new configuration.
+\fB(ALPHA)\fR Imports a backend service's configuration to a file. This
+configuration can be imported at a later time.
 
 
 
@@ -75,11 +73,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+A backend service can be imported by running:
+
+.RS 2m
+$ gcloud alpha compute backend\-services import NAME \e
+    \-\-source=<path\-to\-file> \-\-global
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute backend\-services import
+.RE
 

@@ -16,15 +16,12 @@ summary:
       domainName: available.app
       notices:
       - HSTS_PRELOADED
-      registrationPrice:
-        currencyCode: USD
-        units: '14'
-      renewalPrice:
-        currencyCode: USD
-        units: '14'
       supportedWhoisPrivacy:
       - PUBLISH_REDACTED_CONTACT_DATA
       - USE_WHOIS_PRIVACY_PROXY
+      yearlyPrice:
+        currencyCode: USD
+        units: '14'
 actions:
 - execute_command:
     command: |
@@ -70,10 +67,6 @@ actions:
               "availability": {
                 "domainName": "available.app",
                 "available": "AVAILABLE",
-                "registrationPrice": {
-                  "currencyCode": "USD",
-                  "units": "14"
-                },
                 "supportedWhoisPrivacy": [
                   "PUBLISH_REDACTED_CONTACT_DATA",
                   "USE_WHOIS_PRIVACY_PROXY"
@@ -81,7 +74,7 @@ actions:
                 "notices": [
                   "HSTS_PRELOADED"
                 ],
-                "renewalPrice": {
+                "yearlyPrice": {
                   "currencyCode": "USD",
                   "units": "14"
                 }
@@ -92,14 +85,11 @@ actions:
         domainName: available.app
         notices:
         - HSTS_PRELOADED
-        registrationPrice:
-          currencyCode: USD
-          units: '14'
-        renewalPrice:
-          currencyCode: USD
-          units: '14'
         supportedWhoisPrivacy:
         - PUBLISH_REDACTED_CONTACT_DATA
         - USE_WHOIS_PRIVACY_PROXY
+        yearlyPrice:
+          currencyCode: USD
+          units: '14'
     - expect_exit:
         code: 0

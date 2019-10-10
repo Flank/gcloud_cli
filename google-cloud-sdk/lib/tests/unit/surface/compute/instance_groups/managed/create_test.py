@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -462,7 +462,7 @@ class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
             .AutoDeleteValueValuesEnum.NEVER,
         'on-permanent-instance-deletion':
             self.messages.StatefulPolicyPreservedStateDiskDevice
-            .AutoDeleteValueValuesEnum.WHEN_NOT_IN_USE
+            .AutoDeleteValueValuesEnum.ON_PERMANENT_INSTANCE_DELETION
     }
     return self.messages.StatefulPolicyPreservedState \
         .DisksValue.AdditionalProperty(
@@ -483,11 +483,6 @@ class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
 
     self._CheckInsertRequestWithStateful(
         self.messages.StatefulPolicy(
-            preservedResources=(self.messages.StatefulPolicyPreservedResources(
-                disks=[
-                    self.messages.StatefulPolicyPreservedDisk(
-                        deviceName='disk-1'),
-                ],)),
             preservedState=self.messages.StatefulPolicyPreservedState(
                 disks=self.messages.StatefulPolicyPreservedState.DisksValue(
                     additionalProperties=[
@@ -508,15 +503,6 @@ class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
 
     self._CheckInsertRequestWithStateful(
         self.messages.StatefulPolicy(
-            preservedResources=(self.messages.StatefulPolicyPreservedResources(
-                disks=[
-                    self.messages.StatefulPolicyPreservedDisk(
-                        deviceName='disk-1'),
-                    self.messages.StatefulPolicyPreservedDisk(
-                        deviceName='disk-2'),
-                    self.messages.StatefulPolicyPreservedDisk(
-                        deviceName='disk-3'),
-                ],)),
             preservedState=self.messages.StatefulPolicyPreservedState(
                 disks=self.messages.StatefulPolicyPreservedState.DisksValue(
                     additionalProperties=[
@@ -538,39 +524,6 @@ class _InstanceGroupManagersCreateZonalWithStatefulTestBase(object):
             --size 1
             --stateful-disk
           """.format(*self.scope_params))
-
-  def testStatefulNames(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --{} {}
-          --template template-1
-          --size 1
-          --stateful-names
-        """.format(*self.scope_params))
-
-    self._CheckInsertRequestWithStateful(self.messages.StatefulPolicy())
-
-  def testStatefulDisksWithNoStatefulNames(self):
-    with self.assertRaises(exceptions.ConflictingArgumentsException):
-      self.Run("""
-        compute instance-groups managed create group-1
-          --{} {}
-          --template template-1
-          --size 1
-          --stateful-disk device-name=device-1
-          --no-stateful-names
-        """.format(*self.scope_params))
-
-  def testNoStatefulNames(self):
-    self.Run("""
-        compute instance-groups managed create group-1
-          --{} {}
-          --template template-1
-          --size 1
-          --no-stateful-names
-        """.format(*self.scope_params))
-
-    self._CheckInsertRequestWithStateful()
 
 
 class _InstanceGroupManagersCreateRegionalWithStatefulTestBase(
@@ -842,6 +795,7 @@ class InstanceGroupManagersCreateZonalTestGA(
         ],
         [],
         [],
+        [],
     ])
     self.WriteInput('2\n')
 
@@ -863,7 +817,7 @@ class InstanceGroupManagersCreateZonalTestGA(
               instanceGroupManager=self.messages.InstanceGroupManager(
                   baseInstanceName='instance-1',
                   instanceTemplate=(
-                      'https://www.googleapis.com/compute/{}/projects/'
+                      'https://compute.googleapis.com/compute/{}/projects/'
                       'my-project/global/instanceTemplates/template-1'.format(
                           self.api)),
                   name='group-1',
@@ -1127,7 +1081,7 @@ class InstanceGroupManagersCreateRegionalTestGA(
               instanceGroupManager=self.messages.InstanceGroupManager(
                   baseInstanceName='instance-1',
                   instanceTemplate=(
-                      'https://www.googleapis.com/compute/{}/projects/'
+                      'https://compute.googleapis.com/compute/{}/projects/'
                       'my-project/global/instanceTemplates/template-1'.format(
                           self.api)),
                   name='group-1',

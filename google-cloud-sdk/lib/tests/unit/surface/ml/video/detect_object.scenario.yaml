@@ -6,16 +6,17 @@ summary:
   - command: |
       ml video detect-object gs://mockbucket/mock_video.mp4 --async
   - stderr: |
-      Check operation [us-west1.1234] for status.
+      Check operation [projects/123/locations/us-west1/operations/1234] for status.
   - stdout: |
       {
-        "name": "us-west1.1234"
+        "name": "projects/123/locations/us-west1/operations/1234"
       }
 - execute:
   - command: |
       ml video detect-object gs://mockbucket/mock_video.mp4
   - progress_tracker:
-    - message: Waiting for operation [us-west1.1234] to complete
+    - message: Waiting for operation [projects/123/locations/us-west1/operations/1234]
+        to complete
     - status: SUCCESS
   - stdout: |
       {
@@ -40,12 +41,12 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-west1.1234}
+          body: {name: projects/123/locations/us-west1/operations/1234}
     - expect_stderr: |
-        Check operation [us-west1.1234] for status.
+        Check operation [projects/123/locations/us-west1/operations/1234] for status.
     - expect_stdout: |
         {
-          "name": "us-west1.1234"
+          "name": "projects/123/locations/us-west1/operations/1234"
         }
     - expect_exit:
         code: 0
@@ -66,10 +67,10 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-west1.1234}
+          body: {name: projects/123/locations/us-west1/operations/1234}
     - api_call:
         expect_request:
-          uri: https://videointelligence.googleapis.com/v1/operations/us-west1.1234?alt=json
+          uri: https://videointelligence.googleapis.com/v1/projects/123/locations/us-west1/operations/1234?alt=json
           method: GET
           headers: {}
           body: null
@@ -78,7 +79,7 @@ actions:
             status: '200'
           body: |-
             {
-              "name": "us-west1.1234",
+              "name": "projects/123/locations/us-west1/operations/1234",
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress",
                 "annotationProgress": [
@@ -97,7 +98,8 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [us-west1.1234] to complete
+        message: Waiting for operation [projects/123/locations/us-west1/operations/1234]
+          to complete
         status: SUCCESS
     - expect_stdout: |
         {

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import vpn_gateways_test_base
 
 
-class VpnGatewaysUpdateLabelsBetaTest(
+class VpnGatewaysUpdateLabelsGaTest(
     vpn_gateways_test_base.VpnGatewaysTestBase):
 
   _VPN_GATEWAY_NAME = 'my-vpn-gateway'
@@ -33,7 +33,7 @@ class VpnGatewaysUpdateLabelsBetaTest(
   _FINGERPRINT_2 = b'fingerprint-9875'
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def _MakeVpnGateway(self, vpn_gateway_ref, fingerprint, labels=None):
     vpn_gateway = self.messages.VpnGateway(
@@ -164,6 +164,13 @@ class VpnGatewaysUpdateLabelsBetaTest(
                             vpn_gateway_ref.Name(), vpn_gateway_ref.region,
                             labels_to_update_cmd, labels_to_remove_cmd))
     self.assertEqual(response, existing_vpn_gateway)
+
+
+class VpnGatewaysUpdateLabelsBetaTest(
+    VpnGatewaysUpdateLabelsGaTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class VpnGatewaysUpdateLabelsAlphaTest(

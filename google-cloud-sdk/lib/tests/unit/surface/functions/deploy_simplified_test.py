@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -539,7 +539,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
 
     with self.assertRaisesRegex(
         exceptions.FunctionsError,
-        'argument --source: Provided directory does not exist.'):
+        'argument `--source`: Provided directory does not exist'):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck '
           '--source my/functions/directory --quiet --runtime=nodejs6')

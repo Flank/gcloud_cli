@@ -8,7 +8,7 @@ summary:
   - stderr: |
       Create request issued for: [$$test-workerpool$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Created workerpool [$$test-workerpool$$].
@@ -22,14 +22,16 @@ summary:
         diskSizeGb: '200'
         diskType: pd-standard
         machineType: n1-standard-2
+        networkAccess: public
 - execute:
-  # In normal cases, it's advised to not use --async in tests.  However, the delete for worker-pools
-  # can take a long time (5-10 minutes).
+  - label: |
+      Delete worker pool (generally --async shouldn't be used in tests, but the delete for worker
+      pools can take a long time (5-10 minutes).
   - command: |
-        remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet --async
+      remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet --async
   - stderr: |
       Delete request issued for: [$$test-workerpool$$]
-      Check operation [$$operation-basename$$] for status.
+      Check operation [$$operation$$] for status.
 actions:
 - generate_resource_id:
     reference: test-workerpool
@@ -63,11 +65,11 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/operations/EAMakgFwcm9qZWN0cy9jbG91ZC1zZGstaW50ZWdyYXRpb24tdGVzdGluZy9pbnN0YW5jZXMvZGVmYXVsdF9pbnN0YW5jZS93b3JrZXJwb29scy93b3JrZXJwb29sLTIwMTkwMzA1LTIwMTExOC1wcm4wIDg3N2RmNmNiLTYwNDMtNDcwOS1hYzhmLTQ2OTM1MGYxMWM0MyIcV29ya2VyUG9vbHMuQ3JlYXRlV29ya2VyUG9vbA==
+            name: projects/cloud-sdk-integration-testing/operations/EAMakgFwcm9qZWN0cy9jbG91ZC1zZGstaW50ZWdyYXRpb24tdGVzdGluZy9pbnN0YW5jZXMvZGVmYXVsdF9pbnN0YW5jZS93b3JrZXJwb29scy93b3JrZXJwb29sLTIwMTkwOTEyLTE2MTMxNS1sNndrIDIxZDNjMWFjLWQxYmQtNGI1Ni05Njk5LWRhZDk3MmZjZWE4MCIcV29ya2VyUG9vbHMuQ3JlYXRlV29ya2VyUG9vbA==
     - expect_stderr: |
         Create request issued for: [$$test-workerpool$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -78,7 +80,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '264'
+            content-length: '295'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -87,6 +89,7 @@ actions:
               machineType: n1-standard-2
               diskType: pd-standard
               diskSizeGb: '200'
+              networkAccess: public
             state: RUNNING
         repeatable: true
     - expect_stderr: |
@@ -106,7 +109,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '264'
+            content-length: '295'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -115,6 +118,7 @@ actions:
               machineType: n1-standard-2
               diskType: pd-standard
               diskSizeGb: '200'
+              networkAccess: public
             state: RUNNING
     - expect_stdout: |
         name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
@@ -123,11 +127,15 @@ actions:
           diskSizeGb: '200'
           diskType: pd-standard
           machineType: n1-standard-2
+          networkAccess: public
     - expect_exit:
         code: 0
 - execute_command:
     command: |
       remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet --async
+    label: |
+      Delete worker pool (generally --async shouldn't be used in tests, but the delete for worker
+      pools can take a long time (5-10 minutes).
     cleanup_for: test-workerpool
     events:
     - api_call:
@@ -144,9 +152,9 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/operations/EAMabXByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9kZWZhdWx0X2luc3RhbmNlL3dvcmtlcnBvb2xzL3dvcmtlcnBvb2wtMjAxOTAzMDUtMjAxMTE4LXBybjAiHFdvcmtlclBvb2xzLkRlbGV0ZVdvcmtlclBvb2w=
+            name: projects/cloud-sdk-integration-testing/operations/EAMabXByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9kZWZhdWx0X2luc3RhbmNlL3dvcmtlcnBvb2xzL3dvcmtlcnBvb2wtMjAxOTA5MTItMTYxMzE1LWw2d2siHFdvcmtlclBvb2xzLkRlbGV0ZVdvcmtlclBvb2w=
     - expect_stderr: |
         Delete request issued for: [$$test-workerpool$$]
-        Check operation [$$operation-basename$$] for status.
+        Check operation [$$operation$$] for status.
     - expect_exit:
         code: 0

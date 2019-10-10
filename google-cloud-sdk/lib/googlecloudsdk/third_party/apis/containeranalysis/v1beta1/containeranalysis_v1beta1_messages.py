@@ -82,74 +82,6 @@ class Attestation(_messages.Message):
   pgpSignedAttestation = _messages.MessageField('PgpSignedAttestation', 2)
 
 
-class AuditConfig(_messages.Message):
-  r"""Specifies the audit configuration for a service. The configuration
-  determines which permission types are logged, and what identities, if any,
-  are exempted from logging. An AuditConfig must have one or more
-  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
-  specific service, the union of the two AuditConfigs is used for that
-  service: the log_types specified in each AuditConfig are enabled, and the
-  exempted_members in each AuditLogConfig are exempted.  Example Policy with
-  multiple AuditConfigs:      {       "audit_configs": [         {
-  "service": "allServices"           "audit_log_configs": [             {
-  "log_type": "DATA_READ",               "exempted_members": [
-  "user:foo@gmail.com"               ]             },             {
-  "log_type": "DATA_WRITE",             },             {
-  "log_type": "ADMIN_READ",             }           ]         },         {
-  "service": "fooservice.googleapis.com"           "audit_log_configs": [
-  {               "log_type": "DATA_READ",             },             {
-  "log_type": "DATA_WRITE",               "exempted_members": [
-  "user:bar@gmail.com"               ]             }           ]         }
-  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
-  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
-  and bar@gmail.com from DATA_WRITE logging.
-
-  Fields:
-    auditLogConfigs: The configuration for logging of each type of permission.
-    service: Specifies a service that will be enabled for audit logging. For
-      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-      `allServices` is a special value that covers all services.
-  """
-
-  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
-  service = _messages.StringField(2)
-
-
-class AuditLogConfig(_messages.Message):
-  r"""Provides the configuration for logging a type of permissions. Example:
-  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
-  "exempted_members": [             "user:foo@gmail.com"           ]
-  },         {           "log_type": "DATA_WRITE",         }       ]     }
-  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-  foo@gmail.com from DATA_READ logging.
-
-  Enums:
-    LogTypeValueValuesEnum: The log type that this config enables.
-
-  Fields:
-    exemptedMembers: Specifies the identities that do not cause logging for
-      this type of permission. Follows the same format of Binding.members.
-    logType: The log type that this config enables.
-  """
-
-  class LogTypeValueValuesEnum(_messages.Enum):
-    r"""The log type that this config enables.
-
-    Values:
-      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
-      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
-      DATA_WRITE: Data writes. Example: CloudSQL Users create
-      DATA_READ: Data reads. Example: CloudSQL Users list
-    """
-    LOG_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    DATA_WRITE = 2
-    DATA_READ = 3
-
-  exemptedMembers = _messages.StringField(1, repeated=True)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
-
-
 class Authority(_messages.Message):
   r"""Note kind that represents a logical attestation "role" or "authority".
   For example, an organization might have one `Authority` for "QA" and one for
@@ -254,19 +186,19 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
       with or without a Google account.  * `allAuthenticatedUsers`: A special
       identifier that represents anyone    who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
-      represents a specific Google    account. For example, `alice@gmail.com`
-      .   * `serviceAccount:{emailid}`: An email address that represents a
-      service    account. For example, `my-other-
+      represents a specific Google    account. For example,
+      `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
+      that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
       * `domain:{domain}`: The G Suite domain (primary) that represents all
@@ -412,6 +344,159 @@ class BuildSignature(_messages.Message):
   keyType = _messages.EnumField('KeyTypeValueValuesEnum', 2)
   publicKey = _messages.StringField(3)
   signature = _messages.BytesField(4)
+
+
+class CVSSv3(_messages.Message):
+  r"""Common Vulnerability Scoring System version 3. For details, see
+  https://www.first.org/cvss/specification-document
+
+  Enums:
+    AttackComplexityValueValuesEnum:
+    AttackVectorValueValuesEnum: Base Metrics Represents the intrinsic
+      characteristics of a vulnerability that are constant over time and
+      across user environments.
+    AvailabilityImpactValueValuesEnum:
+    ConfidentialityImpactValueValuesEnum:
+    IntegrityImpactValueValuesEnum:
+    PrivilegesRequiredValueValuesEnum:
+    ScopeValueValuesEnum:
+    UserInteractionValueValuesEnum:
+
+  Fields:
+    attackComplexity: A AttackComplexityValueValuesEnum attribute.
+    attackVector: Base Metrics Represents the intrinsic characteristics of a
+      vulnerability that are constant over time and across user environments.
+    availabilityImpact: A AvailabilityImpactValueValuesEnum attribute.
+    baseScore: The base score is a function of the base metric scores.
+    confidentialityImpact: A ConfidentialityImpactValueValuesEnum attribute.
+    exploitabilityScore: A number attribute.
+    impactScore: A number attribute.
+    integrityImpact: A IntegrityImpactValueValuesEnum attribute.
+    privilegesRequired: A PrivilegesRequiredValueValuesEnum attribute.
+    scope: A ScopeValueValuesEnum attribute.
+    userInteraction: A UserInteractionValueValuesEnum attribute.
+  """
+
+  class AttackComplexityValueValuesEnum(_messages.Enum):
+    r"""AttackComplexityValueValuesEnum enum type.
+
+    Values:
+      ATTACK_COMPLEXITY_UNSPECIFIED: <no description>
+      ATTACK_COMPLEXITY_LOW: <no description>
+      ATTACK_COMPLEXITY_HIGH: <no description>
+    """
+    ATTACK_COMPLEXITY_UNSPECIFIED = 0
+    ATTACK_COMPLEXITY_LOW = 1
+    ATTACK_COMPLEXITY_HIGH = 2
+
+  class AttackVectorValueValuesEnum(_messages.Enum):
+    r"""Base Metrics Represents the intrinsic characteristics of a
+    vulnerability that are constant over time and across user environments.
+
+    Values:
+      ATTACK_VECTOR_UNSPECIFIED: <no description>
+      ATTACK_VECTOR_NETWORK: <no description>
+      ATTACK_VECTOR_ADJACENT: <no description>
+      ATTACK_VECTOR_LOCAL: <no description>
+      ATTACK_VECTOR_PHYSICAL: <no description>
+    """
+    ATTACK_VECTOR_UNSPECIFIED = 0
+    ATTACK_VECTOR_NETWORK = 1
+    ATTACK_VECTOR_ADJACENT = 2
+    ATTACK_VECTOR_LOCAL = 3
+    ATTACK_VECTOR_PHYSICAL = 4
+
+  class AvailabilityImpactValueValuesEnum(_messages.Enum):
+    r"""AvailabilityImpactValueValuesEnum enum type.
+
+    Values:
+      IMPACT_UNSPECIFIED: <no description>
+      IMPACT_HIGH: <no description>
+      IMPACT_LOW: <no description>
+      IMPACT_NONE: <no description>
+    """
+    IMPACT_UNSPECIFIED = 0
+    IMPACT_HIGH = 1
+    IMPACT_LOW = 2
+    IMPACT_NONE = 3
+
+  class ConfidentialityImpactValueValuesEnum(_messages.Enum):
+    r"""ConfidentialityImpactValueValuesEnum enum type.
+
+    Values:
+      IMPACT_UNSPECIFIED: <no description>
+      IMPACT_HIGH: <no description>
+      IMPACT_LOW: <no description>
+      IMPACT_NONE: <no description>
+    """
+    IMPACT_UNSPECIFIED = 0
+    IMPACT_HIGH = 1
+    IMPACT_LOW = 2
+    IMPACT_NONE = 3
+
+  class IntegrityImpactValueValuesEnum(_messages.Enum):
+    r"""IntegrityImpactValueValuesEnum enum type.
+
+    Values:
+      IMPACT_UNSPECIFIED: <no description>
+      IMPACT_HIGH: <no description>
+      IMPACT_LOW: <no description>
+      IMPACT_NONE: <no description>
+    """
+    IMPACT_UNSPECIFIED = 0
+    IMPACT_HIGH = 1
+    IMPACT_LOW = 2
+    IMPACT_NONE = 3
+
+  class PrivilegesRequiredValueValuesEnum(_messages.Enum):
+    r"""PrivilegesRequiredValueValuesEnum enum type.
+
+    Values:
+      PRIVILEGES_REQUIRED_UNSPECIFIED: <no description>
+      PRIVILEGES_REQUIRED_NONE: <no description>
+      PRIVILEGES_REQUIRED_LOW: <no description>
+      PRIVILEGES_REQUIRED_HIGH: <no description>
+    """
+    PRIVILEGES_REQUIRED_UNSPECIFIED = 0
+    PRIVILEGES_REQUIRED_NONE = 1
+    PRIVILEGES_REQUIRED_LOW = 2
+    PRIVILEGES_REQUIRED_HIGH = 3
+
+  class ScopeValueValuesEnum(_messages.Enum):
+    r"""ScopeValueValuesEnum enum type.
+
+    Values:
+      SCOPE_UNSPECIFIED: <no description>
+      SCOPE_UNCHANGED: <no description>
+      SCOPE_CHANGED: <no description>
+    """
+    SCOPE_UNSPECIFIED = 0
+    SCOPE_UNCHANGED = 1
+    SCOPE_CHANGED = 2
+
+  class UserInteractionValueValuesEnum(_messages.Enum):
+    r"""UserInteractionValueValuesEnum enum type.
+
+    Values:
+      USER_INTERACTION_UNSPECIFIED: <no description>
+      USER_INTERACTION_NONE: <no description>
+      USER_INTERACTION_REQUIRED: <no description>
+    """
+    USER_INTERACTION_UNSPECIFIED = 0
+    USER_INTERACTION_NONE = 1
+    USER_INTERACTION_REQUIRED = 2
+
+  attackComplexity = _messages.EnumField('AttackComplexityValueValuesEnum', 1)
+  attackVector = _messages.EnumField('AttackVectorValueValuesEnum', 2)
+  availabilityImpact = _messages.EnumField('AvailabilityImpactValueValuesEnum', 3)
+  baseScore = _messages.FloatField(4, variant=_messages.Variant.FLOAT)
+  confidentialityImpact = _messages.EnumField('ConfidentialityImpactValueValuesEnum', 5)
+  exploitabilityScore = _messages.FloatField(6, variant=_messages.Variant.FLOAT)
+  impactScore = _messages.FloatField(7, variant=_messages.Variant.FLOAT)
+  integrityImpact = _messages.EnumField('IntegrityImpactValueValuesEnum', 8)
+  privilegesRequired = _messages.EnumField('PrivilegesRequiredValueValuesEnum', 9)
+  scope = _messages.EnumField('ScopeValueValuesEnum', 10)
+  userInteraction = _messages.EnumField('UserInteractionValueValuesEnum', 11)
 
 
 class CloudRepoSourceContext(_messages.Message):
@@ -876,6 +961,9 @@ class Detail(_messages.Message):
       node.js packages etc).
     severityName: The severity (eg: distro assigned severity) for this
       vulnerability.
+    sourceUpdateTime: The time this information was last changed at the
+      source. This is an upstream timestamp from the underlying information
+      source - e.g. Ubuntu security tracker.
   """
 
   cpeUri = _messages.StringField(1)
@@ -887,6 +975,7 @@ class Detail(_messages.Message):
   package = _messages.StringField(7)
   packageType = _messages.StringField(8)
   severityName = _messages.StringField(9)
+  sourceUpdateTime = _messages.StringField(10)
 
 
 class Details(_messages.Message):
@@ -1147,9 +1236,9 @@ class FixableTotalByDigest(_messages.Message):
 
 class GenericSignedAttestation(_messages.Message):
   r"""An attestation wrapper that uses the Grafeas `Signature` message. This
-  attestation must define the `plaintext` that the `signatures` verify and any
-  metadata necessary to interpret that plaintext.  The signatures should
-  always be over the `plaintext` bytestring.
+  attestation must define the `serialized_payload` that the `signatures`
+  verify and any metadata necessary to interpret that plaintext.  The
+  signatures should always be over the `serialized_payload` bytestring.
 
   Enums:
     ContentTypeValueValuesEnum: Type (for example schema) of the attestation
@@ -1212,7 +1301,28 @@ class GerritSourceContext(_messages.Message):
 
 
 class GetIamPolicyRequest(_messages.Message):
-  r"""Request message for `GetIamPolicy` method."""
+  r"""Request message for `GetIamPolicy` method.
+
+  Fields:
+    options: OPTIONAL: A `GetPolicyOptions` object for specifying options to
+      `GetIamPolicy`. This field is only used by Cloud IAM.
+  """
+
+  options = _messages.MessageField('GetPolicyOptions', 1)
+
+
+class GetPolicyOptions(_messages.Message):
+  r"""Encapsulates settings provided to GetIamPolicy.
+
+  Fields:
+    requestedPolicyVersion: Optional. The policy format version to be
+      returned.  Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.  Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
+  """
+
+  requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class GitSourceContext(_messages.Message):
@@ -1826,27 +1936,37 @@ class PgpSignedAttestation(_messages.Message):
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.   A `Policy`
-  consists of a list of `bindings`. A `binding` binds a list of `members` to a
-  `role`, where the members can be user accounts, Google groups, Google
-  domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **JSON Example**      {       "bindings": [         {
-  "role": "roles/owner",           "members": [
+  is a collection of `bindings`. A `binding` binds one or more `members` to a
+  single `role`. Members can be user accounts, service accounts, Google
+  groups, and domains (such as G Suite). A `role` is a named list of
+  permissions (defined by IAM or configured by users). A `binding` can
+  optionally specify a `condition`, which is a logic expression that further
+  constrains the role binding based on attributes about the request and/or
+  target resource.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
-  "domain:google.com",             "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com"           ]         },         {
-  "role": "roles/viewer",           "members": ["user:sean@example.com"]
-  }       ]     }  **YAML Example**      bindings:     - members:       -
-  user:mike@example.com       - group:admins@example.com       -
-  domain:google.com       - serviceAccount:my-other-
-  app@appspot.gserviceaccount.com       role: roles/owner     - members:
-  - user:sean@example.com       role: roles/viewer   For a description of IAM
-  and its features, see the [IAM developer's
+  "domain:google.com",             "serviceAccount:my-project-
+  id@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/resourcemanager.organizationViewer",           "members":
+  ["user:eve@example.com"],           "condition": {             "title":
+  "expirable access",             "description": "Does not grant access after
+  Sep 2020",             "expression": "request.time <
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
+  **YAML Example**      bindings:     - members:       - user:mike@example.com
+  - group:admins@example.com       - domain:google.com       - serviceAccount
+  :my-project-id@appspot.gserviceaccount.com       role:
+  roles/resourcemanager.organizationAdmin     - members:       -
+  user:eve@example.com       role: roles/resourcemanager.organizationViewer
+  condition:         title: expirable access         description: Does not
+  grant access after Sep 2020         expression: request.time <
+  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
+  features, see the [IAM developer's
   guide](https://cloud.google.com/iam/docs).
 
   Fields:
-    auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. `bindings` with no
-      members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally may
+      specify a `condition` that determines when binding is in effect.
+      `bindings` with no members will result in an error.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1855,14 +1975,23 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
       policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten blindly.
-    version: Deprecated.
+      the existing policy is overwritten. Due to blind-set semantics of an
+      etag-less policy, 'setIamPolicy' will not fail even if either of
+      incoming or stored policy does not meet the version requirements.
+    version: Specifies the format of the policy.  Valid values are 0, 1, and
+      3. Requests specifying an invalid value will be rejected.  Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.  If no etag is provided in the call to
+      `setIamPolicy`, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
-  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
-  bindings = _messages.MessageField('Binding', 2, repeated=True)
-  etag = _messages.BytesField(3)
-  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  bindings = _messages.MessageField('Binding', 1, repeated=True)
+  etag = _messages.BytesField(2)
+  version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class ProjectRepoId(_messages.Message):
@@ -1906,10 +2035,10 @@ class Resource(_messages.Message):
   r"""An entity that can have metadata. For example, a Docker image.
 
   Fields:
-    contentHash: The hash of the resource content. For example, the Docker
-      digest.
-    name: The name of the resource. For example, the name of a Docker image -
-      "Debian".
+    contentHash: Deprecated, do not use. Use uri instead.  The hash of the
+      resource content. For example, the Docker digest.
+    name: Deprecated, do not use. Use uri instead.  The name of the resource.
+      For example, the name of a Docker image - "Debian".
     uri: Required. The unique URI of the resource. For example,
       `https://gcr.io/project/image@sha256:foo` for a Docker image.
   """
@@ -1949,14 +2078,9 @@ class SetIamPolicyRequest(_messages.Message):
       size of the policy is limited to a few 10s of KB. An empty policy is a
       valid policy but certain Cloud Platform services (such as Projects)
       might reject them.
-    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
-      modify. Only the fields in the mask will be modified. If no mask is
-      provided, the following default mask is used: paths: "bindings, etag"
-      This field is only used by Cloud IAM.
   """
 
   policy = _messages.MessageField('Policy', 1)
-  updateMask = _messages.StringField(2)
 
 
 class Signature(_messages.Message):
@@ -2180,37 +2304,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -2326,10 +2423,14 @@ class Vulnerability(_messages.Message):
 
   Fields:
     cvssScore: The CVSS score for this vulnerability.
+    cvssV3: The full description of the CVSSv3.
     details: All information about the package to specifically identify this
       vulnerability. One entry per (version range and cpe_uri) the package
       vulnerability has manifested in.
     severity: Note provider assigned impact of the vulnerability.
+    sourceUpdateTime: The time this information was last changed at the
+      source. This is an upstream timestamp from the underlying information
+      source - e.g. Ubuntu security tracker.
     windowsDetails: Windows details get their own format because the
       information format and model don't match a normal detail. Specifically
       Windows updates are done as patches, thus Windows vulnerabilities really
@@ -2356,9 +2457,11 @@ class Vulnerability(_messages.Message):
     CRITICAL = 5
 
   cvssScore = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  details = _messages.MessageField('Detail', 2, repeated=True)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 3)
-  windowsDetails = _messages.MessageField('WindowsDetail', 4, repeated=True)
+  cvssV3 = _messages.MessageField('CVSSv3', 2)
+  details = _messages.MessageField('Detail', 3, repeated=True)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 4)
+  sourceUpdateTime = _messages.StringField(5)
+  windowsDetails = _messages.MessageField('WindowsDetail', 6, repeated=True)
 
 
 class VulnerabilityLocation(_messages.Message):

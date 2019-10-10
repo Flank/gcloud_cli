@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class Route(k8s_object.KubernetesObject):
 
   @property
   def domain(self):
-    return self._m.status.domain
+    return self._m.status.url or self._m.status.domain
 
   @property
   def active_revisions(self):

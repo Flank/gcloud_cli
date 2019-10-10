@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -256,7 +256,7 @@ def GetAutoRepair(args):
   # default. Other node pools using (Ubuntu, custom images) don't support
   # node auto repairs, attempting to enable autorepair for them will result
   # in API call failing so don't do it.
-  return (args.image_type or '').lower() in ['', 'cos']
+  return (args.image_type or '').lower() in ['', 'cos', 'cos_containerd']
 
 
 def ParseUpdateOptionsBase(args, locations):
@@ -273,11 +273,14 @@ def ParseUpdateOptionsBase(args, locations):
   return api_adapter.UpdateClusterOptions(
       monitoring_service=args.monitoring_service,
       logging_service=args.logging_service,
+      enable_stackdriver_kubernetes=args.enable_stackdriver_kubernetes,
       disable_addons=args.disable_addons,
       enable_autoscaling=args.enable_autoscaling,
+      enable_binauthz=args.enable_binauthz,
       min_nodes=args.min_nodes,
       max_nodes=args.max_nodes,
       node_pool=args.node_pool,
       locations=locations,
       enable_master_authorized_networks=args.enable_master_authorized_networks,
-      master_authorized_networks=args.master_authorized_networks)
+      master_authorized_networks=args.master_authorized_networks,
+      enable_vertical_pod_autoscaling=args.enable_vertical_pod_autoscaling)

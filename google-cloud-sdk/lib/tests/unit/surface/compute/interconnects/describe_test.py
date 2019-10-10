@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,11 +77,11 @@ class InterconnectsDescribeGATest(test_base.BaseTest):
     self.assertEqual(result.requestedLinkCount, 5)
     self.assertEqual(
         result.selfLink,
-        'https://www.googleapis.com/compute/v1/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnects/my-interconnect1')
     self.assertEqual(
         result.location,
-        'https://www.googleapis.com/compute/v1/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnectLocations/my-location')
 
   def testDescribeWithUri(self):
@@ -100,7 +100,7 @@ class InterconnectsDescribeGATest(test_base.BaseTest):
         ],
     ])
     result = self.Run(
-        'compute interconnects describe https://www.googleapis.com/compute/'
+        'compute interconnects describe https://compute.googleapis.com/compute/'
         'v1/projects/my-project/global/interconnects/my-interconnect1')
 
     self.CheckRequests(
@@ -114,11 +114,11 @@ class InterconnectsDescribeGATest(test_base.BaseTest):
     self.assertEqual(result.requestedLinkCount, 5)
     self.assertEqual(
         result.selfLink,
-        'https://www.googleapis.com/compute/v1/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnects/my-interconnect1')
     self.assertEqual(
         result.location,
-        'https://www.googleapis.com/compute/v1/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnectLocations/my-location')
 
 
@@ -174,11 +174,11 @@ class InterconnectsDescribeBetaTest(test_base.BaseTest):
     self.assertEqual(result.requestedLinkCount, 5)
     self.assertEqual(
         result.selfLink,
-        'https://www.googleapis.com/compute/beta/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnects/my-interconnect1')
     self.assertEqual(
         result.location,
-        'https://www.googleapis.com/compute/beta/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnectLocations/my-location')
 
   def testDescribeWithUri(self):
@@ -197,7 +197,7 @@ class InterconnectsDescribeBetaTest(test_base.BaseTest):
         ],
     ])
     result = self.Run(
-        'compute interconnects describe https://www.googleapis.com/compute/'
+        'compute interconnects describe https://compute.googleapis.com/compute/'
         'beta/projects/my-project/global/interconnects/my-interconnect1')
 
     self.CheckRequests(
@@ -211,11 +211,11 @@ class InterconnectsDescribeBetaTest(test_base.BaseTest):
     self.assertEqual(result.requestedLinkCount, 5)
     self.assertEqual(
         result.selfLink,
-        'https://www.googleapis.com/compute/beta/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnects/my-interconnect1')
     self.assertEqual(
         result.location,
-        'https://www.googleapis.com/compute/beta/projects/my-project/global/'
+        'https://compute.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnectLocations/my-location')
 
 

@@ -56,7 +56,7 @@ SDK_ROOT = os.path.dirname(BIN_DIR)
 
 
 def DisallowPython3():
-  if not platforms.PythonVersion().IsCompatible(allow_py3=False):
+  if not platforms.PythonVersion().IsCompatible():
     sys.exit(1)
 
 
@@ -76,8 +76,19 @@ def ExecutePythonTool(tool_dir, exec_name, *args):
     exec_name: additional path to the executable under the tool_dir
     *args: args for the command
   """
+  py_path = None  # Let execution_utils resolve the path.
+  # Gsutil allows users to set the desired Python interpreter using a separate
+  # environment variable, so as to allow users to run gsutil using Python 3
+  # without forcing the rest of the Cloud SDK to use Python 3 (as it would
+  # likely break at the time this comment was written).
+  if exec_name == 'gsutil':
+    gsutil_py = encoding.GetEncodedValue(os.environ, 'CLOUDSDK_GSUTIL_PYTHON')
+    if gsutil_py:
+      py_path = gsutil_py
+
   _ExecuteTool(
-      execution_utils.ArgsForPythonTool(_FullPath(tool_dir, exec_name), *args))
+      execution_utils.ArgsForPythonTool(
+          _FullPath(tool_dir, exec_name), *args, python=py_path))
 
 
 def ExecuteJarTool(java_bin, jar_dir, jar_name, classname, flags=None, *args):

@@ -5,11 +5,20 @@ NAME
 SYNOPSIS
     gcloud alpha ml speech recognize AUDIO --language-code=LANGUAGE_CODE
         [--additional-language-codes=[LANGUAGE_CODE,...]]
+        [--enable-automatic-punctuation]
         [--encoding=ENCODING; default="encoding-unspecified"]
         [--filter-profanity] [--hints=[HINTS,...]] [--include-word-confidence]
         [--include-word-time-offsets]
         [--max-alternatives=MAX_ALTERNATIVES; default=1]
         [--sample-rate=SAMPLE_RATE]
+        [--audio-channel-count=AUDIO_CHANNEL_COUNT
+          --separate-channel-recognition]
+        [--audio-topic=AUDIO_TOPIC --interaction-type=INTERACTION_TYPE
+          --microphone-distance=MICROPHONE_DISTANCE --naics-code=NAICS_CODE
+          --original-media-type=ORIGINAL_MEDIA_TYPE
+          --original-mime-type=ORIGINAL_MIME_TYPE
+          --recording-device-name=RECORDING_DEVICE_NAME
+          --recording-device-type=RECORDING_DEVICE_TYPE]
         [--enable-speaker-diarization
           : --diarization-speaker-count=DIARIZATION_SPEAKER_COUNT]
         [GCLOUD_WIDE_FLAG ...]
@@ -42,6 +51,9 @@ OPTIONAL FLAGS
         If alternative languages are listed, recognition result will contain
         recognition in the most likely language detected including the main
         language-code.
+
+     --enable-automatic-punctuation
+        Adds punctuation to recognition result hypotheses.
 
      --encoding=ENCODING; default="encoding-unspecified"
         The type of encoding of the file. Required if the file format is not
@@ -81,6 +93,96 @@ OPTIONAL FLAGS
         the audio source to 16000 Hz. If that's not possible, use the native
         sample rate of the audio source (instead of re-sampling).
 
+     Audio channel settings.
+
+       --audio-channel-count=AUDIO_CHANNEL_COUNT
+          The number of channels in the input audio data. Set this for
+          separate-channel-recognition. Valid values are: 1)LINEAR16 and FLAC
+          are 1-8 2)OGG_OPUS are 1-254 3) MULAW, AMR, AMR_WB and
+          SPEEX_WITH_HEADER_BYTE is only 1. This flag must be specified if any
+          of the other arguments in this group are specified.
+
+       --separate-channel-recognition
+          Recognition result will contain a channel_tag field to state which
+          channel that result belongs to. If this is not true, only the first
+          channel will be recognized. This flag must be specified if any of the
+          other arguments in this group are specified.
+
+     Description of audio data to be recognized.
+
+       --audio-topic=AUDIO_TOPIC
+          Description of the content, e.g. "Recordings of federal supreme court
+          hearings from 2012".
+
+       --interaction-type=INTERACTION_TYPE
+          Determining the interaction type in the conversation.
+          INTERACTION_TYPE must be one of:
+
+           dictation
+              Transcribe speech to text to create a written document, such as a
+              text-message, email or report.
+           discussion
+              Multiple people in a conversation or discussion.
+           phone-call
+              A phone-call or video-conference in which two or more people, who
+              are not in the same room, are actively participating.
+           professionally-produced
+              Professionally produced audio (eg. TV Show, Podcast).
+           voice-command
+              Transcribe voice commands, such as for controlling a device.
+           voice-search
+              Transcribe spoken questions and queries into text.
+           voicemail
+              A recorded message intended for another person to listen to.
+
+       --microphone-distance=MICROPHONE_DISTANCE
+          The distance at which the audio device is placed to record the
+          conversation. MICROPHONE_DISTANCE must be one of:
+
+           farfield
+              The speaker is more than 3 meters away from the microphone.
+           midfield
+              The speaker is within 3 meters of the microphone.
+           nearfield
+              The speaker is within 1 meter of the microphone.
+
+       --naics-code=NAICS_CODE
+          The industry vertical to which this speech recognition request most
+          closely applies.
+
+       --original-media-type=ORIGINAL_MEDIA_TYPE
+          The media type of the original audio conversation.
+          ORIGINAL_MEDIA_TYPE must be one of:
+
+           audio
+              The speech data is an audio recording.
+           video
+              The speech data originally recorded on a video.
+
+       --original-mime-type=ORIGINAL_MIME_TYPE
+          Mime type of the original audio file. Examples: audio/m4a, audio/mp3.
+
+       --recording-device-name=RECORDING_DEVICE_NAME
+          The device used to make the recording. Examples: Nexus 5X, Polycom
+          SoundStation IP 6000
+
+       --recording-device-type=RECORDING_DEVICE_TYPE
+          The device type through which the original audio was recorded on.
+          RECORDING_DEVICE_TYPE must be one of:
+
+           indoor
+              Speech was recorded indoors.
+           outdoor
+              Speech was recorded outdoors.
+           pc
+              Speech was recorded using a personal computer or tablet.
+           phone-line
+              Speech was recorded over a phone line.
+           smartphone
+              Speech was recorded on a smartphone.
+           vehicle
+              Speech was recorded in a vehicle.
+
      --enable-speaker-diarization
         Enable speaker detection for each recognized word in the top
         alternative of the recognition result using an integer speaker_tag
@@ -104,9 +206,8 @@ API REFERENCE
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud ml speech recognize
         $ gcloud beta ml speech recognize

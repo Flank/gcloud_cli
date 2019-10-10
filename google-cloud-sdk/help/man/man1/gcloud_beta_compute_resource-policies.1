@@ -11,7 +11,7 @@ gcloud beta compute resource\-policies \- manage Google Compute Engine Resource 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute resource\-policies\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute resource\-policies\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,6 +31,19 @@ help\fR for details.
 
 
 
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Create Google Compute Engine Resource Policies.
+
+
+.RE
+.sp
+
 .SH "COMMANDS"
 
 \f5\fICOMMAND\fR\fR is one of the following:
@@ -38,7 +51,8 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\-snapshot\-schedule\fR
-\fB(BETA)\fR Create a Google Compute Engine Snapshot Schedule Resource Policy.
+\fB(BETA)\fR \fB(DEPRECATED)\fR Create a Google Compute Engine Snapshot Schedule
+Resource Policy.
 
 .TP 2m
 \fBdelete\fR
@@ -58,10 +72,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute resource\-policies
 $ gcloud alpha compute resource\-policies
 .RE
 

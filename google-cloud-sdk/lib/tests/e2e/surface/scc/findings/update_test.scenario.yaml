@@ -4,13 +4,13 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      scc findings update "gcloudcsccfinding2" --organization 345840165995 --source 2948230327750090626 --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt" --event-time "2018-01-12T07:03:00Z" --state=ACTIVE --source-properties "pKey1=pVal1,pKey2=pVal2"
+      scc findings update "gcloudcsccfinding2" --organization 345840165995 --source 2948230327750090626 --event-time "2019-06-12T07:03:00Z" --state=ACTIVE --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt"
   - stderr: |
       Updated finding [gcloudcsccfinding2].
   - stdout: |
       category: CAT3
       createTime: '2019-03-12T23:45:08.062Z'
-      eventTime: '2018-01-12T07:03:00Z'
+      eventTime: '2019-06-12T07:03:00Z'
       externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
       name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
       parent: organizations/345840165995/sources/2948230327750090626
@@ -25,20 +25,17 @@ actions:
 - execute_command:
     # Selectively update some attributes/properties.
     command: |
-      scc findings update "gcloudcsccfinding2" --organization 345840165995 --source 2948230327750090626 --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt" --event-time "2018-01-12T07:03:00Z" --state=ACTIVE --source-properties "pKey1=pVal1,pKey2=pVal2"
+      scc findings update "gcloudcsccfinding2" --organization 345840165995 --source 2948230327750090626 --event-time "2019-06-12T07:03:00Z" --state=ACTIVE --external-uri "ftp://ftp.is.co.za/rfc/rfc1808.txt"
     events:
     - api_call:
         expect_request:
-          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2?alt=json&updateMask=eventTime%2CexternalUri%2CsourceProperties%2Cstate
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2?alt=json&updateMask=eventTime%2CexternalUri%2Cstate
           method: PATCH
           headers: {}
           body:
             json:
-              eventTime: '2018-01-12T07:03:00Z'
+              eventTime: '2019-06-12T07:03:00Z'
               externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
-              sourceProperties:
-                pKey1: pVal1
-                pKey2: pVal2
               state: ACTIVE
         return_response:
           headers:
@@ -58,14 +55,14 @@ actions:
               pKey2: pVal2
             securityMarks:
               name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
-            eventTime: '2018-01-12T07:03:00Z'
+            eventTime: '2019-06-12T07:03:00Z'
             createTime: '2019-03-12T23:45:08.062Z'
     - expect_stderr: |
         Updated finding [gcloudcsccfinding2].
     - expect_stdout: |
         category: CAT3
         createTime: '2019-03-12T23:45:08.062Z'
-        eventTime: '2018-01-12T07:03:00Z'
+        eventTime: '2019-06-12T07:03:00Z'
         externalUri: ftp://ftp.is.co.za/rfc/rfc1808.txt
         name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
         parent: organizations/345840165995/sources/2948230327750090626

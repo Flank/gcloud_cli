@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,17 +44,17 @@ class UnmanagedInstanceGroupsInstancesRemoveTest(test_base.BaseTest):
               instanceGroupsRemoveInstancesRequest=(
                   self.messages.InstanceGroupsRemoveInstancesRequest(instances=[
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-1'.format(
                                         API_VERSION))),
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-2'.format(
                                         API_VERSION))),
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-3'.format(
                                         API_VERSION)))])),
@@ -64,9 +64,9 @@ class UnmanagedInstanceGroupsInstancesRemoveTest(test_base.BaseTest):
   def testRemoveInstancesToInstanceGroupByUri(self):
     self.Run("""
         compute instance-groups unmanaged remove-instances
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
           --instances
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1,https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2,https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1,https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-2,https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
         """.format(API_VERSION))
 
     self.CheckRequests(
@@ -77,17 +77,17 @@ class UnmanagedInstanceGroupsInstancesRemoveTest(test_base.BaseTest):
               instanceGroupsRemoveInstancesRequest=(
                   self.messages.InstanceGroupsRemoveInstancesRequest(instances=[
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-1'.format(
                                         API_VERSION))),
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-2'.format(
                                         API_VERSION))),
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-3'.format(
                                         API_VERSION)))])),
@@ -121,17 +121,17 @@ class UnmanagedInstanceGroupsInstancesRemoveTest(test_base.BaseTest):
               instanceGroupsRemoveInstancesRequest=(
                   self.messages.InstanceGroupsRemoveInstancesRequest(instances=[
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-1'.format(
                                         API_VERSION))),
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-2'.format(
                                         API_VERSION))),
                       self.messages.InstanceReference(
-                          instance=('https://www.googleapis.com/compute/'
+                          instance=('https://compute.googleapis.com/compute/'
                                     '{0}/projects/my-project/'
                                     'zones/central2-a/instances/inst-3'.format(
                                         API_VERSION)))])),
@@ -142,12 +142,12 @@ class UnmanagedInstanceGroupsInstancesRemoveTest(test_base.BaseTest):
     with self.AssertRaisesToolExceptionRegexp(
         'The zone of instance must match the instance group zone. '
         'Following instances has invalid zone: '
-        'https://www.googleapis.com/compute/{0}/projects/my-project/zones/'
+        'https://compute.googleapis.com/compute/{0}/projects/my-project/zones/'
         'central1-a/instances/inst-2'.format(API_VERSION)):
       self.Run("""
           compute instance-groups unmanaged remove-instances
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
-            --instances https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1,https://www.googleapis.com/compute/{0}/projects/my-project/zones/central1-a/instances/inst-2,https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instanceGroups/group-1
+            --instances https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-1,https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central1-a/instances/inst-2,https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/inst-3
           """.format(API_VERSION))
 
 

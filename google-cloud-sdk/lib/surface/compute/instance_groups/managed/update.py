@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -237,7 +237,6 @@ class UpdateAlpha(UpdateBeta):
         update_disk.get('device-name'): update_disk
         for update_disk in update_disks
     }
-    preserved_disks = []
     additional_properties = []
     if current_stateful_policy and current_stateful_policy.preservedState \
         and current_stateful_policy.preservedState.disks:
@@ -250,20 +249,12 @@ class UpdateAlpha(UpdateBeta):
         continue
       if disk_entry.key not in update_map:
         additional_properties.append(disk_entry)
-        preserved_disks.append(
-            client.messages.StatefulPolicyPreservedDisk(
-                deviceName=disk_entry.key))
-    for device_name, stateful_disk in six.iteritems(update_map):
+    for _, stateful_disk in six.iteritems(update_map):
       additional_properties.append(
           self._MakePreservedStateDiskEntry(client, stateful_disk))
-      preserved_disks.append(
-          client.messages.StatefulPolicyPreservedDisk(deviceName=device_name))
     additional_properties.sort(key=lambda x: x.key)
-    preserved_disks.sort(key=lambda x: x.deviceName)
-    if preserved_disks:
+    if additional_properties:
       return client.messages.StatefulPolicy(
-          preservedResources=client.messages.StatefulPolicyPreservedResources(
-              disks=preserved_disks),
           preservedState=client.messages.StatefulPolicyPreservedState(
               disks=client.messages.StatefulPolicyPreservedState.DisksValue(
                   additionalProperties=additional_properties)))
@@ -288,13 +279,11 @@ class UpdateAlpha(UpdateBeta):
     return client.MakeRequests([(service, 'Update', request)])
 
   def _StatefulArgsSet(self, args):
-    return (args.IsSpecified('stateful_names') or
-            args.IsSpecified('update_stateful_disk') or
+    return (args.IsSpecified('update_stateful_disk') or
             args.IsSpecified('remove_stateful_disks'))
 
   def _StatefulnessIntroduced(self, args):
-    return (args.IsSpecified('stateful_names') or
-            args.IsSpecified('update_stateful_disk'))
+    return args.IsSpecified('update_stateful_disk')
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -341,10 +330,7 @@ class UpdateAlpha(UpdateBeta):
 
     if not device_names:
       # TODO(b/70314588): Use Patch instead of manual Update.
-      if args.IsSpecified(
-          'stateful_names') and not args.GetValue('stateful_names'):
-        igm_resource.reset('statefulPolicy')
-      elif igm_resource.statefulPolicy or args.GetValue('stateful_names'):
+      if igm_resource.statefulPolicy:
         igm_resource.statefulPolicy = self._UpdateStatefulPolicy(
             client, igm_resource.statefulPolicy, args.update_stateful_disk,
             args.remove_stateful_disks)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -279,7 +279,7 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
             .AutoDeleteValueValuesEnum.NEVER,
         'on-permanent-instance-deletion':
             self.messages.StatefulPolicyPreservedStateDiskDevice
-            .AutoDeleteValueValuesEnum.WHEN_NOT_IN_USE
+            .AutoDeleteValueValuesEnum.ON_PERMANENT_INSTANCE_DELETION
     }
     return self.messages.StatefulPolicyPreservedState \
         .DisksValue.AdditionalProperty(
@@ -292,23 +292,15 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
         )
 
   def _getStatefulPolicyWithDisks(self, disks=None):
-    preserved_resources = None
     preserved_state = None
     if disks:
-      preserved_resources = self.messages.StatefulPolicyPreservedResources(
-          disks=[
-              self.messages.StatefulPolicyPreservedDisk(
-                  deviceName=stateful_disk['device-name'])
-              for stateful_disk in disks
-          ])
       preserved_state = self.messages.StatefulPolicyPreservedState(
           disks=self.messages.StatefulPolicyPreservedState.DisksValue(
               additionalProperties=[
                   self._MakePreservedStateDisksMapEntry(stateful_disk)
                   for stateful_disk in disks
               ]))
-    return self.messages.StatefulPolicy(
-        preservedResources=preserved_resources, preservedState=preserved_state)
+    return self.messages.StatefulPolicy(preservedState=preserved_state)
 
   def _checkGetAndUpdateRequests(self,
                                  with_empty_stateful_policy=False,
@@ -494,30 +486,16 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
             --remove-stateful-disks disk-1
           """.format(*self.scope_params))
 
-  def testUpdateNoStatefulNamesNoStatefulPolicy_createsUpdateRequest(self):
+  def testUpdateNoStatefulPolicy_createsUpdateRequest(self):
     # TODO(b/70314588): Fix this test to expect Patch instead of Update.
     self._setInitialIgm()
 
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --no-stateful-names
         """.format(*self.scope_params))
 
-    self._checkGetAndUpdateRequests()
-
-  def testUpdateRemoveAndNoStatefulNames_createsUpdateRequest(self):
-    # TODO(b/70314588): Fix this test to expect Patch instead of Update.
-    self._setInitialIgmWithStatefulPolicy('disk-1')
-
-    self.Run("""
-        compute instance-groups managed update group-1
-          --{} {}
-          --remove-stateful-disks disk-1
-          --no-stateful-names
-        """.format(*self.scope_params))
-
-    self._checkGetAndUpdateRequests()
+    self._checkGetAndPatchRequests()
 
   def testUpdateRemoveAllStatefulDisksFromStatefulPolicy_createsUpdateRequest(
       self):
@@ -531,42 +509,6 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
         """.format(*self.scope_params))
 
     self._checkGetAndUpdateRequests(with_empty_stateful_policy=True)
-
-  def testUpdateNoStatefulNamesWithStatefulPolicy_throws(self):
-    self._setInitialIgmWithStatefulPolicy('disk-1')
-
-    with self.AssertRaisesExceptionMatches(
-        calliope_exceptions.InvalidArgumentException,
-        'Stateful Policy is not empty, so you cannot mark instance names as '
-        'non-stateful'):
-      self.Run("""
-          compute instance-groups managed update group-1
-            --{} {}
-            --no-stateful-names
-          """.format(*self.scope_params))
-
-  def testUpdateStatefulNamesWithoutStatefulPolicy_setsNames(self):
-    self._setInitialIgm()
-
-    self.Run("""
-        compute instance-groups managed update group-1
-          --{} {}
-          --stateful-names
-        """.format(*self.scope_params))
-
-    self._checkGetAndUpdateRequests(with_empty_stateful_policy=True)
-
-  def testUpdateStatefulNamesWithStatefulPolicy_preservesPolicy(self):
-    self._setInitialIgmWithStatefulPolicy('disk-1')
-
-    self.Run("""
-        compute instance-groups managed update group-1
-          --{} {}
-          --stateful-names
-        """.format(*self.scope_params))
-
-    self._checkGetAndPatchRequests(
-        disks=[self._createStatefulDiskDict('disk-1')])
 
   def testUpdateWithHealthCheckAndStatefulDisk(self):
     self._setInitialIgm()
@@ -597,9 +539,8 @@ class InstanceGroupManagersUpdateZonalTestAlpha(
         compute instance-groups managed update group-1
         --{} {}
         --health-check health-check-2
-        --no-stateful-names
         """.format(*self.scope_params))
-    self._checkGetAndUpdateRequests(
+    self._checkGetAndPatchRequests(
         health_check=health_check_uri2, initial_delay=120)
 
 
@@ -855,12 +796,10 @@ class InstanceGroupManagersUpdateRegionalTestAlpha(
     self.Run("""
         compute instance-groups managed update group-1
           --{} {}
-          --no-stateful-names
           --instance-redistribution-type none
         """.format(*self.scope_params))
 
-    self._checkGetAndUpdateRequests(
-        with_empty_stateful_policy=False,
+    self._checkGetAndPatchRequests(
         update_policy=self.messages.InstanceGroupManagerUpdatePolicy(
             instanceRedistributionType=self.messages.
             InstanceGroupManagerUpdatePolicy.

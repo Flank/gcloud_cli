@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_ALPHA_BUILD\-ARTIFACTS_REPOSITORIES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha build\-artifacts repositories delete \- delete a Cloud Build Artifacts repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha build\-artifacts repositories delete\fR \fIREPOSITORY\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Delete a Cloud Build Artifacts repository. Before you delete a
+repository, ensure that any active dependencies on this repository are adjusted
+to use a new location.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The specified repository does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to delete repositories.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Repository resource \- The Cloud Build Artifacts repository to delete. This
+represents a Cloud resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [repository] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREPOSITORY\fR
+ID of the repository or fully qualified identifier for the repository.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbuildartifacts/v1alpha2\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/build\-artifacts
+
+
+
+.SH "EXAMPLES"
+
+To delete repository named \f5my\-repo\fR under the current project, run:
+
+.RS 2m
+$ gcloud alpha build\-artifacts repositories delete my\-repo
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

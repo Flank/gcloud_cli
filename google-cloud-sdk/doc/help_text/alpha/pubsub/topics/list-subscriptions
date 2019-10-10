@@ -62,25 +62,24 @@ EXAMPLES
     To filter results by subscription name (ie. only show subscription
     'mysubs'), run:
 
-        $ gcloud alpha pubsub topics list-subscriptions --topic mytopic \
+        $ gcloud alpha pubsub topics list-subscriptions mytopic \
             --filter=subscriptionId:mysubs
 
     To combine multiple filters (with AND or OR), run:
 
-        $ gcloud alpha pubsub topics list-subscriptions --topic mytopic \
+        $ gcloud alpha pubsub topics list-subscriptions mytopic \
             --filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
 
     To filter subscriptions that match an expression:
 
-        $ gcloud alpha pubsub topics list-subscriptions --topic mytopic \
+        $ gcloud alpha pubsub topics list-subscriptions mytopic \
             --filter="subscriptionId:subs_*"
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud pubsub topics list-subscriptions
         $ gcloud beta pubsub topics list-subscriptions

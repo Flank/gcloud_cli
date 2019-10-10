@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class PerimetersDeleteTestGA(accesscontextmanager.Base):
@@ -49,35 +50,40 @@ class PerimetersDeleteTestGA(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
-      self.Run('access-context-manager perimeters delete --policy my_policy')
+      self.Run('access-context-manager perimeters delete --policy 123')
 
   def testDelete_Prompt(self):
     self.SetUpForTrack(self.track)
     with self.assertRaises(console_io.UnattendedPromptError):
-      self.Run(
-          'access-context-manager perimeters delete my_perimeter '
-          '--policy my_policy'
-      )
+      self.Run('access-context-manager perimeters delete my_perimeter '
+               '--policy 123')
 
   def testDelete(self):
     self.SetUpForTrack(self.track)
-    self._ExpectDelete('my_perimeter', 'my_policy')
+    self._ExpectDelete('my_perimeter', '123')
 
-    self.Run(
-        'access-context-manager perimeters delete my_perimeter --policy '
-        'my_policy --quiet')
+    self.Run('access-context-manager perimeters delete my_perimeter --policy '
+             '123 --quiet')
 
     self.AssertOutputEquals('')
 
   def testDelete_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
-    policy = 'my_acm_policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectDelete('my_perimeter', policy)
 
     self.Run('access-context-manager perimeters delete my_perimeter --quiet')
 
     self.AssertOutputEquals('')
+
+  def testDelete_InvalidPolicyArg(self):
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager perimeters delete MY_PERIMETER '
+               '    --policy accessPolicies/123'
+               '    --quiet')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class PerimetersDeleteTestBeta(PerimetersDeleteTestGA):

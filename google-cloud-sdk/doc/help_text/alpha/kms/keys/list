@@ -11,10 +11,10 @@ DESCRIPTION
 
 FLAGS
      --keyring=KEYRING
-        Key ring of the resource.
+        Key ring of the key.
 
      --location=LOCATION
-        Location of the resource.
+        Location of the key.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -56,14 +56,13 @@ EXAMPLES
     The following command lists all keys within the keyring fellowship and
     location global:
 
-        $ gcloud alpha kms keys list --keyring fellowship --location global
+        $ gcloud alpha kms keys list --keyring=fellowship --location=global
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud kms keys list
         $ gcloud beta kms keys list

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,12 +22,9 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.services import enable_api as services_enable_api
-from googlecloudsdk.api_lib.services import services_util
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.projects import util as command_lib_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import resources
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -58,12 +55,8 @@ class EnablementTest(e2e_base.WithServiceAuth):
     operations.WaitForOperation(create_op)
 
     log.debug('Enabling cloudapis.googleapis.com')
-    services_client = apis.GetClientInstance('servicemanagement', 'v1')
-    enable_operation = services_enable_api.EnableServiceApiCall(
-        self.project_ref.Name(), 'cloudapis.googleapis.com')
-    enable_operation_ref = resources.REGISTRY.Parse(
-        enable_operation.name, collection='servicemanagement.operations')
-    services_util.WaitForOperation(enable_operation_ref, services_client)
+    services_enable_api.EnableService(self.project_ref.Name(),
+                                      'cloudapis.googleapis.com')
 
     self.Run('services enable cloudbilling')
     self.Run(('alpha billing accounts projects link {project} '

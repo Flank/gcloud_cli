@@ -43,7 +43,9 @@ OPTIONAL FLAGS
 
      --forwarding-targets=[IP_ADDRESSES,...]
         List of IPv4 addresses of target name servers that the zone will
-        forward queries to. Ignored for public visibility.
+        forward queries to. Ignored for public visibility. Non-RFC1918
+        addresses will forward to the target through the Internet. RFC1918
+        addresses will forward through the VPC.
 
      --ksk-algorithm=KSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the key-signing key.
@@ -80,11 +82,11 @@ OPTIONAL FLAGS
         Length of the zone-signing key in bits. Requires DNSSEC enabled.
 
      --target-network=TARGET_NETWORK
-        The network id of the Google Compute Engine private network to forward
+        Network ID of the Google Compute Engine private network to forward
         queries to.
 
      --target-project=TARGET_PROJECT
-        The project id of the Google Compute Engine private network to forward
+        Project ID of the Google Compute Engine private network to forward
         queries to.
 
 GCLOUD WIDE FLAGS
@@ -108,8 +110,9 @@ EXAMPLES
             --dnssec-state=on
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns managed-zones create
+        $ gcloud alpha dns managed-zones create
 

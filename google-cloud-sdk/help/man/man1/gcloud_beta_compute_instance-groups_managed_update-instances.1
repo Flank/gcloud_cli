@@ -1,0 +1,178 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCE\-GROUPS_MANAGED_UPDATE\-INSTANCES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instance\-groups managed update\-instances \- immediately update selected instances in a Google Compute Engine managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instance\-groups managed update\-instances\fR \fINAME\fR \fB\-\-instances\fR=\fIINSTANCE\fR,[\fIINSTANCE\fR,...] [\fB\-\-minimal\-action\fR=\fIMINIMAL_ACTION\fR;\ default="none"] [\fB\-\-most\-disruptive\-allowed\-action\fR=\fIMOST_DISRUPTIVE_ALLOWED_ACTION\fR;\ default="replace"] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR When using a managed instance group, it's possible that your
+intended specification for a VM is different from the current state of that VM.
+For example, this can happen due to changes to the group's target instance
+template. This command enables you to initiate the update process on the given
+set of instances instantly, thus when your Managed Instance Group is stable you
+can be sure that all the changes were applied.
+
+\fBgcloud beta compute instance\-groups managed update\-instances\fR allows you
+to specify the least and the most disruptive actions that can be performed while
+updating the instances. This way you can reduce the risk of rolling out too many
+changes at once. Possible actions are: \f5none\fR, \f5refresh\fR, \f5restart\fR
+and \f5replace\fR. The order of disruption to the instance is: \f5none\fR <
+\f5refresh\fR < \f5restart\fR < \f5replace\fR.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instances\fR=\fIINSTANCE\fR,[\fIINSTANCE\fR,...]
+Names of instances to update.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-minimal\-action\fR=\fIMINIMAL_ACTION\fR; default="none"
+Perform at least this action on each instance while updating.
+\fIMINIMAL_ACTION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBnone\fR
+No action
+.TP 2m
+\fBrefresh\fR
+Apply properties that are possible to apply without stopping the instance
+.TP 2m
+\fBreplace\fR
+Delete the instance and create it again
+.TP 2m
+\fBrestart\fR
+Stop the instance and start it again
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-most\-disruptive\-allowed\-action\fR=\fIMOST_DISRUPTIVE_ALLOWED_ACTION\fR; default="replace"
+Perform at most this action on each instance while updating. If the update
+requires a more disruptive action than the one specified here, then the update
+will fail and no changes will be made. \fIMOST_DISRUPTIVE_ALLOWED_ACTION\fR must
+be one of:
+
+.RS 2m
+.TP 2m
+\fBnone\fR
+No action
+.TP 2m
+\fBrefresh\fR
+Apply properties that are possible to apply without stopping the instance
+.TP 2m
+\fBreplace\fR
+Delete the instance and create it again
+.TP 2m
+\fBrestart\fR
+Stop the instance and start it again
+.RE
+.sp
+
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to operate on. If not specified, you may be
+prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to operate on. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update instances \f5instance\-1\fR, \f5instance\-2\fR in \f5my\-group\fR,
+with \f5minimal\-action\fR none and \f5most\-disruptive\-allowed\-action\fR
+equal to \f5restart\fR, run:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed update\-instances \e
+      my\-group \-\-instances=instance\-1,instance2 \e
+      \-\-minimal\-action=none
+      \-\-most\-disruptive\-allowed\-action=restart
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed update\-instances
+.RE
+

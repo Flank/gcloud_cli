@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,10 +24,18 @@ from tests.lib import test_case
 from tests.lib.surface.compute import disks_test_base as test_base
 
 
-class DisksAddResourcePoliciesBetaTest(test_base.TestBase):
+class DisksAddResourcePoliciesTest(test_base.TestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def _MakeResourcePolicies(self, policy_names):
+    resource_policies = []
+    for name in policy_names:
+      resource_policies.append(
+          self.compute_uri + '/projects/{0}/regions/{1}/resourcePolicies/{2}'
+          .format(self.Project(), self.region, name))
+    return resource_policies
 
   def _CheckAddRequest(self, policy_names):
     add_request = self.messages.ComputeDisksAddResourcePoliciesRequest(
@@ -36,11 +44,7 @@ class DisksAddResourcePoliciesBetaTest(test_base.TestBase):
         zone=self.zone,
         disksAddResourcePoliciesRequest=
         self.messages.DisksAddResourcePoliciesRequest(
-            resourcePolicies=[
-                self.compute_uri + '/projects/{0}/regions/{1}/'
-                'resourcePolicies/{2}'.format(
-                    self.Project(), self.region, name)
-                for name in policy_names]))
+            resourcePolicies=self._MakeResourcePolicies(policy_names)))
     self.CheckRequests(
         [(self.compute.disks, 'AddResourcePolicies', add_request)],)
 
@@ -51,11 +55,7 @@ class DisksAddResourcePoliciesBetaTest(test_base.TestBase):
         region=self.region,
         regionDisksAddResourcePoliciesRequest=
         self.messages.RegionDisksAddResourcePoliciesRequest(
-            resourcePolicies=[
-                self.compute_uri + '/projects/{0}/regions/{1}/'
-                'resourcePolicies/{2}'.format(
-                    self.Project(), self.region, name)
-                for name in policy_names]))
+            resourcePolicies=self._MakeResourcePolicies(policy_names)))
     self.CheckRequests(
         [(self.compute.regionDisks, 'AddResourcePolicies', add_request)],)
 
@@ -99,6 +99,12 @@ class DisksAddResourcePoliciesBetaTest(test_base.TestBase):
              .format(disk=self.disk_name,
                      region=self.region))
     self._CheckRegionalAddRequest(['pol1'])
+
+
+class DisksAddResourcePoliciesBetaTest(DisksAddResourcePoliciesTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class DisksAddResourcePoliciesAlphaTest(DisksAddResourcePoliciesBetaTest):

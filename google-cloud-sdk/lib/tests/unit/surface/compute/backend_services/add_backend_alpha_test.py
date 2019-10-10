@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# TODO(b/140557440) Break up file to prevent linter deadline.
+
 """Tests for the backend services add-backend subcommand."""
 
 from __future__ import absolute_import
@@ -96,7 +99,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -112,11 +115,11 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'alpha/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'alpha/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
@@ -148,15 +151,15 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-1')),
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-2')),
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-3')),
                   ],
@@ -171,7 +174,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'alpha/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -232,7 +235,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           description='Hello, world!',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -288,7 +291,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxUtilization=1.0),
@@ -333,7 +336,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._rate,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxRate=100),
@@ -369,7 +372,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
 
     backend = messages.Backend(
         balancingMode=self._rate,
-        group=('https://www.googleapis.com/compute/alpha/projects/my-project/'
+        group=('https://compute.googleapis.com/compute/alpha/projects/my-project/'
                'zones/us-central1-a/{}/my-group'.format(resource_type)))
     if rate_flag_suffix == 'instance':
       backend.maxRatePerInstance = 0.9
@@ -401,7 +404,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'alpha/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -413,7 +416,8 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--network-endpoint-group-zone]) must be specified.'):
+        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --balancing-mode RATE
@@ -430,7 +434,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'alpha/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -489,7 +493,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._connection,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxConnections=100),
@@ -523,7 +527,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
 
     backend = messages.Backend(
         balancingMode=self._connection,
-        group=('https://www.googleapis.com/compute/alpha/projects/my-project/'
+        group=('https://compute.googleapis.com/compute/alpha/projects/my-project/'
                'zones/us-central1-a/{}/my-group'.format(resource_type)))
     if rate_flag_suffix == 'instance':
       backend.maxConnectionsPerInstance = 5
@@ -555,7 +559,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
+                    group=('https://compute.googleapis.com/compute/'
                            'alpha/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group')),
             ],
@@ -567,7 +571,8 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--network-endpoint-group-zone]) must be specified.'):
+        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --balancing-mode CONNECTION
@@ -698,7 +703,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxRatePerInstance=0.5,
@@ -744,7 +749,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group'),
                           maxConnections=200),
@@ -811,7 +816,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   backends=[
                       messages.Backend(
                           capacityScaler=0.0,
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -876,7 +881,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
     self.Run("""
         compute backend-services add-backend
           {uri}/projects/my-project/global/backendServices/my-backend-service
-          --instance-group https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/instanceGroups/my-group
+          --instance-group https://compute.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/instanceGroups/my-group
           --global
         """.format(uri=self.compute_uri))
 
@@ -896,7 +901,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -919,7 +924,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
     self.Run("""
         compute backend-services add-backend
           {compute_uri}/projects/google.com:my-project/global/backendServices/my-backend-service
-          --instance-group https://www.googleapis.com/compute/alpha/projects/google.com:my-project/zones/us-central1-a/instanceGroups/my-group
+          --instance-group https://compute.googleapis.com/compute/alpha/projects/google.com:my-project/zones/us-central1-a/instanceGroups/my-group
           --global
         """.format(compute_uri=self.compute_uri))
 
@@ -939,7 +944,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/google.com:my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group')),
                   ],
@@ -1002,7 +1007,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
                   fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-1')),
                   ],
@@ -1047,7 +1052,8 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest,
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of ([--instance-group : --instance-group-region | '
         '--instance-group-zone] | [--network-endpoint-group : '
-        '--network-endpoint-group-zone]) must be specified.'):
+        '--global-network-endpoint-group | --network-endpoint-group-zone]) '
+        'must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --network-endpoint-group my-group
@@ -1380,6 +1386,104 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
                                  '/projects/my-project/regions/'
                                  'us-central2/instanceGroups/my-group')),
                   ],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
+
+
+class BackendServiceAddBackendGlobalNetworkEndpointGroupTest(
+    test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testAddGlobalNetworkEndpointGroup(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.BackendService(
+                name='my-backend-service',
+                fingerprint=b'my-fingerprint',
+                port=80,
+                timeoutSec=120)
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services add-backend my-backend-service
+          --global-network-endpoint-group
+          --network-endpoint-group my-group
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          group=(self.compute_uri +
+                                 '/projects/my-project/global'
+                                 '/networkEndpointGroups/my-group')),
+                  ],
+                  healthChecks=[],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
+
+  def testAddGlobalNetworkEndpointGroupWithExistingHealthChecks(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.BackendService(
+                name='my-backend-service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/httpHealthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/httpHealthChecks/my-health-check-2')
+                ],
+                port=80,
+                fingerprint=b'my-fingerprint',
+                timeoutSec=120)
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services add-backend my-backend-service
+          --global-network-endpoint-group
+          --network-endpoint-group my-group
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          group=(self.compute_uri +
+                                 '/projects/my-project/global'
+                                 '/networkEndpointGroups/my-group')),
+                  ],
+                  healthChecks=[],
                   timeoutSec=120),
               project='my-project'))],
     )

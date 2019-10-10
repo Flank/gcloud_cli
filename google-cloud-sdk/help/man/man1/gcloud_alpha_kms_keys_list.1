@@ -26,11 +26,11 @@ gcloud alpha kms keys list \- list the keys within a keyring
 .RS 2m
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
-Key ring of the resource.
+Key ring of the key.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Location of the resource.
+Location of the key.
 
 
 .RE
@@ -92,7 +92,7 @@ The following command lists all keys within the keyring \f5fellowship\fR and
 location \f5global\fR:
 
 .RS 2m
-$ gcloud alpha kms keys list \-\-keyring fellowship \-\-location global
+$ gcloud alpha kms keys list \-\-keyring=fellowship \-\-location=global
 .RE
 
 
@@ -101,9 +101,8 @@ $ gcloud alpha kms keys list \-\-keyring fellowship \-\-location global
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud kms keys list

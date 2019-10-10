@@ -17,7 +17,11 @@ gcloud alpha survey \- invoke a customer satisfaction survey for Cloud SDK
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Invoke a customer satisfaction survey for Cloud SDK.
+\fB(ALPHA)\fR To permanently disable the survey prompt, run:
+
+.RS 2m
+$ gcloud config set survey/disable_prompts True
+.RE
 
 
 
@@ -35,7 +39,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

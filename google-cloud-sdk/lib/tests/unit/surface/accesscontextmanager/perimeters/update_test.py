@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class PerimetersUpdateTestGA(accesscontextmanager.Base):
@@ -64,25 +65,16 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
-      self.Run('access-context-manager perimeters update --policy MY_POLICY')
+      self.Run('access-context-manager perimeters update --policy 123')
 
   def testUpdate_NoUpdates(self):
     self.SetUpForTrack(self.track)
-    perimeter_kwargs = {
-        'title': 'My Perimeter Title',
-        'description': None,
-        'restricted_services': [],
-        'access_levels': [],
-        'type_': 'PERIMETER_TYPE_REGULAR'
-    }
-    perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
-    self._ExpectPatch(self.messages.ServicePerimeter(), perimeter, '',
-                      'MY_POLICY')
+    # No patch message sent, because nothing is changed.
 
-    result = self.Run('access-context-manager perimeters update MY_PERIMETER '
-                      '    --policy MY_POLICY')
-
-    self.assertEqual(result, perimeter)
+    self.Run('access-context-manager perimeters update MY_PERIMETER '
+             '    --policy 123')
+    self.AssertErrContains(
+        'The update specified results in an identical resource.')
 
   def testUpdate_NonRepeatingFields(self):
     self.SetUpForTrack(self.track)
@@ -101,11 +93,11 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
         perimeterType=perimeter_types.PERIMETER_TYPE_BRIDGE,
     )
     self._ExpectPatch(perimeter_update, perimeter,
-                      'description,perimeterType,title', 'MY_POLICY')
+                      'description,perimeterType,title', '123')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
-        '    --policy MY_POLICY --type bridge --title "My Perimeter Title" '
+        '    --policy 123 --type bridge --title "My Perimeter Title" '
         '    --description "foo bar"')
 
     self.assertEqual(result, perimeter)
@@ -122,16 +114,14 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
         type_='PERIMETER_TYPE_BRIDGE')
     perimeter_update = self.messages.ServicePerimeter(
         status=self.messages.ServicePerimeterConfig(
-            restrictedServices=[],
-            accessLevels=[],
-            resources=[]))
+            restrictedServices=[], accessLevels=[], resources=[]))
     self._ExpectPatch(
         perimeter_update, perimeter, 'status.accessLevels,status.resources,'
-        'status.restrictedServices', 'MY_POLICY')
+        'status.restrictedServices', '123')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
-        '   --policy MY_POLICY --clear-resources --clear-restricted-services '
+        '   --policy 123 --clear-resources --clear-restricted-services '
         '   --clear-access-levels')
 
     self.assertEqual(result, perimeter)
@@ -149,17 +139,17 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
         status=self.messages.ServicePerimeterConfig(
             restrictedServices=perimeter.status.restrictedServices,
             accessLevels=[  # _MakePerimeter has sugar for resource names
-                'accessPolicies/MY_POLICY/accessLevels/a',
-                'accessPolicies/MY_POLICY/accessLevels/b'
+                'accessPolicies/123/accessLevels/a',
+                'accessPolicies/123/accessLevels/b'
             ],
             resources=perimeter.status.resources))
     self._ExpectPatch(
         perimeter_update, perimeter, 'status.accessLevels,status.resources,'
-        'status.restrictedServices', 'MY_POLICY')
+        'status.restrictedServices', '123')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
-        '   --policy MY_POLICY '
+        '   --policy 123 '
         '   --set-resources projects/12345,projects/67890 '
         '   --set-restricted-services foo.googleapis.com,bar.googleapis.com '
         '   --set-access-levels a,b')
@@ -187,13 +177,12 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
         status=self.messages.ServicePerimeterConfig(
             restrictedServices=perimeter_after.status.restrictedServices,
             accessLevels=perimeter_after.status.accessLevels))
-    self._ExpectGet('MY_POLICY', perimeter_before)
+    self._ExpectGet('123', perimeter_before)
     self._ExpectPatch(perimeter_update, perimeter_after,
-                      'status.accessLevels,status.restrictedServices',
-                      'MY_POLICY')
+                      'status.accessLevels,status.restrictedServices', '123')
 
     result = self.Run('access-context-manager perimeters update MY_PERIMETER '
-                      '   --policy MY_POLICY '
+                      '   --policy 123 '
                       '   --add-resources projects/12345,projects/67890 '
                       '   --remove-restricted-services foo.googleapis.com '
                       '   --add-access-levels c,d')
@@ -202,7 +191,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
 
   def testUpdate_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
-    policy = 'my_acm_policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     perimeter = self._MakePerimeter(
         'MY_PERIMETER',
@@ -212,8 +201,7 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
         restricted_services=[],
         access_levels=[],
         type_='PERIMETER_TYPE_BRIDGE')
-    perimeter.name = (
-        'accessPolicies/my_acm_policy/servicePerimeters/MY_PERIMETER')
+    perimeter.name = ('accessPolicies/456/servicePerimeters/MY_PERIMETER')
     perimeter_types = (
         self.messages.ServicePerimeter.PerimeterTypeValueValuesEnum)
     perimeter_update = self.messages.ServicePerimeter(
@@ -230,6 +218,14 @@ class PerimetersUpdateTestGA(accesscontextmanager.Base):
 
     self.assertEqual(result, perimeter)
 
+  def testUpdate_InvalidPolicyArg(self):
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager perimeters update MY_PERIMETER '
+               '    --policy accessPolicies/123'
+               '    --title "My Perimeter Title" ')
+    self.assertIn('set to the policy number', text_type(ex.exception))
+
 
 class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
 
@@ -241,6 +237,70 @@ class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdate_AddServiceFilterFields(self):
+    self.SetUpForTrack(self.track)
+
+    perimeter_before = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_after = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
+        type_='PERIMETER_TYPE_BRIDGE',
+        vpc_allowed_services=['bar-vpc.googleapis.com'],
+    )
+    perimeter_update = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            vpcServiceRestriction=perimeter_after.status.vpcServiceRestriction))
+    self._ExpectGet('123', perimeter_before)
+    self._ExpectPatch(
+        perimeter_update, perimeter_after,
+        'status.vpcServiceRestriction.allowedServices', '123')
+
+    result = self.Run(
+        'access-context-manager perimeters update MY_PERIMETER '
+        '   --policy 123 '
+        '   --add-vpc-allowed-services bar-vpc.googleapis.com ')
+
+    self.assertEqual(result, perimeter_after)
+
+  def testUpdate_EnableServiceFilters(self):
+    self.SetUpForTrack(self.track)
+
+    perimeter_before = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
+        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_after = self._MakePerimeter(
+        'MY_PERIMETER',
+        title='My Perimeter Title',
+        description='foo bar',
+        restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
+        type_='PERIMETER_TYPE_BRIDGE',
+        enable_vpc_service_restriction=True,
+    )
+    perimeter_update = self.messages.ServicePerimeter(
+        status=self.messages.ServicePerimeterConfig(
+            vpcServiceRestriction=perimeter_after.status.vpcServiceRestriction))
+
+    self._ExpectGet('123', perimeter_before)
+    self._ExpectPatch(
+        perimeter_update, perimeter_after,
+        'status.vpcServiceRestriction.enableRestriction', '123')
+
+    result = self.Run('access-context-manager perimeters update MY_PERIMETER '
+                      '   --policy 123 '
+                      '   --enable-vpc-service-restriction ')
+
+    self.assertEqual(result, perimeter_after)
 
 
 if __name__ == '__main__':

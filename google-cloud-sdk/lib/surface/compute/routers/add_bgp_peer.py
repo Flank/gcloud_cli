@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ from googlecloudsdk.core import resources
 import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class AddBgpPeer(base.UpdateCommand):
   """Add a BGP peer to a Google Compute Engine router."""
 
@@ -49,7 +49,11 @@ class AddBgpPeer(base.UpdateCommand):
   def Args(cls, parser):
     cls._Args(parser)
 
-  def _Run(self, args, support_bfd=False, support_enable=False):
+  def _Run(self,
+           args,
+           support_bfd=False,
+           support_enable=False,
+           support_bfd_mode=False):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     messages = holder.client.messages
     service = holder.client.apitools_client.routers
@@ -59,8 +63,12 @@ class AddBgpPeer(base.UpdateCommand):
     request_type = messages.ComputeRoutersGetRequest
     replacement = service.Get(request_type(**router_ref.AsDict()))
 
-    peer = _CreateBgpPeerMessage(messages, args, support_bfd=support_bfd,
-                                 support_enable=support_enable)
+    peer = _CreateBgpPeerMessage(
+        messages,
+        args,
+        support_bfd=support_bfd,
+        support_enable=support_enable,
+        support_bfd_mode=support_bfd_mode)
 
     if router_utils.HasReplaceAdvertisementFlags(args):
       mode, groups, ranges = router_utils.ParseAdvertisements(
@@ -93,7 +101,7 @@ class AddBgpPeer(base.UpdateCommand):
             'region': router_ref.region,
         })
 
-    if args.async:
+    if args.async_:
       log.UpdatedResource(
           operation_ref,
           kind='router [{0}] to add peer [{1}]'.format(router_ref.Name(),
@@ -121,8 +129,8 @@ class AddBgpPeer(base.UpdateCommand):
     return self._Run(args)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AddBgpPeerAlpha(AddBgpPeer):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class AddBgpPeerBeta(AddBgpPeer):
   """Add a BGP peer to a Google Compute Engine router."""
 
   ROUTER_ARG = None
@@ -133,15 +141,38 @@ class AddBgpPeerAlpha(AddBgpPeer):
 
   def Run(self, args):
     """See base.UpdateCommand."""
-    return self._Run(args, support_bfd=True, support_enable=True)
+    return self._Run(
+        args, support_bfd=True, support_enable=True, support_bfd_mode=False)
 
 
-def _CreateBgpPeerMessage(messages, args, support_bfd=False,
-                          support_enable=False):
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AddBgpPeerAlpha(AddBgpPeerBeta):
+  """Add a BGP peer to a Google Compute Engine router."""
+
+  ROUTER_ARG = None
+
+  @classmethod
+  def Args(cls, parser):
+    cls._Args(parser, support_bfd=True, support_enable=True)
+
+  def Run(self, args):
+    """See base.UpdateCommand."""
+    return self._Run(
+        args, support_bfd=True, support_enable=True, support_bfd_mode=True)
+
+
+def _CreateBgpPeerMessage(messages,
+                          args,
+                          support_bfd=False,
+                          support_enable=False,
+                          support_bfd_mode=False):
   """Creates a BGP peer with base attributes based on flag arguments."""
   bfd = None
   if support_bfd:
-    bfd = _CreateBgpPeerBfdMessage(messages, args)
+    if support_bfd_mode:
+      bfd = _CreateBgpPeerBfdMessageMode(messages, args)
+    else:
+      bfd = _CreateBgpPeerBfdMessage(messages, args)
   enable = None
   if support_enable and args.enabled is not None:
     if args.enabled:
@@ -171,23 +202,40 @@ def _CreateBgpPeerBfdMessage(messages, args):
   if not (args.IsSpecified('bfd_min_receive_interval') or
           args.IsSpecified('bfd_min_transmit_interval') or
           args.IsSpecified('bfd_session_initialization_mode') or
-          args.IsSpecified('bfd_multiplier') or
-          args.IsSpecified('bfd_packet_mode') or
-          args.IsSpecified('bfd_slow_timer_interval')):
+          args.IsSpecified('bfd_multiplier')):
     return None
   bfd_session_initialization_mode = None
   if args.bfd_session_initialization_mode is not None:
-    bfd_session_initialization_mode = messages.RouterBgpPeerBfd.ModeValueValuesEnum(
-        args.bfd_session_initialization_mode)
-  bfd_packet_mode = None
-  if args.bfd_packet_mode is not None:
-    bfd_packet_mode = messages.RouterBgpPeerBfd.PacketModeValueValuesEnum(
-        args.bfd_packet_mode)
+    bfd_session_initialization_mode = (
+        messages.RouterBgpPeerBfd.SessionInitializationModeValueValuesEnum(
+            args.bfd_session_initialization_mode))
   return messages.RouterBgpPeerBfd(
       minReceiveInterval=args.bfd_min_receive_interval,
       minTransmitInterval=args.bfd_min_transmit_interval,
-      mode=bfd_session_initialization_mode,
+      sessionInitializationMode=bfd_session_initialization_mode,
       multiplier=args.bfd_multiplier,
-      packetMode=bfd_packet_mode,
-      slowTimerInterval=args.bfd_slow_timer_interval,
+  )
+
+
+def _CreateBgpPeerBfdMessageMode(messages, args):
+  """Creates a BGP peer with base attributes based on flag arguments."""
+  if not (args.IsSpecified('bfd_min_receive_interval') or
+          args.IsSpecified('bfd_min_transmit_interval') or
+          args.IsSpecified('bfd_session_initialization_mode') or
+          args.IsSpecified('bfd_multiplier')):
+    return None
+  mode = None
+  bfd_session_initialization_mode = None
+  if args.bfd_session_initialization_mode is not None:
+    mode = messages.RouterBgpPeerBfd.ModeValueValuesEnum(
+        args.bfd_session_initialization_mode)
+    bfd_session_initialization_mode = (
+        messages.RouterBgpPeerBfd.SessionInitializationModeValueValuesEnum(
+            args.bfd_session_initialization_mode))
+  return messages.RouterBgpPeerBfd(
+      minReceiveInterval=args.bfd_min_receive_interval,
+      minTransmitInterval=args.bfd_min_transmit_interval,
+      mode=mode,
+      sessionInitializationMode=bfd_session_initialization_mode,
+      multiplier=args.bfd_multiplier,
   )

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@ from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.api_lib.util import waiter as waiter_test_base
 
 
-class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
+                 waiter_test_base.Base):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -56,16 +58,47 @@ class UpdateTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         """)
 
   def testUpdate_switchToCustomSubnetMode_yes(self):
-    self.WriteInput('y\n')
     self.mock_client.networks.SwitchToCustomMode.Expect(
         self.messages.ComputeNetworksSwitchToCustomModeRequest(
             project='fake-project',
             network='my-network'),
         self.messages.Operation(name='myop'))
+    self.mock_client.globalOperations.Get.Expect(
+        self.messages.ComputeGlobalOperationsGetRequest(
+            project='fake-project', operation='myop'),
+        self.messages.Operation(
+            name='myop',
+            status=self.messages.Operation.StatusValueValuesEnum.DONE))
+    self.mock_client.networks.Get.Expect(
+        self.messages.ComputeNetworksGetRequest(
+            project='fake-project', network='my-network'),
+        response=self.messages.Network(
+            name='my-network', IPv4Range='10.240.0.0/16'))
 
+    self.WriteInput('y\n')
     self.Run("""
         compute networks update my-network --switch-to-custom-subnet-mode
         """)
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Switching network to custom-mode')
+
+  def testUpdate_switchToCustomSubnetMode_async(self):
+    self.mock_client.networks.SwitchToCustomMode.Expect(
+        self.messages.ComputeNetworksSwitchToCustomModeRequest(
+            project='fake-project', network='my-network'),
+        self.messages.Operation(name='myop'))
+
+    self.WriteInput('y\n')
+    self.Run("""
+        compute networks update my-network --switch-to-custom-subnet-mode --async
+        """)
+    self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'Update in progress for network my-network '
+        '[https://compute.googleapis.com/compute/v1/'
+        'projects/fake-project/global/operations/myop] '
+        'Run the [gcloud compute operations describe] command to check the '
+        'status of this operation.\n')
 
   def testUpdate_switchToCustomSubnetMode_no(self):
     self.WriteInput('n\n')
@@ -130,6 +163,18 @@ class UpdateTestAlpha(UpdateTestBeta):
     self.Run("""
         compute networks update my-network --multicast-mode zonal
         """)
+
+  def testUpdateMtu(self):
+    expected = self.messages.Network()
+
+    expected.mtu = 1500
+    self.mock_client.networks.Patch.Expect(
+        self.messages.ComputeNetworksPatchRequest(
+            project='fake-project',
+            network='my-network',
+            networkResource=expected), self.messages.Operation(name='myop'))
+
+    self.Run("""compute networks update my-network --mtu 1500""")
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import unit_base
 
 
-class AutoscalingPoliciesImportUnitTestBeta(unit_base.DataprocUnitTestBase):
+class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
   """Tests for dataproc autoscaling-policies import."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   # N.B. this test suite assumes edge cases around reading the YAML files and
   # resolving duration fields is already taken care of in util_test.py.
@@ -239,11 +239,16 @@ class AutoscalingPoliciesImportUnitTestBeta(unit_base.DataprocUnitTestBase):
           'autoscaling-policies import policy-1 --source {}'.format(file_name))
 
 
-class AutoscalingPoliciesImportUnitTestAlpha(
-    AutoscalingPoliciesImportUnitTestBeta):
+class AutoscalingPoliciesImportUnitTestAlpha(AutoscalingPoliciesImportUnitTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class AutoscalingPoliciesImportUnitTestBeta(AutoscalingPoliciesImportUnitTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

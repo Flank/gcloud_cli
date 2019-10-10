@@ -3,11 +3,11 @@ NAME
         proxy
 
 SYNOPSIS
-    gcloud alpha compute target-https-proxies create NAME
-        --ssl-certificates=SSL_CERTIFICATE,[...] --url-map=URL_MAP
-        [--description=DESCRIPTION]
+    gcloud alpha compute target-https-proxies create NAME --url-map=URL_MAP
+        [--description=DESCRIPTION] [--proxy-bind]
         [--quic-override=QUIC_OVERRIDE; default="NONE"]
-        [--ssl-policy=SSL_POLICY] [--global | --region=REGION]
+        [--ssl-certificates=SSL_CERTIFICATE,[...]] [--ssl-policy=SSL_POLICY]
+        [--global | --region=REGION]
         [--global-ssl-certificates
           | --ssl-certificates-region=SSL_CERTIFICATES_REGION]
         [--global-url-map | --url-map-region=URL_MAP_REGION]
@@ -29,13 +29,6 @@ POSITIONAL ARGUMENTS
         Name of the target HTTPS proxy to create.
 
 REQUIRED FLAGS
-     --ssl-certificates=SSL_CERTIFICATE,[...]
-        References to at most 15 SSL certificate resources that are used for
-        server-side authentication. The first SSL certificate in this list is
-        considered the primary SSL certificate associated with the load
-        balancer. The SSL certificate must exist and cannot be deleted while
-        referenced by a target HTTPS proxy.
-
      --url-map=URL_MAP
         A reference to a URL map resource that defines the mapping of URLs to
         backend services. The URL map must exist and cannot be deleted while
@@ -44,6 +37,12 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the target HTTPS proxy.
+
+     --proxy-bind
+        This flag only applies when the load_balancing_scheme of the associated
+        backend service is INTERNAL_SELF_MANAGED. When specified, the envoy
+        binds to the IP address and port specified by the forwarding rule. By
+        default this flag is off.
 
      --quic-override=QUIC_OVERRIDE; default="NONE"
         Controls whether load balancer may negotiate QUIC with clients. QUIC is
@@ -57,6 +56,13 @@ OPTIONAL FLAGS
             Allows load balancer to negotiate QUIC with clients.
          NONE
             Allows Google to control when QUIC is rolled out.
+
+     --ssl-certificates=SSL_CERTIFICATE,[...]
+        References to at most 15 SSL certificate resources that are used for
+        server-side authentication. The first SSL certificate in this list is
+        considered the primary SSL certificate associated with the load
+        balancer. The SSL certificates must exist and cannot be deleted while
+        referenced by a target HTTPS proxy.
 
      --ssl-policy=SSL_POLICY
         A reference to an SSL policy resource that defines the server-side
@@ -133,9 +139,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute target-https-proxies create
         $ gcloud beta compute target-https-proxies create

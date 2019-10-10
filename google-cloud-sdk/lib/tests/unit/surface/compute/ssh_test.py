@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the ssh subcommand."""
 
 from __future__ import absolute_import
@@ -53,6 +52,7 @@ INSTANCE_WITH_EXTERNAL_ADDRESS = MESSAGES.Instance(
     id=11111,
     name='instance-1',
     networkInterfaces=[
+        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
         MESSAGES.NetworkInterface(
             accessConfigs=[
                 MESSAGES.AccessConfig(
@@ -62,9 +62,9 @@ INSTANCE_WITH_EXTERNAL_ADDRESS = MESSAGES.Instance(
         ),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 INSTANCE_WITHOUT_EXTERNAL_ADDRESS = MESSAGES.Instance(
@@ -74,9 +74,9 @@ INSTANCE_WITHOUT_EXTERNAL_ADDRESS = MESSAGES.Instance(
         MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-2/instances/instance-2'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-2'))
 
 # An instance resource that has not been allocated an IP address
@@ -87,6 +87,7 @@ INSTANCE_WITHOUT_EXTERNAL_ADDRESS_YET = MESSAGES.Instance(
     id=33333,
     name='instance-3',
     networkInterfaces=[
+        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
         MESSAGES.NetworkInterface(
             accessConfigs=[
                 MESSAGES.AccessConfig(
@@ -95,9 +96,9 @@ INSTANCE_WITHOUT_EXTERNAL_ADDRESS_YET = MESSAGES.Instance(
         ),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-3'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 
@@ -112,6 +113,7 @@ INSTANCE_WITH_OSLOGIN_ENABLED = MESSAGES.Instance(
         ]
     ),
     networkInterfaces=[
+        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
         MESSAGES.NetworkInterface(
             accessConfigs=[
                 MESSAGES.AccessConfig(
@@ -121,9 +123,9 @@ INSTANCE_WITH_OSLOGIN_ENABLED = MESSAGES.Instance(
         ),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 
@@ -138,6 +140,7 @@ INSTANCE_WITH_OSLOGIN_DISABLED = MESSAGES.Instance(
         ]
     ),
     networkInterfaces=[
+        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
         MESSAGES.NetworkInterface(
             accessConfigs=[
                 MESSAGES.AccessConfig(
@@ -147,13 +150,86 @@ INSTANCE_WITH_OSLOGIN_DISABLED = MESSAGES.Instance(
         ),
     ],
     status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 
+INSTANCE_WITH_GUEST_ATTRIBUTES_ENABLED = MESSAGES.Instance(
+    id=66666,
+    name='instance-6',
+    metadata=MESSAGES.Metadata(
+        items=[
+            MESSAGES.Metadata.ItemsValueListEntry(
+                key='enable-guest-attributes',
+                value='TruE'),
+        ]
+    ),
+    networkInterfaces=[
+        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
+        MESSAGES.NetworkInterface(
+            accessConfigs=[
+                MESSAGES.AccessConfig(
+                    name='external-nat',
+                    natIP='23.251.133.75'),
+            ],
+        ),
+    ],
+    status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
+              'zones/zone-1/instances/instance-6'),
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
+          'zones/zone-1'))
+
+
+INSTANCE_WITH_GUEST_ATTRIBUTES_DISABLED = MESSAGES.Instance(
+    id=77777,
+    name='instance-7',
+    metadata=MESSAGES.Metadata(
+        items=[
+            MESSAGES.Metadata.ItemsValueListEntry(
+                key='enable-guest-attributes',
+                value='false'),
+        ]
+    ),
+    networkInterfaces=[
+        MESSAGES.NetworkInterface(networkIP='10.240.0.52'),
+        MESSAGES.NetworkInterface(
+            accessConfigs=[
+                MESSAGES.AccessConfig(
+                    name='external-nat',
+                    natIP='23.251.133.75'),
+            ],
+        ),
+    ],
+    status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
+              'zones/zone-1/instances/instance-7'),
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
+          'zones/zone-1'))
+
+GUEST_ATTRIBUTES_CONTENTS = MESSAGES.GuestAttributes(
+    queryPath='hostkeys/',
+    queryValue=MESSAGES.GuestAttributesValue(
+        items=[
+            MESSAGES.GuestAttributesEntry(
+                key='ssh-rsa',
+                namespace='hostkeys',
+                value='AAAAB3NzaC1yc2EAAAADAQABAAABAQCo4bTdpLeTwhpAOmHe'),
+        ],
+    ),
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
+              'zones/zone-1/instances/instance-6/guestAttributes/'))
+
+
 class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
+
+  def SetUp(self):
+    datetime_patcher = mock.patch('datetime.datetime',
+                                  test_base.FakeDateTimeWithTimeZone)
+    self.addCleanup(datetime_patcher.stop)
+    datetime_patcher.start()
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -356,7 +432,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         r'to the instance, use \[gcloud compute instances '
         r'add-access-config\].'):
       self.Run("""
-          compute ssh instance-2 --zone zone-2
+          compute ssh instance-2 --zone zone-2 --no-tunnel-through-iap
           """)
 
     self.CheckRequests(
@@ -392,7 +468,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         r'Instance \[instance-3\] in zone \[zone-1\] has not been allocated an '
         'external IP address yet. Try rerunning this command later.'):
       self.Run("""
-          compute ssh instance-3 --zone zone-1
+          compute ssh instance-3 --zone zone-1 --no-tunnel-through-iap
           """)
 
     self.CheckRequests(
@@ -486,7 +562,161 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         remote=remote,
         identity_file=self.private_key_file,
         extra_flags=[],
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
+
+    self.poller_poll.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHPoller),
+        self.env, force_connect=True)
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        remote=remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        tty=None,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        remote_command=None,
+        iap_tunnel_args=None,
+        remainder=[])
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+    self.AssertErrContains('Updating project ssh metadata')
+
+  def testWithRelativeExpiration(self):
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_EXTERNAL_ADDRESS],
+        [self.project_resource_without_metadata],
+        [],
+    ])
+
+    self.Run("""
+        compute ssh instance-1 --zone zone-1
+        --ssh-key-expire-after 1d
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute_v1.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute_v1.projects,
+          'SetCommonInstanceMetadata',
+          self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.messages.Metadata(
+                  items=[
+                      self.messages.Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value=('me:{0} google-ssh {{"userName":"me",'
+                                 '"expireOn":'
+                                 '"2014-01-03T03:04:05+0000"}}').format(
+                                     self.pubkey.ToEntry())),
+                  ]),
+
+              project='my-project'))],
+    )
+
+    remote = ssh.Remote(self.remote.host, user='me')
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # Polling
+    self.poller_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHPoller),
+        remote=remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
+
+    self.poller_poll.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHPoller),
+        self.env, force_connect=True)
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        remote=remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        tty=None,
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        remote_command=None,
+        iap_tunnel_args=None,
+        remainder=[])
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+    self.AssertErrContains('Updating project ssh metadata')
+
+  def testWithAbsoluteExpiration(self):
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_EXTERNAL_ADDRESS],
+        [self.project_resource_without_metadata],
+        [],
+    ])
+
+    self.Run("""
+        compute ssh instance-1 --zone zone-1
+        --ssh-key-expiration 2015-01-23T12:34:56+0000
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute_v1.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute_v1.projects,
+          'SetCommonInstanceMetadata',
+          self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.messages.Metadata(
+                  items=[
+                      self.messages.Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value=('me:{0} google-ssh {{"userName":"me",'
+                                 '"expireOn":'
+                                 '"2015-01-23T12:34:56+0000"}}').format(
+                                     self.pubkey.ToEntry())),
+                  ]),
+
+              project='my-project'))],
+    )
+
+    remote = ssh.Remote(self.remote.host, user='me')
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # Polling
+    self.poller_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHPoller),
+        remote=remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options, HostKeyAlias='compute.11111'),
         iap_tunnel_args=None)
 
@@ -522,6 +752,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         compute ssh instance-1 --zone zone-1
              --ssh-flag="-vvv"
              --ssh-flag="-o HostName='%INSTANCE%'"
+             --ssh-flag="-o InternalIp='%INTERNAL%'"
              --ssh-flag="-o User=\"%USER%\""
         """)
 
@@ -549,8 +780,10 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         mock_matchers.TypeMatcher(ssh.SSHCommand),
         remote=self.remote,
         identity_file=self.private_key_file,
-        extra_flags=['-vvv', '-o', 'HostName=\'23.251.133.75\'', '-o',
-                     'User=me'],
+        extra_flags=[
+            '-vvv', '-o', 'HostName=\'23.251.133.75\'', '-o',
+            'InternalIp=\'10.240.0.52\'', '-o', 'User=me'
+        ],
         tty=None,
         options=dict(self.options, HostKeyAlias='compute.11111'),
         remote_command=None,
@@ -948,7 +1181,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         remote=self.remote,
         identity_file=self.private_key_file,
         extra_flags=[],
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options, HostKeyAlias='compute.11111'),
         iap_tunnel_args=None)
 
@@ -1930,7 +2163,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     ])
 
     self.Run("""
-        compute ssh https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+        compute ssh https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
         """)
 
     # Require SSH keys
@@ -2120,9 +2353,9 @@ class SSHInstanceProjectOverrideTest(test_base.BaseSSHTest):
                 ],),
         ],
         status=MESSAGES.Instance.StatusValueValuesEnum.RUNNING,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/asdf-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/asdf-project/'
                   'zones/zone-1/instances/instance-1'),
-        zone=('https://www.googleapis.com/compute/v1/projects/asdf-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/asdf-project/'
               'zones/zone-1'))
     self.project = self.v1_messages.Project(
         commonInstanceMetadata=self.v1_messages.Metadata(items=[
@@ -2141,7 +2374,7 @@ class SSHInstanceProjectOverrideTest(test_base.BaseSSHTest):
     ])
 
     self.Run("""\
-        compute ssh https://www.googleapis.com/compute/v1/projects/asdf-project/zones/zone-1/instances/instance-1 -- -vvv
+        compute ssh https://compute.googleapis.com/compute/v1/projects/asdf-project/zones/zone-1/instances/instance-1 -- -vvv
         """)
 
     self.CheckRequests(
@@ -2180,7 +2413,7 @@ class SSHInstanceProjectOverrideTest(test_base.BaseSSHTest):
     ])
 
     self.Run("""\
-        compute ssh https://www.googleapis.com/compute/v1/projects/asdf-project/zones/zone-1/instances/instance-1 --project my-project -- -vvv
+        compute ssh https://compute.googleapis.com/compute/v1/projects/asdf-project/zones/zone-1/instances/instance-1 --project my-project -- -vvv
         """)
 
     self.CheckRequests(
@@ -2711,21 +2944,21 @@ class SSHOsloginTest(test_base.BaseSSHTest):
         self.env, force_connect=True)
 
 
-class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
-                                  parameterized.TestCase):
+class SSHTunnelThroughIapTestGA(test_base.BaseSSHTest,
+                                parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi(self.track.prefix)
+    self.SelectApi('v1' if self.track.prefix is None else self.track.prefix)
+
     self.instances = {
         _INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY: self.messages.Instance(
             id=11111,
             name='instance-1',
             networkInterfaces=[
                 self.messages.NetworkInterface(
-                    name='nic0',
                     networkIP='10.240.0.52',
                     accessConfigs=[
                         self.messages.AccessConfig(natIP='23.251.133.1'),
@@ -2734,72 +2967,50 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
             ],
             status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
             selfLink=(
-                'https://www.googleapis.com/compute/{}/projects/my-project/'
+                'https://compute.googleapis.com/compute/{}/projects/my-project/'
                 'zones/zone-1/instances/instance-1').format(self.track.prefix),
-            zone=('https://www.googleapis.com/compute/{}/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/{}/projects/my-project/'
                   'zones/zone-1').format(self.track.prefix)),
         _INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY: self.messages.Instance(
             id=22222,
             name='instance-2',
             networkInterfaces=[
-                self.messages.NetworkInterface(
-                    name='nic0',
-                    networkIP='10.240.0.53',
-                ),
+                self.messages.NetworkInterface(networkIP='10.240.0.53'),
             ],
             status=self.messages.Instance.StatusValueValuesEnum.RUNNING,
             selfLink=(
-                'https://www.googleapis.com/compute/{}/projects/my-project/'
+                'https://compute.googleapis.com/compute/{}/projects/my-project/'
                 'zones/zone-1/instances/instance-2').format(self.track.prefix),
-            zone=('https://www.googleapis.com/compute/{}/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/{}/projects/my-project/'
                   'zones/zone-1').format(self.track.prefix)),
     }
 
-  def _GetGuestAttributeCall(self, _):
-    return []
-
-  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
-                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
-  def testSimpleCase(self, test_instance_key):
+  @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY, True),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY, True),
+                            (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY, False))
+  def testSimpleCase(self, test_instance_key, explicit_flag):
     test_instance = self.instances[test_instance_key]
     self.make_requests.side_effect = iter([
         [test_instance],
         [self.project_resource],
-        [None],
     ])
 
-    self.Run('compute ssh {} --zone zone-1 --tunnel-through-iap'.format(
-        test_instance.name))
+    self.Run('compute ssh {} --zone zone-1{}'.format(
+        test_instance.name,
+        ' --tunnel-through-iap' if explicit_flag else ''))
 
-    guest_attribute_call = self._GetGuestAttributeCall(test_instance.name)
-
-    if guest_attribute_call:
-      self.CheckRequests(
-          [(self.compute.instances,
-            'Get',
-            self.messages.ComputeInstancesGetRequest(
-                instance=test_instance.name,
-                project='my-project',
-                zone='zone-1'))],
-          [(self.compute.projects,
-            'Get',
-            self.messages.ComputeProjectsGetRequest(
-                project='my-project'))],
-          guest_attribute_call,
-      )
-    else:
-      self.CheckRequests(
-          [(self.compute.instances,
-            'Get',
-            self.messages.ComputeInstancesGetRequest(
-                instance=test_instance.name,
-                project='my-project',
-                zone='zone-1'))],
-          [(self.compute.projects,
-            'Get',
-            self.messages.ComputeProjectsGetRequest(
-                project='my-project'))],
-      )
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance=test_instance.name,
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+    )
 
     # Require SSH keys
     self.ensure_keys.assert_called_once_with(
@@ -2813,7 +3024,6 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = test_instance.name
-    expected_tunnel_args.interface = 'nic0'
 
     # SSH Command
     self.ssh_init.assert_called_once_with(
@@ -2840,62 +3050,34 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
         [test_instance],
         [self.project_resource_without_metadata],
         [None],
-        [None],
     ])
 
     self.Run('compute ssh hapoo@{} --zone zone-1 --tunnel-through-iap'.format(
         test_instance.name))
 
-    guest_attribute_call = self._GetGuestAttributeCall(test_instance.name)
-    if guest_attribute_call:
-      self.CheckRequests(
-          [(self.compute.instances,
-            'Get',
-            self.messages.ComputeInstancesGetRequest(
-                instance=test_instance.name,
-                project='my-project',
-                zone='zone-1'))],
-          [(self.compute.projects,
-            'Get',
-            self.messages.ComputeProjectsGetRequest(
-                project='my-project'))],
-          guest_attribute_call,
-          [(self.compute.projects,
-            'SetCommonInstanceMetadata',
-            self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
-                metadata=self.messages.Metadata(
-                    items=[
-                        self.messages.Metadata.ItemsValueListEntry(
-                            key='ssh-keys',
-                            value='hapoo:' + self.public_key_material),
-                    ]),
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance=test_instance.name,
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute.projects,
+          'SetCommonInstanceMetadata',
+          self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.messages.Metadata(
+                  items=[
+                      self.messages.Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value='hapoo:' + self.public_key_material),
+                  ]),
 
-                project='my-project'))],
-      )
-    else:
-      self.CheckRequests(
-          [(self.compute.instances,
-            'Get',
-            self.messages.ComputeInstancesGetRequest(
-                instance=test_instance.name,
-                project='my-project',
-                zone='zone-1'))],
-          [(self.compute.projects,
-            'Get',
-            self.messages.ComputeProjectsGetRequest(
-                project='my-project'))],
-          [(self.compute.projects,
-            'SetCommonInstanceMetadata',
-            self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
-                metadata=self.messages.Metadata(
-                    items=[
-                        self.messages.Metadata.ItemsValueListEntry(
-                            key='ssh-keys',
-                            value='hapoo:' + self.public_key_material),
-                    ]),
-
-                project='my-project'))],
-      )
+              project='my-project'))],
+    )
 
     # Require SSH keys
     self.ensure_keys.assert_called_once_with(
@@ -2906,7 +3088,6 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = test_instance.name
-    expected_tunnel_args.interface = 'nic0'
 
     # Polling
     remote = ssh.Remote.FromArg('hapoo@compute.%s' % test_instance.id)
@@ -2915,7 +3096,7 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
         remote=remote,
         identity_file=self.private_key_file,
         extra_flags=[],
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options,
                      HostKeyAlias='compute.%s' % test_instance.id),
         iap_tunnel_args=expected_tunnel_args)
@@ -2967,56 +3148,29 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
       self.Run('compute ssh hapoo@{} --zone zone-1 --tunnel-through-iap'.format(
           test_instance.name))
 
-    guest_attribute_call = self._GetGuestAttributeCall(test_instance.name)
-    if guest_attribute_call:
-      self.CheckRequests(
-          [(self.compute.instances,
-            'Get',
-            self.messages.ComputeInstancesGetRequest(
-                instance=test_instance.name,
-                project='my-project',
-                zone='zone-1'))],
-          [(self.compute.projects,
-            'Get',
-            self.messages.ComputeProjectsGetRequest(
-                project='my-project'))],
-          guest_attribute_call,
-          [(self.compute.projects,
-            'SetCommonInstanceMetadata',
-            self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
-                metadata=self.messages.Metadata(
-                    items=[
-                        self.messages.Metadata.ItemsValueListEntry(
-                            key='ssh-keys',
-                            value='hapoo:' + self.public_key_material),
-                    ]),
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance=test_instance.name,
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute.projects,
+          'SetCommonInstanceMetadata',
+          self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.messages.Metadata(
+                  items=[
+                      self.messages.Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value='hapoo:' + self.public_key_material),
+                  ]),
 
-                project='my-project'))],
-      )
-    else:
-      self.CheckRequests(
-          [(self.compute.instances,
-            'Get',
-            self.messages.ComputeInstancesGetRequest(
-                instance=test_instance.name,
-                project='my-project',
-                zone='zone-1'))],
-          [(self.compute.projects,
-            'Get',
-            self.messages.ComputeProjectsGetRequest(
-                project='my-project'))],
-          [(self.compute.projects,
-            'SetCommonInstanceMetadata',
-            self.messages.ComputeProjectsSetCommonInstanceMetadataRequest(
-                metadata=self.messages.Metadata(
-                    items=[
-                        self.messages.Metadata.ItemsValueListEntry(
-                            key='ssh-keys',
-                            value='hapoo:' + self.public_key_material),
-                    ]),
-
-                project='my-project'))],
-      )
+              project='my-project'))],
+    )
 
     # Require SSH keys
     self.ensure_keys.assert_called_once_with(
@@ -3027,7 +3181,6 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
     expected_tunnel_args.project = 'my-project'
     expected_tunnel_args.zone = 'zone-1'
     expected_tunnel_args.instance = test_instance.name
-    expected_tunnel_args.interface = 'nic0'
 
     # Polling
     remote = ssh.Remote.FromArg('hapoo@compute.%s' % test_instance.id)
@@ -3036,7 +3189,7 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
         remote=remote,
         identity_file=self.private_key_file,
         extra_flags=[],
-        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
+        max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_MS,
         options=dict(self.options,
                      HostKeyAlias='compute.%s' % test_instance.id),
         iap_tunnel_args=expected_tunnel_args)
@@ -3050,19 +3203,180 @@ class SSHTunnelThroughIapTestBeta(test_base.BaseSSHTest,
     self.AssertErrContains('Updating project ssh metadata')
 
 
+class SSHTunnelThroughIapTestBeta(SSHTunnelThroughIapTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 class SSHTunnelThroughIapTestAlpha(SSHTunnelThroughIapTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _GetGuestAttributeCall(self, instance_name):
-    return [(self.compute.instances,
-             'GetGuestAttributes',
-             self.messages.ComputeInstancesGetGuestAttributesRequest(
-                 instance=instance_name,
-                 project='my-project',
-                 queryPath='hostkeys/',
-                 zone='zone-1'))]
+
+class GuestAttributesEnabledTest(test_base.BaseSSHTest):
+
+  def testSimpleCase(self):
+    # Guest Attributes enabled with host keys returned should cause
+    # StrictHostKeyChecking to be set to 'yes'.
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_GUEST_ATTRIBUTES_ENABLED],
+        [self.project_resource],
+        [GUEST_ATTRIBUTES_CONTENTS],
+    ])
+
+    self.Run("""
+        compute ssh instance-6 --zone zone-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-6',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute_v1.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute.instances,
+          'GetGuestAttributes',
+          self.messages.ComputeInstancesGetGuestAttributesRequest(
+              instance='instance-6',
+              project='my-project',
+              queryPath='hostkeys/',
+              zone='zone-1'))],
+    )
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # No polling
+    self.poller_poll.assert_not_called()
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        remote=self.remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        tty=None,
+        options=dict(self.options, StrictHostKeyChecking='yes',
+                     HostKeyAlias='compute.66666'),
+        remote_command=None,
+        iap_tunnel_args=None,
+        remainder=[])
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+  def testEnabledAtProjectLevel(self):
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_EXTERNAL_ADDRESS],
+        [self.project_resource_with_guest_attr_enabled],
+        [GUEST_ATTRIBUTES_CONTENTS],
+    ])
+
+    self.Run("""
+        compute ssh instance-1 --zone zone-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute_v1.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.compute.instances,
+          'GetGuestAttributes',
+          self.messages.ComputeInstancesGetGuestAttributesRequest(
+              instance='instance-1',
+              project='my-project',
+              queryPath='hostkeys/',
+              zone='zone-1'))],
+    )
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # No polling
+    self.poller_poll.assert_not_called()
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        remote=self.remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        tty=None,
+        options=dict(self.options, StrictHostKeyChecking='yes',
+                     HostKeyAlias='compute.11111'),
+        remote_command=None,
+        iap_tunnel_args=None,
+        remainder=[])
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+  def testEnabledAtProjectDisabledAtInstance(self):
+    # Instance value overrides project value, so Guest Attributes won't
+    # be retrieved and StrictHostKeyChecking should be set to 'no'.
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_GUEST_ATTRIBUTES_DISABLED],
+        [self.project_resource_with_guest_attr_enabled],
+    ])
+
+    self.Run("""
+        compute ssh instance-7 --zone zone-1
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='instance-7',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.compute_v1.projects,
+          'Get',
+          self.messages.ComputeProjectsGetRequest(
+              project='my-project'))],
+    )
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # No polling
+    self.poller_poll.assert_not_called()
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        remote=self.remote,
+        identity_file=self.private_key_file,
+        extra_flags=[],
+        tty=None,
+        options=dict(self.options, StrictHostKeyChecking='no',
+                     HostKeyAlias='compute.77777'),
+        remote_command=None,
+        iap_tunnel_args=None,
+        remainder=[])
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
 
 
 if __name__ == '__main__':

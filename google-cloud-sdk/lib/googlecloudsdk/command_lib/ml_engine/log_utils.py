@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from apitools.base.py import encoding
 from googlecloudsdk.api_lib.ml_engine import jobs
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+import six
 
 LOG_FORMAT = ('value('
               'severity,'
@@ -139,7 +140,7 @@ def _EntryToDict(log_entry):
       del json_data['levelname']
     output['json'] = json_data
   elif log_entry.textPayload is not None:
-    output['message'] += str(log_entry.textPayload)
+    output['message'] += six.text_type(log_entry.textPayload)
   elif log_entry.protoPayload is not None:
     output['json'] = encoding.MessageToDict(log_entry.protoPayload)
   return output

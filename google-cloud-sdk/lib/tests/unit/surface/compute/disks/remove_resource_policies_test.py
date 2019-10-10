@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,15 @@ from tests.lib.surface.compute import disks_test_base as test_base
 class DisksRemoveResourcePoliciesTest(test_base.TestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def _MakeResourcePolicies(self, policy_names):
+    resource_policies = []
+    for name in policy_names:
+      resource_policies.append(
+          self.compute_uri + '/projects/{0}/regions/{1}/resourcePolicies/{2}'
+          .format(self.Project(), self.region, name))
+    return resource_policies
 
   def _CheckRemoveRequest(self, policy_names):
     request_cls = self.messages.ComputeDisksRemoveResourcePoliciesRequest
@@ -37,11 +45,7 @@ class DisksRemoveResourcePoliciesTest(test_base.TestBase):
         zone=self.zone,
         disksRemoveResourcePoliciesRequest=
         self.messages.DisksRemoveResourcePoliciesRequest(
-            resourcePolicies=[
-                self.compute_uri + '/projects/{0}/regions/{1}/'
-                'resourcePolicies/{2}'.format(
-                    self.Project(), self.region, name)
-                for name in policy_names]))
+            resourcePolicies=self._MakeResourcePolicies(policy_names)))
     self.CheckRequests(
         [(self.compute.disks, 'RemoveResourcePolicies', remove_request)],)
 
@@ -53,11 +57,7 @@ class DisksRemoveResourcePoliciesTest(test_base.TestBase):
         region=self.region,
         regionDisksRemoveResourcePoliciesRequest=
         self.messages.RegionDisksRemoveResourcePoliciesRequest(
-            resourcePolicies=[
-                self.compute_uri + '/projects/{0}/regions/{1}/'
-                'resourcePolicies/{2}'.format(
-                    self.Project(), self.region, name)
-                for name in policy_names]))
+            resourcePolicies=self._MakeResourcePolicies(policy_names)))
     self.CheckRequests(
         [(self.compute.regionDisks, 'RemoveResourcePolicies', remove_request)],)
 
@@ -103,7 +103,13 @@ class DisksRemoveResourcePoliciesTest(test_base.TestBase):
     self._CheckRegionalRemoveRequest(['pol1'])
 
 
-class DisksRemoveResourcePoliciesAlphaTest(DisksRemoveResourcePoliciesTest):
+class DisksRemoveResourcePoliciesBetaTest(DisksRemoveResourcePoliciesTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DisksRemoveResourcePoliciesAlphaTest(DisksRemoveResourcePoliciesBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

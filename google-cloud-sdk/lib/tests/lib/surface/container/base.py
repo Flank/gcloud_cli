@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Base classes for container tests."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
 import datetime
 import json
 import os
@@ -52,6 +52,7 @@ class Error(Exception):
 class UnexpectedCallExceptionError(Error):
   """For unexpected calls to mocked functions."""
 
+
 NOT_FOUND_ERROR = http_error.MakeHttpError(404, 'not found')
 UNAUTHORIZED_ERROR = http_error.MakeHttpError(403, 'unauthorized')
 
@@ -63,6 +64,7 @@ def format_date_time(duration):
 
   Args:
     duration: string ISO 8601 duration, e.g. 'P5D' for period 5 days.
+
   Returns:
     string timestamp
   """
@@ -82,8 +84,8 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   ZONE = 'us-central1-f'
   REGION = 'us-central1'
   PROJECT_ID = 'fake-project-id'
-  PROJECT_REF = resources.REGISTRY.Create('container.projects',
-                                          projectsId=PROJECT_ID)
+  PROJECT_REF = resources.REGISTRY.Create(
+      'container.projects', projectsId=PROJECT_ID)
   PROJECT_NUM = 123456789012
   NUM_NODES = 3
   NODE_POOL_NAME = 'my-pool'
@@ -91,8 +93,8 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   TARGET_LINK = 'https://container.googleapis.com/{0}/projects/{1}/zones/{2}/clusters/{3}'  # pylint: disable=line-too-long
   NODE_POOL_TARGET_LINK = 'https://container.googleapis.com/{0}/projects/{1}/zones/{2}/clusters/{3}/nodePools/{4}'  # pylint: disable=line-too-long
   MOCK_OPERATION_ID = 'operation-1414184316101-d4546dd2'
-  MOCK_OPERATION_TARGET = OPERATION_TARGET.format(
-      PROJECT_NUM, ZONE, CLUSTER_NAME)
+  MOCK_OPERATION_TARGET = OPERATION_TARGET.format(PROJECT_NUM, ZONE,
+                                                  CLUSTER_NAME)
   ENDPOINT = '130.211.191.49'
   VERSION = '1.8.0'
   INSTANCE_GROUP_URL = 'https://www.googleapis.com/compute/v1/projects/{0}/zones/{1}/instanceGroupManagers/gke-{2}-group'  # pylint: disable=line-too-long
@@ -103,8 +105,8 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.MOCK_TARGET_LINK = self.TARGET_LINK.format(  # pylint: disable=invalid-name
         self.API_VERSION, self.PROJECT_NUM, self.ZONE, self.CLUSTER_NAME)
     self.MOCK_NODE_POOL_TARGET_LINK = self.NODE_POOL_TARGET_LINK.format(  # pylint: disable=invalid-name
-        self.API_VERSION, self.PROJECT_NUM, self.ZONE,
-        self.CLUSTER_NAME, self.NODE_POOL_NAME)
+        self.API_VERSION, self.PROJECT_NUM, self.ZONE, self.CLUSTER_NAME,
+        self.NODE_POOL_NAME)
     properties.VALUES.core.project.Set(self.PROJECT_ID)
     self.mocked_client = mock.Client(
         core_apis.GetClientClass('container', self.API_VERSION),
@@ -157,9 +159,10 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         'cert_data': 'fakeclientcertificatedata',
         'currentNodeCount': self.NUM_NODES,
         'currentNodeVersion': version,
-        'instanceGroupUrls': [self._MakeInstanceGroupUrl(self.PROJECT_ID,
-                                                         self.ZONE,
-                                                         name)],
+        'instanceGroupUrls': [
+            self._MakeInstanceGroupUrl(self.PROJECT_ID, self.ZONE, name)
+        ],
+        'maintenancePolicyResourceVersion': 'emptyRV',
     }
     defaults.update(kwargs)
     return self._MakeCluster(**defaults)
@@ -169,12 +172,13 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     pool_name = kwargs.get('nodePoolName', self.NODE_POOL_NAME)
     zone = kwargs.get('zone', self.ZONE)
     defaults = {
-        'name': name,
-        'nodePoolName': pool_name,
-        'instanceGroupUrls': [self._MakeInstanceGroupUrl(self.PROJECT_ID,
-                                                         zone,
-                                                         name,
-                                                         pool_name)],
+        'name':
+            name,
+        'nodePoolName':
+            pool_name,
+        'instanceGroupUrls': [
+            self._MakeInstanceGroupUrl(self.PROJECT_ID, zone, name, pool_name)
+        ],
     }
     defaults.update(kwargs)
     return self._RunningCluster(**defaults)
@@ -205,8 +209,7 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     if platforms.OperatingSystem.IsWindows():
       bin_name = 'gcloud.cmd'
     self.assertDictEqual(
-        kubeconfig.users[c_config.kube_context]['user']['auth-provider'],
-        {
+        kubeconfig.users[c_config.kube_context]['user']['auth-provider'], {
             'name': 'gcp',
             'config': {
                 'cmd-path': os.path.join(FAKE_SDK_BIN_PATH, bin_name),
@@ -258,6 +261,14 @@ class TestBase(cli_test_base.CliTestBase):
     self.action_set_username = self.messages.SetMasterAuthRequest.ActionValueValuesEnum.SET_USERNAME  # pylint: disable=line-too-long
 
   def _MakeCluster(self, **kwargs):
+    # Avoid side effects by copying all these args. This ensures that when we
+    # modify parts of a message, it won't affect the original objects that were
+    # passed in, allowing them to be reused in calls that might depend on them
+    # not having been changed (which is especially dangerous given that we make
+    # all these Expect... calls that are not actually checked until after we
+    # declare them all!).
+    kwargs = copy.deepcopy(kwargs)
+
     # Construct the default pool, if we don't have any passed in. We
     # can't know all the possible permutations, so any tests involving
     # multiple nodepools must construct them prior to _MakeCluster.
@@ -287,6 +298,7 @@ class TestBase(cli_test_base.CliTestBase):
         addonsConfig=kwargs.get('addonsConfig'),
         nodePools=kwargs.get('nodePools'),
         nodeConfig=kwargs.get('nodeConfig'),
+        binaryAuthorization=kwargs.get('binaryAuthorization'),
         enableKubernetesAlpha=kwargs.get('enableKubernetesAlpha'),
         expireTime=kwargs.get('expireTime'),
         selfLink=kwargs.get('selfLink'),
@@ -297,6 +309,7 @@ class TestBase(cli_test_base.CliTestBase):
         privateClusterConfig=kwargs.get('privateClusterConfig'),
         defaultMaxPodsConstraint=kwargs.get('defaultMaxPodsConstraint'),
         enableTpu=kwargs.get('enableTpu'),
+        verticalPodAutoscaling=kwargs.get('verticalPodAutoscaling'),
     )
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
@@ -320,9 +333,7 @@ class TestBase(cli_test_base.CliTestBase):
     return c
 
   def _MakeClusterWithAutoscaling(self, **kwargs):
-    pool = self.messages.NodePool(
-        autoscaling=kwargs.get('autoscaling')
-    )
+    pool = self.messages.NodePool(autoscaling=kwargs.get('autoscaling'))
     kwargs['nodePools'] = [pool]
     return self._MakeCluster(**kwargs)
 
@@ -355,8 +366,8 @@ class TestBase(cli_test_base.CliTestBase):
         ),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
         autoscaling=kwargs.get('autoscaling'),
-        management=(kwargs.get('management') if 'management' in kwargs
-                    else self._MakeDefaultNodeManagement()),
+        management=(kwargs.get('management') if 'management' in kwargs else
+                    self._MakeDefaultNodeManagement()),
         maxPodsConstraint=kwargs.get('maxPodsConstraint'),
     )
 
@@ -367,8 +378,8 @@ class TestBase(cli_test_base.CliTestBase):
   # autoupgrade default value to GA
   def _MakeDefaultNodeManagement(self, auto_repair=True):
     auto_upgrade = None if self.API_VERSION == 'v1' else True
-    return self.messages.NodeManagement(autoRepair=auto_repair,
-                                        autoUpgrade=auto_upgrade)
+    return self.messages.NodeManagement(
+        autoRepair=auto_repair, autoUpgrade=auto_upgrade)
 
   def _MakeIPAllocationPolicy(self, **kwargs):
     policy = self.messages.IPAllocationPolicy()
@@ -459,15 +470,24 @@ class TestBase(cli_test_base.CliTestBase):
   def ExpectGetCluster(self, cluster, exception=None, zone=None):
     raise NotImplementedError('ExpectGetCluster is not overridden')
 
-  def ExpectCreateCluster(self, cluster, response=None,
-                          exception=None, zone=None):
+  def ExpectCreateCluster(self,
+                          cluster,
+                          response=None,
+                          exception=None,
+                          zone=None):
     raise NotImplementedError('ExpectCreateCluster is not overridden')
 
-  def ExpectDeleteCluster(self, cluster_name, response=None,
-                          exception=None, zone=None):
+  def ExpectDeleteCluster(self,
+                          cluster_name,
+                          response=None,
+                          exception=None,
+                          zone=None):
     raise NotImplementedError('ExpectDeleteCluster is not overridden')
 
-  def ExpectListClusters(self, clusters, zone=None, project_id=None,
+  def ExpectListClusters(self,
+                         clusters,
+                         zone=None,
+                         project_id=None,
                          missing=None):
     raise NotImplementedError('ExpectListClusters is not overridden')
 
@@ -485,12 +505,15 @@ class TestBase(cli_test_base.CliTestBase):
             instanceGroupManager=group,
             project=self.PROJECT_ID,
             zone=cluster.zone,
-            size=size),
-        op)
+            size=size), op)
     return op
 
-  def ExpectResizeNodePool(self, node_pool_name, size, response=None,
-                           exception=None, zone=None):
+  def ExpectResizeNodePool(self,
+                           node_pool_name,
+                           size,
+                           response=None,
+                           exception=None,
+                           zone=None):
     raise NotImplementedError('ExpectResizeNodePool is not overridden')
 
   def ExpectCreateNodePool(self,
@@ -500,12 +523,18 @@ class TestBase(cli_test_base.CliTestBase):
                            zone=None):
     raise NotImplementedError('ExpectCreateNodePool is not overridden')
 
-  def ExpectGetNodePool(self, node_pool_id, response=None,
-                        exception=None, zone=None):
+  def ExpectGetNodePool(self,
+                        node_pool_id,
+                        response=None,
+                        exception=None,
+                        zone=None):
     raise NotImplementedError('ExpectGetNodePool is not overridden')
 
-  def ExpectDeleteNodePool(self, node_pool_name, response=None,
-                           exception=None, zone=None):
+  def ExpectDeleteNodePool(self,
+                           node_pool_name,
+                           response=None,
+                           exception=None,
+                           zone=None):
     raise NotImplementedError('ExpectDeleteNodePool is not overridden')
 
   def ExpectSetNodePoolManagement(self,
@@ -518,21 +547,29 @@ class TestBase(cli_test_base.CliTestBase):
 
   def ExpectUpdateNodePool(self,
                            node_pool_name,
-                           workload_metadata_from_node=None,
+                           workload_metadata_config=None,
+                           locations=None,
                            response=None,
                            exception=None,
-                           zone=None):
+                           zone=None,
+                           upgrade_settings=None):
     raise NotImplementedError('ExpectUpdateNodePool is not overridden')
 
   def _MakeListNodePoolsResponse(self, node_pools):
     return self.messages.ListNodePoolsResponse(nodePools=node_pools)
 
-  def ExpectListNodePools(self, project_id=None, response=None,
-                          exception=None, zone=None):
+  def ExpectListNodePools(self,
+                          project_id=None,
+                          response=None,
+                          exception=None,
+                          zone=None):
     raise NotImplementedError('ExpectListNodePools is not overridden')
 
-  def ExpectRollbackOperation(self, node_pool_name, response=None,
-                              exception=None, zone=None):
+  def ExpectRollbackOperation(self,
+                              node_pool_name,
+                              response=None,
+                              exception=None,
+                              zone=None):
     raise NotImplementedError('ExpectRollbackOperation is not overridden')
 
   def ExpectCancelOperation(self, op=None, exception=None):
@@ -542,7 +579,8 @@ class TestBase(cli_test_base.CliTestBase):
                       cluster_name,
                       resource_labels,
                       fingerprint,
-                      response=None, zone=None):
+                      response=None,
+                      zone=None):
     raise NotImplementedError('ExpectSetLabels is not overridden')
 
   def ExpectUpgradeCluster(self, cluster_name, update, response, location=None):
@@ -603,8 +641,11 @@ class GATestBase(TestBase):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
-  def ExpectCreateCluster(self, cluster, response=None,
-                          exception=None, zone=None):
+  def ExpectCreateCluster(self,
+                          cluster,
+                          response=None,
+                          exception=None,
+                          zone=None):
     if not zone:
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters.Create.Expect(
@@ -623,8 +664,8 @@ class GATestBase(TestBase):
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters.Delete.Expect(
         self.messages.ContainerProjectsLocationsClustersDeleteRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, zone, cluster_name)),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, zone,
+                                                    cluster_name)),
         response=response,
         exception=exception)
 
@@ -638,8 +679,8 @@ class GATestBase(TestBase):
     self.mocked_client.projects_locations_clusters.Get.Expect(
         self.messages.ContainerProjectsLocationsClustersGetRequest(
             # use the response operation name/zone same as request
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, zone, cluster.name)),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, zone,
+                                                    cluster.name)),
         response,
         exception=exception)
 
@@ -669,16 +710,19 @@ class GATestBase(TestBase):
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters_nodePools.Create.Expect(
         self.messages.CreateNodePoolRequest(
-            parent=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, zone, self.CLUSTER_NAME),
+            parent=api_adapter.ProjectLocationCluster(self.PROJECT_ID, zone,
+                                                      self.CLUSTER_NAME),
             nodePool=node_pool),
         response=response,
         exception=exception)
 
   # TODO(b/64575339) Make this work more like GetCluster (specifically, infer
   # node_pool_id from node_pool (response).
-  def ExpectGetNodePool(self, node_pool_id, response=None,
-                        exception=None, zone=None):
+  def ExpectGetNodePool(self,
+                        node_pool_id,
+                        response=None,
+                        exception=None,
+                        zone=None):
     if not zone:
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters_nodePools.Get.Expect(
@@ -711,8 +755,8 @@ class GATestBase(TestBase):
                                   zone=None):
     if not zone:
       zone = self.ZONE
-    (self.mocked_client.projects_locations_clusters_nodePools.
-     SetManagement.Expect(
+    (self.mocked_client.projects_locations_clusters_nodePools.SetManagement
+     .Expect(
          self.messages.SetNodePoolManagementRequest(
              name=api_adapter.ProjectLocationClusterNodePool(
                  self.PROJECT_ID, zone, self.CLUSTER_NAME, node_pool_name),
@@ -722,18 +766,22 @@ class GATestBase(TestBase):
 
   def ExpectUpdateNodePool(self,
                            node_pool_name,
-                           workload_metadata_config,
+                           workload_metadata_config=None,
+                           locations=None,
                            response=None,
                            exception=None,
-                           zone=None):
+                           zone=None,
+                           upgrade_settings=None):
     if not zone:
       zone = self.ZONE
+    if locations is None:
+      locations = []
     msg = self.messages.UpdateNodePoolRequest(
         name=api_adapter.ProjectLocationClusterNodePool(self.PROJECT_ID, zone,
                                                         self.CLUSTER_NAME,
                                                         node_pool_name),
         workloadMetadataConfig=workload_metadata_config,
-    )
+        locations=locations)
     self.mocked_client.projects_locations_clusters_nodePools.Update.Expect(
         msg, response=response, exception=exception)
 
@@ -742,27 +790,32 @@ class GATestBase(TestBase):
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters_nodePools.List.Expect(
         self.messages.ContainerProjectsLocationsClustersNodePoolsListRequest(
-            parent=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, zone, self.CLUSTER_NAME)),
+            parent=api_adapter.ProjectLocationCluster(self.PROJECT_ID, zone,
+                                                      self.CLUSTER_NAME)),
         response=response,
         exception=exception)
 
-  def ExpectResizeNodePool(self, node_pool_name, size, response=None,
-                           exception=None, zone=None):
+  def ExpectResizeNodePool(self,
+                           node_pool_name,
+                           size,
+                           response=None,
+                           exception=None,
+                           zone=None):
     if not zone:
       zone = self.ZONE
     req = self.messages.SetNodePoolSizeRequest(
-        name=api_adapter.ProjectLocationClusterNodePool(
-            self.PROJECT_ID, zone, self.CLUSTER_NAME, node_pool_name),
-        nodeCount=size
-    )
+        name=api_adapter.ProjectLocationClusterNodePool(self.PROJECT_ID, zone,
+                                                        self.CLUSTER_NAME,
+                                                        node_pool_name),
+        nodeCount=size)
     self.mocked_client.projects_locations_clusters_nodePools.SetSize.Expect(
-        req,
-        response=response,
-        exception=exception)
+        req, response=response, exception=exception)
 
-  def ExpectRollbackOperation(self, node_pool_name, response=None,
-                              exception=None, zone=None):
+  def ExpectRollbackOperation(self,
+                              node_pool_name,
+                              response=None,
+                              exception=None,
+                              zone=None):
     if not zone:
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters_nodePools.Rollback.Expect(
@@ -775,8 +828,8 @@ class GATestBase(TestBase):
   def ExpectGetOperation(self, response, exception=None):
     # use the response operation name/zone same as request
     req = self.messages.ContainerProjectsLocationsOperationsGetRequest(
-        name=api_adapter.ProjectLocationOperation(
-            self.PROJECT_ID, response.zone, response.name))
+        name=api_adapter.ProjectLocationOperation(self.PROJECT_ID,
+                                                  response.zone, response.name))
     if exception:
       response = None
     self.mocked_client.projects_locations_operations.Get.Expect(
@@ -793,8 +846,8 @@ class GATestBase(TestBase):
   def ExpectCancelOperation(self, op=None, exception=None):
     self.mocked_client.projects_locations_operations.Cancel.Expect(
         self.messages.CancelOperationRequest(
-            name=api_adapter.ProjectLocationOperation(
-                self.PROJECT_ID, self.ZONE, op.name)),
+            name=api_adapter.ProjectLocationOperation(self.PROJECT_ID,
+                                                      self.ZONE, op.name)),
         response=self.messages.Empty(),
         exception=exception)
 
@@ -802,32 +855,32 @@ class GATestBase(TestBase):
                       cluster_name,
                       resource_labels,
                       fingerprint,
-                      response=None, zone=None):
+                      response=None,
+                      zone=None):
     if not zone:
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters.SetResourceLabels.Expect(
         self.messages.SetLabelsRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, zone, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, zone,
+                                                    cluster_name),
             resourceLabels=resource_labels,
-            labelFingerprint=fingerprint),
-        response)
+            labelFingerprint=fingerprint), response)
 
   def ExpectUpgradeCluster(self, cluster_name, update, response, location=None):
     if not location:
       location = self.ZONE
     self.mocked_client.projects_locations_clusters.Update.Expect(
         self.msgs.UpdateClusterRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, location, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, location,
+                                                    cluster_name),
             update=update),
         response=response)
 
   def ExpectUpdateCluster(self, cluster_name, update, response):
     self.mocked_client.projects_locations_clusters.Update.Expect(
         self.msgs.UpdateClusterRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name),
             update=update),
         response=response)
 
@@ -839,8 +892,8 @@ class GATestBase(TestBase):
                           exception=None):
     self.mocked_client.projects_locations_clusters.SetMasterAuth.Expect(
         self.msgs.SetMasterAuthRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name),
             action=action,
             update=update),
         response=response,
@@ -849,8 +902,8 @@ class GATestBase(TestBase):
   def ExpectLegacyAbac(self, cluster_name, enabled, response):
     self.mocked_client.projects_locations_clusters.SetLegacyAbac.Expect(
         self.msgs.SetLegacyAbacRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name),
             enabled=enabled),
         response=response)
 
@@ -873,20 +926,20 @@ class GATestBase(TestBase):
                                exception=None):
     self.mocked_client.projects_locations_clusters.CompleteIpRotation.Expect(
         self.msgs.CompleteIPRotationRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name)),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name)),
         response=response,
         exception=exception)
 
   def ExpectSetNetworkPolicy(self, cluster_name, enabled=True, response=None):
     self.mocked_client.projects_locations_clusters.SetNetworkPolicy.Expect(
         self.msgs.SetNetworkPolicyRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name),
             networkPolicy=self.msgs.NetworkPolicy(
                 enabled=enabled,
-                provider=self.msgs.NetworkPolicy.
-                ProviderValueValuesEnum.CALICO)),
+                provider=self.msgs.NetworkPolicy.ProviderValueValuesEnum.CALICO)
+        ),
         response=response)
 
   def ExpectSetLoggingService(self,
@@ -896,18 +949,19 @@ class GATestBase(TestBase):
                               exception=None):
     self.mocked_client.projects_locations_clusters.SetLogging.Expect(
         self.msgs.SetLoggingServiceRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name),
             loggingService=logging_service),
         response=response,
         exception=exception)
 
-  def ExpectSetMaintenanceWindow(self, cluster_name, policy=None,
+  def ExpectSetMaintenancePolicy(self,
+                                 cluster_name,
+                                 policy=None,
                                  response=None):
     self.mocked_client.projects_locations_clusters.SetMaintenancePolicy.Expect(
         self.msgs.SetMaintenancePolicyRequest(
-            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID,
-                                                    self.ZONE,
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
                                                     cluster_name),
             maintenancePolicy=policy),
         response=response)
@@ -978,7 +1032,6 @@ class BetaTestBase(GATestBase):
 
   def _MakeCluster(self, **kwargs):
     cluster = GATestBase._MakeCluster(self, **kwargs)
-    cluster.binaryAuthorization = kwargs.get('binaryAuthorization')
     cluster.autoscaling = kwargs.get('clusterAutoscaling')
     cluster.verticalPodAutoscaling = kwargs.get('verticalPodAutoscaling')
     cluster.shieldedNodes = kwargs.get('shieldedNodes')
@@ -986,6 +1039,20 @@ class BetaTestBase(GATestBase):
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
           keyName=kwargs.get('databaseEncryptionKey'),
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
+
+    # Initialize maintenance policy resource version if told to. We can't do
+    # this all the time because it's something the server sets. So normally all
+    # get requests will have it, but we shouldn't be setting ourselves for
+    # create requests.
+    resource_version = kwargs.get('maintenancePolicyResourceVersion')
+    if resource_version:
+      if cluster.maintenancePolicy is None:
+        cluster.maintenancePolicy = self.messages.MaintenancePolicy()
+      if not cluster.maintenancePolicy.resourceVersion:
+        cluster.maintenancePolicy.resourceVersion = resource_version
+
+    cluster.releaseChannel = kwargs.get('releaseChannel')
+
     return cluster
 
   def _MakeNodePool(self, **kwargs):
@@ -994,6 +1061,13 @@ class BetaTestBase(GATestBase):
         'workloadMetadataConfig')
     node_pool.config.metadata = kwargs.get('metadata')
     node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
+    node_pool.config.shieldedInstanceConfig = kwargs.get(
+        'shieldedInstanceConfig',
+        self.messages.ShieldedInstanceConfig(
+            enableSecureBoot=False, enableIntegrityMonitoring=False),
+    )
+    if kwargs.get('nodePoolLocations'):
+      node_pool.locations = kwargs.get('nodePoolLocations')
     return node_pool
 
   def _MakeIPAllocationPolicy(self, **kwargs):
@@ -1016,13 +1090,15 @@ class BetaTestBase(GATestBase):
     #   pool = self._MakeDefaultNodePool(**kwargs)
     #   kwargs['nodePools'] = [pool]
     #   kwargs['instanceGroupUrls'] = pool.instanceGroupUrls
-    network = resources.REGISTRY.Create('compute.networks',
-                                        project=self.PROJECT_ID,
-                                        network=kwargs.get('network'))
-    subnetwork = resources.REGISTRY.Create('compute.subnetworks',
-                                           project=self.PROJECT_ID,
-                                           region=self.REGION,
-                                           subnetwork=kwargs.get('subnetwork'))
+    network = resources.REGISTRY.Create(
+        'compute.networks',
+        project=self.PROJECT_ID,
+        network=kwargs.get('network'))
+    subnetwork = resources.REGISTRY.Create(
+        'compute.subnetworks',
+        project=self.PROJECT_ID,
+        region=self.REGION,
+        subnetwork=kwargs.get('subnetwork'))
     return self.messages.UsableSubnetwork(
         subnetwork=subnetwork.RelativeName(),
         network=network.RelativeName(),
@@ -1035,9 +1111,7 @@ class BetaTestBase(GATestBase):
 
   def _ExpectListUsableSubnets(self, response, exception=None):
     req = self.messages.ContainerProjectsAggregatedUsableSubnetworksListRequest(
-        parent=self.PROJECT_REF.RelativeName(),
-        pageSize=500,
-        filter='')
+        parent=self.PROJECT_REF.RelativeName(), pageSize=500, filter='')
     if exception:
       response = None
     self.mocked_client.projects_aggregated_usableSubnetworks.List.Expect(
@@ -1057,7 +1131,7 @@ class AlphaTestBase(BetaTestBase):
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
           keyName=kwargs.get('databaseEncryptionKey'),
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
-    cluster.releaseChannel = kwargs.get('releaseChannel')
+
     return cluster
 
   def _MakeNodePool(self, **kwargs):
@@ -1069,12 +1143,35 @@ class AlphaTestBase(BetaTestBase):
     node_pool.config.nodeGroup = kwargs.get('nodeGroup')
     node_pool.upgradeSettings = kwargs.get('upgradeSettings')
     node_pool.config.linuxNodeConfig = kwargs.get('linuxNodeConfig')
+    node_pool.config.kubeletConfig = kwargs.get('kubeletConfig')
+
     return node_pool
 
+  def ExpectUpdateNodePool(self,
+                           node_pool_name,
+                           workload_metadata_config=None,
+                           locations=None,
+                           response=None,
+                           exception=None,
+                           zone=None,
+                           upgrade_settings=None):
+    if not zone:
+      zone = self.ZONE
+    if locations is None:
+      locations = []
+    msg = self.messages.UpdateNodePoolRequest(
+        name=api_adapter.ProjectLocationClusterNodePool(self.PROJECT_ID, zone,
+                                                        self.CLUSTER_NAME,
+                                                        node_pool_name),
+        workloadMetadataConfig=workload_metadata_config,
+        upgradeSettings=upgrade_settings,
+        locations=locations)
+    self.mocked_client.projects_locations_clusters_nodePools.Update.Expect(
+        msg, response=response, exception=exception)
 
-class IntegrationTestBase(
-    e2e_base.WithServiceAuth,
-    sdk_test_base.WithOutputCapture):
+
+class IntegrationTestBase(e2e_base.WithServiceAuth,
+                          sdk_test_base.WithOutputCapture):
   """Base class for container integration tests."""
 
   REGION = 'us-central1'
@@ -1087,16 +1184,16 @@ class IntegrationTestBase(
       log.status.Print('Attempting to cleaning up %s', self.cluster_name)
       # Make cluster deletion asynchronized until gcloud can allow a timeout
       # longer than 20 minutes.
-      self.Run('container clusters delete {0} --zone={1} --async -q'
-               .format(self.cluster_name, self.ZONE))
+      self.Run('container clusters delete {0} --zone={1} --async -q'.format(
+          self.cluster_name, self.ZONE))
     except core_exceptions.Error as error:
       log.status.Print('Failed to delete %s:\n%s', self.cluster_name, error)
     try:
       log.status.Print('Attempting to cleaning up %s', self.cluster_name)
       # Make cluster deletion asynchronized until gcloud can allow a timeout
       # longer than 20 minutes.
-      self.Run('container clusters delete {0} --region={1} --async -q'
-               .format(self.cluster_name, self.REGION))
+      self.Run('container clusters delete {0} --region={1} --async -q'.format(
+          self.cluster_name, self.REGION))
     except core_exceptions.Error as error:
       log.status.Print('Failed to delete %s:\n%s', self.cluster_name, error)
 
@@ -1141,8 +1238,8 @@ class ClustersTestBase(UnitTestBase):
 
   def SetUp(self):
     self.clusters_command_base = self.COMMAND_BASE + ' clusters --zone {0}'
-    self.regional_clusters_command_base = (self.COMMAND_BASE +
-                                           ' clusters --region {0}')
+    self.regional_clusters_command_base = (
+        self.COMMAND_BASE + ' clusters --region {0}')
     kubeconfig_path = kconfig.Kubeconfig.DefaultPath()
     if os.path.exists(kubeconfig_path):
       os.unlink(kubeconfig_path)
@@ -1155,8 +1252,8 @@ class NodePoolsTestBase(UnitTestBase):
 
   def SetUp(self):
     self.node_pools_command_base = self.COMMAND_BASE + ' node-pools --zone {0}'
-    self.regional_node_pools_command_base = (self.COMMAND_BASE +
-                                             ' node-pools --region {0}')
+    self.regional_node_pools_command_base = (
+        self.COMMAND_BASE + ' node-pools --region {0}')
     kubeconfig_path = kconfig.Kubeconfig.DefaultPath()
     if os.path.exists(kubeconfig_path):
       os.unlink(kubeconfig_path)
@@ -1164,7 +1261,8 @@ class NodePoolsTestBase(UnitTestBase):
 
   def HttpError(self):
     return http_error.MakeHttpError(
-        400, 'your request is bad and you should feel bad.',
+        400,
+        'your request is bad and you should feel bad.',
         url='https://fake-url.io')
 
 
@@ -1180,8 +1278,8 @@ class GetServerConfigTestBase(UnitTestBase):
   """Base class for get-server-config command tests."""
 
   def SetUp(self):
-    self.get_server_config_command_base = (self.COMMAND_BASE +
-                                           ' get-server-config')
+    self.get_server_config_command_base = (
+        self.COMMAND_BASE + ' get-server-config')
     self.msgs = core_apis.GetMessagesModule('container', self.API_VERSION)
 
 

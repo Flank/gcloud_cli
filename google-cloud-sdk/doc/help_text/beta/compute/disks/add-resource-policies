@@ -84,8 +84,9 @@ EXAMPLES
             --zone=ZONE --resource-policies=policy-1,policy-2
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute disks add-resource-policies
         $ gcloud alpha compute disks add-resource-policies
 

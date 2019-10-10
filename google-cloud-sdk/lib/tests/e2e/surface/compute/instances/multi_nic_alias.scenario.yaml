@@ -5,31 +5,31 @@ summary:
 - execute:
   - command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
   - stdout:
       matches: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
 - execute:
   - command: compute networks subnets create $$subnet1$$ --region us-central1 --network
       $$network1$$ --range 10.0.3.0/24 --format 'text(name,network,ipCidrRange)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
   - stdout: |
       ---
       ipCidrRange: 10.0.3.0/24
       name:        $$subnet1$$
-      network:     https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+      network:     https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --network-interface
       subnet=$$subnet1$$,aliases=/32  --format='yaml(networkInterfaces[].subnetwork,
       networkInterfaces[].aliasIpRanges)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |-
       ---
       networkInterfaces:
       - aliasIpRanges:
         - ipCidrRange: 10.0.3.*/32
-        subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+        subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
       $
 - execute:
   - command: compute instances network-interfaces update $$instance$$ --zone us-central1-f
@@ -42,7 +42,7 @@ summary:
       networkInterfaces[].aliasIpRanges)'
   - stdout: |
       networkInterfaces:
-      - subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+      - subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
 - execute:
   - command: compute instances network-interfaces update $$instance$$ --zone us-central1-f
       --aliases /32
@@ -56,24 +56,24 @@ summary:
       networkInterfaces:
       - aliasIpRanges:
         - ipCidrRange: 10.0.3.*/32
-        subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+        subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
       $
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute networks subnets delete $$subnet1$$ --region us-central1 --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
 - execute:
   - command: compute networks delete $$network1$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
+      Deleted [https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: network1
     prefix: multi-nic-template
@@ -108,17 +108,18 @@ actions:
             id: '8960750156329223838'
             name: operation-1537882225313-576b21bbf0777-3b9b0f3b-e35e72b7
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+            targetLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
             targetId: '1545482728873887390'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-25T06:30:25.936-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1537882225313-576b21bbf0777-3b9b0f3b-e35e72b7
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1537882225313-576b21bbf0777-3b9b0f3b-e35e72b7
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
@@ -134,7 +135,7 @@ actions:
             id: '1545482728873887390'
             creationTimestamp: '2018-09-25T06:30:25.928-07:00'
             name: $$network1$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
             autoCreateSubnetworks: false
             routingConfig:
               routingMode: REGIONAL
@@ -156,7 +157,7 @@ actions:
             json:
               ipCidrRange: 10.0.3.0/24
               name: $$subnet1$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+              network: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
               privateIpGoogleAccess: false
         return_response:
           headers:
@@ -166,18 +167,19 @@ actions:
             id: '1964909027180119664'
             name: operation-1537882269798-576b21e65cea2-8a21fb77-54ee3bde
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+            targetLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
             targetId: '2058280761496667760'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-25T06:31:11.098-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1537882269798-576b21e65cea2-8a21fb77-54ee3bde
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1537882269798-576b21e65cea2-8a21fb77-54ee3bde
+            region: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
@@ -193,20 +195,21 @@ actions:
             id: '2058280761496667760'
             creationTimestamp: '2018-09-25T06:31:11.087-07:00'
             name: $$subnet1$$
-            network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+            network: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
             ipCidrRange: 10.0.3.0/24
             gatewayAddress: 10.0.3.1
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+            region: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
             privateIpGoogleAccess: false
             fingerprint: E5sAXLHADXQ=
             allowSubnetCidrRoutesOverlap: false
             kind: compute#subnetwork
-    - expect_stdout: |
-        ---
-        ipCidrRange: 10.0.3.0/24
-        name:        $$subnet1$$
-        network:     https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
+    - expect_stdout:
+        matches: |
+          ---
+          ipCidrRange: 10.0.3.0/24
+          name:        $$subnet1$$
+          network:     https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
     - expect_exit:
         code: 0
 - execute_command:
@@ -231,8 +234,8 @@ actions:
             name: us-central1-f
             description: us-central1-f
             status: UP
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            region: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
             availableCpuPlatforms:
             - Intel Skylake
             - Intel Broadwell
@@ -262,7 +265,7 @@ actions:
               reportNamePrefix: ''
             enabledFeatures:
             - alpha-api
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing
             defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
             xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
             defaultNetworkTier: PREMIUM
@@ -280,10 +283,10 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-9
                 mode: READ_WRITE
                 type: PERSISTENT
-              machineType: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              machineType: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
               metadata: {}
               name: $$instance$$
               networkInterfaces:
@@ -292,7 +295,7 @@ actions:
                   type: ONE_TO_ONE_NAT
                 aliasIpRanges:
                 - ipCidrRange: /32
-                subnetwork: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
+                subnetwork: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$
               scheduling:
                 automaticRestart: true
               serviceAccounts:
@@ -312,19 +315,20 @@ actions:
           body:
             id: '1025948284860466776'
             name: operation-1537882294292-576b21fdb8f70-9a8279a7-a7d3d684
-            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
             targetId: '476051617519994457'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-25T06:31:35.528-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537882294292-576b21fdb8f70-9a8279a7-a7d3d684
+            selfLink: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537882294292-576b21fdb8f70-9a8279a7-a7d3d684
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
@@ -978,8 +982,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537882345878-576b222eeb29d-f3eddc3e-ea9f754c
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -1010,8 +1015,9 @@ actions:
             region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -1041,7 +1047,8 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1537882440651-576b22894d386-99a0590c-897182c9
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$\].
     - expect_exit:
         code: 0

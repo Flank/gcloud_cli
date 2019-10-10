@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -346,7 +346,7 @@ class ValidationTestsGA(SignUrlTestsBase):
   def _MockResponseForRequest(self, url, response_code):
     """Mocks the response for the specified request URL."""
     self.http_response_mock.status = response_code
-    response_body = ''
+    response_body = b''
     self.http_request_mock.return_value = (self.http_response_mock,
                                            response_body)
 

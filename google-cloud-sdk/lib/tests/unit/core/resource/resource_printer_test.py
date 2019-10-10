@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +52,8 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
   def testDefaultFormat(self):
     [resource] = self.CreateResourceList(1)
     resource_printer.Print(resource, 'default')
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         SelfLink: http://g/selfie/a-0
         kind: compute#instance
         labels:
@@ -80,6 +81,7 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.0
+        size: 0
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         """))
@@ -102,15 +104,15 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
 
   def testSupportedFormats(self):
     formats = resource_printer.SupportedFormats()
-    self.assertTrue('default' in formats)
-    self.assertTrue('none' in formats)
-    self.assertTrue('yaml' in formats)
+    self.assertIn('default', formats)
+    self.assertIn('none', formats)
+    self.assertIn('yaml', formats)
 
   def testGetFormatRegistry(self):
     registry = resource_printer.GetFormatRegistry()
-    self.assertTrue('default' in registry)
-    self.assertTrue('none' in registry)
-    self.assertTrue('yaml' in registry)
+    self.assertIn('default', registry)
+    self.assertIn('none', registry)
+    self.assertIn('yaml', registry)
 
   def testGetSupportedFormatsAndFormatRegistry(self):
     expected = resource_printer.SupportedFormats()

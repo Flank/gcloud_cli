@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -186,7 +186,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
 
     self.Run("""
         compute instances remove-metadata
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance
           --keys x,hello
         """)
 

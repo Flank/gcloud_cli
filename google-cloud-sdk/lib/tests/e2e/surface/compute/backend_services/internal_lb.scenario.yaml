@@ -4,24 +4,24 @@ release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: compute health-checks create tcp $$hc$$ --format none
+  - command: compute health-checks create tcp $$hc$$ $$global-flag$$ --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instance-groups unmanaged create $$ig$$ --zone us-central1-f
       --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute backend-services create $$bs$$ --load-balancing-scheme=internal
-      --health-checks=$$hc$$ --protocol=TCP --timeout=30 --region us-central1 --format
-      'text(name,loadBalancingScheme,timeoutSec)'
+      --health-checks=$$hc$$ $$global-hc-flag$$ --protocol=TCP --timeout=30 --region us-central1
+      --format 'text(name,loadBalancingScheme,timeoutSec)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       loadBalancingScheme: INTERNAL
@@ -44,34 +44,34 @@ summary:
   - command: compute instance-groups unmanaged add-instances $$ig$$ --instances $$instance$$
       --zone us-central1-f
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Updated [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute backend-services add-backend $$bs$$ --region us-central1 --instance-group
       $$ig$$ --instance-group-zone us-central1-f --description initial-test-backend
       --format 'text(name,backends[0].description,backends[0].group)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Updated [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       backends[0].description: initial-test-backend
-      backends[0].group:       https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+      backends[0].group:       https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
       name:                    $$bs$$
 - execute:
   - command: compute backend-services update-backend $$bs$$ --region us-central1 --instance-group
       $$ig$$ --instance-group-zone us-central1-f --description updated-test-backend
       --format 'text(name,backends[0].description,backends[0].group)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Updated [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       backends[0].description: updated-test-backend
-      backends[0].group:       https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+      backends[0].group:       https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
       name:                    $$bs$$
 - execute:
   - command: compute backend-services remove-backend $$bs$$ --region us-central1 --instance-group
       $$ig$$ --instance-group-zone us-central1-f --format 'text(name,backends)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Updated [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       name: $$bs$$
@@ -79,7 +79,7 @@ summary:
   - command: compute backend-services update $$bs$$ --region us-central1 --timeout=20
       --format 'text(name,loadBalancingScheme,timeoutSec)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Updated [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
   - stdout: |
       ---
       loadBalancingScheme: INTERNAL
@@ -90,36 +90,36 @@ summary:
       --backend-service $$bs$$ --ports 80-82,85 --network default --region us-central1
       --format 'text(name,loadBalancingScheme,backendService)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+      Created [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$\].
   - stdout: |
       ---
-      backendService:      https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+      backendService:      https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
       loadBalancingScheme: INTERNAL
       name:                $$fr$$
 - execute:
   - command: compute forwarding-rules delete $$fr$$ --quiet --region us-central1
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$\].
 - execute:
   - command: compute backend-services delete $$bs$$ --quiet --region us-central1
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
 - execute:
   - command: compute instance-groups unmanaged delete $$ig$$ --quiet --zone us-central1-f
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute instances delete $$instance$$ --quiet --zone us-central1-f
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
-  - command: compute health-checks delete $$hc$$ --quiet
+  - command: compute health-checks delete $$hc$$ $$global-flag$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+      Deleted [https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -129,15 +129,32 @@ actions:
       ALPHA: alpha
 
 
+- define_reference:
+    reference: global-flag
+    value: ""
+    track_values:
+      ALPHA: --global
+      BETA: --global
+
+
+- define_reference:
+    reference: global-hc-flag
+    value: ""
+    track_values:
+      ALPHA: --global-health-checks
+      BETA: --global-health-checks
+
+
 - generate_resource_id:
     reference: hc
     prefix: compute-internal-lb-health-check
 - execute_command:
-    command: compute health-checks create tcp $$hc$$ --format none
+    command: compute health-checks create tcp $$hc$$ $$global-flag$$ --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
     - expect_exit:
         code: 0
 
@@ -149,8 +166,9 @@ actions:
     command: compute instances create $$instance$$ --zone us-central1-f --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 
@@ -163,8 +181,9 @@ actions:
       --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -174,8 +193,8 @@ actions:
     prefix: compute-internal-lb-backend-service
 - execute_command:
     command: compute backend-services create $$bs$$ --load-balancing-scheme=internal
-      --health-checks=$$hc$$ --protocol=TCP --timeout=30 --region us-central1 --format
-      'text(name,loadBalancingScheme,timeoutSec)'
+      --health-checks=$$hc$$ $$global-hc-flag$$ --protocol=TCP --timeout=30 --region us-central1
+      --format 'text(name,loadBalancingScheme,timeoutSec)'
     events:
     - api_call:
         expect_request:
@@ -185,7 +204,7 @@ actions:
           body:
             json:
               healthChecks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+              - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
               loadBalancingScheme: INTERNAL
               name: $$bs$$
               protocol: TCP
@@ -201,17 +220,18 @@ actions:
             id: '5870500205943480382'
             name: operation-1538514640390-577455a9f4772-e4f1bbed-da8887f8
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
             targetId: '7253485598015381566'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-10-02T14:10:41.427-07:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514640390-577455a9f4772-e4f1bbed-da8887f8
-            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514640390-577455a9f4772-e4f1bbed-da8887f8
+            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -231,14 +251,14 @@ actions:
             creationTimestamp: '2018-10-02T14:10:41.418-07:00'
             name: $$bs$$
             description: ''
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
             healthChecks:
-            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
             timeoutSec: 30
             protocol: TCP
             fingerprint: 0Avy1e2iUJI=
             sessionAffinity: NONE
-            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             loadBalancingScheme: INTERNAL
             connectionDraining:
               drainingTimeoutSec: 0
@@ -286,14 +306,14 @@ actions:
                   creationTimestamp: '2018-10-02T14:10:41.418-07:00'
                   name: $$bs$$
                   description: ''
-                  selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+                  selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
                   healthChecks:
-                  - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+                  - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
                   timeoutSec: 30
                   protocol: TCP
                   fingerprint: 0Avy1e2iUJI=
                   sessionAffinity: NONE
-                  region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+                  region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
                   loadBalancingScheme: INTERNAL
                   connectionDraining:
                     drainingTimeoutSec: 0
@@ -433,7 +453,7 @@ actions:
                   data:
                   - key: scope
                     value: regions/us-west2
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/aggregated/backendServices
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/aggregated/backendServices
     - expect_stdout: |
         ---
         name: $$bs$$
@@ -464,14 +484,14 @@ actions:
             creationTimestamp: '2018-10-02T14:10:41.418-07:00'
             name: $$bs$$
             description: ''
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
             healthChecks:
-            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
+            - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$
             timeoutSec: 30
             protocol: TCP
             fingerprint: 0Avy1e2iUJI=
             sessionAffinity: NONE
-            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            region: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
             loadBalancingScheme: INTERNAL
             connectionDraining:
               drainingTimeoutSec: 0
@@ -488,8 +508,9 @@ actions:
       --zone us-central1-f
     validation_only: true
     events:
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -538,7 +559,7 @@ actions:
             json:
               backends:
               - description: initial-test-backend
-                group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+                group: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
               connectionDraining:
                 drainingTimeoutSec: 0
               description: ''
@@ -572,8 +593,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514652484-577455b57d1a3-ae6c02e1-e2593ed3
             region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -700,8 +722,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514681158-577455d0d5971-019ef726-96217355
             region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -823,8 +846,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514715296-577455f164101-55fbfdad-574ac920
             region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -936,8 +960,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514739187-577456082cd38-49c02933-58b73c09
             region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
@@ -992,10 +1017,10 @@ actions:
           headers: {}
           body:
             json:
-              backendService: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
+              backendService: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$
               loadBalancingScheme: INTERNAL
               name: $$fr$$
-              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
               ports:
               - '80'
               - '81'
@@ -1021,8 +1046,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514747706-577456104ca90-cfb8288c-f6d028c8
             region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$?alt=json
@@ -1069,8 +1095,9 @@ actions:
     cleanup_for: fr
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$\].
     - expect_exit:
         code: 0
 
@@ -1105,8 +1132,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1538514778134-5774562d515f0-c3cc85c8-9ff619bf
             region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$\].
     - expect_exit:
         code: 0
 
@@ -1116,8 +1144,9 @@ actions:
     cleanup_for: ig
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -1127,18 +1156,20 @@ actions:
     cleanup_for: instance
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 
 
 - execute_command:
-    command: compute health-checks delete $$hc$$ --quiet
+    command: compute health-checks delete $$hc$$ $$global-flag$$ --quiet
     cleanup_for: hc
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$\].
     - expect_exit:
         code: 0

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,8 +53,8 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
 
   def testRevisionLabels(self):
     self.conf.spec.revisionTemplate.metadata = None
-    self.conf.revision_labels['foo'] = 'bar'
-    self.assertEqual(self.conf.revision_labels['foo'], 'bar')
+    self.conf.template.labels['foo'] = 'bar'
+    self.assertEqual(self.conf.template.labels['foo'], 'bar')
 
   def testGetMessage(self):
     """Sanity check on exported message object."""
@@ -81,8 +81,8 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
       attrs.extend(['source_manifest', 'source_archive', 'build_template_name'])
     for attr in attrs:
       value = 12 if attr in int_attrs else 'fake-{}'.format(attr)
-      setattr(self.conf, attr, value)
-      self.assertEquals(getattr(self.conf, attr), value)
+      setattr(self.conf.template, attr, value)
+      self.assertEqual(getattr(self.conf.template, attr), value)
 
   def testGenerationHack(self):
     """Test that the spec generation overrides the metadata one."""
@@ -108,21 +108,27 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
     self.conf._m.status = None
     self.assertEquals(len(self.conf.conditions), 0)
 
-  @parameterized.parameters(['env_vars', 'labels', 'annotations'])
+  @parameterized.parameters(['env_vars.literals', 'labels', 'annotations'])
   def testReadWriteDictProperties(self, dict_attr):
-    """Basic sanity check for configuration attributes that behave as dicts."""
+    """Checks that some configuration attributes behave as dicts."""
     key = 'key-{}'.format(dict_attr)
     value = 'value-{}'.format(dict_attr)
 
+    # Allow nested dicts via dot syntax
+    dict_attrs = dict_attr.split('.')
+    obj = self.conf
+    for attr in dict_attrs:
+      obj = getattr(obj, attr)
+
     # Check basic assignment, retrieval, and len()
-    getattr(self.conf, dict_attr)[key] = value
-    self.assertEquals(getattr(self.conf, dict_attr)[key], value)
-    self.assertEquals(len(getattr(self.conf, dict_attr)), 1)
+    obj[key] = value
+    self.assertEqual(obj[key], value)
+    self.assertEqual(len(obj), 1)
 
     # Check deletion
-    del getattr(self.conf, dict_attr)[key]
+    del obj[key]
     with self.assertRaises(KeyError):
-      getattr(self.conf, dict_attr)[key]  # pylint: disable=expression-not-assigned
+      obj[key]  # pylint: disable=pointless-statement
 
 
 if __name__ == '__main__':

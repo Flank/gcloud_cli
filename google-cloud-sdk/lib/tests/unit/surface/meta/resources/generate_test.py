@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
     actual = self.Run('meta resources generate --format=disable '
                       '--collection=compute.instances')
     expected = [
-        'https://www.googleapis.com/compute/v1/projects/my-project-1/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-1/'
         'zones/my-zone-1/instances/my-instance-1'
     ]
     self.assertEqual(expected, actual)
@@ -39,7 +39,7 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
     actual = self.Run('meta resources generate --format=disable '
                       '--collection=compute.instances --count=1')
     expected = [
-        'https://www.googleapis.com/compute/v1/projects/my-project-1/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-1/'
         'zones/my-zone-1/instances/my-instance-1',
     ]
     self.assertEqual(expected, actual)
@@ -48,9 +48,9 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
     actual = self.Run('meta resources generate --format=disable '
                       '--collection=compute.instances --count=2')
     expected = [
-        'https://www.googleapis.com/compute/v1/projects/my-project-1/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-1/'
         'zones/my-zone-1/instances/my-instance-1',
-        'https://www.googleapis.com/compute/v1/projects/my-project-2/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-2/'
         'zones/my-zone-2/instances/my-instance-2',
     ]
     self.assertEqual(expected, actual)
@@ -60,9 +60,9 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
              '--collection=compute.instances --count=3')
     self.AssertOutputEquals("""\
 [
-  "https://www.googleapis.com/compute/v1/projects/my-project-1/zones/my-zone-1/instances/my-instance-1",
-  "https://www.googleapis.com/compute/v1/projects/my-project-2/zones/my-zone-2/instances/my-instance-2",
-  "https://www.googleapis.com/compute/v1/projects/my-project-3/zones/my-zone-3/instances/my-instance-3"
+  "https://compute.googleapis.com/compute/v1/projects/my-project-1/zones/my-zone-1/instances/my-instance-1",
+  "https://compute.googleapis.com/compute/v1/projects/my-project-2/zones/my-zone-2/instances/my-instance-2",
+  "https://compute.googleapis.com/compute/v1/projects/my-project-3/zones/my-zone-3/instances/my-instance-3"
 ]
 """)
 

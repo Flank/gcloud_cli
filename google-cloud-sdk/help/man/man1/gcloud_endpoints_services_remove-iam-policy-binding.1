@@ -19,6 +19,9 @@ gcloud endpoints services remove\-iam\-policy\-binding \- remove IAM policy bind
 
 Remove an IAM policy binding from a service.
 
+Note: The 'roles/servicemanagement.serviceConsumer' role can only exist on a
+member which is a user, group, or service account.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -98,16 +101,6 @@ with service 'my\-service', run:
 .RS 2m
 $ gcloud endpoints services remove\-iam\-policy\-binding my\-service \e
     \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/servicemanagement.serviceConsumer'
-.RE
-
-To remove an IAM policy binding for the role of
-\'roles/servicemanagement.serviceConsumer' from all authenticated users on
-service 'my\-service', run:
-
-.RS 2m
-$ gcloud endpoints services remove\-iam\-policy\-binding my\-service \e
-    \-\-member='allAuthenticatedUsers' \e
     \-\-role='roles/servicemanagement.serviceConsumer'
 .RE
 

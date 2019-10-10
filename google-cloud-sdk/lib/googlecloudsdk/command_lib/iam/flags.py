@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.util.args import common_args
 
 
 def GetRoleFlag(verb):
@@ -49,6 +50,17 @@ def GetOrgFlag(verb):
       help='The organization of the role you want to {0}.'.format(verb))
 
 
+def GetProjectFlag(verb):
+  help_text = 'The project of the role you want to {0}.'.format(verb)
+  return common_args.ProjectArgument(help_text_to_prepend=help_text)
+
+
+def AddParentFlags(parser, verb, required=True):
+  parent_group = parser.add_mutually_exclusive_group(required=required)
+  GetOrgFlag(verb).AddToParser(parent_group)
+  GetProjectFlag(verb).AddToParser(parent_group)
+
+
 _RESOURCE_NAME_HELP = """\
 The full resource name or URI to {verb}.
 
@@ -58,8 +70,8 @@ flag. For example:
 
 ```
 $ gcloud compute instances list --project prj --uri
-https://www.googleapis.com/compute/v1/projects/prj/zones/us-east1-c/instances/i1
-https://www.googleapis.com/compute/v1/projects/prj/zones/us-east1-d/instances/i2
+https://compute.googleapis.com/compute/v1/projects/prj/zones/us-east1-c/instances/i1
+https://compute.googleapis.com/compute/v1/projects/prj/zones/us-east1-d/instances/i2
 ```
 
 """

@@ -80,7 +80,7 @@ help\fR for details.
 To start a transaction, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets transaction start \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets transaction start \-\-zone=MANAGED_ZONE
 .RE
 
 To append a record\-set addition to the transaction, run:
@@ -88,7 +88,7 @@ To append a record\-set addition to the transaction, run:
 .RS 2m
 $ gcloud beta dns record\-sets transaction add \e
     \-\-name RECORD_SET_NAME \-\-ttl TTL \-\-type TYPE DATA \e
-    \-\-zone MANAGED_ZONE
+    \-\-zone=MANAGED_ZONE
 .RE
 
 To append a record\-set removal to the transaction, run:
@@ -102,29 +102,30 @@ To look at the details of the transaction, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets transaction describe \e
-    \-\-zone MANAGED_ZONE
+    \-\-zone=MANAGED_ZONE
 .RE
 
 To delete the transaction, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets transaction abort \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets transaction abort \-\-zone=MANAGED_ZONE
 .RE
 
 To execute the transaction, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets transaction execute \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets transaction execute \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets transaction
+$ gcloud alpha dns record\-sets transaction
 .RE
 

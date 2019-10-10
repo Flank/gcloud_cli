@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import enum
 
 
-BASE_URL = 'https://www.googleapis.com/compute/v1/'
+BASE_URL = 'https://compute.googleapis.com/compute/v1/'
 DOCS_URL = 'https://developers.google.com/compute/docs/reference/latest/'
 
 
@@ -71,6 +71,13 @@ class Collections(enum.Enum):
       'projects/{project}/zones/{zone}/disks/{disk}',
       {},
       [u'project', u'zone', u'disk'],
+      True
+  )
+  EXTERNALVPNGATEWAYS = (
+      'externalVpnGateways',
+      'projects/{project}/global/externalVpnGateways/{externalVpnGateway}',
+      {},
+      [u'project', u'externalVpnGateway'],
       True
   )
   FIREWALLS = (
@@ -293,6 +300,13 @@ class Collections(enum.Enum):
       [u'project', u'region', u'disk'],
       True
   )
+  REGIONHEALTHCHECKS = (
+      'regionHealthChecks',
+      'projects/{project}/regions/{region}/healthChecks/{healthCheck}',
+      {},
+      [u'project', u'region', u'healthCheck'],
+      True
+  )
   REGIONINSTANCEGROUPMANAGERS = (
       'regionInstanceGroupManagers',
       'projects/{project}/regions/{region}/instanceGroupManagers/'
@@ -315,11 +329,55 @@ class Collections(enum.Enum):
       [u'project', u'region', u'operation'],
       True
   )
+  REGIONSSLCERTIFICATES = (
+      'regionSslCertificates',
+      'projects/{project}/regions/{region}/sslCertificates/{sslCertificate}',
+      {},
+      [u'project', u'region', u'sslCertificate'],
+      True
+  )
+  REGIONTARGETHTTPPROXIES = (
+      'regionTargetHttpProxies',
+      'projects/{project}/regions/{region}/targetHttpProxies/'
+      '{targetHttpProxy}',
+      {},
+      [u'project', u'region', u'targetHttpProxy'],
+      True
+  )
+  REGIONTARGETHTTPSPROXIES = (
+      'regionTargetHttpsProxies',
+      'projects/{project}/regions/{region}/targetHttpsProxies/'
+      '{targetHttpsProxy}',
+      {},
+      [u'project', u'region', u'targetHttpsProxy'],
+      True
+  )
+  REGIONURLMAPS = (
+      'regionUrlMaps',
+      'projects/{project}/regions/{region}/urlMaps/{urlMap}',
+      {},
+      [u'project', u'region', u'urlMap'],
+      True
+  )
   REGIONS = (
       'regions',
       'projects/{project}/regions/{region}',
       {},
       [u'project', u'region'],
+      True
+  )
+  RESERVATIONS = (
+      'reservations',
+      'projects/{project}/zones/{zone}/reservations/{reservation}',
+      {},
+      [u'project', u'zone', u'reservation'],
+      True
+  )
+  RESOURCEPOLICIES = (
+      'resourcePolicies',
+      'projects/{project}/regions/{region}/resourcePolicies/{resourcePolicy}',
+      {},
+      [u'project', u'region', u'resourcePolicy'],
       True
   )
   ROUTERS = (
@@ -434,6 +492,13 @@ class Collections(enum.Enum):
       'projects/{project}/global/urlMaps/{urlMap}',
       {},
       [u'project', u'urlMap'],
+      True
+  )
+  VPNGATEWAYS = (
+      'vpnGateways',
+      'projects/{project}/regions/{region}/vpnGateways/{vpnGateway}',
+      {},
+      [u'project', u'region', u'vpnGateway'],
       True
   )
   VPNTUNNELS = (

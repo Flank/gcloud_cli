@@ -25,7 +25,7 @@ To create a new policy with minimal arguments, run:
 
 .RS 2m
 $ gcloud beta dns policies create mypolicy \e
-\-\-description 'My new policy test policy 5' \e
+\-\-description='My new policy test policy 5' \e
 \-\-networks=''
 .RE
 
@@ -33,10 +33,11 @@ To create a new policy with all optional arguments, run:
 
 .RS 2m
 $ gcloud beta dns policies create mypolicy \e
-\-\-description 'My new policy test policy 5' \e
-\-\-networks network1,network2 \e
-\-\-alternative\-name\-servers 192.168.1.1,192.168.1.2
+\-\-description='My new policy test policy 5' \e
+\-\-networks=network1,network2 \e
+\-\-alternative\-name\-servers=192.168.1.1,192.168.1.2
 \-\-enable\-inbound\-forwarding
+\-\-enable\-logging
 .RE
 
 
@@ -84,7 +85,8 @@ The comma separated list of network names to associate with the policy.
 .TP 2m
 \fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]
 List of alternative name servers to forward to. Must be a comma separated list
-of IPv4 addresses.
+of IPv4 addresses. Non\-RFC1918 addresses will forward to the target through the
+Internet. RFC1918 addresses will forward through the VPC.
 
 .TP 2m
 \fB\-\-enable\-inbound\-forwarding\fR
@@ -118,5 +120,11 @@ can be found at: https://developers.google.com/cloud\-dns
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud dns policies create
+$ gcloud alpha dns policies create
+.RE
 

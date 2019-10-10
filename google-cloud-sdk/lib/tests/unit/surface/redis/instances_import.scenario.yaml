@@ -1,0 +1,66 @@
+title: instances import scenario test
+release_tracks: [BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: redis instances import gs://my-bucket/my-redis-instance.rdb my-redis-instance
+      --region=us-central1 --async
+  - stderr: |
+      Request issued for: [my-redis-instance]
+      Check operation [projects/fake-project/locations/us-central1/operations/operation-1551469133486-5830d8e94db6b-c6657c3d-3740666b] for status.
+  - stdout: |
+      done: false
+      metadata:
+        '@type': type.googleapis.com/google.cloud.redis.v1.OperationMetadata
+        apiVersion: v1
+        cancelRequested: false
+        createTime: '2019-03-01T19:38:53.515048956Z'
+        target: projects/fake-project/locations/us-central1/instances/my-redis-instance
+        verb: import
+      name: projects/fake-project/locations/us-central1/operations/operation-1551469133486-5830d8e94db6b-c6657c3d-3740666b
+actions:
+- execute_command:
+    command: redis instances import gs://my-bucket/my-redis-instance.rdb my-redis-instance
+      --region=us-central1 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://redis.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/instances/my-redis-instance:import?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              inputConfig:
+                gcsSource:
+                  uri: gs://my-bucket/my-redis-instance.rdb
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/operations/operation-1551469133486-5830d8e94db6b-c6657c3d-3740666b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.redis.v1.OperationMetadata",
+                "createTime": "2019-03-01T19:38:53.515048956Z",
+                "target": "projects/fake-project/locations/us-central1/instances/my-redis-instance",
+                "verb": "import",
+                "cancelRequested": false,
+                "apiVersion": "v1"
+              },
+              "done": false
+            }
+    - expect_stderr: |
+        Request issued for: [my-redis-instance]
+        Check operation [projects/fake-project/locations/us-central1/operations/operation-1551469133486-5830d8e94db6b-c6657c3d-3740666b] for status.
+    - expect_stdout: |
+        done: false
+        metadata:
+          '@type': type.googleapis.com/google.cloud.redis.v1.OperationMetadata
+          apiVersion: v1
+          cancelRequested: false
+          createTime: '2019-03-01T19:38:53.515048956Z'
+          target: projects/fake-project/locations/us-central1/instances/my-redis-instance
+          verb: import
+        name: projects/fake-project/locations/us-central1/operations/operation-1551469133486-5830d8e94db6b-c6657c3d-3740666b
+    - expect_exit:
+        code: 0

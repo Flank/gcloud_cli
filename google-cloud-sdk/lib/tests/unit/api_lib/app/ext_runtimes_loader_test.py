@@ -37,6 +37,7 @@ from dulwich import web
 from googlecloudsdk.api_lib.app.ext_runtimes import loader
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+import six
 
 
 class WSGIServerLoggerIPv6(web.WSGIServerLogger):
@@ -217,7 +218,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/master']
 
     # Make the files in the target dir readonly.
-    for dirpath, dirnames, filenames in os.walk(self.repo_clone):
+    for dirpath, dirnames, filenames in os.walk(six.text_type(self.repo_clone)):
       for name in filenames:
         full_name = os.path.join(dirpath, name)
         os.chmod(full_name, stat.S_IREAD)
@@ -226,7 +227,7 @@ class LoaderTests(sdk_test_base.SdkBase):
       loader.InstallRuntimeDef(self._GetRepoUrl(), self.repo_clone)
 
     # Make all the directories read-only.
-    for dirpath, dirnames, filenames in os.walk(self.repo_clone):
+    for dirpath, dirnames, filenames in os.walk(six.text_type(self.repo_clone)):
       for name in dirnames:
         full_name = os.path.join(dirpath, name)
         file_stat = os.stat(full_name)[0]

@@ -1,0 +1,91 @@
+
+.TH "GCLOUD_ALPHA_BUILD\-ARTIFACTS_PRINT\-SETTINGS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha build\-artifacts print\-settings \- print snippets to add to native tools settings files
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha build\-artifacts print\-settings\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The snippets provides credentials placeholder and configurations
+to allow native tools to interact with Cloud Build Artifacts repositories.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBgradle\fR
+\fB(ALPHA)\fR Print a snippet to add a repository to the Gradle build.gradle
+file.
+
+.TP 2m
+\fBmaven\fR
+\fB(ALPHA)\fR Print a snippet to add a Maven repository to the pom.xml file.
+
+.TP 2m
+\fBnpm\fR
+\fB(ALPHA)\fR Print credential settings to add to the .npmrc file.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To print a snippet to add a repository to the Gradle build.gradle file for
+repository my\-repo in the current project, run:
+
+.RS 2m
+$ gcloud alpha build\-artifacts print\-settings gradle \e
+  \-\-repository=my\-repo
+.RE
+
+To print a snippet to add to the Maven pom.xml file for repository my\-repo in
+the current project, run:
+
+.RS 2m
+$ gcloud alpha build\-artifacts print\-settings maven \e
+  \-\-repository=my\-repo
+.RE
+
+To print a snippet to add to the npm .npmrc file for repository my\-repo in the
+current project, run:
+
+.RS 2m
+$ gcloud alpha build\-artifacts print\-settings npm \e
+  \-\-repository=my\-repo
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

@@ -38,7 +38,7 @@ requires = [
     #   https://code.google.com/p/socksipy-branch/issues/detail?id=3
     'SocksiPy-branch==1.01',
     'retry_decorator>=1.0.0',
-    'six>=1.6.1'
+    'six>=1.12.0'
 ]
 
 extras_require = {
@@ -50,7 +50,7 @@ extras_require = {
 
 setup(
     name='gcs-oauth2-boto-plugin',
-    version='2.2',
+    version='2.5',
     url='https://developers.google.com/storage/docs/gspythonlibrary',
     download_url=('https://github.com/GoogleCloudPlatform'
                   '/gcs-oauth2-boto-plugin'),
@@ -78,6 +78,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

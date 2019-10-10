@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 
 
-class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
+class NetworkEndpointGroupsUpdateTest(sdk_test_base.WithFakeAuth,
                                       cli_test_base.CliTestBase,
                                       waiter_test_base.Base):
 
@@ -49,7 +49,7 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://www.googleapis.com/compute/v1/projects/{0}/zones/'
+        selfLink='https://compute.googleapis.com/compute/v1/projects/{0}/zones/'
         '{1}/operations/{2}'.format(self.Project(), self.zone, operation_name),
         targetLink=resource_uri)
 
@@ -87,7 +87,7 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
 
   def _ExpectPollAndGet(self, operation_suffix='X'):
     neg_name = 'my-neg'
-    neg_uri = ('https://www.googleapis.com/compute/v1/projects/{0}/zones/'
+    neg_uri = ('https://compute.googleapis.com/compute/v1/projects/{0}/zones/'
                '{1}/networkEndpointGroups/{2}'.format(self.Project(), self.zone,
                                                       neg_name))
     self.client.zoneOperations.Get.Expect(
@@ -177,12 +177,135 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
 
   def testUpdate_AddAndRemoveEndpointsMutuallyExclusive(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'At most one of --add-endpoint | --remove-endpoint may be specified.'):
+        'Exactly one of (--add-endpoint | --remove-endpoint) '
+        'must be specified.'):
       self.Run(
           'compute network-endpoint-groups update my-neg '
           '--add-endpoint instance=my-instance1,ip=127.0.0.1,port=8888 '
           '--remove-endpoint instance=my-instance2,port=10001 '
           '--zone ' + self.zone)
+
+  def testUpdate_MissingEndpointsGroupFlag(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--add-endpoint | --remove-endpoint) '
+        'must be specified.'):
+      self.Run(
+          'compute network-endpoint-groups update my-neg '
+          '--zone ' + self.zone)
+
+
+class AlphaNetworkEndpointGroupsUpdateTest(NetworkEndpointGroupsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.client.Mock()
+    self.messages = self.client.MESSAGES_MODULE
+    self.addCleanup(self.client.Unmock)
+
+    self.operation_status_enum = self.messages.Operation.StatusValueValuesEnum
+
+  def _GetGlobalOperationMessage(self,
+                                 operation_name,
+                                 status,
+                                 resource_uri=None):
+    return self.messages.Operation(
+        name=operation_name,
+        status=status,
+        selfLink='https://compute.googleapis.com/compute/v1/projects/{0}/global/'
+        'operations/{1}'.format(self.Project(), operation_name),
+        targetLink=resource_uri)
+
+  def _ExpectAttachGlobalEndpoints(self, endpoints, operation_suffix='X'):
+    request_class = (
+        self.messages
+        .ComputeGlobalNetworkEndpointGroupsAttachNetworkEndpointsRequest)
+    nested_request_class = (
+        self.messages.GlobalNetworkEndpointGroupsAttachEndpointsRequest)
+    self.client.globalNetworkEndpointGroups.AttachNetworkEndpoints.Expect(
+        request_class(
+            networkEndpointGroup='my-global-neg',
+            project=self.Project(),
+            globalNetworkEndpointGroupsAttachEndpointsRequest=nested_request_class(
+                networkEndpoints=endpoints)),
+        self._GetGlobalOperationMessage('operation-' + operation_suffix,
+                                        self.operation_status_enum.PENDING))
+
+  def _ExpectDetachGlobalEndpoints(self, endpoints, operation_suffix='X'):
+    request_class = (
+        self.messages
+        .ComputeGlobalNetworkEndpointGroupsDetachNetworkEndpointsRequest)
+    nested_request_class = (
+        self.messages.GlobalNetworkEndpointGroupsDetachEndpointsRequest)
+    self.client.globalNetworkEndpointGroups.DetachNetworkEndpoints.Expect(
+        request_class(
+            networkEndpointGroup='my-global-neg',
+            project=self.Project(),
+            globalNetworkEndpointGroupsDetachEndpointsRequest=nested_request_class(
+                networkEndpoints=endpoints)),
+        self._GetGlobalOperationMessage('operation-' + operation_suffix,
+                                        self.operation_status_enum.PENDING))
+
+  def _ExpectGlobalPollAndGet(self, operation_suffix='X'):
+    neg_name = 'my-global-neg'
+    neg_uri = ('https://compute.googleapis.com/compute/alpha/projects/{0}/global/'
+               'networkEndpointGroups/{1}'.format(self.Project(), neg_name))
+    self.client.globalOperations.Get.Expect(
+        self.messages.ComputeGlobalOperationsGetRequest(
+            operation='operation-' + operation_suffix, project=self.Project()),
+        self._GetGlobalOperationMessage(
+            'operation-' + operation_suffix,
+            self.messages.Operation.StatusValueValuesEnum.DONE, neg_uri))
+    self.client.globalNetworkEndpointGroups.Get.Expect(
+        self.messages.ComputeGlobalNetworkEndpointGroupsGetRequest(
+            networkEndpointGroup=neg_name, project=self.Project()),
+        self.messages.NetworkEndpointGroup(name=neg_name))
+
+  def testUpdate_AddInternetIpEndpoint(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(ipAddress='8.8.8.8', port=8080),
+    ]
+    expected_neg = self.messages.NetworkEndpointGroup(name='my-global-neg')
+    self._ExpectAttachGlobalEndpoints(endpoints)
+    self._ExpectGlobalPollAndGet()
+    result = self.Run('compute network-endpoint-groups update my-global-neg '
+                      '--add-endpoint ip=8.8.8.8,port=8080 --global')
+    self.assertEqual(expected_neg, result)
+    self.AssertErrContains('Attaching 1 endpoints to [my-global-neg].')
+
+  def testUpdate_AddInternetFqdnEndpoint(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(fqdn='test.example.com', port=8080),
+    ]
+    expected_neg = self.messages.NetworkEndpointGroup(name='my-global-neg')
+    self._ExpectAttachGlobalEndpoints(endpoints)
+    self._ExpectGlobalPollAndGet()
+    result = self.Run('compute network-endpoint-groups update my-global-neg '
+                      '--add-endpoint fqdn=test.example.com,port=8080 --global')
+    self.assertEqual(expected_neg, result)
+    self.AssertErrContains('Attaching 1 endpoints to [my-global-neg].')
+
+  def testUpdate_RemoveInternetIpEndpoint(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(ipAddress='8.8.8.8', port=8080),
+    ]
+    self._ExpectDetachGlobalEndpoints(endpoints)
+    self._ExpectGlobalPollAndGet()
+    self.Run('compute network-endpoint-groups update my-global-neg '
+             '--remove-endpoint ip=8.8.8.8,port=8080 --global')
+    self.AssertErrContains('Detaching 1 endpoints from [my-global-neg].')
+
+  def testUpdate_RemoveInternetFqdnEndpoint(self):
+    endpoints = [
+        self.messages.NetworkEndpoint(fqdn='example.com'),
+    ]
+    self._ExpectDetachGlobalEndpoints(endpoints)
+    self._ExpectGlobalPollAndGet()
+    self.Run('compute network-endpoint-groups update my-global-neg '
+             '--remove-endpoint fqdn=example.com --global')
+    self.AssertErrContains('Detaching 1 endpoints from [my-global-neg].')
 
 
 if __name__ == '__main__':

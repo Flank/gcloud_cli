@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -766,6 +766,8 @@ class BrowseTest(VersionsApiTestBase):
 
   def testBrowse_NoLaunchBrowser(self):
     """Test when the user does not want to open the browser."""
+    self.ExpectGetApplicationRequest(self.Project())
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app versions browse --no-launch-browser v1 v2')
     self.launch_browser_mock.assert_called_with(False)
     self.open_mock.assert_not_called()
@@ -781,6 +783,7 @@ class BrowseTest(VersionsApiTestBase):
 
     If service is not given, should open default page.
     """
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app versions browse v1')
     self.launch_browser_mock.assert_called_with(True)
     self.open_mock.assert_called_once_with(
@@ -788,6 +791,8 @@ class BrowseTest(VersionsApiTestBase):
 
   def testBrowse_SpecifyMultiVersionDefaultService(self):
     """Test `browse` command where two versions given."""
+    self.ExpectGetApplicationRequest(self.Project())
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app versions browse v1 v2')
     self.open_mock.assert_has_calls([
         mock.call('https://v1-dot-{0}.appspot.com'.format(self.Project())),
@@ -800,12 +805,15 @@ class BrowseTest(VersionsApiTestBase):
 
     Should open the correct page for the service arg given.
     """
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app versions browse --service=service1 v1')
     self.open_mock.assert_called_once_with(
         'https://v1-dot-service1-dot-{0}.appspot.com'.format(self.Project()))
 
   def testBrowse_SpecifyMultiVersionNotDefaultService(self):
     """Same as above, with multiple versions."""
+    self.ExpectGetApplicationRequest(self.Project())
+    self.ExpectGetApplicationRequest(self.Project())
     self.Run('app versions browse --service=service1 v1 v2')
     self.open_mock.assert_has_calls([
         mock.call(

@@ -59,10 +59,11 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To execute the transaction, run:
 
-        $ gcloud dns record-sets transaction execute --zone MANAGED_ZONE
+        $ gcloud dns record-sets transaction execute --zone=MANAGED_ZONE
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets transaction execute
         $ gcloud beta dns record-sets transaction execute
 

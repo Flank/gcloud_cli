@@ -1,0 +1,68 @@
+NAME
+    gcloud alpha recommender insights mark-dismissed - mark an insight's state
+        as DISMISSED. Can be applied to insights in ACTIVE state
+
+SYNOPSIS
+    gcloud alpha recommender insights mark-dismissed
+        (INSIGHT : --insight-type=INSIGHT_TYPE --location=LOCATION) --etag=ETAG
+        [--recommendation-change-type=RECOMMENDATION_CHANGE_TYPE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Mark an insight's state as DISMISSED. Can be applied to insights in
+    ACTIVE state.
+
+POSITIONAL ARGUMENTS
+     Insight resource - The insight to mark as dismissed. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [insight] on
+     the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       INSIGHT
+          ID of the insight or fully qualified identifier for the insight. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --insight-type=INSIGHT_TYPE
+          The insight type.
+
+       --location=LOCATION
+          The location ID.
+
+REQUIRED FLAGS
+     --etag=ETAG
+        Insight's current etag value.
+
+OPTIONAL FLAGS
+     --recommendation-change-type=RECOMMENDATION_CHANGE_TYPE
+        Indicate whether or not dismiss state will apply to associated
+        recommendations. RECOMMENDATION_CHANGE_TYPE must be one of: dismiss,
+        leave_unchanged.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the recommender/v1alpha2 API. The full documentation for
+    this API can be found at: https://cloud.google.com/recommender/docs/
+
+EXAMPLES
+    To mark an insight as DISMISSED:
+
+        $ gcloud alpha recommender insights mark-dismissed abcd-1234 \
+            --project=project-name --location=global \
+            --insight-type=google.compute.firewall.Insight --etag=abc123
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

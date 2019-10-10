@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ class Credential(object):
     expiry = getattr(cred, 'token_expiry', None)
     self.token_expiry = (expiry.strftime(Credential._EXPIRY_FORMAT) if expiry
                          else None)
+
     # The cache blanks the token_response field, so if it's present that
     # indicates there's either no cache entry, or we just refreshed tokens.
     # Either way, the response is fresher.

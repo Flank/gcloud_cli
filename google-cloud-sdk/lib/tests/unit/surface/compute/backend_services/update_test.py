@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1071,14 +1071,14 @@ class WithHealthcheckApiTest(UpdateTestBase):
                 backends=[],
                 description='my backend service',
                 healthChecks=[
-                    ('https://www.googleapis.com/compute/v1/projects/'
+                    ('https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/httpHealthChecks/my-health-check')
                 ],
                 name='backend-service-1',
                 portName='http',
                 protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
                 selfLink=(
-                    'https://www.googleapis.com/compute/v1/projects/'
+                    'https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/backendServices/backend-service-1'),
                 timeoutSec=30,
                 customRequestHeaders=['test: '])
@@ -1107,6 +1107,38 @@ class WithHealthcheckApiTest(UpdateTestBase):
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+  def testWithHttp2Protocol(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._http_backend_services_with_health_check[0]],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --protocol http2')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-3', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/healthChecks/'
+                                 'orig-health-check')],
+                  name='backend-service-3',
+                  portName='http',
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.HTTP2),
+                  selfLink=(self.compute_uri +
+                            '/projects/my-project/global/backendServices/'
+                            'backend-service-3'),
                   timeoutSec=30),
               project='my-project'))],
     )

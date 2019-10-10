@@ -84,7 +84,7 @@ summary:
 - execute:
   - label: Entry and --lookup-entry both specified
   - command: data-catalog entries update entry1 --entry-group=group1 --location=us-central1
-      --lookup-entry=pubsub.fake-project.topic1 --schema=field1=type1
+      --lookup-entry=pubsub.topic.fake-project.topic1 --schema=field1=type1
   - error: '1: Failed to specify [entry]: Exactly one of ([ENTRY : --entry-group=ENTRY_GROUP
       --location=LOCATION] | --lookup-entry) must be specified.'
 - execute:
@@ -94,7 +94,7 @@ summary:
       --location=LOCATION] | --lookup-entry) must be specified.'
 - execute:
   - label: --lookup-entry
-  - command: data-catalog entries update --lookup-entry=pubsub.fake-project.topic1
+  - command: data-catalog entries update --lookup-entry=pubsub.topic.fake-project.topic1
       --schema=field1=type1
   - stderr: |
       Updated entry.
@@ -393,7 +393,7 @@ actions:
 - execute_command:
     label: Entry and --lookup-entry both specified
     command: data-catalog entries update entry1 --entry-group=group1 --location=us-central1
-      --lookup-entry=pubsub.fake-project.topic1 --schema=field1=type1
+      --lookup-entry=pubsub.topic.fake-project.topic1 --schema=field1=type1
     events:
     - expect_exit:
         code: 1
@@ -409,12 +409,12 @@ actions:
           --location=LOCATION] | --lookup-entry) must be specified.'
 - execute_command:
     label: --lookup-entry
-    command: data-catalog entries update --lookup-entry=pubsub.fake-project.topic1
+    command: data-catalog entries update --lookup-entry=pubsub.topic.fake-project.topic1
       --schema=field1=type1
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.fake-project.topic1
+          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.topic.fake-project.topic1
           method: GET
           headers: {}
           body: null

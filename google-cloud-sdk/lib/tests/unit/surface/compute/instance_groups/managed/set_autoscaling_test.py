@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups managed set-autoscaling subcommand."""
+
+# TODO(b/140557440) Break up file to prevent linter deadline.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -1225,7 +1227,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
     ])
 
     self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
-             '--max-num-replicas 10 --zone zone-1 --mode only-down')
+             '--max-num-replicas 10 --zone zone-1 --mode only-up')
 
     custom_metric_utilization = (
         self.messages.AutoscalingPolicyCustomMetricUtilization(
@@ -1242,7 +1244,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
             autoscalingPolicy=self.messages.AutoscalingPolicy(
                 customMetricUtilizations=[custom_metric_utilization],
                 maxNumReplicas=10,
-                mode=mode_cls.ONLY_DOWN
+                mode=mode_cls.ONLY_UP
             ),
             name='autoscaler-1',
             target=self.managed_instance_group_self_link,
@@ -1284,6 +1286,81 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
                 customMetricUtilizations=[custom_metric_utilization],
                 maxNumReplicas=10,
                 mode=self.messages.AutoscalingPolicy.ModeValueValuesEnum.ONLY_UP
+            ),
+            name='autoscaler-1',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Update', request)],
+    )
+
+  def testInsertAutoscaler_ScaleDown(self):
+    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 '
+             '--scale-down-control max-scaled-down-replicas=5,time-window=30')
+    scale_down = self.messages.AutoscalingPolicyScaleDownControl(
+        maxScaledDownReplicas=self.messages.FixedOrPercent(
+            fixed=5
+        ),
+        timeWindowSec=30
+    )
+    request = self.messages.ComputeAutoscalersInsertRequest(
+        autoscaler=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[],
+                maxNumReplicas=10,
+                scaleDownControl=scale_down
+            ),
+            name='group-1-aaaa',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Insert', request)],
+    )
+
+  def testUpdateAutoscaler_ScaleDown(self):
+    self.make_requests.side_effect = iter([
+        [self.INSTANCE_GROUP_MANAGERS[0]],
+        self.AUTOSCALERS,
+        []
+    ])
+
+    scale_down = self.messages.AutoscalingPolicyScaleDownControl(
+        maxScaledDownReplicas=self.messages.FixedOrPercent(
+            fixed=5
+        ),
+        timeWindowSec=30
+    )
+
+    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 '
+             '--scale-down-control max-scaled-down-replicas=5,time-window=30')
+
+    custom_metric_utilization = (
+        self.messages.AutoscalingPolicyCustomMetricUtilization(
+            metric='custom.cloudmonitoring.googleapis.com/seconds',
+            utilizationTarget=60.,
+            utilizationTargetType=(
+                self.messages.AutoscalingPolicyCustomMetricUtilization.
+                UtilizationTargetTypeValueValuesEnum.DELTA_PER_MINUTE)))
+
+    request = self.messages.ComputeAutoscalersUpdateRequest(
+        autoscaler='autoscaler-1',
+        autoscalerResource=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[custom_metric_utilization],
+                maxNumReplicas=10,
+                scaleDownControl=scale_down
             ),
             name='autoscaler-1',
             target=self.managed_instance_group_self_link,

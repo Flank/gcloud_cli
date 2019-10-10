@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ class Get(base.DescribeCommand):
       instance = sql_client.instances.Get(
           sql_messages.SqlInstancesGetRequest(
               project=instance_ref.project, instance=instance_ref.instance))
+      instance.state = instance_api_util.GetInstanceState(instance)
       # TODO(b/122660263): Remove when V1 instances are no longer supported.
       if instance_api_util.IsInstanceV1(instance):
         instance_command_util.ShowV1DeprecationWarning()

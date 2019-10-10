@@ -33,10 +33,50 @@ COMMANDS
      update
         (ALPHA) Update a membership.
 
+EXAMPLES
+    Create a membership:
+
+        $ gcloud container memberships create a-membership
+            --description="Description of a-membership."
+
+    Check the status of a membership:
+
+        $ gcloud container memberships describe a-membership
+
+    List the memberships in a project:
+
+        $ gcloud container memberships list
+
+    Delete a membership:
+
+        $ gcloud container memberships delete a-membership
+
+    Register a cluster referenced from the default kubeconfig file, installing
+    the Connect agent:
+
+        $ gcloud alpha container memberships register my-cluster           \
+            --context=my-cluster-context             \
+          --service-account-key-file=/tmp/keyfile.json
+
+    Upgrade the Connect agent in a cluster:
+
+        $ gcloud alpha container memberships register my-cluster           \
+            --context=my-cluster-context             \
+          --service-account-key-file=/tmp/keyfile.json
+
+    Register a cluster and output a manifest that can be used to install the
+    Connect agent:
+
+        $ gcloud alpha container memberships register my-cluster           \
+            --context=my-cluster-context             \
+          --manifest-output-file=/tmp/manifest.yaml             \
+          --service-account-key-file=/tmp/keyfile.json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta container memberships
 

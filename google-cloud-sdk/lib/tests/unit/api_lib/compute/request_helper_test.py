@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -141,8 +141,11 @@ class MakeRequestsTest(test_case.TestCase):
     operations_data = []
     for operation in operations:
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute_v1.
-                                zoneOperations, self.compute_v1.instances))
+          waiters.OperationData(
+              operation,
+              self.compute_v1.zoneOperations,
+              self.compute_v1.instances,
+              project='my-project'))
     self.wait_for_operations.assert_called_once_with(
         operations_data=operations_data,
         http=self.mock_http,
@@ -216,8 +219,11 @@ class MakeRequestsTest(test_case.TestCase):
     operations_data = []
     for operation in operations:
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute_v1.
-                                zoneOperations, self.compute_v1.instances))
+          waiters.OperationData(
+              operation,
+              self.compute_v1.zoneOperations,
+              self.compute_v1.instances,
+              project='my-project'))
     self.wait_for_operations.assert_called_once_with(
         operations_data=operations_data,
         http=self.mock_http,
@@ -263,8 +269,11 @@ class MakeRequestsTest(test_case.TestCase):
     operations_data = []
     for operation in operations:
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute_v1.
-                                zoneOperations, self.compute_v1.instances))
+          waiters.OperationData(
+              operation,
+              self.compute_v1.zoneOperations,
+              self.compute_v1.instances,
+              project='my-project'))
     self.wait_for_operations.assert_called_once_with(
         operations_data=operations_data,
         http=self.mock_http,
@@ -313,8 +322,11 @@ class MakeRequestsTest(test_case.TestCase):
     operations_data = []
     for operation in operations:
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute_v1.
-                                zoneOperations, self.compute_v1.instances))
+          waiters.OperationData(
+              operation,
+              self.compute_v1.zoneOperations,
+              self.compute_v1.instances,
+              project='my-project'))
     self.wait_for_operations.assert_called_once_with(
         operations_data=operations_data,
         http=self.mock_http,
@@ -361,8 +373,11 @@ class MakeRequestsTest(test_case.TestCase):
     operations_data = []
     for operation in operations:
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute_v1.
-                                regionOperations, self.compute_v1.addresses))
+          waiters.OperationData(
+              operation,
+              self.compute_v1.regionOperations,
+              self.compute_v1.addresses,
+              project='my-project'))
     self.wait_for_operations.assert_called_once_with(
         operations_data=operations_data,
         http=self.mock_http,
@@ -408,8 +423,11 @@ class MakeRequestsTest(test_case.TestCase):
     operations_data = []
     for operation in operations:
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute_v1.
-                                globalOperations, self.compute_v1.networks))
+          waiters.OperationData(
+              operation,
+              self.compute_v1.globalOperations,
+              self.compute_v1.networks,
+              project='my-project'))
     self.wait_for_operations.assert_called_once_with(
         operations_data=operations_data,
         http=self.mock_http,

@@ -47,10 +47,10 @@ COMMANDS
         credentials.
 
      print-access-token
-        (BETA) Print an access token for the active account.
+        (BETA) Print an access token for the specified account.
 
      print-identity-token
-        (BETA) Print an identity token for the active account.
+        (BETA) Print an identity token for the specified account.
 
      revoke
         (BETA) Revoke access credentials for an account.

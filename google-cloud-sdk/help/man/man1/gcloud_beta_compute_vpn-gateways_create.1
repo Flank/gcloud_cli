@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute vpn\-gateways create \- create a new Google Compute Engine High Available VPN gateway
+gcloud beta compute vpn\-gateways create \- create a new Google Compute Engine Highly Available VPN gateway
 
 
 
@@ -17,12 +17,12 @@ gcloud beta compute vpn\-gateways create \- create a new Google Compute Engine H
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute vpn\-gateways create\fR creates a new High
+\fB(BETA)\fR \fBgcloud beta compute vpn\-gateways create\fR creates a new Highly
 Available VPN gateway.
 
-High Available VPN Gateway provides a means to create a VPN solution with a
-higher availability SLA compared to Classic Target VPN Gateway. High Available
-VPN gateways are referred to as simply VPN gateways in the API documentation and
+Highly Available VPN Gateway provides a means to create a VPN solution with a
+higher availability SLA compared to Classic Target VPN Gateway. Highly Available
+VPN gateways are simply referred to as VPN gateways in the API documentation and
 gcloud commands. A VPN Gateway can reference one or more VPN tunnels that
 connect it to external VPN gateways or Cloud VPN Gateways.
 
@@ -98,12 +98,24 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To create a VPN gateway, run:
 
 .RS 2m
+$ gcloud beta compute vpn\-gateways create my\-vpn\-gateway \e
+  \-\-region=us\-central1 \-\-network=default
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute vpn\-gateways create
 $ gcloud alpha compute vpn\-gateways create
 .RE
 

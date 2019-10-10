@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ from googlecloudsdk.core import http
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_printer
+import six
 
 
 class Delete(base.DeleteCommand):
@@ -114,7 +115,7 @@ class Delete(base.DeleteCommand):
 
       # Resolve tags to digests.
       for tag in explicit_tags:
-        digests.add(util.GetDigestFromName(str(tag)))
+        digests.add(util.GetDigestFromName(six.text_type(tag)))
 
       # Find all the tags that reference digests to be deleted.
       all_tags = set()
@@ -127,7 +128,7 @@ class Delete(base.DeleteCommand):
       if implicit_tags and not args.force_delete_tags:
         log.error('Tags:')
         for tag in explicit_tags:
-          log.error('- ' + str(tag))
+          log.error('- ' + six.text_type(tag))
         raise exceptions.Error(
             'This operation will implicitly delete the tags listed above. '
             'Please manually remove with the `untag` command or re-run with '
@@ -143,7 +144,7 @@ class Delete(base.DeleteCommand):
       if explicit_tags:
         log.status.Print('Tags:')
       for tag in explicit_tags:
-        log.status.Print('- ' + str(tag))
+        log.status.Print('- ' + six.text_type(tag))
 
       # Prompt the user for consent to delete all the above.
       console_io.PromptContinue(
@@ -159,10 +160,10 @@ class Delete(base.DeleteCommand):
       result = []
       for tag in explicit_tags:  # tags must be deleted before digests
         self._DeleteDockerTagOrDigest(tag, http_obj)
-        result.append({'name': str(tag)})
+        result.append({'name': six.text_type(tag)})
       for digest in digests:
         self._DeleteDockerTagOrDigest(digest, http_obj)
-        result.append({'name': str(digest)})
+        result.append({'name': six.text_type(digest)})
       return result
 
   def _ProcessImageNames(self, image_names):
@@ -196,7 +197,7 @@ class Delete(base.DeleteCommand):
     log.DeletedResource(digest)
 
   def _PrintDigest(self, digest, http_obj):
-    log.status.Print('- ' + str(digest))
+    log.status.Print('- ' + six.text_type(digest))
     self._DisplayDigestTags(digest, http_obj)
 
   def _DisplayDigestTags(self, digest, http_obj):

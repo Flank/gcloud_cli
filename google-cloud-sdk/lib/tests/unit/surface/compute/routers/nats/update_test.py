@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,13 +68,13 @@ class UpdateTest(router_test_base.RouterTestBase):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-3') %
                 self.version,
             ],
@@ -129,7 +129,7 @@ class UpdateTest(router_test_base.RouterTestBase):
             subnetworks=[
                 self.messages.RouterNatSubnetworkToNat(
                     name=(
-                        'https://www.googleapis.com/compute/%s/projects/'
+                        'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-1')
                     % self.version,
                     sourceIpRangesToNat=[
@@ -139,7 +139,7 @@ class UpdateTest(router_test_base.RouterTestBase):
                     ]),
                 self.messages.RouterNatSubnetworkToNat(
                     name=(
-                        'https://www.googleapis.com/compute/%s/projects/'
+                        'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-2')
                     % self.version,
                     sourceIpRangesToNat=[
@@ -150,7 +150,7 @@ class UpdateTest(router_test_base.RouterTestBase):
                     secondaryIpRangeNames=['range-1']),
                 self.messages.RouterNatSubnetworkToNat(
                     name=(
-                        'https://www.googleapis.com/compute/%s/projects/'
+                        'https://compute.googleapis.com/compute/%s/projects/'
                         'fake-project/regions/us-central1/subnetworks/subnet-3')
                     % self.version,
                     sourceIpRangesToNat=[
@@ -242,7 +242,7 @@ class UpdateTest(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for nat [my-nat] in router [my-router]'
-        ' [https://www.googleapis.com/compute/v1/'
+        ' [https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
@@ -257,17 +257,6 @@ class UpdateTest(router_test_base.RouterTestBase):
           --region us-central1 --auto-allocate-nat-external-ips
           --nat-all-subnet-ip-ranges
           """)
-
-
-class BetaUpdateTest(UpdateTest):
-
-  def SetUp(self):
-    self.version = 'beta'
-    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
-
-    self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='beta')
-    self.orig.nats = [self.messages.RouterNat(name='my-nat')]
 
   def testLogging(self):
     expected_router = copy.deepcopy(self.orig)
@@ -378,14 +367,14 @@ class BetaUpdateTest(UpdateTest):
         """)
 
 
-class AlphaUpdateTest(BetaUpdateTest):
+class BetaUpdateTest(UpdateTest):
 
   def SetUp(self):
-    self.version = 'alpha'
-    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+    self.version = 'beta'
+    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
 
     self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='alpha')
+        self.messages, track='beta')
     self.orig.nats = [self.messages.RouterNat(name='my-nat')]
 
   def testDrainIps(self):
@@ -396,15 +385,15 @@ class AlphaUpdateTest(BetaUpdateTest):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
                 self.version,
             ],
             drainNatIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-3') %
                 self.version,
             ],
@@ -433,10 +422,10 @@ class AlphaUpdateTest(BetaUpdateTest):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
                 self.version,
             ],
@@ -452,12 +441,12 @@ class AlphaUpdateTest(BetaUpdateTest):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
                 self.version,
             ],
             drainNatIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
                 self.version,
             ],
@@ -497,10 +486,10 @@ class AlphaUpdateTest(BetaUpdateTest):
             natIpAllocateOption=self.messages.RouterNat
             .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
             natIps=[
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-1') %
                 self.version,
-                ('https://www.googleapis.com/compute/%s/projects/'
+                ('https://compute.googleapis.com/compute/%s/projects/'
                  'fake-project/regions/us-central1/addresses/address-2') %
                 self.version,
             ],
@@ -522,6 +511,18 @@ class AlphaUpdateTest(BetaUpdateTest):
         --clear-drain-nat-ips
         --nat-all-subnet-ip-ranges
         """)
+
+
+class AlphaUpdateTest(BetaUpdateTest):
+
+  def SetUp(self):
+    self.version = 'alpha'
+    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='alpha')
+    self.orig.nats = [self.messages.RouterNat(name='my-nat')]
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import exceptions as gcloud_exceptions
+from googlecloudsdk.command_lib.projects import util as project_util
 
 
 def VerifyParentForExport(organization,
@@ -52,6 +53,15 @@ def GetParentNameForExport(organization,
   if folder:
     return 'folders/{0}'.format(folder)
   return 'projects/{0}'.format(project)
+
+
+def GetFeedParent(organization, project, folder):
+  """Get the parent name from organization Number, project Id, or folder Number."""
+  if organization:
+    return 'organizations/{0}'.format(organization)
+  if folder:
+    return 'folders/{0}'.format(folder)
+  return 'projects/{0}'.format(project_util.GetProjectNumber(project))
 
 
 def VerifyParentForGetHistory(organization,

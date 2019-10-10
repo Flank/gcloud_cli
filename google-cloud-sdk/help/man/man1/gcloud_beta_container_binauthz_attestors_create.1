@@ -15,12 +15,6 @@ gcloud beta container binauthz attestors create \- create an Attestor
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Create an Attestor.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -55,9 +49,9 @@ created attestor will be bound.
 .sp
 For the attestor to be able to access and use the Note, the Note must exist and
 the active gcloud account (core/account) must have the
-\f5containeranalysis.occurrences.viewer\fR permission for the Note. This can be
-achieved by granting the \f5containeranalysis.notes.viewer\fR role to the active
-account for the Note resource in question.
+\f5containeranalysis.notes.listOccurrences\fR permission for the Note. This can
+be achieved by granting the \f5containeranalysis.notes.occurrences.viewer\fR
+role to the active account for the Note resource in question.
 
 .RS 2m
 The arguments in this group can be used to specify the attributes of this resource. This must be specified.
@@ -101,12 +95,27 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To create an Attestor with an existing Note
+\f5projects/my_proj/notes/my_note\fR:
 
 .RS 2m
+$ gcloud beta container binauthz attestors create \e
+    my_new_attestor
+    \-\-attestation\-authority\-note=my_note \e
+    \-\-attestation\-authority\-note\-project=my_proj \e
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container binauthz attestors create
 $ gcloud alpha container binauthz attestors create
 .RE
 

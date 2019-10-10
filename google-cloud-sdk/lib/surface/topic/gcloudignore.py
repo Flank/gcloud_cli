@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -103,6 +103,9 @@ class GcloudignoreHelp(base.TopicCommand):
   that point in the file. It does not recurse (that is, the included file
   *cannot* `#!include` another file) and cannot be anywhere but the top-level
   directory to be uploaded.
+
+  The `gcloud meta list-files-for-upload` command can be used to display files
+  files that will uploaded.
 
 
   ## EXAMPLES

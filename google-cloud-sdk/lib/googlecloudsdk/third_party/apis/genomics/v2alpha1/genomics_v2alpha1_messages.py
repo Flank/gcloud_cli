@@ -38,14 +38,14 @@ class Action(_messages.Message):
 
   Messages:
     EnvironmentValue: The environment to pass into the container. This
-      environment is merged with any values specified in the `Pipeline`
-      message. These values overwrite any in the `Pipeline` message.  In
-      addition to the values passed here, a few other values are automatically
-      injected into the environment. These cannot be hidden or overwritten.
-      `GOOGLE_PIPELINE_FAILED` will be set to "1" if the pipeline failed
-      because an action has exited with a non-zero status (and did not have
-      the `IGNORE_EXIT_STATUS` flag set). This can be used to determine if
-      additional debug or logging actions should execute.
+      environment is merged with values specified in the
+      google.genomics.v2alpha1.Pipeline message, overwriting any duplicate
+      values.  In addition to the values passed here, a few other values are
+      automatically injected into the environment. These cannot be hidden or
+      overwritten.  `GOOGLE_PIPELINE_FAILED` will be set to "1" if the
+      pipeline failed because an action has exited with a non-zero status (and
+      did not have the `IGNORE_EXIT_STATUS` flag set). This can be used to
+      determine if additional debug or logging actions should execute.
       `GOOGLE_LAST_EXIT_STATUS` will be set to the exit status of the last
       non-background action that executed. This can be used by workflow engine
       authors to determine whether an individual action has succeeded or
@@ -75,10 +75,10 @@ class Action(_messages.Message):
     entrypoint: If specified, overrides the `ENTRYPOINT` specified in the
       container.
     environment: The environment to pass into the container. This environment
-      is merged with any values specified in the `Pipeline` message. These
-      values overwrite any in the `Pipeline` message.  In addition to the
-      values passed here, a few other values are automatically injected into
-      the environment. These cannot be hidden or overwritten.
+      is merged with values specified in the google.genomics.v2alpha1.Pipeline
+      message, overwriting any duplicate values.  In addition to the values
+      passed here, a few other values are automatically injected into the
+      environment. These cannot be hidden or overwritten.
       `GOOGLE_PIPELINE_FAILED` will be set to "1" if the pipeline failed
       because an action has exited with a non-zero status (and did not have
       the `IGNORE_EXIT_STATUS` flag set). This can be used to determine if
@@ -88,11 +88,18 @@ class Action(_messages.Message):
       authors to determine whether an individual action has succeeded or
       failed.
     flags: The set of flags to apply to this action.
-    imageUri: The URI to pull the container image from. Note that all images
-      referenced by actions in the pipeline are pulled before the first action
-      runs. If multiple actions reference the same image, it is only pulled
-      once, ensuring that the same image is used for all actions in a single
-      pipeline.
+    imageUri: Required. The URI to pull the container image from. Note that
+      all images referenced by actions in the pipeline are pulled before the
+      first action runs. If multiple actions reference the same image, it is
+      only pulled once, ensuring that the same image is used for all actions
+      in a single pipeline.  The image URI can be either a complete host and
+      image specification (e.g., quay.io/biocontainers/samtools), a library
+      and image name (e.g., google/cloud-sdk) or a bare image name ('bash') to
+      pull from the default library.  No schema is required in any of these
+      cases.  If the specified image is not public, the service account
+      specified for the Virtual Machine must have access to pull the images
+      from GCR, or appropriate credentials must be specified in the
+      google.genomics.v2alpha1.Action.credentials field.
     labels: Labels to associate with the action. This field is provided to
       assist workflow engine authors in identifying actions (for example, to
       indicate what sort of action they perform, such as localization or
@@ -112,7 +119,7 @@ class Action(_messages.Message):
     name: An optional name for the container. The container hostname will be
       set to this name, making it useful for inter-container communication.
       The name must contain only upper and lowercase alphanumeric characters
-      and hypens and cannot start with a hypen.
+      and hypens and cannot start with a hyphen.
     pidNamespace: An optional identifier for a PID namespace to run the action
       inside. Multiple actions should use the same string to share a
       namespace.  If unspecified, a separate isolated namespace is used.
@@ -154,17 +161,16 @@ class Action(_messages.Message):
   @encoding.MapUnrecognizedFields('additionalProperties')
   class EnvironmentValue(_messages.Message):
     r"""The environment to pass into the container. This environment is merged
-    with any values specified in the `Pipeline` message. These values
-    overwrite any in the `Pipeline` message.  In addition to the values passed
-    here, a few other values are automatically injected into the environment.
-    These cannot be hidden or overwritten.  `GOOGLE_PIPELINE_FAILED` will be
-    set to "1" if the pipeline failed because an action has exited with a non-
-    zero status (and did not have the `IGNORE_EXIT_STATUS` flag set). This can
-    be used to determine if additional debug or logging actions should
-    execute.  `GOOGLE_LAST_EXIT_STATUS` will be set to the exit status of the
-    last non-background action that executed. This can be used by workflow
-    engine authors to determine whether an individual action has succeeded or
-    failed.
+    with values specified in the google.genomics.v2alpha1.Pipeline message,
+    overwriting any duplicate values.  In addition to the values passed here,
+    a few other values are automatically injected into the environment. These
+    cannot be hidden or overwritten.  `GOOGLE_PIPELINE_FAILED` will be set to
+    "1" if the pipeline failed because an action has exited with a non-zero
+    status (and did not have the `IGNORE_EXIT_STATUS` flag set). This can be
+    used to determine if additional debug or logging actions should execute.
+    `GOOGLE_LAST_EXIT_STATUS` will be set to the exit status of the last non-
+    background action that executed. This can be used by workflow engine
+    authors to determine whether an individual action has succeeded or failed.
 
     Messages:
       AdditionalProperty: An additional property for a EnvironmentValue
@@ -478,7 +484,7 @@ class Disk(_messages.Message):
   Fields:
     name: A user-supplied name for the disk. Used when mounting the disk into
       actions. The name must contain only upper and lowercase alphanumeric
-      characters and hypens and cannot start with a hypen.
+      characters and hypens and cannot start with a hyphen.
     sizeGb: The size, in GB, of the disk to attach. If the size is not
       specified, a default is chosen to ensure reasonable I/O performance.  If
       the disk type is specified as `local-ssd`, multiple local drives are
@@ -1197,7 +1203,7 @@ class RunPipelineRequest(_messages.Message):
       used by the operation, and can be modified at any time.  To associate
       labels with resources created while executing the operation, see the
       appropriate resource message (for example, `VirtualMachine`).
-    pipeline: The description of the pipeline to run.
+    pipeline: Required. The description of the pipeline to run.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -1274,7 +1280,8 @@ class ServiceAccount(_messages.Message):
     email: Email address of the service account. If not specified, the default
       Compute Engine service account for the project will be used.
     scopes: List of scopes to be enabled for this service account on the VM,
-      in addition to the Cloud Genomics API scope.
+      in addition to the cloud-platform API scope that will be added by
+      default.
   """
 
   email = _messages.StringField(1)
@@ -1347,37 +1354,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -1442,9 +1422,11 @@ class VirtualMachine(_messages.Message):
 
   Messages:
     LabelsValue: Optional set of labels to apply to the VM and any attached
-      disk resources. These labels must adhere to the name and value
-      restrictions on VM labels imposed by Compute Engine.  Labels applied at
-      creation time to the VM. Applied on a best-effort basis to attached disk
+      disk resources. These labels must adhere to the [name and value
+      restrictions](https://cloud.google.com/compute/docs/labeling-resources)
+      on VM labels imposed by Compute Engine.  Labels keys with the prefix
+      'google-' are reserved for use by Google.  Labels applied at creation
+      time to the VM. Applied on a best-effort basis to attached disk
       resources shortly after VM creation.
 
   Fields:
@@ -1474,15 +1456,17 @@ class VirtualMachine(_messages.Message):
     enableStackdriverMonitoring: Whether Stackdriver monitoring should be
       enabled on the VM.
     labels: Optional set of labels to apply to the VM and any attached disk
-      resources. These labels must adhere to the name and value restrictions
-      on VM labels imposed by Compute Engine.  Labels applied at creation time
-      to the VM. Applied on a best-effort basis to attached disk resources
-      shortly after VM creation.
-    machineType: The machine type of the virtual machine to create. Must be
-      the short name of a standard machine type (such as "n1-standard-1") or a
-      custom machine type (such as "custom-1-4096", where "1" indicates the
-      number of vCPUs and "4096" indicates the memory in MB). See [Creating an
-      instance with a custom machine
+      resources. These labels must adhere to the [name and value
+      restrictions](https://cloud.google.com/compute/docs/labeling-resources)
+      on VM labels imposed by Compute Engine.  Labels keys with the prefix
+      'google-' are reserved for use by Google.  Labels applied at creation
+      time to the VM. Applied on a best-effort basis to attached disk
+      resources shortly after VM creation.
+    machineType: Required. The machine type of the virtual machine to create.
+      Must be the short name of a standard machine type (such as
+      "n1-standard-1") or a custom machine type (such as "custom-1-4096",
+      where "1" indicates the number of vCPUs and "4096" indicates the memory
+      in MB). See [Creating an instance with a custom machine
       type](https://cloud.google.com/compute/docs/instances/creating-instance-
       with-custom-machine-type#create) for more specifications on creating a
       custom machine type.
@@ -1500,10 +1484,12 @@ class VirtualMachine(_messages.Message):
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
     r"""Optional set of labels to apply to the VM and any attached disk
-    resources. These labels must adhere to the name and value restrictions on
-    VM labels imposed by Compute Engine.  Labels applied at creation time to
-    the VM. Applied on a best-effort basis to attached disk resources shortly
-    after VM creation.
+    resources. These labels must adhere to the [name and value
+    restrictions](https://cloud.google.com/compute/docs/labeling-resources) on
+    VM labels imposed by Compute Engine.  Labels keys with the prefix
+    'google-' are reserved for use by Google.  Labels applied at creation time
+    to the VM. Applied on a best-effort basis to attached disk resources
+    shortly after VM creation.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -1545,11 +1531,13 @@ class WorkerAssignedEvent(_messages.Message):
 
   Fields:
     instance: The worker's instance name.
+    machineType: The machine type that was assigned for the worker.
     zone: The zone the worker is running in.
   """
 
   instance = _messages.StringField(1)
-  zone = _messages.StringField(2)
+  machineType = _messages.StringField(2)
+  zone = _messages.StringField(3)
 
 
 class WorkerReleasedEvent(_messages.Message):

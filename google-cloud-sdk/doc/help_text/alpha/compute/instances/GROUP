@@ -85,7 +85,7 @@ COMMANDS
         (ALPHA) Get the Shielded identity for a Google Compute Engine instance.
 
      import
-        (ALPHA) create Google Compute Engine virtual machine instances from
+        (ALPHA) Create Google Compute Engine virtual machine instances from
         virtual appliance in OVA/OVF format.
 
      list
@@ -132,6 +132,9 @@ COMMANDS
         (ALPHA) (DEPRECATED) Set minimum CPU platform for Google Compute Engine
         virtual machines.
 
+     set-name
+        (ALPHA) Set the name of a Google Compute Engine virtual machine.
+
      set-scheduling
         (ALPHA) Set scheduling options for Google Compute Engine virtual
         machines.
@@ -170,9 +173,8 @@ COMMANDS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instances
         $ gcloud beta compute instances

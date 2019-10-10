@@ -78,7 +78,7 @@ actions:
                 "createTime": "2019-02-20T16:47:22.739565061Z",
                 "updateTime": "2019-02-20T16:47:38.694801567Z",
                 "expireTime": "2020-02-20T16:47:26Z",
-                "state": "TRANSFERRED",
+                "state": "DETACHED",
                 "detachTime": "2019-02-21T22:10:50.112490545Z"
               }
             }

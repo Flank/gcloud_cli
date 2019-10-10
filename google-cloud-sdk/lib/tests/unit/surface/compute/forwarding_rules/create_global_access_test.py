@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class GlobalAccessApiAlphaTest(test_base.BaseTest):
+class GlobalAccessApiBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testAllowGlobalAccessInGlobalRequest(self):
     """Tests specifying global access in creating global l7 lb request."""
@@ -116,6 +116,13 @@ class GlobalAccessApiAlphaTest(test_base.BaseTest):
                              forwardingRule=expected_forwarding_rule,
                              project='my-project',
                              region='us-central1'))],)
+
+
+class GlobalAccessApiAlphaTest(GlobalAccessApiBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

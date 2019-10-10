@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -119,7 +119,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'secondaryIpRanges': [
             self.messages.SubnetworkSecondaryRange(
@@ -162,7 +162,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'secondaryIpRanges': [
             self.messages.SubnetworkSecondaryRange(
@@ -207,7 +207,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'secondaryIpRanges': [
             self.messages.SubnetworkSecondaryRange(
@@ -249,7 +249,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'secondaryIpRanges': [
             self.messages.SubnetworkSecondaryRange(
@@ -288,7 +288,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'secondaryIpRanges': [
             self.messages.SubnetworkSecondaryRange(
@@ -313,7 +313,7 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
     """Tests toggling enableFlowLogs on a subnet."""
     subnetwork_resource = {
         'name': 'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'fingerprint': b'ABC123',
     }
@@ -326,19 +326,12 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
         compute networks subnets update subnet-1
           {0} --region us-central2
         """.format(enable_flow_logs_flag))
-
-    if self.track == calliope_base.ReleaseTrack.GA:
-      expected_subnetwork_resource = {
-          'enableFlowLogs': enable_flow_logs,
-          'fingerprint': b'ABC123'
-      }
-    else:
-      expected_subnetwork_resource = {
-          'logConfig': {
-              'enable': enable_flow_logs
-          },
-          'fingerprint': b'ABC123'
-      }
+    expected_subnetwork_resource = {
+        'logConfig': {
+            'enable': enable_flow_logs
+        },
+        'fingerprint': b'ABC123'
+    }
 
     self.CheckRequests([
         (self.compute.subnetworks, 'Get',
@@ -352,18 +345,11 @@ class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
              subnetwork='subnet-1',
              subnetworkResource=expected_subnetwork_resource))])
 
-
-class SubnetsUpdateTestBeta(SubnetsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   def testUpdateFlowLogsAggregationAndSampling(self):
     """Tests updating the flow logging options on a subnet."""
     subnetwork_resource = {
         'name': 'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'fingerprint': b'ABC123',
     }
@@ -407,6 +393,81 @@ class SubnetsUpdateTestBeta(SubnetsUpdateTest):
              subnetworkResource=expected_subnetwork_resource))])
 
 
+class SubnetsUpdateTestBeta(SubnetsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+
+  def testSetRoleToActive(self):
+    """Tests setting the role of a subnet to ACTIVE."""
+    subnetwork_resource = {
+        'name':
+            'subnetwork-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --role active --region us-central2
+        """)
+
+    subnetwork_resource['role'] = (
+        self.messages.Subnetwork.RoleValueValuesEnum.ACTIVE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource,
+             drainTimeoutSeconds=0))])
+
+  def testSetRoleToActiveWithDrainTimeout(self):
+    """Tests setting the role of a subnet to ACTIVE."""
+    subnetwork_resource = {
+        'name':
+            'subnetwork-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --role active --region us-central2 --drain-timeout 10
+        """)
+
+    subnetwork_resource['role'] = (
+        self.messages.Subnetwork.RoleValueValuesEnum.ACTIVE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource,
+             drainTimeoutSeconds=10))])
+
+
 class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
 
   def SetUp(self):
@@ -417,7 +478,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     """Tests updating the flow logging options on a subnet."""
     subnetwork_resource = {
         'name': 'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
         'fingerprint': b'ABC123',
     }
@@ -465,7 +526,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -499,7 +560,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnetwork-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -533,7 +594,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -564,7 +625,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -595,7 +656,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -629,7 +690,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -663,7 +724,7 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource = {
         'name':
             'subnet-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     self.make_requests.side_effect = iter([
@@ -679,6 +740,145 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTest):
     subnetwork_resource['privateIpv6GoogleAccess'] = (
         self.messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum
         .ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testPrivateIpv6GoogleAccessWithEnableOutboundWithServiceAccounts(self):
+    """Tests set ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS private ipv6 access on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+          --private-ipv6-google-access-type enable-outbound-vm-access-for-service-accounts
+          --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccess'] = (
+        self.messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum
+        .ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2', subnetwork='subnet-1'))
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testPrivateIpv6GoogleAccessSetServiceAccounts(self):
+    """Tests set private ipv6 access service accounts on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+        --private-ipv6-google-access-service-accounts src1@google.com,src2@google.com
+        --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccessServiceAccounts'] = [
+        'src1@google.com', 'src2@google.com'
+    ]
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testPrivateIpv6GoogleAccessSetServiceAccountsWithEnum(self):
+    """Tests set private ipv6 access service accounts on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+        --private-ipv6-google-access-type enable-outbound-vm-access-for-service-accounts
+        --private-ipv6-google-access-service-accounts src1@google.com,src2@google.com
+        --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccess'] = (
+        self.messages.Subnetwork.PrivateIpv6GoogleAccessValueValuesEnum
+        .ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE_FOR_SERVICE_ACCOUNTS)
+    subnetwork_resource['privateIpv6GoogleAccessServiceAccounts'] = [
+        'src1@google.com', 'src2@google.com'
+    ]
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Get',
+         self.messages.ComputeSubnetworksGetRequest(
+             project='my-project', region='us-central2',
+             subnetwork='subnet-1')),
+    ], [(self.compute.subnetworks, 'Patch',
+         self.messages.ComputeSubnetworksPatchRequest(
+             project='my-project',
+             region='us-central2',
+             subnetwork='subnet-1',
+             subnetworkResource=subnetwork_resource))])
+
+  def testPrivateIpv6GoogleAccessClearServiceAccounts(self):
+    """Tests clear private ipv6 access service accounts on a subnet."""
+    subnetwork_resource = {
+        'name':
+            'subnet-1',
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/default'),
+        'privateIpv6GoogleAccessServiceAccounts':
+            (['src1@google.com', 'src2@google.com']),
+    }
+    self.make_requests.side_effect = iter([
+        [self.messages.Subnetwork(**subnetwork_resource)],
+        [],
+    ])
+
+    self.Run("""
+        compute networks subnets update subnet-1
+        --private-ipv6-google-access-service-accounts ''
+        --region us-central2
+        """)
+    subnetwork_resource['privateIpv6GoogleAccessServiceAccounts'] = []
 
     self.CheckRequests([
         (self.compute.subnetworks, 'Get',

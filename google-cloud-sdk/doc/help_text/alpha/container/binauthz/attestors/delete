@@ -5,9 +5,6 @@ SYNOPSIS
     gcloud alpha container binauthz attestors delete ATTESTOR
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) Delete an Attestor.
-
 POSITIONAL ARGUMENTS
      Attestor resource - The attestor to be deleted. This represents a Cloud
      resource. (NOTE) Some attributes are not given arguments in this group but
@@ -26,12 +23,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To delete an existing Attestor my_attestor:
+
+        $ gcloud alpha container binauthz attestors delete my_attestor
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud container binauthz attestors delete
         $ gcloud beta container binauthz attestors delete
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,10 @@ class CloudTasksTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    if self.track == calliope_base.ReleaseTrack.BETA:
+    if not hasattr(self, 'api_track'):
+      self.api_track = self.track
+
+    if self.api_track == calliope_base.ReleaseTrack.BETA:
       api_version = cloudtasks_api.BETA_API_VERSION
     else:
       api_version = cloudtasks_api.GA_API_VERSION
@@ -44,7 +47,7 @@ class CloudTasksTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.apitools_mock_client.Mock()
     self.addCleanup(self.apitools_mock_client.Unmock)
 
-    if self.track == calliope_base.ReleaseTrack.BETA:
+    if self.api_track == calliope_base.ReleaseTrack.BETA:
       api_adapter = cloudtasks_api.BetaApiAdapter()
     else:
       api_adapter = cloudtasks_api.GaApiAdapter()

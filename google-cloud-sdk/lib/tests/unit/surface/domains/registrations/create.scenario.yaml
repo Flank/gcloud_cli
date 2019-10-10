@@ -7,8 +7,7 @@ summary:
       domains registrations create example.com --registrant-contact-from-file=contact.yaml --whois-privacy=publish-redacted-contact-data
   - prompt:
     - message: |
-        Yearly registration price: 12.00 USD
-        Yearly renewal price: 12.00 USD
+        Yearly price: 12.00 USD
     - input: y
   - progress_tracker:
     - message: Waiting for [operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14]
@@ -31,8 +30,7 @@ summary:
     - input: y
   - prompt:
     - message: |
-        Yearly registration price: 14.00 USD
-        Yearly renewal price: 14.00 USD
+        Yearly price: 14.00 USD
     - input: y
 - execute:
   - command: |
@@ -45,8 +43,7 @@ summary:
     - input: '1'
   - prompt:
     - message: |
-        Yearly registration price: 12.00 USD
-        Yearly renewal price: 12.00 USD
+        Yearly price: 12.00 USD
     - input: y
 - execute:
   - command: |
@@ -63,8 +60,7 @@ summary:
     - input: '1'
   - prompt:
     - message: |
-        Yearly registration price: 12.00 USD
-        Yearly renewal price: 12.00 USD
+        Yearly price: 12.00 USD
     - input: n
   - error: '1: Aborted by user.'
 - execute:
@@ -107,15 +103,11 @@ actions:
               "availability": {
                 "domainName": "example.com",
                 "available": "AVAILABLE",
-                "registrationPrice": {
-                  "currencyCode": "USD",
-                  "units": "12"
-                },
                 "supportedWhoisPrivacy": [
                   "PUBLISH_REDACTED_CONTACT_DATA",
                   "USE_WHOIS_PRIVACY_PROXY"
                 ],
-                "renewalPrice": {
+                "yearlyPrice": {
                   "currencyCode": "USD",
                   "units": "12"
                 }
@@ -123,8 +115,7 @@ actions:
             }
     - expect_prompt_continue:
         message: |
-          Yearly registration price: 12.00 USD
-          Yearly renewal price: 12.00 USD
+          Yearly price: 12.00 USD
         user_input: y
     - api_call:
         expect_request:
@@ -134,10 +125,7 @@ actions:
           body:
             json:
               domainName: example.com
-              registrationPrice:
-                currencyCode: USD
-                units: '12'
-              renewalPrice:
+              yearlyPrice:
                 currencyCode: USD
                 units: '12'
               whoisConfig:
@@ -197,6 +185,9 @@ actions:
                 "createTime": "2019-01-11T14:09:08.068037639Z",
                 "updateTime": "2019-01-11T14:09:08.137325285Z",
                 "expireTime": "2020-01-11T14:09:12Z",
+                "outstandingIssues": [
+                  "UNVERIFIED_EMAIL"
+                ],
                 "state": "ACTIVE",
                 "dnsConfig": {},
                 "whoisConfig": {
@@ -247,10 +238,6 @@ actions:
                "availability": {
                  "domainName": "example.app",
                  "available": "AVAILABLE",
-                 "registrationPrice": {
-                   "currencyCode": "USD",
-                   "units": "14"
-                 },
                  "supportedWhoisPrivacy": [
                    "PUBLISH_REDACTED_CONTACT_DATA",
                    "USE_WHOIS_PRIVACY_PROXY"
@@ -258,7 +245,7 @@ actions:
                  "notices": [
                    "HSTS_PRELOADED"
                  ],
-                 "renewalPrice": {
+                 "yearlyPrice": {
                    "currencyCode": "USD",
                    "units": "14"
                  }
@@ -274,8 +261,7 @@ actions:
         user_input: y
     - expect_prompt_continue:
         message: |
-          Yearly registration price: 14.00 USD
-          Yearly renewal price: 14.00 USD
+          Yearly price: 14.00 USD
         user_input: y
     - api_call:
         expect_request:
@@ -285,10 +271,7 @@ actions:
           body:
             json:
               domainName: example.app
-              registrationPrice:
-                currencyCode: USD
-                units: '14'
-              renewalPrice:
+              yearlyPrice:
                 currencyCode: USD
                 units: '14'
               dnsConfig:
@@ -345,18 +328,14 @@ actions:
               "availability": {
                 "domainName": "example.com",
                 "available": "AVAILABLE",
-                "registrationPrice": {
+                "yearlyPrice": {
                   "currencyCode": "USD",
                   "units": "12"
                 },
                 "supportedWhoisPrivacy": [
                   "PUBLISH_REDACTED_CONTACT_DATA",
                   "USE_WHOIS_PRIVACY_PROXY"
-                ],
-                "renewalPrice": {
-                  "currencyCode": "USD",
-                  "units": "12"
-                }
+                ]
               }
             }
     - expect_prompt_choice:
@@ -365,8 +344,7 @@ actions:
         user_input: '1'
     - expect_prompt_continue:
         message: |
-          Yearly registration price: 12.00 USD
-          Yearly renewal price: 12.00 USD
+          Yearly price: 12.00 USD
         user_input: y
     - api_call:
         expect_request:
@@ -376,10 +354,7 @@ actions:
           body:
             json:
               domainName: example.com
-              registrationPrice:
-                currencyCode: USD
-                units: '12'
-              renewalPrice:
+              yearlyPrice:
                 currencyCode: USD
                 units: '12'
               whoisConfig:
@@ -442,15 +417,11 @@ actions:
               "availability": {
                 "domainName": "example.com",
                 "available": "AVAILABLE",
-                "registrationPrice": {
-                  "currencyCode": "USD",
-                  "units": "12"
-                },
                 "supportedWhoisPrivacy": [
                   "PUBLISH_REDACTED_CONTACT_DATA",
                   "USE_WHOIS_PRIVACY_PROXY"
                 ],
-                "renewalPrice": {
+                "yearlyPrice": {
                   "currencyCode": "USD",
                   "units": "12"
                 }
@@ -462,8 +433,7 @@ actions:
         user_input: '1'
     - expect_prompt_continue:
         message: |
-          Yearly registration price: 12.00 USD
-          Yearly renewal price: 12.00 USD
+          Yearly price: 12.00 USD
         user_input: n
     - expect_exit:
         code: 1

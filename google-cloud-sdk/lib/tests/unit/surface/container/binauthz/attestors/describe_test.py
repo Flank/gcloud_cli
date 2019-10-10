@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class DescribeTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+class DescribeTest(base.WithMockGaBinauthz, base.BinauthzTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSuccess_WithPublicKey(self):
     ascii_armored_key = textwrap.dedent("""
@@ -44,19 +44,33 @@ class DescribeTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
 
     name = 'bar'
     proj = self.Project()
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[
-                self.messages.AttestorPublicKey(
-                    asciiArmoredPgpPublicKey=ascii_armored_key,
-                    comment=None,
-                    id='new_key'),
-            ],
-        ))
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey=ascii_armored_key,
+                      comment=None,
+                      id='new_key'),
+              ],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey=ascii_armored_key,
+                      comment=None,
+                      id='new_key'),
+              ],
+          ))
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name='projects/{}/attestors/{}'.format(proj, name),
     )
 
@@ -71,7 +85,13 @@ class DescribeTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
         r'\n[ ]*'.join([''] + ascii_armored_key.splitlines()).rstrip())
 
 
-class DescribeAlphaTest(base.WithMockAlphaBinauthz, DescribeTest):
+class DescribeBetaTest(base.WithMockBetaBinauthz, DescribeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DescribeAlphaTest(base.WithMockAlphaBinauthz, DescribeBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

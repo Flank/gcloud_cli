@@ -6,17 +6,17 @@ summary:
   - command: |
       scc assets get-project 345840165995 --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
   - stdout: |
-        projectId: prober-project-1
+      projectId: prober-project-1
 - execute:
   - command: |
       scc assets get-project 345840165995 --asset=4285038039734670702
   - stdout: |
-        projectId: prober-project-1
+      projectId: prober-project-1
 - execute:
   - command: |
       scc assets get-project organizations/345840165995 --asset=4285038039734670702
   - stdout: |
-        projectId: prober-project-1
+      projectId: prober-project-1
 - execute:
   - command: |
       scc assets get-project 345840165995 --asset=10851265360336357506
@@ -24,7 +24,18 @@ summary:
 - execute:
   - command: |
       scc assets get-project 345840165995 --asset=1
-  - error: '1: Asset or resource does not exist for the provided Organization. Please verify that both the OrganizationId and AssetId/ResourceName are correct.'
+  - error: '1: Asset or resource does not exist for the provided Organization. Please
+      verify that both the OrganizationId and AssetId/ResourceName are correct.'
+- execute:
+  - command: |
+      config set scc/organization 345840165995
+  - stderr: |
+      Updated property [scc/organization].
+- execute:
+  - command: |
+      scc assets get-project --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
+  - stdout: |
+      projectId: prober-project-1
 actions:
 # Get project using resource name.
 - execute_command:
@@ -85,7 +96,6 @@ actions:
         projectId: prober-project-1
     - expect_exit:
         code: 0
-# Get project using asset id.
 - execute_command:
     command: |
       scc assets get-project 345840165995 --asset=4285038039734670702
@@ -194,7 +204,6 @@ actions:
         projectId: prober-project-1
     - expect_exit:
         code: 0
-# Get project using asset id and full resouce.
 - execute_command:
     command: |
       scc assets get-project organizations/345840165995 --asset=4285038039734670702
@@ -303,7 +312,6 @@ actions:
         projectId: prober-project-1
     - expect_exit:
         code: 0
-# Try to get project of an Organization. This will fail.
 - execute_command:
     command: |
       scc assets get-project 345840165995 --asset=10851265360336357506
@@ -353,7 +361,6 @@ actions:
     - expect_exit:
         code: 1
         message: Organization assets do not belong to a Project.
-# Try to get project of an invalid asset. This will fail.
 - execute_command:
     command: |
       scc assets get-project 345840165995 --asset=1
@@ -371,4 +378,71 @@ actions:
           body: null
     - expect_exit:
         code: 1
-        message: Asset or resource does not exist for the provided Organization. Please verify that both the OrganizationId and AssetId/ResourceName are correct.
+        message: Asset or resource does not exist for the provided Organization. Please
+          verify that both the OrganizationId and AssetId/ResourceName are correct.
+- execute_command:
+    command: |
+      config set scc/organization 345840165995
+    events:
+    - expect_stderr: |
+        Updated property [scc/organization].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      scc assets get-project --resource-name=//cloudresourcemanager.googleapis.com/projects/428809690096
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=securityCenterProperties.resourceName%3D%22%2F%2Fcloudresourcemanager.googleapis.com%2Fprojects%2F428809690096%22
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            {
+              "listAssetsResults": [
+                {
+                  "asset": {
+                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "securityCenterProperties": {
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceType": "google.cloud.resourcemanager.Project",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceOwners": [
+                        "user:riskdashboard.prober@cscc-prober-org.joonix.net"
+                      ]
+                    },
+                    "resourceProperties": {
+                      "name": "prober project 1",
+                      "lifecycleState": "active",
+                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
+                      "projectId": "prober-project-1",
+                      "createTime": "2018-09-12t17:39:00.974z",
+                      "projectNumber": 428809690096
+                    },
+                    "securityMarks": {
+                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "marks": {
+                        "probermark": "proberTestValue",
+                        "testB": "valueB",
+                        "testA": "valueA"
+                      }
+                    },
+                    "createTime": "2018-09-12T18:12:07.356Z",
+                    "updateTime": "2018-10-17T22:00:25.516Z",
+                    "iamPolicy": {}
+                  }
+                }
+              ],
+              "readTime": "2019-03-21T22:11:36.105Z",
+              "totalSize": 1
+            }
+        repeatable: true
+    - expect_stdout: |
+        projectId: prober-project-1
+    - expect_exit:
+        code: 0

@@ -13,16 +13,17 @@ EXAMPLES
     To create a new policy with minimal arguments, run:
 
         $ gcloud beta dns policies create mypolicy \
-        --description 'My new policy test policy 5' \
+        --description='My new policy test policy 5' \
         --networks=''
 
     To create a new policy with all optional arguments, run:
 
         $ gcloud beta dns policies create mypolicy \
-        --description 'My new policy test policy 5' \
-        --networks network1,network2 \
-        --alternative-name-servers 192.168.1.1,192.168.1.2
+        --description='My new policy test policy 5' \
+        --networks=network1,network2 \
+        --alternative-name-servers=192.168.1.1,192.168.1.2
         --enable-inbound-forwarding
+        --enable-logging
 
 POSITIONAL ARGUMENTS
      Policy resource - The name of the policy you want to create. This
@@ -45,7 +46,9 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --alternative-name-servers=[IP_ADDRESS,...]
         List of alternative name servers to forward to. Must be a comma
-        separated list of IPv4 addresses.
+        separated list of IPv4 addresses. Non-RFC1918 addresses will forward to
+        the target through the Internet. RFC1918 addresses will forward through
+        the VPC.
 
      --enable-inbound-forwarding
         Specifies whether to allow networks bound to this policy to receive DNS
@@ -67,5 +70,9 @@ API REFERENCE
     can be found at: https://developers.google.com/cloud-dns
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud dns policies create
+        $ gcloud alpha dns policies create
 

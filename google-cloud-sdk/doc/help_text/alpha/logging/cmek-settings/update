@@ -1,0 +1,79 @@
+NAME
+    gcloud alpha logging cmek-settings update - updates the CMEK settings for
+        the Stackdriver Logs Router
+
+SYNOPSIS
+    gcloud alpha logging cmek-settings update --organization=ORGANIZATION_ID
+        (--clear-kms-key | [--kms-key-name=KMS_KEY_NAME
+          : --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT])
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Use this command to update the --kms-key-name associated with the
+    Stackdriver Logs Router.
+
+    The Cloud KMS key must already exist and Stackdriver Logging must have
+    permission to access it.
+
+    Customer-managed encryption keys (CMEK) for the Logs Router can currently
+    only be configured at the organization-level and will apply to all projects
+    in the organization.
+
+REQUIRED FLAGS
+     --organization=ORGANIZATION_ID
+        Organization to update Logs Router CMEK settings for.
+
+     Exactly one of these must be specified:
+
+       --clear-kms-key
+          Disable CMEK for the Logs Router by clearing out Cloud KMS cryptokey
+          in the organization's CMEK settings.
+
+       Key resource - The Cloud KMS (Key Management Service) cryptokey that
+       will be used to protect the logs being processed by the Stackdriver Logs
+       Router. The Cloud KMS CryptoKey Encrypter/Decryper role must be assigned
+       to the Stackdriver Logs Router service account. The arguments in this
+       group can be used to specify the attributes of this resource.
+
+         --kms-key-name=KMS_KEY_NAME
+            ID of the key or fully qualified identifier for the key. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
+
+         --kms-keyring=KMS_KEYRING
+            The KMS keyring of the key.
+
+         --kms-location=KMS_LOCATION
+            The Cloud location for the key.
+
+         --kms-project=KMS_PROJECT
+            The Cloud project for the key.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To enable CMEK for the Logs Router for an organization, run:
+
+        $ gcloud alpha logging cmek-settings update \
+            --organization=[ORGANIZATION_ID] \
+            --kms-key-name='projects/my-project/locations/my-location/keyRin\
+        gs/my-keyring/cryptoKeys/key'
+
+    To disable CMEK for the Logs Router for an organization, run:
+
+        $ gcloud alpha logging cmek-settings update \
+            --organization=[ORGANIZATION_ID] --clear-kms-key
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

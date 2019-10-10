@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ def _CommonArgs(parser, messages):
   flags.GetManagedZonesDescriptionArg().AddToParser(parser)
   labels_util.AddUpdateLabelsFlags(parser)
   flags.GetManagedZoneNetworksArg().AddToParser(parser)
+  base.ASYNC_FLAG.AddToParser(parser)
+  flags.GetForwardingTargetsArg().AddToParser(parser)
 
 
 def _Update(zones_client,
@@ -60,6 +62,7 @@ def _Update(zones_client,
     kwargs['peering_config'] = peering_config
   return zones_client.Patch(
       zone_ref,
+      args.async_,
       dnssec_config=dnssec_config,
       description=args.description,
       labels=labels_update.GetOrNone(),
@@ -89,6 +92,11 @@ class UpdateGA(base.UpdateCommand):
     zones_client = managed_zones.Client.FromApiVersion('v1')
     messages = apis.GetMessagesModule('dns', 'v1')
 
+    forwarding_config = None
+    if args.forwarding_targets:
+      forwarding_config = command_util.ParseManagedZoneForwardingConfig(
+          args.forwarding_targets, messages)
+
     visibility_config = None
     if args.networks:
       networks = args.networks if args.networks != [''] else []
@@ -110,7 +118,8 @@ class UpdateGA(base.UpdateCommand):
           networks=network_configs)
 
     return _Update(zones_client, args,
-                   private_visibility_config=visibility_config)
+                   private_visibility_config=visibility_config,
+                   forwarding_config=forwarding_config)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -131,11 +140,11 @@ class UpdateBeta(base.UpdateCommand):
   def Args(parser):
     messages = apis.GetMessagesModule('dns', 'v1beta2')
     _CommonArgs(parser, messages)
-    flags.GetForwardingTargetsArg().AddToParser(parser)
     flags.GetDnsPeeringArgs().AddToParser(parser)
 
   def Run(self, args):
-    zones_client = managed_zones.Client.FromApiVersion('v1beta2')
+    api_version = util.GetApiFromTrack(self.ReleaseTrack())
+    zones_client = managed_zones.Client.FromApiVersion(api_version)
     messages = zones_client.messages
 
     forwarding_config = None
@@ -156,7 +165,7 @@ class UpdateBeta(base.UpdateCommand):
       networks = args.networks if args.networks != [''] else []
 
       def GetNetworkSelfLink(network):
-        return util.GetRegistry('v1beta2').Parse(
+        return util.GetRegistry(api_version).Parse(
             network,
             collection='compute.networks',
             params={
@@ -177,3 +186,24 @@ class UpdateBeta(base.UpdateCommand):
         private_visibility_config=visibility_config,
         forwarding_config=forwarding_config,
         peering_config=peering_config)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class UpdateAlpha(UpdateBeta):
+  """Update an existing Cloud DNS managed-zone.
+
+  Update an existing Cloud DNS managed-zone.
+
+  ## EXAMPLES
+
+  To change the description of a managed-zone, run:
+
+    $ {command} my_zone --description="Hello, world!"
+
+  """
+
+  @staticmethod
+  def Args(parser):
+    messages = apis.GetMessagesModule('dns', 'v1alpha2')
+    _CommonArgs(parser, messages)
+    flags.GetDnsPeeringArgs().AddToParser(parser)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._utilization,
                           description='max connections',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-1/'
                               'instanceGroups/group-1'),
                           maxUtilization=0.3,
@@ -102,7 +102,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._utilization,
                           description='utilziation with conneciton',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-2/'
                               'instanceGroups/group-2'),
                           maxUtilization=1.0,
@@ -155,7 +155,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._rate,
                           description='group one',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-1/'
                               'instanceGroups/group-1'),
                           maxRate=100),
@@ -163,7 +163,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._connection,
                           description='group two',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-2/'
                               'instanceGroups/group-2'),
                           maxConnections=200),
@@ -215,7 +215,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._rate,
                           description='max connections',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-1/'
                               'instanceGroups/group-1'),
                           maxRate=230),
@@ -223,7 +223,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._utilization,
                           description='utilziation with conneciton',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-2/'
                               'instanceGroups/group-2'),
                           maxUtilization=1.0,
@@ -276,7 +276,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._connection,
                           description='group one',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-1/'
                               'instanceGroups/group-1'),
                           maxConnectionsPerInstance=200),
@@ -284,7 +284,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._utilization,
                           description='group two',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-2/'
                               'instanceGroups/group-2'),
                           maxUtilization=1.0),
@@ -335,7 +335,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._connection,
                           description='max connections',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-1/'
                               'instanceGroups/group-1'),
                           maxConnections=40),
@@ -343,7 +343,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._utilization,
                           description='utilziation with conneciton',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-2/'
                               'instanceGroups/group-2'),
                           maxUtilization=1.0,
@@ -507,7 +507,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._rate,
                           description='my new description',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-1/'
                               'instanceGroups/group-1'),
                           maxRate=100),
@@ -515,7 +515,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
                           balancingMode=self._utilization,
                           description='group two',
                           group=(
-                              'https://www.googleapis.com/compute/'
+                              'https://compute.googleapis.com/compute/'
                               'beta/projects/my-project/zones/zone-2/'
                               'instanceGroups/group-2'),
                           maxUtilization=1.0),
@@ -547,27 +547,27 @@ class BackendServicesUpdateBackendWithNEGTest(test_base.BaseTest,
             self.messages.Backend(
                 balancingMode=self._connection,
                 description='max connections',
-                group=('https://www.googleapis.com/compute/'
+                group=('https://compute.googleapis.com/compute/'
                        'beta/projects/my-project/zones/zone-1/'
                        'networkEndpointGroups/neg-1'),
                 maxConnectionsPerEndpoint=100),
             self.messages.Backend(
                 balancingMode=self._rate,
                 description='max connections',
-                group=('https://www.googleapis.com/compute/'
+                group=('https://compute.googleapis.com/compute/'
                        'beta/projects/my-project/zones/zone-2/'
                        'networkEndpointGroups/neg-2'),
                 maxRatePerEndpoint=0.9),
             self.messages.Backend(
                 balancingMode=self._utilization,
                 description='utilziation with conneciton',
-                group=('https://www.googleapis.com/compute/'
+                group=('https://compute.googleapis.com/compute/'
                        'beta/projects/my-project/zones/zone-1/'
                        'instanceGroups/ig-1'),
                 maxUtilization=1.0,
                 maxConnections=10),
         ],
-        healthChecks=[('https://www.googleapis.com/compute/beta/projects/'
+        healthChecks=[('https://compute.googleapis.com/compute/beta/projects/'
                        'my-project/global/healthChecks/my-health-check')],
         name='my-backend-service',
         portName='http',
@@ -669,28 +669,28 @@ class BackendServicesUpdateBackendWithNEGTest(test_base.BaseTest,
                       messages.Backend(
                           balancingMode=self._rate,
                           description='max connections',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/zone-1/'
                                  'networkEndpointGroups/neg-1'),
                           maxRatePerEndpoint=230),
                       messages.Backend(
                           balancingMode=self._rate,
                           description='max connections',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/zone-2/'
                                  'networkEndpointGroups/neg-2'),
                           maxRatePerEndpoint=0.9),
                       messages.Backend(
                           balancingMode=self._utilization,
                           description='utilziation with conneciton',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/zone-1/'
                                  'instanceGroups/ig-1'),
                           maxUtilization=1.0,
                           maxConnections=10),
                   ],
                   healthChecks=[
-                      ('https://www.googleapis.com/compute/beta/projects/'
+                      ('https://compute.googleapis.com/compute/beta/projects/'
                        'my-project/global/healthChecks/my-health-check')
                   ],
                   name='my-backend-service',
@@ -730,28 +730,28 @@ class BackendServicesUpdateBackendWithNEGTest(test_base.BaseTest,
                       messages.Backend(
                           balancingMode=self._connection,
                           description='max connections',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/zone-1/'
                                  'networkEndpointGroups/neg-1'),
                           maxConnectionsPerEndpoint=100),
                       messages.Backend(
                           balancingMode=self._connection,
                           description='max connections',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/zone-2/'
                                  'networkEndpointGroups/neg-2'),
                           maxConnectionsPerEndpoint=320),
                       messages.Backend(
                           balancingMode=self._utilization,
                           description='utilziation with conneciton',
-                          group=('https://www.googleapis.com/compute/'
+                          group=('https://compute.googleapis.com/compute/'
                                  'beta/projects/my-project/zones/zone-1/'
                                  'instanceGroups/ig-1'),
                           maxUtilization=1.0,
                           maxConnections=10),
                   ],
                   healthChecks=[
-                      ('https://www.googleapis.com/compute/beta/projects/'
+                      ('https://compute.googleapis.com/compute/beta/projects/'
                        'my-project/global/healthChecks/my-health-check')
                   ],
                   name='my-backend-service',

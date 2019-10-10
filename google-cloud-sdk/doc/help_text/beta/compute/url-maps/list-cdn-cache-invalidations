@@ -3,8 +3,8 @@ NAME
         cache invalidations for a URL map
 
 SYNOPSIS
-    gcloud beta compute url-maps list-cdn-cache-invalidations URLMAP
-        [--limit=LIMIT] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute url-maps list-cdn-cache-invalidations URL_MAP
+        [--limit=LIMIT] [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) List Cloud CDN cache invalidations for a URL map. A cache
@@ -12,12 +12,37 @@ DESCRIPTION
     invalidations to check which have completed.
 
 POSITIONAL ARGUMENTS
-     URLMAP
-        The name of the URL map.
+     URL_MAP
+        Name of the URL map to describe.
 
 FLAGS
      --limit=LIMIT
         The maximum number of invalidations to list.
+
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to describe. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

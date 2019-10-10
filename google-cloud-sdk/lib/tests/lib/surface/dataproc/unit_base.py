@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -184,33 +184,6 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     return self.MakeOperation(done=True, **kwargs)
 
   def MakeCluster(self, **kwargs):
-    secondary_worker_config = None
-    if ('secondaryWorkerConfigNumInstances' in kwargs or
-        'secondaryWorkerBootDiskSizeGb' in kwargs or
-        'secondaryWorkerBootDiskType' in kwargs):
-
-      disk_config = self.messages.DiskConfig(
-          bootDiskSizeGb=kwargs.get('secondaryWorkerBootDiskSizeGb', None),
-          bootDiskType=kwargs.get('secondaryWorkerBootDiskType', None))
-
-      secondary_worker_config = self.messages.InstanceGroupConfig(
-          numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
-          diskConfig=disk_config)
-
-    endpoint_config = None
-    if 'enableHttpPortAccess' in kwargs:
-      endpoint_config = self.messages.EndpointConfig(
-          enableHttpPortAccess=kwargs.get('enableHttpPortAccess', False))
-
-    # Convert from a dict to Python client library version of dict (LabelsValue)
-    labels = kwargs.get('labels', None)
-    labels_values = None
-    if labels is not None:
-      labels_values = self.messages.Cluster.LabelsValue(additionalProperties=[
-          self.messages.Cluster.LabelsValue.AdditionalProperty(
-              key=key, value=value) for key, value in six.iteritems(labels)
-      ])
-
     def make_disk_config(group_name):
       return self.messages.DiskConfig(
           bootDiskSizeGb=kwargs.get(group_name + 'BootDiskSizeGb', None),
@@ -226,6 +199,35 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
             acceleratorCount=kwargs.get(count_key, None))
         return [accelerator_config]
       return []
+
+    secondary_worker_config = None
+    if ('secondaryWorkerConfigNumInstances' in kwargs or
+        'secondaryWorkerBootDiskSizeGb' in kwargs or
+        'secondaryWorkerBootDiskType' in kwargs or
+        'secondaryWorkerAcceleratorTypeUri' in kwargs):
+
+      disk_config = self.messages.DiskConfig(
+          bootDiskSizeGb=kwargs.get('secondaryWorkerBootDiskSizeGb', None),
+          bootDiskType=kwargs.get('secondaryWorkerBootDiskType', None))
+
+      secondary_worker_config = self.messages.InstanceGroupConfig(
+          numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
+          diskConfig=disk_config,
+          accelerators=make_accelerators('secondaryWorker'))
+
+    endpoint_config = None
+    if 'enableHttpPortAccess' in kwargs:
+      endpoint_config = self.messages.EndpointConfig(
+          enableHttpPortAccess=kwargs.get('enableHttpPortAccess', False))
+
+    # Convert from a dict to Python client library version of dict (LabelsValue)
+    labels = kwargs.get('labels', None)
+    labels_values = None
+    if labels is not None:
+      labels_values = self.messages.Cluster.LabelsValue(additionalProperties=[
+          self.messages.Cluster.LabelsValue.AdditionalProperty(
+              key=key, value=value) for key, value in six.iteritems(labels)
+      ])
 
     cluster = self.messages.Cluster(
         clusterName=kwargs.get('clusterName', self.CLUSTER_NAME),
@@ -322,6 +324,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
             kmsKeyUri=config.get('kerberosKmsKeyUri'),
             kdcDbKeyUri=config.get('kerberosKdcDbKeyUri'),
             tgtLifetimeHours=config.get('kerberosTgtLifetimeHours'),
+            realm=config.get('kerberosRealm'),
             keystoreUri=config.get('kerberosKeystoreUri'),
             truststoreUri=config.get('kerberosTruststoreUri'),
             keystorePasswordUri=config.get('kerberosKeystorePasswordUri'),

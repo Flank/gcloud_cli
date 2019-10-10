@@ -32,7 +32,8 @@ EXAMPLES
         $ gcloud dns managed-zones describe my_zone
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns managed-zones describe
         $ gcloud beta dns managed-zones describe
 

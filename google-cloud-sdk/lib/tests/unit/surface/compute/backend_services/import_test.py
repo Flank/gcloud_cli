@@ -31,12 +31,12 @@ from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute.backend_services import backend_services_test_base
 
 
-class BackendServiceImportTestAlpha(
+class BackendServiceImportTestBeta(
     backend_services_test_base.BackendServicesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.ALPHA
-    self._backend_services = test_resources.BACKEND_SERVICES_ALPHA
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._backend_services = test_resources.BACKEND_SERVICES_BETA
 
   def RunImport(self, command):
     self.Run('compute backend-services import ' + command)
@@ -97,6 +97,13 @@ class BackendServiceImportTestAlpha(
         "('id' was unexpected)"):
       self.RunImport('my-backend-service --region alaska '
                      '--source {0}'.format(file_name))
+
+
+class BackendServiceImportTestAlpha(BackendServiceImportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+    self._backend_services = test_resources.BACKEND_SERVICES_ALPHA
 
 
 if __name__ == '__main__':

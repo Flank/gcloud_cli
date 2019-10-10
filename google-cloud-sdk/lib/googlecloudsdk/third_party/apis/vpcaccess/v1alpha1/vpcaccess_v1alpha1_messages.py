@@ -17,7 +17,6 @@ class Connector(_messages.Message):
 
   Enums:
     StatusValueValuesEnum: Output only. Status of the VPC access connector.
-    TypeValueValuesEnum: Type of the VPC access connector.
 
   Fields:
     id: Identifier for the connector, short form of the name. Example:
@@ -28,7 +27,6 @@ class Connector(_messages.Message):
       `projects/*/locations/*/connectors/*`.
     network: Name of a VPC network.
     status: Output only. Status of the VPC access connector.
-    type: Type of the VPC access connector.
   """
 
   class StatusValueValuesEnum(_messages.Enum):
@@ -49,24 +47,11 @@ class Connector(_messages.Message):
     ERROR = 4
     UPDATING = 5
 
-  class TypeValueValuesEnum(_messages.Enum):
-    r"""Type of the VPC access connector.
-
-    Values:
-      TYPE_UNSPECIFIED: Invalid type.
-      EXTENDED: Extended functionality with ILB support.
-      BASIC: Basic functionality, only single VM and VPN.
-    """
-    TYPE_UNSPECIFIED = 0
-    EXTENDED = 1
-    BASIC = 2
-
   id = _messages.StringField(1)
   ipCidrRange = _messages.StringField(2)
   name = _messages.StringField(3)
   network = _messages.StringField(4)
   status = _messages.EnumField('StatusValueValuesEnum', 5)
-  type = _messages.EnumField('TypeValueValuesEnum', 6)
 
 
 class ListConnectorsResponse(_messages.Message):
@@ -299,6 +284,24 @@ class OperationMetadata(_messages.Message):
   r"""Metadata for google.longrunning.Operation.
 
   Fields:
+    createTime: Output only. Time when the operation was created.
+    endTime: Output only. Time when the operation completed.
+    method: Output only. Method that initiated the operation e.g.
+      google.cloud.vpcaccess.v1.Connectors.CreateConnector.
+    target: Output only. Name of the resource that this operation is acting on
+      e.g. projects/my-project/locations/us-central1/connectors/v1.
+  """
+
+  createTime = _messages.StringField(1)
+  endTime = _messages.StringField(2)
+  method = _messages.StringField(3)
+  target = _messages.StringField(4)
+
+
+class OperationMetadataV1Alpha1(_messages.Message):
+  r"""Metadata for google.longrunning.Operation.
+
+  Fields:
     endTime: Output only. Time when the operation completed.
     insertTime: Output only. Time when the operation was created.
     method: Output only. Method that initiated the operation e.g.
@@ -397,37 +400,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -477,8 +453,8 @@ class VpcaccessProjectsLocationsConnectorsCreateRequest(_messages.Message):
 
   Fields:
     connector: A Connector resource to be passed as the request body.
-    parent: The project and location in which the configuration should be
-      created, specified in the format `projects/*/locations/*`.
+    parent: Required. The project and location in which the configuration
+      should be created, specified in the format `projects/*/locations/*`.
   """
 
   connector = _messages.MessageField('Connector', 1)
@@ -489,7 +465,7 @@ class VpcaccessProjectsLocationsConnectorsDeleteRequest(_messages.Message):
   r"""A VpcaccessProjectsLocationsConnectorsDeleteRequest object.
 
   Fields:
-    name: Name of a Serverless VPC Access connector to delete.
+    name: Required. Name of a Serverless VPC Access connector to delete.
   """
 
   name = _messages.StringField(1, required=True)
@@ -499,7 +475,7 @@ class VpcaccessProjectsLocationsConnectorsGetRequest(_messages.Message):
   r"""A VpcaccessProjectsLocationsConnectorsGetRequest object.
 
   Fields:
-    name: Name of a Serverless VPC Access connector to get.
+    name: Required. Name of a Serverless VPC Access connector to get.
   """
 
   name = _messages.StringField(1, required=True)
@@ -511,7 +487,8 @@ class VpcaccessProjectsLocationsConnectorsListRequest(_messages.Message):
   Fields:
     pageSize: Maximum number of functions to return per call.
     pageToken: Continuation token.
-    parent: The project and location from which the routes should be listed.
+    parent: Required. The project and location from which the routes should be
+      listed.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)

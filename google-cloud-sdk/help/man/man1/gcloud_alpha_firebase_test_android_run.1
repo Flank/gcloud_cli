@@ -11,7 +11,7 @@ gcloud alpha firebase test android run \- invoke a test in Firebase Test Lab for
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha firebase test android run\fR [\fIARGSPEC\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fITEST\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-additional\-apks\fR=\fIAPK\fR,[\fIAPK\fR,...]] [\fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR] [\fB\-\-async\fR] [\fB\-\-auto\-google\-login\fR] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-profile\fR=\fIPROFILE_ID\fR] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]] [\fB\-\-other\-files\fR=\fIFILE\fR=\fIDEVICE_DIR\fR,[...]] [\fB\-\-performance\-metrics\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-labels\fR=\fILABEL\fR,[\fILABEL\fR,...]] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-package\fR=\fITEST_PACKAGE\fR] [\fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR] [\fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]] [\fB\-\-use\-orchestrator\fR] [\fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]] [\fB\-\-robo\-script\fR=\fIROBO_SCRIPT\fR] [\fB\-\-device\-ids\fR=\fIMODEL_ID\fR,[\fIMODEL_ID\fR,...],\ \fB\-d\fR\ \fIMODEL_ID\fR,[\fIMODEL_ID\fR,...]] [\fB\-\-locales\fR=\fILOCALE\fR,[\fILOCALE\fR,...],\ \fB\-l\fR\ \fILOCALE\fR,[\fILOCALE\fR,...]] [\fB\-\-orientations\fR=\fIORIENTATION\fR,[\fIORIENTATION\fR],\ \fB\-o\fR\ \fIORIENTATION\fR,[\fIORIENTATION\fR]] [\fB\-\-os\-version\-ids\fR=\fIOS_VERSION_ID\fR,[...],\ \fB\-v\fR\ \fIOS_VERSION_ID\fR,[...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha firebase test android run\fR [\fIARGSPEC\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fITEST\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-additional\-apks\fR=\fIAPK\fR,[\fIAPK\fR,...]] [\fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR] [\fB\-\-async\fR] [\fB\-\-auto\-google\-login\fR] [\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-profile\fR=\fIPROFILE_ID\fR] [\fB\-\-num\-flaky\-test\-attempts\fR=\fIint\fR] [\fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]] [\fB\-\-other\-files\fR=\fIFILE\fR=\fIDEVICE_DIR\fR,[...]] [\fB\-\-performance\-metrics\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-labels\fR=\fILABEL\fR,[\fILABEL\fR,...]] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-package\fR=\fITEST_PACKAGE\fR] [\fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR] [\fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]] [\fB\-\-use\-orchestrator\fR] [\fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]] [\fB\-\-robo\-script\fR=\fIROBO_SCRIPT\fR] [\fB\-\-device\-ids\fR=\fIMODEL_ID\fR,[\fIMODEL_ID\fR,...],\ \fB\-d\fR\ \fIMODEL_ID\fR,[\fIMODEL_ID\fR,...]] [\fB\-\-locales\fR=\fILOCALE\fR,[\fILOCALE\fR,...],\ \fB\-l\fR\ \fILOCALE\fR,[\fILOCALE\fR,...]] [\fB\-\-orientations\fR=\fIORIENTATION\fR,[\fIORIENTATION\fR],\ \fB\-o\fR\ \fIORIENTATION\fR,[\fIORIENTATION\fR]] [\fB\-\-os\-version\-ids\fR=\fIOS_VERSION_ID\fR,[...],\ \fB\-v\fR\ \fIOS_VERSION_ID\fR,[...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -162,6 +162,20 @@ before beginning the test. Enabled by default, use \-\-no\-auto\-google\-login
 to disable.
 
 .TP 2m
+\fB\-\-client\-details\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Comma\-separated, KEY=VALUE map of additional details to attach to the test
+matrix. Arbitrary KEY=VALUE pairs may be attached to a test matrix to provide
+additional context about the tests being run. When consuming the test results,
+such as in Cloud Functions or a CI system, these details can add additional
+context such as a link to the corresponding pull request.
+
+Example:
+
+.RS 2m
+\-\-client\-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull\-request
+.RE
+
+.TP 2m
 \fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]
 A list of paths that will be copied from the device's storage to the designated
 results bucket after the test is complete. These must be absolute paths under
@@ -176,9 +190,9 @@ prefix for that device.
 .TP 2m
 \fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A comma\-separated, key=value map of environment variables and their desired
-values. This flag is repeatable. The environment variables are mirrored as extra
-options to the \f5am instrument \-e KEY1 VALUE1 ...\fR command and passed to
-your test runner (typically AndroidJUnitRunner). Examples:
+values. The environment variables are mirrored as extra options to the \f5am
+instrument \-e KEY1 VALUE1 ...\fR command and passed to your test runner
+(typically AndroidJUnitRunner). Examples:
 
 Break test cases into four shards and run only the first shard:
 
@@ -613,9 +627,8 @@ $ gcloud alpha firebase test android run \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud firebase test android run

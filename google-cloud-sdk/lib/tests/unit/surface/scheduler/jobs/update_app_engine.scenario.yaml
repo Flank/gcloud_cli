@@ -1,0 +1,329 @@
+title: Update AppEngine Jobs Test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: test update schedule
+  - command: |
+      scheduler jobs update app-engine my-job --schedule "every friday"
+  - stdout: |
+      appEngineHttpTarget:
+        body: bXktcGF5bG9hZA==
+        httpMethod: POST
+        relativeUri: /
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      retryConfig:
+        maxBackoffDuration: 3600s
+        maxDoublings: 16
+        minBackoffDuration: 5s
+        retryCount: 0
+      schedule: every friday
+      timeZone: Etc/UTC
+- execute:
+  - label: test update all arguments
+  - command: |
+      scheduler jobs update app-engine my-job --schedule "every thursday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 3 --max-retry-duration 3h --min-backoff 0.2s
+      --max-backoff 13s --max-doublings 3
+      --relative-url /foo/bar
+      --http-method gEt
+      --service service
+      --version version
+      --update-headers Header1=Value1
+      --remove-headers Header2
+      --message-body my-payload-2
+      --attempt-deadline 42m
+  - stdout: |
+      appEngineHttpTarget:
+        appEngineRouting:
+          service: service
+          version: version
+        body: bXktcGF5bG9hZC0y
+        headers:
+          Header1: Value1
+          Header2: null
+        httpMethod: GET
+        relativeUri: /
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test all clear flags
+  - command: |
+      scheduler jobs update app-engine my-job --clear-relative-url --clear-service
+      --clear-time-zone --clear-max-retry-attempts --clear-max-retry-duration
+      --clear-min-backoff --clear-max-backoff --clear-max-doublings
+  - stdout: |
+      appEngineHttpTarget:
+        body: bXktcGF5bG9hZC0y
+        headers:
+          Header1: Value1
+          Header2: Value2
+        httpMethod: GET
+        relativeUri: /
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every tuesday
+      timeZone: Etc/UTC
+- execute:
+  - label: test update headers
+  - command: |
+      scheduler jobs update app-engine my-job --update-headers X-Header-1=Value1,X-Header-2=Value2
+      --remove-headers X-Header-3
+  - stdout: |
+      appEngineHttpTarget:
+        body: bXktcGF5bG9hZC0y
+        headers:
+          X-Header-1: Value1
+          X-Header-2: Value2
+        httpMethod: GET
+        relativeUri: /
+      name: projects/fake-project/locations/us-central1/jobs/my-job
+      schedule: every tuesday
+      timeZone: Etc/UTC
+actions:
+- write_file:
+    path: payload_file
+    contents: my-payload-2
+- execute_command:
+    label: test update schedule
+    command: |
+      scheduler jobs update app-engine my-job --schedule "every friday"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations?alt=json&pageSize=2
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            locations:
+            - name: projects/fake-project/locations/us-central1
+              locationId: us-central1
+              labels:
+                cloud.googleapis.com/region: us-central1
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=schedule
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              schedule: every friday
+        return_response:
+          headers:
+            status: '200'
+          body:
+            appEngineHttpTarget:
+              body: bXktcGF5bG9hZA==
+              httpMethod: POST
+              relativeUri: /
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            retryConfig:
+              maxBackoffDuration: 3600s
+              maxDoublings: 16
+              minBackoffDuration: 5s
+              retryCount: 0
+            schedule: every friday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        appEngineHttpTarget:
+          body: bXktcGF5bG9hZA==
+          httpMethod: POST
+          relativeUri: /
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        retryConfig:
+          maxBackoffDuration: 3600s
+          maxDoublings: 16
+          minBackoffDuration: 5s
+          retryCount: 0
+        schedule: every friday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update all arguments
+    command: |
+      scheduler jobs update app-engine my-job --schedule "every thursday"
+      --time-zone America/New_York --description "my super cool job"
+      --max-retry-attempts 3 --max-retry-duration 3h --min-backoff 0.2s
+      --max-backoff 13s --max-doublings 3
+      --relative-url /foo/bar
+      --http-method gEt
+      --service service
+      --version version
+      --update-headers Header1=Value1
+      --remove-headers Header2
+      --message-body my-payload-2
+      --attempt-deadline 42m
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=appEngineHttpTarget.appEngineRouting.service%2CappEngineHttpTarget.appEngineRouting.version%2CappEngineHttpTarget.body%2CappEngineHttpTarget.headers%2CappEngineHttpTarget.relativeUri%2CattemptDeadline%2Cdescription%2CretryConfig.maxBackoffDuration%2CretryConfig.maxDoublings%2CretryConfig.maxRetryDuration%2CretryConfig.minBackoffDuration%2CretryConfig.retryCount%2Cschedule%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              appEngineHttpTarget:
+                appEngineRouting:
+                  service: service
+                  version: version
+                body: bXktcGF5bG9hZC0y
+                headers:
+                  Header1: Value1
+                  Header2: null
+                httpMethod: GET
+                relativeUri: /foo/bar
+              attemptDeadline: 2520s
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 3
+                maxRetryDuration: 10800s
+                minBackoffDuration: 0.2s
+                maxBackoffDuration: 13s
+                maxDoublings: 3
+        return_response:
+          headers:
+            status: '200'
+          body:
+            appEngineHttpTarget:
+              appEngineRouting:
+                service: service
+                version: version
+              body: bXktcGF5bG9hZC0y
+              headers:
+                Header1: Value1
+                Header2: null
+              httpMethod: GET
+              relativeUri: /
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        appEngineHttpTarget:
+          appEngineRouting:
+            service: service
+            version: version
+          body: bXktcGF5bG9hZC0y
+          headers:
+            Header1: Value1
+            Header2: null
+          httpMethod: GET
+          relativeUri: /
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test all clear flags
+    command: |
+      scheduler jobs update app-engine my-job --clear-relative-url --clear-service
+      --clear-time-zone --clear-max-retry-attempts --clear-max-retry-duration
+      --clear-min-backoff --clear-max-backoff --clear-max-doublings
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=appEngineHttpTarget.appEngineRouting.service%2CappEngineHttpTarget.relativeUri%2CretryConfig.maxBackoffDuration%2CretryConfig.maxDoublings%2CretryConfig.maxRetryDuration%2CretryConfig.minBackoffDuration%2CretryConfig.retryCount%2CtimeZone
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              appEngineHttpTarget:
+                appEngineRouting:
+                  service: default
+                relativeUri: /
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+                maxRetryDuration: null
+                minBackoffDuration: 5s
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+        return_response:
+          headers:
+            status: '200'
+          body:
+            appEngineHttpTarget:
+              body: bXktcGF5bG9hZC0y
+              headers:
+                Header1: Value1
+                Header2: Value2
+              httpMethod: GET
+              relativeUri: /
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        appEngineHttpTarget:
+          body: bXktcGF5bG9hZC0y
+          headers:
+            Header1: Value1
+            Header2: Value2
+          httpMethod: GET
+          relativeUri: /
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    label: test update headers
+    command: |
+      scheduler jobs update app-engine my-job --update-headers X-Header-1=Value1,X-Header-2=Value2
+      --remove-headers X-Header-3
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job?alt=json&updateMask=appEngineHttpTarget.headers
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              appEngineHttpTarget:
+                relativeUri: /
+                headers:
+                  X-Header-1: Value1
+                  X-Header-2: Value2
+                  X-Header-3: null
+              name: projects/fake-project/locations/us-central1/jobs/my-job
+              retryConfig:
+                retryCount: 0
+                maxRetryDuration: null
+                minBackoffDuration: 5s
+                maxBackoffDuration: 3600s
+                maxDoublings: 16
+        return_response:
+          headers:
+            status: '200'
+          body:
+            appEngineHttpTarget:
+              body: bXktcGF5bG9hZC0y
+              headers:
+                X-Header-1: Value1
+                X-Header-2: Value2
+              httpMethod: GET
+              relativeUri: /
+            name: projects/fake-project/locations/us-central1/jobs/my-job
+            schedule: every tuesday
+            timeZone: Etc/UTC
+    - expect_stdout: |
+        appEngineHttpTarget:
+          body: bXktcGF5bG9hZC0y
+          headers:
+            X-Header-1: Value1
+            X-Header-2: Value2
+          httpMethod: GET
+          relativeUri: /
+        name: projects/fake-project/locations/us-central1/jobs/my-job
+        schedule: every tuesday
+        timeZone: Etc/UTC
+    - expect_exit:
+        code: 0

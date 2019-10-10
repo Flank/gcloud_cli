@@ -28,8 +28,9 @@ COMMANDS
         (BETA) Create a Cloud Scheduler job with a Pub/Sub target.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud scheduler jobs create
         $ gcloud alpha scheduler jobs create
 

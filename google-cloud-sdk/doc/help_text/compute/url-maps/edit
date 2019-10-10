@@ -2,7 +2,7 @@ NAME
     gcloud compute url-maps edit - modify URL maps
 
 SYNOPSIS
-    gcloud compute url-maps edit URL_MAP_NAME [GCLOUD_WIDE_FLAG ...]
+    gcloud compute url-maps edit URL_MAP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute url-maps edit can be used to modify a URL map. The URL map
@@ -14,7 +14,7 @@ DESCRIPTION
     environment variable.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 GCLOUD WIDE FLAGS

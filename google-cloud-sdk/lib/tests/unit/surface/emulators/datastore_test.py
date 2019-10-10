@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,9 +28,29 @@ from tests.lib.surface.compute import test_base
 class DatastoreTest(test_base.BaseTest):
 
   def testIpv6Port(self):
-    self.StartObjectPatch(
-        util, 'GetHostPort', autospec=True, return_value='[::1]:12345')
+    host, port = self._RunHostPortTest('[::1]:12345')
 
+    self.assertEqual('::1', host)
+    self.assertEqual('12345', port)
+
+  def testNoPort(self):
+    host, port = self._RunHostPortTest('10.10.10.10')
+    self.assertEqual('10.10.10.10', host)
+    self.assertEqual('8081', port)
+
+  def testNoHost(self):
+    host, port = self._RunHostPortTest(':1234')
+    self.assertEqual('localhost', host)
+    self.assertEqual('1234', port)
+
+  def _RunHostPortTest(self, hostport):
+    """Runs a test with the provided --host-port.
+
+    Args:
+      hostport: The value to send to --host-port.
+    Returns:
+      a tuple of host, port that was used.
+    """
     self.StartObjectPatch(java, 'RequireJavaInstalled')
     self.StartObjectPatch(util, 'EnsureComponentIsInstalled')
 
@@ -45,9 +65,9 @@ class DatastoreTest(test_base.BaseTest):
     self.StartObjectPatch(datastore_util, 'WriteGCDEnvYaml')
     self.StartObjectPatch(util, 'PrefixOutput')
 
-    self.Run('beta emulators datastore start')
-    self.assertEqual('::1', ret.get('host'))
-    self.assertEqual('12345', ret.get('port'))
+    self.Run('beta emulators datastore start --host-port=%s' % hostport)
+
+    return ret['host'], ret['port']
 
 
 if __name__ == '__main__':

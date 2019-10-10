@@ -23,8 +23,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Whether to return an asynchronous long-running operation immediately
-        instead of waiting for the operation to finish
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --folder=FOLDER_ID
         ID for the folder to use as a parent

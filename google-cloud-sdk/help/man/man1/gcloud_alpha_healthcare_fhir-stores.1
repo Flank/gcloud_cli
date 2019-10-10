@@ -11,7 +11,7 @@ gcloud alpha healthcare fhir\-stores \- manage Cloud Healthcare API FHIR stores
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha healthcare fhir\-stores\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha healthcare fhir\-stores\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,6 +30,23 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBexport\fR
+\fB(ALPHA)\fR Manage Cloud Healthcare API FHIR store exports.
+
+.TP 2m
+\fBimport\fR
+\fB(ALPHA)\fR Manage Cloud Healthcare API FHIR store imports.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -53,16 +70,8 @@ help\fR for details.
 \fB(ALPHA)\fR Describe a Cloud Healthcare API FHIR store.
 
 .TP 2m
-\fBexport\fR
-\fB(ALPHA)\fR Export Cloud Healthcare API FHIR resources.
-
-.TP 2m
 \fBget\-iam\-policy\fR
 \fB(ALPHA)\fR Retrieve the IAM policy for a Cloud Healthcare API FHIR store.
-
-.TP 2m
-\fBimport\fR
-\fB(ALPHA)\fR Import FHIR resources into a Cloud Healthcare API FHIR store.
 
 .TP 2m
 \fBlist\fR
@@ -89,7 +98,10 @@ store.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta healthcare fhir\-stores
+.RE
 

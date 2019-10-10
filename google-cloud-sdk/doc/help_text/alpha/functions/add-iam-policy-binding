@@ -52,10 +52,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To add the iam policy binding for FUNCTION-1 to role ROLE-1 for member
+    MEMBER-1 run:
+
+        $ gcloud alpha functions add-iam-policy-binding FUNCTION-1 \
+            --member=MEMBER-1 --role=ROLE-1
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta functions add-iam-policy-binding
 

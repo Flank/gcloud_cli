@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,19 +19,17 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class KeyringsCreateTest(base.KmsMockTest):
+class KeyringsCreateTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.kr_name = self.project_name.Descendant('global/my_kr')
+    self.kr_name = self.project_name.KeyRing('global/my_kr')
     self.kms.projects_locations_keyRings.Create.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCreateRequest(
             parent=self.kr_name.Parent().RelativeName(),
@@ -39,14 +37,24 @@ class KeyringsCreateTest(base.KmsMockTest):
             keyRing=self.messages.KeyRing()),
         self.messages.KeyRing(name=self.kr_name.RelativeName()))
 
-  def testCreate(self, track):
-    self.track = track
+  def testCreate(self):
     self.Run('kms keyrings create --location={0} {1}'.format(
         self.kr_name.location_id, self.kr_name.key_ring_id))
 
-  def testCreateFullName(self, track):
-    self.track = track
+  def testCreateFullName(self):
     self.Run('kms keyrings create {0}'.format(self.kr_name.RelativeName()))
+
+
+class KeyringsCreateTestBeta(KeyringsCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class KeyringsCreateTestAlpha(KeyringsCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

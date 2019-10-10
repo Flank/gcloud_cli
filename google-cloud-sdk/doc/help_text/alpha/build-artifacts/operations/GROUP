@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha build-artifacts operations - manage Cloud Build Artifacts
+        long-running operations
+
+SYNOPSIS
+    gcloud alpha build-artifacts operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe a Cloud Build Artifacts operation.
+
+EXAMPLES
+    To describe a Cloud Build Artifacts operation given a valid operation id,
+    run:
+
+        $ gcloud alpha build-artifacts operations describe \
+            13166c87-a9c0-4b5f-8ccf-c5343a93eb2b
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

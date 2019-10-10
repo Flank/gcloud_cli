@@ -9,6 +9,9 @@ SYNOPSIS
 DESCRIPTION
     Add an IAM policy binding to a service.
 
+    Note: The 'roles/servicemanagement.serviceConsumer' role can only be added
+    to a member which is a user, group, or service account.
+
 POSITIONAL ARGUMENTS
      Service resource - The service for which to add IAM policy binding to.
      This represents a Cloud resource. This must be specified.
@@ -61,14 +64,6 @@ EXAMPLES
         $ gcloud endpoints services add-iam-policy-binding \
             test-proj1@example.domain.com \
             --member='serviceAccount:test-proj1@example.domain.com' \
-            --role='roles/servicemanagement.serviceConsumer'
-
-    To add an IAM policy binding for the role of
-    'roles/servicemanagement.serviceConsumer' for all authenticated users on a
-    service with identifier 'my-service', run:
-
-        $ gcloud endpoints services add-iam-policy-binding my-service \
-            --member='allAuthenticatedUsers' \
             --role='roles/servicemanagement.serviceConsumer'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of

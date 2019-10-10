@@ -11,9 +11,9 @@ DESCRIPTION
     more Google Compute Engine Highly Available VPN Gateways. VPN Gateways can
     only be deleted when no VPN tunnels refer to them.
 
-    High Available VPN Gateway provides a means to create a VPN solution with a
-    higher availability SLA compared to Classic Target VPN Gateway. High
-    Available VPN gateways are referred to as simply VPN gateways in the API
+    Highly Available VPN Gateway provides a means to create a VPN solution with
+    a higher availability SLA compared to Classic Target VPN Gateway. Highly
+    Available VPN gateways are simply referred to as VPN gateways in the API
     documentation and gcloud commands. A VPN Gateway can reference one or more
     VPN tunnels that connect it to external VPN gateways or Cloud VPN Gateways.
 
@@ -49,12 +49,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To delete a VPN gateway, run:
+
+        $ gcloud alpha compute vpn-gateways delete my-gateway \
+          --region=us-central1
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud compute vpn-gateways delete
         $ gcloud beta compute vpn-gateways delete
 

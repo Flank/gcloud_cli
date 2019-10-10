@@ -11,13 +11,19 @@ gcloud kms keys versions describe \- get metadata for a given version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud kms keys versions describe\fR \fIVERSION\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud kms keys versions describe\fR \fIVERSION\fR [\fB\-\-attestation\-file\fR=\fIATTESTATION_FILE\fR] [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 Returns metadata for the given version.
+
+The optional flag \f5attestation\-file\fR specifies file to write the
+attestation object into. The attestation object enables the user to verify the
+integrity and provenance of the key. See
+https://cloud.google.com/kms/docs/attest\-key for more information about
+attestations.
 
 
 
@@ -35,6 +41,10 @@ Name of the version to describe.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-attestation\-file\fR=\fIATTESTATION_FILE\fR
+Path to the output attestation file.
+
 .TP 2m
 \fB\-\-key\fR=\fIKEY\fR
 The containing key.
@@ -67,8 +77,17 @@ The following command returns metadata for version 2 within key \f5frodo\fR
 within the keyring \f5fellowship\fR in the location \f5us\-east1\fR:
 
 .RS 2m
-$ gcloud kms keys versions describe 2 \-\-key frodo \e
-    \-\-keyring fellowship \-\-location us\-east1
+$ gcloud kms keys versions describe 2 \-\-key=frodo \e
+    \-\-keyring=fellowship \-\-location=us\-east1
+.RE
+
+For key versions with protection level \f5HSM\fR, use the
+\f5\-\-attestation\-file\fR flag to save the attestation to a local file.
+
+.RS 2m
+$ gcloud kms keys versions describe 2 \-\-key=frodo \e
+    \-\-keyring=fellowship \-\-location=us\-east1 \e
+    \-\-attestation\-file=path/to/attestation.dat
 .RE
 
 

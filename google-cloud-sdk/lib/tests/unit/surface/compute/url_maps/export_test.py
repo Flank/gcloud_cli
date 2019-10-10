@@ -28,11 +28,12 @@ from tests.lib import test_case
 from tests.lib.surface.compute import url_maps_test_base
 
 
-class UrlMapsExportTestAlpha(url_maps_test_base.UrlMapsTestBase):
+class UrlMapsExportTestBeta(url_maps_test_base.UrlMapsTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.ALPHA
-    self._api = 'alpha'
+    # TODO(b/135125441): Use SelectApi() instead.
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
 
   def RunExport(self, command):
     self.Run('compute url-maps export ' + command)
@@ -48,9 +49,9 @@ class UrlMapsExportTestAlpha(url_maps_test_base.UrlMapsTestBase):
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            defaultService: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/default-service
+            defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/default-service
             name: url-map-1
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-1
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-1
             """ % {'api': self._api}))
 
   def testExportToFile(self):
@@ -68,6 +69,13 @@ class UrlMapsExportTestAlpha(url_maps_test_base.UrlMapsTestBase):
     exported_url_map = export_util.Import(
         message_type=self.messages.UrlMap, stream=data)
     self.AssertMessagesEqual(url_map, exported_url_map)
+
+
+class UrlMapsExportTestAlpha(UrlMapsExportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+    self._api = 'alpha'
 
 
 if __name__ == '__main__':

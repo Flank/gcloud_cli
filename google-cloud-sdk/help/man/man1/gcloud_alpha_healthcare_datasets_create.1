@@ -53,8 +53,7 @@ Google Cloud location.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-time\-zone\fR=\fITIME_ZONE\fR
@@ -81,11 +80,31 @@ this API can be found at: https://cloud.google.com/healthcare
 
 
 
+.SH "EXAMPLES"
+
+To create a dataset called 'test\-dataset' in us\-central1, run:
+
+.RS 2m
+$ gcloud alpha healthcare datasets create test\-dataset
+.RE
+
+To create a dataset in a different region (ex: asia\-northeast1), run:
+
+.RS 2m
+$ gcloud alpha healthcare datasets create test\-dataset \e
+    \-\-location=asia\-northeast1
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta healthcare datasets create
+.RE
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.util import times
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -53,28 +54,26 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     name = 'tosetloggingservice'
     logging_service = 'none'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetLoggingService(
-        name,
-        logging_service,
-        self._MakeOperation(status=self.op_pending))
+    self.ExpectSetLoggingService(name, logging_service,
+                                 self._MakeOperation(status=self.op_pending))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1} {2}'.
-        format(name, '--logging-service', logging_service))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1} {2}'.format(name, '--logging-service', logging_service)
+    )
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def testUpdateLoggingGoogle(self):
     name = 'tosetloggingservice'
     logging_service = 'logging.googleapis.com'
     self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetLoggingService(
-        name,
-        logging_service,
-        self._MakeOperation(status=self.op_pending))
+    self.ExpectSetLoggingService(name, logging_service,
+                                 self._MakeOperation(status=self.op_pending))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1} {2}'.
-        format(name, '--logging-service', logging_service))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1} {2}'.format(name, '--logging-service', logging_service)
+    )
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def testUpdateLoggingInvalid(self):
@@ -87,9 +86,31 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         exception=http_error.MakeHttpError(400, 'bad request'))
     with self.assertRaises(exceptions.HttpException):
       self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update {0} {1} {2}'.
-          format(name, '--logging-service', logging_service))
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1} {2}'.format(name, '--logging-service',
+                                       logging_service))
     self.AssertErrContains('message=bad request')
+
+  def testEnableStackdriverKubernetesOnly(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredMonitoringService='monitoring.googleapis.com/kubernetes',
+            desiredLoggingService='logging.googleapis.com/kubernetes'),
+        flags='--enable-stackdriver-kubernetes')
+
+  def testEnableIntraNodeVisibility(self):
+    update = self.msgs.ClusterUpdate(
+        desiredIntraNodeVisibilityConfig=self.msgs.IntraNodeVisibilityConfig(
+            enabled=True))
+    self._TestUpdate(update=update, flags='--enable-intra-node-visibility')
+
+  def testInvalidEnableStackdriverKubernetesTogetherWithLegacyFlags(self):
+    with self.AssertRaisesArgumentErrorRegexp('Exactly one of '):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update clustername '
+          '--monitoring-service=some.monitoring.service '
+          '--logging-service=some.logging.service '
+          '--enable-stackdriver-kubernetes')
 
   def testNoUpdate(self):
     with self.AssertRaisesArgumentErrorRegexp('^Exactly one of '):
@@ -123,8 +144,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
-                httpLoadBalancing=self.msgs.HttpLoadBalancing(
-                    disabled=False),
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
                 horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
                     disabled=True))),
         flags='--update-addons '
@@ -132,8 +152,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self._TestUpdate(
         self.msgs.ClusterUpdate(
             desiredAddonsConfig=self.msgs.AddonsConfig(
-                httpLoadBalancing=self.msgs.HttpLoadBalancing(
-                    disabled=False))),
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False))),
         flags='--update-addons HttpLoadBalancing=ENABLED')
     self._TestUpdate(
         self.msgs.ClusterUpdate(
@@ -194,7 +213,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         cidrBlocks=[
             self.msgs.CidrBlock(cidrBlock='10.0.0.1/32'),
             self.msgs.CidrBlock(cidrBlock='10.0.0.2/32'),
-        ],)
+        ],
+    )
     self._TestUpdate(
         self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
         flags='--enable-master-authorized-networks '
@@ -208,8 +228,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
       cidr_blocks.append(cidr)
       msgs_cidr_blocks.append(self.msgs.CidrBlock(cidrBlock=cidr))
     desired = self.msgs.MasterAuthorizedNetworksConfig(
-        enabled=True,
-        cidrBlocks=msgs_cidr_blocks)
+        enabled=True, cidrBlocks=msgs_cidr_blocks)
 
     self._TestUpdate(
         self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
@@ -239,14 +258,11 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
           '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
 
   def testEnableLegacyAbac(self):
-    self._TestLegacyAbac(
-        enabled=True,
-        flags='--enable-legacy-authorization ')
+    self._TestLegacyAbac(enabled=True, flags='--enable-legacy-authorization ')
 
   def testNoEnableLegacyAbac(self):
     self._TestLegacyAbac(
-        enabled=False,
-        flags='--no-enable-legacy-authorization ')
+        enabled=False, flags='--no-enable-legacy-authorization ')
 
   def _TestLegacyAbac(self, enabled, flags):
     name = 'tobeupdated'
@@ -257,8 +273,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         response=self._MakeOperation(operationType=self.op_update_cluster))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, flags))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flags))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def testStartIpRotation(self):
@@ -282,8 +298,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         after=self._RunningCluster(
             name=name, endpoint=updated_ip, ca_data=updated_ca))
     c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
-    self.assertTrue(c_config.server == 'https://' + updated_ip)
-    self.assertTrue(c_config.ca_data == updated_ca)
+    self.assertEqual(c_config.server, 'https://' + updated_ip)
+    self.assertEqual(c_config.ca_data, updated_ca)
 
   def testStartCredentialRotation(self):
     """Correctly handle the success case, and persist the updated config."""
@@ -307,8 +323,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         after=self._RunningCluster(
             name=name, endpoint=updated_ip, ca_data=updated_ca))
     c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
-    self.assertTrue(c_config.server == 'https://' + updated_ip)
-    self.assertTrue(c_config.ca_data == updated_ca)
+    self.assertEqual(c_config.server, 'https://' + updated_ip)
+    self.assertEqual(c_config.ca_data, updated_ca)
 
   def testStartIpRotationAborted(self):
     """Correctly handle a user aborting the command at the prompt."""
@@ -320,9 +336,12 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
 
     name = 'tobeupdated'
     self.assertEqual(self.tmp_home.path, os.environ['HOME'])
-    self.StartDictPatch('os.environ',
-                        {'HOME': '', 'HOMEDRIVE': '', 'HOMEPATH': '',
-                         'USERPROFILE': ''})
+    self.StartDictPatch('os.environ', {
+        'HOME': '',
+        'HOMEDRIVE': '',
+        'HOMEPATH': '',
+        'USERPROFILE': ''
+    })
     self._TestIpRotation(response='y')
     self.ExpectStartIpRotation(
         cluster_name=name,
@@ -353,8 +372,9 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self._TestIpRotation(response='y')
     self.ExpectStartIpRotation(
         cluster_name=name,
-        exception=http_error.MakeHttpError(409, 'The cluster has an IP rotation'
-                                           ' in progress.'))
+        exception=http_error.MakeHttpError(
+            409, 'The cluster has an IP rotation'
+            ' in progress.'))
 
     with self.assertRaises(exceptions.HttpException):
       self.Run(
@@ -380,7 +400,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         flag='--complete-ip-rotation',
         after=self._RunningCluster(name=name, ca_data=updated_ca))
     c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
-    self.assertTrue(c_config.ca_data == updated_ca)
+    self.assertEqual(c_config.ca_data, updated_ca)
 
   def testCompleteCredentialRotation(self):
     """Correctly handle the success case, and persist the updated config."""
@@ -399,7 +419,7 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         flag='--complete-credential-rotation',
         after=self._RunningCluster(name=name, ca_data=updated_ca))
     c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
-    self.assertTrue(c_config.ca_data == updated_ca)
+    self.assertEqual(c_config.ca_data, updated_ca)
 
   def testCompleteIpRotationAborted(self):
     """Correctly handle a user aborting the command at the prompt."""
@@ -411,9 +431,12 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
 
     name = 'tobeupdated'
     self.assertEqual(self.tmp_home.path, os.environ['HOME'])
-    self.StartDictPatch('os.environ',
-                        {'HOME': '', 'HOMEDRIVE': '', 'HOMEPATH': '',
-                         'USERPROFILE': ''})
+    self.StartDictPatch('os.environ', {
+        'HOME': '',
+        'HOMEDRIVE': '',
+        'HOMEPATH': '',
+        'USERPROFILE': ''
+    })
     self._TestIpRotation(response='y')
     self.ExpectCompleteIpRotation(
         cluster_name=name,
@@ -443,8 +466,9 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self._TestIpRotation(response='y')
     self.ExpectCompleteIpRotation(
         cluster_name=name,
-        exception=http_error.MakeHttpError(400, 'The cluster does not have an'
-                                           ' IP rotation in progress.'))
+        exception=http_error.MakeHttpError(
+            400, 'The cluster does not have an'
+            ' IP rotation in progress.'))
 
     with self.assertRaises(exceptions.HttpException):
       self.Run(
@@ -466,7 +490,10 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
       before = self._RunningCluster(name='tobeupdated')
     self.ExpectGetCluster(before)
 
-  def _TestIpRotationSuccess(self, name, flag, after=None,
+  def _TestIpRotationSuccess(self,
+                             name,
+                             flag,
+                             after=None,
                              after_exception=None):
     """This runs an ip rotation command and confirms that it succeeded.
 
@@ -484,16 +511,16 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
       after = self._RunningCluster(name='tobeupdated')
     self.ExpectGetCluster(after, after_exception)
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, flag))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flag))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestIpRotationAborted(self, flag):
     """This runs an ip rotation command, but then aborts at the prompt.
 
     Args:
-      flag: Either '--start-ip-rotation' or '--complete-ip-rotation',
-        depending on which operation is being tested.
+      flag: Either '--start-ip-rotation' or '--complete-ip-rotation', depending
+        on which operation is being tested.
     """
     name = 'tobeupdated'
     self._TestIpRotation(response='n')
@@ -631,6 +658,12 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
           '--username='.format(name) + username)
     self.AssertErrContains('code=500, message=internal error')
 
+  def testEnableVerticalPodAutoscaling(self):
+    update = self.msgs.ClusterUpdate(
+        desiredVerticalPodAutoscaling=self.msgs.VerticalPodAutoscaling(
+            enabled=True))
+    self._TestUpdate(update=update, flags='--enable-vertical-pod-autoscaling')
+
   def _TestUpdate(self, update, flags):
     self._TestUpdateNoAsync(update, flags)
     self._TestUpdateAsync(update, flags)
@@ -644,8 +677,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         response=self._MakeOperation(operationType=self.op_update_cluster))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, flags))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flags))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
     self.AssertErrContains(
         ('go to: https://console.cloud.google.com/kubernetes/'
@@ -659,8 +692,9 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         cluster_name=name,
         update=update,
         response=self._MakeOperation(operationType=self.op_update_cluster))
-    self.Run(self.clusters_command_base.format(self.ZONE) +
-             ' update {0} {1} --async'.format(name, flags))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1} --async'.format(name, flags))
 
   def _TestUpdateMasterAuth(self, action, update, password, flags):
     name = 'tosetmasterauth'
@@ -673,8 +707,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.WriteInput(password + '\n')
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, flags))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flags))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestUpdateAdditionalZonesRemove(self):
@@ -684,15 +718,16 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
 
   def _TestUpdateAdditionalZonesAdd(self):
     self._TestUpdate(
-        update=self.msgs.ClusterUpdate(desiredLocations=sorted(
-            [self.ZONE, 'us-central1-a', 'moon-north3-z'])),
+        update=self.msgs.ClusterUpdate(
+            desiredLocations=sorted(
+                [self.ZONE, 'us-central1-a', 'moon-north3-z'])),
         flags='--additional-zones=us-central1-a,moon-north3-z')
 
   def _TestUpdateLabels(self, location):
     desired = self.msgs.SetLabelsRequest.ResourceLabelsValue(
         additionalProperties=[
-            self.msgs.SetLabelsRequest.ResourceLabelsValue.
-            AdditionalProperty(key='k', value='v')
+            self.msgs.SetLabelsRequest.ResourceLabelsValue.AdditionalProperty(
+                key='k', value='v')
         ],)
     name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name), zone=location)
@@ -701,11 +736,11 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         cluster_name=name,
         resource_labels=desired,
         fingerprint=None,
-        response=self._MakeOperation(operationType=self.op_set_labels,
-                                     zone=location),
+        response=self._MakeOperation(
+            operationType=self.op_set_labels, zone=location),
         zone=location)
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done,
-                                                zone=location))
+    self.ExpectGetOperation(
+        self._MakeOperation(status=self.op_done, zone=location))
     if location == self.REGION:
       self.Run(
           self.regional_clusters_command_base.format(self.REGION) +
@@ -719,8 +754,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
   def _TestUpdateLabelsToSame(self):
     desired = self.msgs.SetLabelsRequest.ResourceLabelsValue(
         additionalProperties=[
-            self.msgs.SetLabelsRequest.ResourceLabelsValue.
-            AdditionalProperty(key='k', value='v')
+            self.msgs.SetLabelsRequest.ResourceLabelsValue.AdditionalProperty(
+                key='k', value='v')
         ],)
     name = 'tobeupdatedsame'
     cluster_kwargs = {
@@ -778,8 +813,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     }
     desired = self.msgs.SetLabelsRequest.ResourceLabelsValue(
         additionalProperties=[
-            self.msgs.SetLabelsRequest.ResourceLabelsValue.
-            AdditionalProperty(key='k', value='v')
+            self.msgs.SetLabelsRequest.ResourceLabelsValue.AdditionalProperty(
+                key='k', value='v')
         ],)
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
@@ -838,10 +873,10 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     }
     desired = self.msgs.SetLabelsRequest.ResourceLabelsValue(
         additionalProperties=[
-            self.msgs.SetLabelsRequest.ResourceLabelsValue.
-            AdditionalProperty(key='k', value='v'),
-            self.msgs.SetLabelsRequest.ResourceLabelsValue.
-            AdditionalProperty(key='k2', value='v2')
+            self.msgs.SetLabelsRequest.ResourceLabelsValue.AdditionalProperty(
+                key='k', value='v'),
+            self.msgs.SetLabelsRequest.ResourceLabelsValue.AdditionalProperty(
+                key='k2', value='v2')
         ],)
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
@@ -865,8 +900,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
       self.Run(
           self.clusters_command_base.format(self.ZONE) +
           ' update {0} --remove-labels=k'.format(name))
-      self.AssertErrContains('Cluster \'{0}\' has no labels to remove.'
-                             .format(name))
+      self.AssertErrContains(
+          'Cluster \'{0}\' has no labels to remove.'.format(name))
 
   def _TestRemoveNonExistentLabel(self):
     name = 'toberemovednonexistentlabel'
@@ -898,8 +933,8 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         response=self._MakeOperation(operationType=self.op_set_master_auth))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--enable-network-policy'))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--enable-network-policy'))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def testSetNetworkPolicyAbort(self):
@@ -913,43 +948,72 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
           ' update {0} {1}'.format(name, '--enable-network-policy'))
     self.AssertErrContains('Aborted by user.')
 
-  def testSetMaintenancePolicy(self):
-    """Correctly handle the success case."""
-    name = 'tosetmaintenancewindow'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    self.ExpectSetMaintenanceWindow(
-        cluster_name=name,
-        policy=self.msgs.MaintenancePolicy(
-            window=self.msgs.MaintenanceWindow(
-                dailyMaintenanceWindow=self.msgs.DailyMaintenanceWindow(
-                    startTime='11:43'))),
-        response=self._MakeOperation(
-            operationType=self.op_update_cluster))
+  def _MP(self, resource_version=None, window=None, exclusions=None):
+    """Creates a maintenance policy for ease of tests."""
+    mp = self.msgs.MaintenancePolicy(window=self.msgs.MaintenanceWindow())
+
+    if hasattr(mp, 'resourceVersion'):
+      mp.resourceVersion = resource_version
+
+    if hasattr(self.msgs, 'RecurringTimeWindow') and isinstance(
+        window, self.msgs.RecurringTimeWindow):
+      mp.window.recurringWindow = window
+    elif isinstance(window, self.msgs.DailyMaintenanceWindow):
+      mp.window.dailyMaintenanceWindow = window
+    elif window is not None:
+      self.fail('Bad window: {0}'.format(window))
+
+    if exclusions is not None:
+      exclusions_val = self.msgs.MaintenanceWindow.MaintenanceExclusionsValue()
+      exclusions_val.additionalProperties = exclusions
+      mp.window.maintenanceExclusions = exclusions_val
+
+    return mp
+
+  def _DailyWindow(self, start_time):
+    return self.msgs.DailyMaintenanceWindow(startTime=start_time)
+
+  def _RecurringWindow(self, start, end, recur):
+    return self.msgs.RecurringTimeWindow(
+        window=self.msgs.TimeWindow(startTime=start, endTime=end),
+        recurrence=recur)
+
+  def _Exclusion(self, start, end, name):
+    exclusions_value = self.msgs.MaintenanceWindow.MaintenanceExclusionsValue
+    return exclusions_value.AdditionalProperty(
+        key=name, value=self.msgs.TimeWindow(startTime=start, endTime=end))
+
+  def _TestExpectedMaintenancePolicyRequests(self, cluster, policy):
+    self.ExpectGetCluster(cluster)
+    self.ExpectSetMaintenancePolicy(
+        cluster_name=cluster.name,
+        policy=policy,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+
+  def testSetMaintenanceWindow(self):
+    name = 'testSetMaintenanceWindow'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            resource_version='emptyRV', window=self._DailyWindow('11:43')))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--maintenance-window=11:43'))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--maintenance-window=11:43'))
     self.AssertErrContains('Updating {0}'.format(name))
 
-  def testRemoveMaintenancePolicy(self):
-    m = self.msgs
-    name = 'mw-cluster'
-    cluster_kwargs = {
-        'name': name,
-        'maintenancePolicy': m.MaintenancePolicy(
-            window=m.MaintenanceWindow(
-                dailyMaintenanceWindow=m.DailyMaintenanceWindow(
-                    startTime='11:43'))),
-    }
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    self.ExpectSetMaintenanceWindow(
-        cluster_name=name,
-        response=self._MakeOperation(
-            operationType=self.op_update_cluster))
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+  def testSetMaintenanceWindowNone(self):
+    name = 'setMaintenanceWindowNone'
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                resource_version='1143RV', window=self._DailyWindow('11:43'))),
+        policy=self._MP(resource_version='1143RV'))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--maintenance-window=None'))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--maintenance-window=None'))
     self.AssertErrContains('Updating {0}'.format(name))
 
   def testUpdateLabels(self):
@@ -983,23 +1047,93 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     name = 'tobeupdated'
     cluster = self._RunningCluster(name=name)
     self.ExpectGetCluster(
-        cluster, exception=
-        apitools_exceptions.HttpForbiddenError(
-            {'status': 403, 'reason': 'missing update permission'},
-            'forbidden', 'foo.com/bar'))
+        cluster,
+        exception=apitools_exceptions.HttpForbiddenError(
+            {
+                'status': 403,
+                'reason': 'missing update permission'
+            }, 'forbidden', 'foo.com/bar'))
     self.ExpectUpdateCluster(
         cluster_name=name,
         update=update,
         response=self._MakeOperation(operationType=self.op_update_cluster))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, flags))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flags))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
     self.AssertErrContains(
         ('go to: https://console.cloud.google.com/kubernetes/'
          'workload_/gcloud/{zone}/{cluster}?project={project}').format(
              cluster=name, zone=self.ZONE, project=self.PROJECT_ID))
+
+  def testResourceUsageExportConfig(self):
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id'),
+            consumptionMeteringConfig=None))
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id '
+        '--enable-network-egress-metering',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id'),
+            enableNetworkEgressMetering=True,
+            consumptionMeteringConfig=None))
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id '
+        '--no-enable-network-egress-metering',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id'),
+            consumptionMeteringConfig=None))
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id '
+        '--enable-resource-consumption-metering',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id'),
+            consumptionMeteringConfig=self.msgs.ConsumptionMeteringConfig(
+                enabled=True)))
+    self._TestUpdateResourceUsageExportConfig(
+        '--resource-usage-bigquery-dataset=updated_dataset_id '
+        '--no-enable-resource-consumption-metering',
+        self.msgs.ResourceUsageExportConfig(
+            bigqueryDestination=self.msgs.BigQueryDestination(
+                datasetId='updated_dataset_id'),
+            consumptionMeteringConfig=self.msgs.ConsumptionMeteringConfig(
+                enabled=False)))
+
+  def _TestUpdateResourceUsageExportConfig(self, flags, export_config):
+    update = self.msgs.ClusterUpdate(
+        desiredResourceUsageExportConfig=export_config)
+    self._TestUpdate(update=update, flags=flags)
+
+  def testResourceUsageExportConfigInvalid(self):
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error, api_adapter.ENABLE_NETWORK_EGRESS_METERING_ERROR_MSG):
+      self.ExpectGetCluster(self._RunningCluster(name=self.CLUSTER_NAME))
+      self.Run('{base} update {name} --quiet {flags}'.format(
+          base=self.clusters_command_base.format(self.ZONE),
+          name=self.CLUSTER_NAME,
+          flags='--enable-network-egress-metering'))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error,
+        api_adapter.ENABLE_RESOURCE_CONSUMPTION_METERING_ERROR_MSG):
+      self.ExpectGetCluster(self._RunningCluster(name=self.CLUSTER_NAME))
+      self.Run('{base} update {name} --quiet {flags}'.format(
+          base=self.clusters_command_base.format(self.ZONE),
+          name=self.CLUSTER_NAME,
+          flags='--enable-resource-consumption-metering'))
+
+  def testClearResourceUsageBigqueryDataset(self):
+    export_config = self.msgs.ResourceUsageExportConfig()
+    update = self.msgs.ClusterUpdate(
+        desiredResourceUsageExportConfig=export_config)
+    self._TestUpdate(
+        update=update, flags='--clear-resource-usage-bigquery-dataset')
 
 
 # TODO(b/64575339): switch to use parameterized testing.
@@ -1045,9 +1179,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
         flags='--enable-pod-security-policy')
 
   def testEnableBinaryAuthorization(self):
-    self._TestEnableBinaryAuthorization(
-        enabled=True,
-        flags='--enable-binauthz')
+    self._TestEnableBinaryAuthorization(enabled=True, flags='--enable-binauthz')
 
   def _TestEnableBinaryAuthorization(self, enabled, flags):
     binauthz = self.msgs.BinaryAuthorization(enabled=enabled)
@@ -1077,6 +1209,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
             self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
             self.msgs.ResourceLimit(resourceType='memory', maximum=128)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
         '--max-cpu 100 --min-cpu 8')
 
@@ -1091,6 +1224,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
             self.msgs.ResourceLimit(
                 resourceType='nvidia-tesla-k80', minimum=0, maximum=2)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
         '--max-cpu 100 --min-cpu 8 '
         '--max-accelerator type=nvidia-tesla-k80,count=2')
@@ -1106,6 +1240,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
             self.msgs.ResourceLimit(
                 resourceType='nvidia-tesla-k80', minimum=1, maximum=2)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
         '--max-cpu 100 --min-cpu 8 '
         '--max-accelerator type=nvidia-tesla-k80,count=2 '
@@ -1117,14 +1252,17 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
         resource_limits=[],
         autoprovisioning_defaults=self.messages
         .AutoprovisioningNodePoolDefaults(oauthScopes=[]),
+        autoprovisioning_locations=[],
         flags='--no-enable-autoprovisioning')
 
   def _TestUpdateAutoprovisioning(self, enabled, resource_limits,
-                                  autoprovisioning_defaults, flags):
+                                  autoprovisioning_defaults,
+                                  autoprovisioning_locations, flags):
     autoscaling = self.msgs.ClusterAutoscaling(
         enableNodeAutoprovisioning=enabled,
         resourceLimits=resource_limits,
-        autoprovisioningNodePoolDefaults=autoprovisioning_defaults)
+        autoprovisioningNodePoolDefaults=autoprovisioning_defaults,
+        autoprovisioningLocations=autoprovisioning_locations)
     update = self.msgs.ClusterUpdate(desiredClusterAutoscaling=autoscaling)
     self._TestUpdate(update=update, flags=flags)
 
@@ -1139,6 +1277,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
             self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
             self.msgs.ResourceLimit(resourceType='memory', maximum=128)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
         '--max-cpu 100 --min-cpu 8 '
         '--autoprovisioning-service-account=sa1')
@@ -1152,6 +1291,7 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
             self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
             self.msgs.ResourceLimit(resourceType='memory', maximum=128)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning --max-memory 128 '
         '--max-cpu 100 --min-cpu 8 '
         '--autoprovisioning-scopes=scope1,scope2')
@@ -1179,6 +1319,7 @@ resourceLimits:
             self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
             self.msgs.ResourceLimit(resourceType='memory', maximum=20)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning '
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
@@ -1206,6 +1347,59 @@ resourceLimits:
             self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
             self.msgs.ResourceLimit(resourceType='memory', maximum=20)
         ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithLocations(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=['us-central1-a', 'us-central1-b'],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-locations=us-central1-a,us-central1-b ')
+
+  def testEnableAutoprovisioningNoLimits(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
+        resource_limits=[],
+        autoprovisioning_locations=['us-central1-a', 'us-central1-b'],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-locations=us-central1-a,us-central1-b ')
+
+  def testEnableAutoprovisioningWithLocationsFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+autoprovisioningLocations:
+  - us-central1-a
+  - us-central1-b
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        autoprovisioning_locations=['us-central1-a', 'us-central1-b'],
         flags='--enable-autoprovisioning '
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
@@ -1218,12 +1412,6 @@ resourceLimits:
           self.clusters_command_base.format(self.ZONE) + ' update ' + name +
           flags)
     self.AssertErrContains(error_message)
-
-  def testEnableAutoprovisioningNoLimitsInvalid(self):
-    self._TestUpdateClusteAutoscalingWithError(
-        ' --enable-autoprovisioning',
-        'Must specify both --max-cpu and --max-memory'
-        ' to enable autoprovisioning.')
 
   def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
     self._TestUpdateClusteAutoscalingWithError(
@@ -1263,6 +1451,7 @@ resourceLimits:
             self.msgs.ResourceLimit(
                 resourceType='nvidia-tesla-p100', minimum=0, maximum=1)
         ],
+        autoprovisioning_locations=[],
         flags='--enable-autoprovisioning '
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
@@ -1299,7 +1488,8 @@ resourceLimits:
             desiredAddonsConfig=self.msgs.AddonsConfig(
                 istioConfig=self.msgs.IstioConfig(
                     disabled=False, auth=auth_none))),
-        flags='--update-addons Istio=ENABLED ''--istio-config auth='
+        flags='--update-addons Istio=ENABLED '
+        '--istio-config auth='
         'MTLS_PERMISSIVE')
     self._TestUpdate(
         self.msgs.ClusterUpdate(
@@ -1326,48 +1516,6 @@ resourceLimits:
           '--istio-config auth=MUUAL_TLS')
     self.AssertErrContains('auth must be one of MTLS_PERMISSIVE or '
                            'MTLS_STRICT')
-
-  def testUpdateResourceUsageExportConfig(self):
-    self._TestUpdateResourceUsageExportConfig(
-        '--resource-usage-bigquery-dataset=updated_dataset_id',
-        self.msgs.ResourceUsageExportConfig(
-            bigqueryDestination=self.msgs.BigQueryDestination(
-                datasetId='updated_dataset_id')))
-    self._TestUpdateResourceUsageExportConfig(
-        '--resource-usage-bigquery-dataset=updated_dataset_id '
-        '--enable-network-egress-metering',
-        self.msgs.ResourceUsageExportConfig(
-            bigqueryDestination=self.msgs.BigQueryDestination(
-                datasetId='updated_dataset_id'),
-            enableNetworkEgressMetering=True))
-    self._TestUpdateResourceUsageExportConfig(
-        '--resource-usage-bigquery-dataset=updated_dataset_id '
-        '--no-enable-network-egress-metering',
-        self.msgs.ResourceUsageExportConfig(
-            bigqueryDestination=self.msgs.BigQueryDestination(
-                datasetId='updated_dataset_id')))
-
-  def _TestUpdateResourceUsageExportConfig(self, flags, export_config):
-    update = self.msgs.ClusterUpdate(
-        desiredResourceUsageExportConfig=export_config)
-    self._TestUpdate(update=update, flags=flags)
-
-  def testUpdateResourceUsageExportConfigInvalid(self):
-    with self.assertRaises(c_util.Error):
-      self.ExpectGetCluster(self._RunningCluster(name=self.CLUSTER_NAME))
-      self.Run('{base} update {name} --quiet {flags}'.format(
-          base=self.clusters_command_base.format(self.ZONE),
-          name=self.CLUSTER_NAME,
-          flags='--enable-network-egress-metering'))
-    self.AssertErrContains('Cannot use --[no-]enable-network-egress-metering '
-                           'without --resource-usage-bigquery-dataset')
-
-  def testClearResourceUsageBigqueryDataset(self):
-    export_config = self.msgs.ResourceUsageExportConfig()
-    update = self.msgs.ClusterUpdate(
-        desiredResourceUsageExportConfig=export_config)
-    self._TestUpdate(update=update,
-                     flags='--clear-resource-usage-bigquery-dataset')
 
   def testDisableWorkloadIdentity(self):
     cluster_name = 'abc'
@@ -1419,15 +1567,292 @@ resourceLimits:
         self.clusters_command_base.format(self.ZONE) +
         ' update {0} {1}'.format(cluster_name, flags))
 
+  def testEnableDatabaseEncryption(self):
+    update = self.msgs.ClusterUpdate(
+        desiredDatabaseEncryption=self.msgs.DatabaseEncryption(
+            keyName='projects/p/locations/l/keyRings/kr/cryptoKeys/k',
+            state=self.msgs.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED))
+    self._TestUpdate(
+        update=update,
+        flags='--database-encryption-key=projects/p/locations/l/keyRings/kr/cryptoKeys/k '
+    )
+
+  def testDisableDatabaseEncryption(self):
+    update = self.msgs.ClusterUpdate(
+        desiredDatabaseEncryption=self.msgs.DatabaseEncryption(
+            state=self.msgs.DatabaseEncryption.StateValueValuesEnum.DECRYPTED))
+    self._TestUpdate(update=update, flags='--disable-database-encryption ')
+
+  def testSetMaintenancePolicyWhenNoExistingPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'emptyRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY')))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
+            '--maintenance-window-end=2000-01-01T17:00:00Z '
+            '--maintenance-window-recurrence=FREQ=DAILY'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetMaintenancePolicyWhenExistingPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP('1143RV', window=self._DailyWindow('11:43')))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            '1143RV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY')))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
+            '--maintenance-window-end=2000-01-01T17:00:00Z '
+            '--maintenance-window-recurrence=FREQ=DAILY'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetMaintenancePolicyBadTimes(self):
+    with self.AssertRaisesArgumentErrorMatches('Failed to parse date/time'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(
+              'emwCluster', '--maintenance-window-start=2000-00-01T09:00:00Z '
+              '--maintenance-window-end=2000-13-01T17:00:00Z '
+              '--maintenance-window-recurrence=FREQ=DAILY'))
+
+  @parameterized.parameters(
+      ('--maintenance-window-start=2000-01-01T09:00:00Z '
+       '--maintenance-window-recurrence=FREQ=DAILY',
+       '--maintenance-window-end'),
+      ('--maintenance-window-end=2000-01-01T17:00:00Z '
+       '--maintenance-window-recurrence=FREQ=DAILY',
+       '--maintenance-window-start'),
+      ('--maintenance-window-start=2000-01-01T09:00:00Z '
+       '--maintenance-window-end=2000-01-01T17:00:00Z',
+       '--maintenance-window-recurrence'),
+  )
+  def testSetMaintenancePolicyMissingFields(self, flags, error_flag):
+    name = 'emwCluster'
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument {0}: Must be specified.'.format(error_flag)):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name, flags))
+
+  def testRemoveMaintenanceWindow(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'someRV',
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--clear-maintenance-window'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveMaintenanceWindowWhenNoWindow(self):
+    name = 'emwCluster'
+    self.ExpectGetCluster(
+        self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                exclusions=[
+                    self._Exclusion('2000-01-01T00:00:00+00:00',
+                                    '2000-01-07T00:00:00+00:00', 'first-week')
+                ])))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error, api_adapter.NOTHING_TO_UPDATE_ERROR_MSG):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name, '--clear-maintenance-window'))
+
+  def testAddMaintenanceExclusionWhenNoExistingPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'emptyRV',
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-start=2000-01-01T00:00:00Z '
+            '--add-maintenance-exclusion-end=2000-01-07T00:00:00Z '
+            '--add-maintenance-exclusion-name=first-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testAddMaintenanceExclusionWhenExistingPolicy(self):
+    name = 'emwCluster'
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                             '2000-01-01T17:00:00+00:00',
+                                             'FREQ=DAILY'),
+                exclusions=[
+                    self._Exclusion('2000-01-01T00:00:00+00:00',
+                                    '2000-01-07T00:00:00+00:00', 'first-week'),
+                ])),
+        policy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+                self._Exclusion('2000-01-07T00:00:00+00:00',
+                                '2000-01-14T00:00:00+00:00', 'second-week'),
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-start=2000-01-07T00:00:00Z '
+            '--add-maintenance-exclusion-end=2000-01-14T00:00:00Z '
+            '--add-maintenance-exclusion-name=second-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testAddMaintenanceExclusionWithMinimalInfo(self):
+    self.StartObjectPatch(
+        times,
+        'Now',
+        return_value=times.ParseDateTime('2000-01-01T09:00:00-04:00'))
+
+    name = 'emwCluster'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'emptyRV',
+            exclusions=[
+                self._Exclusion(
+                    '2000-01-01T09:00:00-04:00', '2000-01-10T12:00:00-04:00',
+                    'generated-exclusion-2000-01-01T09:00:00-04:00')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-end=2000-01-10T12:00:00-04:00'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveMaintenanceExclusion(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+                self._Exclusion('2000-01-07T00:00:00+00:00',
+                                '2000-01-14T00:00:00+00:00', 'second-week'),
+                self._Exclusion('2000-01-14T00:00:00+00:00',
+                                '2000-01-21T00:00:00+00:00', 'third-week'),
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+                self._Exclusion('2000-01-14T00:00:00+00:00',
+                                '2000-01-21T00:00:00+00:00', 'third-week'),
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--remove-maintenance-exclusion=second-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveOnlyMaintenanceExclusion(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster, policy=self._MP('someRV', exclusions=[]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--remove-maintenance-exclusion=first-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveMaintenanceExclusionNonExisting(self):
+    name = 'emwCluster'
+    self.ExpectGetCluster(
+        self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                exclusions=[
+                    self._Exclusion('2000-01-01T00:00:00+00:00',
+                                    '2000-01-07T00:00:00+00:00', 'first-week'),
+                    self._Exclusion('2000-01-14T00:00:00+00:00',
+                                    '2000-01-21T00:00:00+00:00', 'third-week'),
+                ])))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error,
+        'No maintenance exclusion with name second-week exists. Existing '
+        'exclusions: first-week, third-week'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(
+              name, '--remove-maintenance-exclusion=second-week'))
+
+  def testRemoveMaintenanceExclusionNoPolicy(self):
+    name = 'emwCluster'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error, 'No maintenance exclusion with name first-week exists.'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name,
+                                   '--remove-maintenance-exclusion=first-week'))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
 
   def testEnableBinaryAuthorization(self):
-    self._TestEnableBinaryAuthorization(
-        enabled=True,
-        flags='--enable-binauthz')
+    self._TestEnableBinaryAuthorization(enabled=True, flags='--enable-binauthz')
 
   def _TestEnableBinaryAuthorization(self, enabled, flags):
     binauthz = self.msgs.BinaryAuthorization(enabled=enabled)
@@ -1446,11 +1871,13 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
         flags='--enable-peering-route-sharing ')
 
   def _TestUpdateAutoprovisioning(self, enabled, resource_limits,
-                                  autoprovisioning_defaults, flags):
+                                  autoprovisioning_defaults,
+                                  autoprovisioning_locations, flags):
     autoscaling = self.msgs.ClusterAutoscaling(
         enableNodeAutoprovisioning=enabled,
         autoprovisioningNodePoolDefaults=autoprovisioning_defaults,
-        resourceLimits=resource_limits)
+        resourceLimits=resource_limits,
+        autoprovisioningLocations=autoprovisioning_locations)
     self._TestUpdateClusterAutoscaling(autoscaling, flags)
 
   def _TestUpdateClusteAutoscalingWithError(self, flags, error_message):
@@ -1474,8 +1901,8 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
         response=self._MakeOperation(operationType=self.op_update_cluster))
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, flags))
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, flags))
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
     self.AssertErrContains(
         ('go to: https://console.cloud.google.com/kubernetes/'
@@ -1498,6 +1925,25 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
           self.clusters_command_base.format(self.ZONE) + ' update ' + name +
           ' --autoscaling-profile invalid-profile')
     self.AssertErrContains('Unknown autoscaling profile')
+
+  @parameterized.parameters(
+      ('--no-disable-default-snat ', False),
+      ('--disable-default-snat ', True),
+  )
+  def testEnableShieldedNodes(self, flags, disabled):
+    update = self.msgs.ClusterUpdate(
+        desiredDefaultSnatStatus=self.msgs.DefaultSnatStatus(disabled=disabled))
+    self._TestUpdate(update=update, flags=flags)
+
+  @parameterized.parameters(
+      ('--no-enable-cost-management', False),
+      ('--enable-cost-management', True),
+  )
+  def testUpdateCostManagementConfig(self, flags, enabled):
+    update = self.msgs.ClusterUpdate(
+        desiredCostManagementConfig=self.msgs.CostManagementConfig(
+            enabled=enabled))
+    self._TestUpdate(update=update, flags=flags)
 
 
 if __name__ == '__main__':

@@ -26,9 +26,13 @@ A constant should not be placed in this file if:
 
 from __future__ import absolute_import
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
 
 import os
 import sys
+
+import six
 
 from gslib.utils.unit_util import ONE_GIB
 from gslib.utils.unit_util import ONE_KIB
@@ -45,6 +49,10 @@ DEFAULT_GCS_JSON_API_VERSION = 'v1'
 DEFAULT_GSUTIL_STATE_DIR = os.path.expanduser(os.path.join('~', '.gsutil'))
 
 GSUTIL_PUB_TARBALL = 'gs://pub/gsutil.tar.gz'
+
+IAM_POLICY_VERSION = 3
+
+IMPERSONATE_SERVICE_ACCOUNT = ''
 
 # Number of seconds to wait before printing a long retry warning message.
 LONG_RETRY_WARN_SEC = 10
@@ -65,12 +73,17 @@ MIN_ACCEPTABLE_OPEN_FILES_LIMIT = 1000
 # TODO: This should say the unit in the name.
 MIN_SIZE_COMPUTE_LOGGING = 100 * ONE_MIB
 
-NO_MAX = sys.maxint
+# The way NO_MAX is used, what is really needed here is the maximum container
+# size in the Python C code, so using six.MAXSIZE which provides that portably.
+NO_MAX = six.MAXSIZE
 
 # Number of objects to request in listing calls.
 NUM_OBJECTS_PER_LIST_PAGE = 1000
 
 RELEASE_NOTES_URL = 'https://pub.storage.googleapis.com/gsutil_ReleaseNotes.txt'
+
+REQUEST_REASON_ENV_VAR = 'CLOUDSDK_CORE_REQUEST_REASON'
+REQUEST_REASON_HEADER_KEY = 'x-goog-request-reason'
 
 RESUMABLE_THRESHOLD_MIB = 8
 RESUMABLE_THRESHOLD_B = RESUMABLE_THRESHOLD_MIB * ONE_MIB
@@ -104,10 +117,10 @@ XML_PROGRESS_CALLBACKS = 10
 
 class Scopes(object):
   """Enum class for auth scopes, as unicode."""
-  CLOUD_PLATFORM = u'https://www.googleapis.com/auth/cloud-platform'
+  CLOUD_PLATFORM = 'https://www.googleapis.com/auth/cloud-platform'
   CLOUD_PLATFORM_READ_ONLY = (
-      u'https://www.googleapis.com/auth/cloud-platform.read-only')
-  FULL_CONTROL = u'https://www.googleapis.com/auth/devstorage.full_control'
-  READ_ONLY = u'https://www.googleapis.com/auth/devstorage.read_only'
-  READ_WRITE = u'https://www.googleapis.com/auth/devstorage.read_write'
-  REAUTH = u'https://www.googleapis.com/auth/accounts.reauth'
+      'https://www.googleapis.com/auth/cloud-platform.read-only')
+  FULL_CONTROL = 'https://www.googleapis.com/auth/devstorage.full_control'
+  READ_ONLY = 'https://www.googleapis.com/auth/devstorage.read_only'
+  READ_WRITE = 'https://www.googleapis.com/auth/devstorage.read_write'
+  REAUTH = 'https://www.googleapis.com/auth/accounts.reauth'

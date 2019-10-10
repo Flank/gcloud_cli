@@ -37,8 +37,8 @@ EXAMPLES
     frodo within the KeyRing fellowship and location global:
 
         $ gcloud kms cryptokeys remove-rotation-schedule frodo \
-            --location global \
-            --keyring fellowship
+            --location=global \
+            --keyring=fellowship
 
 NOTES
     This command is an internal implementation detail and may change or

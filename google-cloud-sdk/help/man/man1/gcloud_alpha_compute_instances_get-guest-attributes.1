@@ -79,15 +79,27 @@ https://developers.google.com/compute/docs/reference/latest/
 
 
 
+.SH "EXAMPLES"
+
+To get the guest attributes for instance 'my\-instance' in zone 'ZONE' with
+query path 'query/path', run:
+
+.RS 2m
+$ gcloud alpha compute instances get\-guest\-attributes my\-instance \e
+    \-\-query\-path=query/path \-\-zone=ZONE
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute instances get\-guest\-attributes
 $ gcloud beta compute instances get\-guest\-attributes
 .RE
 

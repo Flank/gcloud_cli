@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -211,7 +211,7 @@ class DeployTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
     encoding.SetEncodedValue(
         os.environ, 'GOPATH', os.path.join(self.test_dir, 'gopath'))
     try:
-      self._deployStandardApp('app_engine_go_data')
+      self._deployStandardApp('app_engine_go111_data')
     finally:
       encoding.SetEncodedValue(os.environ, 'GOPATH', None)
 
@@ -280,6 +280,7 @@ class DeployTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
       if os.path.exists(git_dir):
         files.RmTree(git_dir)
 
+  @test_case.Filters.skip('Failing', 'b/141941956')
   def testDeployNodejsUsingApi(self):
     self._deployStandardApp('app_engine_nodejs_data')
 

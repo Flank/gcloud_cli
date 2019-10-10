@@ -1,5 +1,5 @@
 title: compute reservations update test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -7,23 +7,24 @@ summary:
       compute reservations update my-reservation --zone=my-zone --vm-count=2 --async
   - stderr: |
       Request issued for: [my-reservation]
-      Check operation [operation-1234] for status.
+      Check operation [projects/fake-project/zones/my-zone/operations/operation-1234] for status.
       Updated reservation [my-reservation].
   - stdout: |
       kind: compute#operation
       name: operation-1234
       operationType: compute.allocations.resize
       progress: 0
-      selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234
+      selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234
       status: RUNNING
-      zone: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone
+      zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone
 - execute:
   - command: |
       compute reservations update my-reservation --zone=my-zone --vm-count=2
   - stderr: |
       Request issued for: [my-reservation]
   - progress_tracker:
-    - message: Waiting for operation [$$operation$$] to complete
+    - message: Waiting for operation [projects/fake-project/zones/my-zone/operations/$$operation-basename$$]
+        to complete
     - status: SUCCESS
   - stderr: |
       Updated reservation [my-reservation].
@@ -33,6 +34,7 @@ actions:
 - define_reference:
     reference: api-version
     track_values:
+      GA: v1
       BETA: beta
       ALPHA: alpha
 - execute_command:
@@ -41,7 +43,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/resize?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/resize?alt=json
           method: POST
           headers: {}
           body:
@@ -50,21 +52,21 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {kind: compute#operation, name: operation-1234, zone: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone',
-                 operationType: compute.allocations.resize, status: RUNNING, progress: 0,
-                 selfLink: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234'}
+          body: {kind: compute#operation, name: operation-1234, zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone,
+            operationType: compute.allocations.resize, status: RUNNING, progress: 0,
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234}
     - expect_stderr: |
         Request issued for: [my-reservation]
-        Check operation [operation-1234] for status.
+        Check operation [projects/fake-project/zones/my-zone/operations/operation-1234] for status.
         Updated reservation [my-reservation].
     - expect_stdout: |
         kind: compute#operation
         name: operation-1234
         operationType: compute.allocations.resize
         progress: 0
-        selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234
+        selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234
         status: RUNNING
-        zone: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone
+        zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone
     - expect_exit:
         code: 0
 - execute_command:
@@ -73,7 +75,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/resize?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation/resize?alt=json
           method: POST
           headers: {}
           body:
@@ -82,18 +84,19 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {kind: compute#operation, name: operation-1234, zone: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone',
-                 operationType: compute.allocations.resize, status: DONE, progress: 0,
-                 selfLink: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234'}
+          body: {kind: compute#operation, name: operation-1234, zone: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone,
+            operationType: compute.allocations.resize, status: DONE, progress: 0,
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/operations/operation-1234}
         poll_operation: true
     - expect_stderr: |
         Request issued for: [my-reservation]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation$$] to complete
+        message: Waiting for operation [projects/fake-project/zones/my-zone/operations/$$operation-basename$$]
+          to complete
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/my-zone/reservations/my-reservation?alt=json
           method: GET
           headers: {}
           body: null

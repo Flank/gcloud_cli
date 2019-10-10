@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta run services remove-iam-policy-binding
         (SERVICE : --region=REGION) --member=MEMBER --role=ROLE
+        [--platform=PLATFORM]
         [--all | --condition=[KEY=VALUE,...]
           | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
 
@@ -27,7 +28,7 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --region=REGION
-          The Cloud Run region
+          The Cloud Run region.
 
 REQUIRED FLAGS
      --member=MEMBER
@@ -48,6 +49,17 @@ REQUIRED FLAGS
         The role to remove the member from.
 
 OPTIONAL FLAGS
+     --platform=PLATFORM
+        Target platform for running commands. PLATFORM must be one of:
+
+         gke
+            Cloud Run on Google Kubernetes Engine. This platform is not
+            supported by this command.
+
+         managed
+            Fully managed version of Cloud Run. Use with the --region flag or
+            set the [run/region] property to specify a Cloud Run region.
+
      At most one of these may be specified:
 
        --all

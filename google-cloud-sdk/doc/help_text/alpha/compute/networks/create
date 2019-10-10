@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha compute networks create NAME
         [--bgp-routing-mode=MODE; default="regional"]
-        [--description=DESCRIPTION] [--range=RANGE] [--subnet-mode=MODE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--mtu=MTU] [--range=RANGE]
+        [--subnet-mode=MODE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute networks create is used to create virtual
@@ -37,6 +37,12 @@ FLAGS
 
      --description=DESCRIPTION
         An optional, textual description for the network.
+
+     --mtu=MTU
+        Maximum transmission unit(MTU) is the size of the largest frame that
+        can be transmitted on this network. Default value is 1460 bytes, the
+        maximum is 1600 bytes. The MTU advertised via DHCP to all instances
+        attached to this network.
 
      --range=RANGE
         Specifies the IPv4 address range of legacy mode networks. The range
@@ -74,9 +80,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute networks create
         $ gcloud beta compute networks create

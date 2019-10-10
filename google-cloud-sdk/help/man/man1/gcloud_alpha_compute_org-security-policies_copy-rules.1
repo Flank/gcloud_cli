@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ORG\-SECURITY\-POLICIES_COPY\-RULES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute org\-security\-policies copy\-rules \- replace the rules of a Google Compute Engine organization security policy with rules from another policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute org\-security\-policies copy\-rules\fR \fISECURITY_POLICY_ID\fR \fB\-\-source\-security\-policy\fR=\fISOURCE_SECURITY_POLICY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute org\-security\-policies copy\-rules\fR is
+used to replace the rules of organization security policies. An.RS 2m
+organization security policy is a set of rules that controls access to
+various resources.
+
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISECURITY_POLICY_ID\fR
+Resource ID of the security policy to copy the rules to.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-security\-policy\fR=\fISOURCE_SECURITY_POLICY\fR
+Source security policy to copy the rules from.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

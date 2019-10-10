@@ -1,0 +1,120 @@
+
+.TH "GCLOUD_BETA_KMS_KEYS_VERSIONS_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta kms keys versions import \- import a version into an existing crypto key
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta kms keys versions import\fR \fB\-\-algorithm\fR=\fIALGORITHM\fR \fB\-\-import\-job\fR=\fIIMPORT_JOB\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-public\-key\-file\fR=\fIPUBLIC_KEY_FILE\fR] [\fB\-\-rsa\-aes\-wrapped\-key\-file\fR=\fIRSA_AES_WRAPPED_KEY_FILE\fR] [\fB\-\-target\-key\-file\fR=\fITARGET_KEY_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Imports wrapped key material into a new version within an existing
+crypto key following the import procedure documented at
+https://cloud.google.com/kms/docs/importing\-a\-key.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-algorithm\fR=\fIALGORITHM\fR
+The algorithm of the key being imported.
+Seehttps://cloud.google.com/kms/docs/algorithms for guidance on choosing an
+algorithm. \fIALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
+\fBec\-sign\-p384\-sha384\fR, \fBgoogle\-symmetric\-encryption\fR,
+\fBrsa\-decrypt\-oaep\-2048\-sha256\fR, \fBrsa\-decrypt\-oaep\-3072\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-4096\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha512\fR,
+\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR,
+\fBrsa\-sign\-pss\-2048\-sha256\fR, \fBrsa\-sign\-pss\-3072\-sha256\fR,
+\fBrsa\-sign\-pss\-4096\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha512\fR.
+
+.TP 2m
+\fB\-\-import\-job\fR=\fIIMPORT_JOB\fR
+Name of the import job to import from.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+The containing key to import into.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the keyring.
+
+.TP 2m
+\fB\-\-public\-key\-file\fR=\fIPUBLIC_KEY_FILE\fR
+Optional path to the public key of the ImportJob, used to wrap the key for
+import. If missing, the public key will be fetched on your behalf.
+
+.TP 2m
+\fB\-\-rsa\-aes\-wrapped\-key\-file\fR=\fIRSA_AES_WRAPPED_KEY_FILE\fR
+Path to the wrapped RSA AES key file to import.
+
+.TP 2m
+\fB\-\-target\-key\-file\fR=\fITARGET_KEY_FILE\fR
+Optional path to the target key to import into a KMS key version. If specified,
+the key will be wrapped in the format produced by the PKCS#11 mechanism
+CKM_RSA_AES_KEY_WRAP
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read the files 'path/to/ephemeral/key' and
+\'path/to/target/key' and use them to create a new version with algorithm
+\'google\-symmetric\-encryption' within the 'frodo' crypto key, 'fellowship'
+keyring, and 'us\-central1' location using import job 'strider' to unwrap the
+provided key material..RS 2m
+$ gcloud beta kms keys versions import \-\-location=global \e
+     \-\-keyring=fellowship \e
+     \-\-key=frodo \e
+     \-\-import\-job=strider \e
+     \-\-rsa\-aes\-wrapped\-key\-file=path/to/target/key \e
+     \-\-algorithm=google\-symmetric\-encryption
+
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha kms keys versions import
+.RE
+

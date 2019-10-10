@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ TIME_NOW_STR = str(test_base.FakeDateTime.now())
 def SetUpClass(test_obj, api_version):
   test_obj.SelectApi(api_version)
 
-  test_obj.PREFIX = ('https://www.googleapis.com/compute/{0}/projects/'
+  test_obj.PREFIX = ('https://compute.googleapis.com/compute/{0}/projects/'
                      '{1}/global/instanceTemplates/{2}')
   test_obj.PROJECT_NAME = 'my-project'
   test_obj.TEMPLATE_A_NAME = test_obj.PREFIX.format(
@@ -774,7 +774,7 @@ class InstanceGroupManagersUpdateInstancesAlphaZonalTest(
 
   def testReplaceIgmWithPerInstanceConfigs(self):
     pics = self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
-        items=[self.messages.PerInstanceConfig(instance='instance123')])
+        items=[self.messages.PerInstanceConfig(name='instance123')])
     self.make_requests.side_effect = iter([[self.igms[0]], [pics], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2} --max-unavailable 1'

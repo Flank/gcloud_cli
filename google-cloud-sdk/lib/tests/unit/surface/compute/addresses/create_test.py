@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -284,8 +284,8 @@ class AddressesCreateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute addresses create
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/addresses/address-1
-          --region https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/addresses/address-1
+          --region https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2
         """)
 
     self.CheckRequests(
@@ -319,7 +319,7 @@ class AddressesGlobalCreateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute addresses create
-          https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/address-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/address-1
           --global
         """)
 
@@ -677,7 +677,7 @@ class CreateWithSubnetTest(test_base.BaseTest):
                   .INTERNAL,
                   purpose=self.messages.Address.PurposeValueValuesEnum
                   .GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/{}/'
+                  subnetwork='https://compute.googleapis.com/compute/{}/'
                   'projects/my-project/regions/us-central2/'
                   'subnetworks/default'.format(self.api_version),
               ),
@@ -705,7 +705,7 @@ class CreateWithSubnetTest(test_base.BaseTest):
                   .INTERNAL,
                   purpose=self.messages.Address.PurposeValueValuesEnum
                   .GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/{}/'
+                  subnetwork='https://compute.googleapis.com/compute/{}/'
                   'projects/my-project/regions/us-central2/'
                   'subnetworks/fancy'.format(self.api_version),
               ),
@@ -735,7 +735,7 @@ class CreateWithSubnetTest(test_base.BaseTest):
                   .INTERNAL,
                   purpose=self.messages.Address.PurposeValueValuesEnum
                   .GCE_ENDPOINT,
-                  subnetwork='https://www.googleapis.com/compute/{}/'
+                  subnetwork='https://compute.googleapis.com/compute/{}/'
                   'projects/my-project/regions/us-east1/'
                   'subnetworks/fancy'.format(self.api_version),
               ),
@@ -764,6 +764,56 @@ class CreateWithSubnetBetaTest(CreateWithSubnetTest):
 
 
 class CreateWithSubnetAlphaTest(CreateWithSubnetBetaTest):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class CreateWithSharedLoadBalancerVipBetaTest(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
+
+  def RunCreate(self, command):
+    self.Run('compute addresses create ' + command)
+
+  def testWithSharedLoadBalancerVip(self):
+    self.RunCreate("""
+        address-1
+          --addresses 10.100.1.1
+          --region us-central1
+          --subnet default
+          --purpose SHARED_LOADBALANCER_VIP
+        """)
+
+    self.CheckRequests(
+        [(self.compute.addresses, 'Insert',
+          self.messages.ComputeAddressesInsertRequest(
+              address=self.messages.Address(
+                  address='10.100.1.1',
+                  name='address-1',
+                  addressType=self.messages.Address.AddressTypeValueValuesEnum
+                  .INTERNAL,
+                  purpose=self.messages.Address.PurposeValueValuesEnum
+                  .SHARED_LOADBALANCER_VIP,
+                  subnetwork='https://compute.googleapis.com/compute/{}/'
+                  'projects/my-project/regions/us-central1/'
+                  'subnetworks/default'.format(self.api_version),
+              ),
+              project='my-project',
+              region='us-central1',
+          ))],)
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('')
+
+
+class CreateWithSharedLoadBalancerVipAlphaTest(
+    CreateWithSharedLoadBalancerVipBetaTest):
 
   def PreSetUp(self):
     self.api_version = 'alpha'
@@ -800,7 +850,7 @@ class GlobalPeeringRangesCreateTest(test_base.BaseTest):
                   .INTERNAL,
                   purpose=self.messages.Address.PurposeValueValuesEnum
                   .VPC_PEERING,
-                  network='https://www.googleapis.com/compute/{}/'
+                  network='https://compute.googleapis.com/compute/{}/'
                   'projects/my-project/global/networks/default'.format(
                       self.api_version)),
               project='my-project'))],)

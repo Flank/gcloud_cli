@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -219,17 +219,48 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
                                  error_regexp):
       self.iap_tunnel_websocket._WaitForOpenOrRaiseError()
 
-  def testSendOneDataFrame(self):
+  def testSend(self):
+    self.assertFalse(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
     self.iap_tunnel_websocket.Send(b'testing')
     self.assertListEqual(list(self.iap_tunnel_websocket._unsent_data),
                          [b'testing'])
+    self.assertFalse(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
     self.iap_tunnel_websocket.Send(b'again')
     self.assertListEqual(list(self.iap_tunnel_websocket._unsent_data),
                          [b'testing', b'again'])
+    self.assertFalse(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
 
-  def testSendSkipIfEmpty(self):
-    self.iap_tunnel_websocket.Send(b'')
-    self.assertFalse(self.iap_tunnel_websocket._unsent_data)
+  def testLocalEOFUnblocksWaitForAllSent(self):
+    self.assertFalse(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
+    self.iap_tunnel_websocket.LocalEOF()
+    self.assertTrue(self.iap_tunnel_websocket._input_eof)
+    self.assertTrue(self.iap_tunnel_websocket._sent_all.is_set())
+
+  def testSendQueuedDataUnblocksWaitForAllSent(self):
+    self.assertFalse(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
+    self.iap_tunnel_websocket.Send(b'testing')
+    self.assertFalse(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
+    self.iap_tunnel_websocket.LocalEOF()
+    self.assertTrue(self.iap_tunnel_websocket._input_eof)
+    self.assertFalse(self.iap_tunnel_websocket._sent_all.is_set())
+    self.iap_tunnel_websocket._SendQueuedData()
+    self.assertTrue(self.iap_tunnel_websocket._input_eof)
+    self.assertTrue(self.iap_tunnel_websocket._sent_all.is_set())
+
+  def testWaitForAllSentTrue(self):
+    self.iap_tunnel_websocket.LocalEOF()
+    self.assertTrue(self.iap_tunnel_websocket.WaitForAllSent())
+
+  def testWaitForAllSentFalse(self):
+    self.StartObjectPatch(iap_tunnel_websocket, 'ALL_DATA_SENT_WAIT_TIME_SEC',
+                          new=0.001)
+    self.assertFalse(self.iap_tunnel_websocket.WaitForAllSent())
 
   def testSendSplitIntoFrames(self):
     large_data = b'\x03' * utils.SUBPROTOCOL_MAX_DATA_FRAME_SIZE

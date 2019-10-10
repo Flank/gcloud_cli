@@ -20,6 +20,9 @@ GROUPS
      create
         (BETA) Create Cloud Scheduler jobs for various types of targets.
 
+     update
+        (BETA) Update Cloud Scheduler jobs for various types of targets.
+
 COMMANDS
     COMMAND is one of the following:
 
@@ -42,8 +45,9 @@ COMMANDS
         (BETA) Trigger an on-demand execution of a job.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud scheduler jobs
         $ gcloud alpha scheduler jobs
 

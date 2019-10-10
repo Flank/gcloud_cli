@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ DETAILED_HELP = {
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Serverless(base.Group):
   """Manage your Cloud Run resources."""
+
+  category = base.COMPUTE_CATEGORY
 
   detailed_help = DETAILED_HELP
 

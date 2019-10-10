@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import copy
-import itertools
 import json
 import operator
 
 from apitools.base.py import encoding
+from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.app import build as app_cloud_build
 from googlecloudsdk.api_lib.app import env
@@ -40,6 +40,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+from googlecloudsdk.third_party.appengine.admin.tools.conversion import convert_yaml
 import six
 from six.moves import filter  # pylint: disable=redefined-builtin
 from six.moves import map  # pylint: disable=redefined-builtin
@@ -355,20 +356,25 @@ class AppengineApiClient(appengine_api_client_base.AppengineApiClientBase):
       versions: list of version_util.Version
 
     Returns:
-      A generator of each instances_util.Instance for the given versions
+      A list of instances_util.Instance objects for the given versions
     """
-    iters = []
+    instances = []
     for version in versions:
       request = self.messages.AppengineAppsServicesVersionsInstancesListRequest(
           parent=self._FormatVersion(version.service, version.id))
-      iters.append(list_pager.YieldFromList(
-          self.client.apps_services_versions_instances,
-          request,
-          field='instances',
-          batch_size=100,  # Set batch size so tests can expect it.
-          batch_size_attribute='pageSize'))
-    return (instances_util.Instance.FromInstanceResource(i)
-            for i in itertools.chain.from_iterable(iters))
+      try:
+        for instance in list_pager.YieldFromList(
+            self.client.apps_services_versions_instances,
+            request,
+            field='instances',
+            batch_size=100,  # Set batch size so tests can expect it.
+            batch_size_attribute='pageSize'):
+          instances.append(
+              instances_util.Instance.FromInstanceResource(instance))
+      except apitools_exceptions.HttpNotFoundError:
+        # Drop versions that were presumed deleted since initial enumeration.
+        pass
+    return instances
 
   def GetAllInstances(self, service=None, version=None, version_filter=None):
     """Generator of all instances, optionally filtering by service or version.
@@ -535,11 +541,18 @@ class AppengineApiClient(appengine_api_client_base.AppengineApiClientBase):
       # Get the versions.
       request = self.messages.AppengineAppsServicesVersionsListRequest(
           parent=self._GetServiceRelativeName(service.id))
-      for version in list_pager.YieldFromList(
-          self.client.apps_services_versions, request, field='versions',
-          batch_size=100, batch_size_attribute='pageSize'):
-        versions.append(
-            version_util.Version.FromVersionResource(version, service))
+      try:
+        for version in list_pager.YieldFromList(
+            self.client.apps_services_versions,
+            request,
+            field='versions',
+            batch_size=100,
+            batch_size_attribute='pageSize'):
+          versions.append(
+              version_util.Version.FromVersionResource(version, service))
+      except apitools_exceptions.HttpNotFoundError:
+        # Drop services that were presumed deleted since initial enumeration.
+        pass
 
     return versions
 
@@ -624,10 +637,6 @@ class AppengineApiClient(appengine_api_client_base.AppengineApiClientBase):
       A Version resource whose Deployment includes either a container pointing
         to a completed image, or a build pointing to an in-progress build.
     """
-    # TODO(b/79871515): Move this import back to the top.
-    # pylint: disable=g-import-not-at-top
-    from googlecloudsdk.third_party.appengine.admin.tools.conversion import convert_yaml
-
     config_dict = copy.deepcopy(service_config.parsed.ToDict())
 
     # We always want to set a value for entrypoint when sending the request

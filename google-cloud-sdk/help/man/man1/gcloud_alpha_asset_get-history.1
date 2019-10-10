@@ -11,7 +11,7 @@ gcloud alpha asset get\-history \- get the update history of assets that overlap
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha asset get\-history\fR \fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...] \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR \fB\-\-start\-time\fR=\fISTART_TIME\fR [\fB\-\-end\-time\fR=\fIEND_TIME\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha asset get\-history\fR \fB\-\-asset\-names\fR=[\fIASSET_NAMES\fR,...] \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR \fB\-\-start\-time\fR=\fISTART_TIME\fR (\fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fB\-\-end\-time\fR=\fIEND_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -32,10 +32,13 @@ format.
 
 .TP 2m
 \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
-Asset content type. Choices are \f5resource\fR, \f5iam\-policy\fR. Specifying
-\f5resource\fR will export resource metadata, and specifying \f5iam\-policy\fR
-will export IAM policy set on assets. \fICONTENT_TYPE\fR must be one of:
-\fBresource\fR, \fBiam\-policy\fR.
+Asset content type. Choices are \f5resource\fR, \f5iam\-policy\fR and
+\f5org\-policy\fR. Specifying \f5resource\fR will export resource metadata,
+specifying \f5iam\-policy\fR will export IAM policy set on assets, specifying
+\f5org\-policy\fR will export Org Policy set on asset, and specifying
+\f5access\-policy\fR will export Access Policy set on asset. \fICONTENT_TYPE\fR
+must be one of: \fBresource\fR, \fBiam\-policy\fR, \fBorg\-policy\fR,
+\fBaccess\-policy\fR.
 
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
@@ -43,7 +46,32 @@ Start time of the time window (inclusive) for the asset history. Must be later
 than 2018\-10\-02T00:00:00Z. See $ gcloud topic datetimes for information on
 time formats.
 
+.TP 2m
 
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+The ID of the organization which is the root asset.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+The project which is the root asset.
+
+The Google Cloud Platform project name to use for this invocation. If omitted,
+then the current project is assumed; the current project can be listed using
+\f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
+\f5gcloud config set project PROJECTID\fR.
+
+\f5\-\-project\fR and its fallback \f5core/project\fR property play two roles in
+the invocation. It specifies the project of the resource to operate on. It also
+specifies the project for API enablement check, quota, and billing. To specify a
+different project for quota and billing, use \f5\-\-billing\-project\fR or
+\f5billing/quota_project\fR property.
+
+
+.RE
 .RE
 .sp
 
@@ -55,10 +83,6 @@ time formats.
 End time of the time window (exclusive) for the asset history. Defaults to
 current time if not specified. See $ gcloud topic datetimes for information on
 time formats.
-
-.TP 2m
-\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
-The ID of the organization which is the root asset.
 
 
 .RE
@@ -107,9 +131,8 @@ $ gcloud alpha asset get\-history \-\-organization='1060499660910' \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud asset get\-history

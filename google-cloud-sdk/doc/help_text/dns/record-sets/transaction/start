@@ -27,10 +27,11 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To start a transaction, run:
 
-        $ gcloud dns record-sets transaction start --zone MANAGED_ZONE
+        $ gcloud dns record-sets transaction start --zone=MANAGED_ZONE
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets transaction start
         $ gcloud beta dns record-sets transaction start
 

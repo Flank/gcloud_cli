@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class UnmanagedInstanceGroupsListTest(test_base.BaseTest,
       if service == self.compute.instanceGroups:
         non_zonal_group = (self.messages.InstanceGroup(
             name='regional-group',
-            selfLink=('https://www.googleapis.com/compute/{0}/'
+            selfLink=('https://compute.googleapis.com/compute/{0}/'
                       'projects/my-project/regions/region-1/'
                       'instanceGroups/group-1'.format(API_VERSION)),
             creationTimestamp='2013-09-06T17:54:10.636-07:00',
@@ -122,7 +122,7 @@ class UnmanagedInstanceGroupsListTest(test_base.BaseTest,
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-4
+            https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-4
             """.format(API_VERSION)), normalize_space=True)
 
   def testInstanceGroupsCompleter(self):

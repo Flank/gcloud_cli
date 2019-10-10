@@ -15,49 +15,48 @@ summary:
 - execute:
   - command: |
       dialogflow entity-types describe $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
   - stdout: |
-      autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
-      displayName: $$entity-type-display-name$$
       entities:
-      - synonyms:
-        - red
-        value: red
       - synonyms:
         - blue
         value: blue
       - synonyms:
         - green
         value: green
+      - synonyms:
+        - red
+        value: red
       kind: KIND_LIST
       name: $$entity-type$$
 - execute:
   - command: |
       dialogflow entity-types update $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
         --remove-entities="green"
         --no-auto-expand
         --display-name="$$entity-type-display-name$$-2"
   - stderr: |
       Updated entityType [$$entity-type-basename$$].
   - stdout: |
-      displayName: $$entity-type-display-name$$-2
       entities:
-      - synonyms:
-        - red
-        value: red
       - synonyms:
         - blue
         value: blue
+      - synonyms:
+        - red
+        value: red
       kind: KIND_LIST
       name: $$entity-type$$
 - execute:
   - command: |
       dialogflow entity-types update $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
         --clear-entities
         --add-entities="yellow"
   - stderr: |
       Updated entityType [$$entity-type-basename$$].
   - stdout: |
-      displayName: $$entity-type-display-name$$-2
       entities:
       - synonyms:
         - yellow
@@ -67,12 +66,12 @@ summary:
 - execute:
   - command: |
       dialogflow entity-types update $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
         --clear-entities
         --flags-file flags_file.yaml
   - stderr: |
       Updated entityType [$$entity-type-basename$$].
   - stdout: |
-      displayName: $$entity-type-display-name$$-2
       entities:
       - synonyms:
         - red
@@ -135,7 +134,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$
             kind: KIND_LIST
             autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
@@ -166,6 +165,7 @@ actions:
 - execute_command:
     command: |
       dialogflow entity-types describe $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
     events:
     - api_call:
         expect_request:
@@ -180,7 +180,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$
             kind: KIND_LIST
             autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
@@ -195,18 +195,16 @@ actions:
               synonyms:
               - green
     - expect_stdout: |
-        autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
-        displayName: $$entity-type-display-name$$
         entities:
-        - synonyms:
-          - red
-          value: red
         - synonyms:
           - blue
           value: blue
         - synonyms:
           - green
           value: green
+        - synonyms:
+          - red
+          value: red
         kind: KIND_LIST
         name: $$entity-type$$
     - expect_exit:
@@ -214,6 +212,7 @@ actions:
 - execute_command:
     command: |
       dialogflow entity-types update $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
         --remove-entities="green"
         --no-auto-expand
         --display-name="$$entity-type-display-name$$-2"
@@ -231,7 +230,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$
             kind: KIND_LIST
             autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
@@ -270,7 +269,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$-2
             kind: KIND_LIST
             entities:
@@ -283,14 +282,13 @@ actions:
     - expect_stderr: |
         Updated entityType [$$entity-type-basename$$].
     - expect_stdout: |
-        displayName: $$entity-type-display-name$$-2
         entities:
-        - synonyms:
-          - red
-          value: red
         - synonyms:
           - blue
           value: blue
+        - synonyms:
+          - red
+          value: red
         kind: KIND_LIST
         name: $$entity-type$$
     - expect_exit:
@@ -298,6 +296,7 @@ actions:
 - execute_command:
     command: |
       dialogflow entity-types update $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
         --clear-entities
         --add-entities="yellow"
     events:
@@ -314,7 +313,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$-2
             kind: KIND_LIST
             entities:
@@ -346,7 +345,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$-2
             kind: KIND_LIST
             entities:
@@ -356,7 +355,6 @@ actions:
     - expect_stderr: |
         Updated entityType [$$entity-type-basename$$].
     - expect_stdout: |
-        displayName: $$entity-type-display-name$$-2
         entities:
         - synonyms:
           - yellow
@@ -375,6 +373,7 @@ actions:
 - execute_command:
     command: |
       dialogflow entity-types update $$entity-type$$
+        --format='yaml(kind,name,entities.sort(value))'
         --clear-entities
         --flags-file flags_file.yaml
     events:
@@ -391,7 +390,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$-2
             kind: KIND_LIST
             entities:
@@ -421,7 +420,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
             displayName: $$entity-type-display-name$$-2
             kind: KIND_MAP
             entities:
@@ -432,7 +431,6 @@ actions:
     - expect_stderr: |
         Updated entityType [$$entity-type-basename$$].
     - expect_stdout: |
-        displayName: $$entity-type-display-name$$-2
         entities:
         - synonyms:
           - red
@@ -461,7 +459,21 @@ actions:
             status: '200'
           body:
             entityTypes:
-            - name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            - name: projects/cloud-sdk-integration-testing/agent/entityTypes/44153f0c-139a-4b11-9ea7-4ef3ff7a29f5
+              displayName: test-et-20190301-164552-5s2f
+              kind: KIND_MAP
+              autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+              entities:
+              - value: blue
+                synonyms:
+                - blue
+              - value: green
+                synonyms:
+                - green
+              - value: red
+                synonyms:
+                - red
+            - name: projects/cloud-sdk-integration-testing/agent/entityTypes/b152d8fb-b157-4b19-95ba-52e47a9cc318
               displayName: $$entity-type-display-name$$-2
               kind: KIND_MAP
               entities:
@@ -469,20 +481,6 @@ actions:
                 synonyms:
                 - red
                 - maroon
-            - name: projects/cloud-sdk-integration-testing/agent/entityTypes/44153f0c-139a-4b11-9ea7-4ef3ff7a29f5
-              displayName: test-et-20190301-164552-5s2f
-              kind: KIND_MAP
-              autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
-              entities:
-              - value: red
-                synonyms:
-                - red
-              - value: blue
-                synonyms:
-                - blue
-              - value: green
-                synonyms:
-                - green
     - expect_stdout: |
         ---
         displayName: $$entity-type-display-name$$-2

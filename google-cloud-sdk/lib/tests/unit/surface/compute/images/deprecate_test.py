@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=DEPRECATED,
                  deleted='2014-01-03T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -97,7 +97,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=DEPRECATED,
                  deleted='2014-01-02T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -117,7 +117,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=ACTIVE,
                  deprecated='2014-01-03T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -137,7 +137,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=ACTIVE,
                  deprecated='2014-01-02T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -157,7 +157,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=DEPRECATED,
                  obsolete='2014-01-03T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -177,7 +177,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=DEPRECATED,
                  obsolete='2014-01-02T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -204,7 +204,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  obsolete='2014-01-04T03:04:05',
                  deleted='2014-01-05T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)
@@ -212,9 +212,9 @@ class ImagesDeprecateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute images deprecate
-          https://www.googleapis.com/compute/v1/projects/my-project/global/images/my-image
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/images/my-image
           --state DEPRECATED
-          --replacement https://www.googleapis.com/compute/v1/projects/my-project/global/images/other-image
+          --replacement https://compute.googleapis.com/compute/v1/projects/my-project/global/images/other-image
           --delete-in 1d
         """)
 
@@ -225,7 +225,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
                  state=DEPRECATED,
                  deleted='2014-01-03T03:04:05',
                  replacement=(
-                     'https://www.googleapis.com/compute/v1/projects/'
+                     'https://compute.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
              image='my-image',
              project='my-project'))],)

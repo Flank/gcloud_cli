@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class ConnectorsListTestBeta(base.VpcAccessUnitTestBase):
+class ConnectorsListTestGa(base.VpcAccessUnitTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def testConnectorsList(self):
     connectors = self._MakeConnectors()
@@ -121,7 +121,14 @@ class ConnectorsListTestBeta(base.VpcAccessUnitTestBase):
         response=self.messages.ListConnectorsResponse(connectors=connectors))
 
 
-class ConnectorsListTestAlpha(ConnectorsListTestBeta):
+class ConnectorsListTestBeta(ConnectorsListTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
+
+
+class ConnectorsListTestAlpha(ConnectorsListTestGa):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -136,13 +143,13 @@ class ConnectorsListTestAlpha(ConnectorsListTestBeta):
     # pylint: disable=line-too-long
     self.AssertOutputEquals(
         """\
-        CONNECTOR_ID    REGION       TYPE      NETWORK       IP_CIDR_RANGE  STATUS
-        my-connector-0  us-central1  EXTENDED  my-network-0  10.132.0.0/28  READY
-        my-connector-1  us-central1  BASIC     my-network-2                 CREATING
-        my-connector-2  us-central1  EXTENDED  my-network-1  10.128.0.0/28  CREATING
-        my-connector-3  us-central1  EXTENDED  my-network-2  10.142.0.0/28  DELETING
-        my-connector-4  us-central1  BASIC     my-network-1                 READY
-        my-connector-5  us-central1  BASIC     my-network-2                 DELETING
+        CONNECTOR_ID    REGION       NETWORK       IP_CIDR_RANGE  STATUS
+        my-connector-0  us-central1  my-network-0  10.132.0.0/28  READY
+        my-connector-1  us-central1  my-network-2  10.10.0.0/28   CREATING
+        my-connector-2  us-central1  my-network-1  10.128.0.0/28  CREATING
+        my-connector-3  us-central1  my-network-2  10.142.0.0/28  DELETING
+        my-connector-4  us-central1  my-network-1  10.100.0.0/28  READY
+        my-connector-5  us-central1  my-network-2  10.200.0.0/28  UPDATING
         """,
         normalize_space=True)
     # pylint: enable=line-too-long
@@ -150,51 +157,39 @@ class ConnectorsListTestAlpha(ConnectorsListTestBeta):
   def _MakeConnectors(self):
     connectors = []
     connectors.append(
-        self._MakeConnectorExtended(
+        self._MakeConnector(
             'my-connector-0', 'my-network-0', '10.132.0.0/28',
             self.messages.Connector.StatusValueValuesEnum('READY')))
     connectors.append(
-        self._MakeConnectorBasic(
-            'my-connector-1', 'my-network-2',
+        self._MakeConnector(
+            'my-connector-1', 'my-network-2', '10.10.0.0/28',
             self.messages.Connector.StatusValueValuesEnum('CREATING')))
     connectors.append(
-        self._MakeConnectorExtended(
+        self._MakeConnector(
             'my-connector-2', 'my-network-1', '10.128.0.0/28',
             self.messages.Connector.StatusValueValuesEnum('CREATING')))
     connectors.append(
-        self._MakeConnectorExtended(
+        self._MakeConnector(
             'my-connector-3', 'my-network-2', '10.142.0.0/28',
             self.messages.Connector.StatusValueValuesEnum('DELETING')))
     connectors.append(
-        self._MakeConnectorBasic(
-            'my-connector-4', 'my-network-1',
+        self._MakeConnector(
+            'my-connector-4', 'my-network-1', '10.100.0.0/28',
             self.messages.Connector.StatusValueValuesEnum('READY')))
     connectors.append(
-        self._MakeConnectorBasic(
-            'my-connector-5', 'my-network-2',
-            self.messages.Connector.StatusValueValuesEnum('DELETING')))
+        self._MakeConnector(
+            'my-connector-5', 'my-network-2', '10.200.0.0/28',
+            self.messages.Connector.StatusValueValuesEnum('UPDATING')))
     return connectors
 
-  def _MakeConnectorExtended(self, connector_id, network, ip_cidr_range,
-                             status):
+  def _MakeConnector(self, connector_id, network, ip_cidr_range, status):
     connector_prefix = 'projects/{}/locations/{}/connectors/'.format(
         self.project_id, self.region_id)
     return self.messages.Connector(
         name=connector_prefix + connector_id,
         id=connector_id,
-        type=self.type_extended,
         network=network,
         ipCidrRange=ip_cidr_range,
-        status=status)
-
-  def _MakeConnectorBasic(self, connector_id, network, status):
-    connector_prefix = 'projects/{}/locations/{}/connectors/'.format(
-        self.project_id, self.region_id)
-    return self.messages.Connector(
-        name=connector_prefix + connector_id,
-        id=connector_id,
-        type=self.type_basic,
-        network=network,
         status=status)
 
 

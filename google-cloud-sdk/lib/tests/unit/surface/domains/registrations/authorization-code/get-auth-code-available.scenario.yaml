@@ -1,0 +1,31 @@
+title: cloud domains authorization-code get positive test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations authorization-code get authcode.com
+  - stdout: |
+      code: 80G*Aop{3g5u_39/
+actions:
+- execute_command:
+    command: |
+      domains registrations authorization-code get authcode.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/authcode.com/authorizationCode?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "code": "80G*Aop{3g5u_39/"
+            }
+    - expect_stdout: |
+        code: 80G*Aop{3g5u_39/
+    - expect_exit:
+        code: 0

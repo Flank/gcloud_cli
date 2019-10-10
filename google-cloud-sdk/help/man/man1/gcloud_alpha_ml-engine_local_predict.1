@@ -20,7 +20,9 @@ gcloud alpha ml\-engine local predict \- run prediction locally
 \fB(ALPHA)\fR \fBgcloud alpha ml\-engine local predict\fR performs prediction
 locally with the given instances. It requires the TensorFlow SDK be installed
 locally. The output format mirrors \f5gcloud ai\-platform predict\fR (online
-prediction)
+prediction).
+
+You cannot use this command with custom prediction routines.
 
 
 
@@ -77,8 +79,8 @@ This flag accepts "\-" for stdin.
 .TP 2m
 \fB\-\-framework\fR=\fIFRAMEWORK\fR
 The ML framework used to train this version of the model. If not specified,
-defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
-\fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
+defaults to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
+\fBtensorflow\fR, \fBxgboost\fR.
 
 .TP 2m
 \fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
@@ -105,9 +107,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud ml\-engine local predict

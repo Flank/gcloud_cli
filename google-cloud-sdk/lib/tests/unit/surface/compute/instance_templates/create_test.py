@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -2573,6 +2573,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
 
     self.Run("""
         compute instance-templates create template-custom-mt
+          --custom-vm-type n2
           --custom-cpu 4
           --custom-memory 4096MiB
         """)
@@ -2589,7 +2590,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                 ),
                 mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                 type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType='custom-4-4096',
+            machineType='n2-custom-4-4096',
             metadata=m.Metadata(),
             networkInterfaces=[m.NetworkInterface(
                 accessConfigs=[self._default_access_config],
@@ -3135,11 +3136,11 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                                       type=self._one_to_one_nat)
                               ],
                               network=(
-                                  'https://www.googleapis.com/compute/alpha/'
+                                  'https://compute.googleapis.com/compute/alpha/'
                                   'projects/my-project/global/networks/'
                                   'some-net')),
                           msg.NetworkInterface(subnetwork=(
-                              'https://www.googleapis.com/compute/alpha/'
+                              'https://compute.googleapis.com/compute/alpha/'
                               'projects/my-project/regions/central1/'
                               'subnetworks/some-subnet')),
                       ],
@@ -3665,6 +3666,70 @@ class InstanceTemplatesCreateTestBeta(InstanceTemplatesCreateTest,
   def SetUp(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testWithCreateDisks(self):
+    m = self.messages
+
+    self.Run(
+        'compute instance-templates create template-create-disk '
+        '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
+        'image-project=debian-cloud,description=testDescription,'
+        'disk-resource-policy='
+        'https://compute.googleapis.com/compute/projects/'
+        'cloudsdktest/regions/central2-a/resourcePolicies/testpolicy')
+
+    template = m.InstanceTemplate(
+        name='template-create-disk',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                m.AttachedDisk(
+                    autoDelete=False,
+                    boot=False,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        diskName='disk-1',
+                        description='testDescription',
+                        diskSizeGb=10,
+                        sourceImage=(self.compute_uri +
+                                     '/projects/debian-cloud/global/images'
+                                     '/debian-8'),
+                        diskType='SSD',
+                        resourcePolicies=['https://compute.googleapis.com/'
+                                          'compute/projects/'
+                                          'cloudsdktest/regions/central2-a/'
+                                          'resourcePolicies/testpolicy']),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+        ))
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates,
+          'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
 
   def testMultipleNetworkInterfaceCards(self):
     msg = self.messages
@@ -4870,11 +4935,11 @@ class InstanceTemplatesCreateWithKmsTestAlpha(
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
-class InstanceTemplatesCreateWithReservationBeta(test_base.BaseTest):
+class InstanceTemplatesCreateWithReservation(test_base.BaseTest):
 
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateWithNoReservationAffinity(self):
     m = self.messages
@@ -5007,6 +5072,12 @@ class InstanceTemplatesCreateWithReservationBeta(test_base.BaseTest):
       self.Run('compute instance-templates create template-1 '
                '--reservation-affinity=specific')
 
+class InstanceTemplatesCreateWithReservationBeta(
+    InstanceTemplatesCreateWithReservation):
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
 class InstanceTemplatesCreateWithReservationAlpha(
     InstanceTemplatesCreateWithReservationBeta):
@@ -5014,6 +5085,52 @@ class InstanceTemplatesCreateWithReservationAlpha(
   def SetUp(self):
     SetUp(self, 'alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceTemplatesCreateWithMinNodeCpusAlpha(test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateWithNoReservationAffinity(self):
+    m = self.messages
+    self.Run('compute instance-templates create template-1 '
+             '--min-node-cpus=10')
+
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True, minNodeCpus=10)))
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
 
 
 if __name__ == '__main__':

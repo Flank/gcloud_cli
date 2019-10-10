@@ -1,0 +1,73 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ORG\-SECURITY\-POLICIES_MOVE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute org\-security\-policies move \- move a Google Compute Engine organization security policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute org\-security\-policies move\fR \fISECURITY_POLICY_ID\fR (\fB\-\-folder\fR=\fIFOLDER\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute org\-security\-policies move\fR is used to
+move is used to move organization security policies to new parent nodes.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISECURITY_POLICY_ID\fR
+Resource ID of the security policy to move.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER\fR
+Folder to which the organization security policy is to be moved.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+Organization to which the organization security policy is to be moved.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

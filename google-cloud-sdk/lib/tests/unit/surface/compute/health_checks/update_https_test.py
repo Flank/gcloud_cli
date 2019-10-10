@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ class HealthChecksUpdateHttpsTest(
 
     self.Run("""
         compute health-checks update https
-          https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
           --host www.google.com
         """ + self.global_flag())
 
@@ -1017,6 +1017,9 @@ class HealthChecksUpdateHttpsBetaTest(HealthChecksUpdateHttpsTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
+  def global_flag(self):
+    return ' --global'
+
 
 class HealthChecksUpdateHttpsAlphaTest(HealthChecksUpdateHttpsBetaTest):
 
@@ -1024,14 +1027,11 @@ class HealthChecksUpdateHttpsAlphaTest(HealthChecksUpdateHttpsBetaTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
 
-  def global_flag(self):
-    return ' --global'
 
-
-class RegionHealthChecksCreateHttpsTest(test_base.BaseTest):
+class RegionHealthChecksCreateHttpsBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testUriSupport(self):
@@ -1049,7 +1049,7 @@ class RegionHealthChecksCreateHttpsTest(test_base.BaseTest):
 
     self.Run("""
         compute health-checks update https
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
           --host www.google.com
         """)
 
@@ -1114,6 +1114,14 @@ class RegionHealthChecksCreateHttpsTest(test_base.BaseTest):
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
+
+
+class RegionHealthChecksCreateHttpsAlphaTest(
+    RegionHealthChecksCreateHttpsBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
 
 if __name__ == '__main__':

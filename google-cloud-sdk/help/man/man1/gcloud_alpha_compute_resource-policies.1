@@ -11,7 +11,7 @@ gcloud alpha compute resource\-policies \- manage Google Compute Engine Resource
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute resource\-policies\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute resource\-policies\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,6 +31,19 @@ help\fR for details.
 
 
 
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+\fB(ALPHA)\fR Create Google Compute Engine Resource Policies.
+
+
+.RE
+.sp
+
 .SH "COMMANDS"
 
 \f5\fICOMMAND\fR\fR is one of the following:
@@ -38,11 +51,13 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\-snapshot\-schedule\fR
-\fB(ALPHA)\fR Create a Google Compute Engine Snapshot Schedule Resource Policy.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Create a Google Compute Engine Snapshot
+Schedule Resource Policy.
 
 .TP 2m
 \fBcreate\-vm\-maintenance\fR
-\fB(ALPHA)\fR Create a Google Compute Engine VM Maintenance Resource Policy.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Create a Google Compute Engine VM Maintenance
+Resource Policy.
 
 .TP 2m
 \fBdelete\fR
@@ -64,11 +79,11 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute resource\-policies
 $ gcloud beta compute resource\-policies
 .RE
 

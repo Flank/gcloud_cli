@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ from tests.lib import test_case
 from tests.lib.core.updater import util
 import mock
 from oauth2client import client as oauth2client
+import six
 from six.moves import range  # pylint: disable=redefined-builtin
 import six.moves.urllib.error
 import six.moves.urllib.parse
@@ -178,7 +179,7 @@ class LocalStateTests(util.Base, test_case.WithOutputCapture):
     # Depending on the Python version, compiled files might be located in the
     # same dir or in the location specified by PEP-3147.
     def _FileMatchesInDir(dirname, regex):
-      for _, _, filenames in os.walk(dirname):
+      for _, _, filenames in os.walk(six.text_type(dirname)):
         for filename in filenames:
           if re.match(regex, filename):
             return True

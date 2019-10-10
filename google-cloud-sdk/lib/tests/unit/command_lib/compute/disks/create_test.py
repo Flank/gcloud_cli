@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -75,9 +75,9 @@ class ParseRegionDisksResourcesTest(cli_test_base.CliTestBase):
   def testZoneInDifferentProjectThanDisk(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        ('Invalid value for [--zone]: Zone [https://www.googleapis.com/compute/'
+        ('Invalid value for [--zone]: Zone [https://compute.googleapis.com/compute/'
          'alpha/projects/project-2/zones/central2-b] lives in different '
-         'project than disk [https://www.googleapis.com/compute/alpha/'
+         'project than disk [https://compute.googleapis.com/compute/alpha/'
          'projects/project-1/regions/central2/disks/disk-1].')):
       create.ParseRegionDisksResources(self.resources, [
           self.CreateLink(
@@ -133,7 +133,7 @@ class ParseRegionDisksResourcesTest(cli_test_base.CliTestBase):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         ('Invalid value for [--replica-zones]: Region from [DISK_NAME] '
-         '(https://www.googleapis.com/compute/alpha/projects/project-1/'
+         '(https://compute.googleapis.com/compute/alpha/projects/project-1/'
          'regions/central1/disks/disk-1) is different from [--replica-zones] '
          '(central2).')):
       create.ParseRegionDisksResources(self.resources, [

@@ -11,7 +11,7 @@ gcloud alpha compute ssh \- SSH into a virtual machine instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute ssh\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-container\fR=\fICONTAINER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-internal\-ip\fR\ |\ \fB\-\-tunnel\-through\-iap\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
+\f5gcloud alpha compute ssh\fR [\fIUSER\fR@]\fIINSTANCE\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-container\fR=\fICONTAINER\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-internal\-ip\fR\ |\ \fB\-\-tunnel\-through\-iap\fR] [\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR\ |\ \fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fISSH_ARGS\fR\ ...]
 
 
 
@@ -48,8 +48,8 @@ generated key will have an empty passphrase).
 [\fIUSER\fR@]\fIINSTANCE\fR
 Specifies the instance to SSH into.
 
-\f5\fIUSER\fR\fR specifies the username with which to SSH. If omitted, $USER
-from the environment is selected.
+\f5\fIUSER\fR\fR specifies the username with which to SSH. If omitted, the user
+login name is used.
 
 \f5\fIINSTANCE\fR\fR specifies the name of the virtual machine instance to SSH
 into.
@@ -188,6 +188,25 @@ https://cloud.google.com/compute/docs/instances/connecting\-advanced#sshbetweeni
 \fB\-\-tunnel\-through\-iap\fR
 Tunnel the ssh connection through the Cloud Identity\-Aware Proxy.
 
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR
+The time when the ssh key will be valid until, such as
+"2017\-08\-29T18:52:51.142Z." This is only valid if the instance is not using OS
+Login. See $ gcloud topic datetimes for information on time formats.
+
+.TP 2m
+\fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR
+The maximum length of time an SSH key is valid for once created and installed,
+e.g. 2m for 2 minutes. See $ gcloud topic datetimes for information on duration
+formats.
+
 
 .RE
 .RE
@@ -227,15 +246,29 @@ $ gcloud alpha compute ssh example\-instance \-\-zone us\-central1\-a \e
     \-\-container CONTAINER
 .RE
 
+You can limit the allowed time to ssh. For example, to allow a key to be used
+through 2019:
+
+.RS 2m
+$ gcloud alpha compute ssh example\-instance \-\-zone us\-central1\-a \e
+    \-\-ssh\-key\-expiration "2020\-01\-01T00:00:00:00Z"
+.RE
+
+Or alternatively, allow access for the next two minutes:
+
+.RS 2m
+$ gcloud alpha compute ssh example\-instance \-\-zone us\-central1\-a \e
+    \-\-ssh\-key\-expire\-after 2m
+.RE
+
 
 
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute ssh

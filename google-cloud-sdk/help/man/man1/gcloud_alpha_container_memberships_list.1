@@ -75,7 +75,17 @@ help\fR for details.
 
 This command uses the \fBgkehub/v1beta1\fR API. The full documentation for this
 API can be found at:
-https://cloud.google.com/gke\-on\-prem/docs/latest/how\-to/connect/registering\-a\-user\-cluster
+https://cloud.google.com/anthos/multicluster\-management/connect/registering\-a\-cluster
+
+
+
+.SH "EXAMPLES"
+
+List memberships in a project:
+
+.RS 2m
+$ gcloud alpha container memberships list
+.RE
 
 
 
@@ -83,7 +93,10 @@ https://cloud.google.com/gke\-on\-prem/docs/latest/how\-to/connect/registering\-
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta container memberships list
+.RE
 

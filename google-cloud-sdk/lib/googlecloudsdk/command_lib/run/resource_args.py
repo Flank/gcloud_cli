@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class PromptFallthrough(deps.Fallthrough):
     return self._Prompt(parsed_args)
 
 
-def GenerateServiceName(source_ref):
+def GenerateServiceName(image):
   """Produce a valid default service name.
 
   Converts a file path or image path into a reasonable default service name by
@@ -60,12 +60,12 @@ def GenerateServiceName(source_ref):
   the service name 'myimage'.
 
   Args:
-    source_ref: SourceRef, The app's source directory or container path.
+    image: str, The container path.
 
   Returns:
     A valid Cloud Run service name.
   """
-  base_name = os.path.basename(source_ref.source_path.rstrip(os.sep))
+  base_name = os.path.basename(image.rstrip(os.sep))
   base_name = base_name.split(':')[0]  # Discard image tag if present.
   base_name = base_name.split('@')[0]  # Disacard image hash if present.
   # Remove non-supported special characters.
@@ -80,12 +80,12 @@ class ServicePromptFallthrough(PromptFallthrough):
         'specify the service name from an interactive prompt')
 
   def _Prompt(self, parsed_args):
-    source_ref = None
-    if hasattr(parsed_args, 'source') or hasattr(parsed_args, 'image'):
-      source_ref = flags.GetSourceRef(parsed_args.source, parsed_args.image)
+    image = None
+    if hasattr(parsed_args, 'image'):
+      image = parsed_args.image
     message = 'Service name'
-    if source_ref:
-      default_name = GenerateServiceName(source_ref)
+    if image:
+      default_name = GenerateServiceName(image)
       service_name = console_io.PromptWithDefault(
           message=message, default=default_name)
     else:
@@ -108,10 +108,7 @@ class DefaultFallthrough(deps.Fallthrough):
         'Otherwise, defaults to project ID.')
 
   def _Call(self, parsed_args):
-    if (getattr(parsed_args, 'cluster', None) or
-        properties.VALUES.run.cluster.Get()) or (
-            getattr(parsed_args, 'cluster_location', None) or
-            properties.VALUES.run.cluster_location.Get()):
+    if flags.IsGKE(parsed_args) or flags.IsKubernetes(parsed_args):
       return 'default'
     elif not (getattr(parsed_args, 'project', None) or
               properties.VALUES.core.project.Get()):
@@ -127,8 +124,8 @@ class DefaultFallthrough(deps.Fallthrough):
 def NamespaceAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='namespace',
-      help_text='Specific to Cloud Run on Kubernetes Engine: '
-      'Kubernetes namespace for the {resource}',
+      help_text='Specific to Cloud Run on GKE: '
+      'Kubernetes namespace for the {resource}.',
       fallthroughs=[
           deps.PropertyFallthrough(properties.VALUES.run.namespace),
           DefaultFallthrough(),
@@ -183,7 +180,7 @@ class ClusterPromptFallthrough(PromptFallthrough):
   def _Prompt(self, parsed_args):
     """Fallthrough to reading the cluster name from an interactive prompt.
 
-    Only prompt for cluster name if cluster location is already defined.
+    Only prompt for cluster name if the user-specified platform is GKE.
 
     Args:
       parsed_args: Namespace, the args namespace.
@@ -191,34 +188,57 @@ class ClusterPromptFallthrough(PromptFallthrough):
     Returns:
       A cluster name string
     """
-    cluster_location = (
-        getattr(parsed_args, 'cluster_location', None) or
-        properties.VALUES.run.cluster_location.Get())
+    if flags.IsGKE(parsed_args):
+      cluster_location = (
+          getattr(parsed_args, 'cluster_location', None) or
+          properties.VALUES.run.cluster_location.Get())
+      cluster_location_msg = ' in [{}]'.format(
+          cluster_location) if cluster_location else ''
 
-    if cluster_location:
       clusters = global_methods.ListClusters(cluster_location)
       if not clusters:
         raise exceptions.ConfigurationError(
-            'No clusters found for cluster location [{}]. '
-            'Ensure your clusters have Cloud Run on GKE enabled.'
-            .format(cluster_location))
-      cluster_names = [c.name for c in clusters]
+            'No compatible clusters found{}. '
+            'Ensure your cluster has Cloud Run on GKE enabled.'.format(
+                cluster_location_msg))
+
+      def _GetClusterDescription(cluster):
+        """Description of cluster for prompt."""
+        if cluster_location:
+          return cluster.name
+        return '{} in {}'.format(cluster.name, cluster.zone)
+
+      cluster_descs = [_GetClusterDescription(c) for c in clusters]
+
       idx = console_io.PromptChoice(
-          cluster_names,
-          message='GKE cluster name:',
+          cluster_descs,
+          message='GKE cluster{}:'.format(cluster_location_msg),
           cancel_option=True)
-      name = cluster_names[idx]
-      log.status.Print('To make this the default cluster, run '
-                       '`gcloud config set run/cluster {}`.\n'.format(name))
-      return name
+      cluster = clusters[idx]
+
+      if cluster_location:
+        cluster_result = cluster.name
+        location_help_text = ''
+      else:
+        cluster_ref = flags.GetClusterRef(cluster)
+        cluster_result = cluster_ref.SelfLink()
+        location_help_text = (
+            ' && gcloud config set run/cluster_location {}'.format(
+                cluster.zone))
+      log.status.Print(
+          'To make this the default cluster, run '
+          '`gcloud config set run/cluster {cluster}'
+          '{location}`.\n'.format(
+              cluster=cluster.name,
+              location=location_help_text))
+      return cluster_result
 
 
 def ClusterAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='cluster',
-      help_text='Specific to Cloud Run on Kubernetes Engine: '
-      'Name of the Kubernetes Engine cluster to use. Alternatively, set the'
-      ' property [run/cluster].',
+      help_text='Name of the Kubernetes Engine cluster to use. '
+      'Alternatively, set the property [run/cluster].',
       fallthroughs=[
           deps.PropertyFallthrough(properties.VALUES.run.cluster),
           ClusterPromptFallthrough()
@@ -235,7 +255,8 @@ class ClusterLocationPromptFallthrough(PromptFallthrough):
   def _Prompt(self, parsed_args):
     """Fallthrough to reading the cluster location from an interactive prompt.
 
-    Only prompt for cluster location name if cluster name is already defined.
+    Only prompt for cluster location if the user-specified platform is GKE
+    and if cluster name is already defined.
 
     Args:
       parsed_args: Namespace, the args namespace.
@@ -246,7 +267,7 @@ class ClusterLocationPromptFallthrough(PromptFallthrough):
     cluster_name = (
         getattr(parsed_args, 'cluster', None) or
         properties.VALUES.run.cluster.Get())
-    if cluster_name:
+    if flags.IsGKE(parsed_args) and cluster_name:
       clusters = [
           c for c in global_methods.ListClusters() if c.name == cluster_name
       ]
@@ -271,9 +292,8 @@ class ClusterLocationPromptFallthrough(PromptFallthrough):
 def ClusterLocationAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='location',
-      help_text='Specific to Cloud Run on Kubernetes Engine: '
-      'Zone in which the {resource} is located. Alternatively, set the '
-      'property [run/cluster_location].',
+      help_text='Zone in which the {resource} is located. '
+      'Alternatively, set the property [run/cluster_location].',
       fallthroughs=[
           deps.PropertyFallthrough(properties.VALUES.run.cluster_location),
           ClusterLocationPromptFallthrough()
@@ -372,7 +392,6 @@ CLOUD_RUN_LOCATION_PRESENTATION = presentation_specs.ResourcePresentationSpec(
 CLUSTER_PRESENTATION = presentation_specs.ResourcePresentationSpec(
     '--cluster',
     GetClusterResourceSpec(),
-    'Specific to Cloud Run on Kubernetes Engine: '
     'Kubernetes Engine cluster to connect to.',
     required=False,
     prefixes=True)

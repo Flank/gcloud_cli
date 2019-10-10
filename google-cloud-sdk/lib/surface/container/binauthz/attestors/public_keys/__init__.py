@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ class PublicKeys(base.Group):
       ```sh
       $ {command} add \
             --attestor my_attestor \
-            --public-key-file=public_key1.pgp
+            --pgp-public-key-file=public_key1.pgp
       ```
 
   To add a subkey to your PGP key:
@@ -139,10 +139,10 @@ class PublicKeys(base.Group):
       $ {command} update \
             ${FINGERPRINT} \
             --attestor=my_attestor \
-            --public-key-file=public_key1_updated.pgp
+            --pgp-public-key-file=public_key1_updated.pgp
       ```
 
-  To remove this new key to the attestor:
+  To remove this new key from the attestor:
 
       ```sh
       $ {command} remove \

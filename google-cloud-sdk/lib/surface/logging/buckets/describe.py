@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ class Describe(base.DescribeCommand):
   def Args(parser):
     """Register flags for this command."""
     parser.add_argument('BUCKET_ID', help='The id of the bucket to describe.')
-    util.AddNonProjectArgs(parser, 'Describe a bucket')
+    util.AddParentArgs(parser, 'Describe a bucket')
     util.AddBucketLocationArg(parser, True, 'Location of the bucket.')
 
   def Run(self, args):

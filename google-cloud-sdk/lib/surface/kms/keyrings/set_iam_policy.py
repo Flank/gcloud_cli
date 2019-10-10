@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class SetIamPolicy(base.Command):
   The following command will read am IAM policy defined in a JSON file
   'policy.json' and set it for the keyring `fellowship` with location `global`:
 
-    $ {command} fellowship policy.json --location global
+    $ {command} fellowship policy.json --location=global
   """
 
   @staticmethod

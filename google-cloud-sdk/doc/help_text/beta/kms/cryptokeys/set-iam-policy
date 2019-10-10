@@ -45,7 +45,7 @@ EXAMPLES
     fellowship and Location global:
 
         $ gcloud beta kms cryptokeys set-iam-policy frodo policy.json \
-            --keyring fellowship --location global
+            --keyring=fellowship --location=global
 
 NOTES
     This command is an internal implementation detail and may change or

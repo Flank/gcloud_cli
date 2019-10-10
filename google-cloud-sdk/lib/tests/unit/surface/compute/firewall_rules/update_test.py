@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
   def SetNextGetResult(self, **kwargs):
     firewall_resource = {
         'name': 'firewall-1',
-        'network': ('https://www.googleapis.com/compute/v1/projects/'
+        'network': ('https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/global/networks/default'),
     }
     firewall_resource.update(kwargs)
@@ -42,7 +42,7 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
         [],
     ])
 
-  def AssertRaisesArgumentValidationExceptionRegexp(
+  def AssertRaisesArgumentValidationExceptionRegexp(  # pylint:disable=keyword-arg-before-vararg
       self, expected_regexp, callable_obj=None, *args, **kwargs):
     if callable_obj is None:
       return self.assertRaisesRegex(
@@ -61,7 +61,7 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
     else:
       update_map = {
           'name': 'firewall-1',
-          'network': ('https://www.googleapis.com/compute/v1/projects/'
+          'network': ('https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/global/networks/default'),
       }
       update_map.update(kwargs)
@@ -95,7 +95,7 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
 
     self.Run("""
         compute firewall-rules update
-          https://www.googleapis.com/compute/v1/projects/my-project/global/firewalls/firewall-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/firewalls/firewall-1
           --source-tags src
         """)
 
@@ -543,7 +543,7 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
     firewall_resource = {
         'name':
             'firewall-1',
-        'network': ('https://www.googleapis.com/compute/beta/projects/'
+        'network': ('https://compute.googleapis.com/compute/beta/projects/'
                     'my-project/global/networks/default'),
     }
     firewall_resource.update(kwargs)
@@ -562,7 +562,7 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
       update_map = {
           'name':
               'firewall-1',
-          'network': ('https://www.googleapis.com/compute/beta/projects/'
+          'network': ('https://compute.googleapis.com/compute/beta/projects/'
                       'my-project/global/networks/default'),
       }
       update_map.update(kwargs)
@@ -586,7 +586,7 @@ class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
     firewall_resource = {
         'name':
             'firewall-1',
-        'network': ('https://www.googleapis.com/compute/alpha/projects/'
+        'network': ('https://compute.googleapis.com/compute/alpha/projects/'
                     'my-project/global/networks/default'),
     }
     firewall_resource.update(kwargs)
@@ -605,7 +605,7 @@ class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
       update_map = {
           'name':
               'firewall-1',
-          'network': ('https://www.googleapis.com/compute/alpha/projects/'
+          'network': ('https://compute.googleapis.com/compute/alpha/projects/'
                       'my-project/global/networks/default'),
       }
       update_map.update(kwargs)

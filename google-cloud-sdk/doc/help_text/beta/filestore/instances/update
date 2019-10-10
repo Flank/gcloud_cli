@@ -32,7 +32,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Do not wait for the update operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --description=DESCRIPTION
         A description of the Cloud Filestore instance.

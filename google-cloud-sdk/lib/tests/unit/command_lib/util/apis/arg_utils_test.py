@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,6 +80,100 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
   def testGetFieldFromMessageError(self):
     with self.assertRaises(arg_utils.UnknownFieldError):
       arg_utils.GetFieldFromMessage(fm.FakeMessage, 'string3')
+
+  def testGetFieldValueFromMessage(self):
+    m = fm.FakeMessage(
+        string1='a',
+        enum1=fm.FakeMessage.FakeEnum.THING_ONE,
+        bool1=True,
+        int1=123,
+        float1=123.45,
+        message1=fm.FakeMessage.InnerMessage(
+            string1='b',
+            ),
+        message2=fm.FakeMessage.InnerMessage2(
+            deeper_message=fm.FakeMessage.InnerMessage2.DeeperMessage(
+                deep_string='c',
+                )
+            ),
+        repeated_message=[
+            fm.FakeMessage.InnerMessage(
+                enum1=fm.FakeMessage.FakeEnum.THING_ONE),
+            fm.FakeMessage.InnerMessage(
+                enum1=fm.FakeMessage.FakeEnum.THING_TWO)
+        ]
+    )
+
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'string1'),
+                     m.string1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'enum1'), m.enum1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'enum2'), [])
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'bool1'), m.bool1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'int1'), m.int1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'float1'), m.float1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'bytes1'), None)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'message1'),
+                     m.message1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'message1.string1'),
+                     m.message1.string1)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'message2'),
+                     m.message2)
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(m, 'message2.deeper_message'),
+        m.message2.deeper_message)
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(
+            m, 'message2.deeper_message.deep_string'),
+        m.message2.deeper_message.deep_string)
+    self.assertEqual(arg_utils.GetFieldValueFromMessage(m, 'repeated_message'),
+                     m.repeated_message)
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(m, 'repeated_message[0]'),
+        m.repeated_message[0])
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(m, 'repeated_message[0].string1'),
+        m.repeated_message[0].string1)
+
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(m, 'repeated_message[2]'),
+        None)
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(m, 'repeated_message[2].string1'),
+        None)
+
+    self.assertEqual(
+        arg_utils.GetFieldValueFromMessage(
+            fm.FakeMessage(), 'message2.deeper_message.deep_string'),
+        None)
+
+  @parameterized.parameters(
+      ('invalid',
+       r'Invalid field path \[invalid\] for message \[FakeMessage\]. Details: '
+       r'\[Field \[invalid\] not found in message \[FakeMessage\]. Available '
+       r'fields:'),
+      ('string1[0]',
+       r'Invalid field path \[string1\[0\]\] for message \[FakeMessage\]. '
+       r'Details: \[Index cannot be specified for non-repeated field '
+       r'\[string1\]\]'),
+      ('enum1.string1',
+       r'Invalid field path \[enum1.string1\] for message \[FakeMessage\]. '
+       r'Details: \[\[enum1\] is not a valid field on field \[FakeEnum\]\]'),
+      ('repeated_message.string1',
+       r'Invalid field path \[repeated_message.string1\] for message '
+       r'\[FakeMessage\]. Details: \[Index needs to be specified for repeated '
+       r'field \[repeated_message\]\]'),
+      ('repeated_message[2].string1[0]',
+       r'Invalid field path \[repeated_message\[2\].string1\[0\]\] for message '
+       r'\[FakeMessage\]. Details: \[Index cannot be specified for '
+       r'non-repeated field \[string1\]\]'),
+      ('repeated_message[2].invalid',
+       r'Invalid field path \[repeated_message\[2\].invalid\] for message '
+       r'\[FakeMessage\]. Details: \[Field \[invalid\] not found in message '
+       r'\[InnerMessage\]. Available fields:'),
+  )
+  def testGetFieldValueFromMessageError(self, path, expected):
+    with self.assertRaisesRegex(arg_utils.InvalidFieldPathError, expected):
+      arg_utils.GetFieldValueFromMessage(fm.FakeMessage(), path)
 
   def testSetFieldInMessage(self):
     m = fm.FakeMessage()

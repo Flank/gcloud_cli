@@ -206,7 +206,7 @@ class _Result(object):
     except Exception as err:  # pylint: disable=broad-except
       return _Result(error=pickle.PicklingError(
           "Couldn't pickle result [{0}]: {1}".format(
-              pickleable_result, str(err))))
+              pickleable_result, six.text_type(err))))
     return pickleable_result
 
   def __str__(self):
@@ -265,7 +265,10 @@ class _MultiFuture(BaseFuture):
       next_uncollected_future = []
       for future in uncollected_future:
         if future.Done():
-          yield future.Get()
+          try:
+            yield future.Get()
+          except Exception as err:  # pylint: disable=broad-except
+            yield err
         else:
           next_uncollected_future.append(future)
       uncollected_future = next_uncollected_future

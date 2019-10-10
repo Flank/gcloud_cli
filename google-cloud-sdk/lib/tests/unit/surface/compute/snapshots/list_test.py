@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,14 +73,14 @@ class SnapshotsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-2
             """))
 
   def testPositionalArgsWithUri(self):
     self.Run("""
         compute snapshots list
-          https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
           --uri
         """)
     self.mock_get_global_resources.assert_called_once_with(
@@ -92,13 +92,13 @@ class SnapshotsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
             """))
 
   def testPositionalArgsWithUriAndSimpleName(self):
     self.Run("""
         compute snapshots list
-          https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
           snapshot-2
           --uri
         """)
@@ -111,8 +111,8 @@ class SnapshotsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         errors=[])
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
-            https://www.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/global/snapshots/snapshot-2
             """))
 
   def testSnapshotsCompleter(self):

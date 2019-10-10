@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class Resume(base.SilentCommand):
 
     operation_refs = [holder.resources.Parse(r.selfLink) for r in responses]
 
-    if args.async:
+    if args.async_:
       for operation_ref in operation_refs:
         log.status.Print('Resume instance in progress for [{}].'.format(
             operation_ref.SelfLink()))

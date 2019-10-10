@@ -1,0 +1,71 @@
+NAME
+    gcloud alpha access-context-manager levels replace-all - replace all
+        existing access levels
+
+SYNOPSIS
+    gcloud alpha access-context-manager levels replace-all [POLICY]
+        --source-file=SOURCE_FILE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Replace all existing access level in specified access policy with
+    access levels specified in a file.
+
+POSITIONAL ARGUMENTS
+     Policy resource - The access policy that contains the levels you want to
+     replace. This represents a Cloud resource.
+
+       [POLICY]
+          ID of the policy or fully qualified identifier for the policy.
+
+REQUIRED FLAGS
+     --source-file=SOURCE_FILE
+        Path to a file containing a list of access levels.
+
+        An access level file is a YAML-formatted list of access levels, which
+        are YAML objects representing a Condition as described in the API
+        reference. For example:
+
+            - name: accessPolicies/my_policy/accessLevels/my_level
+              title: My Level
+              description: Level for foo.
+              basic:
+                combiningFunction: AND
+                conditions:
+                - ipSubnetworks:
+                  - 192.168.100.14/24
+                  - 2001:db8::/48
+                - members
+                  - user1:user1@example.com
+            - name: accessPolicies/my_policy/accessLevels/my_other_level
+              title: My Other Level
+              description: Level for bar.
+              basic:
+                combiningFunction: OR
+                conditions:
+                - ipSubnetworks:
+                  - 192.168.100.14/24
+                  - 2001:db8::/48
+                - members
+                  - user2:user2@example.com
+
+        For more information, see:
+        https://cloud.google.com/access-context-manager/docs/reference/rest/v1beta/accessPolicies.accessLevels
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the accesscontextmanager/v1beta API. The full
+    documentation for this API can be found at:
+    https://cloud.google.com/access-context-manager/docs/reference/rest/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

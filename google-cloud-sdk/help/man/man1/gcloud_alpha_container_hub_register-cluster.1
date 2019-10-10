@@ -11,7 +11,7 @@ gcloud alpha container hub register\-cluster \- registers a cluster with Google 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container hub register\-cluster\fR \fICLUSTER_NAME\fR \fB\-\-context\fR=\fICONTEXT\fR \fB\-\-service\-account\-key\-file\fR=\fISERVICE_ACCOUNT_KEY_FILE\fR [\fB\-\-kubeconfig\-file\fR=\fIKUBECONFIG_FILE\fR] [\fB\-\-manifest\-output\-file\fR=\fIMANIFEST_OUTPUT_FILE\fR] [\fB\-\-proxy\fR=\fIPROXY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container hub register\-cluster\fR \fICLUSTER_NAME\fR \fB\-\-context\fR=\fICONTEXT\fR \fB\-\-service\-account\-key\-file\fR=\fISERVICE_ACCOUNT_KEY_FILE\fR [\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-manifest\-output\-file\fR=\fIMANIFEST_OUTPUT_FILE\fR] [\fB\-\-proxy\fR=\fIPROXY\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,7 +53,7 @@ The JSON file of a Google Cloud service account private key.
 
 .RS 2m
 .TP 2m
-\fB\-\-kubeconfig\-file\fR=\fIKUBECONFIG_FILE\fR
+\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
 The kubeconfig file containing an entry for the cluster. Defaults to $KUBECONFIG
 if it is set in the environment, otherwise defaults to to $HOME/.kube/config.
 
@@ -68,6 +68,11 @@ need to be deployed manually.
 \fB\-\-proxy\fR=\fIPROXY\fR
 The proxy address in the format of http[s]://{hostname}. The proxy must support
 the HTTP CONNECT method in order for this connection to succeed.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+The version of the connect agent to install/upgrade if not using the latest
+connect version.
 
 
 .RE
@@ -110,6 +115,14 @@ $ gcloud alpha container hub register\-cluster my\-cluster \e
     \-\-context=my\-cluster\-context \e
     \-\-manifest\-output\-file=/tmp/manifest.yaml \e
     \-\-service\-account\-key\-file=/tmp/keyfile.json
+Register a cluster with a specific version of GKE Connect:
+.RE
+
+.RS 2m
+$ gcloud alpha container hub register\-cluster my\-cluster \e
+    \-\-context=my\-cluster\-context \e
+    \-\-service\-account\-key\-file=/tmp/keyfile.json \e
+    \-\-version=gkeconnect_20190802_02_00
 .RE
 
 
@@ -118,7 +131,10 @@ $ gcloud alpha container hub register\-cluster my\-cluster \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta container hub register\-cluster
+.RE
 

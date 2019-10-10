@@ -1,5 +1,5 @@
 title: End-to-end tests for the `gcloud scheduler` pubsub job workflow.
-release_tracks: [BETA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -134,7 +134,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -151,7 +151,7 @@ actions:
                 cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs?alt=json
           method: POST
           headers: {}
           body:
@@ -202,7 +202,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -219,7 +219,7 @@ actions:
                 cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$:run?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$:run?alt=json
           method: POST
           headers: {}
           body: null
@@ -253,7 +253,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -270,7 +270,7 @@ actions:
                 cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -314,7 +314,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -334,7 +334,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/jobs/$$pubsub_job$$?alt=json
           method: DELETE
           headers: {}
           body: null

@@ -123,23 +123,23 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles\/owner\n    - members:\n      - user:sean@example.com\n      role: roles\/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
       "type": "object",
       "properties": {
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and\/or stored policy is skipped.",
           "type": "integer",
           "format": "int32"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
           "type": "array",
           "items": {
             "$ref": "Binding"
           }
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten blindly.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
           "type": "string",
           "format": "byte"
         }
@@ -155,7 +155,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -235,11 +235,11 @@
           }
         },
         "messageStoragePolicy": {
-          "description": "Policy constraining how messages published to the topic may be stored. It\nis determined when the topic is created based on the policy configured at\nthe project level. It must not be set by the caller in the request to\nCreateTopic or to UpdateTopic. This field will be populated in the\nresponses for GetTopic, CreateTopic, and UpdateTopic: if not present in the\nresponse, then no constraints are in effect.",
+          "description": "Policy constraining the set of Google Cloud Platform regions where messages\npublished to the topic may be stored. If not present, then no constraints\nare in effect.",
           "$ref": "MessageStoragePolicy"
         },
         "kmsKeyName": {
-          "description": "The resource name of the Cloud KMS CryptoKey to be used to protect access\nto messages published on this topic.\n\nThe expected format is `projects\/*\/locations\/*\/keyRings\/*\/cryptoKeys\/*`.\n<b>EXPERIMENTAL:<\/b> This feature is part of a closed alpha release. This\nAPI might be changed in backward-incompatible ways and is not recommended\nfor production use. It is not subject to any SLA or deprecation policy.",
+          "description": "The resource name of the Cloud KMS CryptoKey to be used to protect access\nto messages published on this topic.\n\nThe expected format is `projects\/*\/locations\/*\/keyRings\/*\/cryptoKeys\/*`.",
           "type": "string"
         }
       }
@@ -249,7 +249,7 @@
       "type": "object",
       "properties": {
         "allowedPersistenceRegions": {
-          "description": "The list of GCP region IDs where messages that are published to the topic\nmay be persisted in storage. Messages published by publishers running in\nnon-allowed GCP regions (or running outside of GCP altogether) will be\nrouted for storage in one of the allowed regions. An empty list indicates a\nmisconfiguration at the project or organization level, which will result in\nall Publish operations failing.",
+          "description": "A list of IDs of GCP regions where messages that are published to the topic\nmay be persisted in storage. Messages published by publishers running in\nnon-allowed GCP regions (or running outside of GCP altogether) will be\nrouted for storage in one of the allowed regions. An empty list means that\nno regions are allowed, and is not a valid configuration.",
           "type": "array",
           "items": {
             "type": "string"
@@ -314,7 +314,7 @@
           "format": "google-datetime"
         },
         "orderingKey": {
-          "description": "Identifies related messages for which publish order should be respected.\nIf a `Subscription` has `enable_message_ordering` set to `true`, messages\npublished with the same `ordering_key` value will be delivered to\nsubscribers in the order in which they are received by the Pub\/Sub system.\n<b>EXPERIMENTAL:<\/b> This feature is part of a closed alpha release. This\nAPI might be changed in backward-incompatible ways and is not recommended\nfor production use. It is not subject to any SLA or deprecation policy.",
+          "description": "If non-empty, identifies related messages for which publish order should be\nrespected. If a `Subscription` has `enable_message_ordering` set to `true`,\nmessages published with the same non-empty `ordering_key` value will be\ndelivered to subscribers in the order in which they are received by the\nPub\/Sub system. All `PubsubMessage`s published in a given `PublishRequest`\nmust specify the same `ordering_key` value.\n<b>EXPERIMENTAL:<\/b> This feature is part of a closed alpha release. This\nAPI might be changed in backward-incompatible ways and is not recommended\nfor production use. It is not subject to any SLA or deprecation policy.",
           "type": "string"
         }
       }
@@ -439,6 +439,14 @@
         "expirationPolicy": {
           "description": "A policy that specifies the conditions for this subscription's expiration.\nA subscription is considered active as long as any connected subscriber is\nsuccessfully consuming messages from the subscription or is issuing\noperations on the subscription. If `expiration_policy` is not set, a\n*default policy* with `ttl` of 31 days will be used. The minimum allowed\nvalue for `expiration_policy.ttl` is 1 day.",
           "$ref": "ExpirationPolicy"
+        },
+        "filter": {
+          "description": "An expression written in the Cloud Pub\/Sub filter language.",
+          "type": "string"
+        },
+        "deadLetterPolicy": {
+          "description": "A policy that specifies the conditions for dead lettering messages in\nthis subscription. If dead_letter_policy is not set, dead lettering\nis disabled.\n\nThe Cloud Pub\/Sub service account associated with this subscriptions's\nparent project (i.e.,\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have\npermission to Acknowledge() messages on this subscription.\n<b>EXPERIMENTAL:<\/b> This feature is part of a closed alpha release. This\nAPI might be changed in backward-incompatible ways and is not recommended\nfor production use. It is not subject to any SLA or deprecation policy.",
+          "$ref": "DeadLetterPolicy"
         }
       }
     },
@@ -452,7 +460,7 @@
           "type": "string"
         },
         "attributes": {
-          "description": "Endpoint configuration attributes.\n\nEvery endpoint has a set of API supported attributes that can be used to\ncontrol different aspects of the message delivery.\n\nThe currently supported attribute is `x-goog-version`, which you can\nuse to change the format of the pushed message. This attribute\nindicates the version of the data expected by the endpoint. This\ncontrols the shape of the pushed message (i.e., its fields and metadata).\nThe endpoint version is based on the version of the Pub\/Sub API.\n\nIf not present during the `CreateSubscription` call, it will default to\nthe version of the API used to make such call. If not present during a\n`ModifyPushConfig` call, its value will not be changed. `GetSubscription`\ncalls will always return a valid version, even if the subscription was\ncreated without this attribute.\n\nThe possible values for this attribute are:\n\n* `v1beta1`: uses the push format defined in the v1beta1 Pub\/Sub API.\n* `v1` or `v1beta2`: uses the push format defined in the v1 Pub\/Sub API.",
+          "description": "Endpoint configuration attributes that can be used to control different\naspects of the message delivery.\n\nThe only currently supported attribute is `x-goog-version`, which you can\nuse to change the format of the pushed message. This attribute\nindicates the version of the data expected by the endpoint. This\ncontrols the shape of the pushed message (i.e., its fields and metadata).\n\nIf not present during the `CreateSubscription` call, it will default to\nthe version of the Pub\/Sub API used to make such call. If not present in a\n`ModifyPushConfig` call, its value will not be changed. `GetSubscription`\ncalls will always return a valid version, even if the subscription was\ncreated without this attribute.\n\nThe only supported values for the `x-goog-version` attribute are:\n\n* `v1beta1`: uses the push format defined in the v1beta1 Pub\/Sub API.\n* `v1` or `v1beta2`: uses the push format defined in the v1 Pub\/Sub API.\n\nFor example:\n<pre><code>attributes { \"x-goog-version\": \"v1\" } <\/code><\/pre>",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -488,6 +496,22 @@
           "description": "Specifies the \"time-to-live\" duration for an associated resource. The\nresource expires if it is not active for a period of `ttl`. The definition\nof \"activity\" depends on the type of the associated resource. The minimum\nand maximum allowed values for `ttl` depend on the type of the associated\nresource, as well. If `ttl` is not set, the associated resource never\nexpires.",
           "type": "string",
           "format": "google-duration"
+        }
+      }
+    },
+    "DeadLetterPolicy": {
+      "id": "DeadLetterPolicy",
+      "description": "Dead lettering is done on a best effort basis. The same message might be\ndead lettered multiple times.\n\nIf validation on any of the fields fails at subscription creation\/updation,\nthe create\/update subscription request will fail.",
+      "type": "object",
+      "properties": {
+        "deadLetterTopic": {
+          "description": "The name of the topic to which dead letter messages should be published.\nFormat is `projects\/{project}\/topics\/{topic}`.The Cloud Pub\/Sub service\naccount associated with the enclosing subscription's parent project (i.e.,\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have\npermission to Publish() to this topic.\n\nThe operation will fail if the topic does not exist.\nUsers should ensure that there is a subscription attached to this topic\nsince messages published to a topic with no subscriptions are lost.",
+          "type": "string"
+        },
+        "maxDeliveryAttempts": {
+          "description": "The maximum number of delivery attempts for any message. The value must be\nbetween 5 and 100.\n\nThe number of delivery attempts is defined as 1 + (the sum of number of\nNACKs and number of times the acknowledgement deadline has been exceeded\nfor the message).\n\nA NACK is any call to ModifyAckDeadline with a 0 deadline. Note that\nclient libraries may automatically extend ack_deadlines.\n\nThis field will be honored on a best effort basis.\n\nIf this parameter is 0, a default value of 5 is used.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -568,7 +592,7 @@
           "type": "boolean"
         },
         "maxMessages": {
-          "description": "The maximum number of messages returned for this request. The Pub\/Sub\nsystem may return fewer than the number specified.",
+          "description": "The maximum number of messages to return for this request. Must be a\npositive integer. The Pub\/Sub system may return fewer than the number\nspecified.",
           "type": "integer",
           "format": "int32"
         }
@@ -600,6 +624,11 @@
         "message": {
           "description": "The message.",
           "$ref": "PubsubMessage"
+        },
+        "deliveryAttempt": {
+          "description": "Delivery attempt counter is 1 + (the sum of number of NACKs and number of\nack_deadline exceeds) for this message.\n\nA NACK is any call to ModifyAckDeadline with a 0 deadline. An ack_deadline\nexceeds event is whenever a message is not acknowledged within\nack_deadline. Note that ack_deadline is initially\nSubscription.ackDeadlineSeconds, but may get extended automatically by\nthe client library.\n\nThe first delivery of a given message will have this value as 1. The value\nis calculated at best effort and is approximate.\n\nIf a DeadLetterPolicy is not set on the subscription, this will be 0.\n<b>EXPERIMENTAL:<\/b> This feature is part of a closed alpha release. This\nAPI might be changed in backward-incompatible ways and is not recommended\nfor production use. It is not subject to any SLA or deprecation policy.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -749,7 +778,7 @@
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/pubsub"
               ],
-              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
+              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"
             },
             "getIamPolicy": {
               "id": "pubsub.projects.topics.getIamPolicy",
@@ -763,6 +792,12 @@
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/topics\/[^\/]+$",
                   "type": "string"
+                },
+                "options.requestedPolicyVersion": {
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
                 }
               },
               "parameterOrder": [
@@ -1098,7 +1133,7 @@
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/pubsub"
               ],
-              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
+              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"
             },
             "getIamPolicy": {
               "id": "pubsub.projects.subscriptions.getIamPolicy",
@@ -1112,6 +1147,12 @@
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/subscriptions\/[^\/]+$",
                   "type": "string"
+                },
+                "options.requestedPolicyVersion": {
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
                 }
               },
               "parameterOrder": [
@@ -1478,7 +1519,7 @@
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/pubsub"
               ],
-              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
+              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"
             },
             "getIamPolicy": {
               "id": "pubsub.projects.snapshots.getIamPolicy",
@@ -1492,6 +1533,12 @@
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/snapshots\/[^\/]+$",
                   "type": "string"
+                },
+                "options.requestedPolicyVersion": {
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
                 }
               },
               "parameterOrder": [

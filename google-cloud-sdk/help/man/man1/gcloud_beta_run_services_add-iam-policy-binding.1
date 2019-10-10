@@ -11,7 +11,7 @@ gcloud beta run services add\-iam\-policy\-binding \- add IAM policy binding to 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta run services add\-iam\-policy\-binding\fR (\fISERVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta run services add\-iam\-policy\-binding\fR (\fISERVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,7 +42,7 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Cloud Run region
+The Cloud Run region.
 
 
 .RE
@@ -85,6 +85,25 @@ Define the role of the member.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-platform\fR=\fIPLATFORM\fR
+Target platform for running commands. \fIPLATFORM\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBgke\fR
+Cloud Run on Google Kubernetes Engine. This platform is not supported by this
+command.
+
+.TP 2m
+\fBmanaged\fR
+Fully managed version of Cloud Run. Use with the \f5\-\-region\fR flag or set
+the [run/region] property to specify a Cloud Run region.
+
+.RE
+.sp
+
+
 .TP 2m
 
 At most one of these may be specified:

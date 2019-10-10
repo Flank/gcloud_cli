@@ -41,10 +41,15 @@ API REFERENCE
     This command uses the healthcare/v1alpha2 API. The full documentation for
     this API can be found at: https://cloud.google.com/healthcare
 
+EXAMPLES
+    To create an annotation store called 'test-annotation-store', run:
+
+        $ gcloud alpha healthcare annotation-stores create \
+            test-annotation-store --dataset=test-dataset
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

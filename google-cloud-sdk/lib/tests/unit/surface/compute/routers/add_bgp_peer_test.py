@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ class AddBgpPeerTestGA(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for router [my-router] to add peer [my-peer] '
-        '[https://www.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/regions/us-central1/operations/operation-X] '
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
@@ -186,13 +186,6 @@ class AddBgpPeerTestBeta(AddBgpPeerTestGA):
     self.track = calliope_base.ReleaseTrack.BETA
     self.api_version = 'beta'
 
-
-class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-
   def testAddBgpPeerBfd_success(self):
     self.SelectApi(self.track, self.api_version)
 
@@ -204,16 +197,7 @@ class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
     new_peer.peerIpAddress = '10.0.0.2'
     new_peer.advertisedRoutePriority = 1
     new_peer.enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.FALSE
-    new_peer.bfd = self.messages.RouterBgpPeerBfd(
-        mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.ACTIVE,
-        minReceiveInterval=400,
-        minTransmitInterval=500,
-        multiplier=5,
-        packetMode=(self.messages.RouterBgpPeerBfd.PacketModeValueValuesEnum
-                    .CONTROL_ONLY),
-        slowTimerInterval=6000,
-    )
-
+    new_peer.bfd = self._GetRouterBgpPeerBfdMessage()
     updated.bgpPeers.append(new_peer)
 
     self.ExpectGet(orig)
@@ -233,11 +217,33 @@ class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
         --bfd-min-receive-interval 400
         --bfd-min-transmit-interval 500
         --bfd-multiplier 5
-        --bfd-packet-mode CONTROL_ONLY
-        --bfd-slow-timer-interval 6000
         """)
     self.AssertOutputEquals('')
     self.AssertErrContains('Creating peer [my-peer] in router [my-router]')
+
+  def _GetRouterBgpPeerBfdMessage(self):
+    return self.messages.RouterBgpPeerBfd(
+        sessionInitializationMode=self.messages.RouterBgpPeerBfd
+        .SessionInitializationModeValueValuesEnum.ACTIVE,
+        minReceiveInterval=400,
+        minTransmitInterval=500,
+        multiplier=5)
+
+
+class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def _GetRouterBgpPeerBfdMessage(self):
+    return self.messages.RouterBgpPeerBfd(
+        mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.ACTIVE,
+        sessionInitializationMode=self.messages.RouterBgpPeerBfd
+        .SessionInitializationModeValueValuesEnum.ACTIVE,
+        minReceiveInterval=400,
+        minTransmitInterval=500,
+        multiplier=5)
 
 
 if __name__ == '__main__':

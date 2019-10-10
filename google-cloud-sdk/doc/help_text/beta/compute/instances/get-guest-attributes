@@ -43,9 +43,17 @@ API REFERENCE
     can be found at:
     https://developers.google.com/compute/docs/reference/latest/
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To get the guest attributes for instance 'my-instance' in zone 'ZONE' with
+    query path 'query/path', run:
 
+        $ gcloud beta compute instances get-guest-attributes my-instance \
+            --query-path=query/path --zone=ZONE
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instances get-guest-attributes
         $ gcloud alpha compute instances get-guest-attributes
 

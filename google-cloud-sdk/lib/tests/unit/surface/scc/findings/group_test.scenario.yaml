@@ -32,6 +32,21 @@ summary:
         properties:
           resourceName: http://somedistinctresource1
       readTime: '2019-03-13T21:34:39.405Z'
+- execute:
+  - command: |
+      scc findings group organizations/345840165995/sources/2948230327750090626 --group-by 'resourceName' --read-time '2019-03-13T21:34:39.405Z'
+  - stdout: |
+      groupByResults:
+      - count: '1'
+        properties:
+          resourceName: null
+      - count: '1'
+        properties:
+          resourceName: http://somearbitresource
+      - count: '1'
+        properties:
+          resourceName: http://somedistinctresource1
+      readTime: '2019-03-13T21:34:39.405Z'
       totalSize: 3
 - execute:
   - command: |
@@ -79,6 +94,27 @@ summary:
             }'
         message: Invalid GroupBy. GroupBy must be valid, comma separated fields.
         status: INVALID_ARGUMENT
+- execute:
+  - command: |
+      config set scc/organization 345840165995
+  - stderr: |
+      Updated property [scc/organization].
+- execute:
+  - command: |
+      scc findings group --group-by 'resource_name' --read-time '2019-03-13T21:34:39.405Z'
+  - stdout: |
+      groupByResults:
+      - count: '11'
+        properties:
+          resource_name: null
+      - count: '1'
+        properties:
+          resource_name: http://somearbitresource
+      - count: '1'
+        properties:
+          resource_name: http://somedistinctresource1
+      readTime: '2019-03-13T21:34:39.405Z'
+      totalSize: 3
 actions:
 - execute_command:
     # Group by multiple fields (comma-separated).
@@ -398,5 +434,69 @@ actions:
               }'
           message: Invalid GroupBy. GroupBy must be valid, comma separated fields.
           status: INVALID_ARGUMENT
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      config set scc/organization 345840165995
+    events:
+    - expect_stderr: |
+        Updated property [scc/organization].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      scc findings group --group-by 'resource_name' --read-time '2019-03-13T21:34:39.405Z'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/-/findings:group?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              groupBy: resource_name
+              readTime: '2019-03-13T21:34:39.405Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "groupByResults": [
+                {
+                  "properties": {
+                    "resource_name": null
+                  },
+                  "count": "11"
+                },
+                {
+                  "properties": {
+                    "resource_name": "http://somearbitresource"
+                  },
+                  "count": "1"
+                },
+                {
+                  "properties": {
+                    "resource_name": "http://somedistinctresource1"
+                  },
+                  "count": "1"
+                }
+              ],
+              "readTime": "2019-03-13T21:34:39.405Z",
+              "totalSize": 3
+            }
+    - expect_stdout: |
+        groupByResults:
+        - count: '11'
+          properties:
+            resource_name: null
+        - count: '1'
+          properties:
+            resource_name: http://somearbitresource
+        - count: '1'
+          properties:
+            resource_name: http://somedistinctresource1
+        readTime: '2019-03-13T21:34:39.405Z'
+        totalSize: 3
     - expect_exit:
         code: 0

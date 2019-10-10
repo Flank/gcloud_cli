@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -231,7 +231,7 @@ class CloudFilestoreInstancesCreateAlphaTest(
        ['instance_name',
         '--location=us-central1-c', '--async',
         '--network=name=test_network',
-        '--file-share=name=my_vol,capacity=1TB,source-snapshot=snap',
+        '--file-share=name=my_vol,capacity=1TB,source-snapshot=snap,source-snapshot-region=us-central1',
         '--description=test_description'],
        'test_network', None, 'my_vol', 1024,
        'projects/fake-project/locations/us-central1/snapshots/snap'))
@@ -239,6 +239,31 @@ class CloudFilestoreInstancesCreateAlphaTest(
                                      expected_range, expected_vol_name,
                                      expected_capacity,
                                      expected_source_snapshot):
+    config = self.messages.Instance(
+        tier=self.standard_tier,
+        description='test_description',
+        networks=self.MakeNetworkConfig(
+            expected_network, expected_range))
+    self.AddInstanceFileShare(
+        config, self.MakeFileShareConfig(
+            expected_vol_name, expected_capacity, expected_source_snapshot))
+    self.ExpectCreateInstance(config)
+    self.RunCreate(*args)
+    self.AssertErrContains(_GetListCommandOuput(self._TRACK.prefix))
+
+  @parameterized.named_parameters(
+      ('NoRange',
+       ['instance_name',
+        '--location=us-central1-c', '--async',
+        '--network=name=test_network',
+        '--file-share=name=my_vol,capacity=1TB,source-snapshot=snap',
+        '--description=test_description'],
+       'test_network', None, 'my_vol', 1024,
+       'projects/fake-project/locations/us-central1-c/snapshots/snap'))
+  def testCreateInstanceFromLocalSnapshot(self, args, expected_network,
+                                          expected_range, expected_vol_name,
+                                          expected_capacity,
+                                          expected_source_snapshot):
     config = self.messages.Instance(
         tier=self.standard_tier,
         description='test_description',

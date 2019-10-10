@@ -7,18 +7,12 @@ SYNOPSIS
         [--page-size=PAGE_SIZE; default=100] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) List autoscaling policies.
-
 FLAGS
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
         independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
+        Compute Engine zones inside the region. Overrides the default
+        dataproc/region property value for this command invocation.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -55,9 +49,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    The following command lists all autoscaling policies in the project:
 
+        $ gcloud beta dataproc autoscaling-policies list
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud dataproc autoscaling-policies list
         $ gcloud alpha dataproc autoscaling-policies list
 

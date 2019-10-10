@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,8 +61,8 @@ class ManagedZonesCreateTest(base.DnsMockMultiTrackTest):
     self.assertEqual([test_zone], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateFormat(self):
     test_zone = util.GetManagedZoneBeforeCreation(self.messages)
@@ -92,8 +92,8 @@ kind: dns#managedZone
 name: mz
 """)
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateLabels(self):
     test_zone = util.GetManagedZoneBeforeCreation(self.messages)
@@ -119,8 +119,8 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
             test_zone.description))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateDnssec(self):
     test_zone = util.GetManagedZoneBeforeCreation(
@@ -141,8 +141,8 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
     self.assertEqual([test_zone], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateWithKeys(self):
     test_zone = util.GetManagedZoneBeforeCreation(
@@ -177,8 +177,8 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
     self.assertEqual([test_zone], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateWithPrivateVisibility(self):
     visibility_settings = util.GetDnsVisibilityDict(
@@ -202,8 +202,8 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
     self.assertEqual([test_zone], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateWithPrivateVisibilityAndMissingNetworks(self):
     visibility_settings = util.GetDnsVisibilityDict(
@@ -255,8 +255,52 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
     self.assertEqual([test_zone], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
+
+  def testCreateWithForwardingTargetsAndPrivateVisibility(self):
+    forwarding_servers = ['1.0.1.1', '1.2.1.1']
+    forwarding_config = util.ParseManagedZoneForwardingConfig(
+        target_servers=forwarding_servers)
+
+    visibility_settings = util.GetDnsVisibilityDict(
+        self.api_version,
+        visibility='private',
+        network_urls=['1.0.2.1', '1.2.2.1'])
+    test_zone = util.GetManagedZoneBeforeCreation(
+        self.messages,
+        dns_sec_config=False,
+        visibility_dict=visibility_settings,
+        forwarding_config=forwarding_config)
+
+    zone_create_request = self.messages.DnsManagedZonesCreateRequest(
+        managedZone=test_zone, project=self.Project())
+    self.client.managedZones.Create.Expect(zone_create_request, test_zone)
+    result = self.Run(
+        'dns managed-zones create {0} --dns-name {1} --description {2} '
+        '--format=disable --visibility private --forwarding-targets {3} '
+        '--networks {4}'.format(
+            test_zone.name, test_zone.dnsName, test_zone.description,
+            ','.join(forwarding_servers), ','.join(['1.0.2.1', '1.2.2.1'])))
+
+    self.assertEqual([test_zone], list(result))
+    self.AssertOutputEquals('')
+    self.AssertErrContains("""\
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
+
+  def testCreateWithForwardingTargetsandPublicVisibility(self):
+    visibility_settings = util.GetDnsVisibilityDict(
+        self.api_version, visibility='private', network_urls=[])
+    test_zone = util.GetManagedZoneBeforeCreation(
+        self.messages,
+        dns_sec_config=False,
+        visibility_dict=visibility_settings)
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run('dns managed-zones create {0} --dns-name {1} --description {2} '
+               '--format=disable --visibility public '
+               '--forwarding-targets 1.0.0.1 --networks 1.0.0.1'.format(
+                   test_zone.name, test_zone.dnsName, test_zone.description))
 
 
 class BetaManagedZonesCreateTest(ManagedZonesCreateTest):
@@ -293,8 +337,8 @@ class BetaManagedZonesCreateTest(ManagedZonesCreateTest):
     self.assertEqual([test_zone], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testCreateWithForwardingTargetsandPublicVisibility(self):
     visibility_settings = util_beta.GetDnsVisibilityDict(

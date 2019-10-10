@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class BigtableV2TestBase(sdk_test_base.WithFakeAuth,
   """Base class for Bigtable command unit tests hitting the v2 API."""
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.ALPHA
     properties.VALUES.core.project.Set(self.Project())
     self.client = mock.Client(client_class=core_apis.GetClientClass(
         'bigtableadmin', 'v2'))

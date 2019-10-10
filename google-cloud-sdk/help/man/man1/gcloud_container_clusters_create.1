@@ -11,7 +11,7 @@ gcloud container clusters create \- create a cluster for running containers
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-default\-max\-pods\-per\-node\fR=\fIDEFAULT_MAX_PODS_PER_NODE\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-nodes\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR] [\fB\-\-enable\-tpu\fR\ \fB\-\-tpu\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-default\-max\-pods\-per\-node\fR=\fIDEFAULT_MAX_PODS_PER_NODE\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-enable\-binauthz\fR] [\fB\-\-enable\-cloud\-logging\fR] [\fB\-\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-intra\-node\-visibility\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-enable\-stackdriver\-kubernetes\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fISTART_TIME\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR] [\fB\-\-enable\-private\-endpoint\fR\ \fB\-\-enable\-private\-nodes\fR\ \fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR] [\fB\-\-enable\-tpu\fR\ \fB\-\-tpu\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,17 +80,16 @@ instead.
 
 .TP 2m
 \fB\-\-addons\fR=[\fIADDON\fR,...]
-Default set of addons includes HttpLoadBalancing, HorizontalPodAutoscaling.
 Addons
 (https://cloud.google.com/kubernetes\-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
 are additional Kubernetes cluster components. Addons specified by this flag will
-be enabled. The others will be disabled. \fIADDON\fR must be one of:
-\fBHttpLoadBalancing\fR, \fBHorizontalPodAutoscaling\fR,
-\fBKubernetesDashboard\fR, \fBIstio\fR, \fBNetworkPolicy\fR.
+be enabled. The others will be disabled. Default addons: HttpLoadBalancing,
+HorizontalPodAutoscaling. \fIADDON\fR must be one of: \fBHttpLoadBalancing\fR,
+\fBHorizontalPodAutoscaling\fR, \fBKubernetesDashboard\fR, \fBNetworkPolicy\fR.
 
 .TP 2m
 \fB\-\-async\fR
-Don't wait for the operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR
@@ -183,22 +182,22 @@ one of: \fBpd\-standard\fR, \fBpd\-ssd\fR.
 
 .TP 2m
 \fB\-\-enable\-autorepair\fR
-Enable node autorepair feature for a cluster's default node\-pool(s).
+Enable node autorepair feature for a cluster's default node pool(s).
 
 .RS 2m
 $ gcloud container clusters create example\-cluster \e
     \-\-enable\-autorepair
 .RE
 
-Node autorepair is enabled by default for clusters using COS as a base image,
-use \-\-no\-enable\-autorepair to disable.
+Node autorepair is enabled by default for clusters using COS or COS_CONTAINERD
+as a base image, use \-\-no\-enable\-autorepair to disable.
 
 See https://cloud.google.com/kubernetes\-engine/docs/how\-to/node\-auto\-repair
 for more info.
 
 .TP 2m
 \fB\-\-enable\-autoupgrade\fR
-Sets autoupgrade feature for a cluster's default node\-pool(s).
+Sets autoupgrade feature for a cluster's default node pool(s).
 
 .RS 2m
 $ gcloud container clusters create example\-cluster \e
@@ -209,22 +208,50 @@ See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-upgrades for
 more info.
 
 .TP 2m
+\fB\-\-enable\-binauthz\fR
+Enable Binary Authorization for this cluster.
+
+.TP 2m
 \fB\-\-enable\-cloud\-logging\fR
-Automatically send logs from the cluster to the Google Cloud Logging API.
-Enabled by default, use \fB\-\-no\-enable\-cloud\-logging\fR to disable.
+(DEPRECATED) Automatically send logs from the cluster to the Google Cloud
+Logging API. This flag is deprecated, use
+\f5\-\-enable\-stackdriver\-kubernetes\fR instead.
+
+From 1.14, legacy Stackdriver GKE logging is deprecated. Thus, flag
+\f5\-\-enable\-cloud\-logging\fR is also deprecated. Please use
+\f5\-\-enable\-stackdriver\-kubernetes\fR instead, to migrate to new Stackdriver
+Kubernetes Engine monitoring and logging. For more details, please read:
+https://cloud.google.com/monitoring/kubernetes\-engine/migration.
 
 .TP 2m
 \fB\-\-enable\-cloud\-monitoring\fR
-Automatically send metrics from pods in the cluster to the Google Cloud
-Monitoring API. VM metrics will be collected by Google Compute Engine regardless
-of this setting. Enabled by default, use \fB\-\-no\-enable\-cloud\-monitoring\fR
-to disable.
+(DEPRECATED) Automatically send metrics from pods in the cluster to the Google
+Cloud Monitoring API. VM metrics will be collected by Google Compute Engine
+regardless of this setting. This flag is deprecated, use
+\f5\-\-enable\-stackdriver\-kubernetes\fR instead.
+
+From 1.14, legacy Stackdriver GKE monitoring is deprecated. Thus, flag
+\f5\-\-enable\-cloud\-monitoring\fR is also deprecated. Please use
+\f5\-\-enable\-stackdriver\-kubernetes\fR instead, to migrate to new Stackdriver
+Kubernetes Engine monitoring and logging. For more details, please read:
+https://cloud.google.com/monitoring/kubernetes\-engine/migration.
+
+.TP 2m
+\fB\-\-enable\-intra\-node\-visibility\fR
+Enable Intra\-node visibility for this cluster.
+
+Enabling intra\-node visibility makes your intra\-node pod\-to\-pod traffic
+visible to the networking fabric. With this feature, you can use VPC flow
+logging or other VPC features for intra\-node traffic.
+
+Enabling it on an existing cluster causes the cluster master and the cluster
+nodes to restart, which might cause a disruption.
 
 .TP 2m
 \fB\-\-enable\-ip\-alias\fR
 Enable use of alias IPs (https://cloud.google.com/compute/docs/alias\-ip/) for
-pod IPs. This will create two secondary ranges, one for the pod IPs and another
-to reserve space for the services range.
+Pod IPs. This will require at least two secondary ranges in the subnetwork, one
+for the pod IPs and another to reserve space for the services range.
 
 .TP 2m
 \fB\-\-enable\-kubernetes\-alpha\fR
@@ -250,6 +277,10 @@ instead, create or update your cluster with the option
 Enable network policy enforcement for this cluster. If you are enabling network
 policy on an existing cluster the network policy addon must first be enabled on
 the master by using \-\-update\-addons=NetworkPolicy=ENABLED flag.
+
+.TP 2m
+\fB\-\-enable\-stackdriver\-kubernetes\fR
+Enable Stackdriver Kubernetes monitoring and logging.
 
 .TP 2m
 \fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR
@@ -317,7 +348,7 @@ $ gcloud container clusters create high\-mem\-pool \e
 .RE
 
 .TP 2m
-\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR
+\fB\-\-maintenance\-window\fR=\fISTART_TIME\fR
 Set a time of day when you prefer maintenance to start on this cluster. For
 example:
 
@@ -425,7 +456,7 @@ clusters. Defaults to the 'default' network.
 
 .TP 2m
 \fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]
-Applies the given kubernetes labels on all nodes in the new node\-pool. Example:
+Applies the given kubernetes labels on all nodes in the new node pool. Example:
 
 .RS 2m
 $ gcloud container clusters create example\-cluster \e
@@ -465,7 +496,7 @@ $ gcloud container clusters create example\-cluster \e
 
 .TP 2m
 \fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]
-Applies the given kubernetes taints on all nodes in default node\-pool(s) in new
+Applies the given kubernetes taints on all nodes in default node pool(s) in new
 cluster, which can be used with tolerations for pod scheduling. Example:
 
 .RS 2m
@@ -605,6 +636,49 @@ The list of CIDR blocks (up to 50) that are allowed to connect to Kubernetes
 master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
 specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
 specified.
+
+.RE
+.sp
+.TP 2m
+
+Exports cluster's usage of cloud resources
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-network\-egress\-metering\fR
+Enable network egress metering on this cluster.
+
+When enabled, a DaemonSet is deployed into the cluster. Each DaemonSet pod
+meters network egress traffic by collecting data from the conntrack table, and
+exports the metered metrics to the specified destination.
+
+Network egress metering is disabled if this flag is omitted, or when
+\f5\-\-no\-enable\-network\-egress\-metering\fR is set.
+
+.TP 2m
+\fB\-\-enable\-resource\-consumption\-metering\fR
+Enable resource consumption metering on this cluster.
+
+When enabled, a table will be created in the specified BigQuery dataset to store
+resource consumption data. The resulting table can be joined with the resource
+usage table or with BigQuery billing export.
+
+Resource consumption metering is enabled unless \f5\-\-no\-enable\-resource\-
+consumption\-metering\fR is set.
+
+.TP 2m
+\fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR
+The name of the BigQuery dataset to which the cluster's usage of cloud resources
+is exported. A table will be created in the specified dataset to store cluster
+resource usage. The resulting table can be joined with BigQuery Billing Export
+to produce a fine\-grained cost breakdown.
+
+Example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-resource\-usage\-bigquery\-dataset=example_bigquery_dataset_name
+.RE
 
 .RE
 .sp

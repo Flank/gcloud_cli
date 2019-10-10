@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta debug source upload DIRECTORY [--branch=BRANCH]
+        [--ignore-file=IGNORE_FILE]
         [--source-context-directory=SOURCE_CONTEXT_DIRECTORY]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -32,6 +33,10 @@ FLAGS
      --branch=BRANCH
         The branch name. If the branch already exists, the new upload will
         overwrite its history.
+
+     --ignore-file=IGNORE_FILE
+        Override the .gcloudignore file and use the specified file instead. See
+        $ gcloud topic gcloudignore for more information.
 
      --source-context-directory=SOURCE_CONTEXT_DIRECTORY
         The directory in which to create the source context file.

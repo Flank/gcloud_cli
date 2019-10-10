@@ -11,7 +11,7 @@ gcloud beta compute ssl\-certificates describe \- describe a Google Compute Engi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute ssl\-certificates describe\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute ssl\-certificates describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,6 +30,50 @@ data associated with Google Compute Engine SSL certificate in a project.
 Name of the SSL certificate to describe.
 
 
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the SSL certificate is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the SSL certificate to describe. If not specified, you may be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
 .RE
 .sp
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,12 +34,12 @@ from tests.lib.surface.container.binauthz import base
 
 class UpdateTest(
     sdk_test_base.WithTempCWD,
-    base.WithMockBetaBinauthz,
+    base.WithMockGaBinauthz,
     base.BinauthzTestBase,
 ):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.ascii_armored_key = textwrap.dedent("""
@@ -56,13 +56,22 @@ class UpdateTest(
         asciiArmoredPgpPublicKey=self.ascii_armored_key,
         comment=None,
         id=self.fingerprint)
-    self.attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, self.name),
-        updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, self.name),
-            publicKeys=[self.existing_pub_key],
-        ))
+    try:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, self.name),
+              publicKeys=[self.existing_pub_key],
+          ))
+    except AttributeError:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, self.name),
+              publicKeys=[self.existing_pub_key],
+          ))
 
     self.updated_pub_key = copy.deepcopy(self.existing_pub_key)
     self.updated_ascii_armored_key = (
@@ -70,24 +79,28 @@ class UpdateTest(
     self.updated_pub_key.asciiArmoredPgpPublicKey = (
         self.updated_ascii_armored_key)
     self.updated_attestor = copy.deepcopy(self.attestor)
-    self.updated_attestor.userOwnedDrydockNote.publicKeys = [
-        self.updated_pub_key]
+    try:
+      self.updated_attestor.userOwnedGrafeasNote.publicKeys = [
+          self.updated_pub_key]
+    except AttributeError:
+      self.updated_attestor.userOwnedDrydockNote.publicKeys = [
+          self.updated_pub_key]
 
     self.fname = self.Touch(
         directory=self.cwd_path, contents=self.updated_ascii_armored_key)
 
-    self.req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+    self.req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=self.attestor.name)
 
   def testSuccess(self):
     self.mock_client.projects_attestors.Get.Expect(
-        self.req, response=self.attestor)
+        self.req, response=copy.deepcopy(self.attestor))
     self.mock_client.projects_attestors.Update.Expect(
         self.updated_attestor, response=self.updated_attestor)
 
     response = self.RunBinauthz(
         'attestors public-keys update {fingerprint} '
-        '--attestor={name} --public-key-file={fname}'.format(
+        '--attestor={name} --pgp-public-key-file={fname}'.format(
             fingerprint=self.existing_pub_key.id, name=self.name,
             fname=self.fname))
 
@@ -97,13 +110,14 @@ class UpdateTest(
     self.updated_pub_key.comment = 'foo'
 
     self.mock_client.projects_attestors.Get.Expect(
-        self.req, response=self.attestor)
+        self.req, response=copy.deepcopy(self.attestor))
     self.mock_client.projects_attestors.Update.Expect(
         self.updated_attestor, response=self.updated_attestor)
 
     response = self.RunBinauthz(
         'attestors public-keys update {fingerprint} '
-        '--attestor={name} --public-key-file={fname} --comment="foo"'.format(
+        '--attestor={name} --pgp-public-key-file={fname} '
+        '--comment="foo"'.format(
             fingerprint=self.existing_pub_key.id, name=self.name,
             fname=self.fname))
 
@@ -114,13 +128,13 @@ class UpdateTest(
     self.updated_pub_key.comment = ''
 
     self.mock_client.projects_attestors.Get.Expect(
-        self.req, response=self.attestor)
+        self.req, response=copy.deepcopy(self.attestor))
     self.mock_client.projects_attestors.Update.Expect(
         self.updated_attestor, response=self.updated_attestor)
 
     response = self.RunBinauthz(
         'attestors public-keys update {fingerprint} '
-        '--attestor={name} --public-key-file={fname} --comment='.format(
+        '--attestor={name} --pgp-public-key-file={fname} --comment='.format(
             fingerprint=self.existing_pub_key.id, name=self.name,
             fname=self.fname))
 
@@ -128,7 +142,7 @@ class UpdateTest(
 
   def testSuccess_EmptyUpdate(self):
     self.mock_client.projects_attestors.Get.Expect(
-        self.req, response=self.attestor)
+        self.req, response=copy.deepcopy(self.attestor))
     self.mock_client.projects_attestors.Update.Expect(
         self.attestor, response=self.attestor)
 
@@ -141,19 +155,56 @@ class UpdateTest(
 
   def testUnknownKeyId(self):
     self.mock_client.projects_attestors.Get.Expect(
-        self.req, response=self.attestor)
+        self.req, response=copy.deepcopy(self.attestor))
 
     with self.assertRaises(exceptions.NotFoundError):
       self.RunBinauthz(
           'attestors public-keys update {fingerprint} '
-          '--attestor={name} --public-key-file={fname}'.format(
+          '--attestor={name} --pgp-public-key-file={fname}'.format(
               fingerprint='not_a_real_id', name=self.name, fname=self.fname))
+
+  def testNonPgpKeyId(self):
+    pkix_pubkey = self.messages.PkixPublicKey(
+        publicKeyPem='abc',
+        signatureAlgorithm=(
+            self.messages.PkixPublicKey.
+            SignatureAlgorithmValueValuesEnum.ECDSA_P256_SHA256))
+    attestor = copy.deepcopy(self.attestor)
+    pubkey_id = 'ni://sha-256;abcd'
+    try:
+      attestor.userOwnedGrafeasNote.publicKeys = [
+          self.messages.AttestorPublicKey(
+              pkixPublicKey=pkix_pubkey, comment=None, id=pubkey_id)
+      ]
+    except AttributeError:
+      attestor.userOwnedDrydockNote.publicKeys = [
+          self.messages.AttestorPublicKey(
+              pkixPublicKey=pkix_pubkey, comment=None, id=pubkey_id)
+      ]
+
+    self.mock_client.projects_attestors.Get.Expect(
+        self.req, response=copy.deepcopy(attestor))
+
+    with self.assertRaises(exceptions.InvalidArgumentError):
+      self.RunBinauthz(
+          'attestors public-keys update {fingerprint} '
+          '--attestor={name} --pgp-public-key-file={fname}'.format(
+              fingerprint=pubkey_id, name=self.name, fname=self.fname))
 
   def testUnknownFile(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunBinauthz(
           'attestors public-keys update '
-          '--attestor=any-old-name --public-key-file=not-a-real-file.pub')
+          '--attestor=any-old-name --pgp-public-key-file=not-a-real-file.pub')
+
+
+class UpdateBetaTest(
+    base.WithMockBetaBinauthz,
+    UpdateTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class UpdateAlphaTest(

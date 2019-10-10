@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,41 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.compute import flags as compute_flags
+from googlecloudsdk.command_lib.util.apis import arg_utils
+import six
+
+_MAINTENANCE_POLICY_CHOICES = {
+    'default': 'VM instances on the host are live migrated to a new '
+               'physical server.',
+    'restart-in-place': 'VM instances on the host are terminated and then '
+                        'restarted on the same physical server after the '
+                        'maintenance event has completed.',
+    'migrate-within-node-group': 'VM instances on the host are live migrated '
+                                 'to another node within the same node group.',
+}
+
+_MAINTENANCE_POLICY_MAPPINGS = {
+    'DEFAULT': 'default',
+    'RESTART_IN_PLACE': 'restart-in-place',
+    'MIGRATE_WITHIN_NODE_GROUP': 'migrate-within-node-group',
+}
+
+_AUTOSCALING_MODES = ['off', 'on']
+_AUTOSCALING_MODE_MAPPINGS = {
+    'OFF': 'off',
+    'ON': 'on',
+}
+
+
+def _ModeChoice():
+  def _Parse(value):
+    value = six.text_type(value.lower())
+    if value not in _AUTOSCALING_MODES:
+      raise arg_parsers.ArgumentTypeError(
+          '[mode] must be one of [{0}]'.format(
+              ','.join(_AUTOSCALING_MODES)))
+    return value
+  return _Parse
 
 
 def MakeNodeGroupArg():
@@ -63,3 +98,58 @@ def AddUpdateArgsToParser(parser):
       type=arg_parsers.ArgList(),
       help='The names of the nodes to remove from the group.')
   AddNoteTemplateFlagToParser(parser, required=False)
+
+
+def AddMaintenancePolicyArgToParser(parser):
+  """Add flag for adding maintenance policy to node group."""
+  parser.add_argument(
+      '--maintenance-policy',
+      choices=_MAINTENANCE_POLICY_CHOICES,
+      type=lambda policy: policy.lower(),
+      help=('Determines the maintenance behavior during host maintenance '
+            'events.'))
+
+
+def GetMaintenancePolicyEnumMapper(messages):
+  return arg_utils.ChoiceEnumMapper(
+      '--maintenance-policy',
+      messages.NodeGroup.MaintenancePolicyValueValuesEnum,
+      custom_mappings=_MAINTENANCE_POLICY_MAPPINGS,
+  )
+
+
+def AddAutoscalingPolicyArgToParser(parser):
+  parser.add_argument(
+      '--autoscaling-policy',
+      type=arg_parsers.ArgDict(
+          spec={
+              'mode': _ModeChoice(),
+              'min-size': int,
+              'max-size': int,
+          },
+          required_keys=[
+              'mode'
+          ]),
+      help="""\
+Option to specify the autoscaling policy for node groups.
+
+*mode*::: Options for mode are 'on' or 'off'. When set to 'on', the autoscaler
+will increase or decrease the size of the node group in response to capacity
+needs. If set to 'off', the autoscaler will not update the size of the node
+group.
+
+*min-size*::: The minimum size of the node group. Default is 0 and must be
+an integer value smaller than or equal to max-size.
+
+*max-size*::: The maximum size of the node group. Default is 100 and must be
+smaller or equal to 100 and larger than or equal to min-size.
+
+""")
+
+
+def GetAutoscalingModeEnumMapper(messages):
+  return arg_utils.ChoiceEnumMapper(
+      'mode',
+      messages.NodeGroupAutoscalingPolicy.ModeValueValuesEnum,
+      custom_mappings=_AUTOSCALING_MODE_MAPPINGS,
+  )

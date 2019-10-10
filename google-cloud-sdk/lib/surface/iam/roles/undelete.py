@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class Undelete(base.DescribeCommand):
 
   @staticmethod
   def Args(parser):
-    flags.GetOrgFlag('undelete').AddToParser(parser)
+    flags.AddParentFlags(parser, 'undelete')
     flags.GetCustomRoleFlag('undelete').AddToParser(parser)
 
   def Run(self, args):

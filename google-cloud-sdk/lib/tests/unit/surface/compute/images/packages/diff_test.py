@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class DiffTest(
     sdk_test_base.WithFakeAuth,
     cli_test_base.CliTestBase,
     sdk_test_base.WithOutputCapture):
-  """Test `image packages diff` command"""
+  """Test `image packages diff` command."""
 
   def _MakeOccurrence(self, image, image_id, package_name, package_versions,
                       package_path, image_project=None):
@@ -39,7 +39,7 @@ class DiffTest(
     installation = self.messages.Installation(
         name=package_name,
         location=[
-            self.messages.Location(
+            self.messages.Location(  # pylint:disable=g-complex-comprehension
                 version=self.messages.Version(
                     name=package_version[0],
                     revision=package_version[1]
@@ -51,7 +51,7 @@ class DiffTest(
 
     image_project = image_project or self.Project()
     resource_url = (
-        'https://www.googleapis.com/compute/v1/'
+        'https://compute.googleapis.com/compute/v1/'
         'projects/{}/global/images/{}/id/{}').format(
             image_project, image, image_id)
 
@@ -138,8 +138,8 @@ class DiffTest(
 
   def _MockYieldFromList(self):
     filter_string = ('kind = "PACKAGE_MANAGER" AND has_prefix(resource_url,'
-                     '"https://www.googleapis.com/compute/") AND has_prefix'
-                     '(resource_url,"https://www.googleapis.com/compute/v1/'
+                     '"https://compute.googleapis.com/compute/") AND has_prefix'
+                     '(resource_url,"https://compute.googleapis.com/compute/v1/'
                      'projects/{}/global/images/{}/id/{}")')
     old_yield = list_pager.YieldFromList
     def _FakeYield(service, request, **kwargs):
@@ -169,7 +169,7 @@ class DiffTest(
     self.StartObjectPatch(list_pager, 'YieldFromList', _FakeYield)
 
   def _MakeImage(self, project, image_name, image_id):
-    self_link_string = """https://www.googleapis.com/compute/v1/projects/{}/
+    self_link_string = """https://compute.googleapis.com/compute/v1/projects/{}/
     global/images/{}/id/{}"""
     return self.compute_messages.Image(
         selfLink=self_link_string.format(project, image_name, str(image_id)),

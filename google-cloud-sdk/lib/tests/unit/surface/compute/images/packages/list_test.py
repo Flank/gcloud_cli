@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class ListTest(
     sdk_test_base.WithFakeAuth,
     cli_test_base.CliTestBase,
     sdk_test_base.WithOutputCapture):
-  """Test `image packages list` command"""
+  """Test `image packages list` command."""
 
   def _MakeOccurrence(self, image, name, note_id, package_name,
                       package_versions, package_path, image_project=None):
@@ -39,7 +39,7 @@ class ListTest(
     installation = self.messages.Installation(
         name=package_name,
         location=[
-            self.messages.Location(
+            self.messages.Location(  # pylint:disable=g-complex-comprehension
                 version=self.messages.Version(
                     name=package_version[0],
                     revision=package_version[1]
@@ -51,7 +51,7 @@ class ListTest(
 
     image_project = image_project or self.Project()
     resource_url = (
-        'https://www.googleapis.com/compute/v1'
+        'https://compute.googleapis.com/compute/v1'
         '/projects/{}/global/images/{}').format(image_project, image)
 
     return self.messages.Occurrence(
@@ -123,8 +123,8 @@ class ListTest(
   def testListPackages(self):
     self._MockYieldFromList(
         'kind = "PACKAGE_MANAGER" AND '
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/") AND '
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/v1/'
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/") AND '
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/global/images/my-image/id/123")'
         )
 

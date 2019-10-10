@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.core.util import edit
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute.backend_services import edit_util
@@ -32,27 +33,27 @@ def _MakeBackendService(messages):
               balancingMode=(
                   messages.Backend.BalancingModeValueValuesEnum.RATE),
               group=(
-                  'https://www.googleapis.com/compute/v1/projects/'
+                  'https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/regions/us-central1/instanceGroups/group-1'),
               maxRate=123),
           messages.Backend(
               balancingMode=(
                   messages.Backend.BalancingModeValueValuesEnum.RATE),
               group=(
-                  'https://www.googleapis.com/compute/v1/projects/'
+                  'https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/zones/us-central1-b/instanceGroups/group-2'),
               maxRate=456),
       ],
       description='The best backend service',
       healthChecks=[
-          ('https://www.googleapis.com/compute/v1/projects/my-project/'
+          ('https://compute.googleapis.com/compute/v1/projects/my-project/'
            'global/httpHealthChecks/health-check'),
       ],
       name='my-backend-service',
       port=80,
       portName='http',
       protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
-      selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+      selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/backendServices/backend-service'),
       timeoutSec=15,
   )
@@ -79,12 +80,12 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         ---
         backends:
         - balancingMode: RATE
-          group: https://www.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
+          group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
           maxRate: 789
         description: I edited this
         healthChecks:
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-1
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-2
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-1
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-2
         port: 80
         portName: http2
         timeoutSec: 10
@@ -101,16 +102,16 @@ class BackendServicesEditTest(test_base.BaseEditTest):
                 balancingMode=(
                     messages.Backend.BalancingModeValueValuesEnum.RATE),
                 group=(
-                    'https://www.googleapis.com/compute/v1/projects/'
+                    'https://compute.googleapis.com/compute/v1/projects/'
                     'my-project/zones/europe-west1-a/instanceGroups/'
                     'other-group'),
                 maxRate=789),
         ],
         description='I edited this',
         healthChecks=[
-            ('https://www.googleapis.com/compute/v1/projects/my-project/'
+            ('https://compute.googleapis.com/compute/v1/projects/my-project/'
              'global/httpHealthChecks/other-health-check-1'),
-            ('https://www.googleapis.com/compute/v1/projects/my-project/'
+            ('https://compute.googleapis.com/compute/v1/projects/my-project/'
              'global/httpHealthChecks/other-health-check-2')
         ],
         name='my-backend-service',
@@ -159,12 +160,12 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         ---
         backends:
         - balancingMode: RATE
-          group: https://www.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
+          group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
           maxRate: 789
         description: I edited this
         healthChecks:
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-1
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-2
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-1
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/other-health-check-2
         port: 80
         portName: http2
         timeoutSec: 10
@@ -185,7 +186,7 @@ class BackendServicesEditTest(test_base.BaseEditTest):
             ---
             backends:
             - balancingMode: RATE
-              group: https://www.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
+              group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
               maxRate: 789
             healthChecks:
             - other-health-check
@@ -194,21 +195,23 @@ class BackendServicesEditTest(test_base.BaseEditTest):
             ---
             backends:
             - balancingMode: RATE
-              group: https://www.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
+              group: https://compute.googleapis.com/compute/v1/projects/my-project/zones/europe-west1-a/instanceGroups/other-group
               maxRate: 789
             healthChecks:
             - {uri}/projects/my-project/global/networks/other-health-check
             """.format(uri=self.compute_uri))
-    self.mock_edit.side_effect = iter([edit_text1, edit_text2])
+    self.mock_edit.side_effect = iter([
+        edit_text1, edit_text2, edit.NoSaveException])
 
     self.make_requests.side_effect = iter([
         [_MakeBackendService(messages)],
-        [],
     ])
 
-    self.Run("""
-        compute backend-services edit my-backend-service --format yaml --global
-        """)
+    with self.AssertRaisesToolExceptionRegexp('Edit aborted by user.'):
+      self.Run("""
+          compute backend-services edit my-backend-service --format yaml
+          --global
+          """)
 
     self.AssertErrContains('[healthChecks] must be referenced using URIs.')
     # Note we only check the beginning and end of the full uri because
@@ -238,15 +241,16 @@ class BackendServicesEditTest(test_base.BaseEditTest):
             healthChecks:
             - {uri}/projects/my-project/global/httpHealthChecks/other-health-check-2
             """.format(uri=self.compute_uri))
-    self.mock_edit.side_effect = iter([edit_text])
+    self.mock_edit.side_effect = iter([edit_text, edit.NoSaveException])
     self.make_requests.side_effect = iter([
         [_MakeBackendService(messages)],
-        [],
     ])
 
-    self.Run("""
-        compute backend-services edit my-backend-service --format yaml --global
-        """)
+    with self.AssertRaisesToolExceptionRegexp('Edit aborted by user.'):
+      self.Run("""
+          compute backend-services edit my-backend-service --format yaml
+          --global
+          """)
     self.AssertErrContains('[group] must be referenced using URIs',
                            normalize_space=True)
 
@@ -279,8 +283,8 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         ---
         protocol: HTTPS
         healthChecks:
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/http-health-check
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/httpsHealthChecks/https-health-check
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/http-health-check
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/httpsHealthChecks/https-health-check
         """)])
 
     yaml_contents = (edit_util.YAML_FILE_CONTENTS_HEADER +
@@ -295,9 +299,9 @@ class BackendServicesEditTest(test_base.BaseEditTest):
 
     updated_service = messages.BackendService(
         healthChecks=[
-            ('https://www.googleapis.com/compute/v1/projects/my-project/'
+            ('https://compute.googleapis.com/compute/v1/projects/my-project/'
              'global/httpHealthChecks/http-health-check'),
-            ('https://www.googleapis.com/compute/v1/projects/my-project/'
+            ('https://compute.googleapis.com/compute/v1/projects/my-project/'
              'global/httpsHealthChecks/https-health-check')
         ],
         name='my-backend-service',
@@ -332,7 +336,7 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         ---
         protocol: HTTPS
         healthChecks:
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/generic-health-check
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/generic-health-check
         """)])
 
     self.make_requests.side_effect = iter([
@@ -352,7 +356,7 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         ---
         protocol: HTTPS
         healthChecks:
-        - https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/generic-health-check
+        - https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/generic-health-check
         """)])
 
     yaml_contents = (edit_util.YAML_FILE_CONTENTS_HEADER +
@@ -367,7 +371,7 @@ class BackendServicesEditTest(test_base.BaseEditTest):
 
     updated_service = messages.BackendService(
         healthChecks=[
-            ('https://www.googleapis.com/compute/v1/projects/my-project/'
+            ('https://compute.googleapis.com/compute/v1/projects/my-project/'
              'global/healthChecks/generic-health-check')
         ],
         name='my-backend-service',

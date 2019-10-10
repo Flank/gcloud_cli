@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from tests.lib import sdk_test_base
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.run import base
 
 
-class GetIamPolicyTest(base.ServerlessBase, sdk_test_base.WithFakeAuth):
+class GetIamPolicyTestBeta(base.ServerlessBase):
   """Tests outputs of get-iam-policy command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testGetPolicy(self):
     self._ExpectGetIamPolicy()
@@ -38,3 +41,10 @@ class GetIamPolicyTest(base.ServerlessBase, sdk_test_base.WithFakeAuth):
         role: roles/next
       etag: {}
       '''.format(self.b64etag).lstrip('\n'), normalize_space=True)
+
+
+class GetIamPolicyTestAlpha(GetIamPolicyTestBeta):
+  """Tests outputs of get-iam-policy command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

@@ -66,8 +66,13 @@ GLOBAL FLAGS
         The Google Cloud Platform project name to use for this invocation. If
         omitted, then the current project is assumed; the current project can
         be listed using gcloud config list --format='text(core.project)' and
-        can be set using gcloud config set project PROJECTID. Overrides the
-        default core/project property value for this command invocation.
+        can be set using gcloud config set project PROJECTID.
+
+        --project and its fallback core/project property play two roles in the
+        invocation. It specifies the project of the resource to operate on. It
+        also specifies the project for API enablement check, quota, and
+        billing. To specify a different project for quota and billing, use
+        --billing-project or billing/quota_project property.
 
      --quiet, -q
         Disable all interactive prompts when running gcloud commands. If input
@@ -78,10 +83,9 @@ GLOBAL FLAGS
         CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
 
      --verbosity=VERBOSITY; default="warning"
-        Override the default verbosity for this command with any of the
-        supported standard verbosity levels: debug, info, warning, error,
-        critical, none. Overrides the default core/verbosity property value for
-        this command invocation.
+        Override the default verbosity for this command. Overrides the default
+        core/verbosity property value for this command invocation. VERBOSITY
+        must be one of: debug, info, warning, error, critical, none.
 
      --version, -v
         Print version information and exit. This flag is only available at the
@@ -163,7 +167,7 @@ GROUPS
         Deploy and manage clusters of machines for running containers.
 
      dataflow
-        Manage Google Cloud Dataflow jobs.
+        Manage Google Cloud Dataflow resources.
 
      dataproc
         Create and manage Google Cloud Dataproc clusters and jobs.
@@ -227,6 +231,9 @@ GROUPS
 
      resource-manager
         Manage Cloud Resources.
+
+     scheduler
+        Manage Cloud Scheduler jobs and schedules.
 
      services
         List, enable and disable APIs and services.

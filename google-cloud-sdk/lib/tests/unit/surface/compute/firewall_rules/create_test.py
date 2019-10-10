@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class FirewallRulesCreateTest(test_base.BaseTest):
                              firewall=self.messages.Firewall(**firewall_msg),
                              project='my-project'))])
 
-  def AssertRaisesArgumentValidationExceptionRegexp(self,
+  def AssertRaisesArgumentValidationExceptionRegexp(self,  # pylint:disable=keyword-arg-before-vararg
                                                     expected_regexp,
                                                     callable_obj=None,
                                                     *args,
@@ -171,16 +171,16 @@ class FirewallRulesCreateTest(test_base.BaseTest):
                 IPProtocol='123', ports=[])
         ],
         name='firewall-1',
-        network=('https://www.googleapis.com/compute/' + self.api_version +
+        network=('https://compute.googleapis.com/compute/' + self.api_version +
                  '/projects/my-project/global/networks/my-network'),
         sourceTags=['src'])
 
   def testUriSupport(self):
     self.Run("""
         compute firewall-rules create
-          https://www.googleapis.com/compute/v1/projects/my-project/global/firewalls/firewall-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/firewalls/firewall-1
           --allow 123
-          --network https://www.googleapis.com/compute/v1/projects/my-project/global/networks/my-network
+          --network https://compute.googleapis.com/compute/v1/projects/my-project/global/networks/my-network
           --source-tags src
         """)
     self.CheckFirewallRequest(
@@ -189,7 +189,7 @@ class FirewallRulesCreateTest(test_base.BaseTest):
                 IPProtocol='123', ports=[])
         ],
         name='firewall-1',
-        network=('https://www.googleapis.com/compute/v1/projects/'
+        network=('https://compute.googleapis.com/compute/v1/projects/'
                  'my-project/global/networks/my-network'),
         sourceTags=['src'])
 

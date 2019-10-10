@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import retry
 from tests.lib import e2e_base
 from tests.lib import test_case
 from tests.lib.surface.projects import base
@@ -27,6 +28,7 @@ class ProjectIntegrationTest(base.ProjectsTestBase, e2e_base.WithServiceAuth):
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
+    self.retryer = retry.Retryer(max_wait_ms=60000)
 
   def getIntegrationTestingProject(self):
     return self.messages.Project(
@@ -77,6 +79,12 @@ class ProjectIntegrationTest(base.ProjectsTestBase, e2e_base.WithServiceAuth):
     result = self.RunProjects('describe', 'cloud-sdk-integration-testing')
     self.assertTrue(self.compareProjects(self.getIntegrationTestingProject(),
                                          result))
+
+  def testGetIamPolicy(self):
+    policy = self.RunProjects(
+        'get-iam-policy',
+        'cloud-sdk-integration-testing')
+    self.assertIsInstance(policy, self.messages.Policy)
 
 if __name__ == '__main__':
   test_case.main()

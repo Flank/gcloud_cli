@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class RecognizeTest(speech_base.MlSpeechTestBase):
 
   _VERSIONS_FOR_RELEASE_TRACKS = {
       calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
-      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.BETA: 'v1p1beta1',
       calliope_base.ReleaseTrack.GA: 'v1'
   }
 
@@ -153,18 +153,19 @@ class RecognizeTest(speech_base.MlSpeechTestBase):
           'ml speech recognize {} --language-code en-US'.format(audio_path))
 
 
+@parameterized.named_parameters(
+    ('Alpha', calliope_base.ReleaseTrack.ALPHA),
+    ('Beta', calliope_base.ReleaseTrack.BETA))
 class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
                                  parameterized.TestCase):
   """Tests for `gcloud ml speech recognize` in a subset of release tracks."""
 
   _VERSIONS_FOR_RELEASE_TRACKS = {
       calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
-      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.BETA: 'v1p1beta1',
       calliope_base.ReleaseTrack.GA: 'v1'
   }
 
-  @parameterized.named_parameters(
-      ('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testIncludeWordConfidence(self, track):
     """Test recognize command basic output with word confidence requested."""
     self.SetUpForTrack(track)
@@ -187,7 +188,6 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
     self.assertEqual(json.loads(self.GetOutput()),
                      encoding.MessageToPyValue(expected))
 
-  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testSpeakerDiarizationRequest(self, track):
     """Test diarization flag values mapped in recognize request."""
     self.SetUpForTrack(track)
@@ -213,7 +213,6 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
     ])
     self.assertEqual(expected, actual)
 
-  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testInvalidSpeakerDiarizationRequest(self, track):
     """Test invalid diarization flag values."""
     self.SetUpForTrack(track)
@@ -230,7 +229,6 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
                '    --enable-speaker-diarization '
                '    --diarization-speaker-count hugsandkittens')
 
-  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testAdditionalLanguagesRequest(self, track):
     """Test additional_language_codes flag mapped in recognize request."""
     self.SetUpForTrack(track)
@@ -253,6 +251,266 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
         ])
     ])
     self.assertEqual(expected, actual)
+
+
+class RecognizeAlpha(speech_base.MlSpeechTestBase,
+                     parameterized.TestCase):
+
+  _VERSIONS_FOR_RELEASE_TRACKS = {
+      calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
+  }
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.transcript = 'what do you think you are doing dave'
+    self.SetUpForTrack(self.track)
+
+  @parameterized.parameters(
+      ('discussion', 'DISCUSSION'),
+      ('phone-call', 'PHONE_CALL'),
+      ('voicemail', 'VOICEMAIL'),
+      ('professionally-produced', 'PROFESSIONALLY_PRODUCED'),
+      ('voice-search', 'VOICE_SEARCH'),
+      ('voice-command', 'VOICE_COMMAND'),
+      ('dictation', 'DICTATION'),
+  )
+  def testRecognizeMetadataInteractionType(self, choice, value):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        interaction_type=value
+    )
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --interaction-type {} '.format(choice))
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testRecognizePunctuation(self):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        enable_punctuation=True)
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --enable-automatic-punctuation ')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testRecognizeNaics(self):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        naics_code=123456)
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --naics-code 123456')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  @parameterized.parameters(
+      ('nearfield', 'NEARFIELD'),
+      ('midfield', 'MIDFIELD'),
+      ('farfield', 'FARFIELD')
+  )
+  def testRecognizeMicrophoneDistance(self, choice, value):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        microphone_distance=value)
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --microphone-distance {}'.format(choice))
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  @parameterized.parameters(
+      ('audio', 'AUDIO'),
+      ('video', 'VIDEO')
+  )
+  def testRecognizeMediaType(self, choice, value):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        media_type=value)
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --original-media-type {}'.format(choice))
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  @parameterized.parameters(
+      ('smartphone', 'SMARTPHONE'),
+      ('pc', 'PC'),
+      ('phone-line', 'PHONE_LINE'),
+      ('vehicle', 'VEHICLE'),
+      ('outdoor', 'OTHER_OUTDOOR_DEVICE'),
+      ('indoor', 'OTHER_INDOOR_DEVICE'),
+  )
+  def testRecognizeDeviceType(self, choice, value):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        device_type=value)
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --recording-device-type {}'.format(choice))
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testRecordingDeviceName(self):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        device_name='Nexus 5X')
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --recording-device-name "Nexus 5X"')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testRecordingMimeType(self):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        mime_type='audio/mp3')
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --original-mime-type "audio/mp3"')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testRecordingAudioTopic(self):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        audio_topic='Recordings of federal supreme court')
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --audio-topic '
+                      '"Recordings of federal supreme court"')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testSeparateChannelRecognition(self):
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[self.transcript],
+        audio_channel_count=3,
+        enable_separate_recognition=True
+    )
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --audio-channel-count 3 '
+                      '    --separate-channel-recognition ')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=self.transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  def testInvalidSeparateRecognitionRequest(self):
+    """Test invalid separate recognition flag values."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        '--separate-channel-recognition: Must be specified.'):
+      self.Run('ml speech recognize gs://bucket/object '
+               '    --language-code en-US '
+               '    --audio-channel-count 3')
+
+  def testInvalidAudioChannelCountRequest(self):
+    """Test invalid separate recognition flag values."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        '-audio-channel-count: Must be specified.'):
+      self.Run('ml speech recognize gs://bucket/object '
+               '    --language-code en-US '
+               '    --separate-channel-recognition ')
 
 
 if __name__ == '__main__':

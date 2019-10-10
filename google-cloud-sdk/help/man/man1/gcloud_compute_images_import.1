@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute images import \- import an image into Google Compute Engine
+gcloud compute images import \- import an image into Compute Engine
 
 
 
@@ -18,27 +18,27 @@ gcloud compute images import \- import an image into Google Compute Engine
 .SH "DESCRIPTION"
 
 \fBgcloud compute images import\fR imports Virtual Disk images, such as VMWare
-VMDK files and VHD files, into Google Compute Engine.
+VMDK files and VHD files, into Compute Engine.
 
-Importing images involves 3 steps:
+Importing images involves three steps:
 .RS 2m
 .IP "\(bu" 2m
-Upload the virtual disk file to Google Cloud Storage.
+Upload the virtual disk file to Cloud Storage.
 .IP "\(bu" 2m
-Import the image to Google Compute Engine.
+Import the image to Compute Engine.
 .IP "\(bu" 2m
 Translate the image to make a bootable image.
 .RE
 .sp
-This command will perform all three of these steps as necessary, depending on
-the input arguments specified by the user.
+This command performs all three of these steps as required, depending on the
+input arguments specified.
 
 This command uses the \f5\-\-os\fR flag to choose the appropriate translation.
 You can omit the translation step using the \f5\-\-data\-disk\fR flag.
 
-If you exported your disk from Google Compute Engine then you do not need to
-re\-import it. Instead, use the \f5create\fR command to create further images
-from it.
+If you exported your disk from Compute Engine then you don't need to re\-import
+it. Instead, use \f5gcloud compute images create\fR to create more images from
+the disk.
 
 Files stored on Cloud Storage and images in Compute Engine incur charges. See
 https://cloud.google.com/compute/docs/images/importing\-virtual\-disks#resource_cleanup.
@@ -71,11 +71,15 @@ without making it bootable or installing Google tools on it.
 
 .TP 2m
 \fB\-\-os\fR=\fIOS\fR
-Specifies the OS of the image being imported. \fIOS\fR must be one of:
+Specifies the OS of the disk image being imported. \fIOS\fR must be one of:
 \fBcentos\-6\fR, \fBcentos\-7\fR, \fBdebian\-8\fR, \fBdebian\-9\fR,
 \fBrhel\-6\fR, \fBrhel\-6\-byol\fR, \fBrhel\-7\fR, \fBrhel\-7\-byol\fR,
-\fBubuntu\-1404\fR, \fBubuntu\-1604\fR, \fBwindows\-2008r2\fR,
-\fBwindows\-2012\fR, \fBwindows\-2012r2\fR, \fBwindows\-2016\fR.
+\fBubuntu\-1404\fR, \fBubuntu\-1604\fR, \fBwindows\-10\-byol\fR,
+\fBwindows\-2008r2\fR, \fBwindows\-2008r2\-byol\fR, \fBwindows\-2012\fR,
+\fBwindows\-2012\-byol\fR, \fBwindows\-2012r2\fR, \fBwindows\-2012r2\-byol\fR,
+\fBwindows\-2016\fR, \fBwindows\-2016\-byol\fR, \fBwindows\-2019\fR,
+\fBwindows\-2019\-byol\fR, \fBwindows\-7\-byol\fR,
+\fBwindows\-8\-1\-x64\-byol\fR.
 
 .RE
 .sp
@@ -86,8 +90,8 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-source\-file\fR=\fISOURCE_FILE\fR
-A local file, or the Google Cloud Storage URI of the virtual disk file to
-import. For example: \f5\fIgs://my\-bucket/my\-image.vmdk\fR\fR or
+A local file, or the Cloud Storage URI of the virtual disk file to import. For
+example: \f5\fIgs://my\-bucket/my\-image.vmdk\fR\fR or
 \f5\fI./my\-local\-image.vmdk\fR\fR
 
 .TP 2m
@@ -104,24 +108,23 @@ An existing Compute Engine image from which to import.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-guest\-environment\fR
-Google Guest Environment will be installed on the image. Enabled by default, use
-\fB\-\-no\-guest\-environment\fR to disable.
+Installs the guest environment on the image. See
+https://cloud.google.com/compute/docs/images/guest\-environment. Enabled by
+default, use \fB\-\-no\-guest\-environment\fR to disable.
 
 .TP 2m
 \fB\-\-log\-location\fR=\fILOG_LOCATION\fR
-Directory in Google Cloud Storage to hold build logs. If not set,
-\f5gs://<project num>.cloudbuild\-logs.googleusercontent.com/\fR will be created
-and used.
+Directory in Cloud Storage to hold build logs. If not set, \f5gs://<project
+num>.cloudbuild\-logs.googleusercontent.com/\fR is created and used.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
 Name of the network in your project to use for the image import. The network
-must have access to Google Cloud Storage. If not specified, the network named
+must have access to Cloud Storage. If not specified, the network named
 \f5default\fR is used.
 
 .TP 2m
@@ -134,9 +137,9 @@ should be specified if this field is specified.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="2h"
-Maximum time a build can last before it is failed as "TIMEOUT". For example,
-specifying \f5\fI2h\fR\fR will fail the process after 2 hours. See $ gcloud
-topic datetimes for information on duration formats.
+Maximum time a build can last before it fails as "TIMEOUT". For example,
+specifying \f52h\fR fails the process after 2 hours. See $ gcloud topic
+datetimes for information about duration formats.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -155,6 +158,24 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import a centos\-7 VMDK file, run:
+
+.RS 2m
+$ gcloud compute images import myimage\-name \-\-os=centos\-7 \e
+    \-\-source\-file=mysourcefile
+.RE
+
+To import a data disk without operating system, run:
+
+.RS 2m
+$ gcloud compute images import myimage\-name \-\-data\-disk \e
+    \-\-source\-file=mysourcefile
+.RE
 
 
 

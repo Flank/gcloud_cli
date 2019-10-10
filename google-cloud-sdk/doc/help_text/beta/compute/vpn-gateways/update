@@ -88,9 +88,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To update labels for a VPN gateway, run:
 
+        $ gcloud beta compute vpn-gateways update my-gateway \
+          --region=us-central1                 \
+          --update-labels=k0=value1,k1=value2
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute vpn-gateways update
         $ gcloud alpha compute vpn-gateways update
 

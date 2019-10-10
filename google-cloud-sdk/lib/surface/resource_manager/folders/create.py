@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class Create(base.CreateCommand):
             parent=flags.GetParentFromFlags(args),
             folder=messages.Folder(
                 displayName=args.display_name)))
-    if args.async:
+    if args.async_:
       return operation
     else:
       finished_operation = operations.WaitForOperation(operation)

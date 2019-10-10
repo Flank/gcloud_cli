@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Base classes for all dataflow tests."""
 
 from __future__ import absolute_import
@@ -21,8 +20,8 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 
+from googlecloudsdk.api_lib.dataflow import apis
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.command_lib.dataflow import job_utils
 from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -41,7 +40,7 @@ JOB_6_ID = '2016-06-06_18_66_66-66666'
 
 DEFAULT_PAGE_SIZE = 20
 
-DEFAULT_REGION = job_utils.DATAFLOW_API_DEFAULT_REGION
+DEFAULT_REGION = apis.DATAFLOW_API_DEFAULT_REGION
 
 
 class DataflowTestBase(cli_test_base.CliTestBase):
@@ -132,7 +131,8 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                  num_workers=None,
                  worker_machine_type=None,
                  network=None,
-                 subnetwork=None):
+                 subnetwork=None,
+                 kms_key_name=None):
     run_job_req_body = MESSAGE_MODULE.CreateJobFromTemplateRequest
     run_job_req_class = (
         MESSAGE_MODULE.DataflowProjectsLocationsTemplatesCreateRequest)
@@ -144,8 +144,9 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
       params_value = run_job_req_body.ParametersValue
       params_list = []
       for k, v in six.iteritems(parameters):
-        params_list.append(params_value.AdditionalProperty(
-            key=six.text_type(k), value=six.text_type(v)))
+        params_list.append(
+            params_value.AdditionalProperty(
+                key=six.text_type(k), value=six.text_type(v)))
       additional_properties = params_value(additionalProperties=params_list)
 
     body = run_job_req_body(
@@ -160,6 +161,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             network=network,
             subnetwork=subnetwork,
             machineType=worker_machine_type,
+            kmsKeyName=kms_key_name,
         ),
         parameters=additional_properties)
 
@@ -184,6 +186,41 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             view=view),
         exception=http_error.MakeHttpError(
             404, 'Requested entity was not found.', url='FakeUrl'))
+
+  def MockCreateSnapshot(self,
+                         job_id,
+                         location=None,
+                         ttl='604800s',
+                         snapshot_sources=False):
+    snapshot_job_req_class = MESSAGE_MODULE.DataflowProjectsLocationsJobsSnapshotRequest
+    location = location or DEFAULT_REGION
+    pubsub_metadata = [self.SamplePubsubMetadata()] if snapshot_sources else []
+    self.mocked_client.projects_locations_jobs.Snapshot.Expect(
+        request=snapshot_job_req_class(
+            projectId=self.Project(),
+            jobId=job_id,
+            location=location,
+            snapshotJobRequest=MESSAGE_MODULE.SnapshotJobRequest(
+                location=location, ttl=ttl, snapshotSources=snapshot_sources)),
+        response=self.SampleSnapshot(
+            snapshot_id=job_id + '_snapshot',
+            job_id=job_id,
+            project_id=self.Project(),
+            ttl=ttl,
+            pubsub_metadata=pubsub_metadata))
+
+  def MockListSnapshot(self, job_id, location=None):
+    snapshot_list_req_class = MESSAGE_MODULE.DataflowProjectsLocationsSnapshotsListRequest
+    location = location or DEFAULT_REGION
+    self.mocked_client.projects_locations_snapshots.List.Expect(
+        request=snapshot_list_req_class(
+            projectId=self.Project(), jobId=job_id, location=location),
+        response=MESSAGE_MODULE.ListSnapshotsResponse(snapshots=[
+            self.SampleSnapshot(
+                snapshot_id=job_id + '_snapshot',
+                job_id=job_id,
+                project_id=self.Project())
+        ]))
 
   def SampleJob(
       self,
@@ -226,3 +263,30 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
         createTime=creation_time_str,
         environment=environment,
         location=region)
+
+  def SamplePubsubMetadata(self):
+    """Returns a PubsubMetadata object for use in tests."""
+    expire_time = times.FormatDateTime(
+        times.ParseDateTime('2019-08-14 15:44:10'))
+    return MESSAGE_MODULE.PubsubSnapshotMetadata(
+        topicName='topic', snapshotName='snapshot', expireTime=expire_time)
+
+  def SampleSnapshot(self,
+                     snapshot_id,
+                     job_id,
+                     project_id=None,
+                     creation_time=None,
+                     state=None,
+                     ttl=None,
+                     pubsub_metadata=None):
+    """Returns a Snapshot message object for use in tests."""
+    creation_time = creation_time or '2019-06-10 17:39:10'
+    creation_time_str = times.FormatDateTime(times.ParseDateTime(creation_time))
+    return MESSAGE_MODULE.Snapshot(
+        projectId=project_id or self.Project(),
+        id=snapshot_id,
+        sourceJobId=job_id,
+        creationTime=creation_time_str,
+        state=state or MESSAGE_MODULE.Snapshot.StateValueValuesEnum.READY,
+        ttl=ttl or '604800s',
+        pubsubMetadata=pubsub_metadata or [])

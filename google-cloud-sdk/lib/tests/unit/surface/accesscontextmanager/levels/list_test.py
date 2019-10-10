@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 from six.moves import map
 from six.moves import range
 
@@ -50,24 +51,22 @@ class LevelsListTestGA(accesscontextmanager.Base):
     m = self.messages
     request_type = m.AccesscontextmanagerAccessPoliciesAccessLevelsListRequest
     self.client.accessPolicies_accessLevels.List.Expect(
-        request_type(
-            parent=policy_name,
-        ),
+        request_type(parent=policy_name,),
         self.messages.ListAccessLevelsResponse(accessLevels=levels))
 
   def testList(self):
     self.SetUpForTrack(self.track)
     levels = self._MakeLevels()
-    self._ExpectList(levels, 'my-policy')
+    self._ExpectList(levels, '123')
 
-    results = self.Run('access-context-manager levels list --policy my-policy')
+    results = self.Run('access-context-manager levels list --policy 123')
 
     self.assertEqual(results, levels)
 
   def testList_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
     levels = self._MakeLevels()
-    policy = 'my-acm-policy'
+    policy = '456'
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectList(levels, policy)
 
@@ -79,16 +78,26 @@ class LevelsListTestGA(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     properties.VALUES.core.user_output_enabled.Set(True)
     levels = self._MakeLevels()
-    self._ExpectList(levels, 'my-policy')
+    self._ExpectList(levels, '123')
 
-    self.Run('access-context-manager levels list --policy my-policy')
+    self.Run('access-context-manager levels list --policy 123')
 
-    self.AssertOutputEquals("""\
+    self.AssertOutputEquals(
+        """\
         NAME    TITLE        LEVEL_TYPE
         level0  My level #0  Basic
         level1  My level #1  Basic
         level2  My level #2  Basic
-        """, normalize_space=True)
+        """,
+        normalize_space=True)
+
+  def testList_InvalidPolicyArg(self):
+    self.SetUpForTrack(self.track)
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager levels list'
+               ' --policy accessPolicy/123')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class LevelsListTestBeta(LevelsListTestGA):

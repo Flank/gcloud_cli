@@ -6,10 +6,10 @@ summary:
   - command: |
       domains registrations list
   - stdout: |
-      DOMAIN           STATE        EXPIRE_TIME
-      example.com      ACTIVE       2019-11-23T11:15:09Z
-      google.com       ACTIVE       2020-01-11T10:12:09Z
-      transferred.com  TRANSFERRED
+      DOMAIN        STATE     EXPIRE_TIME
+      example.com   ACTIVE    2019-11-23T11:15:09Z
+      google.com    ACTIVE    2020-01-11T10:12:09Z
+      detached.com  DETACHED
 actions:
 - execute_command:
     command: |
@@ -84,18 +84,18 @@ actions:
                   }
                 },
                 {
-                  "name": "projects/fake-project/locations/global/registrations/transferred.com",
-                  "domainName": "transferred.com",
+                  "name": "projects/fake-project/locations/global/registrations/detached.com",
+                  "domainName": "detached.com",
                   "createTime": "2018-11-23T11:15:04.123212416Z",
                   "updateTime": "2018-11-28T12:49:34.888985282Z",
-                  "state": "TRANSFERRED"
+                  "state": "DETACHED"
                 }
               ]
             }
     - expect_stdout: |
-        DOMAIN           STATE        EXPIRE_TIME
-        example.com      ACTIVE       2019-11-23T11:15:09Z
-        google.com       ACTIVE       2020-01-11T10:12:09Z
-        transferred.com  TRANSFERRED
+        DOMAIN        STATE     EXPIRE_TIME
+        example.com   ACTIVE    2019-11-23T11:15:09Z
+        google.com    ACTIVE    2020-01-11T10:12:09Z
+        detached.com  DETACHED
     - expect_exit:
         code: 0

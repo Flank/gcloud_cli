@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# TODO(b/140557440) Break up file to prevent linter deadline.
+
 
 """Tests for the backend services update alpha command."""
 
@@ -310,14 +313,14 @@ class WithHealthcheckApiTest(AlphaUpdateTestBase):
                 backends=[],
                 description='my backend service',
                 healthChecks=[
-                    ('https://www.googleapis.com/compute/alpha/projects/'
+                    ('https://compute.googleapis.com/compute/alpha/projects/'
                      'my-project/global/httpHealthChecks/my-health-check')
                 ],
                 name='backend-service-1',
                 portName='http',
                 protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
                 selfLink=(
-                    'https://www.googleapis.com/compute/alpha/projects/'
+                    'https://compute.googleapis.com/compute/alpha/projects/'
                     'my-project/global/backendServices/backend-service-1'),
                 timeoutSec=30,
                 customRequestHeaders=['test: '])

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class DeleteTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+class DeleteTest(base.WithMockGaBinauthz, base.BinauthzTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSuccess_ExistingAttestor(self):
     name = 'bar'
     proj = self.Project()
-    req = self.messages.BinaryauthorizationProjectsAttestorsDeleteRequest(  # pylint: disable=line-too-long
+    req = self.messages.BinaryauthorizationProjectsAttestorsDeleteRequest(
         name='projects/{}/attestors/{}'.format(proj, name),
     )
 
@@ -44,7 +44,13 @@ class DeleteTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
     self.assertIsNone(response)
 
 
-class DeleteAlphaTest(base.WithMockAlphaBinauthz, DeleteTest):
+class DeleteBetaTest(base.WithMockBetaBinauthz, DeleteTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DeleteAlphaTest(base.WithMockAlphaBinauthz, DeleteBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

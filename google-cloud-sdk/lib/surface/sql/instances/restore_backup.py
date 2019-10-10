@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,10 +58,7 @@ class RestoreBackup(base.Command):
         '--backup-instance',
         completer=flags.InstanceCompleter,
         help='The ID of the instance that the backup was taken from.')
-    parser.add_argument(
-        '--async',
-        action='store_true',
-        help='Do not wait for the operation to complete.')
+    base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
     """Restores a backup of a Cloud SQL instance.
@@ -121,7 +118,7 @@ class RestoreBackup(base.Command):
         operation=result_operation.name,
         project=instance_ref.project)
 
-    if args.async:
+    if args.async_:
       return sql_client.operations.Get(
           sql_messages.SqlOperationsGetRequest(
               project=operation_ref.project, operation=operation_ref.operation))

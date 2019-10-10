@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -154,7 +154,7 @@ status_message: <A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere. Try
 url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
 """
     actual = six.text_type(exc)
-    self.maxDiff = None
+    self.maxDiff = None  # pylint:disable=invalid-name
     self.assertEqual(expected, actual)
 
   def testHttpException400Content(self):
@@ -333,8 +333,7 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
 
   def testHttpException400UrlNoInstance(self):
     err = http_error.MakeHttpError(
-        400,
-        url='https://www.googleapis.com/compute/v1/projects/')
+        400, url='https://compute.googleapis.com/compute/v1/projects/')
     exc = exceptions.HttpException(err)
     self.assertEqual('compute', exc.payload.api_name)
     self.assertEqual('v1', exc.payload.api_version)
@@ -345,8 +344,9 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
   def testHttpException400UrlParseOK(self):
     err = http_error.MakeHttpError(
         400,
-        url=('https://www.googleapis.com/compute/alpha/projects/mock-project/'
-             'zones/us-east1-b/instances/mock-instance'))
+        url=(
+            'https://compute.googleapis.com/compute/alpha/projects/mock-project/'
+            'zones/us-east1-b/instances/mock-instance'))
     exc = exceptions.HttpException(err)
     self.assertEqual('compute', exc.payload.api_name)
     self.assertEqual('alpha', exc.payload.api_version)
@@ -357,8 +357,9 @@ url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
   def testHttpException400UrlInstanceWithSlashRegistryParseOK(self):
     err = http_error.MakeHttpError(
         400,
-        url=('https://www.googleapis.com/compute/alpha/projects/mock-project/'
-             'zones/us-east1-b/instances/mock-instance/with-a-slash'))
+        url=(
+            'https://compute.googleapis.com/compute/alpha/projects/mock-project/'
+            'zones/us-east1-b/instances/mock-instance/with-a-slash'))
     exc = exceptions.HttpException(err)
     self.assertEqual('compute', exc.payload.api_name)
     self.assertEqual('alpha', exc.payload.api_version)
@@ -856,7 +857,7 @@ Invalid request API reason: Precondition check failed.
                             ' or @digest], obtained really/bad/image',
                     }]}]}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(
+    self.assertEquals(  # pylint:disable=g-deprecated-assert
         self._GetFieldViolations(err),
         {'spec.revisionTemplate.spec.container.image':
              'Invalid image provided in the revision'
@@ -879,7 +880,7 @@ Invalid request API reason: Precondition check failed.
                         {'field': 'doop.doop', 'description': 'lol'},
                     ]}]}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(
+    self.assertEquals(  # pylint:disable=g-deprecated-assert
         self._GetFieldViolations(err),
         {'blog.blug': 'hahaha', 'doop.doop': 'lol'})
 
@@ -909,7 +910,7 @@ Invalid request API reason: Precondition check failed.
                     }
                 ]}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(
+    self.assertEquals(  # pylint:disable=g-deprecated-assert
         self._GetFieldViolations(err),
         {'blog.blug': 'hahaha', 'doop.doop': 'lol'})
 
@@ -924,7 +925,7 @@ Invalid request API reason: Precondition check failed.
                 'status': 'INVALID_ARGUMENT',
                 'details': []}},
         details=http_error.ExampleErrorDetails())
-    self.assertEquals(self._GetFieldViolations(err), {})
+    self.assertEquals(self._GetFieldViolations(err), {})  # pylint:disable=g-deprecated-assert
 
   def testGetFieldViolationsBadJson(self):
     err = http_error.MakeDetailedHttpError(
@@ -934,7 +935,7 @@ Invalid request API reason: Precondition check failed.
         details=http_error.ExampleErrorDetails())
     # Override content, since the factory doesn't let us make it invalid.
     err.content = 'this is bad json yo . it is . like. so bad'
-    self.assertEquals(self._GetFieldViolations(err), {})
+    self.assertEquals(self._GetFieldViolations(err), {})  # pylint:disable=g-deprecated-assert
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,9 +45,12 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def _CreateBaseNodeTemplateMessage(self):
     affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
+    server_binding = (self.messages.ServerBinding.TypeValueValuesEnum
+                      .RESTART_NODE_ON_ANY_SERVER)
     return self.messages.NodeTemplate(
         name='my-template',
-        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels))
+        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels),
+        serverBinding=self.messages.ServerBinding(type=server_binding))
 
   def testCreate_AllOptionsWithNodeType(self):
     template = self._CreateBaseNodeTemplateMessage()
@@ -133,23 +136,6 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
     self.AssertErrContains('--node-requirements')
     self.AssertErrContains('--node-type')
 
-
-class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
-
-  def SetUp(self):
-    self.region = 'us-central1'
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
-  def _CreateBaseNodeTemplateMessage(self):
-    affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
-    server_binding = (self.messages.ServerBinding.TypeValueValuesEnum
-                      .RESTART_NODE_ON_ANY_SERVER)
-    return self.messages.NodeTemplate(
-        name='my-template',
-        nodeAffinityLabels=self._CreateAffinityLabelsMessage(affinity_labels),
-        serverBinding=self.messages.ServerBinding(type=server_binding))
-
   @parameterized.named_parameters(
       ('DefaultSpecified', '--server-binding restart-node-on-any-server',
        'RESTART_NODE_ON_ANY_SERVER'),
@@ -175,12 +161,64 @@ class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
     self.assertEqual(result, template)
 
 
+class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
+
+  def SetUp(self):
+    self.region = 'us-central1'
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+
+
 class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
 
   def SetUp(self):
     self.region = 'us-central1'
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
+
+  @parameterized.named_parameters(
+      ('SimpleDisk', 'type=local-ssd,count=1', 'local-ssd', '1', None),
+      ('SizeSpecified', 'type=local-ssd,count=1,size=375GB', 'local-ssd', '1',
+       '375'),
+      )
+  def testCreate_Disk(self, disk, disk_type, count, size):
+    template = self._CreateBaseNodeTemplateMessage()
+    template.disks = [(
+        self.messages.LocalDisk(
+            diskType=disk_type, diskCount=count, diskSizeGb=size))]
+    template.nodeTypeFlexibility = (
+        self.messages.NodeTemplateNodeTypeFlexibility(
+            cpus='64', localSsd=None, memory='128'))
+    request = self._ExpectCreate(template)
+
+    result = self.Run(
+        'compute sole-tenancy node-templates create my-template '
+        '--node-affinity-labels environment=prod,grouping=frontend '
+        '--node-requirements vCPU=64,memory=128MB '
+        '--disk {0} '
+        '--region {1}'.format(disk, self.region))
+
+    self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
+    self.assertEqual(result, template)
+
+  @parameterized.parameters(
+      ('type=invalid,count=1', r'\[type\] must be one of \[local-ssd\]'),
+      ('count=1', r'Key \[type\] required in dict arg but not provided'),
+      ('type=local-ssd',
+       r'Key \[count\] required in dict arg but not provided'),
+      ('type=local-ssd,count=1,size=200GB',
+       'value must be greater than or equal to 375GB'),
+      ('type=local-ssd,count=1,size=500GB',
+       'value must be less than or equal to 375GB'))
+  def testCreate_InvalidDisk(self, disk, error_msg):
+    with self.AssertRaisesArgumentErrorRegexp(
+        'argument --disk: ' + error_msg):
+      self.Run(
+          'compute sole-tenancy node-templates create my-template '
+          '--node-affinity-labels environment=prod,grouping=frontend '
+          '--node-requirements vCPU=64,memory=128MB '
+          '--disk {0} '
+          '--region {1}'.format(disk, self.region))
 
 
 if __name__ == '__main__':

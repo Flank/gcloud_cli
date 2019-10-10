@@ -7,9 +7,6 @@ SYNOPSIS
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) List Attestors associated with the current project.
-
 LIST COMMAND FLAGS
      --filter=EXPRESSION
         Apply a Boolean filter EXPRESSION to each resource item to be listed.
@@ -46,12 +43,22 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list attestors:
+
+        $ gcloud alpha container binauthz attestors list
+
+    To list attestors in a verbose format (including information about public
+    keys associated with each attestor:
+
+        $ gcloud alpha container binauthz attestors list --format=yaml
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud container binauthz attestors list
         $ gcloud beta container binauthz attestors list
 

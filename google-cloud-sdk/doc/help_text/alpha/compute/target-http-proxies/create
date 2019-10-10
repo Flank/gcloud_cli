@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute target-http-proxies create NAME --url-map=URL_MAP
-        [--description=DESCRIPTION] [--global | --region=REGION]
+        [--description=DESCRIPTION] [--proxy-bind] [--global | --region=REGION]
         [--global-url-map | --url-map-region=URL_MAP_REGION]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -29,6 +29,12 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the target HTTP proxy.
+
+     --proxy-bind
+        This flag only applies when the load_balancing_scheme of the associated
+        backend service is INTERNAL_SELF_MANAGED. When specified, the envoy
+        binds to the IP address and port specified by the forwarding rule. By
+        default this flag is off.
 
      At most one of these may be specified:
 
@@ -86,9 +92,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute target-http-proxies create
         $ gcloud beta compute target-http-proxies create

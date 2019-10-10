@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,23 +20,21 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptoKeysUpdateTest(base.KmsMockTest):
+class CryptoKeysUpdateTestGa(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/3')
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key')
+    self.version_name = self.project_name.Version('global/my_kr/my_key/3')
+    self.key_name = self.project_name.CryptoKey('global/my_kr/my_key')
 
-  def testLabelsOnlySuccess(self, track):
-    self.track = track
+  def testLabelsOnlySuccess(self):
     # Test update labels.
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
@@ -128,8 +126,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
-  def testUpdateNextRotationTimeOnlySuccess(self, track):
-    self.track = track
+  def testUpdateNextRotationTimeOnlySuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -152,8 +149,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
-  def testUpdateRotationPeriodOnlySuccess(self, track):
-    self.track = track
+  def testUpdateRotationPeriodOnlySuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -174,8 +170,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                                             self.key_name.key_ring_id,
                                             self.key_name.crypto_key_id))
 
-  def testUpdateBothRotationPeriodAndNextRotationTimeSuccess(self, track):
-    self.track = track
+  def testUpdateBothRotationPeriodAndNextRotationTimeSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -201,8 +196,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                                             self.key_name.key_ring_id,
                                             self.key_name.crypto_key_id))
 
-  def testUpdateBothRotationAndLabelsSuccess(self, track):
-    self.track = track
+  def testUpdateBothRotationAndLabelsSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -236,8 +230,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
-  def testRemoveRotationScheduleSuccess(self, track):
-    self.track = track
+  def testRemoveRotationScheduleSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -257,8 +250,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                                                  self.key_name.key_ring_id,
                                                  self.key_name.crypto_key_id))
 
-  def testUpdatePrimaryVersionSuccess(self, track):
-    self.track = track
+  def testUpdatePrimaryVersionSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -279,8 +271,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id, self.version_name.version_id))
 
-  def testUpdatePrimaryVersionAndRemoveRotationScheduleSuccess(self, track):
-    self.track = track
+  def testUpdatePrimaryVersionAndRemoveRotationScheduleSuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -308,8 +299,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id, self.version_name.version_id))
 
-  def testUpdatePrimaryVersionFailedRaisesError(self, track):
-    self.track = track
+  def testUpdatePrimaryVersionFailedRaisesError(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -334,8 +324,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                    self.version_name.location_id, self.version_name.key_ring_id,
                    self.version_name.crypto_key_id))
 
-  def testRaisesErrorWhenUpdatesArePartiallyFailed(self, track):
-    self.track = track
+  def testRaisesErrorWhenUpdatesArePartiallyFailed(self):
     # When primary-version is failed to update while other updates succeed.
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
@@ -402,8 +391,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                    self.version_name.crypto_key_id, self.version_name.version_id
                ))
 
-  def testRaisesErrorWhenAllUpdatesFailed(self, track):
-    self.track = track
+  def testRaisesErrorWhenAllUpdatesFailed(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
             name=self.key_name.RelativeName()),
@@ -437,8 +425,7 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                    self.version_name.location_id, self.version_name.key_ring_id,
                    self.version_name.crypto_key_id))
 
-  def testSetAndRemoveRotationScheduleRaisesError(self, track):
-    self.track = track
+  def testSetAndRemoveRotationScheduleRaisesError(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.ToolException,
         'You cannot set and remove rotation schedule at the same time.'):
@@ -470,52 +457,16 @@ class CryptoKeysUpdateTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id))
 
-  def testNoUpdateFieldsSpecifiedRaisesError(self, track):
-    self.track = track
+  def testNoUpdateFieldsSpecifiedRaisesError(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.ToolException,
         'At least one of --primary-version or --update-labels or --remove-'
         'labels or --clear-labels or --rotation-period or --next-rotation-time '
-        'or --remove-rotation-schedule must be specified.'):
+        'or --remove-rotation-schedule or --default-algorithm must be specified.'
+    ):
       self.Run('kms keys update --location={0} --keyring={1} {2}'.format(
           self.key_name.location_id, self.key_name.key_ring_id,
           self.key_name.crypto_key_id))
-
-
-class CryptoKeysUpdateAlphaTest(base.KmsMockTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/3')
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key')
-
-    ckvt_2048 = self.messages.CryptoKeyVersionTemplate(
-        algorithm=self.messages.CryptoKeyVersionTemplate.
-        AlgorithmValueValuesEnum.RSA_DECRYPT_OAEP_2048_SHA256,
-        protectionLevel=self.messages.CryptoKeyVersionTemplate.
-        ProtectionLevelValueValuesEnum.SOFTWARE)
-
-    # Create an ASYMMETRIC-DECRYPT key with algorithm
-    # RSA_DECRYPT_OAEP_2048_SHA256.
-    self.kms.projects_locations_keyRings_cryptoKeys.Create.Expect(
-        self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest(
-            parent=self.key_name.Parent().RelativeName(),
-            cryptoKeyId=self.key_name.crypto_key_id,
-            cryptoKey=self.messages.CryptoKey(
-                purpose=self.messages.CryptoKey.PurposeValueValuesEnum.
-                ASYMMETRIC_DECRYPT,
-                versionTemplate=ckvt_2048)),
-        self.messages.CryptoKey(
-            name=self.key_name.RelativeName(),
-            purpose=self.messages.CryptoKey.PurposeValueValuesEnum.
-            ASYMMETRIC_DECRYPT,
-            versionTemplate=ckvt_2048))
-
-    self.Run('kms keys create '
-             '--location={0} --keyring={1} {2} --purpose=asymmetric-encryption '
-             '--default-algorithm=rsa-decrypt-oaep-2048-sha256'.format(
-                 self.key_name.location_id, self.key_name.key_ring_id,
-                 self.key_name.crypto_key_id))
 
   def testUpdateDefaultAlgorithmSuccess(self):
     ckvt_3072 = self.messages.CryptoKeyVersionTemplate(
@@ -563,6 +514,18 @@ class CryptoKeysUpdateAlphaTest(base.KmsMockTest):
                '--default-algorithm=google-symmetric-encryption'.format(
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id))
+
+
+class CryptoKeysUpdateTestBeta(CryptoKeysUpdateTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptoKeysUpdateTestAlpha(CryptoKeysUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -1,6 +1,12 @@
 - help_text:
     brief: Create a Cloud Scheduler job with a Pub/Sub target.
     description: Create a Cloud Scheduler job with a Pub/Sub target.
+    examples: |
+      The following command creates a job that publishes a messgae with the body
+      'Hello' to the Pub/Sub topic 'cron-topic' every 3 hours:
+
+        $ {command} my-job --schedule="0 */3 * * *"
+          --topic=cron-topic --message-body="Hello"
 
   request:
     collection: cloudscheduler.projects.locations.jobs
@@ -14,15 +20,17 @@
       spec: !REF googlecloudsdk.command_lib.scheduler.resources:job
       removed_flags: [location]
     params:
-    - _REF_googlecloudsdk.command_lib.scheduler.flags:args
-    - _REF_googlecloudsdk.command_lib.scheduler.flags:retry_args
-    - api_field: job.pubsubTarget.topicName
-      arg_name: topic
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:schedule
       required: true
-      type: googlecloudsdk.command_lib.util.hooks.types:Resource:collection=pubsub.projects.topics
-      processor: googlecloudsdk.command_lib.util.hooks.processors:RelativeName
-      help_text: |
-        Name of the Google Cloud Pub/Sub topic to publish to when the job runs.
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:timezone
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:description
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:retry_attempts
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:retry_duration
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:min_backoff
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:max_backoff
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:max_doublings
+    - _REF_: googlecloudsdk.command_lib.scheduler.flags:pubsub_topic
+      required: true
     - group:
         mutex: true
         required: true
@@ -34,7 +42,7 @@
         - arg_name: message-body
           help_text: Body of the message.
         - arg_name: message-body-from-file
-          type: "googlecloudsdk.calliope.arg_parsers:BufferedFileInput:"
+          type: "googlecloudsdk.calliope.arg_parsers:FileContents:"
           help_text: Path to a file containing the body of the message.
     - arg_name: attributes
       api_field: job.pubsubTarget.attributes

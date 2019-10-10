@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -160,8 +160,9 @@ class RecordSetsImportTest(base.DnsMockTest):
     1   today now   pending
     """))
     self.AssertErrContains((
-        'Created [https://www.googleapis.com/dns/v1/projects/{0}/'
-        'managedZones/mz/changes/1]').format(self.Project()))
+        'Created [{0}projects/{1}/'
+        'managedZones/mz/changes/1]').format(self.client.BASE_URL,
+                                             self.Project()))
 
   def testImportFromYamlFile(self):
     self._ImportFromFileHelper(self.yaml_file_path_no_conflicts,
@@ -201,8 +202,8 @@ class RecordSetsImportTest(base.DnsMockTest):
     2   today 5 mins ago  done
     """))
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz/changes/2].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz/changes/2].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testImportReplaceFromYamlFile(self):
     self._ImportReplaceFromFileHelper(self.yaml_file_path)
@@ -369,8 +370,9 @@ ID  START_TIME  STATUS
 1   today now   pending
 """, normalize_space=True)
     self.AssertErrContains((
-        'Created [https://www.googleapis.com/dns/{0}/projects/{1}/'
-        'managedZones/mz/changes/1]').format(self.api_version, self.Project()))
+        'Created [{0}projects/{1}/'
+        'managedZones/mz/changes/1]').format(self.client.BASE_URL,
+                                             self.Project()))
 
   def testImportFromYamlFile(self):
     self._ImportFromFileHelper(self.yaml_file_path_no_conflicts,
@@ -410,8 +412,8 @@ ID  START_TIME        STATUS
 2   today 5 mins ago  done
 """, normalize_space=True)
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz/changes/2].
-""".format(self.api_version, self.Project()))
+Created [{0}projects/{1}/managedZones/mz/changes/2].
+""".format(self.client.BASE_URL, self.Project()))
 
   def testImportReplaceFromYamlFile(self):
     self._ImportReplaceFromFileHelper(self.yaml_file_path)

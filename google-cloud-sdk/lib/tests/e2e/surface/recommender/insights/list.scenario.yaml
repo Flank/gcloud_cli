@@ -1,0 +1,23 @@
+skip:
+  reason: Failing
+  bug: b/141650011
+title: List insights
+release_tracks: [ALPHA]
+actions:
+- execute_command:
+    command: recommender insights list --project=cloud-sdk-integration-testing --location=global
+      --insight-type=google.compute.firewall.Insight
+    events:
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/v1alpha2/projects/cloud-sdk-integration-testing/locations/global/insightTypes/google.compute.firewall.Insight/insights?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+    - expect_stderr:
+        matches: .*Listed 0 items.
+    - expect_exit:
+        code: 0

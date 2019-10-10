@@ -48,8 +48,9 @@ REQUIRED FLAGS
                 *source-snapshot*::: The name of the snapshot to restore from.
 
          source-snapshot-region
-            The region of the source snapshot. If unspecified, the region of
-            the instance will be used.
+            The region of the source snapshot. If unspecified, it is assumed
+            that the Filestore snapshot is local and instance-zone will be
+            used.
 
      --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE]
         Network configuration for a Cloud Filestore instance. Specifying
@@ -60,8 +61,8 @@ REQUIRED FLAGS
             instance is connected.
 
          reserved-ip-range
-            A /29 CIDR block in one of the [internal IP address
-            ranges(https://www.arin.net/knowledge/address_filters.html) that
+            A /29 CIDR block in one of the internal IP address ranges
+            (https://www.arin.net/knowledge/address_filters.html) that
             identifies the range of IP addresses reserved for this instance.
             For example, 10.0.0.0/29 or 192.168.0.0/29. The range you specify
             can't overlap with either existing subnets or assigned IP address
@@ -70,7 +71,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Do not wait for the create operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --description=DESCRIPTION
         A description of the Cloud Filestore instance.
@@ -115,9 +117,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud filestore instances create
         $ gcloud beta filestore instances create

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -81,6 +81,51 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
       serviceusage.DisableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
     self.AssertErrContains('--force')
 
+  def testGetService_Disabled(self):
+    """Test GetService."""
+    want = self._NewServiceConfig(
+        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=False)
+    self.ExpectGetService(want)
+
+    got = serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+
+    self.assertEqual(got, want)
+
+  def testGetService_Enabled(self):
+    """Test GetService."""
+    want = self._NewServiceConfig(
+        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME, enabled=True)
+    self.ExpectGetService(want)
+
+    got = serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+
+    self.assertEqual(got, want)
+
+  def testGetService_PermissionDenied(self):
+    """Test GetService raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectGetService(None, error=server_error)
+
+    with self.assertRaisesRegex(exceptions.GetServicePermissionDeniedException,
+                                r'Error.'):
+      serviceusage.GetService(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+
+  def testIsServiceEnabled_Disabled(self):
+    service = self.services_messages.GoogleApiServiceusageV1Service(
+        name='projects/123/services/hi.googleapis.com',
+        state=self.services_messages.GoogleApiServiceusageV1Service
+        .StateValueValuesEnum.DISABLED,
+    )
+    self.assertFalse(serviceusage.IsServiceEnabled(service))
+
+  def testIsServiceEnabled_Enabled(self):
+    service = self.services_messages.GoogleApiServiceusageV1Service(
+        name='projects/123/services/hi.googleapis.com',
+        state=self.services_messages.GoogleApiServiceusageV1Service
+        .StateValueValuesEnum.ENABLED,
+    )
+    self.assertTrue(serviceusage.IsServiceEnabled(service))
+
   def testListServicesCall(self):
     """Test ListServices returns operation when successful."""
     want = [self.DEFAULT_SERVICE_NAME, self.DEFAULT_SERVICE_NAME_2]
@@ -106,11 +151,24 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
     with self.assertRaisesRegex(exceptions.OperationErrorException, r'Error.'):
       serviceusage.GetOperation(self.OPERATION_NAME)
 
-  def testWaitOperation_Success(self):
-    """Test WaitOperation returns operation when successful."""
-    want = self.services_messages.Operation(name=self.OPERATION_NAME, done=True)
-    self.ExpectOperation(self.OPERATION_NAME, 3)
+  def testGenerateServiceIdentityCall_Success(self):
+    """Test EnableApiCall returns operation when successful."""
+    email = 'hello@world.com'
+    unique_id = 'hello-uid'
+    self.ExpectGenerateServiceIdentityCall(email, unique_id)
 
-    got = serviceusage.WaitOperation(self.OPERATION_NAME)
+    got_email, got_unique_id = serviceusage.GenerateServiceIdentity(
+        self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
 
-    self.assertEqual(got, want)
+    self.assertEqual(got_email, email)
+    self.assertEqual(got_unique_id, unique_id)
+
+  def testGenerateServiceIdentityCall_PermissionDenied(self):
+    """Test EnableApiCall returns operation when successful."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
+    self.ExpectGenerateServiceIdentityCall(None, None, error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.GenerateServiceIdentityPermissionDeniedException, r'Error.'):
+      serviceusage.GenerateServiceIdentity(self.PROJECT_NAME,
+                                           self.DEFAULT_SERVICE_NAME)

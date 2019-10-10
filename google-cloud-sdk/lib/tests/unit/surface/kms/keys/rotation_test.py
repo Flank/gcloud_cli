@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,22 +19,19 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysRotationTest(base.KmsMockTest):
+class CryptokeysRotationTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key')
+    self.key_name = self.project_name.CryptoKey('global/my_kr/my_key')
 
-  def testSetNextOnly(self, track):
-    self.track = track
+  def testSetNextOnly(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Patch.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysPatchRequest(
             name=self.key_name.RelativeName(),
@@ -51,8 +48,7 @@ class CryptokeysRotationTest(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
-  def testSetPeriodOnly(self, track):
-    self.track = track
+  def testSetPeriodOnly(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Patch.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysPatchRequest(
             name=self.key_name.RelativeName(),
@@ -67,8 +63,7 @@ class CryptokeysRotationTest(base.KmsMockTest):
                                             self.key_name.key_ring_id,
                                             self.key_name.crypto_key_id))
 
-  def testSetBoth(self, track):
-    self.track = track
+  def testSetBoth(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Patch.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysPatchRequest(
             name=self.key_name.RelativeName(),
@@ -88,8 +83,7 @@ class CryptokeysRotationTest(base.KmsMockTest):
                                             self.key_name.key_ring_id,
                                             self.key_name.crypto_key_id))
 
-  def testRemove(self, track):
-    self.track = track
+  def testRemove(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Patch.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysPatchRequest(
             name=self.key_name.RelativeName(),
@@ -101,6 +95,18 @@ class CryptokeysRotationTest(base.KmsMockTest):
              '--location={0} --keyring={1} {2} '.format(
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
+
+
+class CryptokeysRotationTestBeta(CryptokeysRotationTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptokeysRotationTestAlpha(CryptokeysRotationTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

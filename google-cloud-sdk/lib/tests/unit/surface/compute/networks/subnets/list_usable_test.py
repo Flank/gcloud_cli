@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
                             sdk_test_base.WithFakeAuth, parameterized.TestCase):
   """Unit tests for 'subnets list-usable' fake auth and mocks."""
 
-  COMPUTE_API_BASE = 'https://www.googleapis.com/compute/v1/projects/'
+  COMPUTE_API_BASE = 'https://compute.googleapis.com/compute/v1/projects/'
   COMPUTE_DISCOVERY_URL = (
-      'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest')
+      'https://compute.googleapis.com/discovery/v1/apis/compute/v1/rest')
   SUBNET_DISCOVERY_TYPE = 'Subnetwork'
   SUBNET_RESOURCE_TYPE = 'type.googleapis.com/compute.Subnetwork'
   PROJECT_ID = 'project-1'

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- #
 
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1671,13 +1671,13 @@ class MultiCompleterTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
     self.assertEqual([',' + item for item in lst], matches)
 
 
-class BufferedFileInputTest(sdk_test_base.SdkBase, test_case.WithInput):
+class FileContentsTest(sdk_test_base.SdkBase, test_case.WithInput):
 
   def FileTest(self, data, binary=False):
     filename = os.path.join(self.temp_path, 'test.txt')
     with open(filename, 'w') as f:
       f.write(data)
-    fun = arg_parsers.BufferedFileInput(binary=binary)
+    fun = arg_parsers.FileContents(binary=binary)
     expected_data = data
     if binary:
       expected_data = expected_data.encode('utf-8')
@@ -1686,7 +1686,7 @@ class BufferedFileInputTest(sdk_test_base.SdkBase, test_case.WithInput):
   def StdinTest(self, lines, binary=True):
     # Each line has an implicit '\n' added by WriteInput.
     self.WriteInput(*lines)
-    fun = arg_parsers.BufferedFileInput(binary=binary)
+    fun = arg_parsers.FileContents(binary=binary)
     expected_data = '\n'.join(lines) + '\n'
     if binary:
       expected_data = expected_data.encode('utf-8')
@@ -1706,9 +1706,67 @@ class BufferedFileInputTest(sdk_test_base.SdkBase, test_case.WithInput):
 
   def testFileMissing(self):
     filename = os.path.join(self.temp_path, 'FileMissing.txt')
-    fun = arg_parsers.BufferedFileInput()
+    fun = arg_parsers.FileContents()
     with self.assertRaises(arg_parsers.ArgumentTypeError):
       fun(filename)
+
+
+class StoreFilePathAndContentsTest(sdk_test_base.SdkBase, test_case.WithInput):
+
+  def SetUp(self):
+    self.parser = util.ArgumentParser()
+
+  def ParseFileAndTest(self, data, binary=False):
+    filename = self.Touch(self.temp_path,
+                          'test.txt', contents=data, makedirs=True,)
+
+    self.parser.add_argument(
+        '--file-arg',
+        action=arg_parsers.StoreFilePathAndContentsAction(binary=binary),
+        help='Auxilio aliis.')
+    ns = self.parser.parse_args(['--file-arg={}'.format(filename)])
+    expected_data = data
+    expected_path = filename
+    if binary and isinstance(expected_data, six.string_types):
+      expected_data = str(expected_data).encode('utf-8')
+    self.assertEqual(expected_data, ns.file_arg)
+    self.assertEqual(expected_path, ns.file_arg_path)
+
+  def StdinTest(self, lines, binary=True):
+    # Each line has an implicit '\n' added by WriteInput.
+    self.WriteInput(*lines)
+    self.parser.add_argument(
+        '--file-arg',
+        action=arg_parsers.StoreFilePathAndContentsAction(binary=binary),
+        help='Auxilio aliis.')
+    ns = self.parser.parse_args(['--file-arg=-'])
+    expected_data = '\n'.join(lines) + '\n'
+    expected_path = '-'
+    if binary and isinstance(expected_data, six.string_types):
+      expected_data = str(expected_data).encode('utf-8')
+    self.assertEqual(expected_data, ns.file_arg)
+    self.assertEqual(expected_path, ns.file_arg_path)
+
+  def testReadFileBytes(self):
+    self.ParseFileAndTest('abcdefg' * 100, binary=True)
+
+  def testReadStdinBytes(self):
+    self.ParseFileAndTest(b'abcdefg' * 100, binary=True)
+
+  def testReadFile(self):
+    self.ParseFileAndTest('abcdefg' * 100)
+
+  def testReadStdin(self):
+    self.StdinTest(['abcdefg'] * 100)
+
+  def testFileMissing(self):
+    filename = os.path.join(self.temp_path, 'FileMissing.txt')
+    self.parser.add_argument(
+        '--other-file-arg',
+        action=arg_parsers.StoreFilePathAndContentsAction(),
+        help='Auxilio aliis.')
+    with self.assertRaises(arg_parsers.ArgumentTypeError):
+      self.parser.parse_args(['--other-file-arg={}'.format(filename)])
 
 
 class ArgBooleanTest(subtests.Base, parameterized.TestCase):

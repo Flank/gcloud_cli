@@ -74,14 +74,14 @@ help\fR for details.
 To import record\-sets from a BIND zone file, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets import \-\-zone MANAGED_ZONE \e
+$ gcloud beta dns record\-sets import \-\-zone=MANAGED_ZONE \e
     \-\-zone\-file\-format ZONE_FILE
 .RE
 
 To export record\-sets in yaml format, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets export \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets export \-\-zone=MANAGED_ZONE
 .RE
 
 To see how to make scriptable changes to your record\-sets through transactions,
@@ -94,30 +94,31 @@ $ gcloud beta dns record\-sets transaction \-\-help
 To list all changes, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets changes list \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets changes list \-\-zone=MANAGED_ZONE
 .RE
 
 To see change details, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets changes describe CHANGE_ID \e
-    \-\-zone MANAGED_ZONE
+    \-\-zone=MANAGED_ZONE
 .RE
 
 To see the list of all record\-sets, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets list \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets list \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets
+$ gcloud alpha dns record\-sets
 .RE
 

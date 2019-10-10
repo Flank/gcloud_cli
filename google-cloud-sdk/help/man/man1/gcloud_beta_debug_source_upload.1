@@ -11,7 +11,7 @@ gcloud beta debug source upload \- upload a directory tree
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta debug source upload\fR \fIDIRECTORY\fR [\fB\-\-branch\fR=\fIBRANCH\fR] [\fB\-\-source\-context\-directory\fR=\fISOURCE_CONTEXT_DIRECTORY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta debug source upload\fR \fIDIRECTORY\fR [\fB\-\-branch\fR=\fIBRANCH\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-source\-context\-directory\fR=\fISOURCE_CONTEXT_DIRECTORY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,11 @@ that respects your .gitignore\-ed files. The global .gitignore is not respected.
 \fB\-\-branch\fR=\fIBRANCH\fR
 The branch name. If the branch already exists, the new upload will overwrite its
 history.
+
+.TP 2m
+\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR
+Override the \f5.gcloudignore\fR file and use the specified file instead. See $
+gcloud topic gcloudignore for more information.
 
 .TP 2m
 \fB\-\-source\-context\-directory\fR=\fISOURCE_CONTEXT_DIRECTORY\fR

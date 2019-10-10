@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.core import properties
+import six
 
 
 def GetFilter(image_ref, holder):
@@ -28,7 +29,7 @@ def GetFilter(image_ref, holder):
       # Display only packages
       'kind = "PACKAGE_MANAGER"',
       # Display only compute metadata
-      'has_prefix(resource_url,"https://www.googleapis.com/compute/")',
+      'has_prefix(resource_url,"https://compute.googleapis.com/compute/")',
   ]
   client = holder.client
   resource_parser = holder.resources
@@ -42,7 +43,7 @@ def GetFilter(image_ref, holder):
         return_image_resource=True
         )
 
-    image_url = self_link+'/id/'+str(image.id)
+    image_url = self_link + '/id/' + six.text_type(image.id)
     filters.append('has_prefix(resource_url,"{}")'.format(image_url))
 
   return ' AND '.join(filters)

@@ -9,6 +9,9 @@ SYNOPSIS
 DESCRIPTION
     (BETA) Remove an IAM policy binding from a service.
 
+    Note: The 'roles/servicemanagement.serviceConsumer' role can only exist on
+    a member which is a user, group, or service account.
+
 POSITIONAL ARGUMENTS
      Service resource - The device registry for which to remove IAM policy
      binding from. This represents a Cloud resource. This must be specified.
@@ -52,14 +55,6 @@ EXAMPLES
 
         $ gcloud beta endpoints services remove-iam-policy-binding \
             my-service --member='user:test-user@gmail.com' \
-            --role='roles/servicemanagement.serviceConsumer'
-
-    To remove an IAM policy binding for the role of
-    'roles/servicemanagement.serviceConsumer' from all authenticated users on
-    service 'my-service', run:
-
-        $ gcloud beta endpoints services remove-iam-policy-binding \
-            my-service --member='allAuthenticatedUsers' \
             --role='roles/servicemanagement.serviceConsumer'
 
     See https://cloud.google.com/iam/docs/managing-policies for details of

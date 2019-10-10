@@ -2,12 +2,12 @@ NAME
     gcloud dns managed-zones update - update an existing Cloud DNS managed-zone
 
 SYNOPSIS
-    gcloud dns managed-zones update ZONE
+    gcloud dns managed-zones update ZONE [--async]
         [--denial-of-existence=DENIAL_OF_EXISTENCE] [--description=DESCRIPTION]
-        [--dnssec-state=DNSSEC_STATE] [--ksk-algorithm=KSK_ALGORITHM]
-        [--ksk-key-length=KSK_KEY_LENGTH] [--networks=[NETWORK,...]]
-        [--update-labels=[KEY=VALUE,...]] [--zsk-algorithm=ZSK_ALGORITHM]
-        [--zsk-key-length=ZSK_KEY_LENGTH]
+        [--dnssec-state=DNSSEC_STATE] [--forwarding-targets=[IP_ADDRESSES,...]]
+        [--ksk-algorithm=KSK_ALGORITHM] [--ksk-key-length=KSK_KEY_LENGTH]
+        [--networks=[NETWORK,...]] [--update-labels=[KEY=VALUE,...]]
+        [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -25,6 +25,10 @@ POSITIONAL ARGUMENTS
           ID of the zone or fully qualified identifier for the zone.
 
 FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
      --denial-of-existence=DENIAL_OF_EXISTENCE
         Requires DNSSEC enabled. DENIAL_OF_EXISTENCE must be one of: nsec,
         nsec3.
@@ -41,6 +45,12 @@ FLAGS
             Enable DNSSEC for the managed zone.
          transfer
             Enable DNSSEC and allow transferring a signed zone in or out.
+
+     --forwarding-targets=[IP_ADDRESSES,...]
+        List of IPv4 addresses of target name servers that the zone will
+        forward queries to. Ignored for public visibility. Non-RFC1918
+        addresses will forward to the target through the Internet. RFC1918
+        addresses will forward through the VPC.
 
      --ksk-algorithm=KSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the key-signing key.
@@ -104,7 +114,8 @@ EXAMPLES
             --description="Hello, world!"
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns managed-zones update
         $ gcloud beta dns managed-zones update
 

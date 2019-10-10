@@ -4,16 +4,17 @@ NAME
 SYNOPSIS
     gcloud alpha functions deploy (NAME : --region=REGION)
         [--allow-unauthenticated] [--egress-settings=EGRESS_SETTINGS]
-        [--entry-point=ENTRY_POINT] [--ingress-settings=INGRESS_SETTINGS]
-        [--memory=MEMORY] [--retry] [--runtime=RUNTIME]
-        [--service-account=SERVICE_ACCOUNT] [--source=SOURCE]
-        [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
-        [--update-labels=[KEY=VALUE,...]] [--vpc-connector=VPC_CONNECTOR]
+        [--entry-point=ENTRY_POINT] [--ignore-file=IGNORE_FILE]
+        [--ingress-settings=INGRESS_SETTINGS] [--memory=MEMORY] [--retry]
+        [--runtime=RUNTIME] [--service-account=SERVICE_ACCOUNT]
+        [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-env-vars | --env-vars-file=FILE_PATH
           | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]]
         [--clear-max-instances | --max-instances=MAX_INSTANCES]
+        [--clear-vpc-connector | --vpc-connector=VPC_CONNECTOR]
         [--trigger-bucket=TRIGGER_BUCKET | --trigger-http
           | --trigger-topic=TRIGGER_TOPIC
           | --trigger-event=EVENT_TYPE --trigger-resource=RESOURCE]
@@ -47,8 +48,8 @@ FLAGS
 
      --egress-settings=EGRESS_SETTINGS
         Egress settings controls what traffic is diverted through the VPC
-        Access Connector resource. By default private_ranges_only will be used.
-        EGRESS_SETTINGS must be one of: unspecified, private, all.
+        Access Connector resource. By default private-ranges-only will be used.
+        EGRESS_SETTINGS must be one of: private-ranges-only, all.
 
      --entry-point=ENTRY_POINT
         Name of a Google Cloud Function (as defined in source code) that will
@@ -58,10 +59,13 @@ FLAGS
         this is name of a function exported by the module specified in
         source_location.
 
+     --ignore-file=IGNORE_FILE
+        Override the .gcloudignore file and use the specified file instead.
+
      --ingress-settings=INGRESS_SETTINGS
-        Ingress settings controls what traffic can reach the function.
-        INGRESS_SETTINGS must be one of: unspecified, all, internal-only,
-        internal-and-gclb.
+        Ingress settings controls what traffic can reach the function.By
+        default all will be used. INGRESS_SETTINGS must be one of: all,
+        internal-only, internal-and-gclb.
 
      --memory=MEMORY
         Limit on the amount of memory the function can use.
@@ -183,13 +187,6 @@ FLAGS
         Label keys starting with deployment are reserved for use by deployment
         tools and cannot be specified manually.
 
-     --vpc-connector=VPC_CONNECTOR
-        The VPC Access connector that the function can connect to. It should be
-        the fully-qualified URI of the VPC Access connector resource whose
-        format is:
-        projects/${PROJECT}/locations/${LOCATION}/connectors/${CONNECTOR} or an
-        empty string to clear the field.
-
      At most one of these may be specified:
 
        --clear-env-vars
@@ -242,6 +239,20 @@ FLAGS
           Sets the maximum number of instances for the function. A function
           execution that would exceed max-instances times out.
 
+     At most one of these may be specified:
+
+       --clear-vpc-connector
+          Clears the VPC connector field.
+
+       --vpc-connector=VPC_CONNECTOR
+          The VPC Access connector that the function can connect to. It can be
+          either the fully-qualified URI, or the short name of the VPC Access
+          connector resource. If the short name is used, the connector must
+          belong to the same project. The format of this field is either
+          projects/${PROJECT}/locations/${LOCATION}/connectors/${CONNECTOR} or
+          ${CONNECTOR}, where ${CONNECTOR} is the short name of the VPC Access
+          connector.
+
      If you don't specify a trigger when deploying an update to an existing
      function it will keep its current trigger. You must specify
      --trigger-topic, --trigger-bucket, --trigger-http or (--trigger-event AND
@@ -284,9 +295,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud functions deploy
         $ gcloud beta functions deploy

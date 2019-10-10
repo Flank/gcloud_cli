@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Obtain details about revisions."""
 
@@ -42,8 +43,18 @@ class Describe(base.DescribeCommand):
   }
 
   @staticmethod
-  def Args(parser):
-    flags.AddRegionArg(parser)
+  def CommonArgs(parser):
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddRegionArg(managed_group)
+    # Flags specific to CRoGKE
+    gke_group = flags.GetGkeArgGroup(parser)
+    concept_parsers.ConceptParser([resource_args.CLUSTER_PRESENTATION
+                                  ]).AddToParser(gke_group)
+    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
+    kubernetes_group = flags.GetKubernetesArgGroup(parser)
+    flags.AddKubeconfigFlags(kubernetes_group)
+    # Flags not specific to any platform
     revision_presentation = presentation_specs.ResourcePresentationSpec(
         'REVISION',
         resource_args.GetRevisionResourceSpec(),
@@ -51,10 +62,14 @@ class Describe(base.DescribeCommand):
         required=True,
         prefixes=False)
     concept_parsers.ConceptParser([
-        resource_args.CLUSTER_PRESENTATION,
         revision_presentation]).AddToParser(parser)
+    flags.AddPlatformArg(parser)
     parser.display_info.AddFormat(
         'yaml(apiVersion, kind, metadata, spec, status)')
+
+  @staticmethod
+  def Args(parser):
+    Describe.CommonArgs(parser)
 
   def Run(self, args):
     """Show details about a revision."""
@@ -68,3 +83,14 @@ class Describe(base.DescribeCommand):
       raise flags.ArgumentError(
           'Cannot find revision [{}]'.format(revision_ref.revisionsId))
     return wrapped_revision
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaDescribe(Describe):
+  """Obtain details about revisions."""
+
+  @staticmethod
+  def Args(parser):
+    Describe.CommonArgs(parser)
+
+AlphaDescribe.__doc__ = Describe.__doc__

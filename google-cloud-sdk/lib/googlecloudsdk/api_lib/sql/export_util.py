@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 from __future__ import absolute_import
 from __future__ import division
-
-
 from __future__ import unicode_literals
 
 
@@ -62,3 +60,18 @@ def CsvExportContext(sql_messages, uri, database=None, query=None):
       fileType='CSV',
       csvExportOptions=sql_messages.ExportContext.CsvExportOptionsValue(
           selectQuery=query))
+
+
+def BakExportContext(sql_messages, uri, database):
+  """Generates the ExportContext for the given args, for exporting to BAK.
+
+  Args:
+    sql_messages: module, The messages module that should be used.
+    uri: The URI of the bucket to export to; the output of the 'uri' arg.
+    database: The list of databases to export from; the output of the
+      '--database' flag.
+
+  Returns:
+    ExportContext, for use in InstancesExportRequest.exportContext.
+  """
+  return sql_messages.ExportContext(uri=uri, databases=database, fileType='BAK')

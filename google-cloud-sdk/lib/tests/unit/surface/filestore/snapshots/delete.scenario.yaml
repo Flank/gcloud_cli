@@ -6,23 +6,25 @@ summary:
   - command: |
       filestore snapshots delete my-snapshot2 --region us-central1
   - prompt:
-    - message: You are about to delete snapshot [my-snapshot2]
+    - message: |
+        You are about to delete a snapshot
     - input: y
   - stderr: |
-      Delete request issued for: [my-snapshot2]
+      Delete request issued
   - progress_tracker:
-    - message: Waiting for operation [operation-1550806351119-582733dac8352-48c0a754-d4b53ccd]
+    - message: Waiting for operation [projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550806351119-582733dac8352-48c0a754-d4b53ccd]
         to complete
     - status: SUCCESS
   - stderr: |
-      Deleted snapshot [my-snapshot2].
+      Deleted snapshot.
 actions:
 - execute_command:
     command: |
       filestore snapshots delete my-snapshot2 --region us-central1
     events:
     - expect_prompt_continue:
-        message: You are about to delete snapshot [my-snapshot2]
+        message: |
+          You are about to delete a snapshot
         user_input: y
     - api_call:
         expect_request:
@@ -48,7 +50,7 @@ actions:
             }
 
     - expect_stderr: |
-        Delete request issued for: [my-snapshot2]
+        Delete request issued
     - api_call:
         expect_request:
           uri: https://file.googleapis.com/v1p1alpha1/projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550806351119-582733dac8352-48c0a754-d4b53ccd?alt=json
@@ -78,10 +80,10 @@ actions:
 
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [operation-1550806351119-582733dac8352-48c0a754-d4b53ccd]
+        message: Waiting for operation [projects/jasonshao-consumer4/locations/us-central1/operations/operation-1550806351119-582733dac8352-48c0a754-d4b53ccd]
           to complete
         status: SUCCESS
     - expect_stderr: |
-        Deleted snapshot [my-snapshot2].
+        Deleted snapshot.
     - expect_exit:
         code: 0

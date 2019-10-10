@@ -1,0 +1,192 @@
+
+.TH "GCLOUD_ALPHA_GAME_SERVERS_SCALING\-POLICIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha game servers scaling\-policies create \- create a Scaling Policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha game servers scaling\-policies create\fR (\fISCALING_POLICY\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-priority\fR=\fIPRIORITY\fR [\fB\-\-async\fR] [\fB\-\-deployment\fR=\fIDEPLOYMENT\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-match\-clusters\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-max\-replicas\fR=\fIMAX_REPLICAS\fR] [\fB\-\-min\-replicas\fR=\fIMIN_REPLICAS\fR] [\fB\-\-schedule\fR=\fISCHEDULE\fR] [\fB\-\-buffer\-size\fR=\fIBUFFER_SIZE\fR\ |\ \fB\-\-buffer\-size\-percent\fR=\fIBUFFER_SIZE_PERCENT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Cloud Game Server Scaling Policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Scaling policy resource \- Cloud Game Server Scaling Policy to create. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[scaling_policy] on the command line with a fully specified name; set the
+property [core/project]; provide the argument [\-\-project] on the command line.
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fISCALING_POLICY\fR
+ID of the scaling policy or fully qualified identifier for the scaling policy.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-priority\fR=\fIPRIORITY\fR
+Priority of the Scaling Policy.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-deployment\fR=\fIDEPLOYMENT\fR
+Deployment for this Scaling Policy. Example:
+"projects/my\-project/locations/global/gameServerDeployments/my\-deployment".
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-match\-clusters\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Labels to select clusters to which this Scaling Policy applies. This flag can be
+repeated.
+
+Example: $ gcloud alpha game servers scaling\-policies create example\-policy \e
+\-\-match\-clusters=label_a=value1,label_b=value2 \e
+\-\-match\-clusters=label_c=value3,label_d=value4
+
+With the above command, this policy is applicable to clusters that have either
+label_a=value1 and label_b=value2, or label_c=value3,label_d=value4.
+
+.TP 2m
+\fB\-\-max\-replicas\fR=\fIMAX_REPLICAS\fR
+Maximum fleet size.
+
+.TP 2m
+\fB\-\-min\-replicas\fR=\fIMIN_REPLICAS\fR
+Minimum fleet size.
+
+.TP 2m
+\fB\-\-schedule\fR=\fISCHEDULE\fR
+Event schedules. Schedules allow Scaling policies to be adjusted for planned
+events. For example, you can add policies to scale specific clusters during an
+event. This flag can be repeated.
+
+The following keys are allowed:
+
+.RS 2m
+.TP 2m
+\fBcron\-spec\fR
+Cron definition of the scheduled event. See https://en.wikipedia.org/wiki/Cron.
+The cron spec specification is in the local time as defined by the realm.
+Requires cron\-job\-duration to be specified.
+
+.TP 2m
+\fBcron\-job\-duration\fR
+Duration for the cron job event. The duration of the event is effective after
+the cron job's start time. See $ gcloud topic datetimes for information on
+duration formats. Required if cron\-spec is specified.
+
+.TP 2m
+\fBstart\-time\fR
+Start time of the event. See $ gcloud topic datetimes for information on
+duration formats. Either start\-time or cron\-spec should be specified.
+
+.TP 2m
+\fBend\-time\fR
+End time of the event. See $ gcloud topic datetimes for information on duration
+formats.
+
+Example:
+
+.RS 2m
+$ gcloud alpha game servers scaling\-policies create example\-policy \e
+    \-\-schedule=start\-time=2019\-01\-01T00:00:01Z,\e
+end\-time=2030\-01\-01T00:00:01Z,cron\-job\-duration=3600s,cron\-spec="10\e
+ 0 1\-7 5 *" \-\-schedule=start\-time=2050\-01\-01T00:00:01Z
+.RE
+
+.RE
+.sp
+.TP 2m
+
+Size of the buffer of ready game server instances in either absolute number or
+percentage. As game server instances get allocated or terminated, the fleet will
+be scaled up and down so that this buffer is maintained. At most one of these
+may be specified:
+
+
+.RS 2m
+.TP 2m
+\fB\-\-buffer\-size\fR=\fIBUFFER_SIZE\fR
+Size of a buffer of ready game server instances in absolute number.
+
+.TP 2m
+\fB\-\-buffer\-size\-percent\fR=\fIBUFFER_SIZE_PERCENT\fR
+Size of a buffer of ready game server instances in percentage.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBgameservices/v1alpha\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/solutions/gaming/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

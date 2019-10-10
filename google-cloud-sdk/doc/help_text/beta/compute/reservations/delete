@@ -28,8 +28,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -43,9 +43,15 @@ API REFERENCE
     can be found at:
     https://developers.google.com/compute/docs/reference/latest/
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To delete a given Compute Engine reservation, run:
 
+        $ gcloud beta compute reservations delete my-reservation --zone=ZONE
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute reservations delete
         $ gcloud alpha compute reservations delete
 

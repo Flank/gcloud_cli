@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -148,6 +148,33 @@ class PeeringsCreateBetaTest(test_base.BaseTest):
         'WARNING: Flag --auto-create-routes is deprecated and '
         'will be removed in a future release.')
 
+
+class PeeringsCreateAlphaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+
+  def testCreatePeeringWithExportSubnetRouteWithPublicIp(self):
+    self.Run('compute networks peerings create peering-1 --network '
+             'network-1 --peer-network network-2 '
+             '--export-subnet-routes-with-public-ip '
+             '--import-subnet-routes-with-public-ip')
+
+    self.CheckRequests(
+        [(self.compute_alpha.networks, 'AddPeering',
+          self.messages.ComputeNetworksAddPeeringRequest(
+              network='network-1',
+              networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
+                  networkPeering=self.messages.NetworkPeering(
+                      exchangeSubnetRoutes=True,
+                      name='peering-1',
+                      network='projects/my-project/global/networks/network-2',
+                      exportSubnetRoutesWithPublicIp=True,
+                      importSubnetRoutesWithPublicIp=True)),
+              project='my-project'))],)
 
 if __name__ == '__main__':
   test_case.main()

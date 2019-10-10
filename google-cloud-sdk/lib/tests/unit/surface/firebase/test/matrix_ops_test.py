@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
+from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
@@ -309,6 +310,28 @@ Instrumentation testing complete.
 
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
+
+  def testFormatInvalidDimensionsForAndroid(self):
+    device = TESTING_V1_MESSAGES.AndroidDevice(
+        androidModelId='walleye',
+        androidVersionId='27',
+        locale='en',
+        orientation='portrait')
+    environment = TESTING_V1_MESSAGES.Environment(androidDevice=device)
+    self.assertEqual(
+        matrix_ops._FormatInvalidDimension(environment),
+        '[OS-version 27 on walleye]')
+
+  def testFormatInvalidDimensionsForIOS(self):
+    device = TESTING_V1_MESSAGES.IosDevice(
+        iosModelId='iphone7',
+        iosVersionId='12',
+        locale='en',
+        orientation='portrait')
+    environment = TESTING_V1_MESSAGES.Environment(iosDevice=device)
+    self.assertEqual(
+        matrix_ops._FormatInvalidDimension(environment),
+        '[OS-version 12 on iphone7]')
 
   def ExpectTestStatus(self, matrix_id, matrix_state,
                        test_id, state, error, progress_msgs):

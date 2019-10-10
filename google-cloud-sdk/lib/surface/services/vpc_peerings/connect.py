@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,13 +96,13 @@ class Connect(base.SilentCommand):
     ranges = args.ranges.split(',')
     op = peering.CreateConnection(project_number, args.service, args.network,
                                   ranges)
-    if args.async:
+    if args.async_:
       cmd = OP_WAIT_CMD.format(op.name)
       log.status.Print('Asynchronous operation is in progress... '
                        'Use the following command to wait for its '
                        'completion:\n {0}'.format(cmd))
       return
-    op = peering.WaitOperation(op.name)
+    op = services_util.WaitOperation(op.name, peering.GetOperation)
     services_util.PrintOperation(op)
 
 

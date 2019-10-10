@@ -5,7 +5,10 @@ NAME
 SYNOPSIS
     gcloud alpha compute sole-tenancy node-groups create NAME
         --node-template=NODE_TEMPLATE --target-size=TARGET_SIZE
-        [--description=DESCRIPTION] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--autoscaling-policy=[max-size=MAX-SIZE],
+          [min-size=MIN-SIZE],[mode=MODE]] [--description=DESCRIPTION]
+        [--maintenance-policy=MAINTENANCE_POLICY] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a Google Compute Engine node group.
@@ -22,8 +25,39 @@ REQUIRED FLAGS
         The target initial number of nodes in the node group.
 
 OPTIONAL FLAGS
+     --autoscaling-policy=[max-size=MAX-SIZE],[min-size=MIN-SIZE],[mode=MODE]
+        Option to specify the autoscaling policy for node groups.
+
+         mode
+            Options for mode are 'on' or 'off'. When set to 'on', the
+            autoscaler will increase or decrease the size of the node group in
+            response to capacity needs. If set to 'off', the autoscaler will
+            not update the size of the node group.
+
+         min-size
+            The minimum size of the node group. Default is 0 and must be an
+            integer value smaller than or equal to max-size.
+
+         max-size
+            The maximum size of the node group. Default is 100 and must be
+            smaller or equal to 100 and larger than or equal to min-size.
+
      --description=DESCRIPTION
         An optional description of this resource.
+
+     --maintenance-policy=MAINTENANCE_POLICY
+        Determines the maintenance behavior during host maintenance events.
+        MAINTENANCE_POLICY must be one of:
+
+         default
+            VM instances on the host are live migrated to a new physical
+            server.
+         migrate-within-node-group
+            VM instances on the host are live migrated to another node within
+            the same node group.
+         restart-in-place
+            VM instances on the host are terminated and then restarted on the
+            same physical server after the maintenance event has completed.
 
      --zone=ZONE
         Zone of the node group to operate on. If not specified and the
@@ -55,9 +89,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute sole-tenancy node-groups create
         $ gcloud beta compute sole-tenancy node-groups create

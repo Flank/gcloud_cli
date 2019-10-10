@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class SetPrimaryVersion(base.Command):
   The following command sets version 9 as the primary version of the
   key `samwise` within keyring `fellowship` and location `global`:
 
-    $ {command} samwise --version 9 --keyring fellowship --location global
+    $ {command} samwise --version=9 --keyring=fellowship --location=global
   """
 
   @staticmethod

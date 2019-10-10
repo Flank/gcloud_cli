@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -215,6 +215,35 @@ add //mock/tmp/dir/base-2.suffix
     sys.stdout.write(' one \n two \n three \n four \n')
     expected = 'one\ntwo\nthree\nfour\n'
     self.AssertOutputEquals(expected, normalize_space=True)
+
+  def testAssertOutputBytesEquals_EqualAscii(self):
+    self.SetEncoding('utf8')
+    sys.stdout.write('expected output')
+    self.AssertOutputBytesEquals(b'expected output')
+
+  def testAssertOutputBytesEquals_NotEqualAscii(self):
+    self.SetEncoding('utf8')
+    sys.stdout.write('expected output')
+    with self.assertRaisesRegexp(
+        AssertionError,
+        r"stdout does not equal the expected value \[(b')?actual output'?\]: "
+        r"\[(b')?expected output'?\]"):
+      self.AssertOutputBytesEquals(b'actual output')
+
+  def testAssertOutputBytesEquals_EqualUnicode(self):
+    self.SetEncoding('utf8')
+    unicode_string = 'Ṳᾔḯ¢◎ⅾℯ'
+    sys.stdout.write(unicode_string)
+    self.AssertOutputBytesEquals(unicode_string.encode('utf8'))
+
+  def testAssertOutputBytesEquals_NotEqualUnicode(self):
+    self.SetEncoding('utf8')
+    unicode_string = 'Ṳᾔḯ¢◎ⅾℯ'
+    sys.stdout.write('unicode')
+    with self.assertRaisesRegexp(
+        AssertionError,
+        r'stdout does not equal the expected value.*'):
+      self.AssertOutputBytesEquals(unicode_string.encode('utf8'))
 
   def testAssertOutputContainsUTF8WithAsciiEncodingMismatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.

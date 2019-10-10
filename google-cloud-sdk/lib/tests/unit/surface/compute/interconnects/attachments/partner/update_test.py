@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import test_base
 
 
-class InterconnectAttachmentsProviderUpdateGaTest(test_base.BaseTest):
+class InterconnectAttachmentsPartnerUpdateGaTest(test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -63,8 +63,8 @@ class InterconnectAttachmentsProviderUpdateGaTest(test_base.BaseTest):
     )
 
 
-class InterconnectAttachmentsProviderUpdateBetaTest(
-    InterconnectAttachmentsProviderUpdateGaTest):
+class InterconnectAttachmentsPartnerUpdateBetaTest(
+    InterconnectAttachmentsPartnerUpdateGaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
@@ -173,10 +173,40 @@ class InterconnectAttachmentsProviderUpdateBetaTest(
     )
 
 
-class InterconnectAttachmentsProviderUpdateAlphaTest(
-    InterconnectAttachmentsProviderUpdateBetaTest):
+class InterconnectAttachmentsPartnerUpdateAlphaTest(
+    InterconnectAttachmentsPartnerUpdateBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
     self.message_version = self.compute_alpha
+
+  def testUpdateMtu(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='this is my attachment',
+                region='us-central1',
+                mtu=1500),
+        ],
+    ])
+
+    self.Run('compute interconnects attachments partner update my-attachment '
+             '--region us-central1 --description "this is my attachment" '
+             '--mtu 1500')
+
+    self.CheckRequests(
+        [(self.message_version.interconnectAttachments, 'Patch',
+          self.messages.ComputeInterconnectAttachmentsPatchRequest(
+              project='my-project',
+              region='us-central1',
+              interconnectAttachment='my-attachment',
+              interconnectAttachmentResource=self.messages.
+              InterconnectAttachment(
+                  name='my-attachment',
+                  description='this is my attachment',
+                  mtu=1500)))],
+    )
+

@@ -56,7 +56,7 @@ EXAMPLES
     The following command lists all keys within the keyring fellowship and
     location global:
 
-        $ gcloud beta kms keys list --keyring fellowship --location global
+        $ gcloud beta kms keys list --keyring=fellowship --location=global
 
 NOTES
     This command is currently in BETA and may change without notice. These

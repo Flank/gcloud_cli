@@ -1,0 +1,160 @@
+title: Cloud Bigtable operations get/list test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      bigtable operations describe my-operation
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.bigtable.admin.v2.FakeRequest
+        finishTime: '2019-09-10T20:23:46.640990278Z'
+        originalRequest:
+          clusters:
+            fake-cluster:
+              defaultStorageType: HDD
+              location: projects/fake-project/locations/us-central1-b
+          instance:
+            displayName: fake-display-name
+            type: DEVELOPMENT
+          instanceId: fake-instance
+          parent: projects/fake-project
+        requestTime: '2019-09-10T20:23:45.236771379Z'
+      name: operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/my-operation
+      response:
+        '@type': type.googleapis.com/google.bigtable.admin.v2.FakeRequest
+        displayName: fake-display-name
+        name: projects/fake-project/instances/fake-instance
+        state: READY
+        type: DEVELOPMENT
+- execute:
+  - command: |
+      bigtable operations list --limit=1
+  - stdout: |
+      OPERATION_ID         INSTANCE       DONE  START_TIME           END_TIME
+      3015903788314914209  fake-instance  True  2019-09-10T20:23:45  2019-09-10T20:23:46
+actions:
+- execute_command:
+    command: |
+      bigtable operations describe my-operation
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/operations/my-operation?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/my-operation",
+              "metadata": {
+                "@type": "type.googleapis.com/google.bigtable.admin.v2.FakeRequest",
+                "originalRequest": {
+                  "parent": "projects/fake-project",
+                  "instanceId": "fake-instance",
+                  "instance": {
+                    "displayName": "fake-display-name",
+                    "type": "DEVELOPMENT"
+                  },
+                  "clusters": {
+                    "fake-cluster": {
+                      "location": "projects/fake-project/locations/us-central1-b",
+                      "defaultStorageType": "HDD"
+                    }
+                  }
+                },
+                "requestTime": "2019-09-10T20:23:45.236771379Z",
+                "finishTime": "2019-09-10T20:23:46.640990278Z"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.bigtable.admin.v2.FakeRequest",
+                "name": "projects/fake-project/instances/fake-instance",
+                "displayName": "fake-display-name",
+                "state": "READY",
+                "type": "DEVELOPMENT"
+              }
+
+            }
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.bigtable.admin.v2.FakeRequest
+          finishTime: '2019-09-10T20:23:46.640990278Z'
+          originalRequest:
+            clusters:
+              fake-cluster:
+                defaultStorageType: HDD
+                location: projects/fake-project/locations/us-central1-b
+            instance:
+              displayName: fake-display-name
+              type: DEVELOPMENT
+            instanceId: fake-instance
+            parent: projects/fake-project
+          requestTime: '2019-09-10T20:23:45.236771379Z'
+        name: operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/my-operation
+        response:
+          '@type': type.googleapis.com/google.bigtable.admin.v2.FakeRequest
+          displayName: fake-display-name
+          name: projects/fake-project/instances/fake-instance
+          state: READY
+          type: DEVELOPMENT
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      bigtable operations list --limit=1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://bigtableadmin.googleapis.com/v2/operations/projects/fake-project/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/3015903788314914209",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.bigtable.admin.v2.FakeRequest",
+                    "originalRequest": {
+                      "parent": "projects/fake-project",
+                      "instanceId": "fake-instance",
+                      "instance": {
+                        "displayName": "fake-display-name",
+                        "type": "DEVELOPMENT"
+                      },
+                      "clusters": {
+                        "testing-c1": {
+                          "location": "projects/fake-project/locations/us-central1-b",
+                          "defaultStorageType": "HDD"
+                        }
+                      }
+                    },
+                    "requestTime": "2019-09-10T20:23:45.236771379Z",
+                    "finishTime": "2019-09-10T20:23:46.640990278Z"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.bigtable.admin.v2.FakeRequest",
+                    "name": "projects/fake-project/instances/fake-instance",
+                    "displayName": "fake-display-name",
+                    "state": "READY",
+                    "type": "DEVELOPMENT"
+                  }
+                }
+              ]
+            }
+    - expect_stdout: |
+        OPERATION_ID         INSTANCE       DONE  START_TIME           END_TIME
+        3015903788314914209  fake-instance  True  2019-09-10T20:23:45  2019-09-10T20:23:46
+    - expect_exit:
+        code: 0

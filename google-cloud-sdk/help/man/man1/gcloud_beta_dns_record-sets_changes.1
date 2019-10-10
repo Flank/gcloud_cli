@@ -54,23 +54,24 @@ To view the details of a particular change, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets changes describe CHANGE_ID \e
-    \-\-zone MANAGED_ZONE
+    \-\-zone=MANAGED_ZONE
 .RE
 
 To view the list of all changes, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets changes list \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets changes list \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets changes
+$ gcloud alpha dns record\-sets changes
 .RE
 

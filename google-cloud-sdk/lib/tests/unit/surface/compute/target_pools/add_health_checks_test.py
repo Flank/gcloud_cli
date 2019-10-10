@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class TargetPoolsAddHealthChecksTest(test_base.BaseTest):
               targetPoolsAddHealthCheckRequest=(
                   messages.TargetPoolsAddHealthCheckRequest(
                       healthChecks=[messages.HealthCheckReference(
-                          healthCheck=('https://www.googleapis.com/compute/v1/'
+                          healthCheck=('https://compute.googleapis.com/compute/v1/'
                                        'projects/my-project/global/'
                                        'httpHealthChecks/my-health-check')
                       )]))))],
@@ -53,8 +53,8 @@ class TargetPoolsAddHealthChecksTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute target-pools add-health-checks
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/my-pool
-          --http-health-check https://www.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/my-pool
+          --http-health-check https://compute.googleapis.com/compute/v1/projects/my-project/global/httpHealthChecks/my-health-check
         """)
 
     self.CheckRequests(
@@ -67,7 +67,7 @@ class TargetPoolsAddHealthChecksTest(test_base.BaseTest):
               targetPoolsAddHealthCheckRequest=(
                   messages.TargetPoolsAddHealthCheckRequest(
                       healthChecks=[messages.HealthCheckReference(
-                          healthCheck=('https://www.googleapis.com/compute/v1/'
+                          healthCheck=('https://compute.googleapis.com/compute/v1/'
                                        'projects/my-project/global/'
                                        'httpHealthChecks/my-health-check')
                       )]))))],
@@ -103,7 +103,7 @@ class TargetPoolsAddHealthChecksTest(test_base.BaseTest):
               targetPoolsAddHealthCheckRequest=(
                   messages.TargetPoolsAddHealthCheckRequest(
                       healthChecks=[messages.HealthCheckReference(
-                          healthCheck=('https://www.googleapis.com/compute/v1/'
+                          healthCheck=('https://compute.googleapis.com/compute/v1/'
                                        'projects/my-project/global/'
                                        'httpHealthChecks/my-health-check')
                       )]))))],

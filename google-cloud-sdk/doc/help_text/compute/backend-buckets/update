@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud compute backend-buckets update BACKEND_BUCKET_NAME
-        [--description=DESCRIPTION] [--enable-cdn]
+        [--description=DESCRIPTION] [--[no-]enable-cdn]
         [--gcs-bucket-name=GCS_BUCKET_NAME]
         [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
         [GCLOUD_WIDE_FLAG ...]
@@ -19,10 +19,10 @@ FLAGS
      --description=DESCRIPTION
         An optional, textual description for the backend bucket.
 
-     --enable-cdn
+     --[no-]enable-cdn
         Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP
         responses from a backend bucket at the edge of the network, close to
-        users.
+        users. Use --enable-cdn to enable and --no-enable-cdn to disable.
 
      --gcs-bucket-name=GCS_BUCKET_NAME
         The name of the Google Cloud Storage bucket to serve from. The storage

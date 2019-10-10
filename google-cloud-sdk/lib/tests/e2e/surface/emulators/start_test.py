@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import os
 import tempfile
 from googlecloudsdk.command_lib.util import java
 from googlecloudsdk.core import log
+from googlecloudsdk.core.util import encoding as enc
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -34,7 +35,6 @@ from tests.lib.api_lib.emulators import proxy_util
 # depend on things like it depends on java -- check if they are there,
 # fail if they aren't. For extra credit, it would be possible to configure
 # the location of the dependency for it can easily be run in different ways.
-@test_case.Filters.SkipOnPy3('They are broken', 'b/116340294')
 class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
 
   def SetUp(self):
@@ -66,9 +66,7 @@ class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
                          'INFO: Starting server on port: {}'.format(port)],
           timeout=30):
 
-        env_dict = {(str(k) if isinstance(k, unicode) else k):
-                    (str(v) if isinstance(v, unicode) else v)
-                    for k, v in os.environ.items()}  # workaround for py2 on win
+        env_dict = enc.EncodeEnv(dict(os.environ))
         test_call_env = dict(
             env_dict,
             PUBSUB_EMULATOR_HOST=str('localhost:{}'.format(port)),

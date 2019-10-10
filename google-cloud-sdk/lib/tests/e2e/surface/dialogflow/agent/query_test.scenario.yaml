@@ -11,6 +11,11 @@ summary:
       test response
 - execute:
   - command: |
+      dialogflow agent query --query-text="test query" --session="my-session"
+  - stdout: |
+      test response
+- execute:
+  - command: |
       dialogflow agent query --query-audio-file="test_query.wav" --sample-rate="16000"
         --audio-encoding="AUDIO_ENCODING_LINEAR_16"
   - stdout: |

@@ -7,9 +7,6 @@ SYNOPSIS
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) List existing Bigtable instance tables.
-
 REQUIRED FLAGS
      --instances=[INSTANCE,...]
         ID of the instances.
@@ -50,8 +47,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list all tables in an instance, run:
+
+        $ gcloud beta bigtable instances tables list \
+            --instances=INSTANCE_NAME
+
+    To list all tables in several instances, run:        $ gcloud beta bigtable instances tables list \
+            --instances=INSTANCE_NAME1,INSTANCE_NAME2
+
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha bigtable instances tables list
 

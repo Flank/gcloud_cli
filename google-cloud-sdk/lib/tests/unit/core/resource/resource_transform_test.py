@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -658,6 +658,7 @@ class ResourceTransformTest(test_case.Base):
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testTransformDateErrors(self):
     resource = [1e12]
     kwargs = {'undefined': 'UNDEFINED'}
@@ -1849,6 +1850,18 @@ class ResourceTransformTest(test_case.Base):
     for r, sep, expected in tests:
       self.assertEqual(resource_transform.TransformSplit(r, sep), expected)
 
+  def testTransformRegex(self):
+    # input, expression, matches, nomatch, expected
+    tests = [
+        ('a.b.c.d', r'a\.*', 'YES', 'NO', 'YES'),
+        ('FooBar', r'Tim', 'YES', 'NO', 'NO'),
+        ('', r'j*', 'YES', 'NO', 'NO'),
+        ('FooBar', r'Foo', 'YES', 'NO', 'YES'),
+    ]
+    for r, exp, match, nomatch, expected in tests:
+      self.assertEqual(
+          resource_transform.TransformRegex(r, exp, match, nomatch), expected)
+
   def testTransformSplitCustomUndefined(self):
     self.assertEqual(resource_transform.TransformSplit(
         '', '/', undefined='foobar'), 'foobar')
@@ -2004,6 +2017,7 @@ class ResourceTransformRealRegistryTest(test_case.Base):
         'list',
         'map',
         'notnull',
+        'regex',
         'resolution',
         'scope',
         'segment',

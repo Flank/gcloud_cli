@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ class Create(base.CreateCommand):
   key, `fellowship` keyring, and `global` location and sets it as
   the primary version:
 
-    $ {command} --location global \
-        --keyring fellowship \
-        --key frodo --primary
+    $ {command} --location=global \
+        --keyring=fellowship \
+        --key=frodo --primary
   """
 
   @staticmethod
@@ -63,7 +63,6 @@ class Create(base.CreateCommand):
     new_version = ckv.Create(req)
 
     if args.primary:
-      # TODO(b/35914817): Find a better way to parse this.
       version_id = os.path.basename(new_version.name)
 
       req = messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionRequest(

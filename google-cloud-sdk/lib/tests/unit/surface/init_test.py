@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import re
 import sys
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
+from googlecloudsdk.api_lib.resource_manager import operations
+from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions as c_exc
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
@@ -194,6 +196,11 @@ def _GetPickProjectMessage(projects, created=None,
                        'creation message.')
     lines.append('')
   return '\n'.join(lines)
+
+
+def _GetWaitingForOperationMessage(status):
+  return ('{{"ux": "PROGRESS_TRACKER", "message": "Waiting for '
+          '[operations/pc.1234] to finish", "status": "{}"}}\n').format(status)
 
 
 def _GetCurrentProjectMessage(project):
@@ -398,7 +405,21 @@ class InitNoAuthTest(
     self.exec_mock = self.StartObjectPatch(
         execution_utils, 'Exec', side_effect=self.mock_execution_utils.Exec)
 
+  def GetCreateProjectOperation(self, project_id):
+    operation_name = 'pc.1234'
+    proj = self.messages.Project(projectId=project_id)
+    return self.messages.Operation(
+        name='operations/' + operation_name,
+        done=True,
+        response=operations.ToOperationResponse(proj))
+
+  def SetProjectToCreate(self, project_id):
+    op = self.GetCreateProjectOperation(project_id)
+    self.get_operation_mock.return_value = op
+    self.projects_create_mock.return_value = op
+
   def SetUp(self):
+    self.messages = apis.GetMessagesModule('cloudresourcemanager', 'v1')
     self.actual_execute = self.cli.Execute
     is_valid_command = self.cli.IsValidCommand
     def CheckCommand(cmd):
@@ -411,6 +432,7 @@ class InitNoAuthTest(
         network_diagnostics.NetworkDiagnostic, 'RunChecks', return_value=True)
     self.projects_list_mock = self.StartObjectPatch(projects_api, 'List')
     self.projects_create_mock = self.StartObjectPatch(projects_api, 'Create')
+    self.get_operation_mock = self.StartObjectPatch(operations, 'GetOperation')
     self.projects_list_mock.return_value = iter([])
     self.ResetExecutor()
     self.ResetExecutionUtils()
@@ -816,6 +838,7 @@ class InitNoAuthTest(
     )
 
   def testSingleProjectSelected2222(self):
+    self.SetProjectToCreate('golden-project')
     self.RunScenario(
         self.WithConfigurations([]) +
         self.WithAuth([], login='foo@google.com') +
@@ -833,20 +856,18 @@ class InitNoAuthTest(
     self.assertMultiLineEqual('', self.GetOutput())
 
     self.assertMultiLineEqual(
-        _GetWelcomeMessage() +
-        _GetCurrentConfigMessage('default') +
-        _GetDiagnosticsMessage() +
-        _GetLoginPromptMessage() +
+        _GetWelcomeMessage() + _GetCurrentConfigMessage('default') +
+        _GetDiagnosticsMessage() + _GetLoginPromptMessage() +
         _GetLoggedInAsMessage('foo@google.com') +
         _GetPickProjectMessage(['other-project'], created='golden-project') +
+        _GetWaitingForOperationMessage('SUCCESS') +
         _GetCurrentProjectMessage('golden-project') +
         _GetComputeMessage(zone='good-zone', region='bad-region') +
-        _GetBotoMessage() +
-        _GetReadyToUseMessage(
-            'foo@google.com', 'golden-project',
-            zone='good-zone', region='bad-region'),
-        self.GetErr()
-    )
+        _GetBotoMessage() + _GetReadyToUseMessage(
+            'foo@google.com',
+            'golden-project',
+            zone='good-zone',
+            region='bad-region'), self.GetErr())
 
   def testSingleProjectCreateFails(self):
     create_error = http_error.MakeHttpError(
@@ -869,6 +890,7 @@ class InitNoAuthTest(
 
   def testNoProjectsUnknownPreSelected(self):
     preselected_project = 'golden-project'
+    self.SetProjectToCreate(preselected_project)
     projects = []
     self.RunScenario(
         self.WithConfigurations([]) +
@@ -882,23 +904,21 @@ class InitNoAuthTest(
     self.assertMultiLineEqual('', self.GetOutput())
 
     self.assertMultiLineEqual(
-        _GetWelcomeMessage() +
-        _GetCurrentConfigMessage('default') +
-        _GetDiagnosticsMessage() +
-        _GetLoginPromptMessage() +
-        _GetLoggedInAsMessage('foo@google.com') +
-        _GetPickProjectMessage([]) +
+        _GetWelcomeMessage() + _GetCurrentConfigMessage('default') +
+        _GetDiagnosticsMessage() + _GetLoginPromptMessage() +
+        _GetLoggedInAsMessage('foo@google.com') + _GetPickProjectMessage([]) +
+        _GetWaitingForOperationMessage('SUCCESS') +
         _GetCurrentProjectMessage('golden-project') +
         _GetComputeMessage(zone='good-zone', region='bad-region') +
-        _GetBotoMessage() +
-        _GetReadyToUseMessage(
-            'foo@google.com', 'golden-project',
-            zone='good-zone', region='bad-region'),
-        self.GetErr()
-    )
+        _GetBotoMessage() + _GetReadyToUseMessage(
+            'foo@google.com',
+            'golden-project',
+            zone='good-zone',
+            region='bad-region'), self.GetErr())
 
   def testOneProjectUnknownPreSelected(self):
     preselected_project = 'unknown-project'
+    self.SetProjectToCreate(preselected_project)
     projects = ['golden-project']
     self.RunScenario(
         self.WithConfigurations([]) +
@@ -912,21 +932,18 @@ class InitNoAuthTest(
     self.assertMultiLineEqual('', self.GetOutput())
 
     self.assertMultiLineEqual(
-        _GetWelcomeMessage() +
-        _GetCurrentConfigMessage('default') +
-        _GetDiagnosticsMessage() +
-        _GetLoginPromptMessage() +
-        _GetLoggedInAsMessage('foo@google.com') +
-        _GetPickProjectMessage(
+        _GetWelcomeMessage() + _GetCurrentConfigMessage('default') +
+        _GetDiagnosticsMessage() + _GetLoginPromptMessage() +
+        _GetLoggedInAsMessage('foo@google.com') + _GetPickProjectMessage(
             projects, preselected_project=preselected_project) +
+        _GetWaitingForOperationMessage('SUCCESS') +
         _GetCurrentProjectMessage('unknown-project') +
         _GetComputeMessage(zone='good-zone', region='bad-region') +
-        _GetBotoMessage() +
-        _GetReadyToUseMessage(
-            'foo@google.com', 'unknown-project',
-            zone='good-zone', region='bad-region'),
-        self.GetErr()
-    )
+        _GetBotoMessage() + _GetReadyToUseMessage(
+            'foo@google.com',
+            'unknown-project',
+            zone='good-zone',
+            region='bad-region'), self.GetErr())
 
   def testOneProjectKnownPreSelected(self):
     preselected_project = 'golden-project'
@@ -994,6 +1011,7 @@ class InitNoAuthTest(
 
   def testMultipleProjectsUnknownPreSelected(self):
     preselected_project = 'unknown-project'
+    self.SetProjectToCreate(preselected_project)
     projects = ['golden-project', 'old-project']
     self.RunScenario(
         self.WithConfigurations([]) +
@@ -1007,21 +1025,18 @@ class InitNoAuthTest(
     self.assertMultiLineEqual('', self.GetOutput())
 
     self.assertMultiLineEqual(
-        _GetWelcomeMessage() +
-        _GetCurrentConfigMessage('default') +
-        _GetDiagnosticsMessage() +
-        _GetLoginPromptMessage() +
-        _GetLoggedInAsMessage('foo@google.com') +
-        _GetPickProjectMessage(
+        _GetWelcomeMessage() + _GetCurrentConfigMessage('default') +
+        _GetDiagnosticsMessage() + _GetLoginPromptMessage() +
+        _GetLoggedInAsMessage('foo@google.com') + _GetPickProjectMessage(
             projects, preselected_project=preselected_project) +
+        _GetWaitingForOperationMessage('SUCCESS') +
         _GetCurrentProjectMessage(preselected_project) +
         _GetComputeMessage(zone='good-zone', region='bad-region') +
-        _GetBotoMessage() +
-        _GetReadyToUseMessage(
-            'foo@google.com', preselected_project,
-            zone='good-zone', region='bad-region'),
-        self.GetErr()
-    )
+        _GetBotoMessage() + _GetReadyToUseMessage(
+            'foo@google.com',
+            preselected_project,
+            zone='good-zone',
+            region='bad-region'), self.GetErr())
 
   def testMultipleProjectsTypoSelected(self):
     selected_project = 'yuor-project'

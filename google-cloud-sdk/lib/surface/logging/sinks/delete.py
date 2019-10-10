@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class Delete(base.DeleteCommand):
   def Args(parser):
     """Register flags for this command."""
     parser.add_argument('sink_name', help='The name of the sink to delete.')
-    util.AddNonProjectArgs(parser, 'Delete a sink')
+    util.AddParentArgs(parser, 'Delete a sink')
     parser.display_info.AddCacheUpdater(None)
 
   def Run(self, args):

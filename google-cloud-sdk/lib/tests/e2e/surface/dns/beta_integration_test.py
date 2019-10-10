@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,13 +67,13 @@ class ManagedZonesTest(base.DnsTest):
                   self.test_zone.name, self.test_zone.dnsName,
                   self.test_zone.description))
     self.AssertErrContains("""\
-Created [https://www.googleapis.com/dns/{2}/projects/{0}/managedZones/{1}].
+Created [https://dns.googleapis.com/dns/{2}/projects/{0}/managedZones/{1}].
 """.format(self.Project(), self.test_zone.name, self.beta_version))
 
   def TearDown(self):
     self.Run('dns managed-zones delete {0}'.format(self.test_zone.name))
     self.AssertErrContains("""\
-Deleted [https://www.googleapis.com/dns/{2}/projects/{0}/managedZones/{1}].
+Deleted [https://dns.googleapis.com/dns/{2}/projects/{0}/managedZones/{1}].
 """.format(self.Project(), self.test_zone.name, self.beta_version))
 
   def testList(self):

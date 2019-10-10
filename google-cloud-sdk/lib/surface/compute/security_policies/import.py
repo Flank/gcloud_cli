@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ from googlecloudsdk.command_lib.compute.security_policies import (
     security_policies_utils)
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import files
+import six
 
 
 @base.UnicodeIsSupported
@@ -77,7 +78,7 @@ class Import(base.SilentCommand):
           imported = security_policies_utils.SecurityPolicyFromFile(
               import_file, holder.client.messages, 'yaml')
     except Exception as exp:
-      exp_msg = getattr(exp, 'message', str(exp))
+      exp_msg = getattr(exp, 'message', six.text_type(exp))
       msg = ('Unable to read security policy config from specified file [{0}] '
              'because [{1}]'.format(args.file_name, exp_msg))
       raise exceptions.BadFileException(msg)

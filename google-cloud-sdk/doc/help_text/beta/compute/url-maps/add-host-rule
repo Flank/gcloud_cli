@@ -3,9 +3,9 @@ NAME
         hosts to a path matcher
 
 SYNOPSIS
-    gcloud beta compute url-maps add-host-rule URL_MAP_NAME
-        --hosts=HOST,[HOST,...] --path-matcher-name=PATH_MATCHER_NAME
-        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute url-maps add-host-rule URL_MAP --hosts=HOST,[HOST,...]
+        --path-matcher-name=PATH_MATCHER_NAME [--description=DESCRIPTION]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute url-maps add-host-rule is used to add a mapping
@@ -17,7 +17,7 @@ DESCRIPTION
     url-maps edit can be used to add path matchers.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS
@@ -37,6 +37,31 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the host rule.
 
+     At most one of these may be specified:
+
+       --global
+          If set, the URL map is global.
+
+       --region=REGION
+          Region of the URL map to operate on. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -49,7 +74,8 @@ EXAMPLES
     to the www path matcher, run:
 
         $ gcloud beta compute url-maps add-host-rule MY-URL-MAP \
-            --hosts '*-foo.example.com,example.com' --path-matcher-name www
+            --hosts '*-foo.example.com,example.com' \
+            --path-matcher-name www --global
 
 NOTES
     This command is currently in BETA and may change without notice. These

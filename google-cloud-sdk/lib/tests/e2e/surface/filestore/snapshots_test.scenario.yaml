@@ -16,18 +16,21 @@ summary:
   - command: filestore snapshots create $$filestore-test-snapshot1$$ --region us-east1
       --instance $$filestore-test-instance1$$ --instance-zone us-east1-c --file-share="my_vol"
   - stderr: |
-      Create request issued for: [$$filestore-test-snapshot1$$]
+      Create request issued
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
-      Created snapshot [$$filestore-test-snapshot1$$].
+      Created snapshot.
 - execute:
   - command: filestore snapshots list --region us-east1 --filter 'name:$$filestore-test-snapshot1$$'
       --format 'table(name,sourceInstance,sourceFileShare,state)'
   - stdout: |
       NAME                                          SRC_INSTANCE                                                       SRC_FILE_SHARE  STATE
       $$filestore-test-snapshot1$$  us-east1-c/instances/$$filestore-test-instance1$$  my_vol          READY
+- execute:
+  - command: filestore snapshots list --zone us-east1-c --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
 - execute:
   - command: filestore snapshots describe '$$filestore-test-snapshot1$$' --region
       us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
@@ -36,8 +39,8 @@ summary:
       projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$  projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$  my_vol             READY
 - execute:
   - command: filestore instances restore '$$filestore-test-instance1$$' --zone us-east1-c
-      --source-snapshot '$$filestore-test-snapshot1$$' --file-share my_vol --format
-      "yaml(name,state,tier,fileShares)"
+      --source-snapshot '$$filestore-test-snapshot1$$' --source-snapshot-region us-east1
+      --file-share my_vol --format "yaml(name,state,tier,fileShares)"
   - prompt:
     - message: |
         You are about to override existing data in [$$filestore-test-instance1$$].
@@ -45,7 +48,7 @@ summary:
   - stderr: |
       Request issued for: [$$filestore-test-instance1$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stdout: |
       fileShares:
@@ -57,7 +60,7 @@ summary:
       tier: STANDARD
 - execute:
   - command: filestore instances create $$filestore-test-instance2$$ --zone us-east1-c
-      --tier STANDARD --network=name=filestore-net --file-share=name=my_vol,capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$
+      --tier STANDARD --network=name=filestore-net --file-share=name="my_vol",capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$,source-snapshot-region=us-east1
   - progress_tracker:
     - message: Waiting for [$$operation-basename$$] to finish
     - status: SUCCESS
@@ -73,15 +76,16 @@ summary:
 - execute:
   - command: filestore snapshots delete $$filestore-test-snapshot1$$ --region us-east1
   - prompt:
-    - message: You are about to delete snapshot [$$filestore-test-snapshot1$$]
+    - message: |
+        You are about to delete a snapshot
     - input: y
   - stderr: |
-      Delete request issued for: [$$filestore-test-snapshot1$$]
+      Delete request issued
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
-      Deleted snapshot [$$filestore-test-snapshot1$$].
+      Deleted snapshot.
 - execute:
   - command: filestore instances delete $$filestore-test-instance2$$ --zone us-east1-c
   - prompt:
@@ -175,32 +179,15 @@ actions:
             done: false
         poll_operation: true
     - expect_stderr: |
-        Create request issued for: [$$filestore-test-snapshot1$$]
+        Create request issued
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
-    - api_call:
-        expect_request:
-          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
-          method: GET
-          headers: {}
-          body:
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '368'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
-            state: READY
-            createTime: '2019-03-13T18:25:24.482381382Z'
-            sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
-            sourceFileShare: my_vol
     - expect_stderr: |
-        Created snapshot [$$filestore-test-snapshot1$$].
+        Created snapshot.
     - expect_exit:
         code: 0
+
 - execute_command:
     command: filestore snapshots list --region us-east1 --filter 'name:$$filestore-test-snapshot1$$'
       --format 'table(name,sourceInstance,sourceFileShare,state)'
@@ -210,7 +197,7 @@ actions:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -290,6 +277,26 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
+    command: filestore snapshots list --zone us-east1-c --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/snapshots?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5185'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            snapshots: null
+    - expect_exit:
+        code: 0
+- execute_command:
     command: filestore snapshots describe '$$filestore-test-snapshot1$$' --region
       us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
     events:
@@ -298,7 +305,7 @@ actions:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -318,8 +325,8 @@ actions:
         code: 0
 - execute_command:
     command: filestore instances restore '$$filestore-test-instance1$$' --zone us-east1-c
-      --source-snapshot '$$filestore-test-snapshot1$$' --file-share my_vol --format
-      "yaml(name,state,tier,fileShares)"
+      --source-snapshot '$$filestore-test-snapshot1$$' --source-snapshot-region us-east1
+      --file-share my_vol --format "yaml(name,state,tier,fileShares)"
     events:
     - expect_prompt_continue:
         message: |
@@ -354,14 +361,14 @@ actions:
     - expect_stderr: |
         Request issued for: [$$filestore-test-instance1$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - api_call:
         expect_request:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -398,7 +405,7 @@ actions:
 
 - execute_command:
     command: filestore instances create $$filestore-test-instance2$$ --zone us-east1-c
-      --tier STANDARD --network=name=filestore-net --file-share=name="my_vol",capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$
+      --tier STANDARD --network=name=filestore-net --file-share=name="my_vol",capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$,source-snapshot-region=us-east1
     events:
     - api_call:
         expect_request:
@@ -450,7 +457,7 @@ actions:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$?alt=json
           method: DELETE
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -479,14 +486,15 @@ actions:
     cleanup_for: filestore-test-snapshot1
     events:
     - expect_prompt_continue:
-        message: You are about to delete snapshot [$$filestore-test-snapshot1$$]
+        message: |
+          You are about to delete a snapshot
         user_input: y
     - api_call:
         expect_request:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
           method: DELETE
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -505,12 +513,12 @@ actions:
             done: false
         poll_operation: true
     - expect_stderr: |
-        Delete request issued for: [$$filestore-test-snapshot1$$]
+        Delete request issued
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
-        Deleted snapshot [$$filestore-test-snapshot1$$].
+        Deleted snapshot.
     - expect_exit:
         code: 0
 
@@ -527,7 +535,7 @@ actions:
           uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$?alt=json
           method: DELETE
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private

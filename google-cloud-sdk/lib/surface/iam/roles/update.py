@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ class Update(base.Command):
         '--file',
         help='The Yaml file you want to use to update a role. '
         'Can not be specified with other flags except role-id.')
-    flags.GetOrgFlag('update').AddToParser(parser)
+    flags.AddParentFlags(parser, 'update')
     flags.GetCustomRoleFlag('update').AddToParser(parser)
 
   def Run(self, args):

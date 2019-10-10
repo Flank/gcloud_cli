@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,14 @@ from googlecloudsdk.core import properties
 
 
 class List(base.ListCommand):
-  """List autoscaling policies."""
+  """List autoscaling policies.
+
+  ## EXAMPLES
+
+  The following command lists all autoscaling policies in the project:
+
+    $ {command}
+  """
 
   @staticmethod
   def Args(parser):

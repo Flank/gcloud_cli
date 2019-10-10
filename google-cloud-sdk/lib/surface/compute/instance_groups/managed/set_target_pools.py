@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ def _AddArgs(parser):
       metavar='TARGET_POOL',
       help=('Compute Engine Target Pools to add the instances to. '
             'Target Pools must be specified by name or by URL. Example: '
-            '--target-pool target-pool-1,target-pool-2.'))
+            '--target-pools=target-pool-1,target-pool-2. To clear the set of '
+            'Target Pools pass in an empty list. Example: --target-pools=""'))
 
 
 class SetTargetPools(base.Command):
@@ -79,7 +80,12 @@ class SetTargetPools(base.Command):
               collection='compute.targetPools'))
     pools = [pool_ref.SelfLink() for pool_ref in pool_refs]
 
-    return self._MakePatchRequest(client, igm_ref, pools)
+    if pools:
+      return self._MakePatchRequest(client, igm_ref, pools)
+    else:
+      # Forces apitools to include field even when it is an empty list.
+      with client.apitools_client.IncludeFields(['targetPools']):
+        return self._MakePatchRequest(client, igm_ref, pools)
 
   def _GetRegionName(self, igm_ref):
     if igm_ref.Collection() == 'compute.instanceGroupManagers':

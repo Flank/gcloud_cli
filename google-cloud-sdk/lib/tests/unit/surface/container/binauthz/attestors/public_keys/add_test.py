@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,12 +34,12 @@ from tests.lib.surface.container.binauthz import base
 
 class AddTest(
     sdk_test_base.WithTempCWD,
-    base.WithMockBetaBinauthz,
+    base.WithMockGaBinauthz,
     base.BinauthzTestBase,
 ):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSuccess(self):
     ascii_armored_key = textwrap.dedent("""
@@ -57,20 +57,32 @@ class AddTest(
         asciiArmoredPgpPublicKey=ascii_armored_key,
         comment=None,
         id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
-    attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name),
-        updateTime=None,
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name),
-            publicKeys=[],
-        ))
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[],
+          ))
 
     updated_attestor = copy.deepcopy(attestor)
-    updated_attestor.userOwnedDrydockNote.publicKeys.append(new_pub_key)
+    try:
+      updated_attestor.userOwnedGrafeasNote.publicKeys.append(new_pub_key)
+    except AttributeError:
+      updated_attestor.userOwnedDrydockNote.publicKeys.append(new_pub_key)
     updated_attestor.updateTime = times.FormatDateTime(
         datetime.datetime.utcnow())
 
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=attestor.name)
 
     self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
@@ -79,10 +91,69 @@ class AddTest(
 
     response = self.RunBinauthz(
         'attestors public-keys add '
-        '--attestor={name} --public-key-file={fname}'.format(
+        '--attestor={name} --pgp-public-key-file={fname}'.format(
             name=name, fname=fname))
 
     self.assertEqual(response, new_pub_key)
+
+  def testAlreadyExists(self):
+    ascii_armored_key = textwrap.dedent("""
+        -----BEGIN PGP PUBLIC KEY BLOCK-----
+        aBcDeFg
+        aBcDeFg
+        aBcDeFg
+        -----END PGP PUBLIC KEY BLOCK-----
+    """)
+    fname = self.Touch(directory=self.cwd_path, contents=ascii_armored_key)
+
+    name = 'bar'
+    proj = self.Project()
+    new_pub_key = self.messages.AttestorPublicKey(
+        asciiArmoredPgpPublicKey=ascii_armored_key,
+        comment=None,
+        id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097')
+    try:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[new_pub_key],
+          ))
+    except AttributeError:
+      attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name),
+          updateTime=None,
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name),
+              publicKeys=[new_pub_key],
+          ))
+
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=attestor.name)
+
+    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
+
+    with self.assertRaises(exceptions.AlreadyExistsError):
+      self.RunBinauthz(
+          'attestors public-keys add '
+          '--attestor={name} --pgp-public-key-file={fname}'.format(
+              name=name, fname=fname))
+
+  def testUnknownFile(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.RunBinauthz(
+          'attestors public-keys add '
+          '--attestor=any-old-name --pgp-public-key-file=not-a-real-file.pub')
+
+
+class AddBetaTest(
+    base.WithMockBetaBinauthz,
+    AddTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testAlreadyExists(self):
     ascii_armored_key = textwrap.dedent("""
@@ -108,7 +179,7 @@ class AddTest(
             publicKeys=[new_pub_key],
         ))
 
-    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=attestor.name)
 
     self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
@@ -116,14 +187,8 @@ class AddTest(
     with self.assertRaises(exceptions.AlreadyExistsError):
       self.RunBinauthz(
           'attestors public-keys add '
-          '--attestor={name} --public-key-file={fname}'.format(
+          '--attestor={name} --pgp-public-key-file={fname}'.format(
               name=name, fname=fname))
-
-  def testUnknownFile(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.RunBinauthz(
-          'attestors public-keys add '
-          '--attestor=any-old-name --public-key-file=not-a-real-file.pub')
 
 
 class AddAlphaTest(

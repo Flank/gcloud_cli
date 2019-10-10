@@ -11,7 +11,7 @@ gcloud beta tasks queues create \- create a Cloud Tasks queue
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta tasks queues create\fR \fIQUEUE\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta tasks queues create\fR \fIQUEUE\fR [\fB\-\-log\-sampling\-ratio\fR=\fILOG_SAMPLING_RATIO\fR] [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,6 +37,12 @@ The queue to create.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-log\-sampling\-ratio\fR=\fILOG_SAMPLING_RATIO\fR
+Specifies the fraction of operations to write to Stackdriver Logging. This field
+may contain any value between 0.0 and 1.0, inclusive. 0.0 is the default and
+means that no operations are logged.
+
 .TP 2m
 \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR
 The maximum number of attempts per task in the queue.

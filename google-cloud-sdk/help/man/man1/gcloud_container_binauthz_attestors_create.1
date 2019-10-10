@@ -1,0 +1,120 @@
+
+.TH "GCLOUD_CONTAINER_BINAUTHZ_ATTESTORS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container binauthz attestors create \- create an Attestor
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container binauthz attestors create\fR \fIATTESTOR\fR (\fB\-\-attestation\-authority\-note\fR=\fIATTESTATION_AUTHORITY_NOTE\fR\ :\ \fB\-\-attestation\-authority\-note\-project\fR=\fIATTESTATION_AUTHORITY_NOTE_PROJECT\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Attestor resource \- The attestor to be created. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[ATTESTOR] on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIATTESTOR\fR
+ID of the attestor or fully qualified identifier for the attestor.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Note resource \- The Container Analysis ATTESTATION_AUTHORITY Note to which the
+created attestor will be bound.
+
+.RE
+.sp
+For the attestor to be able to access and use the Note, the Note must exist and
+the active gcloud account (core/account) must have the
+\f5containeranalysis.notes.listOccurrences\fR permission for the Note. This can
+be achieved by granting the \f5containeranalysis.notes.occurrences.viewer\fR
+role to the active account for the Note resource in question.
+
+.RS 2m
+The arguments in this group can be used to specify the attributes of this resource. This must be specified.
+.RE
+
+
+.RS 2m
+.TP 2m
+\fB\-\-attestation\-authority\-note\fR=\fIATTESTATION_AUTHORITY_NOTE\fR
+ID of the note or fully qualified identifier for the note. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-attestation\-authority\-note\-project\fR=\fIATTESTATION_AUTHORITY_NOTE_PROJECT\fR
+The Container Analysis project for the note.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A description for the attestor
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an Attestor with an existing Note
+\f5projects/my_proj/notes/my_note\fR:
+
+.RS 2m
+$ gcloud container binauthz attestors create \e
+    my_new_attestor
+    \-\-attestation\-authority\-note=my_note \e
+    \-\-attestation\-authority\-note\-project=my_proj \e
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors create
+$ gcloud beta container binauthz attestors create
+.RE
+

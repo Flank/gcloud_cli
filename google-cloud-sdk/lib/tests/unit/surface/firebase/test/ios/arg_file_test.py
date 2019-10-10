@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+import re
 
 from googlecloudsdk.api_lib.firebase.test import arg_file
 from googlecloudsdk.api_lib.firebase.test import arg_util
@@ -31,6 +32,7 @@ from tests.lib.surface.firebase.test.ios import unit_base
 GOOD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'good_args')
 BAD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'bad_args')
 TEST_TYPES = os.path.join(unit_base.TEST_DATA_PATH, 'test_types')
+INTEGERS = os.path.join(unit_base.TEST_DATA_PATH, 'integers')
 
 
 class IosArgFileTests(unit_base.IosUnitTestBase):
@@ -66,25 +68,54 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
     PrepareIosArgs(args)
     self.assertEqual(args.type, 'xctest')
 
+  def testType_XctestNoTestIsInvalid(self):
+    args = self.NewTestArgs(argspec=TEST_TYPES + ':type-xctest')
+    with self.assertRaisesRegex(calliope_exceptions.RequiredArgumentException,
+                                re.escape('Missing required argument [test]')):
+      PrepareIosArgs(args)
+
+  def testType_GameLoopIsValid(self):
+    args = self.NewTestArgs(app='app', argspec=TEST_TYPES + ':type-game-loop')
+    PrepareIosArgs(args)
+    self.assertEqual(args.type, 'game-loop')
+
+  def testType_GameLoopNoAppIsInvalid(self):
+    args = self.NewTestArgs(argspec=TEST_TYPES + ':type-game-loop')
+    with self.assertRaisesRegex(calliope_exceptions.RequiredArgumentException,
+                                re.escape('Missing required argument [app]')):
+      PrepareIosArgs(args)
+
+  def testType_TestSpecifiedNotType(self):
+    args = self.NewTestArgs(test='test')
+    PrepareIosArgs(args)
+    self.assertEqual(args.type, 'xctest')
+
+  def testType_AppSpecifiedNotTypeInvalid(self):
+    args = self.NewTestArgs(app='app')
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        re.escape('[app]: may not be used with test type [xctest]')):
+      PrepareIosArgs(args)
+
   def testType_CannotBeAndroidType(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-robo')
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                "'robo' is not a valid test type."):
       PrepareIosArgs(args)
-    self.assertIn("'robo' is not a valid test type.", str(e.exception))
 
   def testType_IntIsInvalid(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-int')
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        re.escape("[type]: '42' is not a valid test type.")):
       PrepareIosArgs(args)
-    self.assertIn('Invalid value for [type]:', str(e.exception))
-    self.assertIn("'42' is not a valid test type.", str(e.exception))
 
   def testType_BoolIsInvalid(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-bool')
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        re.escape("[type]: 'True' is not a valid test type.")):
       PrepareIosArgs(args)
-    self.assertIn('Invalid value for [type]:', str(e.exception))
-    self.assertIn("'True' is not a valid test type.", str(e.exception))
 
   # Tests for --device arg
 
@@ -125,24 +156,85 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
     self.assertDictEqual(d1, {})
 
   def testDevice_InvalidSparseMatrix_1(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('Invalid value for [device]:')):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse1', self.ios_args_set)
-    self.assertIn('Invalid value for [device]:', str(e.exception))
 
   def testDevice_InvalidSparseMatrix_2(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('Invalid value for [device]:')):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse2', self.ios_args_set)
-    self.assertIn('Invalid value for [device]:', str(e.exception))
 
   def testDevice_InvalidSparseMatrix_3(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('Invalid value for [model]:')):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse3', self.ios_args_set)
-    self.assertIn('Invalid value for [model]:', str(e.exception))
 
   def testDevice_InvalidSparseMatrix_4(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('Invalid value for [model]:')):
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse4', self.ios_args_set)
-    self.assertIn('Invalid value for [model]:', str(e.exception))
+
+  # Various int-list arg validation tests
+
+  def testIntList_ValidNumber(self):
+    args = arg_file.GetArgsFromArgFile(INTEGERS + ':scenario1',
+                                       self.ios_args_set)
+    self.assertListEqual(args['scenario_numbers'], [2000])
+
+  def testIntList_ListWithFourElements(self):
+    args = arg_file.GetArgsFromArgFile(INTEGERS + ':scenario4',
+                                       self.ios_args_set)
+    self.assertListEqual(args['scenario_numbers'], [1, 3, 13, 77])
+
+  def testIntList_ZeroIsNotAPositiveInt(self):
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        re.escape(
+            '[scenario-numbers]: Value must be greater than or equal to 1; received: 0'
+        )):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-zero',
+                                  self.ios_args_set)
+
+  def testIntList_InvalidNegativeInt(self):
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        re.escape(
+            '[scenario-numbers]: Value must be greater than or equal to 1; received: -1024'
+        )):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-neg', self.ios_args_set)
+
+  def testIntList_InvalidNegativeIntInList(self):
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        re.escape(
+            '[scenario-numbers]: Value must be greater than or equal to 1; received: -1'
+        )):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-neg-in-list',
+                                  self.ios_args_set)
+
+  def testIntList_InvalidFloat(self):
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('[scenario-numbers]: 3.14')):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-float',
+                                  self.ios_args_set)
+
+  def testIntList_InvalidSingleString(self):
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('[scenario-numbers]: 1a')):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-str', self.ios_args_set)
+
+  def testIntList_InvalidListOfStrings(self):
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('[scenario-numbers]: 1')):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-str-list',
+                                  self.ios_args_set)
+
+  def testIntList_InvalidDictValue(self):
+    with self.assertRaisesRegex(calliope_exceptions.InvalidArgumentException,
+                                re.escape('[scenario-numbers]: {')):
+      arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-dict',
+                                  self.ios_args_set)
 
 
 def PrepareIosArgs(args):

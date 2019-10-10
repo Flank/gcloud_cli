@@ -6,25 +6,26 @@ summary:
   - command: |
       ml video detect-text gs://mockbucket/mock_video.mp4 --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
       {
-        "name": "us-east1.1234"
+        "name": "projects/123/locations/us-east1/operations/1234"
       }
 - execute:
   - command: |
       ml video detect-text gs://mockbucket/mock_video.mp4 --language-hints en-US,fr-CA --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
       {
-        "name": "us-east1.1234"
+        "name": "projects/123/locations/us-east1/operations/1234"
       }
 - execute:
   - command: |
       ml video detect-text gs://mockbucket/mock_video.mp4 --language-hints en-US,fr-CA
   - progress_tracker:
-    - message: Waiting for operation [us-east1.1234] to complete
+    - message: Waiting for operation [projects/123/locations/us-east1/operations/1234]
+        to complete
     - status: SUCCESS
   - stdout: |
       {
@@ -56,12 +57,12 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
         {
-          "name": "us-east1.1234"
+          "name": "projects/123/locations/us-east1/operations/1234"
         }
     - expect_exit:
         code: 0
@@ -87,12 +88,12 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
         {
-          "name": "us-east1.1234"
+          "name": "projects/123/locations/us-east1/operations/1234"
         }
     - expect_exit:
         code: 0
@@ -118,10 +119,10 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - api_call:
         expect_request:
-          uri: https://videointelligence.googleapis.com/v1/operations/us-east1.1234?alt=json
+          uri: https://videointelligence.googleapis.com/v1/projects/123/locations/us-east1/operations/1234?alt=json
           method: GET
           headers: {}
           body: null
@@ -154,7 +155,8 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [us-east1.1234] to complete
+        message: Waiting for operation [projects/123/locations/us-east1/operations/1234]
+          to complete
         status: SUCCESS
     - expect_stdout: |
         {

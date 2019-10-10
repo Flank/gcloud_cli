@@ -11,9 +11,9 @@ DESCRIPTION
 FLAGS
      --host-port=HOST_PORT
         The host:port to which the emulator should be bound. Can take the form
-        of a single address (hostname, IPv4, or IPv6) and port:
+        of a single address (hostname, IPv4, or IPv6) and/or port:
 
-            ADDRESS[:PORT]
+            [ADDRESS][:PORT]
 
         In this format you must enclose IPv6 addresses in square brackets: e.g.
 

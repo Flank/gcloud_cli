@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -162,9 +162,9 @@ class InstancesDeleteTest(test_base.BaseTest,
 
     self.Run("""
         compute instances delete
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
           instance-2
-          --zone https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-2
+          --zone https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-2
         """)
 
     self.CheckRequests(
@@ -266,10 +266,10 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=False,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -315,10 +315,10 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
     ])
@@ -355,10 +355,10 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=False,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
     ])
@@ -395,10 +395,10 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -444,16 +444,16 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -499,16 +499,16 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
     ])
@@ -545,16 +545,16 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
     ])
@@ -591,16 +591,16 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -645,29 +645,29 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-2')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-3',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-3')),
 
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -734,29 +734,29 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=False,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-2')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-3',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-3')),
 
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -810,29 +810,29 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=True,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-2')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-3',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-3')),
 
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -886,29 +886,29 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=False,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-2')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-3',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-3')),
 
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -970,29 +970,29 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=False,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-1')),
                 messages.AttachedDisk(
                     autoDelete=True,
                     boot=False,
                     deviceName='persistent-disk-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-2')),
                 messages.AttachedDisk(
                     autoDelete=False,
                     boot=False,
                     deviceName='persistent-disk-3',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/data-disk-3')),
 
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))],
         [],
         [],
@@ -1102,10 +1102,10 @@ class InstancesDeleteTest(test_base.BaseTest,
                     autoDelete=False,
                     boot=True,
                     deviceName='persistent-disk-0',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/zone-1/disks/instance-1')),
             ],
-            zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1'))
 
       elif method == 'SetDiskAutoDelete':

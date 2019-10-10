@@ -13,6 +13,8 @@ help_text:
 request:
   collection: compute.instances
   use_relative_name: false
+  modify_request_hooks:
+  - googlecloudsdk.command_lib.iam.hooks:UseMaxRequestedPolicyVersion:api_field=zoneSetPolicyRequest.policy.version
   api_version: v1
   BETA:
     api_version: beta
@@ -22,8 +24,7 @@ request:
 arguments:
   resource:
     help_text:
-      Instance resource - The instance to set the IAM policy of. The arguments in this group can
-      be used to specify the attributes of this resource.
+      The instance to set the IAM policy of.
     spec: !REF googlecloudsdk.command_lib.compute.resources:instance
 iam:
   set_iam_policy_request_path: zoneSetPolicyRequest

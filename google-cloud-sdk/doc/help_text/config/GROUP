@@ -73,6 +73,10 @@ AVAILABLE PROPERTIES
             If True, color will not be used when printing messages in the
             terminal.
 
+         disable_file_logging
+            If True, gcloud will not store logs to a file. This may be useful
+            if disk space is limited.
+
          disable_prompts
             If True, the default answer will be assumed for all user prompts.
             However, for any prompts that require user input, an error will be
@@ -174,6 +178,12 @@ AVAILABLE PROPERTIES
             different project, you can use this property to specify the
             alternate project.
 
+     build_artifacts
+         repository
+            Default repository to use when working with Cloud Build Artifacts
+            resources. When a repository is required but not provided by a
+            flag, the command will fall back to this value, if set.
+
      builds
          kaniko_cache_ttl
             TTL, in hours, of cached layers when using Kaniko. If zero, layer
@@ -237,14 +247,24 @@ AVAILABLE PROPERTIES
             If True, use the cluster's client certificate to authenticate to
             the cluster API server.
 
+     context_aware
+         use_client_certificate
+            If True, use client certificate to authorize user device using
+            context aware access.
+
+     datafusion
+         location
+            Datafusion location to use. Each Datafusion location constitutes an
+            independent resource namespace constrained to deploying
+            environments into Compute Engine regions inside this location. This
+            parameter corresponds to the /locations/<location> segment of the
+            Datafusion resource URIs being referenced.
+
      dataproc
          region
             Cloud Dataproc region to use. Each Cloud Dataproc region
             constitutes an independent resource namespace constrained to
             deploying instances into Compute Engine zones inside the region.
-            The default value of global is a special multi-region namespace
-            which is capable of deploying instances into all Compute Engine
-            zones globally, and is disjoint from other Cloud Dataproc regions.
 
      deployment_manager
          glob_imports
@@ -267,6 +287,12 @@ AVAILABLE PROPERTIES
             When a --region flag is required but not provided, the command will
             fall back to this value, if set. To see valid choices, run gcloud
             beta functions regions list.
+
+     game_services
+         location
+            Default location to use when working with Cloud Game Services
+            resources. When a --location flag is required but not provided, the
+            command will fall back to this value.
 
      gcloudignore
          enabled
@@ -326,6 +352,12 @@ AVAILABLE PROPERTIES
          suggest
             If True, add command line suggestions based on history.
 
+     lifesciences
+         location
+            Default location to use when working with Cloud Life Sciences
+            resources. When a --location flag is required but not provided, the
+            command will fall back to this value.
+
      ml_engine
          local_python
             Full path to the Python interpreter to use for Cloud ML Engine
@@ -366,11 +398,35 @@ AVAILABLE PROPERTIES
             resources. When a region is required but not provided by a flag,
             the command will fall back to this value, if set.
 
+     run
+         cluster
+            ID of the cluster or fully qualified identifier for the cluster
+
+         cluster_location
+            Zone or region in which the cluster is located.
+
+         platform
+            Target platform for running commands.
+
+         region
+            Default region to use when working with Cloud Run resources. When a
+            --region flag is required but not provided, the command will fall
+            back to this value, if set.
+
+     scc
+         organization
+            Default organization gcloud should use for scc surface.
+
      spanner
          instance
             Default instance to use when working with Cloud Spanner resources.
             When an instance is required but not provided by a flag, the
             command will fall back to this value, if set.
+
+     survey
+         disable_prompts
+            If True, gcloud will not prompt you to take periodic usage
+            experience surveys.
 
 NOTES
     These variants are also available:

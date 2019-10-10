@@ -7,7 +7,8 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [--location=LOCATION]
         [--next-rotation-time=NEXT_ROTATION_TIME]
         [--protection-level=PROTECTION_LEVEL; default="software"]
-        [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
+        [--rotation-period=ROTATION_PERIOD] [--skip-initial-version-creation]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a new key within the given keyring.
@@ -28,6 +29,10 @@ DESCRIPTION
     created key. The default is software; use "HSM" to create a hardware-backed
     key.
 
+    The flag --skip-initial-version-creation creates a CryptoKey with no
+    version, and no primary. If you import into the CryptoKey, or create a new
+    version in that CryptoKey, you must set that first version to primary.
+
 POSITIONAL ARGUMENTS
      KEY
         Name of the key to create.
@@ -39,15 +44,16 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --default-algorithm=DEFAULT_ALGORITHM
-        The default algorithm for the crypto key. DEFAULT_ALGORITHM must be one
-        of: ec-sign-p256-sha256, ec-sign-p384-sha384,
-        google-symmetric-encryption, rsa-decrypt-oaep-2048-sha256,
-        rsa-decrypt-oaep-3072-sha256, rsa-decrypt-oaep-4096-sha256,
-        rsa-decrypt-oaep-4096-sha512, rsa-sign-pkcs1-2048-sha256,
-        rsa-sign-pkcs1-3072-sha256, rsa-sign-pkcs1-4096-sha256,
-        rsa-sign-pkcs1-4096-sha512, rsa-sign-pss-2048-sha256,
-        rsa-sign-pss-3072-sha256, rsa-sign-pss-4096-sha256,
-        rsa-sign-pss-4096-sha512.
+        The default algorithm for the crypto key. See
+        https://cloud.google.com/kms/docs/algorithms for guidance on choosing
+        an algorithm. DEFAULT_ALGORITHM must be one of: ec-sign-p256-sha256,
+        ec-sign-p384-sha384, google-symmetric-encryption,
+        rsa-decrypt-oaep-2048-sha256, rsa-decrypt-oaep-3072-sha256,
+        rsa-decrypt-oaep-4096-sha256, rsa-decrypt-oaep-4096-sha512,
+        rsa-sign-pkcs1-2048-sha256, rsa-sign-pkcs1-3072-sha256,
+        rsa-sign-pkcs1-4096-sha256, rsa-sign-pkcs1-4096-sha512,
+        rsa-sign-pss-2048-sha256, rsa-sign-pss-3072-sha256,
+        rsa-sign-pss-4096-sha256, rsa-sign-pss-4096-sha512.
 
      --keyring=KEYRING
         Key ring of the key.
@@ -75,6 +81,10 @@ OPTIONAL FLAGS
         Automatic rotation period of the key. See $ gcloud topic datetimes for
         information on duration formats.
 
+     --skip-initial-version-creation
+        Skip creating the first version in a key and setting it as primary
+        during creation.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -87,35 +97,34 @@ EXAMPLES
     fellowship and location us-east1:
 
         $ gcloud alpha kms keys create frodo \
-            --location us-east1 \
-            --keyring fellowship \
-            --purpose encryption
+            --location=us-east1 \
+            --keyring=fellowship \
+            --purpose=encryption
 
     The following command creates a key named strider within the keyring
     rangers and location global with a specified rotation schedule:
 
         $ gcloud alpha kms keys create strider \
-            --location global --keyring rangers \
-            --purpose encryption \
-            --rotation-period 30d \
-            --next-rotation-time 2017-10-12T12:34:56.1234Z
+                --location=global --keyring=rangers \
+                --purpose=encryption \
+            --rotation-period=30d \
+            --next-rotation-time=2017-10-12T12:34:56.1234Z
 
     The following command creates an asymmetric key named samwise with default
     algorithm 'ec-sign-p256-sha256' within the keyring fellowship and location
     us-east1:
 
         $ gcloud alpha kms keys create samwise \
-            --location us-east1 \
-            --keyring fellowship \
-            --purpose asymmetric-signing \
-            --default-algorithm ec-sign-p256-sha256
+            --location=us-east1 \
+            --keyring=fellowship \
+            --purpose=asymmetric-signing \
+            --default-algorithm=ec-sign-p256-sha256
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud kms keys create
         $ gcloud beta kms keys create

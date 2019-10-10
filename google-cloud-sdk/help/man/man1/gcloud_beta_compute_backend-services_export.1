@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_BETA_COMPUTE_BACKEND\-SERVICES_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute backend\-services export \- export a backend service
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute backend\-services export\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Exports a backend service's configuration to a file. This
+configuration can be imported at a later time.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBACKEND_SERVICE_NAME\fR
+Name of the backend service to export.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Path to a YAML file where the backend service configuration will be exported.
+The exported data will not contain any output\-only fields. Alternatively, you
+may omit this flag to write to standard output. A schema describing the
+export/import format can be found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/beta/BackendService.yaml.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the backend service is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the backend service to export. Overrides the default
+\fBcompute/region\fR property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+A backend service can be exported by running:
+
+.RS 2m
+$ gcloud beta compute backend\-services export NAME \e
+    \-\-destination=<path\-to\-file> \-\-global
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute backend\-services export
+.RE
+

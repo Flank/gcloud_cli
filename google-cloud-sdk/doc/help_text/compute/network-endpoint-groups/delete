@@ -1,5 +1,5 @@
 NAME
-    gcloud compute network-endpoint-groups delete - deletes a Google Compute
+    gcloud compute network-endpoint-groups delete - delete a Google Compute
         Engine network endpoint group
 
 SYNOPSIS

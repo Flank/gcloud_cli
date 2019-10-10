@@ -19,7 +19,7 @@ REQUIRED FLAGS
      Node management At least one of these must be specified:
 
        --enable-autorepair
-          Enable node autorepair feature for a node-pool.
+          Enable node autorepair feature for a node pool.
 
               $ gcloud container node-pools update node-pool-1 \
                   --cluster=example-cluster --enable-autorepair
@@ -29,7 +29,7 @@ REQUIRED FLAGS
           for more info.
 
        --enable-autoupgrade
-          Sets autoupgrade feature for a node-pool.
+          Sets autoupgrade feature for a node pool.
 
               $ gcloud container node-pools update node-pool-1 \
                   --cluster=example-cluster --enable-autoupgrade

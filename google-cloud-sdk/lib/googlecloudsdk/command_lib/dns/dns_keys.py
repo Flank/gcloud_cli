@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from googlecloudsdk.api_lib.dns import util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.dns import flags
+import six
 
 
 ALGORITHM_NUMBERS = {
@@ -50,9 +51,10 @@ DIGEST_TYPE_NUMBERS = {
 
 
 def _GenerateDSRecord(key):
-  key_tag = str(key.keyTag)
-  key_algorithm = str(ALGORITHM_NUMBERS[key.algorithm.name])
-  digest_algorithm = str(DIGEST_TYPE_NUMBERS[key.digests[0].type.name])
+  key_tag = six.text_type(key.keyTag)
+  key_algorithm = six.text_type(ALGORITHM_NUMBERS[key.algorithm.name])
+  digest_algorithm = six.text_type(
+      DIGEST_TYPE_NUMBERS[key.digests[0].type.name])
   digest = key.digests[0].digest
   return ' '.join([key_tag, key_algorithm, digest_algorithm, digest])
 
@@ -80,12 +82,12 @@ DESCRIBE_HELP = {
         To show details about a DNS key resource with ID 3 in a managed zone
         `my_zone`, run:
 
-          $ {command} --zone my_zone 3
+          $ {command} --zone=my_zone 3
 
         To get the DS record corresponding for the DNSKEY record from the
         previous example, run (the DNSKEY record must be for a key-signing key):
 
-          $ {command} --zone my_zone 3 --format 'value(ds_record())'
+          $ {command} --zone=my_zone 3 --format='value(ds_record())'
         """
 }
 
@@ -105,13 +107,13 @@ LIST_HELP = {
         To see the list of all DNS key resources for a managed zone `my_zone`,
         run:
 
-          $ {command} --zone my_zone
+          $ {command} --zone=my_zone
 
         To see the DS records for every key-signing DnsKey in a managed zone,
         run:
 
-          $ {command} --zone my_zone 3 --format 'value(ds_record())' \
-              --filter 'type=keySigning'
+          $ {command} --zone=my_zone 3 --format='value(ds_record())' \
+              --filter='type=keySigning'
         """
 }
 

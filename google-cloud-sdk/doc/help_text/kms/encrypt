@@ -60,11 +60,11 @@ EXAMPLES
     and write the ciphertext to 'path/to/ciphertext'.
 
         $ gcloud kms encrypt \
-            --key frodo \
-            --keyring fellowship \
-            --location global \
-            --plaintext-file path/to/input/plaintext \
-            --ciphertext-file path/to/output/ciphertext
+            --key=frodo \
+            --keyring=fellowship \
+            --location=global \
+            --plaintext-file=path/to/input/plaintext \
+            --ciphertext-file=path/to/output/ciphertext
 
 NOTES
     These variants are also available:

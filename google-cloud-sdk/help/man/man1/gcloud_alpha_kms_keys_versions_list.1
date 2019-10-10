@@ -96,9 +96,9 @@ The following command lists all versions within the key \f5frodo\fR, keyring
 \f5fellowship\fR, and location \f5global\fR:
 
 .RS 2m
-$ gcloud alpha kms keys versions list \-\-location global \e
-    \-\-keyring fellowship \e
-    \-\-key frodo
+$ gcloud alpha kms keys versions list \-\-location=global \e
+    \-\-keyring=fellowship \e
+    \-\-key=frodo
 .RE
 
 
@@ -107,9 +107,8 @@ $ gcloud alpha kms keys versions list \-\-location global \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud kms keys versions list

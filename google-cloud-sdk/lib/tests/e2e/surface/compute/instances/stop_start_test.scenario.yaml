@@ -7,7 +7,7 @@ summary:
   - command: compute instances create $$instance$$ --zone us-central1-f --format="text(name,
       status)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |
       ---
       name:   $$instance$$
@@ -18,7 +18,7 @@ summary:
     - message: Stopping instance(s) $$instance$$
     - status: SUCCESS
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(name,
       status)"
@@ -31,7 +31,7 @@ summary:
     - message: Starting instance(s) $$instance$$
     - status: SUCCESS
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instances describe $$instance$$ --zone us-central1-f --format="text(name,
       status)"
@@ -41,11 +41,11 @@ summary:
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
@@ -115,7 +115,7 @@ actions:
           body:
             json:
               canIpForward: false
-              machineType: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              machineType: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
               deletionProtection: false
               metadata: {}
               name: $$instance$$
@@ -132,7 +132,7 @@ actions:
               disks:
               - type: PERSISTENT
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/$$api-version$$/projects/debian-cloud/global/images/family/debian-9
                 autoDelete: true
                 mode: READ_WRITE
                 boot: true
@@ -140,7 +140,7 @@ actions:
               - accessConfigs:
                 - name: external-nat
                   type: ONE_TO_ONE_NAT
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+                network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
               scheduling:
                 automaticRestart: true
         return_response:
@@ -162,7 +162,9 @@ actions:
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536249571288-57535f9fba3c1-a685a76f-e71cec5a
-    - expect_stderr: "Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].\n"
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
@@ -344,7 +346,9 @@ actions:
               networkIP: 10.240.2.25
             creationTimestamp: '2018-09-06T08:59:35.413-07:00'
             zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-    - expect_stderr: "Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].\n"
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -445,17 +449,17 @@ actions:
             Content-Type: application/json; charset=UTF-8
           body:
             id: '9166740576010039676'
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetLink: https://$$compute-uri$$/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
             status: PENDING
             targetId: '6403744477625511948'
-            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://$$compute-uri$$/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
             kind: compute#operation
             name: operation-1536249746711-57536047061d9-2baea9ef-33b7d40e
             insertTime: '2018-09-06T09:02:27.458-07:00'
             operationType: start
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536249746711-57536047061d9-2baea9ef-33b7d40e
+            selfLink: https://$$compute-uri$$/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536249746711-57536047061d9-2baea9ef-33b7d40e
     - expect_progress_tracker:
         status: SUCCESS
         message: Starting instance(s) $$instance$$
@@ -531,7 +535,9 @@ actions:
               networkIP: 10.240.2.25
             creationTimestamp: '2018-09-06T08:59:35.413-07:00'
             zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-    - expect_stderr: "Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].\n"
+    - expect_stderr:
+        matches: |
+          Updated \[https://.*/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -645,6 +651,8 @@ actions:
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536249760784-5753605471e81-fb6b24ba-95491988
-    - expect_stderr: "Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].\n"
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0

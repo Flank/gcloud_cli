@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import itertools
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.container import base
 
@@ -384,10 +385,79 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self.AssertErrContains('--enable-autoupgrade')
     self.AssertErrContains('--enable-autoprovisioning')
 
+  def testNodeLocations(self):
+    pool = self._MakeNodePool(
+        version=self.VERSION,
+        locations=['us-central1-a', 'us-central1-b'])
+    cmdbase = (self.node_pools_command_base.format(self.ZONE) +
+               ' update {0} --cluster={1} ' +
+               '--node-locations=us-central1-a,us-central1-b')
+    self.ExpectUpdateNodePool(
+        self.NODE_POOL_NAME,
+        locations=['us-central1-a', 'us-central1-b'],
+        response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
+class UpdateTestAlpha(parameterized.TestCase,
+                      base.AlphaTestBase,
+                      UpdateTestBeta):
   """gcloud Alpha track using container v1alpha1 API."""
+
+  @parameterized.parameters(
+      ((3, 2), (4, None), (4, 2)),
+      ((3, 2), (None, 1), (3, 1)),
+      ((3, 2), (4, 1), (4, 1)),
+      ((3, None), (4, None), (4, None)),
+      ((3, None), (None, 1), (3, 1)),
+      ((3, None), (4, 1), (4, 1)),
+      ((None, 2), (4, None), (4, 2)),
+      ((None, 2), (None, 1), (None, 1)),
+      ((None, 2), (4, 1), (4, 1)),
+      ((None, None), (4, None), (4, None)),
+      ((None, None), (None, 1), (None, 1)),
+      ((None, None), (4, 1), (4, 1)),
+      (None, (4, None), (4, None)),
+      (None, (None, 1), (None, 1)),
+      (None, (4, 1), (4, 1)))
+  def testSurgeUpgradeSettings(self,
+                               old_upgrade_settings,
+                               patch_upgrade_settings,
+                               expected_upgrade_settings):
+    if old_upgrade_settings is None:
+      pool = self._MakeNodePool(upgradeSettings=None)
+    else:
+      old_ms, old_mu = old_upgrade_settings
+      pool = self._MakeNodePool(
+          upgradeSettings=self._MakeUpgradeSettings(maxSurge=old_ms,
+                                                    maxUnavailable=old_mu))
+    patch_ms, patch_mu = patch_upgrade_settings
+    expected_ms, expected_mu = expected_upgrade_settings
+    max_surge_arg = ('--max-surge-upgrade={}'.format(patch_ms)
+                     if patch_ms is not None else '')
+    max_unavailable_arg = ('--max-unavailable-upgrade={}'.format(patch_mu)
+                           if patch_mu is not None else '')
+
+    cmd = (self.node_pools_command_base.format(self.ZONE) +
+           ' update {0} --cluster={1} {2} {3}'.format(
+               self.NODE_POOL_NAME, self.CLUSTER_NAME,
+               max_surge_arg, max_unavailable_arg))
+
+    updated_upgrade_settings = self._MakeUpgradeSettings(
+        maxSurge=expected_ms, maxUnavailable=expected_mu)
+
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.ExpectUpdateNodePool(
+        self.NODE_POOL_NAME,
+        zone=self.ZONE,
+        upgrade_settings=updated_upgrade_settings,
+        response=self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(cmd)
 
 
 if __name__ == '__main__':

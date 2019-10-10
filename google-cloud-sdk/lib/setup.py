@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*- #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2011 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ setup(
     url='https://developers.google.com/cloud/sdk',
     download_url='https://cloud.google.com/sdk',
     license='Apache 2.0',
-    author='Google Inc.',
+    author='Google LLC.',
     author_email='google-cloud-sdk@googlegroups.com',
     description=('A command line tool for interacting with '
                  'Google Cloud Platform.'),

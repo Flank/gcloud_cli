@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
-from tests.lib import cli_test_base
-from tests.lib import sdk_test_base
 from tests.lib.surface.run import base
 
 
-class DeleteTest(base.ServerlessSurfaceBase,
-                 cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
+class DeleteTestBeta(base.ServerlessSurfaceBase):
   """Tests outputs of delete revision command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDeleteSucceed(self):
     """Tests successful delete with default output format."""
@@ -43,3 +44,10 @@ class DeleteTest(base.ServerlessSurfaceBase,
     with self.assertRaises(console_io.UnattendedPromptError):
       self.Run('run revisions delete r1')
     self.operations.DeleteRevision.assert_not_called()
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+  """Tests outputs of delete revision command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

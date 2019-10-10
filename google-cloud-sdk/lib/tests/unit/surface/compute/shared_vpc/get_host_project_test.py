@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class GetHostProjectTest(shared_vpc_test_base.SharedVpcTestBase):
     project = self.messages.Project(
         name='xpn-host',
         creationTimestamp='2013-09-06T17:54:10.636-07:00',
-        selfLink='https://www.googleapis.com/compute/alpha/projects/xpn-host/',
+        selfLink='https://compute.googleapis.com/compute/alpha/projects/xpn-host/',
         xpnProjectStatus=project_status_enum.HOST
     )
     self.xpn_client.GetHostProject.return_value = project
@@ -53,7 +53,7 @@ class GetHostProjectTest(shared_vpc_test_base.SharedVpcTestBase):
     self.AssertOutputEquals("""\
         creationTimestamp: '2013-09-06T17:54:10.636-07:00'
         name: xpn-host
-        selfLink: https://www.googleapis.com/compute/alpha/projects/xpn-host/
+        selfLink: https://compute.googleapis.com/compute/alpha/projects/xpn-host/
         xpnProjectStatus: HOST
         """, normalize_space=True)
     self.xpn_client.GetHostProject.assert_called_once_with('foo')

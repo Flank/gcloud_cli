@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -267,7 +267,7 @@ class EnvironmentsDeleteGATest(base.EnvironmentsUnitTest):
           exception=deletion.deletion_exception,
           response=running_op if deletion.deletion_exception is None else None)
     for deletion in deletions:
-      if not deletion.async and deletion.deletion_exception is None:
+      if not deletion.async_ and deletion.deletion_exception is None:
         successful_op = self.MakeOperation(
             deletion.project,
             deletion.location,
@@ -307,7 +307,7 @@ class _Deletion(object):
     self.location = location
     self.environment_id = environment_id
     self.operation_uuid = operation_uuid
-    self.async = is_async
+    self.async_ = is_async
     self.deletion_exception = deletion_exception
     self.get_operation_response = get_operation_response
 

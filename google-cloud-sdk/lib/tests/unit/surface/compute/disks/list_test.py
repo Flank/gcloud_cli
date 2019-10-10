@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,15 +93,15 @@ class RegionalDisksListTestGA(test_base.BaseTest):
         resource_projector.MakeSerializable(test_resources.DISKS + [
             self.messages.Disk(
                 name='disk-3',
-                selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                           'my-project/regions/region-1/disks/disk-3'),
                 sizeGb=10,
                 status=self.messages.Disk.StatusValueValuesEnum.READY,
                 type=(
-                    'https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/region-1/diskTypes/pd-standard'),
                 region=(
-                    'https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/region-1'))
         ])
     ]
@@ -129,14 +129,14 @@ class RegionalDisksListTestGA(test_base.BaseTest):
     self.list_json.side_effect = [
         [encoding.MessageToDict(self.messages.Disk(
             name='disk-3',
-            selfLink=('https://www.googleapis.com/compute/v1/projects/'
+            selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                       'my-project/regions/region-1/disks/disk-3'),
             sizeGb=10,
             status=self.messages.Disk.StatusValueValuesEnum.READY,
             type=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/region-1/diskTypes/pd-standard'),
-            region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/region-1')))]]
 
     self.Run('compute disks list --regions region-1')

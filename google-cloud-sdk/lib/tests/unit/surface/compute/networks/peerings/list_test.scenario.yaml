@@ -33,7 +33,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -42,20 +42,20 @@ actions:
             status: '200'
           body:
             id: projects/fake-project/global/networks
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
             kind: compute#networkList
             items:
             - id: '4465277762394316593'
               kind: compute#network
               creationTimestamp: '2019-02-06T14:38:22.111-08:00'
               name: network-1
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
               autoCreateSubnetworks: false
               subnetworks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
               peerings:
               - name: peer-1
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
@@ -68,13 +68,13 @@ actions:
               kind: compute#network
               creationTimestamp: '2019-02-06T14:40:42.968-08:00'
               name: network-2
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
               autoCreateSubnetworks: false
               subnetworks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
               peerings:
               - name: peer-2
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
@@ -95,7 +95,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -104,20 +104,20 @@ actions:
             status: '200'
           body:
             id: projects/fake-project/global/networks
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
             kind: compute#networkList
             items:
             - id: '4465277762394316593'
               kind: compute#network
               creationTimestamp: '2019-02-06T14:38:22.111-08:00'
               name: network-1
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
               autoCreateSubnetworks: false
               subnetworks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
               peerings:
               - name: peer-1
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
@@ -130,13 +130,13 @@ actions:
               kind: compute#network
               creationTimestamp: '2019-02-06T14:40:42.968-08:00'
               name: network-2
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
               autoCreateSubnetworks: false
               subnetworks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
               peerings:
               - name: peer-2
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
@@ -156,7 +156,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -165,20 +165,20 @@ actions:
             status: '200'
           body:
             id: projects/fake-project/global/networks
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
             kind: compute#networkList
             items:
             - id: '4465277762394316593'
               kind: compute#network
               creationTimestamp: '2019-02-06T14:38:22.111-08:00'
               name: network-1
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
               autoCreateSubnetworks: false
               subnetworks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
               peerings:
               - name: peer-1
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true
@@ -191,13 +191,13 @@ actions:
               kind: compute#network
               creationTimestamp: '2019-02-06T14:40:42.968-08:00'
               name: network-2
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
               autoCreateSubnetworks: false
               subnetworks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
               peerings:
               - name: peer-2
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
                 state: ACTIVE
                 stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
                 autoCreateRoutes: true

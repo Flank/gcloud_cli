@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,12 +68,10 @@ class _BaseConnectTest(object):
             region='us-central1',
             replicaConfiguration=None,
             replicaNames=[],
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+            selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
             .format(self.Project(), self.instance['id']),
             serverCaCert=self.messages.SslCert(
-                cert=
-                '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
+                cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
                 certSerialNumber='0',
                 commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
                 createTime=datetime.datetime(
@@ -99,8 +97,7 @@ class _BaseConnectTest(object):
                 selfLink=None,
                 sha1Fingerprint='fcddb49c4a00ff8796ba099933dbeb208b8599bd',
             ),
-            serviceAccountEmailAddress=
-            'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
+            serviceAccountEmailAddress='vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
             settings=self.messages.Settings(
                 activationPolicy='ALWAYS',
                 authorizedGaeApplications=[],
@@ -194,8 +191,9 @@ class _BaseConnectTest(object):
                     authorizedNetworks=[
                         self.messages.AclEntry(
                             expirationTime=(
-                                self.time_of_connection + datetime.timedelta(
-                                    minutes=5)).replace(microsecond=10000),
+                                self.time_of_connection +
+                                datetime.timedelta(minutes=5)).replace(
+                                    microsecond=10000),
                             kind='sql#aclEntry',
                             name='sql connect at time {0}'.format(
                                 str(self.time_of_connection)),
@@ -227,7 +225,8 @@ class _BaseConnectTest(object):
           exception=http_error.MakeHttpError(
               code=400,
               message='invalidInstanceProperty',
-              reason='Invalid instance property.',))
+              reason='Invalid instance property.',
+          ))
     else:
       self.mocked_client.instances.Patch.Expect(
           patch_request,
@@ -249,18 +248,15 @@ class _BaseConnectTest(object):
               kind='sql#operation',
               name='8b7ffa62-e950-45c0-bdad-1d366ad8b964',
               operationType='UPDATE',
-              selfLink=
-              'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'.
-              format(self.Project()),
+              selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'
+              .format(self.Project()),
               startTime=None,
               status='PENDING',
               targetId=self.instance['id'],
-              targetLink=
-              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
-              format(self.Project(), self.instance['id']),
+              targetLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+              .format(self.Project(), self.instance['id']),
               targetProject=self.Project(),
-              user=
-              '462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
+              user='462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
           ))
       self.mocked_client.operations.Get.Expect(
           self.messages.SqlOperationsGetRequest(
@@ -293,9 +289,8 @@ class _BaseConnectTest(object):
               kind='sql#operation',
               name='8b7ffa62-e950-45c0-bdad-1d366ad8b964',
               operationType='UPDATE',
-              selfLink=
-              'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'.
-              format(self.Project()),
+              selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'
+              .format(self.Project()),
               startTime=datetime.datetime(
                   2017,
                   5,
@@ -307,12 +302,10 @@ class _BaseConnectTest(object):
                   tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
               status='DONE',
               targetId=self.instance['id'],
-              targetLink=
-              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
-              format(self.Project(), self.instance['id']),
+              targetLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+              .format(self.Project(), self.instance['id']),
               targetProject=self.Project(),
-              user=
-              '462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
+              user='462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
           ))
       self.mocked_client.instances.Get.Expect(
           self.messages.SqlInstancesGetRequest(
@@ -346,15 +339,12 @@ class _BaseConnectTest(object):
               region='us-central1',
               replicaConfiguration=None,
               replicaNames=[],
-              selfLink=
-              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+              selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
               .format(self.Project(), self.instance['id']),
               serverCaCert=self.messages.SslCert(
-                  cert=
-                  '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
+                  cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
                   certSerialNumber='0',
-                  commonName=
-                  'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
+                  commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
                   createTime=datetime.datetime(
                       2017,
                       5,
@@ -380,8 +370,7 @@ class _BaseConnectTest(object):
                   selfLink=None,
                   sha1Fingerprint='fcddb49c4a00ff8796ba099933dbeb208b8599bd',
               ),
-              serviceAccountEmailAddress=
-              'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
+              serviceAccountEmailAddress='vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
               settings=self.messages.Settings(
                   activationPolicy='ALWAYS',
                   authorizedGaeApplications=[],
@@ -702,6 +691,69 @@ class PsqlConnectBetaTest(_BasePsqlConnectBetaTest, base.SqlMockTestBeta):
 class PsqlConnectAlphaTest(_BasePsqlConnectBetaTest, base.SqlMockTestAlpha):
   pass
 
+
+class MssqlCliConnectBetaTest(_BaseConnectTest, base.SqlMockTestBeta):
+  instance = {
+      'id': 'mssql-instance',
+      'tier': 'db-custom-1-1024',
+      'databaseVersion': 'SQLSERVER_2017_STANDARD',
+      'backendType': 'SECOND_GEN'
+  }
+
+  def RunMssqlCliConnectTest(self, database=None):
+    self.MockConnectionSetup()
+
+    mocked_mssqlcli_path = 'mssql-cli'
+    self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value=mocked_mssqlcli_path)
+
+    # Mock the actual execution of mssql-cli and assert it's called at the end.
+    exec_patched = self.StartPatch(
+        'googlecloudsdk.core.execution_utils.Exec', return_value=True)
+    cmd = 'sql connect {0}'.format(self.instance['id'])
+    if database:
+      cmd += ' --database={0}'.format(database)
+    self.Run(cmd)
+    self.AssertErrContains('Connecting to database with SQL user [sqlserver]')
+
+    self.assertTrue(exec_patched.called)
+
+    # call_args[0] is the ordered list of args the mock is called with.
+    # Exec is called with exactly one arg, the list of subprocess args, so
+    # call_args[0][0] gives us subprocess_args.
+    exec_ordered_arguments = exec_patched.call_args[0]
+    subprocess_args = exec_ordered_arguments[0]
+    self.AssertMssqlCliArgsAreCorrect(subprocess_args, mocked_mssqlcli_path)
+
+  def MockConnectionSetup(self):
+    self.MockProxyStartAndInstanceGet()
+
+  def AssertMssqlCliArgsAreCorrect(self, subprocess_args, mocked_mssqlcli_path):
+    base_args_length = 6
+    (actual_mssqlcli_path, actual_host_flag, actual_ip_address,
+     actual_user_flag, actual_username,
+     actual_pass_flag) = subprocess_args[:base_args_length]
+    self.assertEqual(mocked_mssqlcli_path, actual_mssqlcli_path)
+    self.assertEqual('-S', actual_host_flag)
+    # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
+    self.assertIn('.', actual_ip_address)
+    self.assertEqual('-U', actual_user_flag)
+    self.assertEqual('sqlserver', actual_username)
+    self.assertEqual('-P', actual_pass_flag)
+
+    # Check for additional args.
+    if len(subprocess_args) > base_args_length:
+      (actual_db_flag, actual_db) = subprocess_args[base_args_length:]
+      self.assertEqual('-d', actual_db_flag)
+      self.assertEqual('somedb', actual_db)
+
+  def testMssqlCliConnectWithDatabase(self):
+    self.RunMssqlCliConnectTest('somedb')
+
+
+class MssqlCliConnectAlphaTest(MssqlCliConnectBetaTest, base.SqlMockTestAlpha):
+  pass
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,0 +1,210 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_DIAGNOSE_SOSREPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute diagnose sosreport \- sosreport run from a Google Compute Engine VM
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute diagnose sosreport\fR \fIINSTANCE_NAME\fR [\fB\-\-download\-dir\fR=\fIDOWNLOAD_DIR\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-python\-path\fR=\fIPYTHON_PATH\fR] [\fB\-\-reports\-path\fR=\fIREPORTS_PATH\fR;\ default="/tmp/gcloud\-sosreport"] [\fB\-\-sosreport\-install\-path\fR=\fISOSREPORT_INSTALL_PATH\fR;\ default="/tmp/git\-sosreport"] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-user\fR=\fIUSER\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR\ |\ \fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command is designed to obtain relevant debug information from
+a VM in a standard way for expediting support cases.
+
+The actual information scraping is done by the Sosreport tool
+(https://github.com/sosreport/sos). This command is a wrapper that handles
+installation, running and (optionally) copying the result.
+
+The location of the tool download and report generation are defaulted to the
+/tmp directory, but can be modified through flags. The user can use the
+\-\-download\-dir flag to specify a location where the command can download the
+resulting from the VM.
+
+NOTE: For this command to work, git needs to be installed within the VM, in
+order to clone the repository and run the code from there.
+
+NOTE: Sosreport is somewhat geared towards Python 3.x, as it uses APIs that had
+to be back\-ported to Python 2.7 (notably concurrent). If the default
+installation of Python is 2.7, it is possible that the Sosreport run fails. To
+fix this either install the dependencies for Python 2.7 or use python\-path to
+specify the path to another Python installation that works, normally it being a
+Python 3.x binary.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE_NAME\fR
+Name of the instance to run Sosreport on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-download\-dir\fR=\fIDOWNLOAD_DIR\fR
+Local dir to which to download the report generated in the VM. If not specified,
+no download will be done. The download will be done using a no\-configuration
+gcloud compute scp command. For more complicated setups, manual download will be
+required.
+
+.TP 2m
+\fB\-\-dry\-run\fR
+Print the equivalent scp/ssh command that would be run to stdout, instead of
+executing it.
+
+.TP 2m
+\fB\-\-force\-key\-file\-overwrite\fR
+If enabled, the gcloud command\-line tool will regenerate and overwrite the
+files associated with a broken SSH key without asking for confirmation in both
+interactive and non\-interactive environments.
+
+If disabled, the files associated with a broken SSH key will not be regenerated
+and will fail in both interactive and non\-interactive environments.
+
+.TP 2m
+\fB\-\-plain\fR
+Suppress the automatic addition of \fBssh(1)\fR/\fBscp(1)\fR flags. This flag is
+useful if you want to take care of authentication yourself or use specific
+ssh/scp features.
+
+.TP 2m
+\fB\-\-python\-path\fR=\fIPYTHON_PATH\fR
+Path to the python binary to be called. Sosreport is a python tool which is
+called by default with the default python installation. This overrides that
+calls and uses the provided python binary.
+
+.TP 2m
+\fB\-\-reports\-path\fR=\fIREPORTS_PATH\fR; default="/tmp/gcloud\-sosreport"
+Remote location (within the VM) to write the reports into.
+
+.TP 2m
+\fB\-\-sosreport\-install\-path\fR=\fISOSREPORT_INSTALL_PATH\fR; default="/tmp/git\-sosreport"
+Remote location (within the VM) to clone sosreport into.
+
+.TP 2m
+\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR
+Additional flags to be passed to \fBssh(1)\fR. It is recommended that flags be
+passed using an assignment operator and quotes. This flag will replace
+occurrences of ``%USER%"" and ``%INSTANCE%"" with their dereferenced values.
+Example:
+
+.RS 2m
+$ gcloud alpha compute diagnose sosreport example\-instance \e
+    \-\-zone us\-central1\-a  \-\-ssh\-flag="\-vvv" \e
+    \-\-ssh\-flag="\-L 80:%INSTANCE%:80"
+.RE
+
+is equivalent to passing the flags ``\-\-vvv"" and ``\-L 80:162.222.181.197:80""
+to \fBssh(1)\fR if the external IP address of "example\-instance" is
+162.222.181.197.
+
+.TP 2m
+\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR
+The path to the SSH key file. By default, this is
+\f5\fI~/.ssh/google_compute_engine\fR\fR.
+
+.TP 2m
+\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR
+Override the default behavior of StrictHostKeyChecking for the connection. By
+default, StrictHostKeyChecking is set to 'no' the first time you connect to an
+instance, and will be set to 'yes' for all subsequent connections.
+\fISTRICT_HOST_KEY_CHECKING\fR must be one of: \fByes\fR, \fBno\fR, \fBask\fR.
+
+.TP 2m
+\fB\-\-user\fR=\fIUSER\fR
+User for login to the selected VMs. If not specified, the default user will be
+used.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the instance to run Sosreport on. If not specified, the user may be
+prompted to select a zone. \f5gcloud\fR will attempt to identify the zone by
+searching for resources in the user's project. If the zone cannot be determined,
+the user will then be prompted with all Google Cloud Platform zones.
+
+To avoid prompting when this flag is omitted, the user can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR
+The time when the ssh key will be valid until, such as
+"2017\-08\-29T18:52:51.142Z." This is only valid if the instance is not using OS
+Login. See $ gcloud topic datetimes for information on time formats.
+
+.TP 2m
+\fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR
+The maximum length of time an SSH key is valid for once created and installed,
+e.g. 2m for 2 minutes. See $ gcloud topic datetimes for information on duration
+formats.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To obtain relevant debug information from a VM, run:
+
+.RS 2m
+$ gcloud alpha compute diagnose sosreport
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

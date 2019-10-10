@@ -35,8 +35,8 @@ EXAMPLES
     The following command sets version 9 as the primary version of the key
     samwise within keyring fellowship and location global:
 
-        $ gcloud beta kms keys set-primary-version samwise --version 9 \
-            --keyring fellowship --location global
+        $ gcloud beta kms keys set-primary-version samwise --version=9 \
+            --keyring=fellowship --location=global
 
 NOTES
     This command is currently in BETA and may change without notice. These

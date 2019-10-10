@@ -29,11 +29,14 @@ SYNOPSIS
           --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
           --boot-disk-kms-project=BOOT_DISK_KMS_PROJECT]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
-          : --custom-extensions]
+          : --custom-extensions --custom-vm-type=CUSTOM_VM_TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY]
         [--node=NODE | --node-affinity-file=NODE_AFFINITY_FILE
-          | --node-group=NODE_GROUP] [--scopes=[SCOPE,...] | --no-scopes]
+          | --node-group=NODE_GROUP]
+        [--reservation=RESERVATION
+          --reservation-affinity=RESERVATION_AFFINITY; default="any"]
+        [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -82,7 +85,7 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        multiple of 1 GB. Limit boot disk size to 2TB to account for MBR
         partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
@@ -517,6 +520,13 @@ FLAGS
        --custom-extensions
           Use the extended custom machine type.
 
+       --custom-vm-type=CUSTOM_VM_TYPE
+          Specifies VM type. n1 - VMs with CPU platforms Skylake and older, n2
+          - VMs with CPU platform Cascade Lake. n2 offers flexible sizing from
+          2 to 80 vCPUs, and 1 to 640GBs of memory. It also features a number
+          of performance enhancements including exposing a more accurate NUMA
+          topology to the guest OS. The default is n1.
+
      --image-project=IMAGE_PROJECT
         The project against which all image and image family references will be
         resolved. It is best practice to define image-project.
@@ -550,7 +560,7 @@ FLAGS
 
           By default, debian-9 is assumed for this flag.
 
-     Sole Tenancy At most one of these may be specified:
+     Sole Tenancy. At most one of these may be specified:
 
        --node=NODE
           The name of the node to schedule this instance on.
@@ -576,6 +586,16 @@ FLAGS
 
        --node-group=NODE_GROUP
           The name of the node group to schedule this instance on.
+
+     Specifies the reservation for instances created from this template.
+
+       --reservation=RESERVATION
+          The name of the reservation, required when
+          --reservation-affinity=specific.
+
+       --reservation-affinity=RESERVATION_AFFINITY; default="any"
+          The type of reservation for instances created from this template.
+          RESERVATION_AFFINITY must be one of: any, none, specific.
 
      At most one of these may be specified:
 

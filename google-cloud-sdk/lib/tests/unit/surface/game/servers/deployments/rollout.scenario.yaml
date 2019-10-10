@@ -1,0 +1,1007 @@
+title: Cloud Game Servers deployments rollout test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers deployments start-rollout my-deployment --location global --spec-file spec.json --template-id template-1
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      {}
+- execute:
+  - command: |
+      game servers deployments start-rollout my-deployment --location global --spec-file spec.yaml --template-id template-1
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      {}
+- execute:
+  - command: |
+      game servers deployments start-rollout my-deployment --location global --spec-file invalid_spec.txt --template-id template-1
+  - error: '1: None'
+- execute:
+  - command: |
+      game servers deployments commit-rollout my-deployment --location global
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560799777814-58b8a045278d8-54db5b18-8dbd58cb]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      createTime: '2019-06-17T19:24:41.122744767Z'
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      stableGameServerTemplate:
+        spec: '{}'
+        templateId: template-1
+      updateTime: '2019-06-17T19:29:37.828486744Z'
+- execute:
+  - command: |
+      game servers deployments revert-rollout my-deployment --location global
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      createTime: '2019-06-17T19:24:41.122744767Z'
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      stableGameServerTemplate:
+        spec: '{}'
+        templateId: template-1
+      updateTime: '2019-06-17T19:42:37.372598128Z'
+- execute:
+  - command: |
+      game servers deployments set-rollout-target my-deployment --selector=cluster-labels="label_a=value1",percent=20 --location global
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560800941529-58b8a49af59a2-fa38a472-681c9a41]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      createTime: '2019-06-17T19:24:41.122744767Z'
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      newGameServerTemplate:
+        clusterPercentageSelectors:
+        - clusterSelector:
+            labels:
+              label_a: value1
+          percent: 20
+        spec: '{}'
+        templateId: template-1
+      stableGameServerTemplate:
+        spec: '{}'
+        templateId: template-1
+      updateTime: '2019-06-17T19:49:01.555814205Z'
+- execute:
+  - command: |
+      game servers deployments set-rollout-target my-deployment --selector=cluster-labels=^:^"label_a=value1:label_b=value2",percent=20 --selector=cluster-labels="label_c=value3",percent=90 --location global
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560801244253-58b8a5bba8b82-3d5b53e9-e9a2676b]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      createTime: '2019-06-17T19:24:41.122744767Z'
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      newGameServerTemplate:
+        clusterPercentageSelectors:
+        - clusterSelector:
+            labels:
+              label_a: value1
+              label_b: value2
+          percent: 20
+        - clusterSelector:
+            labels:
+              label_c: value3
+          percent: 90
+        spec: '{}'
+        templateId: template-1
+      stableGameServerTemplate:
+        spec: '{}'
+        templateId: template-1
+      updateTime: '2019-06-17T19:54:04.265628339Z'
+- execute:
+  - command: |
+      game servers deployments set-rollout-target my-deployment --selector="^::^cluster-labels=label_a=value1,label_b=value2::percent=10" --location global
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560801583854-58b8a6ff871fd-e7b05e53-1ad8c2fd]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      createTime: '2019-06-17T19:24:41.122744767Z'
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      newGameServerTemplate:
+        clusterPercentageSelectors:
+        - clusterSelector:
+            labels:
+              label_a: value1
+              label_b: value2
+          percent: 10
+        spec: '{}'
+        templateId: template-1
+      stableGameServerTemplate:
+        spec: '{}'
+        templateId: template-1
+      updateTime: '2019-06-17T19:59:43.870618997Z'
+actions:
+- write_file:
+    path: spec.json
+    contents: |
+      {
+        "metadata": {"name": "game-server-template-spec-0"},
+        "spec":{
+          "template": {
+            "spec": {
+              "containers": [
+                {
+                  "name": "shruggie",
+                  "image": "gcr.io/agones-images/udp-server:0.8"
+                }
+              ],
+              "restartPolicy": "Never"
+            }
+          }
+        }
+      }
+- write_file:
+    path: spec.yaml
+    contents: |
+      metadata:
+        name: game-server-template-spec-1
+      spec:
+        template:
+          spec:
+            containers:
+            - name: shruggie
+              image: gcr.io/agones-images/udp-server:0.11
+            restartPolicy: Never
+- write_file:
+    path: invalid_spec.txt
+    contents: blah
+- execute_command:
+    command: |
+      game servers deployments start-rollout my-deployment --location global --spec-file spec.json --template-id template-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:startRollout?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "newGameServerTemplate": {
+                "spec": {
+                  "metadata": {"name": "game-server-template-spec-0"},
+                  "spec": {
+                    "template": {
+                      "spec": {
+                        "containers": [
+                          {
+                            "name": "shruggie",
+                            "image": "gcr.io/agones-images/udp-server:0.8"
+                          }
+                        ],
+                        "restartPolicy": "Never"
+                      }
+                    }
+                  }
+                }
+                "templateId": "template-1"
+              }
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "startRollout",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:37:58.961626920Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                },
+                "newGameServerTemplate": {
+                  "spec": {
+                    "metadata": {"name": "game-server-template-spec-0"},
+                    "spec": {
+                      "template": {
+                        "spec": {
+                          "restartPolicy": "Never",
+                          "containers": [
+                            {
+                              "image": "gcr.io/agones-images/udp-server:0.8",
+                              "name": "shruggie"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments start-rollout my-deployment --location global --spec-file spec.yaml --template-id template-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:startRollout?alt=json
+          method: POST
+          headers: {}
+          body: |
+            {
+              "newGameServerTemplate": {
+                "spec": {
+                  "metadata": {"name": "game-server-template-spec-1"},
+                  "spec": {
+                    "template": {
+                      "spec": {
+                        "containers": [
+                          {
+                            "name": "shruggie",
+                            "image": "gcr.io/agones-images/udp-server:0.8"
+                          }
+                        ],
+                        "restartPolicy": "Never"
+                      }
+                    }
+                  }
+                }
+                "templateId": "template-1"
+              }
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:37:58.958728294Z",
+                "endTime": "2019-06-17T19:37:59.569152907Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "startRollout",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:37:58.961626920Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                },
+                "newGameServerTemplate": {
+                  "spec": {
+                    "metadata": {"name": "game-server-template-spec-0"},
+                    "spec": {
+                      "template": {
+                        "spec": {
+                          "restartPolicy": "Never",
+                          "containers": [
+                            {
+                              "image": "gcr.io/agones-images/udp-server:0.8",
+                              "name": "shruggie"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560800278943-58b8a22311613-e8028b30-d16ec62d]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments start-rollout my-deployment --location global --spec-file invalid_spec.txt --template-id template-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:startRollout?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              newGameServerTemplate:
+                spec: '"blah"'
+                templateId: template-1
+        return_response:
+          headers:
+            status: '400'
+          body: |
+            {
+              "error": {
+                "code": 400,
+                "message": "new_game_server_template.spec must be json format of GameServerTemplateSpec, defined in https://github.com/googleforgames/agones/blob/master/pkg/apis/stable/v1alpha1/gameserver.go",
+                "status": "INVALID_ARGUMENT",
+              }
+            }
+    - expect_exit:
+        code: 1
+- execute_command:
+    command: |
+      game servers deployments commit-rollout my-deployment --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:commitRollout?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560799777814-58b8a045278d8-54db5b18-8dbd58cb",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560799777814-58b8a045278d8-54db5b18-8dbd58cb?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560799777814-58b8a045278d8-54db5b18-8dbd58cb",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:29:37.825457021Z",
+                "endTime": "2019-06-17T19:29:37.930866419Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "commitRollout",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:29:37.828486744Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560799777814-58b8a045278d8-54db5b18-8dbd58cb]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T19:24:41.122744767Z",
+              "updateTime": "2019-06-17T19:29:37.828486744Z",
+              "stableGameServerTemplate": {
+                "spec": "{}",
+                "templateId": "template-1"
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        stableGameServerTemplate:
+          spec: '{}'
+          templateId: template-1
+        updateTime: '2019-06-17T19:29:37.828486744Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments revert-rollout my-deployment --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:revertRollout?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800557361-58b8a32c967b5-cd539750-47372289",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:42:37.370308879Z",
+                "endTime": "2019-06-17T19:42:37.852585726Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "revertRollout",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:42:37.372598128Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1558735209008-589a9526e8bdc-6a2413f4-4e67b6b9]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T19:24:41.122744767Z",
+              "updateTime": "2019-06-17T19:42:37.372598128Z",
+              "stableGameServerTemplate": {
+                "spec": "{}",
+                "templateId": "template-1"
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        stableGameServerTemplate:
+          spec: '{}'
+          templateId: template-1
+        updateTime: '2019-06-17T19:42:37.372598128Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments set-rollout-target my-deployment --selector=cluster-labels="label_a=value1",percent=20 --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:setRolloutTarget?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              clusterPercentageSelector:
+              - clusterSelector:
+                  labels:
+                    label_a: value1
+                percent: 20
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800941529-58b8a49af59a2-fa38a472-681c9a41",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560800941529-58b8a49af59a2-fa38a472-681c9a41?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560800941529-58b8a49af59a2-fa38a472-681c9a41",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:49:01.551735093Z",
+                "endTime": "2019-06-17T19:49:02.058632060Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "setRolloutTarget",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:49:01.555814205Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                },
+                "newGameServerTemplate": {
+                  "spec": "{}",
+                  "clusterPercentageSelectors": [
+                    {
+                      "clusterSelector": {
+                        "labels": {
+                          "label_a": "value1"
+                        }
+                      },
+                      "percent": 20
+                    }
+                  ],
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560800941529-58b8a49af59a2-fa38a472-681c9a41]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T19:24:41.122744767Z",
+              "updateTime": "2019-06-17T19:49:01.555814205Z",
+              "stableGameServerTemplate": {
+                "spec": "{}",
+                "templateId": "template-1"
+              },
+              "newGameServerTemplate": {
+                "spec": "{}",
+                "clusterPercentageSelectors": [
+                  {
+                    "clusterSelector": {
+                      "labels": {
+                        "label_a": "value1"
+                      }
+                    },
+                    "percent": 20
+                  }
+                ],
+                "templateId": "template-1"
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        newGameServerTemplate:
+          clusterPercentageSelectors:
+          - clusterSelector:
+              labels:
+                label_a: value1
+            percent: 20
+          spec: '{}'
+          templateId: template-1
+        stableGameServerTemplate:
+          spec: '{}'
+          templateId: template-1
+        updateTime: '2019-06-17T19:49:01.555814205Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments set-rollout-target my-deployment --selector=cluster-labels=^:^"label_a=value1:label_b=value2",percent=20 --selector=cluster-labels="label_c=value3",percent=90 --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:setRolloutTarget?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              clusterPercentageSelector:
+              - clusterSelector:
+                  labels:
+                    label_a: value1
+                    label_b: value2
+                percent: 20
+              - clusterSelector:
+                  labels:
+                    label_c: value3
+                percent: 90
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560801244253-58b8a5bba8b82-3d5b53e9-e9a2676b",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560801244253-58b8a5bba8b82-3d5b53e9-e9a2676b?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560801244253-58b8a5bba8b82-3d5b53e9-e9a2676b",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:54:04.262778945Z",
+                "endTime": "2019-06-17T19:54:04.540026355Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "setRolloutTarget",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:54:04.265628339Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                },
+                "newGameServerTemplate": {
+                  "spec": "{}",
+                  "clusterPercentageSelectors": [
+                    {
+                      "clusterSelector": {
+                        "labels": {
+                          "label_a": "value1",
+                          "label_b": "value2"
+                        }
+                      },
+                      "percent": 20
+                    },
+                    {
+                      "clusterSelector": {
+                        "labels": {
+                          "label_c": "value3"
+                        }
+                      },
+                      "percent": 90
+                    }
+                  ],
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560801244253-58b8a5bba8b82-3d5b53e9-e9a2676b]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T19:24:41.122744767Z",
+              "updateTime": "2019-06-17T19:54:04.265628339Z",
+              "stableGameServerTemplate": {
+                "spec": "{}",
+                "templateId": "template-1"
+              },
+              "newGameServerTemplate": {
+                "spec": "{}",
+                "clusterPercentageSelectors": [
+                  {
+                    "clusterSelector": {
+                      "labels": {
+                        "label_a": "value1",
+                        "label_b": "value2"
+                      }
+                    },
+                    "percent": 20
+                  },
+                  {
+                    "clusterSelector": {
+                      "labels": {
+                        "label_c": "value3"
+                      }
+                    },
+                    "percent": 90
+                  }
+                ],
+                "templateId": "template-1"
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        newGameServerTemplate:
+          clusterPercentageSelectors:
+          - clusterSelector:
+              labels:
+                label_a: value1
+                label_b: value2
+            percent: 20
+          - clusterSelector:
+              labels:
+                label_c: value3
+            percent: 90
+          spec: '{}'
+          templateId: template-1
+        stableGameServerTemplate:
+          spec: '{}'
+          templateId: template-1
+        updateTime: '2019-06-17T19:54:04.265628339Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments set-rollout-target my-deployment --selector="^::^cluster-labels=label_a=value1,label_b=value2::percent=10" --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment:setRolloutTarget?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              clusterPercentageSelector:
+              - clusterSelector:
+                  labels:
+                    label_a: value1
+                    label_b: value2
+                percent: 10
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560801583854-58b8a6ff871fd-e7b05e53-1ad8c2fd",
+              "done": true
+            }
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560801583854-58b8a6ff871fd-e7b05e53-1ad8c2fd?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560801583854-58b8a6ff871fd-e7b05e53-1ad8c2fd",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T19:59:43.867325826Z",
+                "endTime": "2019-06-17T19:59:44.126918381Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "setRolloutTarget",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T19:24:41.122744767Z",
+                "updateTime": "2019-06-17T19:59:43.870618997Z",
+                "stableGameServerTemplate": {
+                  "spec": "{}",
+                  "templateId": "template-1"
+                },
+                "newGameServerTemplate": {
+                  "spec": "{}",
+                  "clusterPercentageSelectors": [
+                    {
+                      "clusterSelector": {
+                        "labels": {
+                          "label_a": "value1",
+                          "label_b": "value2"
+                        }
+                      },
+                      "percent": 10
+                    }
+                  ],
+                  "templateId": "template-1"
+                }
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560801583854-58b8a6ff871fd-e7b05e53-1ad8c2fd]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T19:24:41.122744767Z",
+              "updateTime": "2019-06-17T19:59:43.870618997Z",
+              "stableGameServerTemplate": {
+                "spec": "{}",
+                "templateId": "template-1"
+              },
+              "newGameServerTemplate": {
+                "spec": "{}",
+                "clusterPercentageSelectors": [
+                  {
+                    "clusterSelector": {
+                      "labels": {
+                        "label_a": "value1",
+                        "label_b": "value2"
+                      }
+                    },
+                    "percent": 10
+                  }
+                ],
+                "templateId": "template-1"
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-06-17T19:24:41.122744767Z'
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        newGameServerTemplate:
+          clusterPercentageSelectors:
+          - clusterSelector:
+              labels:
+                label_a: value1
+                label_b: value2
+            percent: 10
+          spec: '{}'
+          templateId: template-1
+        stableGameServerTemplate:
+          spec: '{}'
+          templateId: template-1
+        updateTime: '2019-06-17T19:59:43.870618997Z'
+    - expect_exit:
+        code: 0

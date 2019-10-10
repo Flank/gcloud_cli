@@ -1,10 +1,10 @@
 title: hl7v2-stores crud test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: healthcare hl7v2-stores create my-store --location us-central1 --dataset
-      my-dataset --pubsub-topic my-topic
+      my-dataset --pubsub-topic projects/fake-project/topics/my-topic
   - stderr: |
       Created hl7v2Store [my-store].
 - execute:
@@ -14,24 +14,24 @@ summary:
       name: projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store
 - execute:
   - command: healthcare hl7v2-stores update my-store --location us-central1 --dataset
-      my-dataset --pubsub-topic my-topic
+      my-dataset --pubsub-topic projects/fake-project/topics/my-topic
   - stderr: |
       Updated hl7v2Store [my-store].
   - stdout: |
       Hl7V2Store:
         notificationConfig:
-          pubsubTopic: my-topic
+          pubsubTopic: projects/fake-project/topics/my-topic
       hl7V2StoreId: my-store
       parent: projects/fake-project/locations/us-central/datasets/my-dataset
 - execute:
   - command: healthcare hl7v2-stores list --location us-central1 --dataset my-dataset
   - stdout: |
       ID          LOCATION     TOPIC
-      my-store-1  us-central1  my-topic-1
-      my-store-2  us-central1  my-topic-2
-      my-store-3  us-central1  my-topic-3
-      my-store-4  us-central1  my-topic-4
-      my-store-5  us-central1  my-topic-5
+      my-store-1  us-central1  projects/fake-project/topics/my-topic-1
+      my-store-2  us-central1  projects/fake-project/topics/my-topic-2
+      my-store-3  us-central1  projects/fake-project/topics/my-topic-3
+      my-store-4  us-central1  projects/fake-project/topics/my-topic-4
+      my-store-5  us-central1  projects/fake-project/topics/my-topic-5
 - execute:
   - command: |
       healthcare hl7v2-stores get-iam-policy my-store --location us-central1 --dataset my-dataset
@@ -45,27 +45,31 @@ summary:
     - input: y
   - stderr: |
       Deleted hl7v2Store [my-store].
-
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: healthcare hl7v2-stores create my-store --location us-central1 --dataset
-      my-dataset --pubsub-topic my-topic
+      my-dataset --pubsub-topic projects/fake-project/topics/my-topic
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores?alt=json&hl7V2StoreId=my-store
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores?alt=json&hl7V2StoreId=my-store
           method: POST
           body:
             json:
               notificationConfig:
-                pubsubTopic: my-topic
+                pubsubTopic: projects/fake-project/topics/my-topic
         return_response:
           headers:
             status: '200'
           body:
             name: projects/fake-project/locations/us-central/datasets/my-dataset/hl7V2Stores/my-store
             notificationConfig:
-              pubsubTopic: my-topic
+              pubsubTopic: projects/fake-project/topics/my-topic
     - expect_stderr: |
         Created hl7v2Store [my-store].
     - expect_exit:
@@ -76,7 +80,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store?alt=json
           method: GET
           body: null
         return_response:
@@ -89,16 +93,16 @@ actions:
         code: 0
 - execute_command:
     command: healthcare hl7v2-stores update my-store --location us-central1 --dataset
-      my-dataset --pubsub-topic my-topic
+      my-dataset --pubsub-topic projects/fake-project/topics/my-topic
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store?alt=json&updateMask=notificationConfig.pubsubTopic
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store?alt=json&updateMask=notificationConfig.pubsubTopic
           method: PATCH
           body:
             json:
               notificationConfig:
-                pubsubTopic: my-topic
+                pubsubTopic: projects/fake-project/topics/my-topic
         return_response:
           headers:
             status: '200'
@@ -107,12 +111,12 @@ actions:
             parent: projects/fake-project/locations/us-central/datasets/my-dataset
             Hl7V2Store:
               notificationConfig:
-                pubsubTopic: my-topic
+                pubsubTopic: projects/fake-project/topics/my-topic
     - expect_stderr: "Updated hl7v2Store [my-store].\n"
     - expect_stdout: |
         Hl7V2Store:
           notificationConfig:
-            pubsubTopic: my-topic
+            pubsubTopic: projects/fake-project/topics/my-topic
         hl7V2StoreId: my-store
         parent: projects/fake-project/locations/us-central/datasets/my-dataset
     - expect_exit:
@@ -122,7 +126,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores?alt=json
           method: GET
           body: null
         return_response:
@@ -132,26 +136,26 @@ actions:
             hl7V2Stores:
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store-1
               notificationConfig:
-                pubsubTopic: my-topic-1
+                pubsubTopic: projects/fake-project/topics/my-topic-1
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store-2
               notificationConfig:
-                pubsubTopic: my-topic-2
+                pubsubTopic: projects/fake-project/topics/my-topic-2
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store-3
               notificationConfig:
-                pubsubTopic: my-topic-3
+                pubsubTopic: projects/fake-project/topics/my-topic-3
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store-4
               notificationConfig:
-                pubsubTopic: my-topic-4
+                pubsubTopic: projects/fake-project/topics/my-topic-4
             - name: projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store-5
               notificationConfig:
-                pubsubTopic: my-topic-5
+                pubsubTopic: projects/fake-project/topics/my-topic-5
     - expect_stdout: |
         ID          LOCATION     TOPIC
-        my-store-1  us-central1  my-topic-1
-        my-store-2  us-central1  my-topic-2
-        my-store-3  us-central1  my-topic-3
-        my-store-4  us-central1  my-topic-4
-        my-store-5  us-central1  my-topic-5
+        my-store-1  us-central1  projects/fake-project/topics/my-topic-1
+        my-store-2  us-central1  projects/fake-project/topics/my-topic-2
+        my-store-3  us-central1  projects/fake-project/topics/my-topic-3
+        my-store-4  us-central1  projects/fake-project/topics/my-topic-4
+        my-store-5  us-central1  projects/fake-project/topics/my-topic-5
     - expect_exit:
         code: 0
 - execute_command:
@@ -160,7 +164,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -184,7 +188,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/hl7V2Stores/my-store?alt=json
           method: DELETE
           body: null
         return_response:

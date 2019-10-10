@@ -70,11 +70,25 @@ this API can be found at: https://cloud.google.com/healthcare
 
 
 
+.SH "EXAMPLES"
+
+To describe the FHIR store 'test\-fhir\-store', run:
+
+.RS 2m
+$ gcloud alpha healthcare fhir\-stores describe test\-fhir\-store \e
+    \-\-dataset=test\-dataset
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta healthcare fhir\-stores describe
+.RE
 

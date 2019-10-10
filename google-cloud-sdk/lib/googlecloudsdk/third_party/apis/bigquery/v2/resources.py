@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import enum
 
 
-BASE_URL = 'https://www.googleapis.com/bigquery/v2/'
+BASE_URL = 'https://bigquery.googleapis.com/bigquery/v2/'
 DOCS_URL = 'https://cloud.google.com/bigquery/'
 
 

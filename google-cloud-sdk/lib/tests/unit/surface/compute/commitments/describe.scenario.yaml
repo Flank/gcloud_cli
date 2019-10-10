@@ -12,13 +12,13 @@ summary:
       kind: compute#commitment
       name: my-commitment
       plan: TWELVE_MONTH
-      region: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1
+      region: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1
       resources:
       - amount: '5'
         type: VCPU
       - amount: '33280'
         type: MEMORY
-      selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment
+      selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment
       startTimestamp: '2018-09-17T00:00:00.000-07:00'
       status: ACTIVE
       statusMessage: The commitment is active, and so will apply to current resource usage.
@@ -35,7 +35,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment?alt=json
           method: GET
           headers: {}
           body: null
@@ -49,9 +49,9 @@ actions:
             kind: compute#commitment,
             name: my-commitment,
             plan: TWELVE_MONTH,
-            region: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1',
+            region: 'https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1',
             resources: [{amount: '5', type: VCPU}, {amount: '33280', type: MEMORY}],
-            selfLink: 'https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment',
+            selfLink: 'https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment',
             startTimestamp: '2018-09-17T00:00:00.000-07:00', status: ACTIVE, statusMessage: 'The
               commitment is active, and so will apply to current resource usage.'}
     - expect_stdout: |
@@ -61,13 +61,13 @@ actions:
         kind: compute#commitment
         name: my-commitment
         plan: TWELVE_MONTH
-        region: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1
+        region: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1
         resources:
         - amount: '5'
           type: VCPU
         - amount: '33280'
           type: MEMORY
-        selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment
+        selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment
         startTimestamp: '2018-09-17T00:00:00.000-07:00'
         status: ACTIVE
         statusMessage: The commitment is active, and so will apply to current resource usage.

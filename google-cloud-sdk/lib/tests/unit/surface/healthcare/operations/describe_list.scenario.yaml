@@ -1,5 +1,5 @@
 title: operations get/list test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -28,13 +28,18 @@ summary:
       ID                    LOCATION     DONE
       16119721569294483457  us-central1  True
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: healthcare operations describe my-operation --location us-central1 --dataset
       my-dataset
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/my-operation?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/my-operation?alt=json
           method: GET
           headers: {}
           body: null
@@ -90,7 +95,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/operations?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations?alt=json
           method: GET
           headers: {}
           body: null

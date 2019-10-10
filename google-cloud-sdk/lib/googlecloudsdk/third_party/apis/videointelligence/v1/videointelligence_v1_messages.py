@@ -344,6 +344,17 @@ class GoogleCloudVideointelligenceV1ObjectTrackingAnnotation(_messages.Message):
   trackId = _messages.IntegerField(5)
 
 
+class GoogleCloudVideointelligenceV1ObjectTrackingConfig(_messages.Message):
+  r"""Config for OBJECT_TRACKING.
+
+  Fields:
+    model: Model to use for object tracking. Supported values:
+      "builtin/stable" (the default if unset) and "builtin/latest".
+  """
+
+  model = _messages.StringField(1)
+
+
 class GoogleCloudVideointelligenceV1ObjectTrackingFrame(_messages.Message):
   r"""Video frame level annotations for object detection and tracking. This
   field stores per frame location, time offset, and confidence.
@@ -390,15 +401,16 @@ class GoogleCloudVideointelligenceV1SpeechRecognitionAlternative(_messages.Messa
   r"""Alternative hypotheses (a.k.a. n-best list).
 
   Fields:
-    confidence: The confidence estimate between 0.0 and 1.0. A higher number
-      indicates an estimated greater likelihood that the recognized words are
-      correct. This field is typically provided only for the top hypothesis,
-      and only for `is_final=true` results. Clients should not rely on the
-      `confidence` field as it is not guaranteed to be accurate or consistent.
-      The default of 0.0 is a sentinel value indicating `confidence` was not
-      set.
+    confidence: Output only. The confidence estimate between 0.0 and 1.0. A
+      higher number indicates an estimated greater likelihood that the
+      recognized words are correct. This field is set only for the top
+      alternative. This field is not guaranteed to be accurate and users
+      should not rely on it to be always provided. The default of 0.0 is a
+      sentinel value indicating `confidence` was not set.
     transcript: Transcript text representing the words that the user spoke.
-    words: A list of word-specific information for each recognized word.
+    words: Output only. A list of word-specific information for each
+      recognized word. Note: When `enable_speaker_diarization` is true, you
+      will see all the words from the beginning of the audio.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -502,9 +514,12 @@ class GoogleCloudVideointelligenceV1TextDetectionConfig(_messages.Message):
       detected is known a priori. It can increase the accuracy of the
       detection. Language hint must be language code in BCP-47 format.
       Automatic language detection is performed if no hint is provided.
+    model: Model to use for text detection. Supported values: "builtin/stable"
+      (the default if unset) and "builtin/latest".
   """
 
   languageHints = _messages.StringField(1, repeated=True)
+  model = _messages.StringField(2)
 
 
 class GoogleCloudVideointelligenceV1TextFrame(_messages.Message):
@@ -539,19 +554,50 @@ class GoogleCloudVideointelligenceV1TextSegment(_messages.Message):
 class GoogleCloudVideointelligenceV1VideoAnnotationProgress(_messages.Message):
   r"""Annotation progress for a single video.
 
+  Enums:
+    FeatureValueValuesEnum: Specifies which feature is being tracked if the
+      request contains more than one features.
+
   Fields:
+    feature: Specifies which feature is being tracked if the request contains
+      more than one features.
     inputUri: Video file location in [Google Cloud
       Storage](https://cloud.google.com/storage/).
     progressPercent: Approximate percentage processed thus far. Guaranteed to
       be 100 when fully processed.
+    segment: Specifies which segment is being tracked if the request contains
+      more than one segments.
     startTime: Time when the request was received.
     updateTime: Time of the most recent update.
   """
 
-  inputUri = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
+  class FeatureValueValuesEnum(_messages.Enum):
+    r"""Specifies which feature is being tracked if the request contains more
+    than one features.
+
+    Values:
+      FEATURE_UNSPECIFIED: Unspecified.
+      LABEL_DETECTION: Label detection. Detect objects, such as dog or flower.
+      SHOT_CHANGE_DETECTION: Shot change detection.
+      EXPLICIT_CONTENT_DETECTION: Explicit content detection.
+      SPEECH_TRANSCRIPTION: Speech transcription.
+      TEXT_DETECTION: OCR text detection and tracking.
+      OBJECT_TRACKING: Object detection and tracking.
+    """
+    FEATURE_UNSPECIFIED = 0
+    LABEL_DETECTION = 1
+    SHOT_CHANGE_DETECTION = 2
+    EXPLICIT_CONTENT_DETECTION = 3
+    SPEECH_TRANSCRIPTION = 4
+    TEXT_DETECTION = 5
+    OBJECT_TRACKING = 6
+
+  feature = _messages.EnumField('FeatureValueValuesEnum', 1)
+  inputUri = _messages.StringField(2)
+  progressPercent = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1VideoSegment', 4)
+  startTime = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class GoogleCloudVideointelligenceV1VideoAnnotationResults(_messages.Message):
@@ -567,13 +613,27 @@ class GoogleCloudVideointelligenceV1VideoAnnotationResults(_messages.Message):
       Storage](https://cloud.google.com/storage/).
     objectAnnotations: Annotations for list of objects detected and tracked in
       video.
-    segmentLabelAnnotations: Label annotations on video level or user
+    segment: Video segment on which the annotation is run.
+    segmentLabelAnnotations: Topical label annotations on video level or user
       specified segment level. There is exactly one element for each unique
       label.
+    segmentPresenceLabelAnnotations: Presence label annotations on video level
+      or user specified segment level. There is exactly one element for each
+      unique label. Compared to the existing topical
+      `segment_label_annotations`, this field presents more fine-grained,
+      segment-level labels detected in video content and is made available
+      only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     shotAnnotations: Shot annotations. Each shot is represented as a video
       segment.
-    shotLabelAnnotations: Label annotations on shot level. There is exactly
-      one element for each unique label.
+    shotLabelAnnotations: Topical label annotations on shot level. There is
+      exactly one element for each unique label.
+    shotPresenceLabelAnnotations: Presence label annotations on shot level.
+      There is exactly one element for each unique label. Compared to the
+      existing topical `shot_label_annotations`, this field presents more
+      fine-grained, shot-level labels detected in video content and is made
+      available only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     speechTranscriptions: Speech transcription.
     textAnnotations: OCR text detection and tracking. Annotations for list of
       detected text snippets. Each will have list of frame information
@@ -585,11 +645,14 @@ class GoogleCloudVideointelligenceV1VideoAnnotationResults(_messages.Message):
   frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 3, repeated=True)
   inputUri = _messages.StringField(4)
   objectAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1ObjectTrackingAnnotation', 5, repeated=True)
-  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 6, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1VideoSegment', 7, repeated=True)
-  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 8, repeated=True)
-  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1SpeechTranscription', 9, repeated=True)
-  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1TextAnnotation', 10, repeated=True)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1VideoSegment', 6)
+  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 7, repeated=True)
+  segmentPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 8, repeated=True)
+  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1VideoSegment', 9, repeated=True)
+  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 10, repeated=True)
+  shotPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1LabelAnnotation', 11, repeated=True)
+  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1SpeechTranscription', 12, repeated=True)
+  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1TextAnnotation', 13, repeated=True)
 
 
 class GoogleCloudVideointelligenceV1VideoContext(_messages.Message):
@@ -598,6 +661,7 @@ class GoogleCloudVideointelligenceV1VideoContext(_messages.Message):
   Fields:
     explicitContentDetectionConfig: Config for EXPLICIT_CONTENT_DETECTION.
     labelDetectionConfig: Config for LABEL_DETECTION.
+    objectTrackingConfig: Config for OBJECT_TRACKING.
     segments: Video segments to annotate. The segments may overlap and are not
       required to be contiguous or span the whole video. If unspecified, each
       video is treated as a single segment.
@@ -608,10 +672,11 @@ class GoogleCloudVideointelligenceV1VideoContext(_messages.Message):
 
   explicitContentDetectionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1ExplicitContentDetectionConfig', 1)
   labelDetectionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1LabelDetectionConfig', 2)
-  segments = _messages.MessageField('GoogleCloudVideointelligenceV1VideoSegment', 3, repeated=True)
-  shotChangeDetectionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1ShotChangeDetectionConfig', 4)
-  speechTranscriptionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1SpeechTranscriptionConfig', 5)
-  textDetectionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1TextDetectionConfig', 6)
+  objectTrackingConfig = _messages.MessageField('GoogleCloudVideointelligenceV1ObjectTrackingConfig', 3)
+  segments = _messages.MessageField('GoogleCloudVideointelligenceV1VideoSegment', 4, repeated=True)
+  shotChangeDetectionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1ShotChangeDetectionConfig', 5)
+  speechTranscriptionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1SpeechTranscriptionConfig', 6)
+  textDetectionConfig = _messages.MessageField('GoogleCloudVideointelligenceV1TextDetectionConfig', 7)
 
 
 class GoogleCloudVideointelligenceV1VideoSegment(_messages.Message):
@@ -886,15 +951,16 @@ class GoogleCloudVideointelligenceV1beta2SpeechRecognitionAlternative(_messages.
   r"""Alternative hypotheses (a.k.a. n-best list).
 
   Fields:
-    confidence: The confidence estimate between 0.0 and 1.0. A higher number
-      indicates an estimated greater likelihood that the recognized words are
-      correct. This field is typically provided only for the top hypothesis,
-      and only for `is_final=true` results. Clients should not rely on the
-      `confidence` field as it is not guaranteed to be accurate or consistent.
-      The default of 0.0 is a sentinel value indicating `confidence` was not
-      set.
+    confidence: Output only. The confidence estimate between 0.0 and 1.0. A
+      higher number indicates an estimated greater likelihood that the
+      recognized words are correct. This field is set only for the top
+      alternative. This field is not guaranteed to be accurate and users
+      should not rely on it to be always provided. The default of 0.0 is a
+      sentinel value indicating `confidence` was not set.
     transcript: Transcript text representing the words that the user spoke.
-    words: A list of word-specific information for each recognized word.
+    words: Output only. A list of word-specific information for each
+      recognized word. Note: When `enable_speaker_diarization` is true, you
+      will see all the words from the beginning of the audio.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -966,19 +1032,50 @@ class GoogleCloudVideointelligenceV1beta2TextSegment(_messages.Message):
 class GoogleCloudVideointelligenceV1beta2VideoAnnotationProgress(_messages.Message):
   r"""Annotation progress for a single video.
 
+  Enums:
+    FeatureValueValuesEnum: Specifies which feature is being tracked if the
+      request contains more than one features.
+
   Fields:
+    feature: Specifies which feature is being tracked if the request contains
+      more than one features.
     inputUri: Video file location in [Google Cloud
       Storage](https://cloud.google.com/storage/).
     progressPercent: Approximate percentage processed thus far. Guaranteed to
       be 100 when fully processed.
+    segment: Specifies which segment is being tracked if the request contains
+      more than one segments.
     startTime: Time when the request was received.
     updateTime: Time of the most recent update.
   """
 
-  inputUri = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
+  class FeatureValueValuesEnum(_messages.Enum):
+    r"""Specifies which feature is being tracked if the request contains more
+    than one features.
+
+    Values:
+      FEATURE_UNSPECIFIED: Unspecified.
+      LABEL_DETECTION: Label detection. Detect objects, such as dog or flower.
+      SHOT_CHANGE_DETECTION: Shot change detection.
+      EXPLICIT_CONTENT_DETECTION: Explicit content detection.
+      SPEECH_TRANSCRIPTION: Speech transcription.
+      TEXT_DETECTION: OCR text detection and tracking.
+      OBJECT_TRACKING: Object detection and tracking.
+    """
+    FEATURE_UNSPECIFIED = 0
+    LABEL_DETECTION = 1
+    SHOT_CHANGE_DETECTION = 2
+    EXPLICIT_CONTENT_DETECTION = 3
+    SPEECH_TRANSCRIPTION = 4
+    TEXT_DETECTION = 5
+    OBJECT_TRACKING = 6
+
+  feature = _messages.EnumField('FeatureValueValuesEnum', 1)
+  inputUri = _messages.StringField(2)
+  progressPercent = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1beta2VideoSegment', 4)
+  startTime = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class GoogleCloudVideointelligenceV1beta2VideoAnnotationResults(_messages.Message):
@@ -994,13 +1091,27 @@ class GoogleCloudVideointelligenceV1beta2VideoAnnotationResults(_messages.Messag
       Storage](https://cloud.google.com/storage/).
     objectAnnotations: Annotations for list of objects detected and tracked in
       video.
-    segmentLabelAnnotations: Label annotations on video level or user
+    segment: Video segment on which the annotation is run.
+    segmentLabelAnnotations: Topical label annotations on video level or user
       specified segment level. There is exactly one element for each unique
       label.
+    segmentPresenceLabelAnnotations: Presence label annotations on video level
+      or user specified segment level. There is exactly one element for each
+      unique label. Compared to the existing topical
+      `segment_label_annotations`, this field presents more fine-grained,
+      segment-level labels detected in video content and is made available
+      only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     shotAnnotations: Shot annotations. Each shot is represented as a video
       segment.
-    shotLabelAnnotations: Label annotations on shot level. There is exactly
-      one element for each unique label.
+    shotLabelAnnotations: Topical label annotations on shot level. There is
+      exactly one element for each unique label.
+    shotPresenceLabelAnnotations: Presence label annotations on shot level.
+      There is exactly one element for each unique label. Compared to the
+      existing topical `shot_label_annotations`, this field presents more
+      fine-grained, shot-level labels detected in video content and is made
+      available only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     speechTranscriptions: Speech transcription.
     textAnnotations: OCR text detection and tracking. Annotations for list of
       detected text snippets. Each will have list of frame information
@@ -1012,11 +1123,14 @@ class GoogleCloudVideointelligenceV1beta2VideoAnnotationResults(_messages.Messag
   frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 3, repeated=True)
   inputUri = _messages.StringField(4)
   objectAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2ObjectTrackingAnnotation', 5, repeated=True)
-  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 6, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2VideoSegment', 7, repeated=True)
-  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 8, repeated=True)
-  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1beta2SpeechTranscription', 9, repeated=True)
-  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2TextAnnotation', 10, repeated=True)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1beta2VideoSegment', 6)
+  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 7, repeated=True)
+  segmentPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 8, repeated=True)
+  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2VideoSegment', 9, repeated=True)
+  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 10, repeated=True)
+  shotPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2LabelAnnotation', 11, repeated=True)
+  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1beta2SpeechTranscription', 12, repeated=True)
+  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta2TextAnnotation', 13, repeated=True)
 
 
 class GoogleCloudVideointelligenceV1beta2VideoSegment(_messages.Message):
@@ -1291,15 +1405,16 @@ class GoogleCloudVideointelligenceV1p1beta1SpeechRecognitionAlternative(_message
   r"""Alternative hypotheses (a.k.a. n-best list).
 
   Fields:
-    confidence: The confidence estimate between 0.0 and 1.0. A higher number
-      indicates an estimated greater likelihood that the recognized words are
-      correct. This field is typically provided only for the top hypothesis,
-      and only for `is_final=true` results. Clients should not rely on the
-      `confidence` field as it is not guaranteed to be accurate or consistent.
-      The default of 0.0 is a sentinel value indicating `confidence` was not
-      set.
+    confidence: Output only. The confidence estimate between 0.0 and 1.0. A
+      higher number indicates an estimated greater likelihood that the
+      recognized words are correct. This field is set only for the top
+      alternative. This field is not guaranteed to be accurate and users
+      should not rely on it to be always provided. The default of 0.0 is a
+      sentinel value indicating `confidence` was not set.
     transcript: Transcript text representing the words that the user spoke.
-    words: A list of word-specific information for each recognized word.
+    words: Output only. A list of word-specific information for each
+      recognized word. Note: When `enable_speaker_diarization` is true, you
+      will see all the words from the beginning of the audio.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -1371,19 +1486,50 @@ class GoogleCloudVideointelligenceV1p1beta1TextSegment(_messages.Message):
 class GoogleCloudVideointelligenceV1p1beta1VideoAnnotationProgress(_messages.Message):
   r"""Annotation progress for a single video.
 
+  Enums:
+    FeatureValueValuesEnum: Specifies which feature is being tracked if the
+      request contains more than one features.
+
   Fields:
+    feature: Specifies which feature is being tracked if the request contains
+      more than one features.
     inputUri: Video file location in [Google Cloud
       Storage](https://cloud.google.com/storage/).
     progressPercent: Approximate percentage processed thus far. Guaranteed to
       be 100 when fully processed.
+    segment: Specifies which segment is being tracked if the request contains
+      more than one segments.
     startTime: Time when the request was received.
     updateTime: Time of the most recent update.
   """
 
-  inputUri = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
+  class FeatureValueValuesEnum(_messages.Enum):
+    r"""Specifies which feature is being tracked if the request contains more
+    than one features.
+
+    Values:
+      FEATURE_UNSPECIFIED: Unspecified.
+      LABEL_DETECTION: Label detection. Detect objects, such as dog or flower.
+      SHOT_CHANGE_DETECTION: Shot change detection.
+      EXPLICIT_CONTENT_DETECTION: Explicit content detection.
+      SPEECH_TRANSCRIPTION: Speech transcription.
+      TEXT_DETECTION: OCR text detection and tracking.
+      OBJECT_TRACKING: Object detection and tracking.
+    """
+    FEATURE_UNSPECIFIED = 0
+    LABEL_DETECTION = 1
+    SHOT_CHANGE_DETECTION = 2
+    EXPLICIT_CONTENT_DETECTION = 3
+    SPEECH_TRANSCRIPTION = 4
+    TEXT_DETECTION = 5
+    OBJECT_TRACKING = 6
+
+  feature = _messages.EnumField('FeatureValueValuesEnum', 1)
+  inputUri = _messages.StringField(2)
+  progressPercent = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 4)
+  startTime = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults(_messages.Message):
@@ -1399,13 +1545,27 @@ class GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults(_messages.Mess
       Storage](https://cloud.google.com/storage/).
     objectAnnotations: Annotations for list of objects detected and tracked in
       video.
-    segmentLabelAnnotations: Label annotations on video level or user
+    segment: Video segment on which the annotation is run.
+    segmentLabelAnnotations: Topical label annotations on video level or user
       specified segment level. There is exactly one element for each unique
       label.
+    segmentPresenceLabelAnnotations: Presence label annotations on video level
+      or user specified segment level. There is exactly one element for each
+      unique label. Compared to the existing topical
+      `segment_label_annotations`, this field presents more fine-grained,
+      segment-level labels detected in video content and is made available
+      only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     shotAnnotations: Shot annotations. Each shot is represented as a video
       segment.
-    shotLabelAnnotations: Label annotations on shot level. There is exactly
-      one element for each unique label.
+    shotLabelAnnotations: Topical label annotations on shot level. There is
+      exactly one element for each unique label.
+    shotPresenceLabelAnnotations: Presence label annotations on shot level.
+      There is exactly one element for each unique label. Compared to the
+      existing topical `shot_label_annotations`, this field presents more
+      fine-grained, shot-level labels detected in video content and is made
+      available only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     speechTranscriptions: Speech transcription.
     textAnnotations: OCR text detection and tracking. Annotations for list of
       detected text snippets. Each will have list of frame information
@@ -1417,11 +1577,14 @@ class GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults(_messages.Mess
   frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 3, repeated=True)
   inputUri = _messages.StringField(4)
   objectAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1ObjectTrackingAnnotation', 5, repeated=True)
-  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 6, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 7, repeated=True)
-  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 8, repeated=True)
-  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1SpeechTranscription', 9, repeated=True)
-  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1TextAnnotation', 10, repeated=True)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 6)
+  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 7, repeated=True)
+  segmentPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 8, repeated=True)
+  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 9, repeated=True)
+  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 10, repeated=True)
+  shotPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 11, repeated=True)
+  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1SpeechTranscription', 12, repeated=True)
+  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1TextAnnotation', 13, repeated=True)
 
 
 class GoogleCloudVideointelligenceV1p1beta1VideoSegment(_messages.Message):
@@ -1696,15 +1859,16 @@ class GoogleCloudVideointelligenceV1p2beta1SpeechRecognitionAlternative(_message
   r"""Alternative hypotheses (a.k.a. n-best list).
 
   Fields:
-    confidence: The confidence estimate between 0.0 and 1.0. A higher number
-      indicates an estimated greater likelihood that the recognized words are
-      correct. This field is typically provided only for the top hypothesis,
-      and only for `is_final=true` results. Clients should not rely on the
-      `confidence` field as it is not guaranteed to be accurate or consistent.
-      The default of 0.0 is a sentinel value indicating `confidence` was not
-      set.
+    confidence: Output only. The confidence estimate between 0.0 and 1.0. A
+      higher number indicates an estimated greater likelihood that the
+      recognized words are correct. This field is set only for the top
+      alternative. This field is not guaranteed to be accurate and users
+      should not rely on it to be always provided. The default of 0.0 is a
+      sentinel value indicating `confidence` was not set.
     transcript: Transcript text representing the words that the user spoke.
-    words: A list of word-specific information for each recognized word.
+    words: Output only. A list of word-specific information for each
+      recognized word. Note: When `enable_speaker_diarization` is true, you
+      will see all the words from the beginning of the audio.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -1776,19 +1940,50 @@ class GoogleCloudVideointelligenceV1p2beta1TextSegment(_messages.Message):
 class GoogleCloudVideointelligenceV1p2beta1VideoAnnotationProgress(_messages.Message):
   r"""Annotation progress for a single video.
 
+  Enums:
+    FeatureValueValuesEnum: Specifies which feature is being tracked if the
+      request contains more than one features.
+
   Fields:
+    feature: Specifies which feature is being tracked if the request contains
+      more than one features.
     inputUri: Video file location in [Google Cloud
       Storage](https://cloud.google.com/storage/).
     progressPercent: Approximate percentage processed thus far. Guaranteed to
       be 100 when fully processed.
+    segment: Specifies which segment is being tracked if the request contains
+      more than one segments.
     startTime: Time when the request was received.
     updateTime: Time of the most recent update.
   """
 
-  inputUri = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
+  class FeatureValueValuesEnum(_messages.Enum):
+    r"""Specifies which feature is being tracked if the request contains more
+    than one features.
+
+    Values:
+      FEATURE_UNSPECIFIED: Unspecified.
+      LABEL_DETECTION: Label detection. Detect objects, such as dog or flower.
+      SHOT_CHANGE_DETECTION: Shot change detection.
+      EXPLICIT_CONTENT_DETECTION: Explicit content detection.
+      SPEECH_TRANSCRIPTION: Speech transcription.
+      TEXT_DETECTION: OCR text detection and tracking.
+      OBJECT_TRACKING: Object detection and tracking.
+    """
+    FEATURE_UNSPECIFIED = 0
+    LABEL_DETECTION = 1
+    SHOT_CHANGE_DETECTION = 2
+    EXPLICIT_CONTENT_DETECTION = 3
+    SPEECH_TRANSCRIPTION = 4
+    TEXT_DETECTION = 5
+    OBJECT_TRACKING = 6
+
+  feature = _messages.EnumField('FeatureValueValuesEnum', 1)
+  inputUri = _messages.StringField(2)
+  progressPercent = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1VideoSegment', 4)
+  startTime = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults(_messages.Message):
@@ -1804,13 +1999,27 @@ class GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults(_messages.Mess
       Storage](https://cloud.google.com/storage/).
     objectAnnotations: Annotations for list of objects detected and tracked in
       video.
-    segmentLabelAnnotations: Label annotations on video level or user
+    segment: Video segment on which the annotation is run.
+    segmentLabelAnnotations: Topical label annotations on video level or user
       specified segment level. There is exactly one element for each unique
       label.
+    segmentPresenceLabelAnnotations: Presence label annotations on video level
+      or user specified segment level. There is exactly one element for each
+      unique label. Compared to the existing topical
+      `segment_label_annotations`, this field presents more fine-grained,
+      segment-level labels detected in video content and is made available
+      only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     shotAnnotations: Shot annotations. Each shot is represented as a video
       segment.
-    shotLabelAnnotations: Label annotations on shot level. There is exactly
-      one element for each unique label.
+    shotLabelAnnotations: Topical label annotations on shot level. There is
+      exactly one element for each unique label.
+    shotPresenceLabelAnnotations: Presence label annotations on shot level.
+      There is exactly one element for each unique label. Compared to the
+      existing topical `shot_label_annotations`, this field presents more
+      fine-grained, shot-level labels detected in video content and is made
+      available only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     speechTranscriptions: Speech transcription.
     textAnnotations: OCR text detection and tracking. Annotations for list of
       detected text snippets. Each will have list of frame information
@@ -1822,11 +2031,14 @@ class GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults(_messages.Mess
   frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 3, repeated=True)
   inputUri = _messages.StringField(4)
   objectAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1ObjectTrackingAnnotation', 5, repeated=True)
-  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 6, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1VideoSegment', 7, repeated=True)
-  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 8, repeated=True)
-  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1SpeechTranscription', 9, repeated=True)
-  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1TextAnnotation', 10, repeated=True)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1VideoSegment', 6)
+  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 7, repeated=True)
+  segmentPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 8, repeated=True)
+  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1VideoSegment', 9, repeated=True)
+  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 10, repeated=True)
+  shotPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1LabelAnnotation', 11, repeated=True)
+  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1SpeechTranscription', 12, repeated=True)
+  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p2beta1TextAnnotation', 13, repeated=True)
 
 
 class GoogleCloudVideointelligenceV1p2beta1VideoSegment(_messages.Message):
@@ -1902,6 +2114,23 @@ class GoogleCloudVideointelligenceV1p3beta1AnnotateVideoResponse(_messages.Messa
   """
 
   annotationResults = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults', 1, repeated=True)
+
+
+class GoogleCloudVideointelligenceV1p3beta1DetectedAttribute(_messages.Message):
+  r"""A generic detected attribute represented by name in string format.
+
+  Fields:
+    confidence: Detected attribute confidence. Range [0, 1].
+    name: The name of the attribute, i.e. glasses, dark_glasses, mouth_open
+      etc. A full list of supported type names will be provided in the
+      document.
+    value: Text value of the detection result. For example, the value for
+      "HairColor" can be "black", "blonde", etc.
+  """
+
+  confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
+  name = _messages.StringField(2)
+  value = _messages.StringField(3)
 
 
 class GoogleCloudVideointelligenceV1p3beta1Entity(_messages.Message):
@@ -2009,6 +2238,25 @@ class GoogleCloudVideointelligenceV1p3beta1LabelSegment(_messages.Message):
   segment = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 2)
 
 
+class GoogleCloudVideointelligenceV1p3beta1LogoRecognitionAnnotation(_messages.Message):
+  r"""Annotation corresponding to one detected, tracked and recognized logo
+  class.
+
+  Fields:
+    entity: Entity category information to specify the logo class that all the
+      logo tracks within this LogoRecognitionAnnotation are recognized as.
+    segments: All video segments where the recognized logo appears. There
+      might be multiple instances of the same logo class appearing in one
+      VideoSegment.
+    tracks: All logo tracks where the recognized logo appears. Each track
+      corresponds to one logo instance appearing in consecutive frames.
+  """
+
+  entity = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1Entity', 1)
+  segments = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 2, repeated=True)
+  tracks = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1Track', 3, repeated=True)
+
+
 class GoogleCloudVideointelligenceV1p3beta1NormalizedBoundingBox(_messages.Message):
   r"""Normalized bounding box. The normalized vertex coordinates are relative
   to the original image. Range: [0, 1].
@@ -2101,15 +2349,16 @@ class GoogleCloudVideointelligenceV1p3beta1SpeechRecognitionAlternative(_message
   r"""Alternative hypotheses (a.k.a. n-best list).
 
   Fields:
-    confidence: The confidence estimate between 0.0 and 1.0. A higher number
-      indicates an estimated greater likelihood that the recognized words are
-      correct. This field is typically provided only for the top hypothesis,
-      and only for `is_final=true` results. Clients should not rely on the
-      `confidence` field as it is not guaranteed to be accurate or consistent.
-      The default of 0.0 is a sentinel value indicating `confidence` was not
-      set.
+    confidence: Output only. The confidence estimate between 0.0 and 1.0. A
+      higher number indicates an estimated greater likelihood that the
+      recognized words are correct. This field is set only for the top
+      alternative. This field is not guaranteed to be accurate and users
+      should not rely on it to be always provided. The default of 0.0 is a
+      sentinel value indicating `confidence` was not set.
     transcript: Transcript text representing the words that the user spoke.
-    words: A list of word-specific information for each recognized word.
+    words: Output only. A list of word-specific information for each
+      recognized word. Note: When `enable_speaker_diarization` is true, you
+      will see all the words from the beginning of the audio.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -2216,22 +2465,90 @@ class GoogleCloudVideointelligenceV1p3beta1TextSegment(_messages.Message):
   segment = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 3)
 
 
+class GoogleCloudVideointelligenceV1p3beta1TimestampedObject(_messages.Message):
+  r"""For tracking related features, such as LOGO_RECOGNITION, FACE_DETECTION,
+  CELEBRITY_RECOGNITION, PERSON_DETECTION. An object at time_offset with
+  attributes, and located with normalized_bounding_box.
+
+  Fields:
+    attributes: Optional. The attributes of the object in the bounding box.
+    normalizedBoundingBox: Normalized Bounding box in a frame, where the
+      object is located.
+    timeOffset: Time-offset, relative to the beginning of the video,
+      corresponding to the video frame for this object.
+  """
+
+  attributes = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1DetectedAttribute', 1, repeated=True)
+  normalizedBoundingBox = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1NormalizedBoundingBox', 2)
+  timeOffset = _messages.StringField(3)
+
+
+class GoogleCloudVideointelligenceV1p3beta1Track(_messages.Message):
+  r"""A track of an object instance.
+
+  Fields:
+    attributes: Optional. Attributes in the track level.
+    confidence: Optional. The confidence score of the tracked object.
+    segment: Video segment of a track.
+    timestampedObjects: The object with timestamp and attributes per frame in
+      the track.
+  """
+
+  attributes = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1DetectedAttribute', 1, repeated=True)
+  confidence = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 3)
+  timestampedObjects = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1TimestampedObject', 4, repeated=True)
+
+
 class GoogleCloudVideointelligenceV1p3beta1VideoAnnotationProgress(_messages.Message):
   r"""Annotation progress for a single video.
 
+  Enums:
+    FeatureValueValuesEnum: Specifies which feature is being tracked if the
+      request contains more than one features.
+
   Fields:
+    feature: Specifies which feature is being tracked if the request contains
+      more than one features.
     inputUri: Video file location in [Google Cloud
       Storage](https://cloud.google.com/storage/).
     progressPercent: Approximate percentage processed thus far. Guaranteed to
       be 100 when fully processed.
+    segment: Specifies which segment is being tracked if the request contains
+      more than one segments.
     startTime: Time when the request was received.
     updateTime: Time of the most recent update.
   """
 
-  inputUri = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
+  class FeatureValueValuesEnum(_messages.Enum):
+    r"""Specifies which feature is being tracked if the request contains more
+    than one features.
+
+    Values:
+      FEATURE_UNSPECIFIED: Unspecified.
+      LABEL_DETECTION: Label detection. Detect objects, such as dog or flower.
+      SHOT_CHANGE_DETECTION: Shot change detection.
+      EXPLICIT_CONTENT_DETECTION: Explicit content detection.
+      SPEECH_TRANSCRIPTION: Speech transcription.
+      TEXT_DETECTION: OCR text detection and tracking.
+      OBJECT_TRACKING: Object detection and tracking.
+      LOGO_RECOGNITION: Logo detection, tracking, and recognition.
+    """
+    FEATURE_UNSPECIFIED = 0
+    LABEL_DETECTION = 1
+    SHOT_CHANGE_DETECTION = 2
+    EXPLICIT_CONTENT_DETECTION = 3
+    SPEECH_TRANSCRIPTION = 4
+    TEXT_DETECTION = 5
+    OBJECT_TRACKING = 6
+    LOGO_RECOGNITION = 7
+
+  feature = _messages.EnumField('FeatureValueValuesEnum', 1)
+  inputUri = _messages.StringField(2)
+  progressPercent = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 4)
+  startTime = _messages.StringField(5)
+  updateTime = _messages.StringField(6)
 
 
 class GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults(_messages.Message):
@@ -2245,15 +2562,31 @@ class GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults(_messages.Mess
       one element for each unique label.
     inputUri: Video file location in [Google Cloud
       Storage](https://cloud.google.com/storage/).
+    logoRecognitionAnnotations: Annotations for list of logos detected,
+      tracked and recognized in video.
     objectAnnotations: Annotations for list of objects detected and tracked in
       video.
-    segmentLabelAnnotations: Label annotations on video level or user
+    segment: Video segment on which the annotation is run.
+    segmentLabelAnnotations: Topical label annotations on video level or user
       specified segment level. There is exactly one element for each unique
       label.
+    segmentPresenceLabelAnnotations: Presence label annotations on video level
+      or user specified segment level. There is exactly one element for each
+      unique label. Compared to the existing topical
+      `segment_label_annotations`, this field presents more fine-grained,
+      segment-level labels detected in video content and is made available
+      only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     shotAnnotations: Shot annotations. Each shot is represented as a video
       segment.
-    shotLabelAnnotations: Label annotations on shot level. There is exactly
-      one element for each unique label.
+    shotLabelAnnotations: Topical label annotations on shot level. There is
+      exactly one element for each unique label.
+    shotPresenceLabelAnnotations: Presence label annotations on shot level.
+      There is exactly one element for each unique label. Compared to the
+      existing topical `shot_label_annotations`, this field presents more
+      fine-grained, shot-level labels detected in video content and is made
+      available only when the client sets `LabelDetectionConfig.model` to
+      "builtin/latest" in the request.
     speechTranscriptions: Speech transcription.
     textAnnotations: OCR text detection and tracking. Annotations for list of
       detected text snippets. Each will have list of frame information
@@ -2264,12 +2597,16 @@ class GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults(_messages.Mess
   explicitAnnotation = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1ExplicitContentAnnotation', 2)
   frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 3, repeated=True)
   inputUri = _messages.StringField(4)
-  objectAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1ObjectTrackingAnnotation', 5, repeated=True)
-  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 6, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 7, repeated=True)
-  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 8, repeated=True)
-  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1SpeechTranscription', 9, repeated=True)
-  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1TextAnnotation', 10, repeated=True)
+  logoRecognitionAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LogoRecognitionAnnotation', 5, repeated=True)
+  objectAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1ObjectTrackingAnnotation', 6, repeated=True)
+  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 7)
+  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 8, repeated=True)
+  segmentPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 9, repeated=True)
+  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1VideoSegment', 10, repeated=True)
+  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 11, repeated=True)
+  shotPresenceLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1LabelAnnotation', 12, repeated=True)
+  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1SpeechTranscription', 13, repeated=True)
+  textAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p3beta1TextAnnotation', 14, repeated=True)
 
 
 class GoogleCloudVideointelligenceV1p3beta1VideoSegment(_messages.Message):
@@ -2459,37 +2796,10 @@ class GoogleProtobufEmpty(_messages.Message):
 class GoogleRpcStatus(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -2597,8 +2907,41 @@ class StandardQueryParameters(_messages.Message):
   upload_protocol = _messages.StringField(12)
 
 
-class VideointelligenceOperationsCancelRequest(_messages.Message):
-  r"""A VideointelligenceOperationsCancelRequest object.
+class VideointelligenceOperationsProjectsLocationsOperationsCancelRequest(_messages.Message):
+  r"""A VideointelligenceOperationsProjectsLocationsOperationsCancelRequest
+  object.
+
+  Fields:
+    name: The name of the operation resource to be cancelled.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class VideointelligenceOperationsProjectsLocationsOperationsDeleteRequest(_messages.Message):
+  r"""A VideointelligenceOperationsProjectsLocationsOperationsDeleteRequest
+  object.
+
+  Fields:
+    name: The name of the operation resource to be deleted.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class VideointelligenceOperationsProjectsLocationsOperationsGetRequest(_messages.Message):
+  r"""A VideointelligenceOperationsProjectsLocationsOperationsGetRequest
+  object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class VideointelligenceProjectsLocationsOperationsCancelRequest(_messages.Message):
+  r"""A VideointelligenceProjectsLocationsOperationsCancelRequest object.
 
   Fields:
     googleLongrunningCancelOperationRequest: A
@@ -2611,8 +2954,8 @@ class VideointelligenceOperationsCancelRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
 
 
-class VideointelligenceOperationsDeleteRequest(_messages.Message):
-  r"""A VideointelligenceOperationsDeleteRequest object.
+class VideointelligenceProjectsLocationsOperationsDeleteRequest(_messages.Message):
+  r"""A VideointelligenceProjectsLocationsOperationsDeleteRequest object.
 
   Fields:
     name: The name of the operation resource to be deleted.
@@ -2621,8 +2964,8 @@ class VideointelligenceOperationsDeleteRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
-class VideointelligenceOperationsGetRequest(_messages.Message):
-  r"""A VideointelligenceOperationsGetRequest object.
+class VideointelligenceProjectsLocationsOperationsGetRequest(_messages.Message):
+  r"""A VideointelligenceProjectsLocationsOperationsGetRequest object.
 
   Fields:
     name: The name of the operation resource.
@@ -2631,8 +2974,8 @@ class VideointelligenceOperationsGetRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
-class VideointelligenceOperationsListRequest(_messages.Message):
-  r"""A VideointelligenceOperationsListRequest object.
+class VideointelligenceProjectsLocationsOperationsListRequest(_messages.Message):
+  r"""A VideointelligenceProjectsLocationsOperationsListRequest object.
 
   Fields:
     filter: The standard list filter.
@@ -2642,7 +2985,7 @@ class VideointelligenceOperationsListRequest(_messages.Message):
   """
 
   filter = _messages.StringField(1)
-  name = _messages.StringField(2)
+  name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
 

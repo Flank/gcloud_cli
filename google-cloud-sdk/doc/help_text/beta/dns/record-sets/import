@@ -50,22 +50,23 @@ EXAMPLES
     To import record-sets from a yaml record-sets file, run:
 
         $ gcloud beta dns record-sets import YAML_RECORDS_FILE \
-            --zone MANAGED_ZONE
+            --zone=MANAGED_ZONE
 
     To import record-sets from a zone file, run:
 
         $ gcloud beta dns record-sets import ZONE_FILE --zone-file-format \
-            --zone MANAGED_ZONE
+            --zone=MANAGED_ZONE
 
     To replace all the record-sets in your zone with records from a yaml file,
     run:
 
         $ gcloud beta dns record-sets import YAML_RECORDS_FILE \
-            --delete-all-existing --zone MANAGED_ZONE
+            --delete-all-existing --zone=MANAGED_ZONE
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns record-sets import
+        $ gcloud alpha dns record-sets import
 

@@ -17,6 +17,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     bak
+        (BETA) Import data into a Cloud SQL instance from a BAK file.
+
      csv
         (BETA) Imports data into a Cloud SQL instance from a CSV file.
 

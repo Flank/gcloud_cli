@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -652,7 +652,7 @@ class GetBaseListerFrontendPrototypeTests(test_case.TestCase):
         limit=None,
         names=[
             'name1',
-            'https://www.googleapis.com/compute/v1/projects/'
+            'https://compute.googleapis.com/compute/v1/projects/'
             'my-project/zones/zone-1/disks/disk-1',
         ],
         regexp='my.*regexp',
@@ -663,7 +663,7 @@ class GetBaseListerFrontendPrototypeTests(test_case.TestCase):
     self.assertEqual(
         args.filter,
         '(name=asdf) AND (name ~ "^my.*regexp$") AND ((name =(name1)) OR '
-        '(selfLink =(https://www.googleapis.com/compute/v1/projects/'
+        '(selfLink =(https://compute.googleapis.com/compute/v1/projects/'
         'my-project/zones/zone-1/disks/disk-1)))')
     self.assertEqual(frontend.filter, None)
     self.assertIsNone(frontend.max_results)
@@ -680,7 +680,7 @@ class ParseZonalFlagsTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     args = MockArgs(
         filter=None,
@@ -714,11 +714,11 @@ class ParseZonalFlagsTests(cli_test_base.CliTestBase):
     )
 
     zone1 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/zones/my-zone-1')
 
     zone2 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/zones/my-zone-2')
 
     frontend = lister.ParseZonalFlags(args, resource_registry)
@@ -739,7 +739,7 @@ class ParseRegionalFlagsTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     args = MockArgs(
         filter=None,
@@ -773,11 +773,11 @@ class ParseRegionalFlagsTests(cli_test_base.CliTestBase):
     )
 
     region1 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/regions/my-region-1')
 
     region2 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/regions/my-region-2')
 
     frontend = lister.ParseRegionalFlags(args, resource_registry)
@@ -827,7 +827,7 @@ class ParseMultiScopeFlagsTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     args = MockArgs(
         filter=None,
@@ -853,7 +853,7 @@ class ParseMultiScopeFlagsTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     args = MockArgs(
         filter=None,
@@ -892,7 +892,7 @@ class ZonalListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     frontend = lister._Frontend('filter', 123,
                                 lister.AllScopes([project], True, False))
@@ -927,11 +927,11 @@ class ZonalListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     zone1 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/zones/my-zone-1')
 
     zone2 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/zones/my-zone-2')
 
     frontend = lister._Frontend('filter', 123, lister.ZoneSet([zone1, zone2]))
@@ -1002,7 +1002,7 @@ class RegionalListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     frontend = lister._Frontend('filter', 123,
                                 lister.AllScopes([project], False, True))
@@ -1037,11 +1037,11 @@ class RegionalListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     region1 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/regions/my-region-1')
 
     region2 = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/'
+        'https://compute.googleapis.com/compute/v1/projects/'
         'lister-project/regions/my-region-2')
 
     frontend = lister._Frontend('filter', 123,
@@ -1146,9 +1146,9 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     #   u'regional_service', u'global_service', u'aggregation_service')"
     # Python 3: "MultiScopeLister('client', 'zonal_service','regional_service',
     #  'global_service', 'aggregation_service')"
-    expected = 'MultiScopeLister({}, {}, {}, {}, {})'.format(
+    expected = 'MultiScopeLister({}, {}, {}, {}, {}, {})'.format(
         repr('client'), repr('zonal_service'), repr('regional_service'),
-        repr('global_service'), repr('aggregation_service'))
+        repr('global_service'), repr('aggregation_service'), repr(True))
     self.assertEqual(repr(multi_scope_lister), expected)
 
   def testEq(self):
@@ -1192,7 +1192,7 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     frontend = lister._Frontend('filter', 123,
                                 lister.AllScopes([project], True, True))
@@ -1231,7 +1231,7 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     frontend = lister._Frontend('filter', 123,
                                 lister.GlobalScope([project]))
@@ -1254,6 +1254,54 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
         batch_url=self.api_mock.adapter.batch_url,
         errors=[])
 
+  def testWithPartialError(self):
+
+    def make_server_responses(*_, **kwargs):
+      for num in range(5):
+        if num == 2:
+          kwargs['errors'].append((400, 'Invalid field name'))
+        else:
+          yield num
+
+    lister_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson',
+        autospec=True)
+    self.addCleanup(lister_patcher.stop)
+    self.list_json = lister_patcher.start()
+    self.list_json.side_effect = make_server_responses
+
+    self.api_mock = utils.ComputeApiMock('v1').Start()
+    self.addCleanup(self.api_mock.Stop)
+
+    resource_registry = resources.REGISTRY.Clone()
+    resource_registry.RegisterApiByName('compute', 'v1')
+
+    project = resource_registry.Parse(
+        'https://www.googleapis.com/compute/v1/projects/lister-project')
+
+    frontend = lister._Frontend('filter', 123,
+                                lister.GlobalScope([project]))
+
+    zones_lister = lister.MultiScopeLister(
+        self.api_mock.adapter,
+        global_service=self.api_mock.adapter.apitools_client.zones)
+
+    result = list(zones_lister(frontend))
+
+    self.assertListEqual(result, [0, 1, 3, 4])
+
+    errors = [(400, u'Invalid field name')]
+    self.list_json.assert_called_once_with(
+        requests=[(self.api_mock.adapter.apitools_client.zones, 'List',
+                   self.api_mock.adapter.messages.ComputeZonesListRequest(
+                       filter='filter',
+                       maxResults=123,
+                       project='lister-project')),
+                 ],
+        http=self.api_mock.adapter.apitools_client.http,
+        batch_url=self.api_mock.adapter.batch_url,
+        errors=errors)
+
   def testWithError(self):
     lister_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson',
@@ -1269,7 +1317,7 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     resource_registry.RegisterApiByName('compute', 'v1')
 
     project = resource_registry.Parse(
-        'https://www.googleapis.com/compute/v1/projects/lister-project')
+        'https://compute.googleapis.com/compute/v1/projects/lister-project')
 
     frontend = lister._Frontend('filter', 123,
                                 lister.GlobalScope([project]))
@@ -1317,7 +1365,7 @@ class ZonalParallelListerTests(test_base.BaseTest):
 
     self.assertEqual(zonal_lister1, zonal_lister2)
     self.assertEqual(hash(zonal_lister1), hash(zonal_lister2))
-    self.assertFalse(zonal_lister1 == object())
+    self.assertNotEqual(zonal_lister1, object())
 
   def testNeq(self):
     client1 = object()

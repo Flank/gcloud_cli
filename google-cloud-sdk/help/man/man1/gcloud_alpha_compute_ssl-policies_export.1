@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SSL\-POLICIES_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute ssl\-policies export \- export an SSL policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute ssl\-policies export\fR \fISSL_POLICY\fR [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Exports an SSL policy's configuration to a file. This
+configuration can be imported at a later time.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISSL_POLICY\fR
+Name of the SSL policy to export.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Path to a YAML file where the ssl policy configuration will be exported. The
+exported data will not contain any output\-only fields. Alternatively, you may
+omit this flag to write to standard output. A schema describing the
+export/import format can be found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/alpha/SslPolicy.yaml.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Tests for the backend services update beta command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -152,7 +150,8 @@ class WithHealthcheckApiTest(BetaUpdateTestBase):
     ])
 
     self.RunUpdate(
-        'backend-service-1 --health-checks health-check-1,health-check-2')
+        'backend-service-1 --health-checks health-check-1,health-check-2' +
+        ' --global-health-checks')
 
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
@@ -187,7 +186,8 @@ class WithHealthcheckApiTest(BetaUpdateTestBase):
         [],
     ])
 
-    self.RunUpdate('backend-service-3 --health-checks health-check-1')
+    self.RunUpdate('backend-service-3 --health-checks health-check-1' +
+                   ' --global-health-checks')
 
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
@@ -219,7 +219,8 @@ class WithHealthcheckApiTest(BetaUpdateTestBase):
         [],
     ])
 
-    self.RunUpdate('backend-service-3 --health-checks new-health-check')
+    self.RunUpdate('backend-service-3 --health-checks new-health-check ' +
+                   '--global-health-checks')
 
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
@@ -343,14 +344,14 @@ class WithHealthcheckApiTest(BetaUpdateTestBase):
                 backends=[],
                 description='my backend service',
                 healthChecks=[
-                    ('https://www.googleapis.com/compute/beta/projects/'
+                    ('https://compute.googleapis.com/compute/beta/projects/'
                      'my-project/global/httpHealthChecks/my-health-check')
                 ],
                 name='backend-service-1',
                 portName='http',
                 protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
                 selfLink=(
-                    'https://www.googleapis.com/compute/beta/projects/'
+                    'https://compute.googleapis.com/compute/beta/projects/'
                     'my-project/global/backendServices/backend-service-1'),
                 timeoutSec=30,
                 customRequestHeaders=['test: '])
@@ -535,7 +536,7 @@ class RegionalTest(test_base.BaseTest):
     ]
 
     self.RunUpdate('backend-service-3 --region alaska '
-                   '--health-checks new-health-check')
+                   '--health-checks new-health-check --global-health-checks')
 
     self.CheckRequests(
         [(self.compute.regionBackendServices, 'Get',

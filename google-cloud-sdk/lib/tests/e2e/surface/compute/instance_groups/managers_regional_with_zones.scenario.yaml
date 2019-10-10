@@ -6,7 +6,7 @@ summary:
   - command: compute instance-templates create $$template1$$ --machine-type n1-standard-1
       --format 'text(name,properties.machineType)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
   - stdout: |
       ---
       name:                   $$template1$$
@@ -16,7 +16,7 @@ summary:
       --base-instance-name $$manager$$ --size 0 --template $$template1$$ --format
       'text(name,region,targetSize)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
   - stdout: |
       ---
       name:       $$manager$$
@@ -30,7 +30,7 @@ summary:
          - [$$manager$$] in [us-central1]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
   - progress_tracker:
     - message: Deleting Managed Instance Group
     - status: SUCCESS
@@ -42,12 +42,12 @@ summary:
          - [$$template1$$]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
 
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: template1
     prefix: mig-regional
@@ -56,8 +56,9 @@ actions:
       --format 'text(name,properties.machineType)'
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
     - expect_stdout: |
         ---
         name:                   $$template1$$
@@ -83,10 +84,10 @@ actions:
               baseInstanceName: $$manager$$
               distributionPolicy:
                 zones:
-                - zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
-              instanceTemplate: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
+                - zone: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
+              instanceTemplate: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$
               name: $$manager$$
-              region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+              region: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1
               targetSize: 0
         return_response:
           headers:
@@ -108,8 +109,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1536706457544-575a05a86a542-450268d6-85f7b6e5
             region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
@@ -220,11 +222,12 @@ actions:
             kind: compute#regionAutoscalerList
             id: projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers
-    - expect_stdout: |
-        ---
-        name:       $$manager$$
-        region:     https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
-        targetSize: 0
+    - expect_stdout:
+        matches: |
+          ---
+          name:       $$manager$$
+          region:     https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+          targetSize: 0
     - expect_exit:
         code: 0
 
@@ -238,8 +241,9 @@ actions:
           The following region instance group managers will be deleted:
            - [$$manager$$] in [us-central1]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$\].
     - expect_progress_tracker:
         message: Deleting Managed Instance Group
         status: SUCCESS
@@ -256,7 +260,8 @@ actions:
           The following instance templates will be deleted:
            - [$$template1$$]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$\].
     - expect_exit:
         code: 0

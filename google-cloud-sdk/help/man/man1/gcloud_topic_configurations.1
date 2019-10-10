@@ -139,6 +139,12 @@ If True, color will not be used when printing messages in the terminal.
 
 
 .TP 2m
+\fBdisable_file_logging\fR
+If True, \f5gcloud\fR will not store logs to a file. This may be useful if disk
+space is limited.
+
+
+.TP 2m
 \fBdisable_prompts\fR
 If True, the default answer will be assumed for all user prompts. However, for
 any prompts that require user input, an error will be raised. This is equivalent
@@ -303,6 +309,19 @@ project, you can use this property to specify the alternate project.
 .RE
 .sp
 .TP 2m
+\fIbuild_artifacts\fR
+
+.RS 2m
+.TP 2m
+\fBrepository\fR
+Default repository to use when working with Cloud Build Artifacts resources.
+When a \f5repository\fR is required but not provided by a flag, the command will
+fall back to this value, if set.
+
+
+.RE
+.sp
+.TP 2m
 \fIbuilds\fR
 
 .RS 2m
@@ -414,6 +433,32 @@ server.
 .RE
 .sp
 .TP 2m
+\fIcontext_aware\fR
+
+.RS 2m
+.TP 2m
+\fBuse_client_certificate\fR
+If True, use client certificate to authorize user device using context aware
+access.
+
+
+.RE
+.sp
+.TP 2m
+\fIdatafusion\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Datafusion location to use. Each Datafusion location constitutes an independent
+resource namespace constrained to deploying environments into Compute Engine
+regions inside this location. This parameter corresponds to the
+/locations/<location> segment of the Datafusion resource URIs being referenced.
+
+
+.RE
+.sp
+.TP 2m
 \fIdataproc\fR
 
 .RS 2m
@@ -421,9 +466,7 @@ server.
 \fBregion\fR
 Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
 independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. The default value of \f5global\fR is a special
-multi\-region namespace which is capable of deploying instances into all Compute
-Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Engine zones inside the region.
 
 
 .RE
@@ -469,6 +512,19 @@ Default region to use when working with Cloud Functions resources. When a
 \f5\-\-region\fR flag is required but not provided, the command will fall back
 to this value, if set. To see valid choices, run \f5gcloud beta functions
 regions list\fR.
+
+
+.RE
+.sp
+.TP 2m
+\fIgame_services\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud Game Services resources. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value.
 
 
 .RE
@@ -578,6 +634,19 @@ If True, add command line suggestions based on history.
 .RE
 .sp
 .TP 2m
+\fIlifesciences\fR
+
+.RS 2m
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud Life Sciences resources. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value.
+
+
+.RE
+.sp
+.TP 2m
 \fIml_engine\fR
 
 .RS 2m
@@ -649,6 +718,45 @@ fall back to this value, if set.
 .RE
 .sp
 .TP 2m
+\fIrun\fR
+
+.RS 2m
+.TP 2m
+\fBcluster\fR
+ID of the cluster or fully qualified identifier for the cluster
+
+
+.TP 2m
+\fBcluster_location\fR
+Zone or region in which the cluster is located.
+
+
+.TP 2m
+\fBplatform\fR
+Target platform for running commands.
+
+
+.TP 2m
+\fBregion\fR
+Default region to use when working with Cloud Run resources. When a
+\f5\-\-region\fR flag is required but not provided, the command will fall back
+to this value, if set.
+
+
+.RE
+.sp
+.TP 2m
+\fIscc\fR
+
+.RS 2m
+.TP 2m
+\fBorganization\fR
+Default organization \f5gcloud\fR should use for scc surface.
+
+
+.RE
+.sp
+.TP 2m
 \fIspanner\fR
 
 .RS 2m
@@ -657,6 +765,17 @@ fall back to this value, if set.
 Default instance to use when working with Cloud Spanner resources. When an
 instance is required but not provided by a flag, the command will fall back to
 this value, if set.
+
+
+.RE
+.sp
+.TP 2m
+\fIsurvey\fR
+
+.RS 2m
+.TP 2m
+\fBdisable_prompts\fR
+If True, gcloud will not prompt you to take periodic usage experience surveys.
 .RE
 .RE
 .sp

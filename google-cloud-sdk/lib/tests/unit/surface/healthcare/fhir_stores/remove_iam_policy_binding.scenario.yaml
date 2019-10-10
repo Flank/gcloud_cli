@@ -1,5 +1,5 @@
 title: healthcare fhir-stores remove-iam-policy-binding-condition scenario test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -20,6 +20,11 @@ summary:
       etag: etag
       version: 1
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 # remove binding with condition to a policy with condition
 - execute_command:
     command: healthcare fhir-stores remove-iam-policy-binding my-store --location=us-central1
@@ -28,7 +33,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store:getIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store:getIamPolicy?alt=json
           method: GET
           headers: {}
           body: null
@@ -56,7 +61,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store:setIamPolicy?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/fhirStores/my-store:setIamPolicy?alt=json
           method: POST
           headers: {}
           body:

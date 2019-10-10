@@ -7,6 +7,11 @@ SYNOPSIS
 DESCRIPTION
     (BETA) Describes details of a Cloud DNS policy.
 
+EXAMPLES
+    To describe a policy, run:
+
+        $ gcloud beta dns policies describe mypolicy
+
 POSITIONAL ARGUMENTS
      Policy resource - The name of the policy you want to describe. This
      represents a Cloud resource. (NOTE) Some attributes are not given
@@ -26,9 +31,13 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the dns/v1beta2 API. The full documentation for this API
-    can be found at: https://developers.google.com/cloud-dns
+    This command uses the dns/v1 API. The full documentation for this API can
+    be found at: https://developers.google.com/cloud-dns
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud dns policies describe
+        $ gcloud alpha dns policies describe
 

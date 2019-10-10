@@ -15,8 +15,7 @@ package = 'accesscontextmanager'
 class AccessLevel(_messages.Message):
   r"""An `AccessLevel` is a label that can be applied to requests to GCP
   services, along with a list of requirements necessary for the label to be
-  applied. `AccessLevels` can be referenced in `AccessZones` and in the `Cloud
-  Org Policy` API.
+  applied.
 
   Fields:
     basic: A `BasicLevel` composed of `Conditions`.
@@ -40,10 +39,10 @@ class AccessLevel(_messages.Message):
 
 class AccessPolicy(_messages.Message):
   r"""`AccessPolicy` is a container for `AccessLevels` (which define the
-  necessary attributes to use GCP services) and `AccessZones` (which define
-  regions of services able to freely pass data within a zone). An access
-  policy is globally visible within an organization, and the restrictions it
-  specifies apply to all projects within an organization.
+  necessary attributes to use GCP services) and `ServicePerimeters` (which
+  define regions of services able to freely pass data within a perimeter). An
+  access policy is globally visible within an organization, and the
+  restrictions it specifies apply to all projects within an organization.
 
   Fields:
     createTime: Output only. Time the `AccessPolicy` was created in UTC.
@@ -52,7 +51,7 @@ class AccessPolicy(_messages.Message):
     parent: Required. The parent of this `AccessPolicy` in the Cloud Resource
       Hierarchy. Currently immutable once created. Format:
       `organizations/{organization_id}`
-    title: Human readable title. Does not affect behavior.
+    title: Required. Human readable title. Does not affect behavior.
     updateTime: Output only. Time the `AccessPolicy` was updated in UTC.
   """
 
@@ -61,89 +60,6 @@ class AccessPolicy(_messages.Message):
   parent = _messages.StringField(3)
   title = _messages.StringField(4)
   updateTime = _messages.StringField(5)
-
-
-class AccessZone(_messages.Message):
-  r"""`AccessZone` describes a set of GCP resources which can freely import
-  and export data amongst themselves, but not export outside of the
-  `AccessZone`. If a request with a source within this `AccessZone` has a
-  target outside of the `AccessZone`, the request will be blocked. Otherwise
-  the request is allowed. Access Zones cannot overlap, a single GCP project
-  can only belong to a single Access Zone. The restriction against overlapping
-  zones may be lifted in the future.
-
-  Enums:
-    ZoneTypeValueValuesEnum: Zone type indicator. A single project is allowed
-      to be a member of single regular access zone, but multiple bridge access
-      zones. A project cannot be a included in a bridge access zone without
-      being included in regular access zone. For bridge access zones,
-      restricted/unrestricted service lists as well as access lists must be
-      empty.
-
-  Fields:
-    accessLevels: A list of `AccessLevel` resource names that allow resources
-      within the `AccessZone` to be accessed from the internet. `AccessLevels`
-      listed must be in the same policy as this `AccessZone`. Referencing a
-      nonexistent `AccessLevel` is a syntax error. If no `AccessLevel` names
-      are listed, resources within the zone can only be accessed via GCP calls
-      with request origins within the zone. Example:
-      `"accessPolicies/MY_POLICY/accessLevels/MY_LEVEL"`. For bridge access
-      zones, must be empty.
-    createTime: Output only. Time the `AccessZone` was created in UTC.
-    description: Description of the `AccessZone` and its use. Does not affect
-      behavior.
-    name: Required. Resource name for the Access Zone.  The `short_name`
-      component must begin with a letter and only include alphanumeric and
-      '_'. Format: `accessPolicies/{policy_id}/accessZones/{short_name}`
-    resources: A list of GCP resources that are inside of the access zone.
-      Currently only projects are allowed. Format: `projects/{project_number}`
-    restrictedServices: GCP services that Access Zone restrictions will be
-      applied to. Must contain list of services. Only resources for services
-      matching the restricted_services will be subject to access zone
-      protection. For example, if `storage.googleapis.com` is specified, then
-      storage buckets that belong to the access zone could be accessed through
-      Storage service only if access conditions are met.  For bridge access
-      zones, must be empty.
-    title: Human readable title. Must be unique within the Policy.
-    unrestrictedServices: GCP services exempt from the Access Zone
-      restrictions. Deprecated. Must be the single wildcard "*". Services
-      matching the unrestricted_services are excluded from Access Zone
-      restrictions.  Wildcard means that unless explicitly specified by
-      "restricted_services" list, any service is treated as unrestricted.  For
-      bridge access zones, must be empty.
-    updateTime: Output only. Time the `AccessZone` was updated in UTC.
-    zoneType: Zone type indicator. A single project is allowed to be a member
-      of single regular access zone, but multiple bridge access zones. A
-      project cannot be a included in a bridge access zone without being
-      included in regular access zone. For bridge access zones,
-      restricted/unrestricted service lists as well as access lists must be
-      empty.
-  """
-
-  class ZoneTypeValueValuesEnum(_messages.Enum):
-    r"""Zone type indicator. A single project is allowed to be a member of
-    single regular access zone, but multiple bridge access zones. A project
-    cannot be a included in a bridge access zone without being included in
-    regular access zone. For bridge access zones, restricted/unrestricted
-    service lists as well as access lists must be empty.
-
-    Values:
-      ZONE_TYPE_REGULAR: Regular zone.
-      ZONE_TYPE_BRIDGE: Bridge zone.
-    """
-    ZONE_TYPE_REGULAR = 0
-    ZONE_TYPE_BRIDGE = 1
-
-  accessLevels = _messages.StringField(1, repeated=True)
-  createTime = _messages.StringField(2)
-  description = _messages.StringField(3)
-  name = _messages.StringField(4)
-  resources = _messages.StringField(5, repeated=True)
-  restrictedServices = _messages.StringField(6, repeated=True)
-  title = _messages.StringField(7)
-  unrestrictedServices = _messages.StringField(8, repeated=True)
-  updateTime = _messages.StringField(9)
-  zoneType = _messages.EnumField('ZoneTypeValueValuesEnum', 10)
 
 
 class AccesscontextmanagerAccessPoliciesAccessLevelsCreateRequest(_messages.Message):
@@ -261,79 +177,11 @@ class AccesscontextmanagerAccessPoliciesAccessLevelsPatchRequest(_messages.Messa
     name: Required. Resource name for the Access Level. The `short_name`
       component must begin with a letter and only include alphanumeric and
       '_'. Format: `accessPolicies/{policy_id}/accessLevels/{short_name}`
-    updateMask: Required.  Mask to control which fields get updated. Must be
-      non-empty.
-  """
-
-  accessLevel = _messages.MessageField('AccessLevel', 1)
-  name = _messages.StringField(2, required=True)
-  updateMask = _messages.StringField(3)
-
-
-class AccesscontextmanagerAccessPoliciesAccessZonesCreateRequest(_messages.Message):
-  r"""A AccesscontextmanagerAccessPoliciesAccessZonesCreateRequest object.
-
-  Fields:
-    accessZone: A AccessZone resource to be passed as the request body.
-    parent: Required. Resource name for the access policy which owns this
-      Access Zone.  Format: `accessPolicies/{policy_id}`
-  """
-
-  accessZone = _messages.MessageField('AccessZone', 1)
-  parent = _messages.StringField(2, required=True)
-
-
-class AccesscontextmanagerAccessPoliciesAccessZonesDeleteRequest(_messages.Message):
-  r"""A AccesscontextmanagerAccessPoliciesAccessZonesDeleteRequest object.
-
-  Fields:
-    name: Required. Resource name for the Access Zone.  Format:
-      `accessPolicies/{policy_id}/accessZones/{access_zone_id}`
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class AccesscontextmanagerAccessPoliciesAccessZonesGetRequest(_messages.Message):
-  r"""A AccesscontextmanagerAccessPoliciesAccessZonesGetRequest object.
-
-  Fields:
-    name: Required. Resource name for the Access Zone.  Format:
-      `accessPolicies/{policy_id}/accessZones/{access_zones_id}`
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class AccesscontextmanagerAccessPoliciesAccessZonesListRequest(_messages.Message):
-  r"""A AccesscontextmanagerAccessPoliciesAccessZonesListRequest object.
-
-  Fields:
-    pageSize: Number of Access Zones to include in the list. Default 100.
-    pageToken: Next page token for the next batch of Access Zone instances.
-      Defaults to the first page of results.
-    parent: Required. Resource name for the access policy to list Access Zones
-      from.  Format: `accessPolicies/{policy_id}`
-  """
-
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
-
-
-class AccesscontextmanagerAccessPoliciesAccessZonesPatchRequest(_messages.Message):
-  r"""A AccesscontextmanagerAccessPoliciesAccessZonesPatchRequest object.
-
-  Fields:
-    accessZone: A AccessZone resource to be passed as the request body.
-    name: Required. Resource name for the Access Zone.  The `short_name`
-      component must begin with a letter and only include alphanumeric and
-      '_'. Format: `accessPolicies/{policy_id}/accessZones/{short_name}`
     updateMask: Required. Mask to control which fields get updated. Must be
       non-empty.
   """
 
-  accessZone = _messages.MessageField('AccessZone', 1)
+  accessLevel = _messages.MessageField('AccessLevel', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
 
@@ -390,6 +238,80 @@ class AccesscontextmanagerAccessPoliciesPatchRequest(_messages.Message):
 
   accessPolicy = _messages.MessageField('AccessPolicy', 1)
   name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class AccesscontextmanagerAccessPoliciesServicePerimetersCreateRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesServicePerimetersCreateRequest
+  object.
+
+  Fields:
+    parent: Required. Resource name for the access policy which owns this
+      Service Perimeter.  Format: `accessPolicies/{policy_id}`
+    servicePerimeter: A ServicePerimeter resource to be passed as the request
+      body.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  servicePerimeter = _messages.MessageField('ServicePerimeter', 2)
+
+
+class AccesscontextmanagerAccessPoliciesServicePerimetersDeleteRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesServicePerimetersDeleteRequest
+  object.
+
+  Fields:
+    name: Required. Resource name for the Service Perimeter.  Format:
+      `accessPolicies/{policy_id}/servicePerimeters/{service_perimeter_id}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesServicePerimetersGetRequest object.
+
+  Fields:
+    name: Required. Resource name for the Service Perimeter.  Format:
+      `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class AccesscontextmanagerAccessPoliciesServicePerimetersListRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesServicePerimetersListRequest object.
+
+  Fields:
+    pageSize: Number of Service Perimeters to include in the list. Default
+      100.
+    pageToken: Next page token for the next batch of Service Perimeter
+      instances. Defaults to the first page of results.
+    parent: Required. Resource name for the access policy to list Service
+      Perimeters from.  Format: `accessPolicies/{policy_id}`
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class AccesscontextmanagerAccessPoliciesServicePerimetersPatchRequest(_messages.Message):
+  r"""A AccesscontextmanagerAccessPoliciesServicePerimetersPatchRequest
+  object.
+
+  Fields:
+    name: Required. Resource name for the ServicePerimeter.  The `short_name`
+      component must begin with a letter and only include alphanumeric and
+      '_'. Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
+    servicePerimeter: A ServicePerimeter resource to be passed as the request
+      body.
+    updateMask: Required. Mask to control which fields get updated. Must be
+      non-empty.
+  """
+
+  name = _messages.StringField(1, required=True)
+  servicePerimeter = _messages.MessageField('ServicePerimeter', 2)
   updateMask = _messages.StringField(3)
 
 
@@ -576,17 +498,17 @@ class ListAccessPoliciesResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
-class ListAccessZonesResponse(_messages.Message):
-  r"""A response to `ListAccessZonesRequest`.
+class ListServicePerimetersResponse(_messages.Message):
+  r"""A response to `ListServicePerimetersRequest`.
 
   Fields:
-    accessZones: List of the Access Zone instances.
     nextPageToken: The pagination token to retrieve the next page of results.
       If the value is empty, no further results remain.
+    servicePerimeters: List of the Service Perimeter instances.
   """
 
-  accessZones = _messages.MessageField('AccessZone', 1, repeated=True)
-  nextPageToken = _messages.StringField(2)
+  nextPageToken = _messages.StringField(1)
+  servicePerimeters = _messages.MessageField('ServicePerimeter', 2, repeated=True)
 
 
 class Operation(_messages.Message):
@@ -736,6 +658,96 @@ class OsConstraint(_messages.Message):
   requireVerifiedChromeOs = _messages.BooleanField(3)
 
 
+class ServicePerimeter(_messages.Message):
+  r"""`ServicePerimeter` describes a set of GCP resources which can freely
+  import and export data amongst themselves, but not export outside of the
+  `ServicePerimeter`. If a request with a source within this
+  `ServicePerimeter` has a target outside of the `ServicePerimeter`, the
+  request will be blocked. Otherwise the request is allowed. There are two
+  types of Service Perimeter - Regular and Bridge. Regular Service Perimeters
+  cannot overlap, a single GCP project can only belong to a single regular
+  Service Perimeter. Service Perimeter Bridges can contain only GCP projects
+  as members, a single GCP project may belong to multiple Service Perimeter
+  Bridges.
+
+  Enums:
+    PerimeterTypeValueValuesEnum: Perimeter type indicator. A single project
+      is allowed to be a member of single regular perimeter, but multiple
+      service perimeter bridges. A project cannot be a included in a perimeter
+      bridge without being included in regular perimeter. For perimeter
+      bridges, the restricted service list as well as access level lists must
+      be empty.
+
+  Fields:
+    createTime: Output only. Time the `ServicePerimeter` was created in UTC.
+    description: Description of the `ServicePerimeter` and its use. Does not
+      affect behavior.
+    name: Required. Resource name for the ServicePerimeter.  The `short_name`
+      component must begin with a letter and only include alphanumeric and
+      '_'. Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
+    perimeterType: Perimeter type indicator. A single project is allowed to be
+      a member of single regular perimeter, but multiple service perimeter
+      bridges. A project cannot be a included in a perimeter bridge without
+      being included in regular perimeter. For perimeter bridges, the
+      restricted service list as well as access level lists must be empty.
+    status: Current ServicePerimeter configuration. Specifies sets of
+      resources, restricted services and access levels that determine
+      perimeter content and boundaries.
+    title: Human readable title. Must be unique within the Policy.
+    updateTime: Output only. Time the `ServicePerimeter` was updated in UTC.
+  """
+
+  class PerimeterTypeValueValuesEnum(_messages.Enum):
+    r"""Perimeter type indicator. A single project is allowed to be a member
+    of single regular perimeter, but multiple service perimeter bridges. A
+    project cannot be a included in a perimeter bridge without being included
+    in regular perimeter. For perimeter bridges, the restricted service list
+    as well as access level lists must be empty.
+
+    Values:
+      PERIMETER_TYPE_REGULAR: Regular Perimeter.
+      PERIMETER_TYPE_BRIDGE: Perimeter Bridge.
+    """
+    PERIMETER_TYPE_REGULAR = 0
+    PERIMETER_TYPE_BRIDGE = 1
+
+  createTime = _messages.StringField(1)
+  description = _messages.StringField(2)
+  name = _messages.StringField(3)
+  perimeterType = _messages.EnumField('PerimeterTypeValueValuesEnum', 4)
+  status = _messages.MessageField('ServicePerimeterConfig', 5)
+  title = _messages.StringField(6)
+  updateTime = _messages.StringField(7)
+
+
+class ServicePerimeterConfig(_messages.Message):
+  r"""`ServicePerimeterConfig` specifies a set of GCP resources that describe
+  specific Service Perimeter configuration.
+
+  Fields:
+    accessLevels: A list of `AccessLevel` resource names that allow resources
+      within the `ServicePerimeter` to be accessed from the internet.
+      `AccessLevels` listed must be in the same policy as this
+      `ServicePerimeter`. Referencing a nonexistent `AccessLevel` is a syntax
+      error. If no `AccessLevel` names are listed, resources within the
+      perimeter can only be accessed via GCP calls with request origins within
+      the perimeter. Example:
+      `"accessPolicies/MY_POLICY/accessLevels/MY_LEVEL"`. For Service
+      Perimeter Bridge, must be empty.
+    resources: A list of GCP resources that are inside of the service
+      perimeter. Currently only projects are allowed. Format:
+      `projects/{project_number}`
+    restrictedServices: GCP services that are subject to the Service Perimeter
+      restrictions. For example, if `storage.googleapis.com` is specified,
+      access to the storage buckets inside the perimeter must meet the
+      perimeter's access restrictions.
+  """
+
+  accessLevels = _messages.StringField(1, repeated=True)
+  resources = _messages.StringField(2, repeated=True)
+  restrictedServices = _messages.StringField(3, repeated=True)
+
+
 class StandardQueryParameters(_messages.Message):
   r"""Query parameters accepted by all methods.
 
@@ -802,37 +814,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.

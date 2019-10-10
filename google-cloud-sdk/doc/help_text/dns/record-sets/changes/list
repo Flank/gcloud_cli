@@ -67,7 +67,8 @@ EXAMPLES
         $ gcloud dns record-sets changes list --limit=10
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets changes list
         $ gcloud beta dns record-sets changes list
 

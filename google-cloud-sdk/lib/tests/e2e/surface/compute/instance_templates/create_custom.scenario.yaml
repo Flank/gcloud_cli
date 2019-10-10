@@ -1,0 +1,54 @@
+title: instance templates create custom gen scenario test
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instance-templates create $$instance-template$$ --custom-vm-type
+      n2 --custom-cpu 2 --custom-memory 2048MiB
+  - stderr: |
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+  - stdout: .*$$instance-template$$.*$
+- execute:
+  - command: compute instance-templates describe $$instance-template$$ --format="value(properties.machineType)"
+  - stdout: |
+      n2-custom-2-2048
+- execute:
+  - command: compute instance-templates delete $$instance-template$$ -q
+  - stderr: |
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+actions:
+- generate_resource_id:
+    reference: instance-template
+    prefix: gcloud-compute-instance-templates
+- execute_command:
+    command: compute instance-templates create $$instance-template$$ --custom-vm-type
+      n2 --custom-cpu 2 --custom-memory 2048MiB
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+    - expect_stdout:
+        matches: .*$$instance-template$$.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-templates describe $$instance-template$$ --format="value(properties.machineType)"
+    validation_only: true
+    events:
+    - expect_stdout: |
+        n2-custom-2-2048
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: compute instance-templates delete $$instance-template$$ -q
+    cleanup_for: instance-template
+    validation_only: true
+    events:
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-template$$\].
+    - expect_exit:
+        code: 0

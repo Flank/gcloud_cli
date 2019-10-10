@@ -11,7 +11,7 @@ gcloud compute scp \- copy files to and from Google Compute Engine virtual machi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute scp\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-compress\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute scp\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-compress\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-internal\-ip\fR\ |\ \fB\-\-tunnel\-through\-iap\fR] [\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR\ |\ \fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -139,7 +139,49 @@ $ gcloud config unset compute/zone
 Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-internal\-ip\fR
+Connect to instances using their internal IP addresses rather than their
+external IP addresses. Use this to connect from one instance to another on the
+same VPC network, over a VPN connection, or between two peered VPC networks.
+
+For this connection to work, you must configure your networks and firewall to
+allow SSH connections to the internal IP address of the instance to which you
+want to connect.
+
+To learn how to use this flag, see
+https://cloud.google.com/compute/docs/instances/connecting\-advanced#sshbetweeninstances.
+
+.TP 2m
+\fB\-\-tunnel\-through\-iap\fR
+Tunnel the ssh connection through the Cloud Identity\-Aware Proxy.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-ssh\-key\-expiration\fR=\fISSH_KEY_EXPIRATION\fR
+The time when the ssh key will be valid until, such as
+"2017\-08\-29T18:52:51.142Z." This is only valid if the instance is not using OS
+Login. See $ gcloud topic datetimes for information on time formats.
+
+.TP 2m
+\fB\-\-ssh\-key\-expire\-after\fR=\fISSH_KEY_EXPIRE_AFTER\fR
+The maximum length of time an SSH key is valid for once created and installed,
+e.g. 2m for 2 minutes. See $ gcloud topic datetimes for information on duration
+formats.
+
+
+.RE
 .RE
 .sp
 
@@ -182,6 +224,21 @@ To specify the project, zone, and recurse all together, run:
 .RS 2m
 $ gcloud compute scp \-\-project "my\-gcp\-project" \e
     \-\-zone "us\-east1\-b" \-\-recurse ~/foo\-folder/ gcp\-instance\-name:~/
+.RE
+
+You can limit the allowed time to ssh. For example, to allow a key to be used
+through 2019:
+
+.RS 2m
+$ gcloud compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe \-\-ssh\-key\-expiration "2020\-01\-01T00:00:00:00Z"
+.RE
+
+Or alternatively, allow access for the next two minutes:
+
+.RS 2m
+$ gcloud compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe \-\-ssh\-key\-expire\-after 2m
 .RE
 
 

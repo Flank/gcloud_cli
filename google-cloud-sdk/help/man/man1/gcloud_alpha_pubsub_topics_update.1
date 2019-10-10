@@ -5,23 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha pubsub topics update \- this feature is part of an invite\-only release of the Cloud Pub/Sub API
+gcloud alpha pubsub topics update \- updates an existing Cloud Pub/Sub topic
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha pubsub topics update\fR \fITOPIC\fR [\fB\-\-recompute\-message\-storage\-policy\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha pubsub topics update\fR \fITOPIC\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-message\-storage\-policy\-allowed\-regions\fR=[\fIREGION\fR,...]\ |\ \fB\-\-recompute\-message\-storage\-policy\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Updates an existing Cloud Pub/Sub topic. This feature is part of
-an invitation\-only release of the underlying Cloud Pub/Sub API. The command
-will generate errors unless you have access to this API. This restriction should
-be relaxed in the near future. Please contact cloud\-pubsub@google.com with any
-questions in the meantime.
+\fB(ALPHA)\fR Updates an existing Cloud Pub/Sub topic.
 
 
 
@@ -49,11 +45,6 @@ ID of the topic or fully qualified identifier for the topic.
 .SH "FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-recompute\-message\-storage\-policy\fR
-If given, Cloud Pub/Sub will recompute the regions where messages can be stored
-at rest based on your organization's policies.
-
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -91,6 +82,23 @@ $ gcloud alpha pubsub topics update \-\-clear\-labels \e
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
 List of label keys to remove. If a label does not exist it is silently ignored.
 
+.RE
+.sp
+.TP 2m
+
+Message storage policy options. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-message\-storage\-policy\-allowed\-regions\fR=[\fIREGION\fR,...]
+A list of one or more Cloud regions where messages are allowed to be stored at
+rest.
+
+.TP 2m
+\fB\-\-recompute\-message\-storage\-policy\fR
+If given, Cloud Pub/Sub will recompute the regions where messages can be stored
+at rest, based on your organization's "Resource Location Restriction" policy.
+
 
 .RE
 .RE
@@ -106,11 +114,54 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To update existing labels on a Cloud Pub/Sub topic, run:
+
+.RS 2m
+$ gcloud alpha pubsub topics update mytopic \e
+  \-\-update\-labels=KEY1=VAL1,KEY2=VAL2
+.RE
+
+To clear all labels on a Cloud Pub/Sub topic, run:
+
+.RS 2m
+$ gcloud alpha pubsub topics update mytopic \-\-clear\-labels
+.RE
+
+To remove an existing label on a Cloud Pub/Sub topic, run:
+
+.RS 2m
+$ gcloud alpha pubsub topics update mytopic \-\-remove\-labels=KEY1,KEY2
+.RE
+
+To update a Cloud Pub/Sub topic's message storage policy, run:
+
+.RS 2m
+$ gcloud alpha pubsub topics update mytopic \e
+  \-\-message\-storage\-policy\-allowed\-regions=some\-cloud\-region1,\e
+some\-cloud\-region2
+.RE
+
+To recompute a Cloud Pub/Sub topic's message storage policy based on your
+organization's "Resource Location Restriction" policy, run:
+
+.RS 2m
+$ gcloud alpha pubsub topics update mytopic \e
+  \-\-recompute\-message\-storage\-policy
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud pubsub topics update
+$ gcloud beta pubsub topics update
+.RE
 

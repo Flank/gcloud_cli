@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -243,6 +243,21 @@ class NetworksCreateAlphaTest(NetworksCreateBetaTest):
     self.make_requests.side_effect = iter([[expected]])
 
     self.Run('compute networks create my-network --multicast-mode zonal')
+    expected_insert = (self.compute.networks, 'Insert',
+                       self.messages.ComputeNetworksInsertRequest(
+                           project='my-project', network=expected))
+    self.CheckRequests([expected_insert])
+
+  def testCreateWithMtu(self):
+    expected = self.messages.Network(
+        name='my-network', autoCreateSubnetworks=True, mtu=1500)
+    expected.routingConfig = self.messages.NetworkRoutingConfig()
+    expected.routingConfig.routingMode = (
+        self.messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.REGIONAL)
+
+    self.make_requests.side_effect = iter([[expected]])
+
+    self.Run('compute networks create my-network --mtu 1500')
     expected_insert = (self.compute.networks, 'Insert',
                        self.messages.ComputeNetworksInsertRequest(
                            project='my-project', network=expected))

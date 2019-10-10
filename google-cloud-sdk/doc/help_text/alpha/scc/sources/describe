@@ -3,7 +3,7 @@ NAME
         name or source id
 
 SYNOPSIS
-    gcloud alpha scc sources describe ORGANIZATION
+    gcloud alpha scc sources describe [ORGANIZATION]
         (--source=SOURCE | --source-display-name=SOURCE_DISPLAY_NAME)
         [GCLOUD_WIDE_FLAG ...]
 
@@ -11,10 +11,10 @@ DESCRIPTION
     (ALPHA) Describe a source given its display name or source id.
 
 POSITIONAL ARGUMENTS
-     Organization resource - The organization to be used for the SCC command.
-     This represents a Cloud resource. This must be specified.
+     Organization resource - The organization to be used for the SCC (Security
+     Command Center) command. This represents a Cloud resource.
 
-       ORGANIZATION
+       [ORGANIZATION]
           ID of the organization or fully qualified identifier for the
           organization.
 
@@ -62,7 +62,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

@@ -7,10 +7,23 @@ SYNOPSIS
         --instance-filter=INSTANCE_FILTER [--apt-dist] [--async]
         [--description=DESCRIPTION] [--dry-run] [--duration=DURATION]
         [--reboot-config=REBOOT_CONFIG] [--retry]
+        [--post-patch-linux-executable=POST_PATCH_LINUX_EXECUTABLE
+          --post-patch-linux-success-codes=[POST_PATCH_LINUX_SUCCESS_CODES,
+          ...]]
+        [--post-patch-windows-executable=POST_PATCH_WINDOWS_EXECUTABLE
+          --post-patch-windows-success-codes=[POST_PATCH_WINDOWS_SUCCESS_CODES,
+          ...]]
+        [--pre-patch-linux-executable=PRE_PATCH_LINUX_EXECUTABLE
+          --pre-patch-linux-success-codes=[PRE_PATCH_LINUX_SUCCESS_CODES,...]]
+        [--pre-patch-windows-executable=PRE_PATCH_WINDOWS_EXECUTABLE
+          --pre-patch-windows-success-codes=[PRE_PATCH_WINDOWS_SUCCESS_CODES,
+          ...]]
         [--windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
           --windows-excludes=[WINDOWS_EXCLUDES,...]]
         [--yum-excludes=[YUM_EXCLUDES,...] --yum-minimal --yum-security]
-        [GCLOUD_WIDE_FLAG ...]
+        [--zypper-categories=[ZYPPER_CATEGORIES,...]
+          --zypper-severities=[ZYPPER_SEVERITIES,...]
+          --zypper-with-optional --zypper-with-update] [GCLOUD_WIDE_FLAG ...]
 
 REQUIRED FLAGS
      --instance-filter=INSTANCE_FILTER
@@ -22,53 +35,126 @@ OPTIONAL FLAGS
      Settings for machines running Apt:
 
        --apt-dist
-          If specified, machines running Apt will patch using the command
-          apt-get dist-upgrade; otherwise the patch will run apt-get upgrade.
+          If specified, machines running Apt use the apt-get dist-upgrade
+          command; otherwise the apt-get upgrade command is used.
 
      --async
-        Display information about the patch job that was started without
-        waiting for it to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --description=DESCRIPTION
         Textual description of the patch job.
 
      --dry-run
         Whether to execute this patch job as a dry run. If this patch job is a
-        dry run, instances will be contacted, but they will do nothing.
+        dry run, instances are contacted, but the patch is not run.
 
      --duration=DURATION
         Total duration in which the patch job must complete. If the patch does
-        not complete in this time, it will time out, and while some instances
-        may still be running the patch, they will not continue to work after
-        they complete their current step. See $ gcloud topic datetimes for
+        not complete in this time, the process times out. While some instances
+        might still be running the patch, they will not continue to work after
+        completing the current step. See $ gcloud topic datetimes for
         information on specifying absolute time durations.
 
-        If unspecified, the job will stay active until all instances complete
-        the patch.
+        If unspecified, the job stays active until all instances complete the
+        patch.
 
      --reboot-config=REBOOT_CONFIG
         Post-patch reboot settings. REBOOT_CONFIG must be one of:
 
          always
-            Always reboot the machine after the update has completed.
+            Always reboot the machine after the update completes.
          default
-            The agent will decide if a reboot is necessary by checking well
-            known signals such as registry keys or '/var/run/reboot-required'.
+            The agent decides if a reboot is necessary by checking signals such
+            as registry keys or '/var/run/reboot-required'.
          never
-            Never reboot the machine after the update has completed.
+            Never reboot the machine after the update completes.
 
      --retry
-        Whether to attempt to retry during the duration window if patching
-        fails. If omitted, the agent will use its default retry strategy.
+        Specifies whether to attempt to retry, within the duration window, if
+        patching initially fails. If omitted, the agent uses its default retry
+        strategy.
+
+     Post-patch step settings for Linux machines:
+
+       --post-patch-linux-executable=POST_PATCH_LINUX_EXECUTABLE
+          A set of commands to run on a Linux machine after an OS patch
+          completes. Commands must be supplied in a file. If the file contains
+          a shell script, include the shebang line.
+
+          The path to the file must be supplied in one of the following
+          formats:
+
+          An absolute path of the file on the local filesystem.
+
+          A URI for a Google Cloud Storage object with a generation number.
+
+       --post-patch-linux-success-codes=[POST_PATCH_LINUX_SUCCESS_CODES,...]
+          Additional exit codes that the executable can return to indicate a
+          successful run. The default exit code for success is 0.
+
+     Post-patch step settings for Windows machines:
+
+       --post-patch-windows-executable=POST_PATCH_WINDOWS_EXECUTABLE
+          A set of commands to run on a Windows machine after an OS patch
+          completes. Commands must be supplied in a file. If the file contains
+          a PowerShell script, include the .ps1 file extension.
+
+          The path to the file must be supplied in one of the following
+          formats:
+
+          An absolute path of the file on the local filesystem.
+
+          A URI for a Google Cloud Storage object with a generation number.
+
+       --post-patch-windows-success-codes=[POST_PATCH_WINDOWS_SUCCESS_CODES,...]
+          Additional exit codes that the executable can return to indicate a
+          successful run. The default exit code for success is 0.
+
+     Pre-patch step settings for Linux machines:
+
+       --pre-patch-linux-executable=PRE_PATCH_LINUX_EXECUTABLE
+          A set of commands to run on a Linux machine before an OS patch
+          begins. Commands must be supplied in a file. If the file contains a
+          shell script, include the shebang line.
+
+          The path to the file must be supplied in one of the following
+          formats:
+
+          An absolute path of the file on the local filesystem.
+
+          A URI for a Google Cloud Storage object with a generation number.
+
+       --pre-patch-linux-success-codes=[PRE_PATCH_LINUX_SUCCESS_CODES,...]
+          Additional exit codes that the executable can return to indicate a
+          successful run. The default exit code for success is 0.
+
+     Pre-patch step settings for Windows machines:
+
+       --pre-patch-windows-executable=PRE_PATCH_WINDOWS_EXECUTABLE
+          A set of commands to run on a Windows machine before an OS patch
+          begins. Commands must be supplied in a file. If the file contains a
+          PowerShell script, include the .ps1 file extension.
+
+          The path to the file must be supplied in one of the following
+          formats:
+
+          An absolute path of the file on the local filesystem.
+
+          A URI for a Google Cloud Storage object with a generation number.
+
+       --pre-patch-windows-success-codes=[PRE_PATCH_WINDOWS_SUCCESS_CODES,...]
+          Additional exit codes that the executable can return to indicate a
+          successful run. The default exit code for success is 0.
 
      Settings for machines running Windows:
 
        --windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
           List of classifications to use to restrict the Windows update. Only
-          patches of the given classifications will be applied. If omitted, a
-          default Windows update will be performed. For more information on
-          classifications, see: https://support.microsoft.com/en-us/help/824684
-
+          patches of the given classifications are applied. If omitted, a
+          default Windows update is performed. For more information on
+          classifications, see:
+          https://support.microsoft.com/en-us/help/824684.
           WINDOWS_CLASSIFICATIONS must be one of: critical, security,
           definition, driver, feature-pack, service-pack, tool, update-rollup,
           update.
@@ -80,16 +166,36 @@ OPTIONAL FLAGS
 
        --yum-excludes=[YUM_EXCLUDES,...]
           Optional list of packages to exclude from updating. If this argument
-          is specified, machines running Yum will exclude the given list of
-          packages using the Yum --exclude flag.
+          is specified, machines running Yum exclude the given list of packages
+          using the Yum --exclude flag.
 
        --yum-minimal
-          If specified, machines running Yum will patch using the command yum
-          update-minimal; otherwise the patch will run yum-update.
+          If specified, machines running Yum use the command yum
+          update-minimal; otherwise the patch uses yum-update.
 
        --yum-security
-          If specified, machines running Yum will append the --security flag to
-          the patch command.
+          If specified, machines running Yum append the --security flag to the
+          patch command.
+
+     Settings for machines running Zypper:
+
+       --zypper-categories=[ZYPPER_CATEGORIES,...]
+          If specified, machines running Zypper install only patches with the
+          specified categories. Categories include security, recommended, and
+          feature.
+
+       --zypper-severities=[ZYPPER_SEVERITIES,...]
+          If specified, machines running Zypper install only patch with the
+          specified severities. Severities include critical, important,
+          moderate, and low.
+
+       --zypper-with-optional
+          If specified, machines running Zypper add the --with-optional flag to
+          zypper patch.
+
+       --zypper-with-update
+          If specified, machines running Zypper add the --with-update flag to
+          zypper patch.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -128,10 +234,20 @@ EXAMPLES
         --instance-filter="name=my-instance" \
         --windows-classifications=SECURITY,CRITICAL
 
+    To patch all instances in the current project and specify scripts to run
+    pre-patch and post-patch, run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter="" \
+        --pre-patch-linux-executable="/bin/my-script" \
+        --pre-patch-linux-success-codes=0,200 \
+        --pre-patch-windows-executable="C:\\Users\\user\\test-script.ps1" \
+        --post-patch-linux-executable="gs://my-bucket/my-linux-script#12345" \
+        --post-patch-windows-executable="gs://my-bucket/my-windows-script#67890"
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

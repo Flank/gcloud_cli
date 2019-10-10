@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,10 +98,10 @@ class FailoverTestGA(redis_test_base.InstancesUnitTestBase):
 
     if is_async:
       self.AssertErrContains('Check operation [{}] for status.'.format(
-          self.wait_operation_id))
+          self.wait_operation_relative_name))
     else:
       self.AssertErrContains('Waiting for operation [{}] to complete'.format(
-          self.wait_operation_id))
+          self.wait_operation_relative_name))
 
 
 class FailoverTestBeta(FailoverTestGA):

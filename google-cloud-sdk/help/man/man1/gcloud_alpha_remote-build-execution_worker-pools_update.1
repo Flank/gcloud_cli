@@ -11,7 +11,7 @@ gcloud alpha remote\-build\-execution worker\-pools update \- update a Remote Bu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha remote\-build\-execution worker\-pools update\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-reserved\fR] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha remote\-build\-execution worker\-pools update\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR] [\fB\-\-reserved\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR] [\fB\-\-clear\-accelerator\-config\fR\ |\ \fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -57,8 +57,7 @@ Instance name.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
@@ -77,15 +76,106 @@ Minimum CPU platform for the workers. For more information see
 https://cloud.google.com/compute/docs/cpu\-platforms.
 
 .TP 2m
+\fB\-\-network\-access\fR=\fINETWORK_ACCESS\fR
+Level of network access available to the pool. \fINETWORK_ACCESS\fR must be one
+of:
+
+.RS 2m
+.TP 2m
+\fBprivate\fR
+Workers can only connect to Google APIs and services.
+
+.TP 2m
+\fBpublic\fR
+Workers can connect to the public internet.
+
+.TP 2m
+\fBrestricted\-private\fR
+Workers can only connect to Google APIs that are reachable through
+\f5restricted.googleapis.com\fR (\f5199.36.153.4/30\fR).
+
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-reserved\fR
 Determines the type of VM to use. If set then reserved VMs are used, otherwise
 preemptable VMs are used.
 
 .TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
 \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR
 Number of workers that should be in the worker pool.
 
+.TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-accelerator\-config\fR
+Remove all accelerators from the VMs in the worker pool.
+
+.TP 2m
+
+Either both or none of accelerator\-count and accelerator\-type should be set.
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR
+Number of the guest accelerator cards attached to each VM in the pool. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR
+Type of accelerator to attach to each VM in the pool, e.g. 'nvidia\-tesla\-k80'
+for nVidia Tesla K80. Run \f5gcloud compute accelerator\-types list\fR to learn
+about all available accelerator types. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha remote\-build\-execution worker\-pools update \e
+  \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha remote\-build\-execution worker\-pools update \e
+  \-\-clear\-labels \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+
+
+.RE
 .RE
 .sp
 
@@ -132,7 +222,6 @@ $ gcloud alpha remote\-build\-execution worker\-pools update pool1 \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

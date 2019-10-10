@@ -9,7 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute external-vpn-gateways update updates labels
-    for a Google Compute Engine External VPN gateway. For example:
+    for a Google Compute Engine external VPN gateway. For example:
 
         $ gcloud alpha compute external-vpn-gateways update example-gateway \
           --update-labels=k0=value1,k1=value2 --remove-labels=k3
@@ -67,12 +67,19 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To update labels for an external VPN gateway, run:
+
+        $ gcloud alpha compute external-vpn-gateways update \
+          my-external-gateway                 \
+          --update-labels=k0=value1,k1=value2
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud compute external-vpn-gateways update
         $ gcloud beta compute external-vpn-gateways update
 

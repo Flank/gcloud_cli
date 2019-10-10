@@ -192,8 +192,8 @@ OPTIONAL FLAGS
 
      --storage-location=LOCATION
         Google Cloud Storage location, either regional or multi-regional, where
-        image content is to be stored. If absent, a nearby regional or
-        multi-regional location is chosen automatically.
+        image content is to be stored. If absent, the multi-region location
+        closest to the source is chosen automatically.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the image. The arguments in this group can be used to
@@ -223,9 +223,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute images create
         $ gcloud beta compute images create

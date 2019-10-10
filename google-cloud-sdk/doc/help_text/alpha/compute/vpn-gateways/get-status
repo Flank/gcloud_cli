@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute vpn-gateways get-status - get status of a Google
-        Compute Engine VPN Gateway
+        Compute Engine Highly Available VPN Gateway
 
 SYNOPSIS
     gcloud alpha compute vpn-gateways get-status NAME [--region=REGION]
@@ -46,12 +46,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To get status of a VPN gateway, run:
+
+        $ gcloud alpha compute vpn-gateways get-status my-gateway \
+          --region=us-central1
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud compute vpn-gateways get-status
         $ gcloud beta compute vpn-gateways get-status
 

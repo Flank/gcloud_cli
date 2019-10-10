@@ -37,6 +37,10 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Add IAM policy binding to a Google Compute Engine reservation.
+
+.TP 2m
 \fBcreate\fR
 \fB(ALPHA)\fR Create a Compute Engine reservation.
 
@@ -49,8 +53,21 @@ help\fR for details.
 \fB(ALPHA)\fR Show details about a Compute Engine reservation.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+\fB(ALPHA)\fR Get the IAM policy for a Google Compute Engine reservation.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List Google Compute Engine reservations.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Remove IAM policy binding from a Google Compute Engine
+reservation.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(ALPHA)\fR Set the IAM policy for a Google Compute Engine reservation.
 
 .TP 2m
 \fBupdate\fR
@@ -64,11 +81,11 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute reservations
 $ gcloud beta compute reservations
 .RE
 

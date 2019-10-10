@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import logging
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -179,13 +178,13 @@ class FirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputContains("ports:\n  - '443'", reset=False)
     self.AssertNewOutputNotContains('disabled: false')
 
-  @test_case.Filters.skip('Failing', 'b/131857233')
   def testFirewallLogging(self):
     self._TestCreateLoggingFirewall()
 
   def _TestCreateLoggingFirewall(self):
     # Create one egress deny firewall.
     self.Run('compute firewall-rules create {0} --action deny '
+             '--network defaultfwrules '
              '--rules tcp:9000,udp:1000-2000,icmp '
              '--direction out --destination-ranges 10.128.1.0/24 '
              '--priority 900 --enable-logging'.format(

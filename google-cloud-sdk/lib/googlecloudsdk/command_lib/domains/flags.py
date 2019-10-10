@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,12 +89,8 @@ def AddValidateOnlyFlagToParser(parser, verb):
       action='store_true').AddToParser(parser)
 
 
-def AddAsyncFlagToParser(parser, verb):
-  base.Argument(
-      '--async',
-      help='Don\'t wait for {} operation to finish.'.format(verb),
-      default=False,
-      action='store_true').AddToParser(parser)
+def AddAsyncFlagToParser(parser):
+  base.ASYNC_FLAG.AddToParser(parser)
 
 
 def _GetWhoisPrivacyEnum():

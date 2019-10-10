@@ -8,12 +8,11 @@ summary:
   - stderr: |
       Create request issued for: [reserved_pool]
   - progress_tracker:
-    - message: Waiting for operation [create_operation_id] to complete
+    - message: Waiting for operation [projects/fake-project/operations/create_operation_id]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created workerpool [reserved_pool].
-# This summary is generated automatically on update and should not be edited.
-
 actions:
 - execute_command:
     command: |
@@ -65,14 +64,16 @@ actions:
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
-                  "reserved": "true"
+                  "reserved": "true",
+                  "networkAccess": "public"
                 },
                 "workerCount": "2",
                 "state": "RUNNING"
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [create_operation_id] to complete
+        message: Waiting for operation [projects/fake-project/operations/create_operation_id]
+          to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -94,7 +95,8 @@ actions:
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
-                  "reserved": "true"
+                  "reserved": "true",
+                  "networkAccess": "public"
                 },
                 "workerCount": "2",
                 "state": "RUNNING"

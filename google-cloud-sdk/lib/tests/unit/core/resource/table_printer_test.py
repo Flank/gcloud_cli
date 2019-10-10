@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1844,6 +1844,68 @@ class TablePrinterFormatSortTest(resource_printer_test_base.Base):
         NAME                      KIND
         my-instance-azzzzzzzz-8   compute#metadata.0
         my-instance-azzzzzzzzz-9  compute#metadata.2
+        """))
+
+  def testNumericSortOrder(self):
+    printer = resource_printer.Printer('table(size:sort=1)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        SIZE
+        0
+        2
+        11
+        33
+        """))
+
+  def testNumericSortOrderReverse(self):
+    printer = resource_printer.Printer('table(size:sort=1:reverse)')
+    for resource in self.CreateResourceList(4):
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        SIZE
+        33
+        11
+        2
+        0
+        """))
+
+  def testNumericSortMultipleStreamedResourceCase(self):
+    printer = resource_printer.Printer(
+        'table(name:label=MONIKER, kind, size:sort=1, '
+        'networkInterfaces[0].networkIP:label=IP)')
+    for index, resource in enumerate(self.CreateResourceList(4)):
+      resource.update({'num': 11 - index})
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        MONIKER             KIND              SIZE  IP
+        my-instance-a-0     compute#instance  0     10.240.150.0
+        my-instance-azz-2   compute#instance  2     10.240.150.2
+        my-instance-az-1    compute#instance  11    10.240.150.1
+        my-instance-azzz-3  compute#instance  33    10.240.150.3
+        """))
+
+  def testNumericSortReverseMultipleStreamedResourceCase(self):
+    printer = resource_printer.Printer(
+        'table(name:label=MONIKER, kind, size:sort=1:reverse, '
+        'networkInterfaces[0].networkIP:label=IP)')
+    for index, resource in enumerate(self.CreateResourceList(4)):
+      resource.update({'num': 11 - index})
+      printer.AddRecord(resource)
+    printer.Finish()
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        MONIKER             KIND              SIZE  IP
+        my-instance-azzz-3  compute#instance  33    10.240.150.3
+        my-instance-az-1    compute#instance  11    10.240.150.1
+        my-instance-azz-2   compute#instance  2     10.240.150.2
+        my-instance-a-0     compute#instance  0     10.240.150.0
         """))
 
   def testMultipleStreamedResourceCaseBoxPageFlagSmall(self):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,8 +44,7 @@ class Update(base.UpdateCommand):
     cls.INTERCONNECT_ATTACHMENT_ARG = (
         attachment_flags.InterconnectAttachmentArgument())
     cls.INTERCONNECT_ATTACHMENT_ARG.AddArgument(parser, operation_type='patch')
-    attachment_flags.AddBandwidth(
-        parser, required=False, track=cls._release_track)
+    attachment_flags.AddBandwidth(parser, required=False)
     attachment_flags.AddPartnerMetadata(parser, required=False)
     attachment_flags.AddDescription(parser)
     labels_util.AddUpdateLabelsFlags(parser)
@@ -96,8 +95,7 @@ class UpdateGa(Update):
     cls.INTERCONNECT_ATTACHMENT_ARG = (
         attachment_flags.InterconnectAttachmentArgument())
     cls.INTERCONNECT_ATTACHMENT_ARG.AddArgument(parser, operation_type='patch')
-    attachment_flags.AddBandwidth(
-        parser, required=False, track=cls._release_track)
+    attachment_flags.AddBandwidth(parser, required=False)
     attachment_flags.AddPartnerMetadata(parser, required=False)
     attachment_flags.AddDescription(parser)
 

@@ -61,11 +61,8 @@ OPTIONAL FLAGS
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
         independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
+        Compute Engine zones inside the region. Overrides the default
+        dataproc/region property value for this command invocation.
 
      --start-after=STEP_ID,[STEP_ID,...]
         (Optional) List of step IDs to start this job after.
@@ -87,9 +84,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud dataproc workflow-templates add-job spark
         $ gcloud beta dataproc workflow-templates add-job spark

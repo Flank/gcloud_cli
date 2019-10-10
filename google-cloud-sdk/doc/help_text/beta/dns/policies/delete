@@ -7,6 +7,11 @@ SYNOPSIS
 DESCRIPTION
     (BETA) Deletes a Cloud DNS policy.
 
+EXAMPLES
+    To delete a policy, run:
+
+        $ gcloud beta dns policies delete mypolicy
+
 POSITIONAL ARGUMENTS
      Policy resource - The name of the policy you want to delete. This
      represents a Cloud resource. (NOTE) Some attributes are not given
@@ -30,5 +35,9 @@ API REFERENCE
     can be found at: https://developers.google.com/cloud-dns
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud dns policies delete
+        $ gcloud alpha dns policies delete
 

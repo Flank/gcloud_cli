@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@ class MachineTypesDescribeTest(test_base.BaseTest,
             guestCpus: 1
             memoryMb: 3840
             name: n1-standard-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
   def testUriCase(self):
@@ -67,7 +67,7 @@ class MachineTypesDescribeTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        compute machine-types describe https://www.googleapis.com/compute/v1/projects/project-1/zones/zone-1/machineTypes/n1-standard-1
+        compute machine-types describe https://compute.googleapis.com/compute/v1/projects/project-1/zones/zone-1/machineTypes/n1-standard-1
         """)
 
     self.CheckRequests(

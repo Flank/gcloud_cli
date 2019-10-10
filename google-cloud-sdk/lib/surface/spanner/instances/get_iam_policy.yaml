@@ -1,4 +1,4 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [ALPHA, BETA, GA]
 
   help_text:
     brief: Get the IAM policy for a Cloud Spanner instance.
@@ -16,6 +16,8 @@
 
   request:
     collection: spanner.projects.instances
+    modify_request_hooks:
+    - googlecloudsdk.command_lib.iam.hooks:UseMaxRequestedPolicyVersion:api_field=getIamPolicyRequest.options.requestedPolicyVersion
 
   arguments:
     resource:

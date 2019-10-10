@@ -6,65 +6,65 @@ summary:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --enable-automatic-punctuation --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --enable-speaker-diarization --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --enable-speaker-diarization --diarization-speaker-count 4 --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --max-alternatives 10 --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --filter-profanity --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --enable-word-confidence --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --audio-tracks 3,4 --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
@@ -75,14 +75,15 @@ summary:
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
       --hints "surface spec,scenario test" --async
   - stderr: |
-      Check operation [us-east1.1234] for status.
+      Check operation [projects/123/locations/us-east1/operations/1234] for status.
   - stdout: |
-      name: us-east1.1234
+      name: projects/123/locations/us-east1/operations/1234
 - execute:
   - command: |
       ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
   - progress_tracker:
-    - message: Waiting for operation [us-east1.1234] to complete
+    - message: Waiting for operation [projects/123/locations/us-east1/operations/1234]
+        to complete
     - status: SUCCESS
   - stdout: |
       '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
@@ -112,11 +113,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -144,11 +145,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -176,11 +177,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -209,11 +210,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -242,11 +243,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -274,11 +275,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -306,11 +307,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -341,11 +342,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -385,11 +386,11 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - expect_stderr: |
-        Check operation [us-east1.1234] for status.
+        Check operation [projects/123/locations/us-east1/operations/1234] for status.
     - expect_stdout: |
-        name: us-east1.1234
+        name: projects/123/locations/us-east1/operations/1234
     - expect_exit:
         code: 0
 - execute_command:
@@ -418,10 +419,10 @@ actions:
         return_response:
           headers:
             status: '200'
-          body: {name: us-east1.1234}
+          body: {name: projects/123/locations/us-east1/operations/1234}
     - api_call:
         expect_request:
-          uri: https://videointelligence.googleapis.com/v1/operations/us-east1.1234?alt=json
+          uri: https://videointelligence.googleapis.com/v1/projects/123/locations/us-east1/operations/1234?alt=json
           method: GET
           headers: {}
           body: null
@@ -430,7 +431,7 @@ actions:
             status: '200'
           body: |-
             {
-              "name": "us-east1.1234",
+              "name": "projects/123/locations/us-east1/operations/1234",
               "metadata": {
               "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress",
               "annotationProgress": [
@@ -450,7 +451,8 @@ actions:
             }
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [us-east1.1234] to complete
+        message: Waiting for operation [projects/123/locations/us-east1/operations/1234]
+          to complete
         status: SUCCESS
     - expect_stdout: |
         '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,14 @@ def _Args(parser, release_track, supports_force_create=False,
     flags.MakeForceCreateArg().AddToParser(parser)
 
   if supports_storage_location:
-    compute_flags.AddStorageLocationFlag(parser, 'image')
+    parser.add_argument(
+        '--storage-location',
+        metavar='LOCATION',
+        help="""\
+      Google Cloud Storage location, either regional or multi-regional, where
+      image content is to be stored. If absent, the multi-region location
+      closest to the source is chosen automatically.
+      """)
 
   if supports_shielded_instance_initial_state:
     compute_flags.AddShieldedInstanceInitialStateKeyArg(parser)
@@ -134,7 +141,7 @@ class Create(base.CreateCommand):
           csek_keys, source_image_ref, client.apitools_client)
 
     if args.source_uri:
-      source_uri = str(resources.REGISTRY.Parse(args.source_uri))
+      source_uri = six.text_type(resources.REGISTRY.Parse(args.source_uri))
       image.rawDisk = messages.Image.RawDiskValue(source=source_uri)
     elif args.source_disk:
       source_disk_ref = flags.SOURCE_DISK_ARG.ResolveAsResource(
@@ -204,8 +211,14 @@ class CreateBeta(Create):
 
   @classmethod
   def Args(cls, parser):
-    _Args(parser, cls.ReleaseTrack(), supports_force_create=True)
+    _Args(parser,
+          cls.ReleaseTrack(),
+          supports_force_create=True,
+          supports_storage_location=True)
     parser.display_info.AddCacheUpdater(flags.ImagesCompleter)
+
+  def Run(self, args):
+    return self._Run(args, supports_storage_location=True)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)

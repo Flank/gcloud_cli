@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 import copy
 
-from apitools.base.protorpclite import protojson
+from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -45,6 +45,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
 
   def test_create_csr_trigger_dockerfile(self):
     trigger = self.msg.BuildTrigger(
+        description='foo',
         triggerTemplate=self.msg.RepoSource(
             repoName='test',
             branchName='.*',
@@ -68,8 +69,8 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
         'alpha', 'builds', 'triggers', 'create', 'cloud-source-repositories',
-        '--repo=projects/foo/repos/test', '--branch_pattern=.*',
-        '--dockerfile=Dockerfile'
+        '--description=foo', '--repo=projects/foo/repos/test',
+        '--branch-pattern=.*', '--dockerfile=Dockerfile'
     ])
     self.assertEqual(want, resp)
 
@@ -80,9 +81,13 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
             branchName='.*',
         ),
         filename='cloudbuild.yaml',
+        substitutions=encoding.PyValueToMessage(
+            self.msg.BuildTrigger.SubstitutionsValue,
+            {'_FAVORITE_COLOR': 'blue'}),
     )
+
     path = self.Touch(
-        '.', 'trigger.json', contents=protojson.encode_message(trigger))
+        '.', 'trigger.json', contents=encoding.MessageToJson(trigger))
 
     want = copy.deepcopy(trigger)
     want.id = 'id'
@@ -94,7 +99,7 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
         'alpha', 'builds', 'triggers', 'create', 'cloud-source-repositories',
-        '--trigger_config', path
+        '--trigger-config', path
     ])
     self.assertEqual(want, resp)
 
@@ -124,9 +129,9 @@ class CreateTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
     properties.VALUES.core.user_output_enabled.Set(False)
     resp = self.Run([
         'alpha', 'builds', 'triggers', 'create', 'cloud-source-repositories',
-        '--repo=test', '--tag_pattern=.*', '--build_config=cloudbuild.yaml',
-        '--substitutions=_FAVORITE_COLOR=blue', '--included_files=src/**',
-        '--ignored_files=docs/**'
+        '--repo=test', '--tag-pattern=.*', '--build-config=cloudbuild.yaml',
+        '--substitutions=_FAVORITE_COLOR=blue', '--included-files=src/**',
+        '--ignored-files=docs/**'
     ])
     self.assertEqual(want, resp)
 

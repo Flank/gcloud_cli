@@ -1,0 +1,229 @@
+
+.TH "GCLOUD_ALPHA_DATA\-CATALOG_CRAWLERS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha data\-catalog crawlers update \- update a Cloud Data Catalog crawler
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha data\-catalog crawlers update\fR \fICRAWLER\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-add\-bundle\-specs\fR=[\fIPATTERN\fR,...]\ \fB\-\-clear\-bundle\-specs\fR\ |\ \fB\-\-remove\-bundle\-specs\fR=[\fIPATTERN\fR,...]] [\fB\-\-crawl\-scope\fR=\fICRAWL_SCOPE\fR\ \fB\-\-add\-buckets\fR=[\fIBUCKET\fR,...]\ \fB\-\-clear\-buckets\fR\ |\ \fB\-\-remove\-buckets\fR=[\fIBUCKET\fR,...]] [\fB\-\-run\-option\fR=\fIRUN_OPTION\fR\ \fB\-\-run\-schedule\fR=\fIRUN_SCHEDULE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a Cloud Data Catalog crawler.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Crawler resource \- The crawler to update. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [crawler] on
+the command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICRAWLER\fR
+ID of the crawler or fully qualified identifier for the crawler.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Textual description of the crawler.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Human\-readable display name for the crawler.
+
+.TP 2m
+
+Update bundling specifications. Bundling specifications direct the crawler to
+bundle files into filesets based on the patterns provided:
+
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-bundle\-specs\fR=[\fIPATTERN\fR,...]
+A list of bundling specifications to add to the existing ones.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-bundle\-specs\fR
+If specified, clear the existing list of bundling specifications.
+
+.TP 2m
+\fB\-\-remove\-bundle\-specs\fR=[\fIPATTERN\fR,...]
+A list of bundling specifications to remove from the existing ones.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Arguments to configure the crawler scope:
+
+.RS 2m
+.TP 2m
+\fB\-\-crawl\-scope\fR=\fICRAWL_SCOPE\fR
+Scope of the crawler. \fICRAWL_SCOPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBbucket\fR
+Directs the crawler to crawl specific buckets within the project that owns the
+crawler.
+.TP 2m
+\fBorganization\fR
+Directs the crawler to crawl all the buckets of the projects in the organization
+that owns the crawler.
+.TP 2m
+\fBproject\fR
+Directs the crawler to crawl all the buckets of the project that owns the
+crawler.
+.RE
+.sp
+
+
+.TP 2m
+
+Update buckets to crawl. These arguments can be provided only if the crawler
+will be bucket\-scoped after updating.
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-buckets\fR=[\fIBUCKET\fR,...]
+List of buckets to add to the crawl scope.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-buckets\fR
+If specified, clear the existing list of buckets in the crawl scope.
+
+.TP 2m
+\fB\-\-remove\-buckets\fR=[\fIBUCKET\fR,...]
+List of buckets to remove from the crawl scope.
+
+.RE
+.RE
+.RE
+.sp
+.TP 2m
+
+Arguments to configure the crawler run scheduling:
+
+.RS 2m
+.TP 2m
+\fB\-\-run\-option\fR=\fIRUN_OPTION\fR
+Run option of the crawler. \fIRUN_OPTION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBmanual\fR
+The crawler run will have to be triggered manually.
+.TP 2m
+\fBscheduled\fR
+The crawler will run automatically on a schedule.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-run\-schedule\fR=\fIRUN_SCHEDULE\fR
+Schedule for the crawler run. This argument can be provided only if the crawler
+run option will be scheduled after updating. \fIRUN_SCHEDULE\fR must be one of:
+\fBdaily\fR, \fBweekly\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1alpha3\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+Update the display name of a crawler:
+
+.RS 2m
+$ gcloud alpha data\-catalog crawlers update crawler1 \e
+    \-\-display\-name="my\-crawler"
+.RE
+
+Add buckets to a BUCKET\-scoped crawler:
+
+.RS 2m
+$ gcloud alpha data\-catalog crawlers update crawler1 \e
+    \-\-add\-buckets=bucket1,bucket2
+.RE
+
+Remove buckets from a BUCKET\-scoped crawler:
+
+.RS 2m
+$ gcloud alpha data\-catalog crawlers update crawler1 \e
+    \-\-remove\-buckets=bucket1,bucket2
+.RE
+
+Overwrite buckets in a BUCKET\-scoped crawler with bucket1, bucket2:
+
+.RS 2m
+$ gcloud alpha data\-catalog crawlers update crawler1 \e
+    \-\-clear\-buckets \-\-add\-buckets=bucker1,bucket2
+.RE
+
+Change the schedule of a manual crawler to run daily:
+
+.RS 2m
+$ gcloud alpha data\-catalog crawlers update crawler1 \e
+    \-\-run\-option=SCHEDULED \-\-run\-schedule=DAILY
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

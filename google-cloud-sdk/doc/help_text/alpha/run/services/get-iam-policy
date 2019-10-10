@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha run services get-iam-policy (SERVICE : --region=REGION)
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+        [--platform=PLATFORM] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command gets the IAM policy for a service. If formatted as
@@ -29,7 +29,23 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --region=REGION
-          The Cloud Run region
+          The Cloud Run region.
+
+FLAGS
+     --platform=PLATFORM
+        Target platform for running commands. PLATFORM must be one of:
+
+         gke
+            Cloud Run on Google Kubernetes Engine. This platform is not
+            supported by this command.
+
+         kubernetes
+            Use a Knative-compatible kubernetes cluster. This platform is not
+            supported by this command.
+
+         managed
+            Fully managed version of Cloud Run. Use with the --region flag or
+            set the [run/region] property to specify a Cloud Run region.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -77,9 +93,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
 
         $ gcloud beta run services get-iam-policy
 

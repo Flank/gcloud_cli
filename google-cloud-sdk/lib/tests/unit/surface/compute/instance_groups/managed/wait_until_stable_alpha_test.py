@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -110,51 +110,6 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
         --zone central2-a
         --timeout 1
         """)
-
-  def testPendingActions(self):
-    self.SelectApi(API_VERSION)
-    self.make_requests.side_effect = iter([
-        [
-            test_resources.MakeInstanceGroupManagersWithActions(
-                API_VERSION, 0, pending_actions_count=10)
-        ],
-        [
-            test_resources.MakeInstanceGroupManagersWithActions(
-                API_VERSION, 1, pending_actions_count=10)
-        ],
-        [
-            test_resources.MakeInstanceGroupManagersWithActions(
-                API_VERSION, 1, pending_actions_count=5)
-        ],
-        [
-            test_resources.MakeInstanceGroupManagersWithActions(
-                API_VERSION, 1, pending_actions_count=1)
-        ],
-        [
-            test_resources.MakeInstanceGroupManagersWithActions(
-                API_VERSION, 1, pending_actions_count=0)
-        ],
-        [test_resources.MakeInstanceGroupManagersWithActions(API_VERSION, 0)],
-        [
-            test_resources.MakeInstanceGroupManagersWithActions(
-                API_VERSION, 0, is_stable=True)
-        ],
-    ])
-    self.Run("""compute instance-groups managed wait-until-stable group-1
-      --zone central2-a
-      """)
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-        Waiting for group to become stable, pending operations: creating: 10
-        Waiting for group to become stable, current operations: creating: 1, pending operations: creating: 10
-        Waiting for group to become stable, current operations: creating: 1, pending operations: creating: 5
-        Waiting for group to become stable, current operations: creating: 1, pending operations: creating: 1
-        Waiting for group to become stable, current operations: creating: 1
-        Waiting for group to become stable
-        Group is stable
-        """),
-        normalize_space=True)
 
   @staticmethod
   def _MakeInstanceGroupManager(current_operations,

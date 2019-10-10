@@ -11,7 +11,7 @@ gcloud alpha compute sole\-tenancy node\-templates create \- creates a Google Co
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute sole\-tenancy node\-templates create\fR \fINAME\fR (\fB\-\-node\-requirements\fR=[\fIlocalSSD\fR=\fILOCALSSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvCPU\fR=\fIVCPU\fR]\ |\ \fB\-\-node\-type\fR=\fINODE_TYPE\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIcount\fR=\fICOUNT\fR],[\fIsize\fR=\fISIZE\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-server\-binding\fR=\fISERVER_BINDING\fR;\ default="restart\-node\-on\-any\-server"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -92,6 +92,30 @@ $ gcloud alpha compute sole\-tenancy node\-types
 An optional description of this resource.
 
 .TP 2m
+\fB\-\-disk\fR=[\fIcount\fR=\fICOUNT\fR],[\fIsize\fR=\fISIZE\fR],[\fItype\fR=\fITYPE\fR]
+Option to specify disk properties. It is mutually exclusive with
+\'\-\-node\-requirements=[localSSD=LOCALSSD]' but
+\'\-\-node\-requirements=[memory=MEMORY],[vCPU=VCPU],any' are still available.
+
+.RS 2m
+.TP 2m
+\fBtype\fR
+Specifies the desired disk type on the node. This disk type must be a local
+storage type. This should be the name of the disk type. Currently only
+\f5local\-ssd\fR is allowed.
+
+.TP 2m
+\fBsize\fR
+The size of the disk in GiB. Currently you can specify only 375 GiB or no value
+at all.
+
+.TP 2m
+\fBcount\fR
+Specifies the number of such disks.
+
+.RE
+.sp
+.TP 2m
 \fB\-\-node\-affinity\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 Labels to use for node affinity, which will be used in instance scheduling. This
 corresponds to the \f5\-\-node\-affinity\fR flag on \f5compute instances
@@ -169,9 +193,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute sole\-tenancy node\-templates create

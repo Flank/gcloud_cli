@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ from googlecloudsdk.core import metrics
 from googlecloudsdk.core.util import retry
 from googlecloudsdk.core.util import text
 from googlecloudsdk.core.util import times
+import six
 from six.moves import map  # pylint: disable=redefined-builtin
 
 
@@ -214,7 +215,7 @@ def DeleteVersions(api_client, versions):
       operations_util.CallAndCollectOpErrors(
           api_client.DeleteVersion, version.service, version.id)
     except operations_util.MiscOperationError as err:
-      errors[version_path] = str(err)
+      errors[version_path] = six.text_type(err)
 
   if errors:
     printable_errors = {}
@@ -358,7 +359,7 @@ def _StopPreviousVersionIfApplies(old_default_version, api_client):
         block=False)
   except operations_util.MiscOperationError as err:
     log.warning('Error stopping version [{0}]: {1}'.format(old_default_version,
-                                                           str(err)))
+                                                           six.text_type(err)))
     log.warning('Version [{0}] is still running and you must stop or delete it '
                 'yourself in order to turn it off. (If you do not, you may be '
                 'charged.)'.format(old_default_version))

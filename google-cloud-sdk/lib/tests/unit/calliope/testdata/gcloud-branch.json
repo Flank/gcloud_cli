@@ -361,7 +361,7 @@
         "none"
       ],
       "default": "warning",
-      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, `critical`, `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+      "description": "Override the default verbosity for this command. Overrides the default *core/verbosity* property value for this command invocation. _VERBOSITY_ must be one of: *debug*, *info*, *warning*, *error*, *critical*, *none*.",
       "is_global": true,
       "is_group": false,
       "is_hidden": false,
@@ -446,7 +446,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
+                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
                   }
                 },
                 "subgroup-command-a": {
@@ -554,7 +554,7 @@
                   "release": "ALPHA",
                   "sections": {
                     "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
-                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
+                    "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
                   }
                 }
               },
@@ -614,7 +614,7 @@
               "release": "ALPHA",
               "sections": {
                 "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests subgroup.",
-                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
+                "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
               }
             }
           },
@@ -673,7 +673,7 @@
           "release": "ALPHA",
           "sections": {
             "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests second level group.",
-            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
+            "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
           }
         }
       },
@@ -731,7 +731,7 @@
       "release": "ALPHA",
       "sections": {
         "DESCRIPTION": "*(ALPHA)*  Alpha versions of gcloud commands.",
-        "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you will have to apply for early access and have your projects registered on the API whitelist to use it. To do so, contact Support at https://cloud.google.com/support/."
+        "NOTES": "This command is currently in ALPHA and may change without notice. If this command fails with API permission errors despite specifying the right project, you may be trying to access an API with an invitation-only early access whitelist."
       }
     },
     "beta": {

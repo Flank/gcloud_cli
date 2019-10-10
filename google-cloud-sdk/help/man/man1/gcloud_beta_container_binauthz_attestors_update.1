@@ -15,12 +15,6 @@ gcloud beta container binauthz attestors update \- update an existing Attestor
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Update an existing Attestor.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -63,12 +57,24 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To update an existing Attestor \f5my_attestor\fR:
 
 .RS 2m
+$ gcloud beta container binauthz attestors update my_attestor \e
+    \-\-description="my new attestor description"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container binauthz attestors update
 $ gcloud alpha container binauthz attestors update
 .RE
 

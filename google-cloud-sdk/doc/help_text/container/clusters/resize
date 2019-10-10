@@ -3,9 +3,10 @@ NAME
         containers
 
 SYNOPSIS
-    gcloud container clusters resize NAME --num-nodes=NUM_NODES,
-        --size=NUM_NODES [--async] [--node-pool=NODE_POOL]
-        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+    gcloud container clusters resize NAME
+        (--num-nodes=NUM_NODES | --size=NUM_NODES) [--async]
+        [--node-pool=NODE_POOL] [--region=REGION | --zone=ZONE, -z ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Resize an existing cluster to a provided size.
@@ -33,12 +34,20 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 REQUIRED FLAGS
-     --num-nodes=NUM_NODES, --size=NUM_NODES
-        Target number of nodes in the cluster.
+     Exactly one of these must be specified:
+
+       --num-nodes=NUM_NODES
+          Target number of nodes in the cluster.
+
+       --size=NUM_NODES
+          (DEPRECATED) Target number of nodes in the cluster.
+
+          The --size flag is now deprecated. Please use --num-nodes instead.
 
 OPTIONAL FLAGS
      --async
-        Don't wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --node-pool=NODE_POOL
         The node pool to resize.

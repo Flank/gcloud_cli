@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -121,13 +121,14 @@ class DeployTestBase(base.FunctionsTestBase):
   def WriteExtraneousFiles(self,
                            source_dir,
                            use_node_modules=False,
-                           use_git=False):
+                           use_git=False,
+                           ignore_file=False):
     """Write files to source_dir that should be filtered by gcloudignore."""
     path = source_dir
     if use_node_modules:
       path = '{}/{}'.format(path, 'node_modules')
     else:
-      self.UpdateIgnoreFile(path, use_git)
+      self.UpdateIgnoreFile(path, use_git, ignore_file)
 
     self.Touch(
         path,
@@ -135,15 +136,18 @@ class DeployTestBase(base.FunctionsTestBase):
         makedirs=True,
         contents=(' ' * self.ReturnLargeFileSize()))
 
-  def UpdateIgnoreFile(self, path, use_git):
-    if use_git:
+  def UpdateIgnoreFile(self, path, use_git, ignore_file):
+    if ignore_file:
+      self.Touch(path, '.ignore_file_test', contents='skip_me.txt')
+    elif use_git:
       self.Touch(path, '.gitignore', contents='skip_me.txt')
     else:
       self.Touch(path, '.gcloudignore', contents='skip_me.txt')
 
   def RemoveIgnoreFile(self, path):
     ignore_files = ['{}/.gcloudignore'.format(path),
-                    '{}/.gitignore'.format(path)]
+                    '{}/.gitignore'.format(path),
+                    '{}/.ignore_file_test'.format(path)]
     try:
       for f in ignore_files:
         os.remove(f)
@@ -165,13 +169,14 @@ class DeployTestBase(base.FunctionsTestBase):
                          file_name=_TEST_FUNCTION_FILE,
                          write_extra_files=False,
                          use_node_modules=False,
-                         use_git=False):
+                         use_git=False,
+                         ignore_file=False):
     """Write Test function source with optional files to be filtered."""
     path = self.CreateTempDir()
     self.Touch(path, 'package.json', contents='package_foo')
     self.Touch(path, file_name, contents='foo')
     if write_extra_files:
-      self.WriteExtraneousFiles(path, use_git)
+      self.WriteExtraneousFiles(path, use_git=use_git, ignore_file=ignore_file)
     elif use_git:
       raise ValueError('Cannot pass `use_git` without `write_extra_files`')
     return path
@@ -338,6 +343,46 @@ class PackagingTest(DeployTestBase):
 
   def SetUp(self):
     self._dirs_size_limit_method = 513 * (2**20)
+
+  @parameterized.parameters([True, False])
+  def testPackageFilesWithIgnoreFile(self, use_node_modules):
+    path = self.PrepareLocalSource(
+        write_extra_files=True, use_node_modules=use_node_modules,
+        ignore_file=True)
+    self.MockGetExistingFunction(response=None)
+    self.MockGeneratedApiUploadUrl()
+
+    location = self.GetLocationResource()
+    function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        https_trigger=self.messages.HttpsTrigger(),
+        source_upload_url='foo', runtime='nodejs6')
+    create_request = self.GetFunctionsCreateRequest(function, location)
+    operation = self._GenerateActiveOperation('operations/operation')
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+    self.MockLongRunningOpResult('operations/operation')
+    self.MockUploadToSignedUrl()
+    self.MockGetExistingFunction(response=function)
+
+    result = self.Run('functions deploy my-test --trigger-http '
+                      '--source {} --quiet --runtime=nodejs6 '
+                      '--ignore-file .ignore_file_test'.format(path))
+    self.assertEqual(result, function)
+    self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
+
+  def testInvalidIgnoreFile(self):
+    path = self.PrepareLocalSource()
+    self.RemoveIgnoreFile(path)
+    self.MockGetExistingFunction(response=None)
+    with self.assertRaisesRegex(
+        exceptions.FileNotFoundError,
+        'File .ignore_file_test referenced by --ignore-file does not exist.'):
+      self.Run('functions deploy my-test --trigger-http '
+               '--source {} --quiet --runtime=nodejs6 '
+               '--ignore-file .ignore_file_test'.format(path))
+    self.AssertErrNotContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   @parameterized.parameters([True, False])
   def testPackageFilesWithGcloudIgnore(self, use_node_modules):
@@ -595,7 +640,7 @@ class CoreTest(DeployTestBase):
     self.MockGetExistingFunction(response=None)
     with self.assertRaisesRegex(
         exceptions.FunctionsError,
-        'argument --source: Provided directory does not exist.'):
+        'argument `--source`: Provided directory does not exist'):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck '
           '--source my/functions/directory --quiet --runtime=nodejs6')

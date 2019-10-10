@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ class HealthChecksCreateTcpTest(test_base.BaseTest, parameterized.TestCase):
   def testUriSupport(self):
     self.Run("""
         compute health-checks create tcp
-          https://www.googleapis.com/compute/{0}/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/{0}/projects/my-project/global/healthChecks/my-health-check
           """.format(self._api))
 
     self.CheckRequests(
@@ -366,6 +366,9 @@ class HealthChecksCreateTcpTestBetaTest(HealthChecksCreateTcpTest):
     self._health_check_api = self.compute_beta.healthChecks
     self._api = 'beta'
 
+  def RunCreate(self, command):
+    self.Run('compute health-checks create tcp --global ' + command)
+
 
 class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest):
 
@@ -375,18 +378,15 @@ class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest):
     self._api = 'alpha'
     self._health_check_api = self.compute_alpha.healthChecks
 
-  def RunCreate(self, command):
-    self.Run('compute health-checks create tcp --global ' + command)
 
-
-class RegionHealthChecksCreateTcpTest(test_base.BaseTest,
-                                      parameterized.TestCase):
+class RegionHealthChecksCreateTcpBetaTest(test_base.BaseTest,
+                                          parameterized.TestCase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
-    self._api = 'alpha'
-    self._health_check_api = self.compute_alpha.regionHealthChecks
+    self._api = 'beta'
+    self._health_check_api = self.compute_beta.regionHealthChecks
 
   def RunCreate(self, command):
     self.Run('compute health-checks create tcp --region us-west-1 ' + command)
@@ -417,7 +417,7 @@ class RegionHealthChecksCreateTcpTest(test_base.BaseTest,
   def testUriSupport(self):
     self.Run("""
         compute health-checks create tcp
-          https://www.googleapis.com/compute/{0}/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/us-west-1/healthChecks/my-health-check
         """.format(self._api))
 
     self.CheckRequests(
@@ -674,6 +674,15 @@ class RegionHealthChecksCreateTcpTest(test_base.BaseTest,
                   unhealthyThreshold=2),
               project='my-project',
               region='us-west-1'))],)
+
+
+class RegionHealthChecksCreateTcpAlphaTest(RegionHealthChecksCreateTcpBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+    self._api = 'alpha'
+    self._health_check_api = self.compute_alpha.regionHealthChecks
 
 
 if __name__ == '__main__':

@@ -1750,3 +1750,4 @@ actions:
         Deleted bucket [gs://$$bucket$$].
     - expect_exit:
         code: 0
+

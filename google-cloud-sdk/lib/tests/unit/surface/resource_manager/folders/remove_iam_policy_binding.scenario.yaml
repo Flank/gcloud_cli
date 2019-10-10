@@ -24,7 +24,10 @@ actions:
           uri: https://cloudresourcemanager.googleapis.com/v2/folders/folder-id:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -55,7 +58,7 @@ actions:
                   - user:newowner@gmail.com
                   role: roles/owner
                 etag: etag
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'

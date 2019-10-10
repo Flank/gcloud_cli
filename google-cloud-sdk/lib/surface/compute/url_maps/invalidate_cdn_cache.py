@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,21 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.url_maps import flags
 from googlecloudsdk.command_lib.compute.url_maps import url_maps_utils
 from googlecloudsdk.core import log
+
+
+def _DetailedHelp():
+  return {
+      'brief':
+          'Invalidate specified objects for a URL map in Cloud CDN caches.',
+      'DESCRIPTION':
+          """\
+      *{command}* requests that Cloud CDN stop using cached content for
+      resources at a particular URL path or set of URL paths.
+
+      *{command}* may succeed even if no content is cached for some or all
+      URLs with the given path.
+      """,
+  }
 
 
 def _Args(parser):
@@ -64,144 +79,89 @@ def _Args(parser):
       specified host.
       """)
 
-  parser.add_argument(
-      '--async',
-      action='store_true',
-      help='Do not wait for the operation to complete.',
-  )
+  base.ASYNC_FLAG.AddToParser(parser)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
-class InvalidateCdnCacheGA(base.SilentCommand):
-  """Invalidate specified objects for a URL map in Cloud CDN caches.
+def _CreateRequests(holder, args, url_map_arg):
+  """Returns a list of requests necessary for cache invalidations."""
+  url_map_ref = url_map_arg.ResolveAsResource(args, holder.resources)
+  cache_invalidation_rule = holder.client.messages.CacheInvalidationRule(
+      path=args.path)
+  if args.host is not None:
+    cache_invalidation_rule.host = args.host
 
-  *{command}* requests that Cloud CDN stop using cached content for
-  resources at a particular URL path or set of URL paths.
-
-  *{command}* may succeed even if no content is cached for some or all
-  URLs with the given path.
-  """
-
-  URL_MAP_ARG = None
-
-  @classmethod
-  def Args(cls, parser):
-    cls.URL_MAP_ARG = flags.UrlMapArgument()
-    cls.URL_MAP_ARG.AddArgument(parser, cust_metavar='URLMAP')
-
-    _Args(parser)
-
-  def CreateRequests(self, holder, args):
-    """Returns a list of requests necessary for cache invalidations."""
-    url_map_ref = self.URL_MAP_ARG.ResolveAsResource(args, holder.resources)
-    cache_invalidation_rule = holder.client.messages.CacheInvalidationRule(
-        path=args.path)
-    if args.host is not None:
-      cache_invalidation_rule.host = args.host
-    request = holder.client.messages.ComputeUrlMapsInvalidateCacheRequest(
+  messages = holder.client.messages
+  if url_maps_utils.IsRegionalUrlMapRef(url_map_ref):
+    request = messages.ComputeRegionUrlMapsInvalidateCacheRequest(
+        project=url_map_ref.project,
+        urlMap=url_map_ref.Name(),
+        cacheInvalidationRule=cache_invalidation_rule,
+        region=url_map_ref.region)
+    collection = holder.client.apitools_client.regionUrlMaps
+  else:
+    request = messages.ComputeUrlMapsInvalidateCacheRequest(
         project=url_map_ref.project,
         urlMap=url_map_ref.Name(),
         cacheInvalidationRule=cache_invalidation_rule)
+    collection = holder.client.apitools_client.urlMaps
 
-    return [request]
+  return [(collection, 'InvalidateCache', request)]
 
-  def Run(self, args):
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    client = holder.client
 
-    request_protobufs = self.CreateRequests(holder, args)
-    requests = []
-    for request in request_protobufs:
-      requests.append((client.apitools_client.urlMaps, 'InvalidateCache',
-                       request))
+def _Run(args, holder, url_map_arg):
+  """Issues requests necessary to invalidate a URL map cdn cache."""
+  client = holder.client
 
-    if args.async:
-      resources, errors = batch_helper.MakeRequests(
-          requests=requests,
-          http=client.apitools_client.http,
-          batch_url=client.batch_url)
-      if not errors:
-        for invalidation_operation in resources:
-          log.status.write('Invalidation pending for [{0}]\n'.format(
-              invalidation_operation.targetLink))
-          log.status.write('Monitor its progress at [{0}]\n'.format(
-              invalidation_operation.selfLink))
-      else:
-        utils.RaiseToolException(errors)
+  requests = _CreateRequests(holder, args, url_map_arg)
+  if args.async_:
+    resources, errors = batch_helper.MakeRequests(
+        requests=requests,
+        http=client.apitools_client.http,
+        batch_url=client.batch_url)
+    if not errors:
+      for invalidation_operation in resources:
+        log.status.write('Invalidation pending for [{0}]\n'.format(
+            invalidation_operation.targetLink))
+        log.status.write('Monitor its progress at [{0}]\n'.format(
+            invalidation_operation.selfLink))
     else:
-      # We want to run through the generator that MakeRequests returns in order
-      # to actually make the requests.
-      resources = client.MakeRequests(requests)
+      utils.RaiseToolException(errors)
+  else:
+    # We want to run through the generator that MakeRequests returns in order
+    # to actually make the requests.
+    resources = client.MakeRequests(requests)
 
-    return resources
+  return resources
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class InvalidateCdnCacheAlpha(InvalidateCdnCacheGA):
-  """Invalidate specified objects for a URL map in Cloud CDN caches.
+@base.ReleaseTracks(base.ReleaseTrack.GA)
+class InvalidateCdnCache(base.SilentCommand):
+  """Invalidate specified objects for a URL map in Cloud CDN caches."""
 
-  *{command}* requests that Cloud CDN stop using cached content for
-  resources at a particular URL path or set of URL paths.
+  _include_l7_internal_load_balancing = False
 
-  *{command}* may succeed even if no content is cached for some or all
-  URLs with the given path.
-  """
-
+  detailed_help = _DetailedHelp()
   URL_MAP_ARG = None
 
   @classmethod
   def Args(cls, parser):
-    cls.URL_MAP_ARG = flags.UrlMapArgument(include_alpha=True)
+    cls.URL_MAP_ARG = flags.UrlMapArgument(
+        include_l7_internal_load_balancing=cls
+        ._include_l7_internal_load_balancing)
     cls.URL_MAP_ARG.AddArgument(parser, cust_metavar='URLMAP')
-
     _Args(parser)
-
-  def CreateRequests(self, holder, args):
-    """Returns a list of requests necessary for cache invalidations."""
-    url_map_ref = self.URL_MAP_ARG.ResolveAsResource(args, holder.resources)
-    cache_invalidation_rule = holder.client.messages.CacheInvalidationRule(
-        path=args.path)
-    if args.host is not None:
-      cache_invalidation_rule.host = args.host
-
-    messages = holder.client.messages
-    if url_maps_utils.IsRegionalUrlMapRef(url_map_ref):
-      request = messages.ComputeRegionUrlMapsInvalidateCacheRequest(
-          project=url_map_ref.project,
-          urlMap=url_map_ref.Name(),
-          cacheInvalidationRule=cache_invalidation_rule,
-          region=url_map_ref.region)
-      collection = holder.client.apitools_client.regionUrlMaps
-    else:
-      request = messages.ComputeUrlMapsInvalidateCacheRequest(
-          project=url_map_ref.project,
-          urlMap=url_map_ref.Name(),
-          cacheInvalidationRule=cache_invalidation_rule)
-      collection = holder.client.apitools_client.urlMaps
-
-    return [(collection, 'InvalidateCache', request)]
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    client = holder.client
+    return _Run(args, holder, self.URL_MAP_ARG)
 
-    requests = self.CreateRequests(holder, args)
-    if args.async:
-      resources, errors = batch_helper.MakeRequests(
-          requests=requests,
-          http=client.apitools_client.http,
-          batch_url=client.batch_url)
-      if not errors:
-        for invalidation_operation in resources:
-          log.status.write('Invalidation pending for [{0}]\n'.format(
-              invalidation_operation.targetLink))
-          log.status.write('Monitor its progress at [{0}]\n'.format(
-              invalidation_operation.selfLink))
-      else:
-        utils.RaiseToolException(errors)
-    else:
-      # We want to run through the generator that MakeRequests returns in order
-      # to actually make the requests.
-      resources = client.MakeRequests(requests)
 
-    return resources
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class InvalidateCdnCacheBeta(InvalidateCdnCache):
+
+  _include_l7_internal_load_balancing = True
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class InvalidateCdnCacheAlpha(InvalidateCdnCacheBeta):
+  pass

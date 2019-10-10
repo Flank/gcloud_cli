@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,14 +32,14 @@ class InterconnectAttachmentsDedicatedUpdateGaTest(test_base.BaseTest):
   def CheckInterconnectAttachmentRequest(self, **kwargs):
     interconnect_attachment_msg = {}
     interconnect_attachment_msg.update(kwargs)
-    self.CheckRequests(
-        [(self.message_version.interconnectAttachments, 'Patch',
-          self.messages.ComputeInterconnectAttachmentsPatchRequest(
-              project='my-project',
-              region='us-central1',
-              interconnectAttachment=kwargs.get('name'),
-              interconnectAttachmentResource=self.messages.
-              InterconnectAttachment(**interconnect_attachment_msg)))],)
+    self.CheckRequests([(
+        self.message_version.interconnectAttachments, 'Patch',
+        self.messages.ComputeInterconnectAttachmentsPatchRequest(
+            project='my-project',
+            region='us-central1',
+            interconnectAttachment=kwargs.get('name'),
+            interconnectAttachmentResource=self.messages.InterconnectAttachment(
+                **interconnect_attachment_msg)))],)
 
   def testUpdateInterconnectAttachment(self):
     messages = self.messages
@@ -72,20 +72,20 @@ class InterconnectAttachmentsDedicatedUpdateGaTest(test_base.BaseTest):
                 region='us-central1',
                 adminEnabled=False,
                 bandwidth=messages.InterconnectAttachment
-                .BandwidthValueValuesEnum('BPS_50M')),
+                .BandwidthValueValuesEnum('BPS_50G')),
         ],
     ])
 
     self.Run('compute interconnects attachments dedicated update my-attachment '
              '--region us-central1 --description "this is my attachment" '
-             '--no-admin-enabled --bandwidth 50m')
+             '--no-admin-enabled --bandwidth 50g')
 
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
         description='this is my attachment',
         adminEnabled=False,
         bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
-            'BPS_50M'),
+            'BPS_50G'),
     )
 
 
@@ -141,8 +141,8 @@ class InterconnectAttachmentsDedicatedUpdateBetaTest(
               project='my-project',
               region='us-central1',
               interconnectAttachment='my-attachment',
-              interconnectAttachmentResource=self.messages.
-              InterconnectAttachment(
+              interconnectAttachmentResource=self.messages
+              .InterconnectAttachment(
                   name='my-attachment',
                   description='this is my attachment',
                   labels=labels,
@@ -189,8 +189,8 @@ class InterconnectAttachmentsDedicatedUpdateBetaTest(
               project='my-project',
               region='us-central1',
               interconnectAttachment='my-attachment',
-              interconnectAttachmentResource=self.messages.
-              InterconnectAttachment(
+              interconnectAttachmentResource=self.messages
+              .InterconnectAttachment(
                   name='my-attachment',
                   description='this is my attachment',
                   labels=labels,
@@ -207,7 +207,7 @@ class InterconnectAttachmentsDedicatedUpdateAlphaTest(
     self.SelectApi('alpha')
     self.message_version = self.compute_alpha
 
-  def testUpdateInterconnectAttachmentWithBandwidth(self):
+  def testUpdateInterconnectAttachmentWithMtu(self):
     messages = self.messages
     self.make_requests.side_effect = iter([
         [
@@ -223,12 +223,10 @@ class InterconnectAttachmentsDedicatedUpdateAlphaTest(
 
     self.Run('compute interconnects attachments dedicated update my-attachment '
              '--region us-central1 --description "this is my attachment" '
-             '--no-admin-enabled --bandwidth 50g')
+             '--no-admin-enabled --mtu 1500')
 
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
         description='this is my attachment',
         adminEnabled=False,
-        bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
-            'BPS_50G'),
-    )
+        mtu=1500)

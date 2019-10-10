@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,9 +25,19 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.binauthz import flags
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class UpdateBeta(base.UpdateCommand):
-  """Update a public key on an Attestor."""
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+class Update(base.UpdateCommand):
+  r"""Update a public key on an Attestor.
+
+  ## EXAMPLES
+
+  To update a PGP public key on an existing Attestor `my_attestor`:
+
+    $ {command} \
+        0638AADD940361EA2D7F14C58C124F0E663DA097 \
+        --attestor=my_attestor \
+        --pgp-public-key-file=my_key.pub
+  """
 
   @classmethod
   def Args(cls, parser):
@@ -41,13 +51,13 @@ class UpdateBeta(base.UpdateCommand):
         ),
     )
     parser.add_argument(
-        'public_key_fingerprint',
-        help='The fingerprint of the public key to update.')
+        'public_key_id',
+        help='The ID of the public key to update.')
     parser.add_argument(
-        '--public-key-file',
-        type=arg_parsers.BufferedFileInput(),
-        help='The path to the file containing the '
-        'new ASCII-armored PGP public key.')
+        '--pgp-public-key-file',
+        type=arg_parsers.FileContents(),
+        help='The path to a file containing the '
+        'updated ASCII-armored PGP public key.')
     parser.add_argument(
         '--comment', help='The comment describing the public key.')
 
@@ -60,8 +70,8 @@ class UpdateBeta(base.UpdateCommand):
 
     return attestors_client.UpdateKey(
         attestor_ref,
-        args.public_key_fingerprint,
-        pgp_pubkey_content=args.public_key_file,
+        args.public_key_id,
+        pgp_pubkey_content=args.pgp_public_key_file,
         comment=args.comment)
 
 
@@ -85,9 +95,9 @@ class UpdateAlpha(base.UpdateCommand):
         help='The ID of the public key to update.')
     parser.add_argument(
         '--pgp-public-key-file',
-        type=arg_parsers.BufferedFileInput(),
-        help='The path to the file containing the '
-        'new ASCII-armored PGP public key.')
+        type=arg_parsers.FileContents(),
+        help='The path to a file containing the '
+        'updated ASCII-armored PGP public key.')
     parser.add_argument(
         '--comment', help='The comment describing the public key.')
 

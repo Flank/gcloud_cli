@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ class ZonesDescribeTest(test_base.BaseTest, completer_test_base.CompleterBase):
         textwrap.dedent("""\
               deprecated:
                 deleted: '2015-03-29T00:00:00.000-07:00'
-                replacement: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b
+                replacement: https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b
                 state: DEPRECATED
               name: us-central1-a
-              region: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1
-              selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a
+              region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central1
+              selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a
               status: UP
             """))
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,3 +63,8 @@ class List(base.ListCommand):
   @classmethod
   def SetPartialApiEndpoint(cls, partial_api_endpoint):
     cls.partial_api_endpoint = partial_api_endpoint
+
+
+def SortByName(list_response):
+  """Return the list_response sorted by name."""
+  return sorted(list_response, key=lambda x: x.name)

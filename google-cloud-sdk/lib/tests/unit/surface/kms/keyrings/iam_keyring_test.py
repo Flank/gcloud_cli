@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
@@ -29,11 +30,13 @@ class KeyringsGetSetIamTestGA(base.KmsMockTest):
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.kr_name = self.project_name.Descendant('global/my_kr')
+    self.kr_name = self.project_name.KeyRing('global/my_kr')
 
   def testGet(self):
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION,
             resource=self.kr_name.RelativeName()),
         self.messages.Policy(etag=b'foo'))
 
@@ -44,6 +47,8 @@ class KeyringsGetSetIamTestGA(base.KmsMockTest):
   def testListCommandFilter(self):
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION,
             resource=self.kr_name.RelativeName()),
         self.messages.Policy(etag=b'foo'))
 
@@ -61,13 +66,14 @@ class KeyringsGetSetIamTestGA(base.KmsMockTest):
         etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
-        ])
+        ],
+        version=3)
     policy_filename = self.Touch(
         self.temp_path,
         contents="""
 {
   "etag": "Zm9v",
-  "bindings": [ { "members": ["people"], "role": "roles/owner" } ]
+  "bindings": [ { "members": ["people"], "role": "roles/owner" } ],
 }
 """)
 
@@ -75,7 +81,7 @@ class KeyringsGetSetIamTestGA(base.KmsMockTest):
         self.messages.CloudkmsProjectsLocationsKeyRingsSetIamPolicyRequest(
             resource=self.kr_name.RelativeName(),
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy, updateMask='bindings,etag')), policy)
+                policy=policy, updateMask='bindings,etag,version')), policy)
 
     self.Run('kms keyrings set-iam-policy '
              '--location={0} {1} {2}'.format(self.kr_name.location_id,
@@ -86,6 +92,7 @@ class KeyringsGetSetIamTestGA(base.KmsMockTest):
   - people
   role: roles/owner
 etag: Zm9v
+version: 3
 """)
     self.AssertErrContains('Updated IAM policy for keyring [my_kr].')
 
@@ -101,14 +108,15 @@ etag: Zm9v
                     logType=self.messages.AuditLogConfig.LogTypeValueValuesEnum.
                     DATA_READ),
             ])
-        ])
+        ],
+        version=3)
     policy_filename = self.Touch(
         self.temp_path,
         contents="""
 {
   "etag": "Zm9v",
   "auditConfigs": [ { "auditLogConfigs": [ { "logType": "DATA_READ" } ] } ],
-  "bindings": [ { "members": ["people"], "role": "roles/owner" } ]
+  "bindings": [ { "members": ["people"], "role": "roles/owner" } ],
 }
 """)
 
@@ -116,8 +124,8 @@ etag: Zm9v
         self.messages.CloudkmsProjectsLocationsKeyRingsSetIamPolicyRequest(
             resource=self.kr_name.RelativeName(),
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy, updateMask='auditConfigs,bindings,etag')),
-        policy)
+                policy=policy,
+                updateMask='auditConfigs,bindings,etag,version')), policy)
 
     self.Run('kms keyrings set-iam-policy '
              '--location={0} {1} {2}'.format(self.kr_name.location_id,
@@ -131,6 +139,7 @@ bindings:
   - people
   role: roles/owner
 etag: Zm9v
+version: 3
 """)
     self.AssertErrContains('Updated IAM policy for keyring [my_kr].')
 

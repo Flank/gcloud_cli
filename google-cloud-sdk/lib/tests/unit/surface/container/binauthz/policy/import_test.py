@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.api_lib.util import messages as messages_util
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.command_lib.container.binauthz import encoding
 from googlecloudsdk.command_lib.container.binauthz import parsing
 from googlecloudsdk.core.console import console_io
 from tests.lib import cli_test_base
@@ -33,12 +33,12 @@ from tests.lib.surface.container.binauthz import base
 
 class ImportTest(
     sdk_test_base.WithTempCWD,
-    base.WithMockBetaBinauthz,
+    base.WithMockGaBinauthz,
     base.BinauthzTestBase,
 ):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSuccessYaml(self):
     policy_fname = self.Touch(
@@ -60,17 +60,16 @@ class ImportTest(
     )
 
     # Create the expected policy proto.
-    EvaluationModeEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.EvaluationModeValueValuesEnum)
-    EnforcementModeEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.EnforcementModeValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
             key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
-                evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
+                evaluationMode=(
+                    self.messages.AdmissionRule.EvaluationModeValueValuesEnum
+                    .REQUIRE_ATTESTATION),
                 enforcementMode=(
-                    EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                    self.messages.AdmissionRule.EnforcementModeValueValuesEnum
+                    .ENFORCED_BLOCK_AND_AUDIT_LOG),
                 requireAttestationsBy=[
                     'projects/fake-project/attestors/build-env',
                 ],
@@ -81,19 +80,18 @@ class ImportTest(
         name='projects/{}/policy'.format(self.Project()),
         admissionWhitelistPatterns=[
             self.messages.AdmissionWhitelistPattern(
-                namePattern='gcr.io/{}/*'.format(self.Project()),
-            ),
+                namePattern='gcr.io/{}/*'.format(self.Project()),),
         ],
         clusterAdmissionRules=self.messages.Policy.ClusterAdmissionRulesValue(
-            additionalProperties=cluster_rules,
-        ),
+            additionalProperties=cluster_rules,),
         defaultAdmissionRule=self.messages.AdmissionRule(
-            evaluationMode=EvaluationModeEnum.ALWAYS_ALLOW,
+            evaluationMode=(self.messages.AdmissionRule
+                            .EvaluationModeValueValuesEnum.ALWAYS_ALLOW),
             enforcementMode=(
-                EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                self.messages.AdmissionRule.EnforcementModeValueValuesEnum
+                .ENFORCED_BLOCK_AND_AUDIT_LOG),
             requireAttestationsBy=[],
         ),
-
     )
     self.mock_client.projects.UpdatePolicy.Expect(
         policy_proto, response=policy_proto)
@@ -131,17 +129,16 @@ class ImportTest(
     )
 
     # Create the expected policy proto.
-    EvaluationModeEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.EvaluationModeValueValuesEnum)
-    EnforcementModeEnum = (  # pylint: disable=invalid-name
-        self.messages.AdmissionRule.EnforcementModeValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
             key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
-                evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
+                evaluationMode=(
+                    self.messages.AdmissionRule.EvaluationModeValueValuesEnum
+                    .REQUIRE_ATTESTATION),
                 enforcementMode=(
-                    EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                    self.messages.AdmissionRule.EnforcementModeValueValuesEnum
+                    .ENFORCED_BLOCK_AND_AUDIT_LOG),
                 requireAttestationsBy=[
                     'projects/fake-project/attestors/build-env',
                 ],
@@ -152,19 +149,18 @@ class ImportTest(
         name='projects/{}/policy'.format(self.Project()),
         admissionWhitelistPatterns=[
             self.messages.AdmissionWhitelistPattern(
-                namePattern='gcr.io/google/*',
-            ),
+                namePattern='gcr.io/google/*',),
         ],
         clusterAdmissionRules=self.messages.Policy.ClusterAdmissionRulesValue(
-            additionalProperties=cluster_rules,
-        ),
+            additionalProperties=cluster_rules,),
         defaultAdmissionRule=self.messages.AdmissionRule(
-            evaluationMode=EvaluationModeEnum.ALWAYS_ALLOW,
+            evaluationMode=(self.messages.AdmissionRule
+                            .EvaluationModeValueValuesEnum.ALWAYS_ALLOW),
             enforcementMode=(
-                EnforcementModeEnum.ENFORCED_BLOCK_AND_AUDIT_LOG),
+                self.messages.AdmissionRule.EnforcementModeValueValuesEnum
+                .ENFORCED_BLOCK_AND_AUDIT_LOG),
             requireAttestationsBy=[],
         ),
-
     )
     self.mock_client.projects.UpdatePolicy.Expect(
         policy_proto, response=policy_proto)
@@ -228,7 +224,7 @@ class ImportTest(
     )
 
     with self.assertRaisesRegexp(
-        encoding.DecodeError,
+        messages_util.DecodeError,
         r'clusterAdmissionRules.*us-east1-b\.my-cluster-1.*evaluationMode'):
       self.RunBinauthz('policy import ' + policy_fname)
 
@@ -241,7 +237,16 @@ class ImportTest(
       self.RunBinauthz('policy import')
 
 
-class ImportAlphaTest(base.WithMockAlphaBinauthz, ImportTest):
+class ImportBetaTest(
+    base.WithMockBetaBinauthz,
+    ImportTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ImportAlphaTest(base.WithMockAlphaBinauthz, ImportBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

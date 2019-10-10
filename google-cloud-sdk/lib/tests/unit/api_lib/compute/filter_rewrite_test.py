@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -844,7 +844,7 @@ class ComputeFilterRewriteResourceTest(subtests.Base):
        '(name eq ".*\\bfoo\\b.*")'
        '(creationTimestamp eq 2014-01-06T00:00:00.000Z)'),
       'name:foo creationTimestamp:"2014-01-06Z"')
-    T((None, 'creationTimestamp eq ".*\\bnot\\ a\\ date\\/time\\b.*"'),
+    T((None, 'creationTimestamp eq ".*\\bnot\\ a\\ date/time\\b.*"'),
       'creationTimestamp:"not a date/time"')
 
     # Inequalties not supported.

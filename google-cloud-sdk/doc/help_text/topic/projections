@@ -417,6 +417,20 @@ DESCRIPTION
      notnull()
         Remove null values from the resource list.
 
+     regex(expression, does_match, nomatch="")
+        Returns does_match or r itself if r matches expression, nomatch
+        otherwise.
+
+        The arguments are:
+
+         expression
+            expression to apply to r.
+         does_match
+            If the string matches expression then return does_match otherwise
+            return the string itself if does_match is not defined.
+         nomatch
+            Returns this value if the string does not match expression.
+
      resolution(undefined="", transpose=false)
         Formats a human readable XY resolution.
 

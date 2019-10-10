@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Connects to a Cloud SQL instance."""
 
 from __future__ import absolute_import
@@ -53,7 +52,10 @@ DETAILED_HELP = {
 # TODO(b/62055574): Improve test coverage in this file.
 
 
-def _WhitelistClientIP(instance_ref, sql_client, sql_messages, resources,
+def _WhitelistClientIP(instance_ref,
+                       sql_client,
+                       sql_messages,
+                       resources,
                        minutes=5):
   """Add CLIENT_IP to the authorized networks list.
 
@@ -63,12 +65,12 @@ def _WhitelistClientIP(instance_ref, sql_client, sql_messages, resources,
 
   Args:
     instance_ref: resources.Resource, The instance we're connecting to.
-    sql_client: apitools.BaseApiClient, A working client for the sql version
-        to be used.
+    sql_client: apitools.BaseApiClient, A working client for the sql version to
+      be used.
     sql_messages: module, The module that defines the messages for the sql
-        version to be used.
+      version to be used.
     resources: resources.Registry, The registry that can create resource refs
-        for the sql version to be used.
+      for the sql version to be used.
     minutes: How long the client IP will be whitelisted for, in minutes.
 
   Returns:
@@ -96,8 +98,7 @@ def _WhitelistClientIP(instance_ref, sql_client, sql_messages, resources,
   try:
     original = sql_client.instances.Get(
         sql_messages.SqlInstancesGetRequest(
-            project=instance_ref.project,
-            instance=instance_ref.instance))
+            project=instance_ref.project, instance=instance_ref.instance))
   except apitools_exceptions.HttpError as error:
     if error.status_code == six.moves.http_client.FORBIDDEN:
       raise exceptions.ResourceNotFoundError(
@@ -119,14 +120,12 @@ def _WhitelistClientIP(instance_ref, sql_client, sql_messages, resources,
     raise calliope_exceptions.HttpException(error)
 
   operation_ref = resources.Create(
-      'sql.operations',
-      operation=result.name,
-      project=instance_ref.project)
+      'sql.operations', operation=result.name, project=instance_ref.project)
   message = ('Whitelisting your IP for incoming connection for '
              '{0} {1}'.format(minutes, text.Pluralize(minutes, 'minute')))
 
-  operations.OperationsV1Beta4.WaitForOperation(
-      sql_client, operation_ref, message)
+  operations.OperationsV1Beta4.WaitForOperation(sql_client, operation_ref,
+                                                message)
 
   return acl_name
 
@@ -135,8 +134,7 @@ def _GetClientIP(instance_ref, sql_client, acl_name):
   """Retrieves given instance and extracts its client ip."""
   instance_info = sql_client.instances.Get(
       sql_client.MESSAGES_MODULE.SqlInstancesGetRequest(
-          project=instance_ref.project,
-          instance=instance_ref.instance))
+          project=instance_ref.project, instance=instance_ref.instance))
   networks = instance_info.settings.ipConfiguration.authorizedNetworks
   client_ip = None
   for net in networks:
@@ -150,9 +148,8 @@ def AddBaseArgs(parser):
   """Declare flag and positional arguments for this command parser.
 
   Args:
-      parser: An argparse parser that you can use it to add arguments that go
-          on the command line after this command. Positional arguments are
-          allowed.
+      parser: An argparse parser that you can use it to add arguments that go on
+        the command line after this command. Positional arguments are allowed.
   """
   parser.add_argument(
       'instance',
@@ -164,6 +161,21 @@ def AddBaseArgs(parser):
       '-u',
       required=False,
       help='Cloud SQL instance user to connect as.')
+
+
+def AddBetaArgs(parser):
+  """Declare beta flag arguments for this command parser.
+
+  Args:
+      parser: An argparse parser that you can use it to add arguments that go on
+        the command line after this command. Positional arguments are allowed.
+  """
+  parser.add_argument(
+      '--port',
+      type=arg_parsers.BoundedInt(lower_bound=1, upper_bound=65535),
+      default=constants.DEFAULT_PROXY_PORT_NUMBER,
+      help=('Port number that gcloud will use to connect to the Cloud SQL '
+            'Proxy through localhost.'))
 
 
 def RunConnectCommand(args, supports_database=False):
@@ -249,7 +261,8 @@ def RunConnectCommand(args, supports_database=False):
   instances_command_util.ConnectToInstance(sql_args, sql_user)
 
 
-def RunBetaConnectCommand(args, supports_database=False):
+def RunProxyConnectCommand(args,
+                           supports_database=False):
   """Connects to a Cloud SQL instance through the Cloud SQL Proxy.
 
   Args:
@@ -283,7 +296,7 @@ def RunBetaConnectCommand(args, supports_database=False):
   # If the instance is V2, keep going with the proxy.
   util.EnsureComponentIsInstalled('cloud_sql_proxy', '`sql connect` command')
 
-  # Check for the mysql or psql executable based on the db version.
+  # Check for the executable based on the db version.
   db_type = instance_info.databaseVersion.split('_')[0]
   exe_name = constants.DB_EXE.get(db_type, 'mysql')
   exe = files.FindExecutableOnPath(exe_name)
@@ -305,7 +318,13 @@ def RunBetaConnectCommand(args, supports_database=False):
 
   # We have everything we need, time to party!
   flags = constants.EXE_FLAGS[exe_name]
-  sql_args = [exe_name, flags['hostname'], '127.0.0.1', flags['port'], port]
+  sql_args = [exe_name]
+  if exe_name == 'mssql-cli':
+    # mssql-cli merges hostname and port into a single argument
+    hostname = 'tcp:127.0.0.1,{0}'.format(port)
+    sql_args.extend([flags['hostname'], hostname])
+  else:
+    sql_args.extend([flags['hostname'], '127.0.0.1', flags['port'], port])
   sql_args.extend([flags['user'], sql_user])
   sql_args.append(flags['password'])
 
@@ -346,14 +365,10 @@ class ConnectBeta(base.Command):
   def Args(parser):
     """Args is called by calliope to gather arguments for this command."""
     AddBaseArgs(parser)
-    sql_flags.AddDatabase(parser, 'The PostgreSQL database to connect to.')
-    parser.add_argument(
-        '--port',
-        type=arg_parsers.BoundedInt(lower_bound=1, upper_bound=65535),
-        default=constants.DEFAULT_PROXY_PORT_NUMBER,
-        help=('Port number that gcloud will use to connect to the Cloud SQL '
-              'Proxy through localhost.'))
+    AddBetaArgs(parser)
+    sql_flags.AddDatabase(
+        parser, 'The PostgreSQL or SQL Server database to connect to.')
 
   def Run(self, args):
     """Connects to a Cloud SQL instance."""
-    return RunBetaConnectCommand(args, supports_database=True)
+    return RunProxyConnectCommand(args, supports_database=True)

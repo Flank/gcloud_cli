@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,10 @@ from googlecloudsdk.core import yaml
 
 class NoFieldsSpecifiedError(exceptions.Error):
   """Error indicating that no updates were requested in a Patch operation."""
+
+
+class NoPackagesSpecifiedError(exceptions.Error):
+  """Error that no packages were specified for non-custom training."""
 
 
 def GetMessagesModule(version='v1'):
@@ -148,6 +152,9 @@ class JobsClient(object):
         labels: Job.LabelsValue, the Cloud labels for the job
         custom_train_server_config: jobs_util.CustomTrainingInputServerConfig,
           configuration object for custom server parameters.
+    Raises:
+      NoPackagesSpecifiedError: if a non-custom job was specified without any
+        trainer_uris.
     Returns:
         A constructed Job object.
     """
@@ -186,10 +193,10 @@ class JobsClient(object):
         if value is not None:
           if field_name.endswith('Config'):
             if value['imageUri']:
-              arg_utils.SetFieldInMessage(job,
-                                          'trainingInput.{}.imageUri'.format(
-                                              field_name),
-                                          value['imageUri'])
+              arg_utils.SetFieldInMessage(
+                  job,
+                  'trainingInput.{}.imageUri'.format(field_name),
+                  value['imageUri'])
             if value['acceleratorConfig']['type']:
               arg_utils.SetFieldInMessage(
                   job,
@@ -200,10 +207,25 @@ class JobsClient(object):
                   job,
                   'trainingInput.{}.acceleratorConfig.count'.format(field_name),
                   value['acceleratorConfig']['count'])
+            if field_name == 'workerConfig' and value['tpuTfVersion']:
+              arg_utils.SetFieldInMessage(
+                  job,
+                  'trainingInput.{}.tpuTfVersion'.format(field_name),
+                  value['tpuTfVersion'])
           else:
             setattr(job.trainingInput, field_name, value)
 
+    if not self.HasPackageURIs(job) and not self.IsCustomContainerTraining(job):
+      raise NoPackagesSpecifiedError('Non-custom jobs must have packages.')
+
     return job
+
+  def HasPackageURIs(self, job):
+    return bool(job.trainingInput.packageUris)
+
+  def IsCustomContainerTraining(self, job):
+    return bool(job.trainingInput.masterConfig and
+                job.trainingInput.masterConfig.imageUri)
 
   def BuildBatchPredictionJob(self,
                               job_name=None,

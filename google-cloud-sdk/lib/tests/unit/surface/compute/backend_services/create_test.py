@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -718,12 +718,6 @@ class WithSessionAffinityApiBetaTest(WithSessionAffinityApiTest):
   def SetUp(self):
     self._SetUp(calliope_base.ReleaseTrack.BETA)
 
-
-class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiBetaTest):
-
-  def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
-
   def testSetIlbSessionAffinity_ClientIpProto(self):
     self._TestSetILBSessionAffinity(
         'client_ip_proto', specify_global_health_check=True)
@@ -731,6 +725,12 @@ class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiBetaTest):
   def testSetIlbSessionAffinity_ClientIpPortProto(self):
     self._TestSetILBSessionAffinity(
         'client_ip_port_proto', specify_global_health_check=True)
+
+
+class WithSessionAffinityApiAlphaTest(WithSessionAffinityApiBetaTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 class WithConnectionDrainingTimeoutApiTest(BackendServiceCreateTestBase):
@@ -820,10 +820,10 @@ class WithConnectionDrainingTimeoutApiTest(BackendServiceCreateTestBase):
             project='my-project'))],)
 
 
-class WithHealthcheckApiAlphaTest(BackendServiceCreateTestBase):
+class WithHealthcheckApiBetaTest(BackendServiceCreateTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
   def testGlobalBackendServiceWithGlobalHealthCheck(self):
     messages = self.messages
@@ -936,6 +936,12 @@ class WithHealthcheckApiAlphaTest(BackendServiceCreateTestBase):
              project='my-project',
              region='region1'))
     ],)
+
+
+class WithHealthcheckApiAlphaTest(WithHealthcheckApiBetaTest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 class WithHealthcheckApiTest(BackendServiceCreateTestBase):
@@ -1247,7 +1253,7 @@ class WithHealthcheckApiTest(BackendServiceCreateTestBase):
               backendService=messages.BackendService(
                   backends=[],
                   healthChecks=[
-                      ('https://www.googleapis.com/compute/alpha/projects/'
+                      ('https://compute.googleapis.com/compute/alpha/projects/'
                        'my-project/regions/us-central1/healthChecks/'
                        'my-health-check-1'),
                   ],
@@ -1333,6 +1339,68 @@ class WithHealthcheckApiTest(BackendServiceCreateTestBase):
              region='alaska',
          ))
     ],)
+
+
+class TrafficDirectorTest(BackendServiceCreateTestBase):
+
+  def testLoadBalancingSchemeInternalSelfManaged(self):
+    messages = self.messages
+    self.Run("""
+        compute backend-services create my-backend-service
+          --protocol HTTP
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --load-balancing-scheme internal_self_managed
+          --global
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-2')
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                loadBalancingScheme=(
+                    messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                    .INTERNAL_SELF_MANAGED),
+                timeoutSec=30),
+            project='my-project'))],)
+
+  def testSimpleHttp2Case(self):
+    messages = self.messages
+    self.Run("""compute backend-services create backend-service-25
+                --global
+                --protocol http2
+                --health-checks my-health-check-1,my-health-check-2
+                --description cheesecake""")
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Insert',
+          messages.ComputeBackendServicesInsertRequest(
+              backendService=messages.BackendService(
+                  backends=[],
+                  description='cheesecake',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/healthChecks/my-health-check-1'),
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/healthChecks/my-health-check-2')
+                  ],
+                  name='backend-service-25',
+                  portName='http2',
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.HTTP2),
+                  timeoutSec=30),
+              project='my-project'))],)
 
 
 class WithCustomCacheKeyApiTest(BackendServiceCreateTestBase):

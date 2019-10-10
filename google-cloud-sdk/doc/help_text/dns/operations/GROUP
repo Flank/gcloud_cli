@@ -24,7 +24,8 @@ COMMANDS
         List Cloud DNS operations.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns operations
         $ gcloud beta dns operations
 

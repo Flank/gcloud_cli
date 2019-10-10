@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.accelerator_types import flags
+from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+import mock
 
 
 class AcceleratorTypesListTest(test_base.BaseTest,
@@ -38,7 +40,7 @@ class AcceleratorTypesListTest(test_base.BaseTest,
     Returns:
       An aggregated list of message objects representing accelerator types.
     """
-    prefix = 'https://www.googleapis.com/compute/' + api
+    prefix = 'https://compute.googleapis.com/compute/' + api
     return [
         msgs.AcceleratorType(
             name='nvidia-tesla-k80',
@@ -64,17 +66,22 @@ class AcceleratorTypesListTest(test_base.BaseTest,
     self.track = calliope_base.ReleaseTrack.GA
     self.SelectApi('v1')
 
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(
+            self._MakeAcceleratorTypes(self.messages, 'v1'))
+    ]
+
   def testAggregatedOutput(self):
-    self.make_requests.side_effect = iter([
-        self._MakeAcceleratorTypes(self.messages, 'v1')
-    ])
+    self.list_json.side_effect = [
+        resource_projector.MakeSerializable(
+            self._MakeAcceleratorTypes(self.messages, 'v1'))
+    ]
 
     self.Run('compute accelerator-types list')
-    self.CheckRequests(
-        [(self.compute.acceleratorTypes, 'AggregatedList',
-          self.messages.ComputeAcceleratorTypesAggregatedListRequest(
-              project='my-project'))])
-
     self.AssertOutputEquals(
         """\
             NAME ZONE DESCRIPTION
@@ -85,9 +92,8 @@ class AcceleratorTypesListTest(test_base.BaseTest,
         normalize_space=True)
 
   def testSslCertificatesCompleter(self):
-    self.make_requests.side_effect = iter([
-        self._MakeAcceleratorTypes(self.messages, 'v1')
-    ])
+    self.make_requests.side_effect = iter(
+        [self._MakeAcceleratorTypes(self.messages, 'v1')])
     self.RunCompleter(
         flags.AcceleratorTypesCompleter,
         expected_command=[

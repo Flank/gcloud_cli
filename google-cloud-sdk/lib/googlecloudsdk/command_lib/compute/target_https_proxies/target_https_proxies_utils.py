@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,13 +68,15 @@ def ResolveSslCertificates(args, ssl_certificate_arg, target_https_proxy_ref,
     Returns the SSL Certificates resource
   """
 
+  if not args.ssl_certificates:
+    return []
+
   if IsRegionalTargetHttpsProxiesRef(target_https_proxy_ref):
     if not getattr(args, 'ssl_certificates_region', None):
       args.ssl_certificates_region = target_https_proxy_ref.region
   else:
     if not getattr(args, 'global_ssl_certificates', None):
       args.global_ssl_certificates = bool(args.ssl_certificates)
-
   return ssl_certificate_arg.ResolveAsResource(args, resources)
 
 

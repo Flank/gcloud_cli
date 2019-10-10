@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha compute org-security-policies move - move a Google Compute
+        Engine organization security policy
+
+SYNOPSIS
+    gcloud alpha compute org-security-policies move SECURITY_POLICY_ID
+        (--folder=FOLDER | --organization=ORGANIZATION) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute org-security-policies move is used to move is
+    used to move organization security policies to new parent nodes.
+
+POSITIONAL ARGUMENTS
+     SECURITY_POLICY_ID
+        Resource ID of the security policy to move.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --folder=FOLDER
+          Folder to which the organization security policy is to be moved.
+
+       --organization=ORGANIZATION
+          Organization to which the organization security policy is to be
+          moved.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

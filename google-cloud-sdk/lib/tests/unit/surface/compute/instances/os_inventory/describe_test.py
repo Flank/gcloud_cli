@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,16 +23,18 @@ import textwrap
 import zlib
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.compute.instances.os_inventory import exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from googlecloudsdk.command_lib.compute.instances.os_inventory import exceptions
 
 
-class DescribeTestAlpha(test_base.BaseTest, test_case.WithOutputCapture):
+class DescribeTestGA(test_base.BaseTest, test_case.WithOutputCapture):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('v1')
 
   def testDescribeWithInventoryData(self):
     installed_packages = (
@@ -228,6 +230,24 @@ class DescribeTestAlpha(test_base.BaseTest, test_case.WithOutputCapture):
         zone='zone-1')
     self.CheckRequests([(service, method, request)])
     self.assertFalse(self.GetOutput())
+
+
+class DescribeTestBeta(DescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi('beta')
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

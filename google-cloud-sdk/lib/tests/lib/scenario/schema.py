@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,12 +152,15 @@ class Scenario(object):
 
     if 'summary' in self._data:
       del self._data['summary']
-    self._data.insert(len(self._data) - 1, 'summary', steps)
-    self._data.yaml_set_comment_before_after_key(
-        'summary',
-        after='This summary is generated automatically on update and should '
-              'not be edited.',
-        after_indent=0)
+    # Only add the summary if it's non-empty; otherwise ruamel messes up the
+    # subsequent indentation when inserting a comment after an empty list.
+    if steps:
+      self._data.insert(len(self._data) - 1, 'summary', steps)
+      self._data.yaml_set_comment_before_after_key(
+          'summary',
+          after='This summary is generated automatically on update and should '
+                'not be edited.',
+          after_indent=0)
     scenario_context.RewriteScenario()
 
 
@@ -408,6 +411,9 @@ class ExecuteBinaryAction(Action):
     self._timeout = timeout
     self._stdin = stdin
     self._original_data = original_data
+
+  def Summary(self):
+    return [{'execute_binary': ' '.join(self._args)}]
 
   def Execute(self, scenario_context):
     original_data = scenario_context.resource_ref_resolver.Resolve(

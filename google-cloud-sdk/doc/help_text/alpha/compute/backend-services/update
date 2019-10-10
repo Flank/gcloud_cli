@@ -8,8 +8,8 @@ SYNOPSIS
         [--connection-drain-on-failover]
         [--connection-draining-timeout=CONNECTION_DRAINING_TIMEOUT]
         [--description=DESCRIPTION] [--drop-traffic-if-unhealthy]
-        [--enable-cdn] [--enable-logging] [--failover-ratio=FAILOVER_RATIO]
-        [--health-checks=HEALTH_CHECK,[...]]
+        [--[no-]enable-cdn] [--enable-logging]
+        [--failover-ratio=FAILOVER_RATIO] [--health-checks=HEALTH_CHECK,[...]]
         [--http-health-checks=HTTP_HEALTH_CHECK,[...]]
         [--https-health-checks=HTTPS_HEALTH_CHECK,[...]]
         [--iap=disabled|enabled,[oauth2-client-id=OAUTH2-CLIENT-ID,
@@ -85,10 +85,12 @@ FLAGS
         the primary and backup instance groups. Not compatible with the
         --global flag and load balancing scheme must be INTERNAL.
 
-     --enable-cdn
-        Enable Cloud CDN for the backend service. Cloud CDN can cache HTTP
-        responses from a backend service at the edge of the network, close to
-        users. Cloud CDN is disabled by default.
+     --[no-]enable-cdn
+        Enable or disable Cloud CDN for the backend service. Only available for
+        backend services with --load-balancing-scheme=EXTERNAL that use a
+        --protocol of HTTP, HTTPS, or HTTP2. Cloud CDN caches HTTP responses at
+        the edge of Google's network. Cloud CDN is disabled by default. Use
+        --enable-cdn to enable and --no-enable-cdn to disable.
 
      --enable-logging
         The logging options for the load balancer traffic served by this
@@ -113,7 +115,7 @@ FLAGS
         Legacy health checks are not recommended for backend services. It is
         possible to use a legacy health check on a backend service for a
         HTTP(S) load balancer if that backend service uses instance groups. For
-        more information, see this guide:
+        more information, refer to this guide:
         https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
 
      --https-health-checks=HTTPS_HEALTH_CHECK,[...]
@@ -123,7 +125,7 @@ FLAGS
         Legacy health checks are not recommended for backend services. It is
         possible to use a legacy health check on a backend service for a
         HTTP(S) load balancer if that backend service uses instance groups. For
-        more information, see this guide:
+        more information, refer to this guide:
         https://cloud.google.com/load-balancing/docs/health-check-concepts#lb_guide
 
      --iap=disabled|enabled,[oauth2-client-id=OAUTH2-CLIENT-ID,oauth2-client-secret=OAUTH2-CLIENT-SECRET]
@@ -176,17 +178,45 @@ FLAGS
             Route requests to instances based on the hash of the client's IP
             address.
          CLIENT_IP_PORT_PROTO
-            (Applicable if load-balancing scheme is internal) Connections from
-            the same client IP with the same IP protocol and port will go to
-            the same VM in the backend while that VM remains healthy.
+            (Applicable if --load-balancing-scheme is INTERNAL) Connections
+            from the same client IP with the same IP protocol and port will go
+            to the same backend VM while that VM remains healthy.
          CLIENT_IP_PROTO
-            (Applicable if load-balancing scheme is internal) Connections from
-            the same client IP with the same IP protocol will go to the same VM
-            in the pool while that VM remains healthy.
+            (Applicable if --load-balancing-scheme is INTERNAL) Connections
+            from the same client IP with the same IP protocol will go to the
+            same backend VM while that VM remains healthy.
          GENERATED_COOKIE
-            (Applicable if load-balancing scheme is external) Route requests to
-            instances based on the contents of the "GCLB" cookie set by the
-            load balancer.
+            (Applicable if --load-balancing-scheme is INTERNAL_MANAGED,
+            INTERNAL_SELF_MANAGED, or EXTERNAL) If the --load-balancing-scheme
+            is EXTERNAL, routes requests to backend VMs or endpoints in a NEG,
+            based on the contents of the GCLB cookie set by the load balancer.
+            Only applicable when --protocol is HTTP, HTTPS, or HTTP2. If the
+            --load-balancing-scheme is INTERNAL_MANAGED or
+            INTERNAL_SELF_MANAGED, routes requests to backend VMs or endpoints
+            in a NEG, based on the contents of the GCILB cookie set by the
+            proxy. (If no cookie is present, the proxy chooses a backend VM or
+            endpoint and sends a Set-Cookie response for future requests.) If
+            the --load-balancing-scheme is INTERNAL_SELF_MANAGED, routes
+            requests to backend VMs or endpoints in a NEG, based on the
+            contents of a cookie set by Traffic Director.
+         HEADER_FIELD
+            (Applicable if --load-balancing-scheme is INTERNAL_MANAGED or
+            INTERNAL_SELF_MANAGED) Route requests to backend VMs or endpoints
+            in a NEG based on the value of the HTTP header named in the
+            --custom-request-header flag. This session affinity is only valid
+            if the load balancing locality policy is either RING_HASH or MAGLEV
+            and the backend service's consistent hash specifies the name of the
+            HTTP header.
+         HTTP_COOKIE
+            (Applicable if --load-balancing-scheme is INTERNAL_MANAGED or
+            INTERNAL_SELF_MANAGED) Route requests to backend VMs or endpoints
+            in a NEG, based on an HTTP cookie named in the HTTP_COOKIE flag
+            (with the optional --affinity-cookie-ttl flag). If the client has
+            not provided the cookie, the proxy generates the cookie and returns
+            it to the client in a Set-Cookie header. This session affinity is
+            only valid if the load balancing locality policy is either
+            RING_HASH or MAGLEV and the backend service's consistent hash
+            specifies the HTTP cookie.
          NONE
             Session affinity is disabled.
 
@@ -205,20 +235,27 @@ FLAGS
         This flag only affects signed URL requests.
 
      --timeout=TIMEOUT
-        Only applicable to HTTP(S), SSL Proxy, and TCP Proxy load balancers:
-        The amount of time to wait for a backend to return a full response for
-        the request and for the load balancer to proxy the response to the
-        client before considering the request failed.
+        Applicable to all load balancers except internal TCP/UDP load
+        balancers. For internal TCP/UDP load balancers (load-balancing-scheme
+        INTERNAL), timeout is ignored.
 
-        For example, specifying 10s gives instances 10 seconds to respond to
-        requests. The load balancer will retry GET requests once if the backend
-        closes the connection or times out before sending response headers to
-        the proxy. If the backend produces any response headers, the load
-        balancer does not retry. If the backend does not reply at all, the load
-        balancer returns a 502 Bad Gateway error to the client. See $ gcloud
-        topic datetimes for information on duration formats.
+        If the protocol is HTTP, HTTPS, or HTTP2, timeout is a request/response
+        timeout for HTTP(S) traffic, meaning the amount of time that the load
+        balancer waits for a backend to return a full response to a request. If
+        WebSockets traffic is supported, the timeout parameter sets the maximum
+        amount of time that a WebSocket can be open (idle or not).
 
-        This parameter has no effect if the load-balancing-scheme is INTERNAL.
+        For example, for HTTP, HTTPS, or HTTP2 traffic, specifying a timeout of
+        10s means that backends have 10 seconds to respond to the load
+        balancer's requests. The load balancer retries the HTTP GET request one
+        time if the backend closes the connection or times out before sending
+        response headers to the load balancer. If the backend sends response
+        headers or if the request sent to the backend is not an HTTP GET
+        request, the load balancer does not retry. If the backend does not
+        reply at all, the load balancer returns a 502 Bad Gateway error to the
+        client.
+
+        If the protocol is SSL or TCP, timeout is an idle timeout.
 
      At most one of these may be specified:
 
@@ -295,9 +332,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute backend-services update
         $ gcloud beta compute backend-services update

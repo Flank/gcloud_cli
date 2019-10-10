@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,15 +41,15 @@ class TargetHTTPProxiesUpdateTest(test_base.BaseTest):
               project='my-project',
               targetHttpProxy='target-http-proxy-1',
               urlMapReference=self.messages.UrlMapReference(
-                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                           'my-project/global/urlMaps/my-map' % {
                               'api': self._api
                           }))))],)
 
   def testUriSupport(self):
     self.RunUpdate("""
-          https://www.googleapis.com/compute/%(api)s/projects/my-project/global/targetHttpProxies/target-http-proxy-1
-          --url-map https://www.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-map
+          https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/targetHttpProxies/target-http-proxy-1
+          --url-map https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/my-map
         """ % {'api': self._api})
 
     self.CheckRequests(
@@ -58,7 +58,7 @@ class TargetHTTPProxiesUpdateTest(test_base.BaseTest):
               project='my-project',
               targetHttpProxy='target-http-proxy-1',
               urlMapReference=self.messages.UrlMapReference(
-                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                           'my-project/global/urlMaps/my-map' % {
                               'api': self._api
                           }))))],)
@@ -71,7 +71,18 @@ class TargetHTTPProxiesUpdateTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class TargetHTTPProxiesUpdateAlphaTest(TargetHTTPProxiesUpdateTest):
+class TargetHTTPProxiesUpdateBetaTest(TargetHTTPProxiesUpdateTest):
+
+  def SetUp(self):
+    self._api = 'beta'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_beta.targetHttpProxies
+
+  def RunUpdate(self, command):
+    self.Run('beta compute target-http-proxies update --global ' + command)
+
+
+class TargetHTTPProxiesUpdateAlphaTest(TargetHTTPProxiesUpdateBetaTest):
 
   def SetUp(self):
     self._api = 'alpha'
@@ -82,15 +93,15 @@ class TargetHTTPProxiesUpdateAlphaTest(TargetHTTPProxiesUpdateTest):
     self.Run('alpha compute target-http-proxies update --global ' + command)
 
 
-class RegionTargetHTTPProxiesUpdateTest(test_base.BaseTest):
+class RegionTargetHTTPProxiesUpdateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self._api = 'alpha'
+    self._api = 'beta'
     self.SelectApi(self._api)
-    self._target_http_proxies_api = self.compute_alpha.regionTargetHttpProxies
+    self._target_http_proxies_api = self.compute_beta.regionTargetHttpProxies
 
   def RunUpdate(self, command):
-    self.Run('alpha compute target-http-proxies update --region us-west-1 ' +
+    self.Run('beta compute target-http-proxies update --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -103,15 +114,15 @@ class RegionTargetHTTPProxiesUpdateTest(test_base.BaseTest):
               region='us-west-1',
               targetHttpProxy='target-http-proxy-1',
               urlMapReference=self.messages.UrlMapReference(
-                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                           'my-project/regions/us-west-1/urlMaps/my-map' % {
                               'api': self._api
                           }))))],)
 
   def testUriSupport(self):
     self.RunUpdate("""
-          https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpProxies/target-http-proxy-1
-          --url-map https://www.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
+          https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/targetHttpProxies/target-http-proxy-1
+          --url-map https://compute.googleapis.com/compute/%(api)s/projects/my-project/regions/us-west-1/urlMaps/my-map
         """ % {'api': self._api})
 
     self.CheckRequests(
@@ -121,7 +132,7 @@ class RegionTargetHTTPProxiesUpdateTest(test_base.BaseTest):
               region='us-west-1',
               targetHttpProxy='target-http-proxy-1',
               urlMapReference=self.messages.UrlMapReference(
-                  urlMap=('https://www.googleapis.com/compute/%(api)s/projects/'
+                  urlMap=('https://compute.googleapis.com/compute/%(api)s/projects/'
                           'my-project/regions/us-west-1/urlMaps/my-map' % {
                               'api': self._api
                           }))))],)
@@ -132,6 +143,19 @@ class RegionTargetHTTPProxiesUpdateTest(test_base.BaseTest):
       self.RunUpdate('my-proxy')
 
     self.CheckRequests()
+
+
+class RegionTargetHTTPProxiesUpdateAlphaTest(
+    RegionTargetHTTPProxiesUpdateBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi(self._api)
+    self._target_http_proxies_api = self.compute_alpha.regionTargetHttpProxies
+
+  def RunUpdate(self, command):
+    self.Run('alpha compute target-http-proxies update --region us-west-1 ' +
+             command)
 
 
 if __name__ == '__main__':

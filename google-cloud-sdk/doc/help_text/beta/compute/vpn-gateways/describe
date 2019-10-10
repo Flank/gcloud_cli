@@ -11,9 +11,9 @@ DESCRIPTION
     data associated with a Google Compute Engine Highly Available VPN Gateway
     in a project.
 
-    High Available VPN Gateway provides a means to create a VPN solution with a
-    higher availability SLA compared to Classic Target VPN Gateway. High
-    Available VPN gateways are referred to as simply VPN gateways in the API
+    Highly Available VPN Gateway provides a means to create a VPN solution with
+    a higher availability SLA compared to Classic Target VPN Gateway. Highly
+    Available VPN gateways are simply referred to as VPN gateways in the API
     documentation and gcloud commands. A VPN Gateway can reference one or more
     VPN tunnels that connect it to external VPN gateways or Cloud VPN Gateways.
 
@@ -49,9 +49,16 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To describe a VPN gateway, run:
 
+        $ gcloud beta compute vpn-gateways describe my-gateway \
+          --region=us-central1
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute vpn-gateways describe
         $ gcloud alpha compute vpn-gateways describe
 

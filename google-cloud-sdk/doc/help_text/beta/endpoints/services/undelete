@@ -20,8 +20,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

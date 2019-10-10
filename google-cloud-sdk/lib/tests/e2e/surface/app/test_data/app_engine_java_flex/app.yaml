@@ -6,13 +6,14 @@ inbound_services:
 - warmup
 threadsafe: true
 resources:
-  memory_gb: 0.9
+  memory_gb: 3
   cpu: 0.5
 
 env_variables:
   'CDBG_AGENT_URL': 'https://storage.googleapis.com/cloud-debugger/appengine-java/current/cdbg_java_agent.tar.gz'
   'DBG_PORT': '5005'
   'DBG_ENABLE': '1'
+  'HEAP_SIZE_RATIO': 40
 beta_settings:
   'java_quickstart': 'true'
 health_check:

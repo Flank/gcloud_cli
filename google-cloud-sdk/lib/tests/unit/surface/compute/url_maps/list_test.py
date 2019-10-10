@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,25 +95,15 @@ class URLMapsListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     )
 
 
-class URLMapsListBetaTest(URLMapsListTest):
+class URLMapsListBetaTest(test_base.BaseTest,
+                          completer_test_base.CompleterBase):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
 
   def SetUp(self):
+    self._api = 'beta'
     self.SelectApi('beta')
-    self._url_maps_api = self.compute_beta.urlMaps
-    self._test_url_maps = test_resources.URL_MAPS_BETA
-
-  def RunList(self, command):
-    self.Run('beta compute url-maps list ' + command)
-
-
-class URLMapsListAlphaTest(test_base.BaseTest,
-                           completer_test_base.CompleterBase):
-
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self._compute_api = self.compute_alpha
+    self._compute_api = self.compute_beta
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
@@ -150,33 +140,34 @@ class URLMapsListAlphaTest(test_base.BaseTest,
     ]
 
   def testGlobalOption(self):
-    command = 'alpha compute url-maps list --uri --global'
+    command = self._api + ' compute url-maps list --uri --global'
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/global/url-maps/url-map1
-        https://www.googleapis.com/compute/alpha/projects/my-project/global/url-maps/url-map2
-    """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/global/url-maps/url-map1
+        https://compute.googleapis.com/compute/{0}/projects/my-project/global/url-maps/url-map2
+    """.format(self._api))
 
     self.RequestOnlyGlobal(command, self.url_maps, output)
 
   def testOneRegion(self):
-    command = 'alpha compute url-maps list --uri --regions region-1'
+    command = self._api + ' compute url-maps list --uri --regions region-1'
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/url-maps/region-url-map1
-        """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/url-maps/region-url-map1
+        """.format(self._api))
 
     self.RequestOneRegion(command, self.region_url_maps, output)
 
   def testTwoRegions(self):
-    command = 'alpha compute url-maps list --uri --regions region-1,region-2'
+    command = self._api + (' compute url-maps list --uri --regions '
+                           'region-1,region-2')
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/url-maps/region-url-map1
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-2/url-maps/region-url-map2
-        """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/url-maps/region-url-map1
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-2/url-maps/region-url-map2
+        """.format(self._api))
 
     self.RequestTwoRegions(command, self.region_url_maps, output)
 
   def testPositionalArgsWithSimpleNames(self):
-    command = 'alpha compute url-maps list'
+    command = self._api + ' compute url-maps list'
     return_value = self.url_maps + self.region_url_maps
     output = ("""\
         NAME            DEFAULT_SERVICE
@@ -252,6 +243,50 @@ class URLMapsListAlphaTest(test_base.BaseTest,
         errors=[])
 
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+
+class URLMapsListAlphaTest(URLMapsListBetaTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi('alpha')
+    self._compute_api = self.compute_alpha
+
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+
+    self.url_maps = [
+        self.messages.UrlMap(
+            name='url-map1',
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
+            selfLink=self.URI_PREFIX + 'global/url-maps/url-map1'),
+        self.messages.UrlMap(
+            name='url-map2',
+            defaultService=(self.URI_PREFIX +
+                            'global/backendService/default-service'),
+            selfLink=self.URI_PREFIX + 'global/url-maps/url-map2')
+    ]
+    self.region_url_maps = [
+        self.messages.UrlMap(
+            name='region-url-map1',
+            defaultService=(self.URI_PREFIX +
+                            'regions/region-1/backendService/default-service'),
+            region='region-1',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-1/url-maps/region-url-map1')),
+        self.messages.UrlMap(
+            name='region-url-map2',
+            defaultService=(self.URI_PREFIX +
+                            'regions/region-1/backendService/default-service'),
+            region='region-2',
+            selfLink=(self.URI_PREFIX +
+                      'regions/region-2/url-maps/region-url-map2'))
+    ]
 
 
 if __name__ == '__main__':

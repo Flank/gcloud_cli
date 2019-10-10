@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -179,11 +179,14 @@ def BuildCondition(messages, condition=None, display_name=None,
         count=trigger_count, percent=trigger_percent)
 
   kwargs = {
-      'aggregations': aggregations if aggregations else None,
       'trigger': trigger,
       'duration': duration,
       'filter': condition_filter,
   }
+
+  # This should be unset, not None, if empty
+  if aggregations:
+    kwargs['aggregations'] = aggregations
 
   if if_value is not None:
     comparator, threshold_value = if_value  # pylint: disable=unpacking-non-sequence

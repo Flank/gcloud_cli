@@ -21,6 +21,9 @@ GROUPS
      network-interfaces
         Read and manipulate Google Compute Engine instance network interfaces.
 
+     os-inventory
+        Read Google Compute Engine OS Inventory Data and Related Resources.
+
 COMMANDS
     COMMAND is one of the following:
 
@@ -62,6 +65,9 @@ COMMANDS
      detach-disk
         Detach disks from Compute Engine virtual machine instances.
 
+     get-guest-attributes
+        Get the Guest Attributes for a compute instance.
+
      get-iam-policy
         Get the IAM policy for a Google Compute Engine instance.
 
@@ -70,6 +76,10 @@ COMMANDS
 
      get-shielded-identity
         Get the Shielded identity for a Google Compute Engine instance.
+
+     import
+        Create Google Compute Engine virtual machine instances from virtual
+        appliance in OVA/OVF format.
 
      list
         List Google Compute Engine instances.

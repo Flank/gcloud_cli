@@ -11,7 +11,7 @@ gcloud alpha compute os\-config patch\-jobs execute \- execute an OS patch on th
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute os\-config patch\-jobs execute\fR \fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR [\fB\-\-apt\-dist\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-retry\fR] [\fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute os\-config patch\-jobs execute\fR \fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR [\fB\-\-apt\-dist\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-retry\fR] [\fB\-\-post\-patch\-linux\-executable\fR=\fIPOST_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-post\-patch\-linux\-success\-codes\fR=[\fIPOST_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-post\-patch\-windows\-success\-codes\fR=[\fIPOST_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-linux\-executable\fR=\fIPRE_PATCH_LINUX_EXECUTABLE\fR\ \fB\-\-pre\-patch\-linux\-success\-codes\fR=[\fIPRE_PATCH_LINUX_SUCCESS_CODES\fR,...]] [\fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR\ \fB\-\-pre\-patch\-windows\-success\-codes\fR=[\fIPRE_PATCH_WINDOWS_SUCCESS_CODES\fR,...]] [\fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fB\-\-zypper\-categories\fR=[\fIZYPPER_CATEGORIES\fR,...]\ \fB\-\-zypper\-severities\fR=[\fIZYPPER_SEVERITIES\fR,...]\ \fB\-\-zypper\-with\-optional\fR\ \fB\-\-zypper\-with\-update\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,15 +38,14 @@ Settings for machines running Apt:
 .RS 2m
 .TP 2m
 \fB\-\-apt\-dist\fR
-If specified, machines running Apt will patch using the command \f5apt\-get
-dist\-upgrade\fR; otherwise the patch will run \f5apt\-get upgrade\fR.
+If specified, machines running Apt use the \f5apt\-get dist\-upgrade\fR command;
+otherwise the \f5apt\-get upgrade\fR command is used.
 
 .RE
 .sp
 .TP 2m
 \fB\-\-async\fR
-Display information about the patch job that was started without waiting for it
-to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -55,18 +54,17 @@ Textual description of the patch job.
 .TP 2m
 \fB\-\-dry\-run\fR
 Whether to execute this patch job as a dry run. If this patch job is a dry run,
-instances will be contacted, but they will do nothing.
+instances are contacted, but the patch is not run.
 
 .TP 2m
 \fB\-\-duration\fR=\fIDURATION\fR
 Total duration in which the patch job must complete. If the patch does not
-complete in this time, it will time out, and while some instances may still be
-running the patch, they will not continue to work after they complete their
+complete in this time, the process times out. While some instances might still
+be running the patch, they will not continue to work after completing the
 current step. See $ gcloud topic datetimes for information on specifying
 absolute time durations.
 
-
-If unspecified, the job will stay active until all instances complete the patch.
+If unspecified, the job stays active until all instances complete the patch.
 
 .TP 2m
 \fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR
@@ -75,23 +73,119 @@ Post\-patch reboot settings. \fIREBOOT_CONFIG\fR must be one of:
 .RS 2m
 .TP 2m
 \fBalways\fR
-Always reboot the machine after the update has completed.
+Always reboot the machine after the update completes.
 .TP 2m
 \fBdefault\fR
-The agent will decide if a reboot is necessary by checking well known signals
-such as registry keys or '/var/run/reboot\-required'.
+The agent decides if a reboot is necessary by checking signals such as registry
+keys or '/var/run/reboot\-required'.
 .TP 2m
 \fBnever\fR
-Never reboot the machine after the update has completed.
+Never reboot the machine after the update completes.
 .RE
 .sp
 
 
 .TP 2m
 \fB\-\-retry\fR
-Whether to attempt to retry during the duration window if patching fails. If
-omitted, the agent will use its default retry strategy.
+Specifies whether to attempt to retry, within the duration window, if patching
+initially fails. If omitted, the agent uses its default retry strategy.
 
+.TP 2m
+
+Post\-patch step settings for Linux machines:
+
+.RS 2m
+.TP 2m
+\fB\-\-post\-patch\-linux\-executable\fR=\fIPOST_PATCH_LINUX_EXECUTABLE\fR
+A set of commands to run on a Linux machine after an OS patch completes.
+Commands must be supplied in a file. If the file contains a shell script,
+include the shebang line.
+
+The path to the file must be supplied in one of the following formats:
+
+An absolute path of the file on the local filesystem.
+
+A URI for a Google Cloud Storage object with a generation number.
+
+.TP 2m
+\fB\-\-post\-patch\-linux\-success\-codes\fR=[\fIPOST_PATCH_LINUX_SUCCESS_CODES\fR,...]
+Additional exit codes that the executable can return to indicate a successful
+run. The default exit code for success is 0.
+
+.RE
+.sp
+.TP 2m
+
+Post\-patch step settings for Windows machines:
+
+.RS 2m
+.TP 2m
+\fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR
+A set of commands to run on a Windows machine after an OS patch completes.
+Commands must be supplied in a file. If the file contains a PowerShell script,
+include the .ps1 file extension.
+
+The path to the file must be supplied in one of the following formats:
+
+An absolute path of the file on the local filesystem.
+
+A URI for a Google Cloud Storage object with a generation number.
+
+.TP 2m
+\fB\-\-post\-patch\-windows\-success\-codes\fR=[\fIPOST_PATCH_WINDOWS_SUCCESS_CODES\fR,...]
+Additional exit codes that the executable can return to indicate a successful
+run. The default exit code for success is 0.
+
+.RE
+.sp
+.TP 2m
+
+Pre\-patch step settings for Linux machines:
+
+.RS 2m
+.TP 2m
+\fB\-\-pre\-patch\-linux\-executable\fR=\fIPRE_PATCH_LINUX_EXECUTABLE\fR
+A set of commands to run on a Linux machine before an OS patch begins. Commands
+must be supplied in a file. If the file contains a shell script, include the
+shebang line.
+
+The path to the file must be supplied in one of the following formats:
+
+An absolute path of the file on the local filesystem.
+
+A URI for a Google Cloud Storage object with a generation number.
+
+.TP 2m
+\fB\-\-pre\-patch\-linux\-success\-codes\fR=[\fIPRE_PATCH_LINUX_SUCCESS_CODES\fR,...]
+Additional exit codes that the executable can return to indicate a successful
+run. The default exit code for success is 0.
+
+.RE
+.sp
+.TP 2m
+
+Pre\-patch step settings for Windows machines:
+
+.RS 2m
+.TP 2m
+\fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR
+A set of commands to run on a Windows machine before an OS patch begins.
+Commands must be supplied in a file. If the file contains a PowerShell script,
+include the .ps1 file extension.
+
+The path to the file must be supplied in one of the following formats:
+
+An absolute path of the file on the local filesystem.
+
+A URI for a Google Cloud Storage object with a generation number.
+
+.TP 2m
+\fB\-\-pre\-patch\-windows\-success\-codes\fR=[\fIPRE_PATCH_WINDOWS_SUCCESS_CODES\fR,...]
+Additional exit codes that the executable can return to indicate a successful
+run. The default exit code for success is 0.
+
+.RE
+.sp
 .TP 2m
 
 Settings for machines running Windows:
@@ -100,13 +194,12 @@ Settings for machines running Windows:
 .TP 2m
 \fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]
 List of classifications to use to restrict the Windows update. Only patches of
-the given classifications will be applied. If omitted, a default Windows update
-will be performed. For more information on classifications, see:
-https://support.microsoft.com/en\-us/help/824684
-
-\fIWINDOWS_CLASSIFICATIONS\fR must be one of: \fBcritical\fR, \fBsecurity\fR,
-\fBdefinition\fR, \fBdriver\fR, \fBfeature\-pack\fR, \fBservice\-pack\fR,
-\fBtool\fR, \fBupdate\-rollup\fR, \fBupdate\fR.
+the given classifications are applied. If omitted, a default Windows update is
+performed. For more information on classifications, see:
+https://support.microsoft.com/en\-us/help/824684. \fIWINDOWS_CLASSIFICATIONS\fR
+must be one of: \fBcritical\fR, \fBsecurity\fR, \fBdefinition\fR, \fBdriver\fR,
+\fBfeature\-pack\fR, \fBservice\-pack\fR, \fBtool\fR, \fBupdate\-rollup\fR,
+\fBupdate\fR.
 
 .TP 2m
 \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]
@@ -122,18 +215,45 @@ Settings for machines running Yum:
 .TP 2m
 \fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]
 Optional list of packages to exclude from updating. If this argument is
-specified, machines running Yum will exclude the given list of packages using
-the Yum \f5\-\-exclude\fR flag.
+specified, machines running Yum exclude the given list of packages using the Yum
+\f5\-\-exclude\fR flag.
 
 .TP 2m
 \fB\-\-yum\-minimal\fR
-If specified, machines running Yum will patch using the command \f5yum
-update\-minimal\fR; otherwise the patch will run \f5yum\-update\fR.
+If specified, machines running Yum use the command \f5yum update\-minimal\fR;
+otherwise the patch uses \f5yum\-update\fR.
 
 .TP 2m
 \fB\-\-yum\-security\fR
-If specified, machines running Yum will append the \f5\-\-security\fR flag to
-the patch command.
+If specified, machines running Yum append the \f5\-\-security\fR flag to the
+patch command.
+
+.RE
+.sp
+.TP 2m
+
+Settings for machines running Zypper:
+
+.RS 2m
+.TP 2m
+\fB\-\-zypper\-categories\fR=[\fIZYPPER_CATEGORIES\fR,...]
+If specified, machines running Zypper install only patches with the specified
+categories. Categories include security, recommended, and feature.
+
+.TP 2m
+\fB\-\-zypper\-severities\fR=[\fIZYPPER_SEVERITIES\fR,...]
+If specified, machines running Zypper install only patch with the specified
+severities. Severities include critical, important, moderate, and low.
+
+.TP 2m
+\fB\-\-zypper\-with\-optional\fR
+If specified, machines running Zypper add the \f5\-\-with\-optional\fR flag to
+\f5zypper patch\fR.
+
+.TP 2m
+\fB\-\-zypper\-with\-update\fR
+If specified, machines running Zypper add the \f5\-\-with\-update\fR flag to
+\f5zypper patch\fR.
 
 
 .RE
@@ -191,6 +311,19 @@ $ gcloud alpha compute os\-config patch\-jobs execute \e
 \-\-windows\-classifications=SECURITY,CRITICAL
 .RE
 
+To patch all instances in the current project and specify scripts to run
+pre\-patch and post\-patch, run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter="" \e
+\-\-pre\-patch\-linux\-executable="/bin/my\-script" \e
+\-\-pre\-patch\-linux\-success\-codes=0,200 \e
+\-\-pre\-patch\-windows\-executable="C:\e\eUsers\e\euser\e\etest\-script.ps1" \e
+\-\-post\-patch\-linux\-executable="gs://my\-bucket/my\-linux\-script#12345" \e
+\-\-post\-patch\-windows\-executable="gs://my\-bucket/my\-windows\-script#67890"
+.RE
+
 
 \fR
 
@@ -198,7 +331,6 @@ $ gcloud alpha compute os\-config patch\-jobs execute \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

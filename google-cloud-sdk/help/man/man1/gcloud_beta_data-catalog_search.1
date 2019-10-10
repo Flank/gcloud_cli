@@ -1,0 +1,136 @@
+
+.TH "GCLOUD_BETA_DATA\-CATALOG_SEARCH" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta data\-catalog search \- search Cloud Data Catalog for resources that match a query
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta data\-catalog search\fR \fIQUERY\fR (\fB\-\-include\-gcp\-public\-datasets\fR\ \fB\-\-include\-organization\-ids\fR=[\fIORGANIZATION\fR,...]\ \fB\-\-include\-project\-ids\fR=[\fIPROJECT\fR,...]) [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-order\-by\fR=\fIORDER_BY\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Search Cloud Data Catalog for resources that match a query.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIQUERY\fR
+Query string in search query syntax in Cloud Data Catalog. For more information,
+see: https://cloud.google.com/data\-catalog/docs/how\-to/search\-reference
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Scope. Control the scope of the search. At least one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-include\-gcp\-public\-datasets\fR
+If True, include Google Cloud Platform public datasets in the search results.
+
+.TP 2m
+\fB\-\-include\-organization\-ids\fR=[\fIORGANIZATION\fR,...]
+List of Cloud Organization IDs to include in the search.
+
+.TP 2m
+\fB\-\-include\-project\-ids\fR=[\fIPROJECT\fR,...]
+List of Cloud Project IDs to include in the search.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR.
+
+.TP 2m
+\fB\-\-order\-by\fR=\fIORDER_BY\fR
+Specifies the ordering of results. Defaults to 'relevance'.
+
+Currently supported case\-sensitive choices are:
+
+.RS 2m
+.IP "\(em" 2m
+relevance
+.IP "\(em" 2m
+last_access_timestamp [asc|desc]: defaults to descending.
+.IP "\(em" 2m
+last_modified_timestamp [asc|desc]: defaults to descending.
+
+.RE
+.RE
+.sp
+To order by last modified timestamp ascending, specify:
+\f5\-\-order\-by="last_modified_timestamp desc"\fR.
+
+.RS 2m
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To search project 'my\-project' for Cloud Data Catalog resources that match the
+simple predicate 'foo':
+
+.RS 2m
+$ gcloud beta data\-catalog search 'foo' \e
+    \-\-include\-project\-ids=my\-project
+.RE
+
+To search organization '1234' for Cloud Data Catalog resources that match
+entities whose names match the predicate 'foo':
+
+.RS 2m
+$ gcloud beta data\-catalog search 'name:foo' \e
+    \-\-include\-organization\-ids=1234
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog search
+.RE
+

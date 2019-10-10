@@ -1,0 +1,28 @@
+NAME
+    gcloud compute networks vpc-access locations - manage locations resource
+        for VPC Access Service
+
+SYNOPSIS
+    gcloud compute networks vpc-access locations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Commands for managing locations resource for VPC Access Service.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        List VPC Access Service regions.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta compute networks vpc-access locations
+

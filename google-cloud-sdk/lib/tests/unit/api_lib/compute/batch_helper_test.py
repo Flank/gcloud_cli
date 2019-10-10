@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,9 +55,17 @@ class MakeRequestsTest(cli_test_base.CliTestBase):
     properties.VALUES.core.should_prompt_to_enable_api.Set(True)
 
     service_enablement = {'enabled': False}
+    service_enabled_mock = self.StartPatch(
+        'googlecloudsdk.api_lib.services.enable_api.'
+        'IsServiceEnabled')
+    def IsServiceEnabled(enable_project, enable_service):
+      self.assertEqual(enable_project, self.project)
+      self.assertEqual(enable_service, self.service)
+      return service_enablement['enabled']
+    service_enabled_mock.side_effect = IsServiceEnabled
     enable_mock = self.StartPatch(
         'googlecloudsdk.api_lib.services.enable_api.'
-        'EnableServiceIfDisabled')
+        'EnableService')
     def Enable(enable_project, enable_service):
       self.assertEqual(enable_project, self.project)
       self.assertEqual(enable_service, self.service)

@@ -11,7 +11,7 @@ gcloud alpha compute disks create \- create Google Compute Engine persistent dis
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-erase\-windows\-vss\-signature\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ \fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,6 +67,12 @@ more details.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the disks being created.
+
+.TP 2m
+\fB\-\-erase\-windows\-vss\-signature\fR
+Specifies whether the disk restored from a source snapshot should erase Windows
+specific VSS signature. See
+https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#\-\-guest\-flush
 
 .TP 2m
 \fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]
@@ -225,6 +231,53 @@ command. This flag is mutually exclusive with \fB\-\-image\fR.
 When using this option, the size of the disks must be at least as large as the
 snapshot size. Use \fB\-\-size\fR to adjust the size of the disks.
 
+.TP 2m
+
+Source disk options
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR
+Source disk used to create the disks. It is safe to delete a source disk after a
+disk has been created from the source disk. To get a list of disks in your
+current project, run \f5gcloud compute disks list\fR. This flag is mutually
+exclusive with \fB\-\-image\fR and \fB\-\-source\-snapshot\fR.
+
+When using this option, the size of the disks must be at least as large as the
+source disk size. Use \fB\-\-size\fR to adjust the size of the disks.
+
+The value for this option can be the name of a disk with the zone specified via
+\f5\fI\-\-source\-disk\-zone\fR\fR flag.
+
+.TP 2m
+\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR
+Zone of the source disk to operate on. If not specified and the
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
+zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+.RE
 .RE
 .sp
 .TP 2m
@@ -331,9 +384,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute disks create

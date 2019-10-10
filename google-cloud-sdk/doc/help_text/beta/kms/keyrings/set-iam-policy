@@ -35,7 +35,7 @@ EXAMPLES
     'policy.json' and set it for the keyring fellowship with location global:
 
         $ gcloud beta kms keyrings set-iam-policy fellowship policy.json \
-            --location global
+            --location=global
 
 NOTES
     This command is currently in BETA and may change without notice. These

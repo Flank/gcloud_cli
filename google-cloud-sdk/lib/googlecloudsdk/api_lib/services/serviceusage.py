@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,13 +21,15 @@ from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.services import exceptions
-from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.api_lib.util import apis_internal
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.util import retry
+from googlecloudsdk.core.credentials import http as http_creds
 
 _PROJECT_RESOURCE = 'projects/%s'
 _PROJECT_SERVICE_RESOURCE = 'projects/%s/services/%s'
+_V1_VERSION = 'v1'
+_V1ALPHA_VERSION = 'v1alpha'
 
 
 def EnableApiCall(project, service):
@@ -126,6 +128,38 @@ def DisableApiCall(project, service, force=False):
     exceptions.ReraiseError(e, exceptions.Error)
 
 
+def GetService(project, service):
+  """Get a service.
+
+  Args:
+    project: The project for which to get the service.
+    service: The service to get.
+
+  Raises:
+    exceptions.GetServicePermissionDeniedException: when getting service fails.
+    apitools_exceptions.HttpError: Another miscellaneous error with the service.
+
+  Returns:
+    The service configuration.
+  """
+  client = _GetClientInstance()
+  messages = client.MESSAGES_MODULE
+
+  request = messages.ServiceusageServicesGetRequest(
+      name=_PROJECT_SERVICE_RESOURCE % (project, service))
+  try:
+    return client.services.Get(request)
+  except (apitools_exceptions.HttpForbiddenError,
+          apitools_exceptions.HttpNotFoundError) as e:
+    exceptions.ReraiseError(e, exceptions.GetServicePermissionDeniedException)
+
+
+def IsServiceEnabled(service):
+  client = _GetClientInstance()
+  messages = client.MESSAGES_MODULE
+  return service.state == messages.GoogleApiServiceusageV1Service.StateValueValuesEnum.ENABLED
+
+
 def ListServices(project, enabled, page_size, limit):
   """Make API call to list services.
 
@@ -189,42 +223,45 @@ def GetOperation(name):
     exceptions.ReraiseError(e, exceptions.OperationErrorException)
 
 
-def WaitOperation(name):
-  """Wait till the operation is done.
+def GenerateServiceIdentity(project, service):
+  """Generate a service identity.
 
   Args:
-    name: The name of operation.
+    project: The project to generate a service identity for.
+    service: The service to generate a service identity for.
 
   Raises:
-    exceptions.OperationErrorException: when the getting operation API fails.
+    exceptions.GenerateServiceIdentityPermissionDeniedException: when generating
+    service identity fails.
     apitools_exceptions.HttpError: Another miscellaneous error with the service.
 
   Returns:
-    The result of the operation
+    The email and uid of the generated service identity.
   """
+  client = _GetClientInstance(version=_V1ALPHA_VERSION)
+  messages = client.MESSAGES_MODULE
 
-  def _CheckOp(name, result):
-    op = GetOperation(name)
-    if op.done:
-      result.append(op)
-    return not op.done
-
-  # Wait for no more than 30 minutes while retrying the Operation retrieval
-  result = []
+  request = messages.ServiceusageServicesGenerateIdentityRequest(
+      parent=_PROJECT_SERVICE_RESOURCE % (project, service))
   try:
-    retry.Retryer(
-        exponential_sleep_multiplier=1.1,
-        wait_ceiling_ms=10000,
-        max_wait_ms=30 * 60 * 1000).RetryOnResult(
-            _CheckOp, [name, result], should_retry_if=True, sleep_ms=2000)
-  except retry.MaxRetrialsException:
-    raise exceptions.TimeoutError('Timed out while waiting for '
-                                  'operation {0}. Note that the operation '
-                                  'is still pending.'.format(name))
-  return result[0] if result else None
+    op = client.services.GenerateIdentity(request)
+    return _GetOperationResponseProperty(
+        op, 'email'), _GetOperationResponseProperty(op, 'unique_id')
+  except (apitools_exceptions.HttpForbiddenError,
+          apitools_exceptions.HttpNotFoundError) as e:
+    exceptions.ReraiseError(
+        e, exceptions.GenerateServiceIdentityPermissionDeniedException)
 
 
-def _GetClientInstance():
+def _GetOperationResponseProperty(op, key):
+  return next((p.value.string_value
+               for p in op.response.additionalProperties
+               if p.key == key), None)
+
+
+def _GetClientInstance(version='v1'):
+  """Get a client instance for service usage."""
+  # pylint:disable=protected-access
   # Specifically disable resource quota in all cases for service management.
   # We need to use this API to turn on APIs and sometimes the user doesn't have
   # this API turned on. We should always use the shared project to do this
@@ -232,5 +269,8 @@ def _GetClientInstance():
   # has explicitly set the quota project, then respect that.
   enable_resource_quota = (
       properties.VALUES.billing.quota_project.IsExplicitlySet())
-  return apis.GetClientInstance(
-      'serviceusage', 'v1', enable_resource_quota=enable_resource_quota)
+  http_client = http_creds.Http(
+      response_encoding=http_creds.ENCODING,
+      enable_resource_quota=enable_resource_quota)
+  return apis_internal._GetClientInstance(
+      'serviceusage', version, http_client=http_client)

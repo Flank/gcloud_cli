@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha sql instances create INSTANCE
-        [--activation-policy=ACTIVATION_POLICY] [--assign-ip] [--async]
+        [--activation-policy=ACTIVATION_POLICY] [--[no-]assign-ip] [--async]
         [--authorized-gae-apps=APP,[APP,...]]
         [--authorized-networks=NETWORK,[NETWORK,...]]
         [--availability-type=AVAILABILITY_TYPE] [--no-backup]
@@ -24,6 +24,10 @@ SYNOPSIS
         [--storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT]
         [--storage-size=STORAGE_SIZE] [--storage-type=STORAGE_TYPE]
         [--tier=TIER, -t TIER]
+        [--disk-encryption-key=DISK_ENCRYPTION_KEY
+          : --disk-encryption-key-keyring=DISK_ENCRYPTION_KEY_KEYRING
+          --disk-encryption-key-location=DISK_ENCRYPTION_KEY_LOCATION
+          --disk-encryption-key-project=DISK_ENCRYPTION_KEY_PROJECT]
         [--master-dump-file-path=MASTER_DUMP_FILE_PATH
           --master-username=MASTER_USERNAME
           : [--master-ca-certificate-path=MASTER_CA_CERTIFICATE_PATH
@@ -51,14 +55,15 @@ FLAGS
         https://cloud.google.com/sql/faq#activation_policy. ACTIVATION_POLICY
         must be one of: always, never, on-demand.
 
-     --assign-ip
+     --[no-]assign-ip
         Assign an IPv4 external address to this instance. This setting is
-        enabled by default. To create an instance which only has a private IP,
-        use --no-assign-ip and specify a private network.
+        enabled by default when creating a new instance, but can be disabled to
+        use private IP connectivity. Use --assign-ip to enable and
+        --no-assign-ip to disable.
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --authorized-gae-apps=APP,[APP,...]
         First Generation instances only. List of project IDs for App Engine
@@ -71,8 +76,7 @@ FLAGS
         (e.g. 192.168.100.0/24).
 
      --availability-type=AVAILABILITY_TYPE
-        Specifies level of availability. Only applies to PostgreSQL instances.
-        AVAILABILITY_TYPE must be one of:
+        Specifies level of availability. AVAILABILITY_TYPE must be one of:
 
          regional
             Provides high availability and is recommended for production
@@ -199,7 +203,8 @@ FLAGS
 
      --storage-size=STORAGE_SIZE
         Amount of storage allocated to the instance. Must be an integer number
-        of GB between 10GB and 10230GB inclusive. The default is 10GB.
+        of GB. The default is 10GB. Information on storage limits can be found
+        here: https://cloud.google.com/sql/docs/quotas#storage_limits
 
      --storage-type=STORAGE_TYPE
         The storage type for the instance. The default is SSD. STORAGE_TYPE
@@ -215,6 +220,26 @@ FLAGS
         IMPORTANT: First Generation instances are deprecated. If you're
         considering any First Generation tiers, we recommend using Second
         Generation instead.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the instance. Please ensure that you have the
+     resourcemanager.projects.setIamPolicy permission for the project
+     associated with the key. The arguments in this group can be used to
+     specify the attributes of this resource.
+
+       --disk-encryption-key=DISK_ENCRYPTION_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --disk-encryption-key-keyring=DISK_ENCRYPTION_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --disk-encryption-key-location=DISK_ENCRYPTION_KEY_LOCATION
+          The Cloud location for the key.
+
+       --disk-encryption-key-project=DISK_ENCRYPTION_KEY_PROJECT
+          The Cloud project for the key.
 
      Options for creating an internal replica of an external data source.
 
@@ -301,9 +326,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud sql instances create
         $ gcloud beta sql instances create

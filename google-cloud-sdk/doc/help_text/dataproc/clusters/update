@@ -8,7 +8,10 @@ SYNOPSIS
         [--num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS]
         [--num-workers=NUM_WORKERS] [--region=REGION]
         [--update-labels=[KEY=VALUE,...]]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+        [--autoscaling-policy=AUTOSCALING_POLICY : --disable-autoscaling]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--expiration-time=EXPIRATION_TIME | --max-age=MAX_AGE | --no-max-age]
+        [--max-idle=MAX_IDLE | --no-max-idle] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update the number of worker nodes and/or the labels in a cluster.
@@ -19,8 +22,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --graceful-decommission-timeout=GRACEFUL_DECOMMISSION_TIMEOUT
         The graceful decommission timeout for decommissioning Node Managers in
@@ -41,11 +44,8 @@ FLAGS
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
         independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
+        Compute Engine zones inside the region. Overrides the default
+        dataproc/region property value for this command invocation.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -55,6 +55,26 @@ FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     At most one of these may be specified:
+
+       Autoscaling policy resource - The autoscaling policy to use. This
+       represents a Cloud resource. (NOTE) Some attributes are not given
+       arguments in this group but can be set in other ways. To set the
+       [project] attribute: provide the argument [--autoscaling-policy] on the
+       command line with a fully specified name; provide the argument
+       [--project] on the command line; set the property [core/project]. To set
+       the [region] attribute: provide the argument [--autoscaling-policy] on
+       the command line with a fully specified name; provide the argument
+       [--region] on the command line; set the property [dataproc/region].
+
+         --autoscaling-policy=AUTOSCALING_POLICY
+            ID of the autoscaling policy or fully qualified identifier for the
+            autoscaling policy.
+
+       --disable-autoscaling
+          Disable autoscaling, if it is enabled. This is an alias for passing
+          the empty string to --autoscaling-policy',
 
      At most one of these may be specified:
 
@@ -74,6 +94,33 @@ FLAGS
        --remove-labels=[KEY,...]
           List of label keys to remove. If a label does not exist it is
           silently ignored.
+
+     At most one of these may be specified:
+
+       --expiration-time=EXPIRATION_TIME
+          The time when cluster will be auto-deleted, such as
+          "2017-08-29T18:52:51.142Z". See $ gcloud topic datetimes for
+          information on time formats.
+
+       --max-age=MAX_AGE
+          The lifespan of the cluster before it is auto-deleted, such as "2h"
+          or "1d". See $ gcloud topic datetimes for information on duration
+          formats.
+
+       --no-max-age
+          Cancels the cluster auto-deletion by maximum cluster age (configured
+          by --max-age or --expiration-time flags)
+
+     At most one of these may be specified:
+
+       --max-idle=MAX_IDLE
+          The duration before cluster is auto-deleted after last job finished,
+          such as "2h" or "1d". See $ gcloud topic datetimes for information on
+          duration formats.
+
+       --no-max-idle
+          Cancels the cluster auto-deletion by cluster idle duration
+          (configured by --max-idle flag)
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

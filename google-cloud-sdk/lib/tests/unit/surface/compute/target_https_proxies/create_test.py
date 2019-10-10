@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -145,14 +145,17 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
                           '/projects/my-project/global/urlMaps/my-map'))))],)
 
   def testWithoutSSLCertificate(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --ssl-certificates: Must be specified.'):
-      self.Run("""
-          compute target-https-proxies create my-proxy
-            --url-map my-map
-          """)
+    # Skip this test case in TargetHTTPSProxiesCreateAlphaTest, because
+    # --ssl-certificates is now optional in Alpha.
+    if not hasattr(self, '_api') or self._api != 'alpha':
+      with self.AssertRaisesArgumentErrorMatches(
+          'argument --ssl-certificates: Must be specified.'):
+        self.Run("""
+            compute target-https-proxies create my-proxy
+              --url-map my-map
+            """)
 
-    self.CheckRequests()
+      self.CheckRequests()
 
   def testWithoutURLMap(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -168,13 +171,8 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
 class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
 
   def SetUp(self):
+    self._api = 'beta'
     self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
-
-
-class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
-
-  def SetUp(self):
-    self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
 
   def testSimpleCaseWithoutQuic(self):
     messages = self.messages
@@ -182,12 +180,12 @@ class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
         messages.TargetHttpsProxy(
             name='my-proxy',
             sslCertificates=[
-                'https://www.googleapis.com/compute/alpha/'
+                'https://compute.googleapis.com/compute/{0}/'
                 'projects/my-project/regions/us-west-1/'
-                'sslCertificates/my-cert'
+                'sslCertificates/my-cert'.format(self._api)
             ],
-            urlMap='https://www.googleapis.com/compute/alpha/projects/'
-            'my-project/regions/us-west-1/urlMaps/my-map',
+            urlMap='https://compute.googleapis.com/compute/{0}/projects/'
+            'my-project/regions/us-west-1/urlMaps/my-map'.format(self._api),
             sslPolicy='my-ssl-policy')
     ]]
 
@@ -203,14 +201,14 @@ class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
     target_https_proxy = list(results)[0]
     self.AssertEqual(target_https_proxy.name, 'my-proxy')
     self.AssertEqual(target_https_proxy.sslCertificates, [
-        'https://www.googleapis.com/compute/alpha/'
+        'https://compute.googleapis.com/compute/{0}/'
         'projects/my-project/regions/us-west-1/'
-        'sslCertificates/my-cert'
+        'sslCertificates/my-cert'.format(self._api)
     ])
     self.AssertEqual(
         target_https_proxy.urlMap,
-        'https://www.googleapis.com/compute/alpha/projects/'
-        'my-project/regions/us-west-1/urlMaps/my-map')
+        'https://compute.googleapis.com/compute/{0}/projects/'
+        'my-project/regions/us-west-1/urlMaps/my-map'.format(self._api))
     self.AssertEqual(target_https_proxy.sslPolicy, 'my-ssl-policy')
 
     self.CheckRequests([
@@ -241,12 +239,12 @@ class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
         messages.TargetHttpsProxy(
             name='my-proxy',
             sslCertificates=[
-                'https://www.googleapis.com/compute/alpha/'
+                'https://compute.googleapis.com/compute/{0}/'
                 'projects/my-project/global/'
                 'sslCertificates/my-cert',
-                'https://www.googleapis.com/compute/alpha/'
+                'https://compute.googleapis.com/compute/{0}/'
                 'projects/my-project/global/'
-                'sslCertificates/my-cert2'
+                'sslCertificates/my-cert2'.format(self._api)
             ],
             urlMap='my-map',
             quicOverride=quic_enum.ENABLE,
@@ -265,11 +263,11 @@ class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
     target_https_proxy = list(results)[0]
     self.AssertEqual(target_https_proxy.name, 'my-proxy')
     self.AssertEqual(target_https_proxy.sslCertificates, [
-        'https://www.googleapis.com/compute/alpha/'
+        'https://compute.googleapis.com/compute/{0}/'
         'projects/my-project/global/'
-        'sslCertificates/my-cert', 'https://www.googleapis.com/compute/alpha/'
+        'sslCertificates/my-cert', 'https://compute.googleapis.com/compute/{0}/'
         'projects/my-project/global/'
-        'sslCertificates/my-cert2'
+        'sslCertificates/my-cert2'.format(self._api)
     ])
     self.AssertEqual(target_https_proxy.urlMap, 'my-map')
     self.AssertEqual(target_https_proxy.sslPolicy, 'my-ssl-policy')
@@ -315,6 +313,64 @@ class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
                   urlMap=(self.compute_uri +
                           '/projects/my-project/regions/us-west-1/'
                           'urlMaps/my-map'))))],)
+
+    self.CheckRequests()
+
+
+class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
+
+  def testProxyBind(self):
+    messages = self.messages
+
+    self.Run("""
+        compute target-https-proxies create --region us-west-1
+          {uri}/projects/my-project/regions/us-west-1/targetHttpsProxies/my-proxy
+          --ssl-certificates {uri}/projects/my-project/regions/us-west-1/sslCertificates/my-cert
+          --url-map {uri}/projects/my-project/regions/us-west-1/urlMaps/my-map
+          --proxy-bind
+        """.format(uri=self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.regionTargetHttpsProxies, 'Insert',
+          messages.ComputeRegionTargetHttpsProxiesInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              targetHttpsProxy=messages.TargetHttpsProxy(
+                  name='my-proxy',
+                  sslCertificates=[(self.compute_uri + '/projects/my-project/'
+                                    'regions/us-west-1/sslCertificates/my-cert')
+                                  ],
+                  urlMap=(self.compute_uri +
+                          '/projects/my-project/regions/us-west-1/'
+                          'urlMaps/my-map'),
+                  proxyBind=True)))],)
+
+  def testOptionalSslCertificates(self):
+    messages = self.messages
+
+    self.Run("""
+        compute target-https-proxies create --region us-west-1
+          {uri}/projects/my-project/regions/us-west-1/targetHttpsProxies/my-proxy
+          --url-map {uri}/projects/my-project/regions/us-west-1/urlMaps/my-map
+          --proxy-bind
+        """.format(uri=self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.regionTargetHttpsProxies, 'Insert',
+          messages.ComputeRegionTargetHttpsProxiesInsertRequest(
+              project='my-project',
+              region='us-west-1',
+              targetHttpsProxy=messages.TargetHttpsProxy(
+                  name='my-proxy',
+                  sslCertificates=[],
+                  urlMap=(self.compute_uri +
+                          '/projects/my-project/regions/us-west-1/'
+                          'urlMaps/my-map'),
+                  proxyBind=True)))],)
 
     self.CheckRequests()
 

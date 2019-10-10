@@ -4,7 +4,7 @@ template:
     disksToCreate:
     - boot: true
       initializeParams:
-        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-v20140415
+        sourceImage: https://compute.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-v20140415
     metadata:
       items:
       - key: simple-param

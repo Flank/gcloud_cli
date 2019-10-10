@@ -11,8 +11,8 @@ summary:
         diskSizeGb: '200'
         diskType: pd-standard
         machineType: n1-standard-2
+        networkAccess: public
       workerCount: '3'
-
 actions:
 - execute_command:
     command: remote-build-execution worker-pools describe pool --instance=default_instance
@@ -32,7 +32,8 @@ actions:
               "workerConfig": {
                 "machineType": "n1-standard-2",
                 "diskType": "pd-standard",
-                "diskSizeGb": "200"
+                "diskSizeGb": "200",
+                "networkAccess": "public"
               },
               "workerCount": "3",
               "state": "RUNNING"
@@ -45,6 +46,7 @@ actions:
           diskSizeGb: '200'
           diskType: pd-standard
           machineType: n1-standard-2
+          networkAccess: public
         workerCount: '3'
     - expect_exit:
         code: 0

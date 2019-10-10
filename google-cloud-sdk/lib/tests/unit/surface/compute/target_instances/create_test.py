@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class TargetInstancesCreateTest(test_base.BaseTest):
           messages.ComputeTargetInstancesInsertRequest(
               targetInstance=messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://www.googleapis.com/compute/v1/projects/'
+                  instance=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
@@ -50,8 +50,8 @@ class TargetInstancesCreateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute target-instances create
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-a/targetInstances/my-target-instance
-          --instance https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/my-instance
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/targetInstances/my-target-instance
+          --instance https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/instances/my-instance
         """)
 
     self.CheckRequests(
@@ -60,7 +60,7 @@ class TargetInstancesCreateTest(test_base.BaseTest):
           messages.ComputeTargetInstancesInsertRequest(
               targetInstance=messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://www.googleapis.com/compute/v1/projects/'
+                  instance=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
@@ -73,8 +73,8 @@ class TargetInstancesCreateTest(test_base.BaseTest):
         'Target instance zone must match the virtual machine instance zone.'):
       self.Run("""
           compute target-instances create
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-a/targetInstances/my-target-instance
-            --instance https://www.googleapis.com/compute/v1/projects/my-project/zones/central2-b/instances/my-instance
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-a/targetInstances/my-target-instance
+            --instance https://compute.googleapis.com/compute/v1/projects/my-project/zones/central2-b/instances/my-instance
           """)
 
     self.CheckRequests()
@@ -105,7 +105,7 @@ class TargetInstancesCreateTest(test_base.BaseTest):
           messages.ComputeTargetInstancesInsertRequest(
               targetInstance=messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://www.googleapis.com/compute/v1/projects/'
+                  instance=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
@@ -132,7 +132,7 @@ class TargetInstancesCreateTest(test_base.BaseTest):
               targetInstance=messages.TargetInstance(
                   description='my-description',
                   name='my-target-instance',
-                  instance=('https://www.googleapis.com/compute/v1/projects/'
+                  instance=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/central2-a/instances/'
                             'my-instance'),
               ),
@@ -153,7 +153,7 @@ class TargetInstancesCreateTest(test_base.BaseTest):
           messages.ComputeTargetInstancesInsertRequest(
               targetInstance=messages.TargetInstance(
                   name='my-target-instance',
-                  instance=('https://www.googleapis.com/compute/v1/projects/'
+                  instance=('https://compute.googleapis.com/compute/v1/projects/'
                             'google.com:my-legacy-project/zones/central2-a/'
                             'instances/my-instance'),
               ),

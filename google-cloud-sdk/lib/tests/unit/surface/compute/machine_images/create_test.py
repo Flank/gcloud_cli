@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -178,40 +178,12 @@ class MachineImagesCreateTest(test_base.BaseTest):
               project='my-project'
           ))],)
 
-  def testKmsSourceDiskKey(self):
-    self.Run('compute machine-images create machine-image-1 '
-             '--source-disk-kms-key kms-key=projects/key-project/locations/'
-             'global/keyRings/disk-ring/cryptoKeys/disk-key,disk=https:'
-             '//www.googleapis.com/compute/alpha/projects/my-project/'
-             'zones/central2-a/disks/hamlet '
-             '--source-instance '
-             '{compute_uri}/projects/my-project/zones/us-central3-a/'
-             'instances/instance-2'.format(compute_uri=self.compute_uri))
-    self.CheckRequests(
-        [(self.compute.machineImages, 'Insert',
-          self.messages.ComputeMachineImagesInsertRequest(
-              machineImage=self.messages.MachineImage(
-                  name='machine-image-1',
-                  sourceDiskEncryptionKeys=
-                  [self.messages.SourceDiskEncryptionKey(
-                      diskEncryptionKey=self.messages.CustomerEncryptionKey(
-                          kmsKeyName='projects/key-project/locations/global/'
-                                     'keyRings/disk-ring/cryptoKeys/disk-key'),
-                      sourceDisk='https://www.googleapis.com/compute/'
-                                 'alpha/projects/my-project/'
-                                 'zones/central2-a/disks/hamlet')],
-                  sourceInstance='{compute_uri}/projects/my-project/zones/'
-                                 'us-central3-a/instances/instance-2'.format(
-                                     compute_uri=self.compute_uri)),
-              project='my-project'
-          ))],)
-
   def testCsekSourceDiskKey(self):
     private_key_fname = self.WriteKeyFile(machine_image=True)
 
     self.Run('compute machine-images create machine-image-1 '
              '--source-disk-csek-key csek-key-file={key},disk=https:'
-             '//www.googleapis.com/compute/alpha/projects/my-project/'
+             '//compute.googleapis.com/compute/alpha/projects/my-project/'
              'zones/central2-a/disks/hamlet '
              '--source-instance '
              '{compute_uri}/projects/my-project/zones/us-central3-a/'
@@ -226,7 +198,7 @@ class MachineImagesCreateTest(test_base.BaseTest):
                   [self.messages.SourceDiskEncryptionKey(
                       diskEncryptionKey=self.messages.CustomerEncryptionKey(
                           rawKey='abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA='),
-                      sourceDisk='https://www.googleapis.com/compute/'
+                      sourceDisk='https://compute.googleapis.com/compute/'
                                  'alpha/projects/my-project/'
                                  'zones/central2-a/disks/hamlet')],
                   sourceInstance='{compute_uri}/projects/my-project/zones/'

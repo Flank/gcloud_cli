@@ -32,7 +32,7 @@ FLAGS
         reference. For example:
 
              - ipSubnetworks:
-               - 192.168.100.14/24
+               - 162.222.181.197/24
                - 2001:db8::/48
              - members
                - user:user@example.com
@@ -57,9 +57,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud access-context-manager levels update
         $ gcloud beta access-context-manager levels update

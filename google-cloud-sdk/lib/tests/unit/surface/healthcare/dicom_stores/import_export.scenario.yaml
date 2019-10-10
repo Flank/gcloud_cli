@@ -1,32 +1,55 @@
 title: dicom stores import export tests
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: healthcare dicom-stores import my-store --location us-central1 --dataset
+  - command: healthcare dicom-stores import gcs my-store --location us-central1 --dataset
       my-dataset --gcs-uri=gs://fake-bucket/fake/path/to/file.txt
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890]
+        to complete
+    - status: SUCCESS
   - stdout: |
-      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
 - execute:
-  - command: healthcare dicom-stores export my-store --location us-central1 --dataset
+  - command: healthcare dicom-stores export bq my-store --location us-central1 --dataset
       my-dataset --bq-table=fake-table --overwrite-table
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890]
+        to complete
+    - status: SUCCESS
   - stdout: |
-      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
 - execute:
   - command: |
-      healthcare dicom-stores export my-store --location us-central1 --dataset
+      healthcare dicom-stores export gcs my-store --location us-central1 --dataset
       my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir
       --mime-type=dicom
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890]
+        to complete
+    - status: SUCCESS
   - stdout: |
       name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
-    command: healthcare dicom-stores import my-store --location us-central1 --dataset
+    command: healthcare dicom-stores import gcs my-store --location us-central1 --dataset
       my-dataset --gcs-uri=gs://fake-bucket/fake/path/to/file.txt
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:import?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:import?alt=json
           method: POST
           headers: {}
           body:
@@ -37,19 +60,52 @@ actions:
             status: '200'
           body: |
             {
-              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
             }
     - expect_stdout: |
-        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
     - expect_exit:
         code: 0
 - execute_command:
-    command: healthcare dicom-stores export my-store --location us-central1 --dataset
+    command: healthcare dicom-stores export bq my-store --location us-central1 --dataset
       my-dataset --bq-table=fake-table --overwrite-table
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:export?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:export?alt=json
           method: POST
           headers: {}
           body:
@@ -59,25 +115,91 @@ actions:
             status: '200'
           body: |
             {
-              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
             }
     - expect_stdout: |
-        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
     - expect_exit:
         code: 0
 - execute_command:
-    command: |
-      healthcare dicom-stores export my-store --location us-central1 --dataset
+    command: healthcare dicom-stores export gcs my-store --location us-central1 --dataset
       my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir
       --mime-type=dicom
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:export?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:export?alt=json
           method: POST
           headers: {}
           body:
             json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
         return_response:
           headers:
             status: '200'

@@ -29,7 +29,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Return immediately, without waiting for operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --description=DESCRIPTION
         Friendly name of the app profile.

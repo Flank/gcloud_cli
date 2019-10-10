@@ -1,0 +1,109 @@
+
+.TH "GCLOUD_BETA_ML_TRANSLATE_DETECT\-LANGUAGE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ml translate detect\-language \- use the Google Cloud Translation API to detect languages
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ml translate detect\-language\fR (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) [\fB\-\-mime\-type\fR=\fIMIME_TYPE\fR] [\fB\-\-model\fR=\fIMODEL\fR] [\fB\-\-zone\fR=\fIZONE\fR;\ default="global"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Detects the language of text in a request.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Contents group. Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-content\fR=\fICONTENT\fR
+Content of the input in string format.
+
+.TP 2m
+\fB\-\-content\-file\fR=\fICONTENT_FILE\fR
+Specify a local file path with content.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-mime\-type\fR=\fIMIME_TYPE\fR
+Format of the source text, for example, 'text/html', 'text/plain'. Defaults to
+\'text/html'.
+
+.TP 2m
+\fB\-\-model\fR=\fIMODEL\fR
+Language detection model to be used. If not specified, the default
+(language\-detection/default) model is used. Authorization requires the
+following Google IAM permission on the specified resource model:
+
+.RS 2m
+cloudtranslate.languageDetectionModels.predict
+.RE
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR; default="global"
+Location to make calls. Non\-global location is required for requests using
+AutoML models. Currently, only 'us\-central1' is supported as a non\-global
+location. Defaults to 'global'.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtranslate/v3beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/translate/docs/quickstarts
+
+
+
+.SH "EXAMPLES"
+
+The following command detects the language of 'What beautiful weather!'
+
+.RS 2m
+$ gcloud beta ml translate detect\-language \e
+    \-\-content='What beautiful weather!' \-\-zone=us\-central1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha ml translate detect\-language
+.RE
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,14 @@ from googlecloudsdk.command_lib.container.binauthz import flags
 
 
 class Delete(base.DeleteCommand):
-  """Delete an Attestor."""
+  """Delete an Attestor.
+
+  ## EXAMPLES
+
+  To delete an existing Attestor `my_attestor`:
+
+    $ {command} my_attestor
+  """
 
   @classmethod
   def Args(cls, parser):

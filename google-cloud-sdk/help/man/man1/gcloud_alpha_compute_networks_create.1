@@ -11,7 +11,7 @@ gcloud alpha compute networks create \- create a Google Compute Engine network
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks create\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR;\ default="regional"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-subnet\-mode\fR=\fIMODE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks create\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR;\ default="regional"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-mtu\fR=\fIMTU\fR] [\fB\-\-range\fR=\fIRANGE\fR] [\fB\-\-subnet\-mode\fR=\fIMODE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,6 +65,12 @@ router's best learned BGP routes.
 An optional, textual description for the network.
 
 .TP 2m
+\fB\-\-mtu\fR=\fIMTU\fR
+Maximum transmission unit(MTU) is the size of the largest frame that can be
+transmitted on this network. Default value is 1460 bytes, the maximum is 1600
+bytes. The MTU advertised via DHCP to all instances attached to this network.
+
+.TP 2m
 \fB\-\-range\fR=\fIRANGE\fR
 Specifies the IPv4 address range of legacy mode networks. The range must be
 specified in CIDR format:
@@ -116,9 +122,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute networks create

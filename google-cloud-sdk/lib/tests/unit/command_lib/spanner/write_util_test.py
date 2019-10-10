@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -130,6 +130,22 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
     self.assertEqual([
         self._GivenScalarColumn('id', 'INT64'),
         self._GivenScalarColumn('name', 'BYTES'),
+    ], list(table._columns.values()))
+
+  def testTableCreationWithKeywordColumn(self):
+    database_ddl_bytes = [
+        'CREATE TABLE keywordTable (  id INT64,  `by` STRING(MAX),) PRIMARY '
+        'KEY(id)',
+    ]
+    table = util.Table.FromDdl(database_ddl_bytes, 'keywordTable')
+
+    self.assertTrue(
+        self._TableCreatedWithExpectedNamesAndPrimaryKeys(
+            table, 'keywordTable', ['id']))
+    self.assertEqual(['id', 'by'], list(table._columns.keys()))
+    self.assertEqual([
+        self._GivenScalarColumn('id', 'INT64'),
+        self._GivenScalarColumn('by', 'STRING'),
     ], list(table._columns.values()))
 
   def testTableCreationFromComplicatedDdl(self):

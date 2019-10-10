@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,11 +92,12 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       )
     return {'segmentLabelAnnotations': response_json}
 
-  def _GetOperationResponse(self, operation_id, results=None, error_json=None):
+  def _GetOperationResponse(self, operation_name, results=None,
+                            error_json=None):
     """Helper function to build GoogleLongRunningOperation response."""
     if results:
       result = {
-          'name': operation_id,
+          'name': operation_name,
           'done': True,
           'response': {
               '@type': ('type.googleapis.com/google.cloud.videointelligence.'
@@ -109,16 +110,16 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
           result)
     if error_json:
       result = {
-          'name': operation_id,
+          'name': operation_name,
           'done': True,
           'error': error_json
       }
       return encoding.PyValueToMessage(
           self.messages.GoogleLongrunningOperation,
           result)
-    return self.messages.GoogleLongrunningOperation(name=operation_id)
+    return self.messages.GoogleLongrunningOperation(name=operation_name)
 
-  def ExpectWaitOperationRequest(self, operation_id, attempts=1,
+  def ExpectWaitOperationRequest(self, operation_name, attempts=1,
                                  results=None, error_json=None):
     """Helper function to expect operations.Get polling.
 
@@ -128,7 +129,8 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     should be None.
 
     Args:
-      operation_id: str, the expected ID of the operation to request.
+      operation_name: str, the expected relative name of the operation to
+        request.
       attempts: int, the number of times to poll.
       results: [str] | None, a list of labels to return, if operation is
         expected to be completed successfully. Should be None if error_json
@@ -137,20 +139,20 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         Should be None if results is not None.
     """
     for _ in range(0, attempts - 1):
-      self.client.operations.Get.Expect(
-          self.messages.VideointelligenceOperationsGetRequest(
-              name=operation_id),
-          self._GetOperationResponse(operation_id, results=None))
-    self.client.operations.Get.Expect(
-        self.messages.VideointelligenceOperationsGetRequest(
-            name=operation_id),
-        self._GetOperationResponse(operation_id, results=results,
+      self.client.projects_locations_operations.Get.Expect(
+          self.messages.VideointelligenceProjectsLocationsOperationsGetRequest(
+              name=operation_name),
+          self._GetOperationResponse(operation_name, results=None))
+    self.client.projects_locations_operations.Get.Expect(
+        self.messages.VideointelligenceProjectsLocationsOperationsGetRequest(
+            name=operation_name),
+        self._GetOperationResponse(operation_name, results=results,
                                    error_json=error_json))
 
   def ExpectAnnotateRequest(self, feature, input_uri=None, input_content=None,
                             output_uri=None, location_id=None,
                             segments=None, label_detection_mode=None,
-                            operation_id=None):
+                            operation_name=None):
     """Helper function to build expected Annotate request and response.
 
     Args:
@@ -164,7 +166,8 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       segments: [str], list of video segments to add to request
       label_detection_mode: Label detection mode to add to label detection
         request.
-      operation_id: str, the ID of the operation message to be returned.
+      operation_name: str, the relative name of the operation message to be
+        returned.
     """
     config = (
         self.detection_config(labelDetectionMode=label_detection_mode)
@@ -183,4 +186,4 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             outputUri=output_uri,
             locationId=location_id,
             videoContext=context),
-        response=self.messages.GoogleLongrunningOperation(name=operation_id))
+        response=self.messages.GoogleLongrunningOperation(name=operation_name))

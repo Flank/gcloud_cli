@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha container memberships unregister - unregisters a cluster from
+        Google Cloud Platform
+
+SYNOPSIS
+    gcloud alpha container memberships unregister --context=CONTEXT
+        [--kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command unregisters a cluster referenced from a kubeconfig
+    file from Google Cloud Platform. It also removes the Connect agent
+    installation from the Cluster.
+
+REQUIRED FLAGS
+     --context=CONTEXT
+        The context in the kubeconfig file that specifies the cluster.
+
+OPTIONAL FLAGS
+     --kubeconfig=KUBECONFIG
+        The kubeconfig file containing an entry for the cluster. Defaults to
+        $KUBECONFIG if it is set in the environment, otherwise defaults to to
+        $HOME/.kube/config.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    Unregister a cluster referenced from the default kubeconfig file:
+
+        $ gcloud alpha container memberships unregister \
+          --context=my-cluster-context
+
+    Unregister a cluster referenced from a specific kubeconfig file:
+
+        $ gcloud alpha container memberships unregister \
+            --kubeconfig=/home/user/custom_kubeconfig \
+            --context=my-cluster-context
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

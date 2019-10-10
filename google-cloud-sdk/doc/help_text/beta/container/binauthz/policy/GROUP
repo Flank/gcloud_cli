@@ -37,8 +37,9 @@ COMMANDS
         (BETA) Set the IAM policy for a Binary Authorization policy.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud container binauthz policy
         $ gcloud alpha container binauthz policy
 

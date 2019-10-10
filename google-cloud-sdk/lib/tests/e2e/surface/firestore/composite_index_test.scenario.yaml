@@ -10,7 +10,7 @@ summary:
   - stderr: |
       Create request issued
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Created index [$$my-index$$].
@@ -150,7 +150,7 @@ actions:
         poll_operation: false
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
         Created index [$$my-index$$].

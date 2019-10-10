@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,175 +18,109 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
-from tests.lib.surface.compute import (
-    forwarding_rules_labels_test_base)
 from tests.lib.surface.compute import (
     forwarding_rules_update_test_base)
 
 
-class UpdateLabelsTestBeta(
-    forwarding_rules_labels_test_base.ForwardingRulesLabelsTestBase):
+class UpdateLabelsTestBeta(forwarding_rules_update_test_base.UpdateTestBase):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testUpdateMissingNameOrLabels(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef(
-        'fr-1', region='us-central1')
-    with self.assertRaisesRegex(calliope_exceptions.RequiredArgumentException,
-                                'At least one of --update-labels or '
-                                '--remove-labels must be specified.'):
-      self.Run('compute forwarding-rules update {0} --region {1}'
-               .format(forwarding_rule_ref.Name(), forwarding_rule_ref.region))
+    self._SetNextGetResult()
+    with self.assertRaisesRegex(calliope_exceptions.ToolException,
+                                'At least one property must be specified.'):
+      self.Run('compute forwarding-rules update forwarding-rule-1 '
+               '--region us-central2')
 
   def testGlobalUpdateAndRemoveLabels(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef('fr-1')
+    self._SetNextGetResult(
+        labels=(('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3')),
+        label_fingerprint=b'fingerprint-42',
+    )
 
-    forwarding_rule_labels = (('key1', 'value1'), ('key2', 'value2'),
-                              ('key3', 'value3'))
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
-    edited_labels = (('key2', 'update2'), ('key3', 'value3'), ('key4',
+    merged_labels = (('key2', 'update2'), ('key3', 'value3'), ('key4',
                                                                'value4'))
 
-    forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
-    updated_forwarding_rule = self._MakeForwardingRuleProto(
-        labels=edited_labels)
-
-    operation_ref = self._GetOperationRef('operation-1')
-    operation = self._MakeOperationMessage(operation_ref, forwarding_rule_ref)
-
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
-    self._ExpectLabelsSetRequest(forwarding_rule_ref, edited_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
-
-    response = self.Run(
-        'compute forwarding-rules update {0} --update-labels {1} '
-        '--remove-labels key1,key0'
-        .format(forwarding_rule_ref.SelfLink(), ','.join(
-            ['{0}={1}'.format(pair[0], pair[1]) for pair in update_labels])))
-    self.assertEqual(response, updated_forwarding_rule)
+    self.Run('compute forwarding-rules update forwarding-rule-1 --global '
+             '--update-labels {0} --remove-labels key1,key0'.format(','.join([
+                 '{0}={1}'.format(pair[0], pair[1]) for pair in update_labels
+             ])))
+    self._CheckSetLabelsRequest(
+        is_global=True,
+        label_fingerprint=b'fingerprint-42',
+        labels=merged_labels)
 
   def testGlobalClearLabels(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef('fr-1')
+    self._SetNextGetResult(
+        labels=(('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3')),
+        label_fingerprint=b'fingerprint-42')
 
-    forwarding_rule_labels = (('key1', 'value1'), ('key2', 'value2'),
-                              ('key3', 'value3'))
-    edited_labels = ()
-
-    forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
-    updated_forwarding_rule = self._MakeForwardingRuleProto(
-        labels=edited_labels)
-
-    operation_ref = self._GetOperationRef('operation-1')
-    operation = self._MakeOperationMessage(operation_ref, forwarding_rule_ref)
-
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
-    self._ExpectLabelsSetRequest(forwarding_rule_ref, edited_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
-
-    response = self.Run(
-        'compute forwarding-rules update {0} --clear-labels'
-        .format(forwarding_rule_ref.SelfLink()))
-    self.assertEqual(response, updated_forwarding_rule)
+    self.Run('compute forwarding-rules update forwarding-rule-1 --global '
+             '--clear-labels')
+    self._CheckSetLabelsRequest(
+        is_global=True, label_fingerprint=b'fingerprint-42', labels=())
 
   def testRegionUpdateAndRemoveLabels(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef(
-        'fr-1', region='us-central1')
+    self._SetNextGetResult(
+        labels=(('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3')),
+        label_fingerprint=b'fingerprint-42',
+    )
 
-    forwarding_rule_labels = (('key1', 'value1'), ('key2', 'value2'),
-                              ('key3', 'value3'))
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
-    edited_labels = (('key2', 'update2'), ('key3', 'value3'), ('key4',
+    merged_labels = (('key2', 'update2'), ('key3', 'value3'), ('key4',
                                                                'value4'))
 
-    forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
-    updated_forwarding_rule = self._MakeForwardingRuleProto(
-        labels=edited_labels)
-
-    operation_ref = self._GetOperationRef('operation-1', 'us-central1')
-    operation = self._MakeOperationMessage(operation_ref, forwarding_rule_ref)
-
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
-    self._ExpectLabelsSetRequest(forwarding_rule_ref, edited_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
-
-    response = self.Run(
-        'compute forwarding-rules update {0} --update-labels {1} '
-        '--remove-labels key1,key0'
-        .format(forwarding_rule_ref.SelfLink(), ','.join(
+    self.Run(
+        'compute forwarding-rules update forwarding-rule-1 --region us-central2'
+        ' --update-labels {0} --remove-labels key1,key0'.format(','.join(
             ['{0}={1}'.format(pair[0], pair[1]) for pair in update_labels])))
-    self.assertEqual(response, updated_forwarding_rule)
+    self._CheckSetLabelsRequest(
+        is_global=False,
+        label_fingerprint=b'fingerprint-42',
+        labels=merged_labels)
 
   def testUpdateWithNoLabels(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef(
-        'fr-1', region='us-central1')
+    self._SetNextGetResult(label_fingerprint=b'fingerprint-42',)
 
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
-    forwarding_rule = self._MakeForwardingRuleProto(
-        labels=(), fingerprint=b'fingerprint-42')
-    updated_forwarding_rule = self._MakeForwardingRuleProto(
+    self.Run('compute forwarding-rules update forwarding-rule-1 --global '
+             '--update-labels {0}'.format(','.join([
+                 '{0}={1}'.format(pair[0], pair[1]) for pair in update_labels
+             ])))
+    self._CheckSetLabelsRequest(
+        is_global=True,
+        label_fingerprint=b'fingerprint-42',
         labels=update_labels)
-    operation_ref = self._GetOperationRef('operation-1', 'us-central1')
-    operation = self._MakeOperationMessage(operation_ref, forwarding_rule_ref)
-
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
-    self._ExpectLabelsSetRequest(forwarding_rule_ref, update_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
-
-    response = self.Run(
-        'compute forwarding-rules update {0} --update-labels {1} '
-        .format(forwarding_rule_ref.SelfLink(), ','.join(
-            ['{0}={1}'.format(pair[0], pair[1]) for pair in update_labels])))
-    self.assertEqual(response, updated_forwarding_rule)
 
   def testRemoveWithNoLabelsOnForwardingRule(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef(
-        'fr-1', region='us-central1')
-    forwarding_rule = self._MakeForwardingRuleProto(
-        labels={}, fingerprint=b'fingerprint-42')
+    self._SetNextGetResult(label_fingerprint=b'fingerprint-42',)
 
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
-
-    response = self.Run(
-        'compute forwarding-rules update {0} --remove-labels DoesNotExist'
-        .format(forwarding_rule_ref.SelfLink()))
-    self.assertEqual(response, forwarding_rule)
+    self.Run('compute forwarding-rules update forwarding-rule-1 --global '
+             '--remove-labels DoesNotExist')
+    self._CheckNoUpdateRequest(is_global=True)
 
   def testNoNetUpdate(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef(
-        'fr-1', region='us-central1')
-
-    forwarding_rule_labels = (('key1', 'value1'), ('key2', 'value2'),
-                              ('key3', 'value3'))
+    self._SetNextGetResult(
+        labels=(('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3')),
+        label_fingerprint=b'fingerprint-42',
+    )
     update_labels = (('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
-
-    forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
-
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
-
-    response = self.Run(
-        'compute forwarding-rules update {0} --update-labels {1} '
-        '--remove-labels key4'.format(forwarding_rule_ref.SelfLink(), ','.join(
-            ['{0}={1}'.format(pair[0], pair[1]) for pair in update_labels])))
-    self.assertEqual(response, forwarding_rule)
+    self.Run('compute forwarding-rules update forwarding-rule-1 --global '
+             '--update-labels {0} --remove-labels key4'.format(','.join([
+                 '{0}={1}'.format(pair[0], pair[1]) for pair in update_labels
+             ])))
+    self._CheckNoUpdateRequest(is_global=True)
 
   def testScopePrompt(self):
-    forwarding_rule_ref = self._GetForwardingRuleRef(
-        'fr-1', region='us-central1')
-    forwarding_rule = self._MakeForwardingRuleProto(labels=[])
-    self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
+    self._SetNextGetResult(label_fingerprint=b'fingerprint-42',)
 
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
@@ -197,10 +131,18 @@ class UpdateLabelsTestBeta(
             self.messages.Region(name='us-central2')
         ],)
     self.WriteInput('2\n')
-    self.Run('compute forwarding-rules update fr-1 --remove-labels key0')
+    self.Run('compute forwarding-rules update forwarding-rule-1 '
+             '--remove-labels key0')
     self.AssertErrContains('PROMPT_CHOICE')
     self.AssertErrContains(
         '"choices": ["global", "region: us-central1", "region: us-central2"]')
+
+
+class UpdateLabelsTestAlpha(UpdateLabelsTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class ForwardingRuleUpdateWithNetworkTierAlphaTest(
@@ -315,6 +257,38 @@ class ForwardingRuleUpdateWithNetworkTierAlphaTest(
           compute forwarding-rules update forwarding-rule-1
             --region us-central2
           """)
+
+
+class ForwardingRuleUpdateWithGlobalAccessBetaTest(
+    forwarding_rules_update_test_base.UpdateTestBase):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testUpdateRegionWithGlobalAccess(self):
+    self._SetNextGetResult(allowGlobalAccess=None)
+
+    self.Run('compute forwarding-rules update forwarding-rule-1 '
+             '--allow-global-access --region us-central2')
+
+    self._CheckPatchRequest(is_global=False, allowGlobalAccess=True)
+
+  def testUpdateGloalBackToRegionAccess(self):
+    self._SetNextGetResult(allowGlobalAccess=True)
+
+    self.Run('compute forwarding-rules update forwarding-rule-1 '
+             '--no-allow-global-access --region us-central2')
+
+    self._CheckPatchRequest(is_global=False, allowGlobalAccess=False)
+
+
+class ForwardingRuleUpdateWithGlobalAccessAlphaTest(
+    ForwardingRuleUpdateWithGlobalAccessBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

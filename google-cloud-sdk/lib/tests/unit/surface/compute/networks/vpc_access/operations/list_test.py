@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class OperationsListTestBeta(base.VpcAccessUnitTestBase):
+class OperationsListTestGa(base.VpcAccessUnitTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def _ExpectList(self, expected_operations):
     self.client.projects_locations_operations.List.Expect(
@@ -127,7 +127,14 @@ class OperationsListTestBeta(base.VpcAccessUnitTestBase):
     # pylint: enable=line-too-long
 
 
-class OperationsListTestAlpha(OperationsListTestBeta):
+class OperationsListTestBeta(OperationsListTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
+
+
+class OperationsListTestAlpha(OperationsListTestGa):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

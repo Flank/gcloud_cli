@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,3 +58,15 @@ class Create(base.CreateCommand):
     reservation.description = args.description
     return messages.ComputeReservationsInsertRequest(
         reservation=reservation, project=project, zone=reservation_ref.zone)
+
+
+Create.detailed_help = {
+    'brief':
+        'Create a Compute Engine reservation.',
+    'EXAMPLES':
+        """
+        To create a Compute Engine reservation, run:
+
+            $ {command} my-reservation --zone=fake-zone --vm-count=1 --machine-type=n1-standard-1 --min-cpu-platform="Intel Haswell"
+        """
+}

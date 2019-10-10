@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,44 +28,74 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class ListTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+class ListTest(base.WithMockGaBinauthz, base.BinauthzTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testSuccess_SinglePage(self):
-    name1 = 'bar'
     proj = self.Project()
-    attestor1 = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name1),
-        updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name1),
-            publicKeys=[
-                self.messages.AttestorPublicKey(
-                    asciiArmoredPgpPublicKey='',
-                    comment=None,
-                    id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097'),
-                self.messages.AttestorPublicKey(
-                    asciiArmoredPgpPublicKey='',
-                    comment=None,
-                    id='92BF3E5381EF8364A6DFC6FC70ACF5E5D04087BA'),
-            ],
-        ))
+    name1 = 'bar'
     name2 = 'baz'
-    attestor2 = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, name2),
-        updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='projects/{}/notes/{}'.format(proj, name2),
-            publicKeys=[
-                self.messages.AttestorPublicKey(
-                    asciiArmoredPgpPublicKey='',
-                    comment=None,
-                    id='7A3DD2310A6A07DF224479C2CFFDC297113486B0'),
-            ],
-        ))
-    req = self.messages.BinaryauthorizationProjectsAttestorsListRequest(  # pylint: disable=line-too-long
+    try:
+      attestor1 = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name1),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name1),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey='',
+                      comment=None,
+                      id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097'),
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey='',
+                      comment=None,
+                      id='92BF3E5381EF8364A6DFC6FC70ACF5E5D04087BA'),
+              ],
+          ))
+      attestor2 = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name2),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name2),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey='',
+                      comment=None,
+                      id='7A3DD2310A6A07DF224479C2CFFDC297113486B0'),
+              ],
+          ))
+    except AttributeError:
+      attestor1 = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name1),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name1),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey='',
+                      comment=None,
+                      id='0638AttestorDD940361EA2D7F14C58C124F0E663DA097'),
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey='',
+                      comment=None,
+                      id='92BF3E5381EF8364A6DFC6FC70ACF5E5D04087BA'),
+              ],
+          ))
+      attestor2 = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, name2),
+          updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference='projects/{}/notes/{}'.format(proj, name2),
+              publicKeys=[
+                  self.messages.AttestorPublicKey(
+                      asciiArmoredPgpPublicKey='',
+                      comment=None,
+                      id='7A3DD2310A6A07DF224479C2CFFDC297113486B0'),
+              ],
+          ))
+    req = self.messages.BinaryauthorizationProjectsAttestorsListRequest(
         pageSize=500,
         pageToken=None,
         parent='projects/{}'.format(proj),
@@ -91,7 +121,7 @@ class ListTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
 
   def testNoResults(self):
     proj = self.Project()
-    req = self.messages.BinaryauthorizationProjectsAttestorsListRequest(  # pylint: disable=line-too-long
+    req = self.messages.BinaryauthorizationProjectsAttestorsListRequest(
         pageSize=500,
         pageToken=None,
         parent='projects/{}'.format(proj),
@@ -107,7 +137,13 @@ class ListTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
     self.AssertOutputMatches('')
 
 
-class ListAlphaTest(base.WithMockAlphaBinauthz, ListTest):
+class ListBetaTest(base.WithMockBetaBinauthz, ListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListAlphaTest(base.WithMockAlphaBinauthz, ListBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

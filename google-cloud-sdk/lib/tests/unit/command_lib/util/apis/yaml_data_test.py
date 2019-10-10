@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,12 +71,24 @@ class ResourceYAMLDataTest(sdk_test_base.WithOutputCapture,
         'name':
             'operation',
         'collection':
-            'videointelligence.operations',
-        'attributes': [{
-            'attribute_name': 'operation',
-            'parameter_name': 'operationsId',
-            'help': 'The ID of the operation'
-        }]
+            'videointelligence.projects.locations.operations',
+        'attributes': [
+            {
+                'attribute_name': 'project',
+                'parameter_name': 'projectsId',
+                'help': 'Project of the {resource}.'
+            },
+            {
+                'attribute_name': 'location',
+                'parameter_name': 'locationsId',
+                'help': 'Location of the {resource}.'
+            },
+            {
+                'attribute_name': 'operation',
+                'parameter_name': 'operationsId',
+                'help': 'The ID of the operation'
+            }
+        ]
     }
 
     self.assertEqual(operation_data, resource_yaml_data.GetData())

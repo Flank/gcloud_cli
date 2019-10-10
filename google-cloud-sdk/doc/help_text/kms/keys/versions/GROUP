@@ -33,6 +33,9 @@ COMMANDS
      enable
         Enable a given version.
 
+     get-public-key
+        Get the public key for a given version.
+
      list
         List the versions within a key.
 

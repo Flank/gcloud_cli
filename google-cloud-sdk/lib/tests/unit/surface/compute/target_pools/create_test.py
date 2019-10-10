@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ class TargetPoolsCreateTest(test_base.BaseTest):
           'Insert',
           messages.ComputeTargetPoolsInsertRequest(
               targetPool=messages.TargetPool(
-                  backupPool=('https://www.googleapis.com/compute/v1/projects/'
+                  backupPool=('https://compute.googleapis.com/compute/v1/projects/'
                               'my-project/regions/us-central2/targetPools/'
                               'backup'),
                   failoverRatio=0.5,
@@ -167,7 +167,7 @@ class TargetPoolsCreateTest(test_base.BaseTest):
           'Insert',
           messages.ComputeTargetPoolsInsertRequest(
               targetPool=messages.TargetPool(
-                  healthChecks=['https://www.googleapis.com/compute/v1/'
+                  healthChecks=['https://compute.googleapis.com/compute/v1/'
                                 'projects/my-project/global/httpHealthChecks/'
                                 'check-it-1'],
                   name='target-pool-1',
@@ -227,8 +227,8 @@ class TargetPoolsCreateTest(test_base.BaseTest):
   def testFailoverRatioZero(self):
     self.Run("""
         compute target-pools create
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
-          --backup-pool https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/backup-pool
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
+          --backup-pool https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/backup-pool
           --failover-ratio 0.0
         """)
 
@@ -238,7 +238,7 @@ class TargetPoolsCreateTest(test_base.BaseTest):
           messages.ComputeTargetPoolsInsertRequest(
               targetPool=messages.TargetPool(
                   name='target-pool-1',
-                  backupPool=('https://www.googleapis.com/compute/v1/projects/'
+                  backupPool=('https://compute.googleapis.com/compute/v1/projects/'
                               'my-project/regions/us-central2/targetPools/'
                               'backup-pool'),
                   failoverRatio=0.0,
@@ -252,8 +252,8 @@ class TargetPoolsCreateTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute target-pools create
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
-          --backup-pool https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/backup-pool
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
+          --backup-pool https://compute.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/backup-pool
           --failover-ratio 0.5
         """)
 
@@ -263,7 +263,7 @@ class TargetPoolsCreateTest(test_base.BaseTest):
           messages.ComputeTargetPoolsInsertRequest(
               targetPool=messages.TargetPool(
                   name='target-pool-1',
-                  backupPool=('https://www.googleapis.com/compute/v1/projects/'
+                  backupPool=('https://compute.googleapis.com/compute/v1/projects/'
                               'my-project/regions/us-central2/targetPools/'
                               'backup-pool'),
                   failoverRatio=0.5,
@@ -301,7 +301,7 @@ class TargetPoolsCreateTest(test_base.BaseTest):
           messages.ComputeTargetPoolsInsertRequest(
               targetPool=messages.TargetPool(
                   name='target-pool-1',
-                  backupPool=('https://www.googleapis.com/compute/v1/projects/'
+                  backupPool=('https://compute.googleapis.com/compute/v1/projects/'
                               'my-project/regions/us-central2/targetPools/'
                               'backup-pool'),
                   failoverRatio=0.5,

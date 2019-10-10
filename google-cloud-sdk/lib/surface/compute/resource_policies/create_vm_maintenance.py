@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,13 @@ from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.resource_policies import flags
 from googlecloudsdk.command_lib.compute.resource_policies import util
 
+_DEPRECATION_WARNING = """
+`create-vm-maintenance` is deprecated.
+Use `compute resource-policies create vm-maintenance` instead.
+"""
 
+
+@base.Deprecate(is_removed=False, warning=_DEPRECATION_WARNING)
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateVmMaintenance(base.CreateCommand):
   """Create a Google Compute Engine VM Maintenance Resource Policy.

@@ -7,19 +7,30 @@ summary:
       ZONE! --visibility private --networks '' --target-network default --target-project
       cloud-sdk-integration-testing
   - stderr: |
-      Created [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+      Created [https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
 - execute:
   - command: dns managed-zones update $$zone$$ --target-network do-not-delete-test-network
       --target-project cloud-sdk-integration-testing
+  - progress_tracker:
+    - message: Updating managed zone [$$zone$$]
+    - status: SUCCESS
 - execute:
   - command: dns managed-zones describe $$zone$$ --format 'text(peeringConfig.targetNetwork.networkUrl)'
   - stdout: |
-      peeringConfig.targetNetwork.networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+      peeringConfig.targetNetwork.networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
 - execute:
   - command: dns managed-zones delete $$zone$$
   - stderr: |
-      Deleted [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+      Deleted [https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
 actions:
+- define_reference:
+    reference: dns-url
+    track_values:
+      GA: dns.googleapis.com/dns/v1
+      BETA: dns.googleapis.com/dns/v1beta2
+- define_reference:
+    reference: compute-url
+    value: www.googleapis.com/compute/v1
 - generate_resource_id:
     reference: zone
     prefix: managed-zones
@@ -31,7 +42,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones?alt=json
+          uri: https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones?alt=json
           method: POST
           headers: {}
           body:
@@ -41,7 +52,7 @@ actions:
               name: $$zone$$
               peeringConfig:
                 targetNetwork:
-                  networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                  networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
               privateVisibilityConfig: {}
               visibility: private
         return_response:
@@ -49,25 +60,25 @@ actions:
             cache-control: private
             content-length: '611'
             content-type: application/json; charset=UTF-8
-            etag: 34decd7d253ef23d00000169c5180657
+            etag: 3fe387e8e27eb82b0000016b8b4f53da
             status: '200'
           body:
             name: $$zone$$
             dnsName: $$zone$$.com.
             description: ZONE!
-            id: '3809708272181506621'
+            id: '4603672678404896811'
             nameServers:
             - ns-gcp-private.googledomains.com.
-            creationTime: '2019-03-28T16:17:59.895Z'
+            creationTime: '2019-06-24T21:06:00.282Z'
             visibility: private
             peeringConfig:
               targetNetwork:
-                networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
                 kind: dns#managedZonePeeringConfigTargetNetwork
               kind: dns#managedZonePeeringConfig
             kind: dns#managedZone
     - expect_stderr: |
-        Created [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+        Created [https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
     - expect_exit:
         code: 0
 
@@ -77,7 +88,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
+          uri: https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -85,7 +96,7 @@ actions:
               name: $$zone$$
               peeringConfig:
                 targetNetwork:
-                  networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                  networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
         return_response:
           headers:
             cache-control: private
@@ -93,8 +104,8 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: d9c0dadc-73bd-4b2e-b94e-a58b238a3b8a
-            startTime: '2019-03-28T16:18:01.681Z'
+            id: e6dc30f0-4e0d-49b5-a158-032276275ff4
+            startTime: '2019-06-24T21:06:03.439Z'
             status: done
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             type: UPDATE
@@ -103,14 +114,14 @@ actions:
                 name: $$zone$$
                 dnsName: $$zone$$.com.
                 description: ZONE!
-                id: '3809708272181506621'
+                id: '4603672678404896811'
                 nameServers:
                 - ns-gcp-private.googledomains.com.
-                creationTime: '2019-03-28T16:17:59.895Z'
+                creationTime: '2019-06-24T21:06:00.282Z'
                 visibility: private
                 peeringConfig:
                   targetNetwork:
-                    networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
                     kind: dns#managedZonePeeringConfigTargetNetwork
                   kind: dns#managedZonePeeringConfig
                 kind: dns#managedZone
@@ -118,18 +129,77 @@ actions:
                 name: $$zone$$
                 dnsName: $$zone$$.com.
                 description: ZONE!
-                id: '3809708272181506621'
+                id: '4603672678404896811'
                 nameServers:
                 - ns-gcp-private.googledomains.com.
-                creationTime: '2019-03-28T16:17:59.895Z'
+                creationTime: '2019-06-24T21:06:00.282Z'
                 visibility: private
                 peeringConfig:
                   targetNetwork:
-                    networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
                     kind: dns#managedZonePeeringConfigTargetNetwork
                   kind: dns#managedZonePeeringConfig
                 kind: dns#managedZone
             kind: dns#operation
+        expect_response:
+          extract_references:
+          - field: id
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1692'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: e6dc30f0-4e0d-49b5-a158-032276275ff4
+            startTime: '2019-06-24T21:06:03.439Z'
+            status: done
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            type: UPDATE
+            zoneContext:
+              oldValue:
+                name: $$zone$$
+                dnsName: $$zone$$.com.
+                description: ZONE!
+                id: '4603672678404896811'
+                nameServers:
+                - ns-gcp-private.googledomains.com.
+                creationTime: '2019-06-24T21:06:00.282Z'
+                visibility: private
+                peeringConfig:
+                  targetNetwork:
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/default
+                    kind: dns#managedZonePeeringConfigTargetNetwork
+                  kind: dns#managedZonePeeringConfig
+                kind: dns#managedZone
+              newValue:
+                name: $$zone$$
+                dnsName: $$zone$$.com.
+                description: ZONE!
+                id: '4603672678404896811'
+                nameServers:
+                - ns-gcp-private.googledomains.com.
+                creationTime: '2019-06-24T21:06:00.282Z'
+                visibility: private
+                peeringConfig:
+                  targetNetwork:
+                    networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                    kind: dns#managedZonePeeringConfigTargetNetwork
+                  kind: dns#managedZonePeeringConfig
+                kind: dns#managedZone
+            kind: dns#operation
+    - expect_progress_tracker:
+        message: Updating managed zone [$$zone$$]
+        status: SUCCESS
     - expect_exit:
         code: 0
 - execute_command:
@@ -137,7 +207,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
+          uri: https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -146,25 +216,25 @@ actions:
             cache-control: private
             content-length: '630'
             content-type: application/json; charset=UTF-8
-            etag: 34decd7d253ef23d00000169c5180cd0
+            etag: 3fe387e8e27eb82b0000016b8b4f5fac
             status: '200'
           body:
             name: $$zone$$
             dnsName: $$zone$$.com.
             description: ZONE!
-            id: '3809708272181506621'
+            id: '4603672678404896811'
             nameServers:
             - ns-gcp-private.googledomains.com.
-            creationTime: '2019-03-28T16:17:59.895Z'
+            creationTime: '2019-06-24T21:06:00.282Z'
             visibility: private
             peeringConfig:
               targetNetwork:
-                networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+                networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
                 kind: dns#managedZonePeeringConfigTargetNetwork
               kind: dns#managedZonePeeringConfig
             kind: dns#managedZone
     - expect_stdout: |
-        peeringConfig.targetNetwork.networkUrl: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
+        peeringConfig.targetNetwork.networkUrl: https://$$compute-url$$/projects/cloud-sdk-integration-testing/global/networks/do-not-delete-test-network
     - expect_exit:
         code: 0
 - execute_command:
@@ -173,7 +243,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
+          uri: https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -186,6 +256,6 @@ actions:
           body: |
             {}
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+        Deleted [https://$$dns-url$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
     - expect_exit:
         code: 0

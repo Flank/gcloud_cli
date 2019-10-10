@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -149,6 +149,31 @@ class TopicsPublishTest(base.CloudPubsubTestBase):
       self.Run('pubsub topics publish topic1'
                ' --message "{0}"'.format(
                    self.message_data[0]))
+
+
+class TopicsPublishAlphaTest(TopicsPublishTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testTopicsPublishWithOrderingKey(self):
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    topic = topic_ref.RelativeName()
+    ordering_key = 'in-order'
+    message = self.messages[0]
+    message.orderingKey = ordering_key
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsTopicsPublishRequest(
+            publishRequest=self.msgs.PublishRequest(
+                messages=self.messages[0:1]),
+            topic=topic),
+        response=self.msgs.PublishResponse(messageIds=self.message_ids[0:1]))
+
+    result = self.Run(
+        'pubsub topics publish topic1 --message "{0}" --ordering-key "{1}"'
+        .format(self.message_data[0], ordering_key))
+
+    self.assertEqual(result.messageIds, ['123456'])
 
 
 class TopicsPublishBetaTest(TopicsPublishTest):

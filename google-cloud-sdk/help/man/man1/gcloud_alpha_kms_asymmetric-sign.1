@@ -86,13 +86,13 @@ the digest algorithm 'sha256' and sign it using the asymmetric CryptoKey
 
 .RS 2m
 $ gcloud alpha kms asymmetric\-sign \e
-\-\-location us\-central1 \e
-\-\-keyring hitchhiker \e
-\-\-key dont\-panic \e
-\-\-version 1 \e
-\-\-digest\-algorithm sha256 \e
-\-\-input\-file /tmp/my/file.to.sign \e
-\-\-signature\-file /tmp/my/signature
+\-\-location=us\-central1 \e
+\-\-keyring=hitchhiker \e
+\-\-key=dont\-panic \e
+\-\-version=1 \e
+\-\-digest\-algorithm=sha256 \e
+\-\-input\-file=/tmp/my/file.to.sign \e
+\-\-signature\-file=/tmp/my/signature
 .RE
 
 
@@ -101,7 +101,11 @@ $ gcloud alpha kms asymmetric\-sign \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud kms asymmetric\-sign
+$ gcloud beta kms asymmetric\-sign
+.RE
 

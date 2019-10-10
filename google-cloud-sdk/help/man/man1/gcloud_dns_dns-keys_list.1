@@ -75,24 +75,25 @@ help\fR for details.
 To see the list of all DNS key resources for a managed zone \f5my_zone\fR, run:
 
 .RS 2m
-$ gcloud dns dns\-keys list \-\-zone my_zone
+$ gcloud dns dns\-keys list \-\-zone=my_zone
 .RE
 
 To see the DS records for every key\-signing DnsKey in a managed zone, run:
 
 .RS 2m
-$ gcloud dns dns\-keys list \-\-zone my_zone 3 \e
-    \-\-format 'value(ds_record())'               \e
-    \-\-filter 'type=keySigning'
+$ gcloud dns dns\-keys list \-\-zone=my_zone 3 \e
+    \-\-format='value(ds_record())'               \e
+    \-\-filter='type=keySigning'
 .RE
 
 
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha dns dns\-keys list
 $ gcloud beta dns dns\-keys list
 .RE
 

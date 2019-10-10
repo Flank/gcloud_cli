@@ -57,16 +57,19 @@ class NodePoolsTestGA(testbase.IntegrationTestBase):
                          .format(self.cluster_name, location_flag))
     self.assertTrue(node_pool.management.autoUpgrade)
 
+  @test_case.Filters.skipAlways('Failing', 'b/135201894')
   def testNodePoolsUpdateZone(self):
     self.NodePoolsUpdate('--zone=' + self.ZONE, 'test-pool',
                          self.releasetrack)
 
+  @test_case.Filters.skipAlways('Failing', 'b/135201894')
   def testNodePoolsUpdateRegion(self):
     self.NodePoolsUpdate('--region=' + self.REGION,
                          'test-pool-region', self.releasetrack)
 
   # This test will cleanup the leaked clusters.
   # Delete clusters that are older than 1h.
+  # TODO(b/141495754) Clean these leaked clusters using our cleanup script
   @sdk_test_base.Filters.RunOnlyInBundle
   def testCleanup(self):
     self.CleanupLeakedClusters(self.ZONE, self.releasetrack)

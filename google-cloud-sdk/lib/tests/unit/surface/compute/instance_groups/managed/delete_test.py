@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -191,8 +191,8 @@ class InstanceGroupManagersDeleteZonalTest(test_base.BaseTest):
     self.WriteInput('y')
     self.Run("""
         compute instance-groups managed delete
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-2/instanceGroupManagers/group-1
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-2
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-2/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-2
         """.format(API_VERSION))
 
     self.CheckRequests(
@@ -227,7 +227,7 @@ class InstanceGroupManagersDeleteZonalTest(test_base.BaseTest):
     self.WriteInput('y')
     self.Run("""
         compute instance-groups managed delete
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-2/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-2/instanceGroupManagers/group-1
           group-2
           --zone zone-1
         """.format(API_VERSION))
@@ -467,8 +467,8 @@ class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):
     self.WriteInput('y')
     self.Run("""
         compute instance-groups managed delete
-          https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-2/instanceGroupManagers/group-1
-          https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroupManagers/group-2
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-2/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroupManagers/group-2
         """.format(API_VERSION))
 
     self.CheckRequests(
@@ -504,7 +504,7 @@ class InstanceGroupManagersDeleteRegionalTest(test_base.BaseTest):
     self.WriteInput('y')
     self.Run("""
         compute instance-groups managed delete
-          https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-2/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-2/instanceGroupManagers/group-1
           group-2
           --region region-1
         """.format(API_VERSION))
@@ -568,8 +568,8 @@ class InstanceGroupManagersDeleteBetaTest(test_base.BaseTest):
     self.WriteInput('y')
     self.Run("""
         beta compute instance-groups managed delete
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-1
-          https://www.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroupManagers/group-2
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/instanceGroupManagers/group-2
         """.format(API_VERSION))
 
     self.AssertErrContains(

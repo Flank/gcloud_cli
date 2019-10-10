@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -76,4 +76,4 @@ class Import(base.UpdateCommand):
     cluster.projectId = cluster_ref.projectId
 
     # Import only supports create, not update (for now).
-    return clusters.CreateCluster(dataproc, cluster, args.async, args.timeout)
+    return clusters.CreateCluster(dataproc, cluster, args.async_, args.timeout)

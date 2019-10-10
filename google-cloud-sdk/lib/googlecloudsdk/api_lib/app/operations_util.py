@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
+import six
 
 # Default is to retry every 5 seconds for 1 hour.
 DEFAULT_OPERATION_RETRY_INTERVAL = 5
@@ -69,7 +70,7 @@ def CallAndCollectOpErrors(method, *args, **kwargs):
 
 def _ReraiseMiscOperationError(err):
   """Transform and re-raise error helper."""
-  exceptions.reraise(MiscOperationError(str(err)))
+  exceptions.reraise(MiscOperationError(six.text_type(err)))
 
 
 class MiscOperationError(exceptions.Error):

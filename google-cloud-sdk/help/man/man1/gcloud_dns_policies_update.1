@@ -1,0 +1,102 @@
+
+.TH "GCLOUD_DNS_POLICIES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud dns policies update \- update an existing Cloud DNS policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud dns policies update\fR \fIPOLICY\fR [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-networks\fR=[\fINETWORKS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update an existing Cloud DNS policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy resource \- The policy to update.. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [policy] on the
+command line with a fully specified name; set the property [core/project]. This
+must be specified.
+
+.RS 2m
+.TP 2m
+\fIPOLICY\fR
+ID of the policy or fully qualified identifier for the policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]
+List of alternative name servers to forward to. Must be a comma separated list
+of IPv4 addresses.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A description of the policy.
+
+.TP 2m
+\fB\-\-enable\-inbound\-forwarding\fR
+Specifies whether to allow networks bound to this policy to receive DNS queries
+sent by VMs or applications over VPN connections. Defaults to False.
+
+.TP 2m
+\fB\-\-enable\-logging\fR
+Specifies whether to enable query logging. Defaults to False.
+
+.TP 2m
+\fB\-\-networks\fR=[\fINETWORKS\fR,...]
+The comma separated list of network names to associate with the policy.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To change the description of a policy, run:
+
+.RS 2m
+$ gcloud dns policies update mypolicy \-\-description="Hello, world!"
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha dns policies update
+$ gcloud beta dns policies update
+.RE
+

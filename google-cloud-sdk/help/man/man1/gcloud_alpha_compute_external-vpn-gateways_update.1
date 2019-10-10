@@ -18,7 +18,7 @@ gcloud alpha compute external\-vpn\-gateways update \- update a Google Compute E
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute external\-vpn\-gateways update\fR updates
-labels for a Google Compute Engine External VPN gateway. For example:
+labels for a Google Compute Engine external VPN gateway. For example:
 
 .RS 2m
 $ gcloud alpha compute external\-vpn\-gateways update example\-gateway \e
@@ -110,15 +110,27 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To update labels for an external VPN gateway, run:
+
+.RS 2m
+$ gcloud alpha compute external\-vpn\-gateways update \e
+  my\-external\-gateway                 \e
+  \-\-update\-labels=k0=value1,k1=value2
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud compute external\-vpn\-gateways update
 $ gcloud beta compute external\-vpn\-gateways update
 .RE
 

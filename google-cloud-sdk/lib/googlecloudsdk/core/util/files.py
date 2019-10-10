@@ -30,7 +30,6 @@ import stat
 import sys
 import tempfile
 import time
-import traceback
 
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.util import encoding as encoding_util
@@ -574,17 +573,9 @@ class TemporaryDirectory(object):
     try:
       self.Close()
     except:  # pylint: disable=bare-except
-      if not prev_exc_type:
-        raise
-      message = (
-          'Got exception {0}'
-          'while another exception was active {1} [{2}]'
-          .format(
-              encoding_util.Decode(traceback.format_exc()),
-              prev_exc_type,
-              encoding_util.Decode(prev_exc_val)))
-      exceptions.reraise(prev_exc_type(message), tb=prev_exc_trace)
-    # always return False so any exceptions will be re-raised
+      exceptions.RaiseWithContext(
+          prev_exc_type, prev_exc_val, prev_exc_trace, *sys.exc_info())
+    # Always return False so any previous exception will be re-raised.
     return False
 
   def Close(self):
@@ -606,15 +597,15 @@ class Checksum(object):
     self.__files = set()
 
   def AddContents(self, contents):
-    """Adds the given string contents to the checksum.
+    """Adds the given contents to the checksum.
 
     Args:
-      contents: str, The contents to add.
+      contents: str or bytes, The contents to add.
 
     Returns:
       self, For method chaining.
     """
-    self.__hash.update(contents)
+    self.__hash.update(six.ensure_binary(contents))
     return self
 
   def AddFileContents(self, file_path):
@@ -1000,7 +991,7 @@ def GetTreeSizeBytes(path, predicate=None):
   result = 0
   if predicate is None:
     predicate = lambda x: True
-  for directory in os.walk(path):
+  for directory in os.walk(six.text_type(path)):
     for file_name in directory[2]:
       file_path = os.path.join(directory[0], file_name)
       if predicate(file_path):
@@ -1126,7 +1117,7 @@ def BinaryFileReader(path):
   Returns:
     A file-like object opened for read in binary mode.
   """
-  return _FileOpener(path, 'rb', 'read')
+  return _FileOpener(encoding_util.Encode(path, encoding='utf-8'), 'rb', 'read')
 
 
 def FileWriter(path, private=False, append=False):

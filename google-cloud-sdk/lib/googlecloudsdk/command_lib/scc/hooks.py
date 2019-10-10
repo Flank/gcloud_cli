@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from googlecloudsdk.api_lib.scc import securitycenter_client as sc_client
 from googlecloudsdk.command_lib.util.apis import yaml_data
 from googlecloudsdk.command_lib.util.args import resource_args
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.core import properties
 
 
 def AppendOrgArg():
@@ -34,7 +35,7 @@ def AppendOrgArg():
   org_spec_data = yaml_data.ResourceYAMLData.FromPath("scc.organization")
   arg_specs = [
       resource_args.GetResourcePresentationSpec(
-          verb="to be used for the SCC command",
+          verb="to be used for the SCC (Security Command Center) command",
           name="organization",
           required=True,
           prefixes=False,
@@ -64,12 +65,29 @@ def GetOrganization(args):
   """Prepend organizations/ to org if necessary."""
   resource_pattern = re.compile("organizations/[0-9]+")
   id_pattern = re.compile("[0-9]+")
-  assert resource_pattern.match(args.organization) or id_pattern.match(
-      args.organization), (
+  if not args.organization:
+    organization = properties.VALUES.scc.organization.Get()
+  else:
+    organization = args.organization
+  assert resource_pattern.match(organization) or id_pattern.match(
+      organization), (
           "Organization must match either organizations/[0-9]+ or [0-9]+.")
-  if resource_pattern.match(args.organization):
-    return args.organization
-  return "organizations/" + args.organization
+  if resource_pattern.match(organization):
+    return organization
+  return "organizations/" + organization
+
+
+def GetDefaultOrganization():
+  """Prepend organizations/ to org if necessary."""
+  resource_pattern = re.compile("organizations/[0-9]+")
+  id_pattern = re.compile("[0-9]+")
+  organization = properties.VALUES.scc.organization.Get()
+  assert resource_pattern.match(organization) or id_pattern.match(
+      organization), (
+          "Organization must match either organizations/[0-9]+ or [0-9]+.")
+  if resource_pattern.match(organization):
+    return organization
+  return "organizations/" + organization
 
 
 def CleanUpUserInput(mask):

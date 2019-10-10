@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ class InterconnectsDeleteTest(test_base.BaseTest):
     properties.VALUES.core.disable_prompts.Set(True)
     messages = self.messages
     self.Run(
-        'compute interconnects delete https://www.googleapis.com/compute/v1/'
+        'compute interconnects delete https://compute.googleapis.com/compute/v1/'
         'projects/my-project/global/interconnects/my-interconnect')
 
     self.CheckRequests(

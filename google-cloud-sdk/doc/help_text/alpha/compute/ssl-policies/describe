@@ -3,7 +3,8 @@ NAME
         Engine ssl policy
 
 SYNOPSIS
-    gcloud alpha compute ssl-policies describe NAME [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute ssl-policies describe SSL_POLICY
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute ssl-policies describe is used to display all
@@ -16,7 +17,7 @@ DESCRIPTION
     balancers and the backends.
 
 POSITIONAL ARGUMENTS
-     NAME
+     SSL_POLICY
         Name of the SSL policy to describe.
 
 GCLOUD WIDE FLAGS
@@ -29,9 +30,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute ssl-policies describe
         $ gcloud beta compute ssl-policies describe

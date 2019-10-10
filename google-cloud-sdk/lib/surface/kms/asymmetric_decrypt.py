@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class AsymmetricDecrypt(base.Command):
   r"""Decrypt an input file using an asymmetric-encryption key version.
 
@@ -40,12 +39,12 @@ class AsymmetricDecrypt(base.Command):
   to '/tmp/my/secret.file.dec'.
 
     $ {command} \
-    --location us-central1 \
-    --keyring hitchhiker \
-    --key dont-panic \
-    --version 3 \
-    --ciphertext-file /tmp/my/secret.file.enc \
-    --plaintext-file /tmp/my/secret.file.dec
+    --location=us-central1 \
+    --keyring=hitchhiker \
+    --key=dont-panic \
+    --version=3 \
+    --ciphertext-file=/tmp/my/secret.file.enc \
+    --plaintext-file=/tmp/my/secret.file.dec
 
   """
 

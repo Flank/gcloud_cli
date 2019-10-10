@@ -29,6 +29,7 @@ from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import pkg_resources
 from googlecloudsdk.core.util import platforms
+import six
 
 
 class Error(exceptions.Error):
@@ -110,7 +111,7 @@ class InstallationConfig(object):
     Returns:
       time.struct_time, The parsed time.
     """
-    return time.strptime(str(revision),
+    return time.strptime(six.text_type(revision),
                          InstallationConfig.REVISION_FORMAT_STRING)
 
   @staticmethod
@@ -281,17 +282,6 @@ class Paths(object):
     return os.path.join(self.global_config_dir, 'completion_cache')
 
   @property
-  def credentials_path(self):
-    """Gets the path to the file to store Oauth2Client credentials in.
-
-    This is oauth2client.contrib.multistore_file format file.
-
-    Returns:
-      str, The path to the credential file.
-    """
-    return os.path.join(self.global_config_dir, 'credentials')
-
-  @property
   def credentials_db_path(self):
     """Gets the path to the file to store credentials in.
 
@@ -420,6 +410,19 @@ class Paths(object):
       str, The path to the sentinel file.
     """
     return os.path.join(self.global_config_dir, 'config_sentinel')
+
+  @property
+  def valid_ppk_sentinel_file(self):
+    """Gets the path to the sentinel used to check for PPK encoding validity.
+
+    The presence of this file is simply used to indicate whether or not we've
+    correctly encoded the PPK used for ssh on Windows (re-encoding may be
+    necessary in order to fix a bug in an older version of winkeygen.exe).
+
+    Returns:
+      str, The path to the sentinel file.
+    """
+    return os.path.join(self.global_config_dir, '.valid_ppk_sentinel')
 
   @property
   def container_config_path(self):

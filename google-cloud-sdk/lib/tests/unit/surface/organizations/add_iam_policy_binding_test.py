@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
 
@@ -51,7 +52,8 @@ class OrganizationsAddIamPolicyBindingGA(testbase.OrganizationsUnitTestBase):
                            members=['user:admin@foo.com'])
   ],
                                etag=b'someUniqueEtag',
-                               version=1)
+                               version=
+                               iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)
 
   def testAddIamPolicyBinding(self):
     """Test the standard use case."""
@@ -84,7 +86,10 @@ class OrganizationsAddIamPolicyBindingGA(testbase.OrganizationsUnitTestBase):
   def ExpectedGetRequest(self):
     return self.messages.CloudresourcemanagerOrganizationsGetIamPolicyRequest(
         organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
-        getIamPolicyRequest=None)
+        getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+            options=self.messages.GetPolicyOptions(
+                requestedPolicyVersion=
+                iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)))
 
   def SetupGetIamPolicyFailure(self, exception):
     self.mock_client.organizations.GetIamPolicy.Expect(

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,7 +63,8 @@ class ImpersonationTest(cli_test_base.CliTestBase):
             generateAccessTokenRequest=self.messages.GenerateAccessTokenRequest(
                 scope=config.CLOUDSDK_SCOPES)),
         self.messages.GenerateAccessTokenResponse(
-            accessToken='impersonation-token', expireTime='expire-time')
+            accessToken='impersonation-token',
+            expireTime='2016-01-08T00:00:00Z')
     )
 
     self.request_mock.return_value = (httplib2.Response({'status': 200}),

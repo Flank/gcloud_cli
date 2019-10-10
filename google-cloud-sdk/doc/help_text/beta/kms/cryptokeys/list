@@ -61,8 +61,8 @@ EXAMPLES
     The following command lists all CryptoKeys within the KeyRing fellowship
     and Location global:
 
-        $ gcloud beta kms cryptokeys list --keyring fellowship \
-            --location global
+        $ gcloud beta kms cryptokeys list --keyring=fellowship \
+            --location=global
 
 NOTES
     This command is an internal implementation detail and may change or

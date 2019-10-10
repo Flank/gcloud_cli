@@ -42,8 +42,6 @@ including:
 .IP "\(bu" 2m
 \f5dev_appserver\fR
 .IP "\(bu" 2m
-\f5gsutil\fR
-.IP "\(bu" 2m
 \f5bq\fR
 .IP "\(bu" 2m
 \f5datalab\fR
@@ -65,6 +63,10 @@ $ export CLOUDSDK_PYTHON=python3
 $ export CLOUDSDK_PYTHON=/usr/local/my\-custom\-python\-install/python
 .RE
 
+Gsutil now supports Python 3.5+ in addition to Python 2.7.x. To use a different
+interpreter (e.g. Python 3) for gsutil than for the other Python tools, you can
+set the desired interpreter by setting the CLOUDSDK_GSUTIL_PYTHON environment
+variable.
 
 
 .SH "Configuring the Python Interpreter"

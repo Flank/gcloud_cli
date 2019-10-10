@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,15 +92,6 @@ class PeeringTest(unit_test_base.SNUnitTestBase):
 
     with self.assertRaisesRegex(exceptions.OperationErrorException, r'Error!'):
       peering.GetOperation(self.OPERATION_NAME)
-
-  def testWaitOperation_Success(self):
-    """Test WaitOperation returns operation when successful."""
-    want = self.services_messages.Operation(name=self.OPERATION_NAME, done=True)
-    self.ExpectOperation(self.OPERATION_NAME, 3)
-
-    got = peering.WaitOperation(self.OPERATION_NAME)
-
-    self.assertEqual(got, want)
 
   def testListConnections_Success(self):
     """Test ListConnection returns connections when successful."""

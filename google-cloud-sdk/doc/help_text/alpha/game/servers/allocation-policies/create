@@ -1,0 +1,123 @@
+NAME
+    gcloud alpha game servers allocation-policies create - create an Allocation
+        Policy
+
+SYNOPSIS
+    gcloud alpha game servers allocation-policies create
+        (ALLOCATION_POLICY : --location=LOCATION) --priority=PRIORITY
+        --weight=WEIGHT [--async] [--labels=[KEY=VALUE,...]]
+        [--match-clusters=[KEY=VALUE,...]] [--schedule=SCHEDULE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a Cloud Game Server Allocation Policy.
+
+POSITIONAL ARGUMENTS
+     Allocation policy resource - Cloud Game Server Allocation Policy to
+     create. The arguments in this group can be used to specify the attributes
+     of this resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute:
+     provide the argument [allocation_policy] on the command line with a fully
+     specified name; set the property [core/project]; provide the argument
+     [--project] on the command line. This must be specified.
+
+       ALLOCATION_POLICY
+          ID of the allocation policy or fully qualified identifier for the
+          allocation policy. This positional must be specified if any of the
+          other arguments in this group are specified.
+
+       --location=LOCATION
+          Google Cloud location.
+
+REQUIRED FLAGS
+     --priority=PRIORITY
+        Priority of the Allocation Policy.
+
+     --weight=WEIGHT
+        Relative weight of the Allocation Policy.
+
+        If there are multiple policies with the same priority, a policy will be
+        selected at random, where the probability of a given policy being
+        selected is based on its weight. For example, if there are two policies
+        with priority 1, where policy A has weight 100 and policy B has weight
+        300, policy A will be selected 25% of the time, and policy B will be
+        selected 75% of the time.
+
+OPTIONAL FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --match-clusters=[KEY=VALUE,...]
+        Labels to select clusters to which this Allocation Policy applies. This
+        flag can be repeated.
+
+        Example: $ gcloud alpha game servers allocation-policies create \
+        example-policy --match-clusters=label_a=value1,label_b=value2 \
+        --match-clusters=label_c=value3,label_d=value4
+
+        With the above command, this policy is applicable to clusters that have
+        either label_a=value1 and label_b=value2, or
+        label_c=value3,label_d=value4.
+
+     --schedule=SCHEDULE
+        Event schedules. Schedules allow allocation policies to be adjusted for
+        planned events. For example, you can add policies to allocate from
+        specific clusters during an event. This flag can be repeated.
+
+        The following keys are allowed:
+
+         cron-spec
+            Cron definition of the scheduled event. See
+            https://en.wikipedia.org/wiki/Cron. The cron spec specification is
+            in the local time as defined by the realm. Requires
+            cron-job-duration to be specified.
+
+         cron-job-duration
+            Duration for the cron job event. The duration of the event is
+            effective after the cron job's start time. See $ gcloud topic
+            datetimes for information on duration formats. Required if
+            cron-spec is specified.
+
+         start-time
+            Start time of the event. See $ gcloud topic datetimes for
+            information on duration formats. Either start-time or cron-spec
+            should be specified.
+
+         end-time
+            End time of the event. See $ gcloud topic datetimes for information
+            on duration formats.
+
+            Example:
+
+                $ gcloud alpha game servers allocation-policies create \
+                    example-policy \
+                    --schedule=start-time=2019-01-01T00:00:01Z,\
+                end-time=2030-01-01T00:00:01Z,cron-job-duration=3600s,cron-spec="10\
+                 0 1-7 5 *" --schedule=start-time=2050-01-01T00:00:01Z
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the gameservices/v1alpha API. The full documentation for
+    this API can be found at: https://cloud.google.com/solutions/gaming/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
@@ -236,14 +237,10 @@ def ValidateDirectoryExistsOrRaiseFunctionError(directory):
   """
   if not os.path.exists(directory):
     raise exceptions.FunctionsError(
-        'argument --source: Provided directory does not exist. If '
-        'you intended to provide a path to Google Cloud Repository, you must '
-        'specify the --source-url argument')
+        'argument `--source`: Provided directory does not exist')
   if not os.path.isdir(directory):
     raise exceptions.FunctionsError(
-        'argument --source: Provided path does not point to a directory. If '
-        'you intended to provide a path to Google Cloud Repository, you must '
-        'specify the --source-url argument')
+        'argument `--source`: Provided path does not point to a directory')
   return directory
 
 
@@ -337,15 +334,18 @@ def GetFunction(function_name):
     raise
 
 
+# TODO(b/139026575): Remove do_every_poll option
 @CatchHTTPErrorRaiseHTTPException
-def WaitForFunctionUpdateOperation(op):
+def WaitForFunctionUpdateOperation(op, do_every_poll=None):
   """Wait for the specied function update to complete.
 
   Args:
     op: Cloud operation to wait on.
+    do_every_poll: function, A function to execute every time we poll.
   """
   client = GetApiClientInstance()
-  operations.Wait(op, client.MESSAGES_MODULE, client, _DEPLOY_WAIT_NOTICE)
+  operations.Wait(op, client.MESSAGES_MODULE, client, _DEPLOY_WAIT_NOTICE,
+                  do_every_poll=do_every_poll)
 
 
 @CatchHTTPErrorRaiseHTTPException
@@ -423,13 +423,13 @@ def RemoveFunctionIamPolicyBindingIfFound(
   policy = GetFunctionIamPolicy(function_resource_name)
   if iam_util.BindingInPolicy(policy, member, role):
     iam_util.RemoveBindingFromIamPolicy(policy, member, role)
-    result = client.projects_locations_functions.SetIamPolicy(
+    client.projects_locations_functions.SetIamPolicy(
         messages.CloudfunctionsProjectsLocationsFunctionsSetIamPolicyRequest(
             resource=function_resource_name,
             setIamPolicyRequest=messages.SetIamPolicyRequest(policy=policy)))
+    return True
   else:
-    result = policy
-  return result
+    return False
 
 
 @CatchHTTPErrorRaiseHTTPException

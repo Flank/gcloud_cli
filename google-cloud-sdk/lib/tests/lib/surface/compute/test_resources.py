@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ alpha_messages = core_apis.GetMessagesModule('compute', 'alpha')
 beta_messages = core_apis.GetMessagesModule('compute', 'beta')
 messages = core_apis.GetMessagesModule('compute', 'v1')
 
-_COMPUTE_PATH = 'https://www.googleapis.com/compute'
+_COMPUTE_PATH = 'https://compute.googleapis.com/compute'
 
 _V1_URI_PREFIX = _COMPUTE_PATH + '/v1/projects/my-project/'
 _ALPHA_URI_PREFIX = _COMPUTE_PATH + '/alpha/projects/my-project/'
@@ -78,18 +78,18 @@ ADDRESSES = [
     messages.Address(
         address='23.251.134.124',
         name='address-1',
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/region-1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/region-1/addresses/address-1'),
         status=messages.Address.StatusValueValuesEnum.IN_USE),
 
     messages.Address(
         address='23.251.134.125',
         name='address-2',
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/region-1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/region-1/addresses/address-2'),
         status=messages.Address.StatusValueValuesEnum.RESERVED),
 ]
@@ -124,12 +124,12 @@ def MakeAutoscalers(api, scope_name='zone-1', scope_type='zone'):
               minNumReplicas=2,
           ),
           name='autoscaler-1',
-          target=('https://www.googleapis.com/compute/{0}/projects/'
+          target=('https://compute.googleapis.com/compute/{0}/projects/'
                   'my-project/{1}/{2}/instanceGroupManagers/group-1'
                   .format(api, scope_type + 's', scope_name)),
           creationTimestamp='Two days ago',
           id=1,
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/autoscalers/autoscaler-1'
                     .format(api, scope_type + 's', scope_name)),
       ),
@@ -138,12 +138,12 @@ def MakeAutoscalers(api, scope_name='zone-1', scope_type='zone'):
               maxNumReplicas=10,
           ),
           name='autoscaler-2',
-          target=('https://www.googleapis.com/compute/{0}/projects/'
+          target=('https://compute.googleapis.com/compute/{0}/projects/'
                   'my-project/{1}/{2}/instanceGroupManagers/group-2'
                   .format(api, scope_type + 's', scope_name)),
           creationTimestamp='Two days ago',
           id=1,
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/autoscalers/autoscaler-2'
                     .format(api, scope_type + 's', scope_name)),
       ),
@@ -173,19 +173,19 @@ def MakeAutoscalers(api, scope_name='zone-1', scope_type='zone'):
               minNumReplicas=2,
           ),
           name='autoscaler-3',
-          target=('https://www.googleapis.com/compute/{0}/projects/'
+          target=('https://compute.googleapis.com/compute/{0}/projects/'
                   'my-project/{1}/{2}/instanceGroupManagers/group-3'
                   .format(api, scope_type + 's', scope_name)),
           creationTimestamp='Two days ago',
           id=1,
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/autoscalers/autoscaler-3'
                     .format(api, scope_type + 's', scope_name)),
       ),
   ]
   for autoscaler in autoscalers:
     setattr(autoscaler, scope_type,
-            'https://www.googleapis.com/compute/{0}/'
+            'https://compute.googleapis.com/compute/{0}/'
             'projects/my-project/{1}/{2}'
             .format(api, scope_type + 's', scope_name))
   return autoscalers
@@ -205,18 +205,18 @@ def MakeAutoscalerOk(api, scope_name='zone-1', scope_type='zone'):
           minNumReplicas=2,
       ),
       name='autoscaler-1',
-      target=('https://www.googleapis.com/compute/{0}/projects/'
+      target=('https://compute.googleapis.com/compute/{0}/projects/'
               'my-project/{1}/{2}/instanceGroupManagers/group-1'
               .format(api, scope_type + 's', scope_name)),
       creationTimestamp='Two days ago',
       status=used_messages.Autoscaler.StatusValueValuesEnum.ACTIVE,
       id=2,
-      selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+      selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                 'my-project/{1}/{2}/autoscalers/autoscaler-1'
                 .format(api, scope_type + 's', scope_name)),
   )
   setattr(autoscaler, scope_type,
-          'https://www.googleapis.com/compute/{0}/projects/my-project/{1}/{2}'
+          'https://compute.googleapis.com/compute/{0}/projects/my-project/{1}/{2}'
           .format(api, scope_type + 's', scope_name))
   return autoscaler
 
@@ -233,15 +233,15 @@ def MakeAutoscalerWithError(api):
           minNumReplicas=2,
       ),
       name='autoscaler-2',
-      target=('https://www.googleapis.com/compute/{0}/projects/'
+      target=('https://compute.googleapis.com/compute/{0}/projects/'
               'my-project/zones/zone-1/instanceGroupManagers/group-2'
               .format(api)),
-      zone=('https://www.googleapis.com/compute/{0}/'
+      zone=('https://compute.googleapis.com/compute/{0}/'
             'projects/my-project/zones/zone-1'.format(api)),
       creationTimestamp='Two days ago',
       status=used_messages.Autoscaler.StatusValueValuesEnum.ERROR,
       id=2,
-      selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+      selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                 'my-project/zones/zone-1/autoscalers/autoscaler-2'
                 .format(api)),
   )
@@ -251,14 +251,14 @@ GLOBAL_ADDRESSES = [
     messages.Address(
         address='23.251.134.126',
         name='global-address-1',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/addresses/global-address-1'),
         status=messages.Address.StatusValueValuesEnum.IN_USE),
 
     messages.Address(
         address='23.251.134.127',
         name='global-address-2',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/addresses/global-address-2'),
         status=messages.Address.StatusValueValuesEnum.RESERVED),
 ]
@@ -305,7 +305,7 @@ def MakeBackendServices(msgs, api):
           backends=[],
           description='my backend service',
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/httpHealthChecks/my-health-check'.format(api))
           ],
           name='backend-service-1',
@@ -322,7 +322,7 @@ def MakeBackendServices(msgs, api):
                       msgs.Backend.BalancingModeValueValuesEnum.RATE),
                   description='group one',
                   group=(
-                      'https://www.googleapis.com/compute/'
+                      'https://compute.googleapis.com/compute/'
                       '{0}/projects/my-project/zones/zone-1/'
                       'instanceGroups/group-1'.format(api)),
                   maxRate=100),
@@ -331,13 +331,13 @@ def MakeBackendServices(msgs, api):
                       msgs.Backend.BalancingModeValueValuesEnum.UTILIZATION),
                   description='group two',
                   group=(
-                      'https://www.googleapis.com/compute/{0}/'
+                      'https://compute.googleapis.com/compute/{0}/'
                       'projects/my-project/zones/zone-2/'
                       'instanceGroups/group-2'.format(api)),
                   maxUtilization=1.0),
           ],
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/httpHealthChecks/my-health-check'.format(api))
           ],
           name='backend-service-2',
@@ -354,13 +354,13 @@ def MakeBackendServices(msgs, api):
                       msgs.Backend.BalancingModeValueValuesEnum.RATE),
                   description='instance group one',
                   group=(
-                      'https://www.googleapis.com/compute/'
+                      'https://compute.googleapis.com/compute/'
                       '{0}/projects/my-project/zones/'
                       'zone-1/instanceGroups/group-1').format(api),
                   maxRate=100),
           ],
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/httpHealthChecks/my-health-check'.format(api))
           ],
           name='instance-group-service',
@@ -377,13 +377,13 @@ def MakeBackendServices(msgs, api):
                       msgs.Backend.BalancingModeValueValuesEnum.RATE),
                   description='group one',
                   group=(
-                      'https://www.googleapis.com/compute/'
+                      'https://compute.googleapis.com/compute/'
                       '{0}/projects/my-project/regions/region-1/'
                       'instanceGroups/group-1'.format(api)),
                   maxRate=100),
           ],
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/httpHealthChecks/my-health-check'.format(api))
           ],
           name='regional-instance-group-service',
@@ -400,7 +400,7 @@ def MakeBackendServices(msgs, api):
                       msgs.Backend.BalancingModeValueValuesEnum.CONNECTION),
                   description='max connections',
                   group=(
-                      'https://www.googleapis.com/compute/'
+                      'https://compute.googleapis.com/compute/'
                       '{0}/projects/my-project/zones/zone-1/'
                       'instanceGroups/group-1'.format(api)),
                   maxConnectionsPerInstance=100),
@@ -409,14 +409,14 @@ def MakeBackendServices(msgs, api):
                       msgs.Backend.BalancingModeValueValuesEnum.UTILIZATION),
                   description='utilziation with conneciton',
                   group=(
-                      'https://www.googleapis.com/compute/'
+                      'https://compute.googleapis.com/compute/'
                       '{0}/projects/my-project/zones/zone-2/'
                       'instanceGroups/group-2'.format(api)),
                   maxUtilization=1.0,
                   maxConnections=10),
           ],
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/healthChecks/my-health-check'.format(api))
           ],
           name='backend-service-tcp',
@@ -469,6 +469,8 @@ def MakeBackendServicesWithHealthCheck(msgs, api, protocol):
     protocol_enum = msgs.BackendService.ProtocolValueValuesEnum.HTTP
   elif protocol == 'HTTPS':
     protocol_enum = msgs.BackendService.ProtocolValueValuesEnum.HTTPS
+  elif protocol == 'HTTP2':
+    protocol_enum = msgs.BackendService.ProtocolValueValuesEnum.HTTP2
   elif protocol == 'TCP':
     protocol_enum = msgs.BackendService.ProtocolValueValuesEnum.TCP
   elif protocol == 'SSL':
@@ -520,7 +522,7 @@ def MakeBackendServicesWithGenCookieSessionAffinity(msgs, api):
           backends=[],
           description='my backend service',
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/httpHealthChecks/my-health-check'.format(api))
           ],
           name='backend-service-1',
@@ -552,7 +554,7 @@ def MakeBackendServicesWithConnectionDrainingTimeout(msgs, api):
           backends=[],
           description='my backend service',
           healthChecks=[
-              ('https://www.googleapis.com/compute/{0}/projects/'
+              ('https://compute.googleapis.com/compute/{0}/projects/'
                'my-project/global/httpHealthChecks/my-health-check'.format(api))
           ],
           name='backend-service-1',
@@ -588,7 +590,7 @@ def MakeBackendServicesWithCustomCacheKey(msgs,
       backends=[],
       description='my backend service',
       healthChecks=[(
-          'https://www.googleapis.com/compute/{0}/projects/'
+          'https://compute.googleapis.com/compute/{0}/projects/'
           'my-project/global/httpHealthChecks/my-health-check'.format(api))],
       name='backend-service-1',
       portName='http',
@@ -639,7 +641,7 @@ CENTOS_IMAGES = [
     messages.Image(
         name='centos-6-v20140408',
         family='centos-6',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/centos-cloud/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/centos-cloud/'
                   'global/images/centos-6-v20140408'),
         status=messages.Image.StatusValueValuesEnum.READY),
 
@@ -648,7 +650,7 @@ CENTOS_IMAGES = [
         family='centos-6',
         deprecated=messages.DeprecationStatus(
             state=messages.DeprecationStatus.StateValueValuesEnum.DEPRECATED),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/centos-cloud/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/centos-cloud/'
                   'global/images/centos-6-v20140318'),
         status=messages.Image.StatusValueValuesEnum.READY),
 ]
@@ -699,9 +701,9 @@ DISK_TYPES = [
     messages.DiskType(
         name='pd-standard',
         validDiskSize='10GB-10TB',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/diskTypes/pd-standard'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.DiskType(
@@ -709,9 +711,9 @@ DISK_TYPES = [
             state=messages.DeprecationStatus.StateValueValuesEnum.OBSOLETE),
         name='pd-ssd',
         validDiskSize='10GB-1TB',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/diskTypes/pd-ssd'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
 ]
@@ -719,38 +721,38 @@ DISK_TYPES = [
 DISKS = [
     messages.Disk(
         name='disk-1',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/disks/disk-1'),
         sizeGb=10,
         status=messages.Disk.StatusValueValuesEnum.READY,
         type=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'zones/zone-1/diskTypes/pd-ssd'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.Disk(
         name='disk-2',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/disks/disk-2'),
         sizeGb=10,
         status=messages.Disk.StatusValueValuesEnum.READY,
         type=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'zones/zone-1/diskTypes/pd-ssd'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.Disk(
         name='disk-3',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/disks/disk-3'),
         sizeGb=10,
         status=messages.Disk.StatusValueValuesEnum.READY,
         type=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'zones/zone-1/diskTypes/pd-standard'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 ]
 
@@ -841,7 +843,7 @@ def MakeGlobalForwardingRules(msgs, api):
 
 GLOBAL_FORWARDING_RULES_ALPHA = MakeGlobalForwardingRules(
     alpha_messages, 'alpha')
-GLOBAL_FORWARDING_RULES_BETA = MakeGlobalForwardingRules(messages, 'beta')
+GLOBAL_FORWARDING_RULES_BETA = MakeGlobalForwardingRules(beta_messages, 'beta')
 GLOBAL_FORWARDING_RULES_V1 = MakeGlobalForwardingRules(messages, 'v1')
 
 
@@ -851,9 +853,9 @@ GLOBAL_OPERATIONS = [
         status=messages.Operation.StatusValueValuesEnum.DONE,
         operationType='insert',
         insertTime='2014-09-04T09:55:33.679-07:00',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/operations/operation-1'),
-        targetLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        targetLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'resource/resource-1')),
 ]
 
@@ -863,9 +865,9 @@ ALPHA_GLOBAL_OPERATIONS = [
         status=alpha_messages.Operation.StatusValueValuesEnum.DONE,
         operationType='insert',
         insertTime='2014-09-04T09:55:33.679-07:00',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/operations/operation-1'),
-        targetLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        targetLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'resource/resource-1')),
 ]
 
@@ -875,9 +877,9 @@ BETA_GLOBAL_OPERATIONS = [
         status=beta_messages.Operation.StatusValueValuesEnum.DONE,
         operationType='insert',
         insertTime='2014-09-04T09:55:33.679-07:00',
-        selfLink=('https://www.googleapis.com/compute/beta/projects/'
+        selfLink=('https://compute.googleapis.com/compute/beta/projects/'
                   'my-project/global/operations/operation-1'),
-        targetLink=('https://www.googleapis.com/compute/beta/projects/'
+        targetLink=('https://compute.googleapis.com/compute/beta/projects/'
                     'my-project/resource/resource-1')),
 ]
 
@@ -893,11 +895,10 @@ def MakeHealthChecks(msgs, api):
               port=8080,
               portName='happy-http-port',
               requestPath='/testpath',
-              proxyHeader=(msgs.HTTPHealthCheck
-                           .ProxyHeaderValueValuesEnum.PROXY_V1)),
+              proxyHeader=(
+                  msgs.HTTPHealthCheck.ProxyHeaderValueValuesEnum.PROXY_V1)),
           selfLink=(prefix + '/projects/'
                     'my-project/global/healthChecks/health-check-http-1')),
-
       msgs.HealthCheck(
           name='health-check-http-2',
           type=msgs.HealthCheck.TypeValueValuesEnum.HTTP,
@@ -908,7 +909,6 @@ def MakeHealthChecks(msgs, api):
               proxyHeader=msgs.HTTPHealthCheck.ProxyHeaderValueValuesEnum.NONE),
           selfLink=(prefix + '/projects/'
                     'my-project/global/healthChecks/health-check-http-2')),
-
       msgs.HealthCheck(
           name='health-check-https',
           type=msgs.HealthCheck.TypeValueValuesEnum.HTTPS,
@@ -917,11 +917,10 @@ def MakeHealthChecks(msgs, api):
               port=443,
               portName='happy-https-port',
               requestPath='/',
-              proxyHeader=(msgs.HTTPSHealthCheck
-                           .ProxyHeaderValueValuesEnum.PROXY_V1)),
+              proxyHeader=(
+                  msgs.HTTPSHealthCheck.ProxyHeaderValueValuesEnum.PROXY_V1)),
           selfLink=(prefix + '/projects/'
                     'my-project/global/healthChecks/health-check-https')),
-
       msgs.HealthCheck(
           name='health-check-tcp',
           type=msgs.HealthCheck.TypeValueValuesEnum.TCP,
@@ -933,7 +932,6 @@ def MakeHealthChecks(msgs, api):
               proxyHeader=msgs.TCPHealthCheck.ProxyHeaderValueValuesEnum.NONE),
           selfLink=(prefix + '/projects/'
                     'my-project/global/healthChecks/health-check-tcp')),
-
       msgs.HealthCheck(
           name='health-check-ssl',
           type=msgs.HealthCheck.TypeValueValuesEnum.SSL,
@@ -942,10 +940,23 @@ def MakeHealthChecks(msgs, api):
               portName='happy-ssl-port',
               request='req',
               response='ack',
-              proxyHeader=(msgs.SSLHealthCheck
-                           .ProxyHeaderValueValuesEnum.PROXY_V1)),
+              proxyHeader=(
+                  msgs.SSLHealthCheck.ProxyHeaderValueValuesEnum.PROXY_V1)),
           selfLink=(prefix + '/projects/'
-                    'my-project/global/healthChecks/health-check-ssl'))]
+                    'my-project/global/healthChecks/health-check-ssl')),
+      msgs.HealthCheck(
+          name='health-check-http2',
+          type=msgs.HealthCheck.TypeValueValuesEnum.HTTP2,
+          http2HealthCheck=msgs.HTTP2HealthCheck(
+              host='www.example.com',
+              port=443,
+              portName='happy-http2-port',
+              requestPath='/',
+              proxyHeader=(
+                  msgs.HTTP2HealthCheck.ProxyHeaderValueValuesEnum.PROXY_V1)),
+          selfLink=(prefix + '/projects/'
+                    'my-project/global/healthChecks/health-check-http2'))
+  ]
 
 
 def MakeHealthCheckBeta(msgs, api):
@@ -974,13 +985,13 @@ HTTP_HEALTH_CHECKS = [
         host='www.example.com',
         port=8080,
         requestPath='/testpath',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/httpHealthChecks/health-check-1')),
     messages.HttpHealthCheck(
         name='health-check-2',
         port=80,
         requestPath='/',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/httpHealthChecks/health-check-2')),
 ]
 
@@ -1007,13 +1018,13 @@ HTTPS_HEALTH_CHECKS_BETA = MakeHttpsHealthChecks(beta_messages, 'beta')
 IMAGES = [
     messages.Image(
         name='image-1',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/images/image-1'),
         status=messages.Image.StatusValueValuesEnum.READY),
 
     messages.Image(
         name='image-2',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/images/image-2'),
         status=messages.Image.StatusValueValuesEnum.READY),
 
@@ -1021,7 +1032,7 @@ IMAGES = [
         name='image-3',
         deprecated=messages.DeprecationStatus(
             state=messages.DeprecationStatus.StateValueValuesEnum.DEPRECATED),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/images/image-3'),
         status=messages.Image.StatusValueValuesEnum.READY),
 
@@ -1029,7 +1040,7 @@ IMAGES = [
         name='image-4',
         deprecated=messages.DeprecationStatus(
             deprecated='2019-04-01T15:00:00'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/images/image-4'),
         status=messages.Image.StatusValueValuesEnum.READY),
 ]
@@ -1090,7 +1101,7 @@ def MakeInstances(msgs, api):
           status=msgs.Instance.StatusValueValuesEnum.RUNNING,
           selfLink=(prefix + '/projects/my-project/'
                     'zones/zone-1/instances/instance-2'),
-          zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'zones/zone-1')),
 
       msgs.Instance(
@@ -1258,57 +1269,10 @@ def MakeInstancesInManagedInstanceGroupBeta(msgs, api):
       msgs.ManagedInstance(
           instance=(prefix +
                     'projects/my-project/zones/central2-a/instances/inst-1'),
-          instanceStatus=(msgs.ManagedInstance
-                          .InstanceStatusValueValuesEnum.RUNNING),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.NONE),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-1',
-              name='xxx')),
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-2'),
-          instanceStatus=(msgs.ManagedInstance
-                          .InstanceStatusValueValuesEnum.STOPPED),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.RECREATING),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-1')),
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-3'),
-          instanceStatus=(msgs.ManagedInstance
-                          .InstanceStatusValueValuesEnum.RUNNING),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.DELETING),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-2',
-              name='yyy')),
-      msgs.ManagedInstance(
-          instance=(prefix +
-                    'projects/my-project/zones/central2-a/instances/inst-4'),
-          currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.CREATING),
-          version=msgs.ManagedInstanceVersion(
-              instanceTemplate='template-3'),
-          lastAttempt=MakeLastAttemptErrors(
-              msgs, [('CONDITION_NOT_MET', 'True is not False'),
-                     ('QUOTA_EXCEEDED', 'Limit is 5')])),
-  ]
-
-
-def MakeInstancesInManagedInstanceGroupAlpha(msgs, api):
-  prefix = '{0}/{1}/'.format(_COMPUTE_PATH, api)
-  return [
-      msgs.ManagedInstance(
-          instance=(
-              prefix + 'projects/my-project/zones/central2-a/instances/inst-1'),
           instanceStatus=(
               msgs.ManagedInstance.InstanceStatusValueValuesEnum.RUNNING),
           instanceHealth=[
               msgs.ManagedInstanceInstanceHealth(
-                  healthState=msgs.ManagedInstanceInstanceHealth
-                  .HealthStateValueValuesEnum.HEALTHY,
                   detailedHealthState=msgs.ManagedInstanceInstanceHealth
                   .DetailedHealthStateValueValuesEnum.HEALTHY)
           ],
@@ -1317,45 +1281,71 @@ def MakeInstancesInManagedInstanceGroupAlpha(msgs, api):
           version=msgs.ManagedInstanceVersion(
               instanceTemplate='template-1', name='xxx')),
       msgs.ManagedInstance(
-          instance=(
-              prefix + 'projects/my-project/zones/central2-a/instances/inst-2'),
+          instance=(prefix +
+                    'projects/my-project/zones/central2-a/instances/inst-2'),
+          instanceStatus=(
+              msgs.ManagedInstance.InstanceStatusValueValuesEnum.STOPPED),
           instanceHealth=[
               msgs.ManagedInstanceInstanceHealth(
-                  healthState=msgs.ManagedInstanceInstanceHealth
-                  .HealthStateValueValuesEnum.UNHEALTHY,
                   detailedHealthState=msgs.ManagedInstanceInstanceHealth
                   .DetailedHealthStateValueValuesEnum.UNHEALTHY)
           ],
-          instanceStatus=(
-              msgs.ManagedInstance.InstanceStatusValueValuesEnum.STOPPED),
           currentAction=(
               msgs.ManagedInstance.CurrentActionValueValuesEnum.RECREATING),
           version=msgs.ManagedInstanceVersion(instanceTemplate='template-1')),
       msgs.ManagedInstance(
-          instance=(
-              prefix + 'projects/my-project/zones/central2-a/instances/inst-3'),
+          instance=(prefix +
+                    'projects/my-project/zones/central2-a/instances/inst-3'),
+          instanceStatus=(
+              msgs.ManagedInstance.InstanceStatusValueValuesEnum.RUNNING),
           instanceHealth=[
               msgs.ManagedInstanceInstanceHealth(
-                  healthState=msgs.ManagedInstanceInstanceHealth
-                  .HealthStateValueValuesEnum.UNHEALTHY,
                   detailedHealthState=msgs.ManagedInstanceInstanceHealth
                   .DetailedHealthStateValueValuesEnum.TIMEOUT)
           ],
-          instanceStatus=(
-              msgs.ManagedInstance.InstanceStatusValueValuesEnum.RUNNING),
           currentAction=(
               msgs.ManagedInstance.CurrentActionValueValuesEnum.DELETING),
           version=msgs.ManagedInstanceVersion(
               instanceTemplate='template-2', name='yyy')),
       msgs.ManagedInstance(
-          instance=(
-              prefix + 'projects/my-project/zones/central2-a/instances/inst-4'),
+          instance=(prefix +
+                    'projects/my-project/zones/central2-a/instances/inst-4'),
           currentAction=(
               msgs.ManagedInstance.CurrentActionValueValuesEnum.CREATING),
           version=msgs.ManagedInstanceVersion(instanceTemplate='template-3'),
           lastAttempt=MakeLastAttemptErrors(
               msgs, [('CONDITION_NOT_MET', 'True is not False'),
                      ('QUOTA_EXCEEDED', 'Limit is 5')])),
+  ]
+
+
+def MakeErrorsInManagedInstanceGroupAlpha(msgs, api):
+  prefix = '{0}/{1}/'.format(_COMPUTE_PATH, api)
+  return [
+      msgs.InstanceManagedByIgmError(
+          instanceActionDetails=msgs
+          .InstanceManagedByIgmErrorInstanceActionDetails(
+              instance=prefix +
+              'projects/my-project/zones/central2-a/instances/inst-1',
+              action=msgs.InstanceManagedByIgmErrorInstanceActionDetails
+              .ActionValueValuesEnum.CREATING,
+              version=msgs.ManagedInstanceVersion(
+                  instanceTemplate='template-1', name='xxx')),
+          error=msgs.InstanceManagedByIgmErrorManagedInstanceError(
+              code='foo', message='bar'),
+          timestamp='2013-09-06T17:54:10.636-07:00'),
+      msgs.InstanceManagedByIgmError(
+          instanceActionDetails=msgs
+          .InstanceManagedByIgmErrorInstanceActionDetails(
+              instance=prefix +
+              'projects/my-project/zones/central2-a/instances/inst-2',
+              action=msgs.InstanceManagedByIgmErrorInstanceActionDetails
+              .ActionValueValuesEnum.DELETING,
+              version=msgs.ManagedInstanceVersion(
+                  instanceTemplate='template-1', name='xxx')),
+          error=msgs.InstanceManagedByIgmErrorManagedInstanceError(
+              code='foo', message='bar'),
+          timestamp='2013-09-06T17:54:10.636-07:00'),
   ]
 
 
@@ -1455,9 +1445,9 @@ MACHINE_TYPES = [
         name='n1-standard-1',
         guestCpus=1,
         memoryMb=3840,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/machineTypes/n1-standard-1'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.MachineType(
@@ -1466,18 +1456,18 @@ MACHINE_TYPES = [
         name='n1-standard-1-d',
         guestCpus=1,
         memoryMb=3840,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/machineTypes/n1-standard-1-d'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.MachineType(
         name='n1-highmem-2',
         guestCpus=2,
         memoryMb=30720,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/machineTypes/n1-standard-2'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 ]
 
@@ -1487,29 +1477,28 @@ def MakeInstanceGroupManagersWithActions(api,
                                          scope_type='zone',
                                          scope_name='zone-1',
                                          actions_state='creating',
-                                         pending_actions_count=None,
                                          is_stable=False,
                                          version_target_reached=None):
   """Creates instance group manages with current actions tests resources."""
-  if (current_actions_count or pending_actions_count) and is_stable:
-    raise Exception('Cannot create stable IGM with pending or current actions.')
+  if current_actions_count and is_stable:
+    raise Exception('Cannot create stable IGM with current actions.')
 
   used_messages = _GetMessagesForApi(api)
   igm = used_messages.InstanceGroupManager(
       name='group-1',
-      selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+      selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                 'my-project/{1}/{2}/instanceGroupManagers/group-1'
                 .format(api, scope_type + 's', scope_name)),
       creationTimestamp='2013-09-06T17:54:10.636-07:00',
-      zone=('https://www.googleapis.com/compute/{0}/'
+      zone=('https://compute.googleapis.com/compute/{0}/'
             'projects/my-project/zones/zone-1'.format(api)),
       baseInstanceName='test-instance-name-1',
       description='Test description.',
       fingerprint=b'1234',
-      instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+      instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                      'my-project/{1}/{2}/instanceGroups/group-1'
                      .format(api, scope_type + 's', scope_name)),
-      instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+      instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                         'my-project/global/instanceTemplates/template-1'
                         .format(api)),
       targetPools=[],
@@ -1518,11 +1507,6 @@ def MakeInstanceGroupManagersWithActions(api,
       actions_state: current_actions_count,
       'none': (10 - current_actions_count)
   })
-  if pending_actions_count is not None:
-    pending_actions = used_messages.InstanceGroupManagerPendingActionsSummary(
-        **{actions_state: pending_actions_count})
-    igm.pendingActions = pending_actions
-
   igm.status = used_messages.InstanceGroupManagerStatus(isStable=is_stable)
   if version_target_reached is not None:
     igm.status.versionTarget = (
@@ -1530,7 +1514,7 @@ def MakeInstanceGroupManagersWithActions(api,
             isReached=version_target_reached))
 
   setattr(igm, scope_type,
-          'https://www.googleapis.com/compute/{0}/projects/my-project/{1}/{2}'
+          'https://compute.googleapis.com/compute/{0}/projects/my-project/{1}/{2}'
           .format(api, scope_type + 's', scope_name))
   return igm
 
@@ -1542,17 +1526,17 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
   group_managers = [
       used_messages.InstanceGroupManager(
           name='group-1',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-1'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2013-09-06T17:54:10.636-07:00',
           baseInstanceName='test-instance-name-1',
           description='Test description.',
           fingerprint=b'1234',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-1'
                          .format(api, scope_type + 's', scope_name)),
-          instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                             'my-project/global/instanceTemplates/template-1'
                             .format(api)),
           targetPools=[],
@@ -1560,17 +1544,17 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
       ),
       used_messages.InstanceGroupManager(
           name='group-2',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-2'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2014-12-31T23:59:59.999-11:00',
           baseInstanceName='test-instance-name-2',
           description='Test description.',
           fingerprint=b'12345',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-2'
                          .format(api, scope_type + 's', scope_name)),
-          instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                             'my-project/global/instanceTemplates/template-2'
                             .format(api)),
           targetPools=[],
@@ -1578,17 +1562,17 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
       ),
       used_messages.InstanceGroupManager(
           name='group-3',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-3'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2012-01-01T00:00:00.001+11:00',
           baseInstanceName='test-instance-name-3',
           description='Test description.',
           fingerprint=b'12346',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/zones/zone-1/instanceGroups/group-3'
                          .format(api)),
-          instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                             'my-project/global/instanceTemplates/template-2'
                             .format(api)),
           targetPools=[],
@@ -1597,7 +1581,7 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
   ]
   for group_manager in group_managers:
     setattr(group_manager, scope_type,
-            'https://www.googleapis.com/compute/{0}/'
+            'https://compute.googleapis.com/compute/{0}/'
             'projects/my-project/{1}/{2}'
             .format(api, scope_type + 's', scope_name))
   return group_managers
@@ -1611,24 +1595,24 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
   group_managers = [
       used_messages.InstanceGroupManager(
           name='group-1',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-1'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2013-09-06T17:54:10.636-07:00',
           baseInstanceName='test-instance-name-1',
           description='Test description.',
           fingerprint=b'1234',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-1'
                          .format(api, scope_type + 's', scope_name)),
-          instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                             'my-project/global/instanceTemplates/template-1'
                             .format(api)),
           targetPools=[],
           targetSize=1,
           versions=[
               used_messages.InstanceGroupManagerVersion(
-                  instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+                  instanceTemplate=('https://compute.googleapis.com/compute/{0}/'
                                     'projects/my-project/global/'
                                     'instanceTemplates/template-1'.format(api)),
               ),
@@ -1636,27 +1620,27 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
       ),
       used_messages.InstanceGroupManager(
           name='group-2',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-2'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2014-12-31T23:59:59.999-11:00',
           baseInstanceName='test-instance-name-2',
           description='Test description.',
           fingerprint=b'12345',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-2'
                          .format(api, scope_type + 's', scope_name)),
           targetPools=[],
           targetSize=10,
           versions=[
               used_messages.InstanceGroupManagerVersion(
-                  instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+                  instanceTemplate=('https://compute.googleapis.com/compute/{0}/'
                                     'projects/my-project/global/'
                                     'instanceTemplates/template-1'.format(api)),
                   targetSize=used_messages.FixedOrPercent(percent=60)
               ),
               used_messages.InstanceGroupManagerVersion(
-                  instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+                  instanceTemplate=('https://compute.googleapis.com/compute/{0}/'
                                     'projects/my-project/global/'
                                     'instanceTemplates/template-2'.format(api)),
               ),
@@ -1664,17 +1648,17 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
       ),
       used_messages.InstanceGroupManager(
           name='group-3',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-3'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2012-01-01T00:00:00.001+11:00',
           baseInstanceName='test-instance-name-3',
           description='Test description.',
           fingerprint=b'12346',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/zones/zone-1/instanceGroups/group-3'
                          .format(api)),
-          instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                             'my-project/global/instanceTemplates/template-2'
                             .format(api)),
           targetPools=[],
@@ -1682,14 +1666,14 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
       ),
       used_messages.InstanceGroupManager(
           name='group-4',
-          selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+          selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                     'my-project/{1}/{2}/instanceGroupManagers/group-4'
                     .format(api, scope_type + 's', scope_name)),
           creationTimestamp='2014-12-31T23:59:59.999-11:00',
           baseInstanceName='test-instance-name-4',
           description='Test description.',
           fingerprint=b'12347',
-          instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+          instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-4'
                          .format(api, scope_type + 's', scope_name)),
           targetPools=[],
@@ -1697,14 +1681,14 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
           versions=[
               used_messages.InstanceGroupManagerVersion(
                   name='some-tag',
-                  instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+                  instanceTemplate=('https://compute.googleapis.com/compute/{0}/'
                                     'projects/my-project/global/'
                                     'instanceTemplates/template-1'.format(api)),
                   targetSize=used_messages.FixedOrPercent(percent=60),
               ),
               used_messages.InstanceGroupManagerVersion(
                   name='other-tag',
-                  instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+                  instanceTemplate=('https://compute.googleapis.com/compute/{0}/'
                                     'projects/my-project/global/'
                                     'instanceTemplates/template-1'.format(api)),
               ),
@@ -1713,7 +1697,7 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
   ]
   for group_manager in group_managers:
     setattr(group_manager, scope_type,
-            'https://www.googleapis.com/compute/{0}/'
+            'https://compute.googleapis.com/compute/{0}/'
             'projects/my-project/{1}/{2}'
             .format(api, scope_type + 's', scope_name))
   return group_managers
@@ -1724,33 +1708,44 @@ def MakeStatefulInstanceGroupManager(api, scope_name='zone-1',
   """Creates sample stateful IGM test resource."""
 
   used_messages = _GetMessagesForApi(api)
+  auto_delete_never = used_messages.StatefulPolicyPreservedStateDiskDevice\
+    .AutoDeleteValueValuesEnum.NEVER
   return used_messages.InstanceGroupManager(
       name='group-stateful-1',
-      selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+      selfLink=('https://compute.googleapis.com/compute/{0}/projects/'
                 'my-project/{1}/{2}/instanceGroupManagers/group-stateful-1'
                 .format(api, scope_type + 's', scope_name)),
       creationTimestamp='2019-05-10T17:54:10.636-07:00',
       baseInstanceName='test-instance-name-1',
       description='Test description.',
       fingerprint=b'1234',
-      instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+      instanceGroup=('https://compute.googleapis.com/compute/{0}/projects/'
                      'my-project/{1}/{2}/instanceGroups/group-stateful-1'
                      .format(api, scope_type + 's', scope_name)),
-      instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+      instanceTemplate=('https://compute.googleapis.com/compute/{0}/projects/'
                         'my-project/global/instanceTemplates/template-1'
                         .format(api)),
       statefulPolicy=used_messages.StatefulPolicy(
-          preservedResources=(
-              used_messages.StatefulPolicyPreservedResources(
-                  disks=[
-                      used_messages.StatefulPolicyPreservedDisk(
-                          deviceName='disk-1'),
-                  ]))),
+          preservedState=(
+              used_messages.StatefulPolicyPreservedState(
+                  disks=used_messages.StatefulPolicyPreservedState.DisksValue(
+                      additionalProperties=[
+                          used_messages.StatefulPolicyPreservedState \
+                            .DisksValue.AdditionalProperty(
+                                key='disk-1',
+                                value=used_messages.\
+                                StatefulPolicyPreservedStateDiskDevice(
+                                    autoDelete=auto_delete_never))
+                      ]
+                  )
+              )
+          )
+      ),
       targetPools=[],
       targetSize=1,
       versions=[
           used_messages.InstanceGroupManagerVersion(
-              instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+              instanceTemplate=('https://compute.googleapis.com/compute/{0}/'
                                 'projects/my-project/global/'
                                 'instanceTemplates/template-1'.format(api)),
           ),
@@ -1821,7 +1816,7 @@ NETWORKS_V1 = [
         IPv4Range='10.240.0.0/16',
         routingConfig=messages.NetworkRoutingConfig(routingMode=(
             messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.REGIONAL)),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/global/networks/network-1')),
 
     # Custom
@@ -1830,12 +1825,12 @@ NETWORKS_V1 = [
         autoCreateSubnetworks=False,
         routingConfig=messages.NetworkRoutingConfig(routingMode=(
             messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.REGIONAL)),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/global/networks/network-2'),
         subnetworks=[
-            'https://www.googleapis.com/compute/v1/projects/'
+            'https://compute.googleapis.com/compute/v1/projects/'
             'my-project/regions/region-1/subnetworks/subnetwork-1',
-            'https://www.googleapis.com/compute/v1/projects/'
+            'https://compute.googleapis.com/compute/v1/projects/'
             'my-project/regions/region-1/subnetworks/subnetwork-2'
         ]),
 
@@ -1845,7 +1840,7 @@ NETWORKS_V1 = [
         autoCreateSubnetworks=True,
         routingConfig=messages.NetworkRoutingConfig(routingMode=(
             messages.NetworkRoutingConfig.RoutingModeValueValuesEnum.GLOBAL)),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/global/networks/network-3'),
         subnetworks=[])
 ]
@@ -1854,14 +1849,14 @@ NETWORK_PEERINGS_V1 = [
     messages.Network(
         name='network-1',
         autoCreateSubnetworks=True,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/global/networks/network-1'),
         subnetworks=[],
         peerings=[
             messages.NetworkPeering(
                 autoCreateRoutes=True,
                 name='peering-1',
-                network='https://www.googleapis.com/compute/v1/'
+                network='https://compute.googleapis.com/compute/v1/'
                 'projects/my-project/global/networks/network-2',
                 state=messages.NetworkPeering.StateValueValuesEnum.ACTIVE,
                 stateDetails='Matching configuration is found on peer network.'
@@ -1869,7 +1864,7 @@ NETWORK_PEERINGS_V1 = [
             messages.NetworkPeering(
                 autoCreateRoutes=True,
                 name='peering-2',
-                network='https://www.googleapis.com/compute/v1/'
+                network='https://compute.googleapis.com/compute/v1/'
                 'projects/my-project-2/global/networks/network-3',
                 state=messages.NetworkPeering.StateValueValuesEnum.ACTIVE,
                 stateDetails='Matching configuration is found on peer '
@@ -1877,7 +1872,7 @@ NETWORK_PEERINGS_V1 = [
             messages.NetworkPeering(
                 autoCreateRoutes=True,
                 name='peering-3',
-                network='https://www.googleapis.com/compute/v1/'
+                network='https://compute.googleapis.com/compute/v1/'
                 'projects/my-project-3/global/networks/network-3',
                 state=(messages.NetworkPeering.StateValueValuesEnum.INACTIVE),
                 stateDetails='Peering is created.')
@@ -1885,14 +1880,14 @@ NETWORK_PEERINGS_V1 = [
     messages.Network(
         name='network-2',
         autoCreateSubnetworks=True,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/'
                   'my-project/global/networks/network-2'),
         subnetworks=[],
         peerings=[
             messages.NetworkPeering(
                 autoCreateRoutes=True,
                 name='my-peering-1',
-                network='https://www.googleapis.com/compute/v1/projects/'
+                network='https://compute.googleapis.com/compute/v1/projects/'
                 'my-project/global/networks/network-1',
                 state=messages.NetworkPeering.StateValueValuesEnum.ACTIVE,
                 stateDetails='Matching configuration is found on peer network.')
@@ -2081,7 +2076,7 @@ def MakeNetworkEndpointGroups(msgs, api):
       msgs.NetworkEndpointGroup(
           description='My NEG 1',
           kind='compute#networkEndpointGroup',
-          network=('https://www.googleapis.com/compute/v1/projects/'
+          network=('https://compute.googleapis.com/compute/v1/projects/'
                    'my-project/global/networks/network-1'),
           zone='zone-1',
           name='my-neg1',
@@ -2092,7 +2087,7 @@ def MakeNetworkEndpointGroups(msgs, api):
       msgs.NetworkEndpointGroup(
           description='My NEG Too',
           kind='compute#networkEndpointGroup',
-          network=('https://www.googleapis.com/compute/v1/projects/'
+          network=('https://compute.googleapis.com/compute/v1/projects/'
                    'my-project/global/networks/network-2'),
           zone='zone-2',
           name='my-neg2',
@@ -2100,10 +2095,49 @@ def MakeNetworkEndpointGroups(msgs, api):
           selfLink=(prefix + '/projects/my-project/zones/zone-2/'
                     'networkEndpointGroups/my-neg2'),
           size=2),
+      msgs.NetworkEndpointGroup(
+          description='My NEG 1',
+          kind='compute#networkEndpointGroup',
+          network=('https://www.googleapis.com/compute/v1/projects/'
+                   'my-project/global/networks/network-1'),
+          zone='zone-1',
+          name='my-neg3',
+          networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
+          selfLink=(prefix + '/projects/my-project/zones/zone-1/'
+                    'networkEndpointGroups/my-neg3'),
+          size=3),
+  ]
+
+
+def MakeGlobalNetworkEndpointGroups(msgs, api):
+  prefix = _COMPUTE_PATH + '/' + api
+  neg_type_enum = msgs.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
+  return [
+      msgs.NetworkEndpointGroup(
+          description='My Global NEG',
+          kind='compute#networkEndpointGroup',
+          name='my-global-neg',
+          networkEndpointType=neg_type_enum.INTERNET_IP_PORT,
+          selfLink=(prefix + '/projects/my-project/global/'
+                    'networkEndpointGroups/my-global-neg'),
+          size=1),
+      msgs.NetworkEndpointGroup(
+          description='My Global NEG FQDN',
+          kind='compute#networkEndpointGroup',
+          name='my-global-neg-fqdn',
+          networkEndpointType=neg_type_enum.INTERNET_FQDN_PORT,
+          selfLink=(prefix + '/projects/my-project/global/'
+                    'networkEndpointGroups/my-global-neg-fqdn'),
+          size=2),
   ]
 
 
 NETWORK_ENDPOINT_GROUPS = MakeNetworkEndpointGroups(messages, 'v1')
+NETWORK_ENDPOINT_GROUPS_ALPHA = MakeNetworkEndpointGroups(
+    alpha_messages, 'alpha')
+
+GLOBAL_NETWORK_ENDPOINT_GROUPS_ALPHA = MakeGlobalNetworkEndpointGroups(
+    alpha_messages, 'alpha')
 
 
 def MakeOsloginClient(version, use_extended_profile=False):
@@ -2205,20 +2239,20 @@ PROJECTS = [
                     value='d'),
             ]
         ),
-        selfLink='https://www.googleapis.com/compute/v1/projects/my-project/')
+        selfLink='https://compute.googleapis.com/compute/v1/projects/my-project/')
 ]
 
 REGIONAL_OPERATIONS = [
     messages.Operation(
         name='operation-2',
         operationType='insert',
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/region-1'),
         status=messages.Operation.StatusValueValuesEnum.DONE,
         insertTime='2014-09-04T09:53:33.679-07:00',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/region-1/operations/operation-2'),
-        targetLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        targetLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/region-1/resource/resource-2')),
 ]
 
@@ -2226,15 +2260,15 @@ BETA_REGIONAL_OPERATIONS = [
     beta_messages.Operation(
         name='operation-2', operationType='insert',
         region=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/region-1'),
         status=beta_messages.Operation.StatusValueValuesEnum.DONE,
         insertTime='2014-09-04T09:53:33.679-07:00',
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/region-1/operations/operation-2'),
         targetLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/region-1/resource/resource-2'))]
 
 REGIONS = [
@@ -2259,12 +2293,12 @@ REGIONS = [
                 usage=2.0),
         ],
         status=messages.Region.StatusValueValuesEnum.UP,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/region-1'),
         deprecated=messages.DeprecationStatus(
             state=messages.DeprecationStatus.StateValueValuesEnum.DEPRECATED,
             deleted='2015-03-29T00:00:00.000-07:00',
-            replacement=('https://www.googleapis.com/compute/v1/projects/'
+            replacement=('https://compute.googleapis.com/compute/v1/projects/'
                          'my-project/regions/region-2'))),
 
     messages.Region(
@@ -2288,7 +2322,7 @@ REGIONS = [
                 usage=20.0),
         ],
         status=messages.Region.StatusValueValuesEnum.UP,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/region-2')),
 
     messages.Region(
@@ -2312,7 +2346,7 @@ REGIONS = [
                 usage=40.0),
         ],
         status=messages.Region.StatusValueValuesEnum.UP,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/region-3')),
 ]
 
@@ -2342,14 +2376,14 @@ BETA_REGIONS = [
                 usage=2.0)],
         status=beta_messages.Region.StatusValueValuesEnum.UP,
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/region-1'),
         deprecated=beta_messages.DeprecationStatus(
             state=beta_messages.DeprecationStatus.StateValueValuesEnum
             .DEPRECATED,
             deleted='2015-03-29T00:00:00.000-07:00',
             replacement=(
-                'https://www.googleapis.com/compute/beta/projects/'
+                'https://compute.googleapis.com/compute/beta/projects/'
                 'my-project/regions/region-2'))),
     beta_messages.Region(
         name='region-2',
@@ -2375,7 +2409,7 @@ BETA_REGIONS = [
                 usage=20.0)],
         status=beta_messages.Region.StatusValueValuesEnum.UP,
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/region-2')),
     beta_messages.Region(
         name='region-3',
@@ -2401,7 +2435,7 @@ BETA_REGIONS = [
                 usage=40.0)],
         status=beta_messages.Region.StatusValueValuesEnum.UP,
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/region-3'))]
 
 
@@ -2497,27 +2531,27 @@ SNAPSHOTS = [
     messages.Snapshot(
         diskSizeGb=10,
         name='snapshot-1',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/snapshots/snapshot-1'),
-        sourceDisk=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        sourceDisk=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'zones/zone-1/disks/disk-1'),
         status=messages.Snapshot.StatusValueValuesEnum.READY),
 
     messages.Snapshot(
         diskSizeGb=10,
         name='snapshot-2',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/snapshots/snapshot-2'),
-        sourceDisk=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        sourceDisk=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'zones/zone-1/disks/disk-2'),
         status=messages.Snapshot.StatusValueValuesEnum.READY),
 
     messages.Snapshot(
         diskSizeGb=10,
         name='snapshot-3',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'global/snapshots/snapshot-3'),
-        sourceDisk=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        sourceDisk=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'zones/zone-1/disks/disk-3'),
         status=messages.Snapshot.StatusValueValuesEnum.READY),
 ]
@@ -2597,42 +2631,40 @@ BETA_SSL_CERTIFICATES = [
     ),
     beta_messages.SslCertificate(
         name='ssl-cert-2',
-        type=beta_messages.SslCertificate.TypeValueValuesEnum.
-        MANAGED,
+        region='us-west-1',
+        type=beta_messages.SslCertificate.TypeValueValuesEnum
+        .MANAGED,
         managed=beta_messages.SslCertificateManagedSslCertificate(
             domains=[
                 'test1.certsbridge.com',
                 # Punycode for Ṳᾔḯ¢◎ⅾℯ.certsbridge.com
                 'xn--8a342mzfam5b18csni3w.certsbridge.com',
             ],
-            status=beta_messages.SslCertificateManagedSslCertificate.
-            StatusValueValuesEnum.ACTIVE,
-            domainStatus=beta_messages.
-            SslCertificateManagedSslCertificate.DomainStatusValue(
+            status=beta_messages.SslCertificateManagedSslCertificate
+            .StatusValueValuesEnum.ACTIVE,
+            domainStatus=beta_messages
+            .SslCertificateManagedSslCertificate.DomainStatusValue(
                 additionalProperties=[
-                    beta_messages.SslCertificateManagedSslCertificate.
-                    DomainStatusValue.AdditionalProperty(
+                    beta_messages.SslCertificateManagedSslCertificate
+                    .DomainStatusValue.AdditionalProperty(
                         key='test1.certsbridge.com',
-                        value=beta_messages.
-                        SslCertificateManagedSslCertificate.
-                        DomainStatusValue.AdditionalProperty.
-                        ValueValueValuesEnum.ACTIVE,
+                        value=beta_messages.SslCertificateManagedSslCertificate
+                        .DomainStatusValue.AdditionalProperty.ValueValueValuesEnum
+                        .ACTIVE,
                     ),
-                    beta_messages.SslCertificateManagedSslCertificate.
-                    DomainStatusValue.AdditionalProperty(
+                    beta_messages.SslCertificateManagedSslCertificate
+                    .DomainStatusValue.AdditionalProperty(
                         key='xn--8a342mzfam5b18csni3w.certsbridge.com',
-                        value=beta_messages.
-                        SslCertificateManagedSslCertificate.
-                        DomainStatusValue.
-                        AdditionalProperty.
-                        ValueValueValuesEnum.FAILED_CAA_FORBIDDEN,
+                        value=beta_messages.SslCertificateManagedSslCertificate
+                        .DomainStatusValue.AdditionalProperty.ValueValueValuesEnum
+                        .FAILED_CAA_FORBIDDEN,
                     ),
                 ])),
         creationTimestamp='2017-12-17T10:00:00.000-07:00',
         expireTime='2018-12-17T10:00:00.000-07:00',
         description='Managed certificate.',
         selfLink=_BETA_URI_PREFIX +
-        'global/sslCertificates/ssl-cert-2',
+        'regions/us-west-1/sslCertificates/ssl-cert-2',
     ),
 ]
 
@@ -2703,6 +2735,23 @@ ALPHA_SSL_CERTIFICATES = [
         'regions/us-west-1/sslCertificates/ssl-cert-2',
     ),
 ]
+
+
+def MakeSslPolicies(msgs, api):
+  """Make ssl policy test resources for the given api version."""
+  prefix = _COMPUTE_PATH + '/' + api
+  return [
+      msgs.SslPolicy(
+          name='ssl-policy-1',
+          profile=msgs.SslPolicy.ProfileValueValuesEnum('COMPATIBLE'),
+          minTlsVersion=msgs.SslPolicy.MinTlsVersionValueValuesEnum('TLS_1_0'),
+          customFeatures=[],
+          selfLink=(prefix +
+                    '/projects/my-project/global/sslPolicies/ssl-policy-1'))
+  ]
+
+
+SSL_POLICIES_ALPHA = MakeSslPolicies(alpha_messages, 'alpha')
 
 TARGET_HTTP_PROXIES = [
     messages.TargetHttpProxy(
@@ -2819,45 +2868,45 @@ TARGET_TCP_PROXIES_V1 = MakeTargetTcpProxies(messages, 'v1')
 TARGET_INSTANCES = [
     messages.TargetInstance(
         name='target-instance-1',
-        instance=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        instance=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-1'),
         natPolicy=messages.TargetInstance.NatPolicyValueValuesEnum.NO_NAT,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/targetInstances/target-instance-1'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.TargetInstance(
         name='target-instance-2',
-        instance=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        instance=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/instances/instance-2'),
         natPolicy=messages.TargetInstance.NatPolicyValueValuesEnum.NO_NAT,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/targetInstances/target-instance-2'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1')),
 
     messages.TargetInstance(
         name='target-instance-3',
-        instance=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        instance=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-2/instances/instance-3'),
         natPolicy=messages.TargetInstance.NatPolicyValueValuesEnum.NO_NAT,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-2/targetInstances/target-instance-3'),
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-2')),
 ]
 
 TARGET_POOLS = [
     messages.TargetPool(
         backupPool=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1/targetPools/pool-2'), name='pool-1',
         region=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1'),
         selfLink=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1/targetPools/pool-1'),
         sessionAffinity=(
             messages.TargetPool.SessionAffinityValueValuesEnum.CLIENT_IP)),
@@ -2865,15 +2914,15 @@ TARGET_POOLS = [
         name='pool-2',
         healthChecks=(
             [
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/httpHealthChecks/check-1',
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/httpHealthChecks/check-2']),
         region=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1'),
         selfLink=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1/targetPools/pool-2'),
         sessionAffinity=(
             messages.TargetPool.SessionAffinityValueValuesEnum.CLIENT_IP_PROTO)
@@ -2881,10 +2930,10 @@ TARGET_POOLS = [
     messages.TargetPool(
         name='pool-3',
         region=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1'),
         selfLink=(
-            'https://www.googleapis.com/compute/v1/projects/my-project/'
+            'https://compute.googleapis.com/compute/v1/projects/my-project/'
             'regions/region-1/targetPools/pool-3'),
         sessionAffinity=(
             messages.TargetPool.SessionAffinityValueValuesEnum.NONE))]
@@ -3109,13 +3158,13 @@ ZONAL_OPERATIONS = [
         name='operation-3',
         httpErrorStatusCode=409,
         operationType='insert',
-        zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1'),
         status=messages.Operation.StatusValueValuesEnum.DONE,
         insertTime='2014-09-04T09:56:33.679-07:00',
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/zone-1/operations/operation-3'),
-        targetLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        targetLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'zones/zone-1/resource/resource-3')),
 ]
 
@@ -3124,57 +3173,57 @@ BETA_ZONAL_OPERATIONS = [
         name='operation-3',
         httpErrorStatusCode=409,
         operationType='insert',
-        zone=('https://www.googleapis.com/compute/beta/projects/my-project/'
+        zone=('https://compute.googleapis.com/compute/beta/projects/my-project/'
               'zones/zone-1'),
         status=beta_messages.Operation.StatusValueValuesEnum.DONE,
         insertTime='2014-09-04T09:56:33.679-07:00',
-        selfLink=('https://www.googleapis.com/compute/beta/projects/'
+        selfLink=('https://compute.googleapis.com/compute/beta/projects/'
                   'my-project/zones/zone-1/operations/operation-3'),
-        targetLink=('https://www.googleapis.com/compute/beta/projects/'
+        targetLink=('https://compute.googleapis.com/compute/beta/projects/'
                     'my-project/zones/zone-1/resource/resource-3')),
 ]
 
 ZONES = [
     messages.Zone(
         name='us-central1-a',
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/us-central1'),
         status=messages.Zone.StatusValueValuesEnum.UP,
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/us-central1-a'),
         deprecated=messages.DeprecationStatus(
             state=messages.DeprecationStatus.StateValueValuesEnum.DEPRECATED,
             deleted='2015-03-29T00:00:00.000-07:00',
-            replacement=('https://www.googleapis.com/compute/v1/projects/'
+            replacement=('https://compute.googleapis.com/compute/v1/projects/'
                          'my-project/zones/us-central1-b'))),
 
     messages.Zone(
         name='us-central1-b',
         status=messages.Zone.StatusValueValuesEnum.UP,
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/us-central1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/us-central1-b')),
 
     messages.Zone(
         name='europe-west1-a',
         status=messages.Zone.StatusValueValuesEnum.UP,
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/europe-west1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/europe-west1-a')),
 
     messages.Zone(
         name='europe-west1-b',
         status=messages.Zone.StatusValueValuesEnum.DOWN,
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/europe-west1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'zones/europe-west1-a'),
         deprecated=messages.DeprecationStatus(
             state=messages.DeprecationStatus.StateValueValuesEnum.DELETED,
             deleted='2015-03-29T00:00:00.000-07:00',
-            replacement=('https://www.googleapis.com/compute/v1/projects/'
+            replacement=('https://compute.googleapis.com/compute/v1/projects/'
                          'my-project/zones/europe-west1-a'))),
 ]
 
@@ -3182,38 +3231,38 @@ BETA_ZONES = [
     beta_messages.Zone(
         name='us-central1-a',
         region=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/us-central1'),
         status=beta_messages.Zone.StatusValueValuesEnum.UP,
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'zones/us-central1-a')),
     beta_messages.Zone(
         name='us-central1-b',
         status=beta_messages.Zone.StatusValueValuesEnum.UP,
         region=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/us-central1'),
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'zones/us-central1-b')),
     beta_messages.Zone(
         name='europe-west1-a',
         status=beta_messages.Zone.StatusValueValuesEnum.UP,
         region=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/europe-west1'),
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'zones/europe-west1-a')),
     beta_messages.Zone(
         name='europe-west1-b',
         status=beta_messages.Zone.StatusValueValuesEnum.DOWN,
         region=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'regions/europe-west1'),
         selfLink=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'zones/europe-west1-b')),
 ]
 
@@ -3221,23 +3270,23 @@ BETA_SUBNETWORKS = [
     beta_messages.Subnetwork(
         name='my-subnet1',
         network=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'global/networks/my-network'),
         ipCidrRange='10.0.0.0/24',
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/us-central1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/us-central1/subnetworks/my-subnet1'),
     ),
     beta_messages.Subnetwork(
         name='my-subnet2',
         network=(
-            'https://www.googleapis.com/compute/beta/projects/my-project/'
+            'https://compute.googleapis.com/compute/beta/projects/my-project/'
             'global/networks/my-other-network'),
         ipCidrRange='10.0.0.0/24',
-        region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/us-central1'),
-        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/us-central1/subnetworks/my-subnet2'),
     ),
 ]

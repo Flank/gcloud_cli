@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ def _CommonArgs(parser, beta=False):
   """Register flags common to all tracks."""
   base.ASYNC_FLAG.AddToParser(parser)
   parser.add_argument('name', help='The name of this cluster.')
-  clusters.ArgsForClusterRef(parser, beta)
+  clusters.ArgsForClusterRef(parser, beta, include_ttl_config=True)
   # Add gce-pd-kms-key args
   kms_flag_overrides = {'kms-key': '--gce-pd-kms-key',
                         'kms-keyring': '--gce-pd-kms-key-keyring',
@@ -93,7 +93,8 @@ class Create(base.CreateCommand):
 
     cluster_config = clusters.GetClusterConfig(args, dataproc,
                                                cluster_ref.projectId,
-                                               compute_resources, self.BETA)
+                                               compute_resources, self.BETA,
+                                               include_ttl_config=True)
 
     cluster = dataproc.messages.Cluster(
         config=cluster_config,
@@ -102,7 +103,7 @@ class Create(base.CreateCommand):
 
     self.ConfigureCluster(dataproc.messages, args, cluster)
 
-    return clusters.CreateCluster(dataproc, cluster, args.async, args.timeout)
+    return clusters.CreateCluster(dataproc, cluster, args.async_, args.timeout)
 
   @staticmethod
   def ConfigureCluster(messages, args, cluster):

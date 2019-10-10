@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ from googlecloudsdk.command_lib.run import pretty_print
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.command_lib.run import stages
-from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core.console import progress_tracker
@@ -50,24 +49,43 @@ class Update(base.Command):
   }
 
   @staticmethod
-  def Args(parser):
+  def CommonArgs(parser):
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddRegionArg(managed_group)
+    flags.AddServiceAccountFlag(managed_group)
+    flags.AddCloudSQLFlags(managed_group)
+    # Flags specific to CRoGKE
+    gke_group = flags.GetGkeArgGroup(parser)
+    concept_parsers.ConceptParser([resource_args.CLUSTER_PRESENTATION
+                                  ]).AddToParser(gke_group)
+    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
+    kubernetes_group = flags.GetKubernetesArgGroup(parser)
+    flags.AddKubeconfigFlags(kubernetes_group)
+    # Flags specific to connecting to a cluster
+    cluster_group = flags.GetClusterArgGroup(parser)
+    flags.AddEndpointVisibilityEnum(cluster_group)
+    flags.AddCpuFlag(cluster_group)
+    # Flags not specific to any platform
     service_presentation = presentation_specs.ResourcePresentationSpec(
         'SERVICE',
         resource_args.GetServiceResourceSpec(prompt=True),
         'Service to update the configuration of.',
         required=True,
         prefixes=False)
-    flags.AddRegionArg(parser)
+    flags.AddPlatformArg(parser)
     flags.AddMutexEnvVarsFlags(parser)
     flags.AddMemoryFlag(parser)
-    flags.AddCpuFlag(parser)
     flags.AddConcurrencyFlag(parser)
     flags.AddTimeoutFlag(parser)
     flags.AddAsyncFlag(parser)
-    flags.AddCloudSQLFlags(parser)
-    concept_parsers.ConceptParser([
-        resource_args.CLUSTER_PRESENTATION,
-        service_presentation]).AddToParser(parser)
+    flags.AddLabelsFlags(parser)
+    flags.AddMaxInstancesFlag(parser)
+    concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
+
+  @staticmethod
+  def Args(parser):
+    Update.CommonArgs(parser)
 
   def Run(self, args):
     """Update configuration information about the service.
@@ -77,56 +95,69 @@ class Update(base.Command):
     Args:
       args: Args!
     """
+    changes = flags.GetConfigurationChanges(args)
+    if not changes:
+      raise exceptions.NoConfigurationChangeError(
+          'No configuration change requested. '
+          'Did you mean to include the flags `--update-env-vars`, '
+          '`--memory`, `--concurrency`, `--timeout`, `--connectivity`?')
+
     conn_context = connection_context.GetConnectionContext(args)
     service_ref = flags.GetService(args)
 
-    if conn_context.supports_one_platform:
-      flags.VerifyOnePlatformFlags(args)
-    else:
-      flags.VerifyGKEFlags(args)
-
     with serverless_operations.Connect(conn_context) as client:
-      changes = flags.GetConfigurationChanges(args)
-      if not changes:
-        raise exceptions.NoConfigurationChangeError(
-            'No configuration change requested. '
-            'Did you mean to include the flags `--update-env-vars`, '
-            '`--memory`, `--concurrency`, or `--timeout`?')
       deployment_stages = stages.ServiceStages()
       with progress_tracker.StagedProgressTracker(
           'Deploying...',
           deployment_stages,
           failure_message='Deployment failed',
-          suppress_output=args.async) as tracker:
-        client.ReleaseService(service_ref, changes, tracker, args.async)
-      if args.async:
+          suppress_output=args.async_) as tracker:
+        client.ReleaseService(
+            service_ref,
+            changes,
+            tracker,
+            asyn=args.async_)
+      if args.async_:
         pretty_print.Success(
             'Deploying asynchronously.')
       else:
-        url = client.GetServiceUrl(service_ref)
+        service = client.GetService(service_ref)
         active_revs = client.GetActiveRevisions(service_ref)
 
-        msg = ('{{bold}}Service [{serv}] revision{plural} {rev_msg} is active'
-               ' and serving traffic at{{reset}} {url}')
+        msg = ('Service [{{bold}}{serv}{{reset}}] revision{plural} {rev_msg} '
+               'is active and serving traffic at {{bold}}{url}{{reset}}')
 
-        rev_msg = ' '.join(['[{}]'.format(rev) for rev in active_revs])
+        rev_msg = ' '.join(
+            ['[{{bold}}{}{{reset}}]'.format(rev) for rev in active_revs])
 
         msg = msg.format(
             serv=service_ref.servicesId,
             plural='s' if len(active_revs) > 1 else '',
             rev_msg=rev_msg,
-            url=url)
+            url=service.domain)
 
         pretty_print.Success(msg)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class AlphaUpdate(Update):
+  """Update Cloud Run environment variables and other configuration settings.
+  """
 
   @staticmethod
   def Args(parser):
-    Update.Args(parser)
-    labels_util.AddUpdateLabelsFlags(parser)
-    flags.AddServiceAccountFlag(parser)
+    Update.CommonArgs(parser)
+    # Flags specific to managed CR
+    managed_group = flags.GetManagedArgGroup(parser)
+    flags.AddVpcConnectorArg(managed_group)
+    flags.AddRevisionSuffixArg(managed_group)
+    # Flags specific to connecting to a cluster
+    cluster_group = flags.GetClusterArgGroup(parser)
+    flags.AddSecretsFlags(cluster_group)
+    flags.AddConfigMapsFlags(cluster_group)
+    # Flags not specific to any platform
+    flags.AddMinInstancesFlag(parser)
+    flags.AddCommandFlag(parser)
+    flags.AddArgsFlag(parser)
 
 AlphaUpdate.__doc__ = Update.__doc__

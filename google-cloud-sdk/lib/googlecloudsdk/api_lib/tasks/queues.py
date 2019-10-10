@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +99,11 @@ class Queues(BaseQueues):
         parent=parent_ref.RelativeName(), queue=queue)
     return self.queues_service.Create(request)
 
-  def Patch(self, queue_ref, retry_config=None, rate_limits=None,
+  def Patch(self,
+            queue_ref,
+            updated_fields,
+            retry_config=None,
+            rate_limits=None,
             app_engine_routing_override=None):
     """Prepares and sends a Patch request for modifying a queue."""
 
@@ -108,20 +112,16 @@ class Queues(BaseQueues):
 
     queue = self.messages.Queue(name=queue_ref.RelativeName())
 
-    updated_fields = []
     if retry_config is not None:
       queue.retryConfig = retry_config
-      updated_fields.append('retryConfig')
     if rate_limits is not None:
       queue.rateLimits = rate_limits
-      updated_fields.append('rateLimits')
     if app_engine_routing_override is not None:
       if _IsEmptyConfig(app_engine_routing_override):
         queue.appEngineRoutingOverride = (
             self.messages.AppEngineRouting())
       else:
         queue.appEngineRoutingOverride = app_engine_routing_override
-      updated_fields.append('appEngineRoutingOverride')
     update_mask = ','.join(updated_fields)
 
     request = self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
@@ -132,39 +132,44 @@ class Queues(BaseQueues):
 class BetaQueues(BaseQueues):
   """Client for queues service in the Cloud Tasks API."""
 
-  def Create(self, parent_ref, queue_ref, retry_config=None,
-             rate_limits=None, app_engine_http_queue=None):
+  def Create(self, parent_ref, queue_ref, retry_config=None, rate_limits=None,
+             app_engine_http_queue=None, stackdriver_logging_config=None):
     """Prepares and sends a Create request for creating a queue."""
     queue = self.messages.Queue(
         name=queue_ref.RelativeName(), retryConfig=retry_config,
-        rateLimits=rate_limits, appEngineHttpQueue=app_engine_http_queue)
+        rateLimits=rate_limits, appEngineHttpQueue=app_engine_http_queue,
+        stackdriverLoggingConfig=stackdriver_logging_config)
     request = self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
         parent=parent_ref.RelativeName(), queue=queue)
     return self.queues_service.Create(request)
 
-  def Patch(self, queue_ref, retry_config=None, rate_limits=None,
-            app_engine_routing_override=None):
+  def Patch(self,
+            queue_ref,
+            updated_fields,
+            retry_config=None,
+            rate_limits=None,
+            app_engine_routing_override=None,
+            stackdriver_logging_config=None):
     """Prepares and sends a Patch request for modifying a queue."""
 
-    if not any([retry_config, rate_limits, app_engine_routing_override]):
+    if not any([retry_config, rate_limits, app_engine_routing_override,
+                stackdriver_logging_config]):
       raise NoFieldsSpecifiedError('Must specify at least one field to update.')
 
     queue = self.messages.Queue(name=queue_ref.RelativeName())
 
-    updated_fields = []
     if retry_config is not None:
       queue.retryConfig = retry_config
-      updated_fields.append('retryConfig')
     if rate_limits is not None:
       queue.rateLimits = rate_limits
-      updated_fields.append('rateLimits')
     if app_engine_routing_override is not None:
       if _IsEmptyConfig(app_engine_routing_override):
         queue.appEngineHttpQueue = self.messages.AppEngineHttpQueue()
       else:
         queue.appEngineHttpQueue = self.messages.AppEngineHttpQueue(
             appEngineRoutingOverride=app_engine_routing_override)
-      updated_fields.append('appEngineHttpQueue.appEngineRoutingOverride')
+    if stackdriver_logging_config is not None:
+      queue.stackdriverLoggingConfig = stackdriver_logging_config
     update_mask = ','.join(updated_fields)
 
     request = self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
@@ -190,7 +195,11 @@ class AlphaQueues(BaseQueues):
         parent=parent_ref.RelativeName(), queue=queue)
     return self.queues_service.Create(request)
 
-  def Patch(self, queue_ref, retry_config=None, rate_limits=None,
+  def Patch(self,
+            queue_ref,
+            updated_fields,
+            retry_config=None,
+            rate_limits=None,
             app_engine_routing_override=None):
     """Prepares and sends a Patch request for modifying a queue."""
 
@@ -199,20 +208,16 @@ class AlphaQueues(BaseQueues):
 
     queue = self.messages.Queue(name=queue_ref.RelativeName())
 
-    updated_fields = []
     if retry_config is not None:
       queue.retryConfig = retry_config
-      updated_fields.append('retryConfig')
     if rate_limits is not None:
       queue.rateLimits = rate_limits
-      updated_fields.append('rateLimits')
     if app_engine_routing_override is not None:
       if _IsEmptyConfig(app_engine_routing_override):
         queue.appEngineHttpTarget = self.messages.AppEngineHttpTarget()
       else:
         queue.appEngineHttpTarget = self.messages.AppEngineHttpTarget(
             appEngineRoutingOverride=app_engine_routing_override)
-      updated_fields.append('appEngineHttpTarget.appEngineRoutingOverride')
     update_mask = ','.join(updated_fields)
 
     request = self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(

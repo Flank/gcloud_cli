@@ -87,31 +87,32 @@ To import record\-sets from a yaml record\-sets file, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets import YAML_RECORDS_FILE \e
-    \-\-zone MANAGED_ZONE
+    \-\-zone=MANAGED_ZONE
 .RE
 
 To import record\-sets from a zone file, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets import ZONE_FILE \-\-zone\-file\-format \e
-    \-\-zone MANAGED_ZONE
+    \-\-zone=MANAGED_ZONE
 .RE
 
 To replace all the record\-sets in your zone with records from a yaml file, run:
 
 .RS 2m
 $ gcloud beta dns record\-sets import YAML_RECORDS_FILE \e
-    \-\-delete\-all\-existing \-\-zone MANAGED_ZONE
+    \-\-delete\-all\-existing \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets import
+$ gcloud alpha dns record\-sets import
 .RE
 

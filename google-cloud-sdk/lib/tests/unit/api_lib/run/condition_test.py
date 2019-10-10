@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -124,6 +124,28 @@ class ConditionTest(base.ServerlessApiBase, parameterized.TestCase):
         ready_condition='type2',
         observed_generation=1, generation=2)
     self.assertFalse(cond.IsTerminal())
+
+  def testSubconditionsAreTerminal(self):
+    cond = condition.Conditions([
+        self.condition_class(type='type1', status='Unknown'),
+        self.condition_class(type='type2', status='True'),
+        self.condition_class(
+            type='type3', status='Unknown', severity='Error')
+    ],
+                                ready_condition='type1')
+    self.assertCountEqual(
+        ['type2', 'type3'], list(cond.TerminalSubconditions()))
+
+  def testSubconditionsAreNonTerminal(self):
+    cond = condition.Conditions([
+        self.condition_class(type='type1', status='Unknown'),
+        self.condition_class(type='type2', status='True', severity='Info'),
+        self.condition_class(
+            type='type3', status='Unknown', severity='Warning')
+    ],
+                                ready_condition='type1')
+    self.assertCountEqual(
+        ['type2', 'type3'], list(cond.NonTerminalSubconditions()))
 
 
 if __name__ == '__main__':

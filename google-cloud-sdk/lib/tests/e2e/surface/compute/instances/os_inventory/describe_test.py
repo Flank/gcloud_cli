@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ from tests.lib.surface.compute import e2e_test_base
 
 # Setup instructions for the required static resource is at
 # go/os-inventory-cloud-sdk-test-resource-setup.
-class DescribeTestAlpha(e2e_test_base.BaseTest):
+class DescribeTestGA(e2e_test_base.BaseTest):
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
     self.instance_names_used = []
 
   def TearDown(self):
@@ -70,6 +70,20 @@ class DescribeTestAlpha(e2e_test_base.BaseTest):
 
     # Cleanup.
     self.DeleteInstance(name)
+
+
+class DescribeTestBeta(DescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.instance_names_used = []
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.instance_names_used = []
 
 
 if __name__ == '__main__':

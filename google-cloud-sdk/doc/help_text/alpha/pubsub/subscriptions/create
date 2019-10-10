@@ -5,13 +5,14 @@ NAME
 SYNOPSIS
     gcloud alpha pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
-        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
-        [--labels=[KEY=VALUE,...]]
+        [--ack-deadline=ACK_DEADLINE] [--enable-message-ordering]
+        [--expiration-period=EXPIRATION_PERIOD] [--labels=[KEY=VALUE,...]]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
         [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
         [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
         [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
-        [GCLOUD_WIDE_FLAG ...]
+        [--dead-letter-topic=DEAD_LETTER_TOPIC
+          --max-delivery-attempts=MAX_DELIVERY_ATTEMPTS] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates one or more Cloud Pub/Sub subscriptions for a given topic.
@@ -48,6 +49,11 @@ OPTIONAL FLAGS
      --ack-deadline=ACK_DEADLINE
         The number of seconds the system will wait for a subscriber to
         acknowledge receiving a message before re-attempting delivery.
+
+     --enable-message-ordering
+        Whether or not to receive messages with the same ordering key in order.
+        If true, messages with the same ordering key will by sent to
+        subscribers in the order in which they were received by Cloud Pub/Sub.
 
      --expiration-period=EXPIRATION_PERIOD
         The subscription will expire if it is inactive for the given period.
@@ -92,6 +98,22 @@ OPTIONAL FLAGS
         not expunged from the subscription's backlog until they fall out of the
         --message-retention-duration window.
 
+     Dead Letter Queue Options
+
+       --dead-letter-topic=DEAD_LETTER_TOPIC
+          Name of the topic to which dead letter messages should be published.
+          Format is projects/{project}/topics/{topic}. The Cloud Pub/Sub
+          service account associated with the enclosing subscription's parent
+          project (i.e.,
+          service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must
+          have permission to Publish() to this topic and Acknowledge() messages
+          on this subscription.
+
+       --max-delivery-attempts=MAX_DELIVERY_ATTEMPTS
+          Maximum number of delivery attempts for any message. The value must
+          be between 5 and 100. Defaults to 5. --dead-letter-topic must also be
+          specified.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -102,9 +124,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud pubsub subscriptions create
         $ gcloud beta pubsub subscriptions create

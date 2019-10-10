@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -361,15 +361,6 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
           ('clusters update {0} --num-workers 10 '
            '--graceful-decommission-timeout=2d').format(self.CLUSTER_NAME))
 
-
-class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
-                                 base.DataprocTestBaseBeta):
-  """Tests for dataproc clusters update."""
-
-  def testBeta(self):
-    self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
-
   def testUpdateCluster_withMaxAgeAndMaxIdle(self):
     cluster = self.messages.Cluster(
         clusterName=self.CLUSTER_NAME,
@@ -557,6 +548,15 @@ class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
     result = self.RunDataproc(
         ('clusters update {0} --disable-autoscaling').format(self.CLUSTER_NAME))
     self.AssertMessagesEqual(expected, result)
+
+
+class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
+                                 base.DataprocTestBaseBeta):
+  """Tests for dataproc clusters update."""
+
+  def testBeta(self):
+    self.assertEqual(self.messages, self._beta_messages)
+    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
   def testUpdateCluster_withExpirationTimeAndMaxAge(self):
     with self.AssertRaisesArgumentErrorMatches(

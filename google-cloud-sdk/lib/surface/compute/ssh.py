@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ def AddSSHArgs(parser):
       Specifies the instance to SSH into.
 
       ``USER'' specifies the username with which to SSH. If omitted,
-      $USER from the environment is selected.
+      the user login name is used.
 
       ``INSTANCE'' specifies the name of the virtual machine instance to SSH
       into.
@@ -103,8 +103,8 @@ def AddContainerArg(parser):
           """)
 
 
-def AddInternalIPArg(parser):
-  parser.add_argument(
+def AddInternalIPArg(group):
+  group.add_argument(
       '--internal-ip',
       default=False,
       action='store_true',
@@ -128,7 +128,6 @@ class Ssh(base.Command):
   """SSH into a virtual machine instance."""
 
   category = base.TOOLS_CATEGORY
-  get_host_keys = False
 
   @staticmethod
   def Args(parser):
@@ -141,9 +140,12 @@ class Ssh(base.Command):
     AddCommandArg(parser)
     AddSSHArgs(parser)
     AddContainerArg(parser)
-    AddInternalIPArg(parser)
     flags.AddZoneFlag(
         parser, resource_type='instance', operation_type='connect to')
+
+    routing_group = parser.add_mutually_exclusive_group()
+    AddInternalIPArg(routing_group)
+    iap_tunnel.AddSshTunnelArgs(parser, routing_group)
 
   def Run(self, args):
     """See ssh_utils.BaseSSHCLICommand.Run."""
@@ -159,40 +161,43 @@ class Ssh(base.Command):
         scope_lister=instance_flags.GetInstanceZoneScopeLister(client))[0]
     instance = ssh_helper.GetInstance(client, instance_ref)
     project = ssh_helper.GetProject(client, instance_ref.project)
-    if self.get_host_keys:
-      host_keys = ssh_helper.GetHostKeysFromGuestAttributes(
-          client, instance_ref)
-      if not host_keys:
-        log.warning('Unable to retrieve host keys from instance metadata. '
-                    'Continuing.')
-    else:
-      host_keys = {}
+    host_keys = ssh_helper.GetHostKeysFromGuestAttributes(client, instance_ref,
+                                                          instance, project)
+    if not host_keys and host_keys is not None:
+      # Only display this message if there was an attempt to retrieve
+      # host keys but it was unsuccessful. If Guest Attributes is disabled,
+      # there is no attempt to retrieve host keys.
+      log.status.Print('Unable to retrieve host keys from instance metadata. '
+                       'Continuing.')
+    expiration, expiration_micros = ssh_utils.GetSSHKeyExpirationFromArgs(args)
     if args.plain:
       use_oslogin = False
     else:
       public_key = ssh_helper.keys.GetPublicKey().ToEntry(include_comment=True)
       user, use_oslogin = ssh.CheckForOsloginAndGetUser(
-          instance, project, user, public_key, self.ReleaseTrack())
+          instance, project, user, public_key, expiration_micros,
+          self.ReleaseTrack())
 
     iap_tunnel_args = iap_tunnel.SshTunnelArgs.FromArgs(
         args, self.ReleaseTrack(), instance_ref,
-        ssh_utils.GetInternalInterface(instance),
         ssh_utils.GetExternalInterface(instance, no_raise=True))
 
+    internal_address = ssh_utils.GetInternalIPAddress(instance)
+
     if iap_tunnel_args:
-      # IAP Tunnel only uses ip_address for the purpose of --ssh-flag
+      # IAP Tunnel only uses instance_address for the purpose of --ssh-flag
       # substitution. In this case, dest_addr doesn't do much, it just matches
       # against entries in the user's ssh_config file. It's best to use
       # something unique to avoid false positive matches, thus we use
       # HostKeyAlias.
-      ip_address = ssh_utils.GetInternalIPAddress(instance)
+      instance_address = internal_address
       dest_addr = ssh_utils.HostKeyAlias(instance)
     elif args.internal_ip:
-      ip_address = ssh_utils.GetInternalIPAddress(instance)
-      dest_addr = ip_address
+      instance_address = internal_address
+      dest_addr = instance_address
     else:
-      ip_address = ssh_utils.GetExternalIPAddress(instance)
-      dest_addr = ip_address
+      instance_address = ssh_utils.GetExternalIPAddress(instance)
+      dest_addr = instance_address
     remote = ssh.Remote(dest_addr, user)
 
     identity_file = None
@@ -203,7 +208,8 @@ class Ssh(base.Command):
                                      args.strict_host_key_checking,
                                      host_keys_to_add=host_keys)
 
-    extra_flags = ssh.ParseAndSubstituteSSHFlags(args, remote, ip_address)
+    extra_flags = ssh.ParseAndSubstituteSSHFlags(args, remote, instance_address,
+                                                 internal_address)
     remainder = []
 
     if args.ssh_args:
@@ -235,7 +241,7 @@ class Ssh(base.Command):
       keys_newly_added = False
     else:
       keys_newly_added = ssh_helper.EnsureSSHKeyExists(
-          client, remote.user, instance, project)
+          client, remote.user, instance, project, expiration=expiration)
 
     if keys_newly_added:
       poller = ssh_utils.CreateSSHPoller(remote, identity_file, options,
@@ -264,27 +270,10 @@ class Ssh(base.Command):
 class SshBeta(Ssh):
   """SSH into a virtual machine instance (Beta)."""
 
-  get_host_keys = False
-
-  @staticmethod
-  def Args(parser):
-    ssh_utils.BaseSSHCLIHelper.Args(parser)
-    AddCommandArg(parser)
-    AddSSHArgs(parser)
-    AddContainerArg(parser)
-    flags.AddZoneFlag(
-        parser, resource_type='instance', operation_type='connect to')
-
-    mutex_scope = parser.add_mutually_exclusive_group()
-    AddInternalIPArg(mutex_scope)
-    iap_tunnel.AddSshTunnelArgs(parser, mutex_scope)
-
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class SshAlpha(SshBeta):
   """SSH into a virtual machine instance (Alpha)."""
-
-  get_host_keys = True
 
 
 def DetailedHelp():
@@ -327,6 +316,15 @@ def DetailedHelp():
         you can SSH into one of your containers with:
 
           $ {command} example-instance --zone us-central1-a --container CONTAINER
+
+        You can limit the allowed time to ssh. For example, to allow a key to be
+        used through 2019:
+
+          $ {command} example-instance --zone us-central1-a --ssh-key-expiration "2020-01-01T00:00:00:00Z"
+
+        Or alternatively, allow access for the next two minutes:
+
+          $ {command} example-instance --zone us-central1-a --ssh-key-expire-after 2m
         """,
   }
   return detailed_help

@@ -135,8 +135,10 @@ OPTIONAL FLAGS
             access token to be included in the request sent to the target when
             executing the job. The service account must be within the same
             project as the job. The caller must have iam.serviceAccounts.actAs
-            permission for the service account. This flag must be specified if
-            any of the other arguments in this group are specified.
+            permission for the service account. The token must be OAuth if the
+            target is a Google APIs service with URL .googleapis.com. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
 
          --oauth-token-scope=OAUTH_TOKEN_SCOPE
             The scope to be used when generating an OAuth2 access token to be
@@ -151,8 +153,10 @@ OPTIONAL FLAGS
             Connect token to be included in the request sent to the target when
             executing the job. The service account must be within the same
             project as the job. The caller must have iam.serviceAccounts.actAs
-            permission for the service account. This flag must be specified if
-            any of the other arguments in this group are specified.
+            permission for the service account. The OIDC token is generally
+            used except for Google APIs hosted on .googleapis.com: these APIs
+            expect an OAuth token. This flag must be specified if any of the
+            other arguments in this group are specified.
 
          --oidc-token-audience=OIDC_TOKEN_AUDIENCE
             The audience to be used when generating an OpenId Connect token to
@@ -167,12 +171,21 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the cloudscheduler/v1beta1 API. The full documentation
-    for this API can be found at: https://cloud.google.com/scheduler/
+    This command uses the cloudscheduler/v1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/scheduler/
+
+EXAMPLES
+    The following command creates a job that sends a HTTP GET request to
+    'http://example.com/path' every 3 hours:
+
+        $ gcloud beta scheduler jobs create http my-job \
+            --schedule="0 */3 * * *"
+          --uri="http://example.com/path" --http-method=GET
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud scheduler jobs create http
         $ gcloud alpha scheduler jobs create http
 

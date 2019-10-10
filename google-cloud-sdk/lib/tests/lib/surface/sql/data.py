@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -538,6 +538,72 @@ def GetPostgresInstance(project, instance_name):
       connectionName='test-connection-name',
       currentDiskSize=None,
       databaseVersion='POSTGRES_9_6',
+      etag='"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
+      failoverReplica=None,
+      instanceType='CLOUD_SQL_INSTANCE',
+      ipAddresses=[
+          sqladmin_v1beta4.IpMapping(
+              ipAddress='0.0.0.0',
+              timeToRetire=None,
+              type='PRIMARY',
+          ),
+      ],
+      ipv6Address=None,
+      kind='sql#instance',
+      masterInstanceName=None,
+      maxDiskSize=None,
+      name=instance_name,
+      onPremisesConfiguration=None,
+      project=project,
+      region='us-central',
+      replicaConfiguration=None,
+      replicaNames=[],
+      selfLink='https://www.googleapis.com/sql/v1beta4/projects/sample-link',
+      serverCaCert=None,
+      serviceAccountEmailAddress='test@sample.iam.gserviceaccount.com',
+      settings=sqladmin_v1beta4.Settings(
+          activationPolicy='ALWAYS',
+          authorizedGaeApplications=[],
+          availabilityType=None,
+          backupConfiguration=sqladmin_v1beta4.BackupConfiguration(
+              binaryLogEnabled=None,
+              enabled=False,
+              kind='sql#backupConfiguration',
+              startTime='06:00',
+          ),
+          crashSafeReplicationEnabled=None,
+          dataDiskSizeGb=10,
+          dataDiskType='PD_SSD',
+          databaseFlags=[],
+          databaseReplicationEnabled=None,
+          ipConfiguration=sqladmin_v1beta4.IpConfiguration(
+              authorizedNetworks=[],
+              ipv4Enabled=True,
+              requireSsl=None,
+          ),
+          kind='sql#settings',
+          locationPreference=None,
+          maintenanceWindow=None,
+          pricingPlan='PER_USE',
+          replicationType='SYNCHRONOUS',
+          settingsVersion=0,
+          storageAutoResize=True,
+          storageAutoResizeLimit=0,
+          tier='db-custom-1-3840',
+          userLabels=None,
+      ),
+      state='RUNNABLE',
+      suspensionReason=[],
+  )
+
+
+def GetSqlServerInstance(project, instance_name):
+  """Returns a sample SQL Server DatabaseInstance named instance_name."""
+  return sqladmin_v1beta4.DatabaseInstance(
+      backendType='SECOND_GEN',
+      connectionName='test-connection-name',
+      currentDiskSize=None,
+      databaseVersion='SQLSERVER_2017_STANDARD',
       etag='"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
       failoverReplica=None,
       instanceType='CLOUD_SQL_INSTANCE',

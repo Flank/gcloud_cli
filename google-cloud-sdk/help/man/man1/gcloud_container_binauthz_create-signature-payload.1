@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_CONTAINER_BINAUTHZ_CREATE\-SIGNATURE\-PAYLOAD" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container binauthz create\-signature\-payload \- create a JSON container image signature object
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container binauthz create\-signature\-payload\fR \fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Given a container image URL specified by the manifest digest, this command will
+produce a JSON object whose signature is expected by Cloud Binary Authorization.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR
+Container URL. May be in the \f5gcr.io/repository/image\fR format, or may
+optionally contain the \f5http\fR or \f5https\fR scheme
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To output serialized JSON to sign, run:
+
+.RS 2m
+$ gcloud container binauthz create\-signature\-payload \e
+    \-\-artifact\-url="gcr.io/example\-project/example\-image@sha256:abcd"
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container binauthz create\-signature\-payload
+$ gcloud beta container binauthz create\-signature\-payload
+.RE
+

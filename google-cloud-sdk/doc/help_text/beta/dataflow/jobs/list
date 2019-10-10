@@ -27,7 +27,9 @@ FLAGS
         topic datetimes for information on time formats.
 
      --region=REGION
-        If provided, only resources from the given region are queried.
+        Only resources from the given region are queried. If not provided, an
+        attempt will be made to query from all available regions. In the event
+        of an outage, jobs from certain regions may not be available.
 
      --status=STATUS
         Filter the jobs to those with the selected status. STATUS must be one

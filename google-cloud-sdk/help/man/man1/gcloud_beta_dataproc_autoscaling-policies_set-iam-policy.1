@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta dataproc autoscaling\-policies set\-iam\-policy \- set IAM policy for an autoscaling\-policy
+gcloud beta dataproc autoscaling\-policies set\-iam\-policy \- set IAM policy for an autoscaling policy
 
 
 
@@ -84,9 +84,9 @@ The following command will read an IAM policy defined in a JSON file
 
 .RS 2m
 $ gcloud beta dataproc autoscaling\-policies set\-iam\-policy \e
+  autoscaling\-policies set\-iam\-policy \e
     example\-autoscaling\-policy policy.json
 .RE
-
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of the
 policy file format and contents.
@@ -95,10 +95,11 @@ policy file format and contents.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud dataproc autoscaling\-policies set\-iam\-policy
 $ gcloud alpha dataproc autoscaling\-policies set\-iam\-policy
 .RE
 

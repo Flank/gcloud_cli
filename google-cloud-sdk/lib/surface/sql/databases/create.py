@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class AddDatabase(base.Command):
         'sql.operations',
         operation=result_operation.name,
         project=instance_ref.project)
-    if args.async:
+    if args.async_:
       result = sql_client.operations.Get(
           sql_messages.SqlOperationsGetRequest(
               project=operation_ref.project, operation=operation_ref.operation))
@@ -101,6 +101,6 @@ class AddDatabase(base.Command):
         raise
       result = new_database
 
-    log.CreatedResource(args.database, kind='database', is_async=args.async)
+    log.CreatedResource(args.database, kind='database', is_async=args.async_)
 
     return result

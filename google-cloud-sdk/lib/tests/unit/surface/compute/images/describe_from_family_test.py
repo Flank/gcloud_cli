@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ class ImagesDescribeFromFamilyTest(test_base.BaseTest):
   def testSimpleCase(self):
     image = self.messages.Image(
         name='image-1',
-        selfLink=('https://www.googleapis.com/compute/beta/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/beta/projects/my-project/'
                   'global/images/image-1'))
     self.make_requests.side_effect = iter([
         [image],
@@ -51,7 +51,7 @@ class ImagesDescribeFromFamilyTest(test_base.BaseTest):
   def testURI(self):
     image = self.messages.Image(
         name='image-1',
-        selfLink=('https://www.googleapis.com/compute/beta/projects/my-project/'
+        selfLink=('https://compute.googleapis.com/compute/beta/projects/my-project/'
                   'global/images/image-1'))
     self.make_requests.side_effect = iter([
         [image],
@@ -59,7 +59,7 @@ class ImagesDescribeFromFamilyTest(test_base.BaseTest):
 
     self.Run("""
         compute images describe-from-family
-        https://www.googleapis.com/compute/beta/projects/my-project/global/images/family/family-1
+        https://compute.googleapis.com/compute/beta/projects/my-project/global/images/family/family-1
         """)
 
     self.CheckRequests(

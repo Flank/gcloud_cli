@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- #
 
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,6 +41,24 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   LEVEL_SPEC = ('[{"ipSubnetworks": ["8.8.8.8/32"]}, '
                 '{"members": ["user:example@example.com"]}, '
                 '{"devicePolicy": {"requireScreenlock": true}}]')
+
+  ACCESS_LEVEL_SPECS = """
+      [
+        {{
+          "name": "accessPolicies/{policy}/accessLevels/{level}",
+          "title": "My Level {level}",
+          "description": "level description",
+          "basic": {{
+            "conditions": [
+                  {{"ipSubnetworks": ["8.8.8.8/32"]}},
+                  {{"members": ["user:example@example.com"]}}
+            ],
+            "combiningFunction": "AND"
+          }}
+        }}
+      ]
+  """
+
   PROJECT_NUMBER = '175742511250'
   # Requires an already-set-up regular perimeter, in case it runs multiple times
   # simultaneously (a single project can only belong to one regular perimeter,
@@ -89,6 +107,23 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
         '    {}'.format(level_id))
 
   @contextlib.contextmanager
+  def _ReplaceLevels(self, policy):
+    level_id = _GetResourceName('LEVEL')
+    level_spec_file = self.Touch(
+        self.temp_path,
+        'level.yaml',
+        contents=self.ACCESS_LEVEL_SPECS.format(policy=policy, level=level_id))
+    try:
+      self.Run(
+          'access-context-manager levels replace-all --source-file {}'.format(
+              level_spec_file))
+      yield level_id
+    finally:
+      self.Run('access-context-manager levels delete '
+               '    --quiet '
+               '   {}'.format(level_id))
+
+  @contextlib.contextmanager
   def _CreatePerimeter(self):
     perimeter_id = _GetResourceName('PERIMETER')
     try:
@@ -125,7 +160,6 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
     self.assertEqual(len(policies), 1)
     policy_ref = resources.REGISTRY.Parse(
         policies[0].name, collection='accesscontextmanager.accessPolicies')
-
     with self._SetPolicyProperty(policy_ref.Name()):
       with self._CreateLevel() as level_id:
         level = self._DescribeLevel(level_id)
@@ -152,6 +186,32 @@ class AccessContextManagerE2eTestsBeta(AccessContextManagerE2eTests):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AccessContextManagerE2eTestsAlpha(AccessContextManagerE2eTests):
+
+  # Beta has support for regions.
+  LEVEL_SPEC = ('[{"ipSubnetworks": ["8.8.8.8/32"]}, '
+                '{"regions": ["CA", "US"]}, '
+                '{"members": ["user:example@example.com"]}, '
+                '{"devicePolicy": {"requireScreenlock": true}}]')
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  # Alpha Track only API methods tests.
+  def testAccessContextManagerAlpha(self):
+    policies = list(
+        self.Run('access-context-manager policies list '
+                 '    --format disable '
+                 '    --organization ' + self.ORG_ID))
+    self.assertEqual(len(policies), 1)
+    policy_ref = resources.REGISTRY.Parse(
+        policies[0].name, collection='accesscontextmanager.accessPolicies')
+    with self._SetPolicyProperty(policy_ref.Name()):
+      with self._ReplaceLevels(policy_ref.Name()) as level_id:
+        level = self._DescribeLevel(level_id)
+        self.assertEqual(level.title, 'My Level ' + level_id)
 
 
 if __name__ == '__main__':

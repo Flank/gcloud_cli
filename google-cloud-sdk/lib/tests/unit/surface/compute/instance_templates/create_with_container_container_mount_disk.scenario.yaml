@@ -11,7 +11,7 @@ summary:
       name=disk-1,mode=rw,device-name=disk-1 --container-mount-disk
       name=disk-1,mount-path="/mounted"
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+      Created [https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
   - stdout: |
       NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
       instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
@@ -23,7 +23,7 @@ summary:
   - stderr: |
       WARNING: Default device-name for disk name [disk-1] will be [disk-1] because it is being mounted to a container with [`--container-mount-disk`]
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+      Created [https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
   - stdout: |
       NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
       instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
@@ -35,7 +35,7 @@ summary:
       name=disk-1,mode=ro,mount-path="/mounted",partition=1 --container-mount-disk
       name=disk-1,mode=ro,mount-path="/mounted-1",partition=2
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+      Created [https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
   - stdout: |
       NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
       instance-template-1  n1-standard-1               2018-11-23T22:11:17.910-08:00
@@ -150,7 +150,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -174,21 +174,21 @@ actions:
               - '1001010'
               - '6880041984096540132'
               licenses:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
               name: cos-stable-70-11021-67-0
               rawDisk:
                 containerType: TAR
                 source: ''
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
               sourceType: RAW
               status: READY
             kind: compute#imageList
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
           method: POST
           headers: {}
           body:
@@ -200,7 +200,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                    sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
                   mode: READ_WRITE
                   type: PERSISTENT
                 - autoDelete: false
@@ -246,7 +246,7 @@ actions:
                 - accessConfigs:
                   - name: external-nat
                     type: ONE_TO_ONE_NAT
-                  network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
+                  network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
                 scheduling:
                   automaticRestart: true
                 serviceAccounts:
@@ -269,16 +269,16 @@ actions:
             name: operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
             operationType: compute.instanceTemplates.insert
             progress: 0
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
             status: PENDING
             targetId: '3451132337698015871'
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            targetLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
             user: example@google.com
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+        Created [https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
           method: GET
           headers: {}
           body: null
@@ -299,7 +299,7 @@ actions:
                 deviceName: persistent-disk-0
                 index: 0
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                  sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
                 kind: compute#attachedDisk
                 mode: READ_WRITE
                 type: PERSISTENT
@@ -339,7 +339,7 @@ actions:
                   networkTier: PREMIUM
                   type: ONE_TO_ONE_NAT
                 kind: compute#networkInterface
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
               scheduling:
                 automaticRestart: true
                 onHostMaintenance: MIGRATE
@@ -354,7 +354,7 @@ actions:
                 - https://www.googleapis.com/auth/service.management.readonly
                 - https://www.googleapis.com/auth/servicecontrol
                 - https://www.googleapis.com/auth/trace.append
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
 
     - expect_stdout: |
         NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
@@ -370,7 +370,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -394,24 +394,24 @@ actions:
               - '1001010'
               - '6880041984096540132'
               licenses:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
               name: cos-stable-70-11021-67-0
               rawDisk:
                 containerType: TAR
                 source: ''
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
               sourceType: RAW
               status: READY
             kind: compute#imageList
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
 
     - expect_stderr: |
         WARNING: Default device-name for disk name [disk-1] will be [disk-1] because it is being mounted to a container with [`--container-mount-disk`]
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
           method: POST
           headers: {}
           body:
@@ -423,7 +423,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                    sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
                   mode: READ_WRITE
                   type: PERSISTENT
                 - autoDelete: false
@@ -468,7 +468,7 @@ actions:
                 - accessConfigs:
                   - name: external-nat
                     type: ONE_TO_ONE_NAT
-                  network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
+                  network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
                 scheduling:
                   automaticRestart: true
                 serviceAccounts:
@@ -491,16 +491,16 @@ actions:
             name: operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
             operationType: compute.instanceTemplates.insert
             progress: 0
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
             status: PENDING
             targetId: '3451132337698015871'
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            targetLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
             user: example@google.com
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+        Created [https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
           method: GET
           headers: {}
           body: null
@@ -521,7 +521,7 @@ actions:
                 deviceName: persistent-disk-0
                 index: 0
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                  sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
                 kind: compute#attachedDisk
                 mode: READ_WRITE
                 type: PERSISTENT
@@ -560,7 +560,7 @@ actions:
                   networkTier: PREMIUM
                   type: ONE_TO_ONE_NAT
                 kind: compute#networkInterface
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
               scheduling:
                 automaticRestart: true
                 onHostMaintenance: MIGRATE
@@ -575,7 +575,7 @@ actions:
                 - https://www.googleapis.com/auth/service.management.readonly
                 - https://www.googleapis.com/auth/servicecontrol
                 - https://www.googleapis.com/auth/trace.append
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
     - expect_stdout: |
         NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
         instance-template-1  n1-standard-1               2018-11-22T14:58:24.163-08:00
@@ -592,7 +592,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -616,21 +616,21 @@ actions:
               - '1001010'
               - '6880041984096540132'
               licenses:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos
+              - https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/licenses/cos-pcid
               name: cos-stable-70-11021-67-0
               rawDisk:
                 containerType: TAR
                 source: ''
-              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+              selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
               sourceType: RAW
               status: READY
             kind: compute#imageList
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates?alt=json
           method: POST
           headers: {}
           body:
@@ -642,7 +642,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                    sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
                   mode: READ_WRITE
                   type: PERSISTENT
                 - autoDelete: false
@@ -696,7 +696,7 @@ actions:
                 - accessConfigs:
                   - name: external-nat
                     type: ONE_TO_ONE_NAT
-                  network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
+                  network: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/default
                 scheduling:
                   automaticRestart: true
                 serviceAccounts:
@@ -719,16 +719,16 @@ actions:
             name: operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
             operationType: compute.instanceTemplates.insert
             progress: 0
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/operations/operation-1542927503473-57b48cdc23d24-ae46c480-1c889735
             status: PENDING
             targetId: '3451132337698015871'
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            targetLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
             user: example@google.com
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
+        Created [https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/instance-template-1?alt=json
           method: GET
           headers: {}
           body: null
@@ -749,7 +749,7 @@ actions:
                 deviceName: persistent-disk-0
                 index: 0
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
+                  sourceImage: https://compute.googleapis.com/compute/$$api-version$$/projects/cos-cloud/global/images/cos-stable-70-11021-67-0
                 kind: compute#attachedDisk
                 mode: READ_WRITE
                 type: PERSISTENT
@@ -791,7 +791,7 @@ actions:
                   networkTier: PREMIUM
                   type: ONE_TO_ONE_NAT
                 kind: compute#networkInterface
-                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
+                network: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/networks/default
               scheduling:
                 automaticRestart: true
                 onHostMaintenance: MIGRATE
@@ -806,7 +806,7 @@ actions:
                 - https://www.googleapis.com/auth/service.management.readonly
                 - https://www.googleapis.com/auth/servicecontrol
                 - https://www.googleapis.com/auth/trace.append
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
+            selfLink: https://compute.googleapis.com/compute/$$api-version$$/projects/cloudsdktest/global/instanceTemplates/instance-template-1
 
     - expect_stdout: |
         NAME                 MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP

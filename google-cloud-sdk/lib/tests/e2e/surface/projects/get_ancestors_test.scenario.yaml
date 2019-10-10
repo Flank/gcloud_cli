@@ -1,0 +1,45 @@
+title: project get-ancestors test
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: projects get-ancestors cloud-sdk-integration-testing
+  - stdout: |
+      ID                             TYPE
+      cloud-sdk-integration-testing  project
+      396521612403                   folder
+      433637338589                   organization
+actions:
+- execute_command:
+    command: projects get-ancestors cloud-sdk-integration-testing
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing:getAncestry?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '341'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            ancestor:
+            - resourceId:
+                type: project
+                id: cloud-sdk-integration-testing
+            - resourceId:
+                type: folder
+                id: '396521612403'
+            - resourceId:
+                type: organization
+                id: '433637338589'
+    - expect_stdout: |
+        ID                             TYPE
+        cloud-sdk-integration-testing  project
+        396521612403                   folder
+        433637338589                   organization
+    - expect_exit:
+        code: 0

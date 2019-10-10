@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,12 +23,14 @@ import os
 
 from googlecloudsdk.command_lib.compute import iap_tunnel
 from googlecloudsdk.command_lib.util.ssh import ssh
+from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import retry
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -77,33 +79,41 @@ class EnvironmentTest(test_case.TestCase):
 
 class KeysTest(sdk_test_base.WithTempCWD,
                sdk_test_base.WithOutputCapture,
-               test_case.WithInput):
+               test_case.WithInput,
+               parameterized.TestCase):
 
   def SetUp(self):
     self.key_file = 'key_file'  # Name of key file
 
-  def _EnsureKeysExist(self, overwrite=None):
-    keys = ssh.Keys(self.key_file)
+  def _EnsureKeysExist(self, overwrite=None, env=None):
+    keys = ssh.Keys(self.key_file, env=env)
     keys.EnsureKeysExist(overwrite)
     return keys
 
-  def _ExpectGenKey(self):
-    def KeygenRunCallback(keygen_command, unused_env=None):
-      self.assertTrue(keygen_command.allow_passphrase)
+  def _ExpectKeygen(self):
+    def KeygenRunCallback(keygen_command, env=None):
+      if keygen_command.reencode_ppk:
+        self._CreateFile(keygen_command.identity_file + '.ppk',
+                         'REENCODED_PPK_CONTENTS')
+        return
+      self._CreateFile(keygen_command.identity_file, 'PRIVATE_KEY_CONTENTS')
       self._CreateFile(keygen_command.identity_file + '.pub',
                        'ssh-rsa KEY_VALUE COMMENT')
+      if env.suite == ssh.Suite.PUTTY:
+        self._CreateFile(keygen_command.identity_file + '.ppk', 'PPK_CONTENTS')
     self.StartObjectPatch(ssh.KeygenCommand, 'Run', KeygenRunCallback)
 
-  def _CreateFile(self, name, content):
+  def _CreateFile(self, name, content=''):
     with open(name, 'w') as f:
       f.write(content)
 
   def testAbsentKeys(self):
-    self._ExpectGenKey()
+    self._ExpectKeygen()
     self._EnsureKeysExist()
     self.AssertErrContains('You do not have an SSH key for gcloud')
 
   def testPresentKeys(self):
+    self._ExpectKeygen()
     private_key = self.key_file
     public_key = private_key + '.pub'
     ppk_key = private_key + '.ppk'
@@ -133,7 +143,7 @@ class KeysTest(sdk_test_base.WithTempCWD,
     self._CreateFile(private_key, 'private key')
     # no public key
     self._CreateFile(ppk_key, 'PuTTY file')  # if test is run on windows
-    self._ExpectGenKey()
+    self._ExpectKeygen()
     self.WriteInput('y')
     keys = self._EnsureKeysExist()
     self.assertEqual(keys.GetPublicKey().ToEntry(True),
@@ -194,7 +204,7 @@ class KeysTest(sdk_test_base.WithTempCWD,
     self._CreateFile(private_key, 'private key')
     self._CreateFile(public_key, 'BROKENCONTENT')
     self._CreateFile(ppk_key, 'PuTTY file')  # if test is run on windows
-    self._ExpectGenKey()
+    self._ExpectKeygen()
     keys = self._EnsureKeysExist(overwrite=True)
     # no write input, flag is present
     self.assertEqual(keys.GetPublicKey().ToEntry(True),
@@ -204,13 +214,54 @@ class KeysTest(sdk_test_base.WithTempCWD,
     self.AssertErrContains('We are going to overwrite all above files')
     # check if deprecation warning is not present
 
+  @parameterized.parameters(
+      (False, False, 'PPK_CONTENTS'),
+      (False, True, 'REENCODED_PPK_CONTENTS'),
+      (True, False, 'PPK_CONTENTS'),
+      (True, True, 'PPK_CONTENTS')
+  )
+  def testReencodePPK_PuttyEnv(
+      self, sentinel_present, keys_present, expected_ppk_contents):
+    env = ssh.Environment(ssh.Suite.PUTTY)
+    sentinel = config.Paths().valid_ppk_sentinel_file
+    private_key = self.key_file
+    public_key = private_key + '.pub'
+    ppk_key = private_key + '.ppk'
+    if sentinel_present:
+      self._CreateFile(sentinel)
+    if keys_present:
+      self._CreateFile(private_key, 'PRIVATE_KEY_CONTENTS')
+      self._CreateFile(public_key, 'ssh-rsa KEY_VALUE COMMENT')
+      self._CreateFile(ppk_key, 'PPK_CONTENTS')
+    self._ExpectKeygen()
+
+    self._EnsureKeysExist(overwrite=True, env=env)
+
+    self.AssertFileEquals('PRIVATE_KEY_CONTENTS', private_key)
+    self.AssertFileEquals('ssh-rsa KEY_VALUE COMMENT', public_key)
+    self.AssertFileEquals(expected_ppk_contents, ppk_key)
+    self.AssertFileExists(sentinel)
+
+  def testReencodePPK_OpenSSHEnv(self):
+    # Make sure we don't try to reencode a PPK on non-PuTTY environments.
+    env = ssh.Environment(ssh.Suite.OPENSSH)
+    private_key = self.key_file
+    public_key = private_key + '.pub'
+    self._CreateFile(private_key, 'private_key')
+    self._CreateFile(public_key, 'ssh-rsa public_key')
+    self._ExpectKeygen()
+
+    self._EnsureKeysExist(overwrite=True, env=env)
+
+    self.AssertFileNotExists(private_key + '.ppk')
+
   def testMissingPublicKey_NoForceOverwrite(self):
     private_key = self.key_file
     ppk_key = private_key + '.ppk'
     self._CreateFile(private_key, 'private key')
     # no public key
     self._CreateFile(ppk_key, 'PuTTY file')  # if test is run on windows
-    self._ExpectGenKey()
+    self._ExpectKeygen()
     # no write input, flag is present
     with self.assertRaisesRegex(
         console_io.OperationCancelledError,
@@ -224,7 +275,7 @@ class KeysTest(sdk_test_base.WithTempCWD,
     self._CreateFile(private_key, 'private key')
     # no public key
     self._CreateFile(ppk_key, 'PuTTY file')  # if test is run on windows
-    self._ExpectGenKey()
+    self._ExpectKeygen()
     keys = self._EnsureKeysExist(overwrite=True)
     # file will disappear just before RemoveKeyFilesIfPermittedOrFail
     function = ssh.Keys.RemoveKeyFilesIfPermittedOrFail
@@ -429,7 +480,6 @@ class CommandTestBase(test_case.TestCase):
     self.iap_tunnel_args.project = 'my-project'
     self.iap_tunnel_args.zone = 'my-zone'
     self.iap_tunnel_args.instance = self.remote.host
-    self.iap_tunnel_args.interface = 'nic0'
 
   def SplitIfString(self, arg):
     """If `arg` is a string, split it into an array.
@@ -496,6 +546,12 @@ class KeygenCommandBuildTest(CommandTestBase):
         ['ssh-keygen', '-N', '', '-t', 'rsa', '-f', '/key/file'],
         'winkeygen /key/file')
 
+  def testReencodePPK(self):
+    self.AssertCommandBuild(
+        ssh.KeygenCommand('/key/file', reencode_ppk=True),
+        ['ssh-keygen', '-N', '', '-t', 'rsa', '-f', '/key/file'],  # No effect
+        'winkeygen --reencode-ppk /key/file')
+
 
 class KeygenCommandRunTest(CommandTestBase):
   """Checks KeygenCommand dispatch to execution_utils."""
@@ -552,6 +608,18 @@ class KeygenCommandExecuteTest(CommandTestBase, sdk_test_base.WithTempCWD):
     cmd.Run()
     self.AssertFileExists('id_rsa')
     self.AssertFileExists('id_rsa.pub')
+    self.AssertFileExists('id_rsa.ppk')
+
+  @test_case.Filters.RunOnlyOnWindows('Command on Windows')
+  def testPuTTY_ReencodePPK(self):
+    # This just tests that --reencode-ppk has an effect when we shell out to
+    # winkeygen.exe. The actual tests for the validity of the reencoded PPK are
+    # in winkeygen_test.
+    cmd1 = ssh.KeygenCommand('id_rsa')
+    cmd1.Run()
+    os.remove('id_rsa.ppk')
+    cmd2 = ssh.KeygenCommand('id_rsa', reencode_ppk=True)
+    cmd2.Run()
     self.AssertFileExists('id_rsa.ppk')
 
 
@@ -675,12 +743,12 @@ class SSHCommandTest(CommandTestBase):
         ['ssh', '-t', '-o',
          ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
           'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          '-o', 'ProxyUseFdpass=no', 'myhost'],
         ['putty', '-t', '-proxycmd',
          ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
           '%port --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          'myhost'])
 
   def testIapTunnelMoreArgs(self):
@@ -693,12 +761,12 @@ class SSHCommandTest(CommandTestBase):
         ['ssh', '-t', '-o', 'Opt=123', '-o',
          ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
           'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          '-o', 'ProxyUseFdpass=no', '-b', 'myhost'],
         ['putty', '-t', '-proxycmd',
          ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
           '%port --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          '-b', 'myhost'])
 
   def testAllArgs(self):
@@ -987,12 +1055,12 @@ class SCPCommandTest(CommandTestBase):
         ['scp', '-o',
          ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
           'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          '-o', 'ProxyUseFdpass=no', 'local_1', 'myhost:remote_1'],
         ['pscp', '-proxycmd',
          ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
           '%port --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          'local_1', 'myhost:remote_1'])
 
   def testAllArgs(self):
@@ -1294,14 +1362,14 @@ class BuildIapTunnelProxyCommandArgsTest(CommandTestBase):
         ['-o',
          ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
           'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning'),
+          '--verbosity=warning'),
          '-o', 'ProxyUseFdpass=no'])
     self.assertEqual(
         ssh._BuildIapTunnelProxyCommandArgs(self.iap_tunnel_args, self.putty),
         ['-proxycmd',
          ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
           '%port --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --verbosity=warning')])
+          '--verbosity=warning')])
 
   def testGaNoVerbosityPassThrough(self):
     self.get_verbosity_name.return_value = None
@@ -1312,14 +1380,14 @@ class BuildIapTunnelProxyCommandArgsTest(CommandTestBase):
         ['-o',
          ('ProxyCommand python /a/b/gcloud.py compute start-iap-tunnel myhost '
           '%p --listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 --a=b --c=d'),
+          '--a=b --c=d'),
          '-o', 'ProxyUseFdpass=no'])
     self.assertEqual(
         ssh._BuildIapTunnelProxyCommandArgs(self.iap_tunnel_args, self.putty),
         ['-proxycmd',
          ('"python" "/a/b/gcloud.py" compute start-iap-tunnel myhost %port '
           '--listen-on-stdin --project=my-project --zone=my-zone '
-          '--network-interface=nic0 "--a=b" "--c=d"')])
+          '"--a=b" "--c=d"')])
 
 
 class EscapeProxyCommandArgTest(CommandTestBase):

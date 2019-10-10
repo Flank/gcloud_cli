@@ -84,12 +84,25 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+The following command saves the contents of autoscaling policy
+\f5example\-autoscaling\-policy\fR to a file so that it can be imported later:
 
 .RS 2m
+$ gcloud beta dataproc autoscaling\-policies export \e
+    example\-autoscaling\-policy \-\-destination=saved\-policy.yaml
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud dataproc autoscaling\-policies export
 $ gcloud alpha dataproc autoscaling\-policies export
 .RE
 

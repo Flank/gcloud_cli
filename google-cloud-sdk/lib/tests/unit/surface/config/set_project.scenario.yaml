@@ -1,0 +1,105 @@
+title: config set project tests
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: core/should_prompt_to_enable_api True
+- execute:
+  - command: |
+      config set project xxxxx-does-not-exist
+  - stderr: |
+      Updated property [core/project].
+  - stderr: |
+      WARNING: You do not appear to have access to project [xxxxx-does-not-exist] or it does not exist.
+- execute:
+  - command: |
+      config set project cloud-sdk-integration-testing
+  - stderr: |
+      Updated property [core/project].
+- execute:
+  - command: |
+      config set project dnednednedne
+  - stderr: |
+      Updated property [core/project].
+  - stderr: |
+      WARNING: You do not appear to have access to project [dnednednedne] or it does not exist.
+actions:
+- set_property:
+    core/should_prompt_to_enable_api: true
+- execute_command:
+    command: |
+      config set project xxxxx-does-not-exist
+    events:
+    - expect_stderr: |
+        Updated property [core/project].
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/xxxxx-does-not-exist?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '403'
+          body: null
+    - expect_stderr: |
+        WARNING: You do not appear to have access to project [xxxxx-does-not-exist] or it does not exist.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      config set project cloud-sdk-integration-testing
+    events:
+    - expect_stderr: |
+        Updated property [core/project].
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0
+# This test mimics the case where Cloud Resource Manager API has not been enabled, it should
+# not trigger the enablement api prompt.
+- execute_command:
+    command: |
+      config set project dnednednedne
+    events:
+    - expect_stderr: |
+        Updated property [core/project].
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/dnednednedne?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '403'
+          body: |-
+            {
+              "error": {
+                "code": 403,
+                "message": "Cloud Resource Manager API has not been used in project 312771595071 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=312771595071 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.",
+                "status": "PERMISSION_DENIED",
+                "details": [
+                 {
+                    "@type": "type.googleapis.com/google.rpc.Help",
+                    "links": [
+                      {
+                        "description": "Google developers console API activation",
+                        "url": "https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview?project=312771595071"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+    - expect_stderr: |
+        WARNING: You do not appear to have access to project [dnednednedne] or it does not exist.
+    - expect_exit:
+        code: 0

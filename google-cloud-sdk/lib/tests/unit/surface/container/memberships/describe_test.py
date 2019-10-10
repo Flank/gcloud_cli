@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,12 @@ from tests.lib import test_case
 from tests.lib.surface.container.memberships import base
 
 
-class DescribeTestAlpha(base.MembershipsTestBase):
-  """gcloud Alpha track using container v1 API."""
+class DescribeTestBeta(base.MembershipsTestBase):
+  """gcloud Beta track using container v1 API."""
 
+  # TODO(b/116715821): add more negative tests.
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDescribeDefaults(self):
     self.ExpectGetMembership(self._MakeMembership())
@@ -42,7 +43,14 @@ class DescribeTestAlpha(base.MembershipsTestBase):
         'description': self.MEMBERSHIP_DESCRIPTION,
     }
     for k in out:
-      self.assertEquals(out[k], kwargs[k])
+      self.assertEqual(out[k], kwargs[k])
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+  """gcloud Alpha track using GKE Hub v1 API."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

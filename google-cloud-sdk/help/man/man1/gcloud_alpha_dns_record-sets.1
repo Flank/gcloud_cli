@@ -1,0 +1,126 @@
+
+.TH "GCLOUD_ALPHA_DNS_RECORD\-SETS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dns record\-sets \- manage the record\-sets within your managed\-zones
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dns record\-sets\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Manage the record\-sets within your managed\-zones.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBchanges\fR
+\fB(ALPHA)\fR View details about changes to your Cloud DNS record\-sets.
+
+.TP 2m
+\fBtransaction\fR
+\fB(ALPHA)\fR Make scriptable and transactional changes to your record\-sets.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBexport\fR
+\fB(ALPHA)\fR Export your record\-sets into a file.
+
+.TP 2m
+\fBimport\fR
+\fB(ALPHA)\fR Import record\-sets into your managed\-zone.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR View the list of record\-sets in a managed\-zone.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To import record\-sets from a BIND zone file, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets import \-\-zone=MANAGED_ZONE \e
+    \-\-zone\-file\-format ZONE_FILE
+.RE
+
+To export record\-sets in yaml format, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets export \-\-zone=MANAGED_ZONE
+.RE
+
+To see how to make scriptable changes to your record\-sets through transactions,
+run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets transaction \-\-help
+.RE
+
+To list all changes, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets changes list \-\-zone=MANAGED_ZONE
+.RE
+
+To see change details, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets changes describe CHANGE_ID \e
+    \-\-zone=MANAGED_ZONE
+.RE
+
+To see the list of all record\-sets, run:
+
+.RS 2m
+$ gcloud alpha dns record\-sets list \-\-zone=MANAGED_ZONE
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
+
+.RS 2m
+$ gcloud dns record\-sets
+$ gcloud beta dns record\-sets
+.RE
+

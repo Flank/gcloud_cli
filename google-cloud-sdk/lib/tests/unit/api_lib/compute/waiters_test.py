@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@ from __future__ import unicode_literals
 
 import collections
 
+from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.compute import waiters
 from googlecloudsdk.api_lib.util import apis
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.apitools import http_error
 
 import mock
 from six.moves import range  # pylint: disable=redefined-builtin
@@ -33,9 +35,9 @@ import six.moves.http_client
 
 
 COMPUTE_V1_MESSAGES = apis.GetMessagesModule('compute', 'v1')
-DONE = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.DONE
-PENDING = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.PENDING
-RUNNING = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.RUNNING
+DONE_V1 = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.DONE
+PENDING_V1 = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.PENDING
+RUNNING_V1 = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.RUNNING
 
 Call = collections.namedtuple('Call', ['requests', 'responses'])
 
@@ -92,14 +94,22 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     args.update(kwargs)
     return list(waiters.WaitForOperations(**args))
 
-  def CreateOperationsData(self, statuses, ids=None, operation_type=None):
+  def CreateOperationsData(self, statuses, ids=None, operation_type=None,
+                           followup_overrides=None):
     operations = self.CreateOperations(statuses, ids, operation_type)
 
+    if not followup_overrides:
+      followup_overrides = [None for _ in statuses]
+
     operations_data = []
-    for operation in operations:
+    for operation, followup_override in zip(operations, followup_overrides):
       operations_data.append(
-          waiters.OperationData(operation, 'my-project', self.compute.
-                                zoneOperations, self.compute.instances))
+          waiters.OperationData(
+              operation,
+              self.compute.zoneOperations,
+              self.compute.instances,
+              project='my-project',
+              followup_override=followup_override))
     return operations_data
 
   def CreateOperations(self, statuses, ids=None, operation_type=None):
@@ -113,13 +123,13 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
       operations.append(self.messages.Operation(
           name='operation-' + str(i),
           operationType=operation_type,
-          selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'zones/us-central1-a/operations/operation-' + str(i)),
           status=status,
           targetLink=(
-              'https://www.googleapis.com/compute/v1/projects/my-project'
+              'https://compute.googleapis.com/compute/v1/projects/my-project'
               '/zones/us-central1-a/instance-' + str(i)),
-          zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'zones/us-central2-a')))
     return operations
 
@@ -147,6 +157,16 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
       res.append((self.compute.instances, 'Get',
                   self.messages.ComputeInstancesGetRequest(
                       instance='instance-' + str(i),
+                      project='my-project',
+                      zone='us-central2-a')))
+    return res
+
+  def CreateInstancesCustomGetRequests(self, instance_names):
+    res = []
+    for instance_name in instance_names:
+      res.append((self.compute.instances, 'Get',
+                  self.messages.ComputeInstancesGetRequest(
+                      instance=instance_name,
                       project='my-project',
                       zone='us-central2-a')))
     return res
@@ -187,10 +207,25 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     )
     self.assertEqual(
         self.Wait(
-            operations_data=self.CreateOperationsData([DONE]),
+            operations_data=self.CreateOperationsData([DONE_V1]),
             progress_tracker=mock_progress_tracker,
-        ),
-        self.CreateInstances([0]))
+        ), self.CreateInstances([0]))
+    self.AssertSleeps()
+    self.assertEqual(self.errors, [])
+    self.assertEqual(self.warnings, [])
+    mock_progress_tracker.Tick.assert_called_once_with()
+
+  def testWithOneDoneOverrideOperation(self):
+    mock_progress_tracker = mock.MagicMock()
+    self.RegisterCalls(
+        Call(
+            requests=self.CreateInstancesCustomGetRequests(['overridden-name']),
+            responses=self.CreateInstances([0])),)
+    self.assertEqual(
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [DONE_V1], followup_overrides=['overridden-name']),
+            progress_tracker=mock_progress_tracker), self.CreateInstances([0]))
     self.AssertSleeps()
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
@@ -202,12 +237,13 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
         Call(requests=self.CreateInstancesGetRequests([0, 1, 2]),
              responses=self.CreateInstances([0, 1, 2])),
     )
+
     self.assertEqual(
         self.Wait(
-            operations_data=self.CreateOperationsData([DONE, DONE, DONE]),
+            operations_data=self.CreateOperationsData(
+                [DONE_V1, DONE_V1, DONE_V1]),
             progress_tracker=mock_progress_tracker,
-        ),
-        self.CreateInstances([0, 1, 2]))
+        ), self.CreateInstances([0, 1, 2]))
     self.AssertSleeps()
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
@@ -216,103 +252,112 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
   def testWithOnePendingInsertOperation(self):
     mock_progress_tracker = mock.MagicMock()
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0]),
-             responses=self.CreateOperations([DONE])),
-
-        Call(requests=self.CreateInstancesGetRequests([0]),
-             responses=self.CreateInstances([0])),
+        Call(
+            requests=self.CreateOperationGetRequests([0]),
+            responses=self.CreateOperations([DONE_V1])),
+        Call(
+            requests=self.CreateInstancesGetRequests([0]),
+            responses=self.CreateInstances([0])),
     )
     self.assertEqual(
         self.Wait(
-            operations_data=self.CreateOperationsData([PENDING]),
+            operations_data=self.CreateOperationsData([PENDING_V1]),
             progress_tracker=mock_progress_tracker,
-        ),
-        self.CreateInstances([0]))
-    self.AssertSleeps(1)
+        ), self.CreateInstances([0]))
+    self.AssertSleeps()
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
     self.assertEqual(mock_progress_tracker.Tick.call_count, 2)
 
   def testWithManyPendingInsertOperations(self):
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([DONE, DONE, DONE])),
-
-        Call(requests=self.CreateInstancesGetRequests([0, 1, 2]),
-             responses=self.CreateInstances([0, 1, 2])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations([DONE_V1, DONE_V1, DONE_V1])),
+        Call(
+            requests=self.CreateInstancesGetRequests([0, 1, 2]),
+            responses=self.CreateInstances([0, 1, 2])),
     )
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING])),
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
         self.CreateInstances([0, 1, 2]))
-    self.AssertSleeps(1, 2)
+    self.AssertSleeps(1)
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
 
   def testWithManyPendingDeleteOperations(self):
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING],
-                                             operation_type='delete')),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([DONE, DONE, DONE],
-                                             operation_type='delete')),
-
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1], operation_type='delete')),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations([DONE_V1, DONE_V1, DONE_V1],
+                                            operation_type='delete')),
     )
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING], operation_type='delete')), [])
-    self.AssertSleeps(1, 2)
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1], operation_type='delete')),
+        [])
+    self.AssertSleeps(1)
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
 
   def testWithManyPendingInsertOperationsAndInterleavingDones(self):
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, DONE, PENDING])),
-
-        Call(requests=(self.CreateInstancesGetRequests([1]) +
-                       self.CreateOperationGetRequests([0, 2])),
-             responses=(self.CreateOperations([PENDING, DONE], ids=[0, 2]) +
-                        self.CreateInstances([1]))),
-
-        Call(requests=(self.CreateInstancesGetRequests([2]) +
-                       self.CreateOperationGetRequests([0])),
-             responses=(self.CreateOperations([PENDING]) +
-                        self.CreateInstances([2]))),
-
-        Call(requests=self.CreateOperationGetRequests([0]),
-             responses=self.CreateOperations([PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0]),
-             responses=self.CreateOperations([PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0]),
-             responses=self.CreateOperations([DONE])),
-
-        Call(requests=self.CreateInstancesGetRequests([0]),
-             responses=self.CreateInstances([0])),
-
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations([PENDING_V1, DONE_V1, PENDING_V1])),
+        Call(
+            requests=(self.CreateInstancesGetRequests([1]) +
+                      self.CreateOperationGetRequests([0, 2])),
+            responses=(
+                self.CreateOperations([PENDING_V1, DONE_V1], ids=[0, 2]) +
+                self.CreateInstances([1]))),
+        Call(
+            requests=(self.CreateInstancesGetRequests([2]) +
+                      self.CreateOperationGetRequests([0])),
+            responses=(self.CreateOperations([PENDING_V1]) +
+                       self.CreateInstances([2]))),
+        Call(
+            requests=self.CreateOperationGetRequests([0]),
+            responses=self.CreateOperations([PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0]),
+            responses=self.CreateOperations([PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0]),
+            responses=self.CreateOperations([DONE_V1])),
+        Call(
+            requests=self.CreateInstancesGetRequests([0]),
+            responses=self.CreateInstances([0])),
     )
 
     # Note that instance-0 became ready last, so we expect it to be
     # returned last.
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING])),
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
         self.CreateInstances([1, 2, 0]))
 
-    self.AssertSleeps(1, 2, 3, 4, 5, 5, 5, 5)
+    self.AssertSleeps(1, 2, 3, 4, 5, 5, 5)
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
 
@@ -322,25 +367,28 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     # we expect to make 12 calls.
     calls = []
     for _ in range(12):
-      calls.append(Call(
-          requests=self.CreateOperationGetRequests([0, 1, 2]),
-          responses=self.CreateOperations([PENDING, PENDING, PENDING])))
+      calls.append(
+          Call(
+              requests=self.CreateOperationGetRequests([0, 1, 2]),
+              responses=self.CreateOperations(
+                  [PENDING_V1, PENDING_V1, PENDING_V1])))
 
     self.RegisterCalls(*calls)
 
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING]), timeout=59),
-        [])
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1]),
+            timeout=59), [])
     self.AssertSleeps(1, 2, 3, 4, 5, 5, 5, 5, 5, 5, 5)
     self.assertEqual(
         self.errors,
         [(None, 'Did not create the following resources within 1800s: '
-          'https://www.googleapis.com/compute/v1/projects/my-project/'
+          'https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/us-central1-a/instance-0, '
-          'https://www.googleapis.com/compute/v1/projects/my-project/'
+          'https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/us-central1-a/instance-1, '
-          'https://www.googleapis.com/compute/v1/projects/my-project/'
+          'https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/us-central1-a/instance-2. '
           'These operations may still be '
           'underway remotely and may still succeed; use gcloud list and '
@@ -354,19 +402,22 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     # we expect to make 12 calls.
     calls = []
     for _ in range(12):
-      calls.append(Call(
-          requests=self.CreateOperationGetRequests([0, 1, 2]),
-          responses=self.CreateOperations(
-              [PENDING, PENDING, PENDING],
-              operation_type='recreateInstancesInstanceGroupManager')))
+      calls.append(
+          Call(
+              requests=self.CreateOperationGetRequests([0, 1, 2]),
+              responses=self.CreateOperations(
+                  [PENDING_V1, PENDING_V1, PENDING_V1],
+                  operation_type='recreateInstancesInstanceGroupManager')))
 
     self.RegisterCalls(*calls)
-    self.Wait(operations_data=self.CreateOperationsData(
-        [PENDING, PENDING, PENDING]), timeout=59)
+    self.Wait(
+        operations_data=self.CreateOperationsData(
+            [PENDING_V1, PENDING_V1, PENDING_V1]),
+        timeout=59)
     self.assertIn('Did not recreate the following', self.errors[0][1])
 
   def testErrorCapturing(self):
-    error_ops = self.CreateOperations([DONE, DONE, DONE])
+    error_ops = self.CreateOperations([DONE_V1, DONE_V1, DONE_V1])
     for i, operation in enumerate(error_ops):
       operation.httpErrorMessage = 'CONFLICT'
       operation.httpErrorStatusCode = six.moves.http_client.CONFLICT
@@ -374,17 +425,19 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
           errors=[self.messages.Operation.ErrorValue.ErrorsValueListEntry(
               message='resource instance-' + str(i) + ' already exists')])
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=error_ops),
-
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=error_ops),
     )
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING])), [])
-    self.AssertSleeps(1, 2)
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1])), [])
+    self.AssertSleeps(1)
     self.assertEqual(self.errors, [
         (six.moves.http_client.CONFLICT, 'resource instance-0 already exists'),
         (six.moves.http_client.CONFLICT, 'resource instance-1 already exists'),
@@ -393,24 +446,26 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     self.assertEqual(self.warnings, [])
 
   def testErrorCapturingWithoutHttpErrorStatusCodeBeingSet(self):
-    error_ops = self.CreateOperations([DONE, DONE, DONE])
+    error_ops = self.CreateOperations([DONE_V1, DONE_V1, DONE_V1])
     for i, operation in enumerate(error_ops):
       operation.error = self.messages.Operation.ErrorValue(
           errors=[self.messages.Operation.ErrorValue.ErrorsValueListEntry(
               message='resource instance-' + str(i) + ' already exists')])
 
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=error_ops),
-
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=error_ops),
     )
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING])), [])
-    self.AssertSleeps(1, 2)
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1])), [])
+    self.AssertSleeps(1)
     self.assertEqual(
         self.errors,
         [(None, 'resource instance-0 already exists'),
@@ -419,28 +474,30 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     self.assertEqual(self.warnings, [])
 
   def testWarningCapturing(self):
-    warning_ops = self.CreateOperations([DONE, DONE, DONE])
+    warning_ops = self.CreateOperations([DONE_V1, DONE_V1, DONE_V1])
     for operation in warning_ops:
       operation.warnings = [
           self.messages.Operation.WarningsValueListEntry(
               message='us-central1-a is deprecated')]
 
     self.RegisterCalls(
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=self.CreateOperations([PENDING, PENDING, PENDING])),
-
-        Call(requests=self.CreateOperationGetRequests([0, 1, 2]),
-             responses=warning_ops),
-
-        Call(requests=self.CreateInstancesGetRequests([0, 1, 2]),
-             responses=self.CreateInstances([0, 1, 2])),
-
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=self.CreateOperations(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
+        Call(
+            requests=self.CreateOperationGetRequests([0, 1, 2]),
+            responses=warning_ops),
+        Call(
+            requests=self.CreateInstancesGetRequests([0, 1, 2]),
+            responses=self.CreateInstances([0, 1, 2])),
     )
     self.assertEqual(
-        self.Wait(operations_data=self.CreateOperationsData(
-            [PENDING, PENDING, PENDING])),
+        self.Wait(
+            operations_data=self.CreateOperationsData(
+                [PENDING_V1, PENDING_V1, PENDING_V1])),
         self.CreateInstances([0, 1, 2]))
-    self.AssertSleeps(1, 2)
+    self.AssertSleeps(1)
     self.assertEqual(self.errors, [])
     self.assertEqual(
         self.warnings,
@@ -454,28 +511,25 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
       return self.messages.Operation(
           name='operation-0',
           operationType='insert',
-          selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/us-central2/operations/operation-0'),
           status=status,
           targetLink=(
-              'https://www.googleapis.com/compute/v1/projects/my-project/'
+              'https://compute.googleapis.com/compute/v1/projects/my-project/'
               'regions/us-central2/address-0'),
-          region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/us-central2'))
 
     self.RegisterCalls(
         Call(
-            requests=[(self.compute.regionOperations,
-                       'Get',
+            requests=[(self.compute.regionOperations, 'Get',
                        self.messages.ComputeRegionOperationsGetRequest(
                            operation='operation-0',
                            project='my-project',
                            region='us-central2'))],
-            responses=[CreateRegionalOperation(DONE)]),
-
+            responses=[CreateRegionalOperation(DONE_V1)]),
         Call(
-            requests=[(self.compute.addresses,
-                       'Get',
+            requests=[(self.compute.addresses, 'Get',
                        self.messages.ComputeAddressesGetRequest(
                            address='address-0',
                            project='my-project',
@@ -485,10 +539,12 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     self.assertEqual(
         self.Wait(operations_data=[
             waiters.OperationData(
-                CreateRegionalOperation(PENDING), 'my-project',
-                self.compute.regionOperations, self.compute.addresses)
+                CreateRegionalOperation(PENDING_V1),
+                self.compute.regionOperations,
+                self.compute.addresses,
+                project='my-project')
         ]), [self.messages.Address(name='address-0')])
-    self.AssertSleeps(1)
+    self.AssertSleeps()
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
 
@@ -498,13 +554,13 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
       return self.messages.Operation(
           name='operation-0',
           operationType='insert',
-          selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/us-central2/operations/operation-0'),
           status=status,
           targetLink=(
-              'https://www.googleapis.com/compute/v1/projects/my-project/'
+              'https://compute.googleapis.com/compute/v1/projects/my-project/'
               'regions/us-central2/address-0'),
-          region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/us-central2'))
 
     self.RegisterCalls(
@@ -520,8 +576,8 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
                            project='my-project',
                            zone='us-central2-a'))],
             responses=[
-                CreateRegionalOperation(DONE),
-                self.CreateOperations([DONE])[0]
+                CreateRegionalOperation(DONE_V1),
+                self.CreateOperations([DONE_V1])[0]
             ]),
         Call(
             requests=[(self.compute.addresses, 'Get',
@@ -542,35 +598,347 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     self.assertEqual(
         self.Wait(operations_data=[
             waiters.OperationData(
-                CreateRegionalOperation(PENDING), 'my-project',
-                self.compute.regionOperations, self.compute.addresses),
-            self.CreateOperationsData([PENDING])[0]
+                CreateRegionalOperation(PENDING_V1),
+                self.compute.regionOperations,
+                self.compute.addresses,
+                project='my-project'),
+            self.CreateOperationsData([PENDING_V1])[0]
         ]), [
             self.messages.Address(name='address-0'),
             self.messages.Instance(name='instance-0')
         ])
-    self.AssertSleeps(1)
+    self.AssertSleeps()
     self.assertEqual(self.errors, [])
     self.assertEqual(self.warnings, [])
+
+
+def _GetOperationStatusEnum(messages, status):
+  enum_type = messages.Operation.StatusValueValuesEnum
+  return getattr(enum_type, status)
+
+
+def _CreateOperation(messages, status, operation_id=None, operation_type=None):
+  operation_id = operation_id or 0
+
+  operation_type = operation_type or 'insert'
+  operation = messages.Operation(
+      name='operation-' + str(operation_id),
+      operationType=operation_type,
+      selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+                'zones/us-central2-a/operations/operation-' +
+                str(operation_id)),
+      status=_GetOperationStatusEnum(messages, status),
+      targetLink=('https://www.googleapis.com/compute/v1/projects/my-project'
+                  '/zones/us-central2-a/instance-' + str(operation_id)),
+      zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            'zones/us-central2-a'))
+  return operation
+
+
+def _CreateOperationData(compute,
+                         messages,
+                         status,
+                         operation_id=None,
+                         operation_type=None):
+  operation = _CreateOperation(messages, status, operation_id, operation_type)
+
+  operation_data = waiters.OperationData(
+      operation,
+      compute.zoneOperations,
+      compute.instances,
+      project='my-project')
+  return operation_data
+
+
+def _InsertErrorsToOperations(messages,
+                              operation,
+                              status_code=404,
+                              errors=(('error-code-1', 'error-location1',
+                                       'error-message-1'),
+                                      ('error-code-2', 'error-location-2',
+                                       'error-message-2'))):
+  operation.error = messages.Operation.ErrorValue(errors=[])
+  for code, location, message in errors:
+    operation.error.errors.append(
+        messages.Operation.ErrorValue.ErrorsValueListEntry(
+            code=code, location=location, message=message))
+  operation.httpErrorStatusCode = status_code
+  return operation
+
+
+def _InsertWarningsToOperation(messages,
+                               operation,
+                               warnings=('warning-message-1',
+                                         'warning-message-2')):
+  operation.warnings = []
+  for warning in warnings:
+    operation.warnings.append(
+        messages.Operation.WarningsValueListEntry(message=warning))
+  return operation
 
 
 class OperationDataTest(sdk_test_base.SdkBase):
 
   def SetUp(self):
-    self.o1 = waiters.OperationData(1, 2, 3, 4)
-    self.o2 = waiters.OperationData(1, 2, 3, 4)
-    self.o3 = waiters.OperationData(-1, 2, 3, 4)
 
-  def testEq(self):
-    self.assertEqual(self.o1, self.o2)
+    self.mock_client = apitools_mock.Client(
+        client_class=apis.GetClientClass('compute', 'alpha'))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
 
-  def testNe(self):
-    self.assertNotEqual(self.o1, self.o3)
-    self.assertNotEqual(self.o1, None)
-    self.assertNotEqual(self.o1, 1)
+    self.messages = apis.GetMessagesModule('compute', 'alpha')
+    self.compute = apis.GetClientInstance('compute', 'alpha', no_http=True)
+    self.pending_operation_data = _CreateOperationData(self.compute,
+                                                       self.messages, 'PENDING')
+
+    self.pending_delete_operation_data = _CreateOperationData(
+        self.compute, self.messages, 'PENDING', operation_type='delete')
+
+    self.done_operation_data = _CreateOperationData(self.compute, self.messages,
+                                                    'DONE')
+
+  def testPollUntilDone(self):
+
+    self.mock_client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), _CreateOperation(self.messages, 'DONE'))
+
+    self.pending_operation_data.PollUntilDone()
+    self.assertEqual(self.pending_operation_data.operation.status,
+                     _GetOperationStatusEnum(self.messages, 'DONE'))
+    self.assertEqual(self.pending_operation_data.errors, [])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testPollUntilDone_FinishedWithErrorsAndWarnings(self):
+
+    done_operation = _CreateOperation(self.messages, 'DONE')
+    _InsertErrorsToOperations(self.messages, done_operation)
+    _InsertWarningsToOperation(self.messages, done_operation)
+
+    self.mock_client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), done_operation)
+
+    self.pending_operation_data.PollUntilDone()
+
+    self.assertEqual(self.pending_operation_data.operation.status,
+                     _GetOperationStatusEnum(self.messages, 'DONE'))
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(404, 'error-message-1'), (404, 'error-message-2')])
+    self.assertEqual(self.pending_operation_data.warnings,
+                     ['warning-message-1', 'warning-message-2'])
+
+  def testPollUntilDone_TimedOut(self):
+    self.pending_operation_data.PollUntilDone(timeout_sec=-1)
+
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(None, 'operation operation-0 timed out')])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testPollUntilDone_HttpRequestCrash(self):
+    self.mock_client.zoneOperations.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'),
+        exception=http_error.MakeHttpError(404, 'not found'))
+    self.pending_operation_data.PollUntilDone()
+
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(404, 'Resource not found API reason: not found')])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testGetResult(self):
+    self.mock_client.ZoneOperationsService.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), _CreateOperation(self.messages, 'DONE'))
+
+    self.mock_client.instances.Get.Expect(
+        self.messages.ComputeInstancesGetRequest(
+            instance='instance-0', project='my-project', zone='us-central2-a'),
+        self.messages.Instance(zone='us-central2-a', name='instance-0'))
+
+    instance = self.pending_operation_data.GetResult()
+    self.assertEqual(instance.zone, 'us-central2-a')
+    self.assertEqual(instance.name, 'instance-0')
+    self.assertEqual(self.pending_operation_data.errors, [])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testGetResult_ResourceFetchingError(self):
+    self.mock_client.ZoneOperationsService.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), _CreateOperation(self.messages, 'DONE'))
+
+    self.mock_client.instances.Get.Expect(
+        self.messages.ComputeInstancesGetRequest(
+            instance='instance-0', project='my-project', zone='us-central2-a'),
+        response=None,
+        exception=http_error.MakeHttpError(404, 'not found'))
+
+    self.pending_operation_data.GetResult()
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(404, 'Resource not found API reason: not found')])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testGetResult_DeleteOperation(self):
+
+    self.mock_client.ZoneOperationsService.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'),
+        _CreateOperation(self.messages, 'DONE', operation_type='delete'))
+
+    self.pending_delete_operation_data.GetResult()
+    self.assertEqual(self.pending_operation_data.errors, [])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testGetResult_OperationFinishedWithError(self):
+    done_operation = _CreateOperation(self.messages, 'DONE')
+    _InsertErrorsToOperations(self.messages, done_operation)
+
+    self.mock_client.ZoneOperationsService.Wait.Expect(
+        self.messages.ComputeZoneOperationsWaitRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), done_operation)
+
+    self.pending_operation_data.GetResult()
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(404, 'error-message-1'), (404, 'error-message-2')])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testIsDone(self):
+    self.assertFalse(self.pending_operation_data.IsDone())
+    self.assertTrue(self.done_operation_data.IsDone())
+
+  def testOperationGetRequest(self):
+    request = self.pending_operation_data.OperationGetRequest()
+    expected_request = self.messages.ComputeZoneOperationsGetRequest(
+        project='my-project', zone='us-central2-a', operation='operation-0')
+    self.assertEqual(request, expected_request)
+
+  def testOperationWaitRequest(self):
+    request = self.pending_operation_data.OperationWaitRequest()
+    expected_request = self.messages.ComputeZoneOperationsWaitRequest(
+        project='my-project', zone='us-central2-a', operation='operation-0')
+    self.assertEqual(request, expected_request)
+
+  def testResourceGetRequest(self):
+    request = self.pending_operation_data.ResourceGetRequest()
+    expected_request = self.messages.ComputeInstancesGetRequest(
+        instance='instance-0', project='my-project', zone='us-central2-a')
+    self.assertEqual(request, expected_request)
+
+  def testEqual(self):
+    operation_data1 = _CreateOperationData(
+        self.compute, self.messages, 'DONE', operation_type='insert')
+    operation_data2 = _CreateOperationData(
+        self.compute, self.messages, 'DONE', operation_type='insert')
+    self.assertEqual(operation_data1, operation_data2)
+
+  def testNotEqual(self):
+    operation_data1 = _CreateOperationData(
+        self.compute, self.messages, 'DONE', operation_type='insert')
+    operation_data2 = _CreateOperationData(
+        self.compute, self.messages, 'DONE', operation_type='delete')
+    self.assertNotEqual(operation_data1, operation_data2)
 
   def testHash(self):
-    self.assertEqual(hash(self.o1), hash(self.o2))
+    operation_data1 = _CreateOperationData(
+        self.compute, self.messages, 'DONE', operation_type='insert')
+    operation_data2 = _CreateOperationData(
+        self.compute, self.messages, 'DONE', operation_type='insert')
+    self.assertEqual(hash(operation_data1), hash(operation_data2))
+
+
+class OperationDataTestOperationGet(sdk_test_base.SdkBase):
+
+  def SetUp(self):
+
+    self.mock_client = apitools_mock.Client(
+        client_class=apis.GetClientClass('compute', 'alpha'))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+    time_patcher = self.StartPatch(
+        'googlecloudsdk.command_lib.util.time_util.CurrentTimeSec',
+        auto_spec=True)
+    time_patcher.side_effect = iter(range(0, 1000, 5))
+
+    self.sleep_patcher = self.StartPatch(
+        'googlecloudsdk.command_lib.util.time_util.Sleep', auto_spec=True)
+
+    self.messages = apis.GetMessagesModule('compute', 'alpha')
+    self.compute = apis.GetClientInstance('compute', 'alpha', no_http=True)
+
+    self.StartObjectPatch(
+        waiters.OperationData, '_SupportOperationWait', return_value=False)
+    self.pending_operation_data = _CreateOperationData(self.compute,
+                                                       self.messages, 'PENDING')
+
+  def AssertSleep(self, *args):
+    sleep_args = []
+    for sleep_time in args:
+      sleep_args.append(mock.call(sleep_time))
+
+    self.assertEqual(self.sleep_patcher.call_args_list, sleep_args)
+
+  def _RegisterOperationGet(self, counts):
+    for _ in range(counts):
+      self.mock_client.zoneOperations.Get.Expect(
+          self.messages.ComputeZoneOperationsGetRequest(
+              operation='operation-0',
+              project='my-project',
+              zone='us-central2-a'), _CreateOperation(self.messages, 'PENDING'))
+
+  def testPollUntilDone(self):
+
+    self.mock_client.zoneOperations.Get.Expect(
+        self.messages.ComputeZoneOperationsGetRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), _CreateOperation(self.messages, 'DONE'))
+
+    self.pending_operation_data.PollUntilDone()
+    self.assertEqual(self.pending_operation_data.operation.status,
+                     _GetOperationStatusEnum(self.messages, 'DONE'))
+    self.assertEqual(self.pending_operation_data.errors, [])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testPollUntilDone_PollIntervalLimit(self):
+    self._RegisterOperationGet(10)
+    self.mock_client.zoneOperations.Get.Expect(
+        self.messages.ComputeZoneOperationsGetRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'), _CreateOperation(self.messages, 'DONE'))
+
+    self.pending_operation_data.PollUntilDone()
+    self.assertEqual(self.pending_operation_data.operation.status,
+                     _GetOperationStatusEnum(self.messages, 'DONE'))
+    self.assertEqual(self.pending_operation_data.errors, [])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+    self.AssertSleep(1, 2, 3, 4, 5, 5, 5, 5, 5, 5)
+
+  def testPollUntilDone_Timeout(self):
+    self._RegisterOperationGet(1)
+
+    self.pending_operation_data.PollUntilDone(9)
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(None, 'operation operation-0 timed out')])
+    self.assertEqual(self.pending_operation_data.warnings, [])
+
+  def testPollUntilDone_HttpRequestCrash(self):
+    self.mock_client.zoneOperations.Get.Expect(
+        self.messages.ComputeZoneOperationsGetRequest(
+            operation='operation-0', project='my-project',
+            zone='us-central2-a'),
+        exception=http_error.MakeHttpError(404, 'not found'))
+    self.pending_operation_data.PollUntilDone()
+
+    self.assertEqual(self.pending_operation_data.errors,
+                     [(404, 'Resource not found API reason: not found')])
+    self.assertEqual(self.pending_operation_data.warnings, [])
 
 
 if __name__ == '__main__':

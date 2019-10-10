@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from tests.lib.surface.compute import test_base
 
 class UrlMapsRemovePathMatcherTest(test_base.BaseTest):
 
-  _V1_URI_PREFIX = 'https://www.googleapis.com/compute/v1/projects/my-project/'
+  _V1_URI_PREFIX = 'https://compute.googleapis.com/compute/v1/projects/my-project/'
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def SetUp(self):
@@ -111,10 +111,55 @@ class UrlMapsRemovePathMatcherTest(test_base.BaseTest):
                              urlMap='url-map-1', project='my-project'))])
 
 
+class UrlMapsRemovePathMatcherBetaTest(UrlMapsRemovePathMatcherTest):
+
+  _V1_URI_PREFIX = (
+      'https://compute.googleapis.com/compute/beta/projects/my-project/')
+  _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._url_maps_api = self.compute_beta.urlMaps
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com'], pathMatcher='youtube'),
+            self.messages.HostRule(hosts=['google.com'], pathMatcher='google'),
+            self.messages.HostRule(
+                hosts=['*-youtube.com'], pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-search'),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-watch'),
+                ]),
+            self.messages.PathMatcher(
+                name='google',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'google-default'),
+        ],
+    )
+
+  def RunRemovePathMatcher(self, command):
+    self.Run('beta compute url-maps remove-path-matcher --global ' + command)
+
+
 class UrlMapsRemovePathMatcherAlphaTest(UrlMapsRemovePathMatcherTest):
 
   _V1_URI_PREFIX = (
-      'https://www.googleapis.com/compute/alpha/projects/my-project/')
+      'https://compute.googleapis.com/compute/alpha/projects/my-project/')
   _BACKEND_SERVICES_URI_PREFIX = _V1_URI_PREFIX + 'global/backendServices/'
 
   def SetUp(self):
@@ -156,16 +201,16 @@ class UrlMapsRemovePathMatcherAlphaTest(UrlMapsRemovePathMatcherTest):
     self.Run('alpha compute url-maps remove-path-matcher --global ' + command)
 
 
-class RegionUrlMapsRemovePathMatcherTest(test_base.BaseTest):
+class RegionUrlMapsRemovePathMatcherBetaTest(test_base.BaseTest):
 
   _V1_URI_PREFIX = (
-      'https://www.googleapis.com/compute/alpha/projects/my-project/')
+      'https://compute.googleapis.com/compute/beta/projects/my-project/')
   _BACKEND_SERVICES_URI_PREFIX = (
       _V1_URI_PREFIX + 'regions/us-west-1/backendServices/')
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._url_maps_api = self.compute_beta.regionUrlMaps
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
@@ -199,7 +244,7 @@ class RegionUrlMapsRemovePathMatcherTest(test_base.BaseTest):
     )
 
   def RunRemovePathMatcher(self, command):
-    self.Run('alpha compute url-maps remove-path-matcher --region us-west-1 ' +
+    self.Run('beta compute url-maps remove-path-matcher --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -250,6 +295,54 @@ class RegionUrlMapsRemovePathMatcherTest(test_base.BaseTest):
                              urlMap='url-map-1',
                              project='my-project',
                              region='us-west-1'))])
+
+
+class RegionUrlMapsRemovePathMatcherAlphaTest(
+    RegionUrlMapsRemovePathMatcherBetaTest):
+
+  _V1_URI_PREFIX = (
+      'https://compute.googleapis.com/compute/alpha/projects/my-project/')
+  _BACKEND_SERVICES_URI_PREFIX = (
+      _V1_URI_PREFIX + 'regions/us-west-1/backendServices/')
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._url_maps_api = self.compute_alpha.regionUrlMaps
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._BACKEND_SERVICES_URI_PREFIX + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com'], pathMatcher='youtube'),
+            self.messages.HostRule(hosts=['google.com'], pathMatcher='google'),
+            self.messages.HostRule(
+                hosts=['*-youtube.com'], pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-search'),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._BACKEND_SERVICES_URI_PREFIX +
+                        'youtube-watch'),
+                ]),
+            self.messages.PathMatcher(
+                name='google',
+                defaultService=self._BACKEND_SERVICES_URI_PREFIX +
+                'google-default'),
+        ],
+    )
+
+  def RunRemovePathMatcher(self, command):
+    self.Run('alpha compute url-maps remove-path-matcher --region us-west-1 ' +
+             command)
 
 
 if __name__ == '__main__':

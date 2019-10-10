@@ -8,7 +8,8 @@ SYNOPSIS
           : --instance-group-region=INSTANCE_GROUP_REGION
           | --instance-group-zone=INSTANCE_GROUP_ZONE]
           | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
-          : --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
+          : --global-network-endpoint-group
+          | --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
         [--balancing-mode=BALANCING_MODE] [--capacity-scaler=CAPACITY_SCALER]
         [--description=DESCRIPTION] [--failover]
         [--max-utilization=MAX_UTILIZATION] [--global | --region=REGION]
@@ -98,55 +99,73 @@ REQUIRED FLAGS
             This flag must be specified if any of the other arguments in this
             group are specified.
 
-         --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
-            Zone of the network endpoint group to add to the backend service.
-            If not specified and the compute/zone property isn't set, you may
-            be prompted to select a zone.
+         At most one of these may be specified:
 
-            To avoid prompting when this flag is omitted, you can set the
-            compute/zone property:
+           --global-network-endpoint-group
+              If set, the network endpoint group is global.
 
-                $ gcloud config set compute/zone ZONE
+           --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
+              Zone of the network endpoint group to add to the backend service.
+              If not specified and the compute/zone property isn't set, you may
+              be prompted to select a zone.
 
-            A list of zones can be fetched by running:
+              To avoid prompting when this flag is omitted, you can set the
+              compute/zone property:
 
-                $ gcloud compute zones list
+                  $ gcloud config set compute/zone ZONE
 
-            To unset the property, run:
+              A list of zones can be fetched by running:
 
-                $ gcloud config unset compute/zone
+                  $ gcloud compute zones list
 
-            Alternatively, the zone can be stored in the environment variable
-            CLOUDSDK_COMPUTE_ZONE.
+              To unset the property, run:
+
+                  $ gcloud config unset compute/zone
+
+              Alternatively, the zone can be stored in the environment variable
+              CLOUDSDK_COMPUTE_ZONE.
 
 OPTIONAL FLAGS
      --balancing-mode=BALANCING_MODE
         Defines the strategy for balancing load. BALANCING_MODE must be one of:
 
          CONNECTION
-            Spreads load based on how many concurrent connections the backend
-            can handle. This balancing mode is only available to backend
-            services that use SSL, TCP, or UDP protocols. For backend services
-            with --load-balancing-scheme EXTERNAL, you must specify exactly one
-            of these additional parameters: --max-connections,
-            --max-connections-per-instance, or --max-connections-per-endpoint.
-            For backend services with --load-balancing-scheme INTERNAL, you
-            must omit all of these parameters.
+            Available if the backend service's load balancing scheme is either
+            INTERNAL or EXTERNAL. Available if the backend service's protocol
+            is one of SSL, TCP, or UDP.
+
+                Spreads load based on how many concurrent connections the backend
+                can handle.
+
+                For backend services with --load-balancing-scheme `EXTERNAL`, you
+                must specify exactly one of these additional parameters:
+                `--max-connections`, `--max-connections-per-instance`, or
+                `--max-connections-per-endpoint`.
+
+                For backend services where `--load-balancing-scheme` is `INTERNAL`,
+                you must omit all of these parameters.
          RATE
-            Spreads load based on how many HTTP requests per second (RPS) the
-            backend can handle. This balancing mode is only available to
-            backend services that use HTTP, HTTPS, or HTTP/2 protocols. You
-            must specify exactly one of these additional parameters:
-            --max-rate, --max-rate-per-instance, or--max-rate-per-endpoint.
+            Available if the backend service's load balancing scheme is
+            INTERNAL_MANAGED, INTERNAL_SELF_MANAGED, or EXTERNAL. Available if
+            the backend service's protocol is one of HTTP, HTTPS, or HTTP/2.
+
+                Spreads load based on how many HTTP requests per second (RPS) the
+                backend can handle.
+
+                You must specify exactly one of these additional parameters:
+                `--max-rate`, `--max-rate-per-instance`, or `--max-rate-per-endpoint`.
          UTILIZATION
-            Spreads load based on the CPU utilization of instances in a backend
-            instance group. This balancing mode is only available to backend
-            services with --load-balancing-scheme EXTERNAL and instance group
-            backends. There is no restriction on the backend service protocol.
-            The following additional parameters may be specified:
-            --max-utilization, --max-rate, --max-rate-per-instance,
-            --max-connections, --max-connections-per-instance. For valid
-            combinations, see --max-utilization below.
+            Available if the backend service's load balancing scheme is
+            INTERNAL_MANAGED, INTERNAL_SELF_MANAGED, or EXTERNAL. Available
+            only for managed or unmanaged instance group backends.
+
+                Spreads load based on the CPU utilization of instances in a backend
+                instance group.
+
+                The following additional parameters may be specified:
+                `--max-utilization`, `--max-rate`, `--max-rate-per-instance`,
+                `--max-connections`, `--max-connections-per-instance`.
+                For valid combinations, see `--max-utilization`.
 
      --capacity-scaler=CAPACITY_SCALER
         A setting that applies to all balancing modes. This value is multiplied
@@ -157,6 +176,9 @@ OPTIONAL FLAGS
         in the group. All existing connections are allowed to continue until
         they close by normal means. This cannot be used for internal load
         balancing.
+
+        This cannot be used when the endpoint type of an attached NEG is
+        INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
      --description=DESCRIPTION
         An optional, textual description for the backend.
@@ -219,6 +241,9 @@ OPTIONAL FLAGS
           Maximum concurrent connections that the backend can handle. Valid for
           instance group and network endpoint group backends.
 
+          This cannot be used when the endpoint type of an attached NEG is
+          INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+
        --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
           Only valid for network endpoint group backends. Defines a maximum
           number of connections per endpoint if all endpoints are healthy. When
@@ -227,6 +252,9 @@ OPTIONAL FLAGS
           MAX_CONNECTIONS_PER_ENDPOINT by the number of endpoints in the
           network endpoint group, then dividing by the number of healthy
           endpoints.
+
+          This cannot be used when the endpoint type of an attached NEG is
+          INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
        --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
           Only valid for instance group backends. Defines a maximum number of
@@ -243,6 +271,9 @@ OPTIONAL FLAGS
           Must not be defined if the backend is a managed instance group using
           autoscaling based on load balancing.
 
+          This cannot be used when the endpoint type of an attached NEG is
+          INTERNET_IP_PORT or INTERNET_FQDN_PORT.
+
        --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
           Only valid for network endpoint group backends. Defines a maximum
           number of HTTP requests per second (RPS) per endpoint if all
@@ -251,6 +282,9 @@ OPTIONAL FLAGS
           multiplying MAX_RATE_PER_ENDPOINT by the number of endpoints in the
           network endpoint group, then dividing by the number of healthy
           endpoints.
+
+          This cannot be used when the endpoint type of an attached NEG is
+          INTERNET_IP_PORT or INTERNET_FQDN_PORT.
 
        --max-rate-per-instance=MAX_RATE_PER_INSTANCE
           Only valid for instance group backends. Defines a maximum number of
@@ -272,9 +306,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute backend-services add-backend
         $ gcloud beta compute backend-services add-backend

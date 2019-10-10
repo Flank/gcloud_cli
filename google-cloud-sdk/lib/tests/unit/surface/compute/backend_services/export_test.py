@@ -29,13 +29,13 @@ from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute.backend_services import backend_services_test_base
 
 
-class BackendServiceExportTestAlpha(
+class BackendServiceExportTestBeta(
     backend_services_test_base.BackendServicesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.ALPHA
-    self._api = 'alpha'
-    self._backend_services = test_resources.BACKEND_SERVICES_ALPHA
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
+    self._backend_services = test_resources.BACKEND_SERVICES_BETA
 
   def RunExport(self, command):
     self.Run('compute backend-services export ' + command)
@@ -53,11 +53,11 @@ class BackendServiceExportTestAlpha(
         textwrap.dedent("""\
             description: my backend service
             healthChecks:
-            - https://www.googleapis.com/compute/%(api)s/projects/my-project/global/httpHealthChecks/my-health-check
+            - https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/httpHealthChecks/my-health-check
             name: backend-service-1
             portName: http
             protocol: HTTP
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/backend-service-1
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/backend-service-1
             timeoutSec: 30
             """ % {'api': self._api}))
 
@@ -78,6 +78,14 @@ class BackendServiceExportTestAlpha(
         message_type=self.messages.BackendService, stream=data)
     self.AssertMessagesEqual(self._backend_services[1],
                              exported_backend_service)
+
+
+class BackendServiceExportTestAlpha(BackendServiceExportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+    self._api = 'alpha'
+    self._backend_services = test_resources.BACKEND_SERVICES_ALPHA
 
 
 if __name__ == '__main__':

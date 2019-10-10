@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class ManagedInstanceGroupsDescribeTest(
   def SetUp(self):
     self.mock_client = SetUpMockClient(API_VERSION)
     self.addCleanup(self.mock_client.Unmock)
-    self.compute_uri = 'https://www.googleapis.com/compute/{0}'.format(
+    self.compute_uri = 'https://compute.googleapis.com/compute/{0}'.format(
         self.track.prefix or 'v1')
 
   def _MockAutoscalerRequest(self, return_value):

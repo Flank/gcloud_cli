@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,9 @@ def _Run(args, enable_labels=False, legacy_output=False):
 
   topic_ref = args.CONCEPTS.topic.Parse()
   push_config = util.ParsePushConfig(args)
+  enable_message_ordering = getattr(args, 'enable_message_ordering', None)
+  dead_letter_topic = getattr(args, 'dead_letter_topic', None)
+  max_delivery_attempts = getattr(args, 'max_delivery_attempts', None)
   retain_acked_messages = getattr(args, 'retain_acked_messages', None)
   retention_duration = getattr(args, 'message_retention_duration', None)
   if retention_duration:
@@ -59,11 +62,19 @@ def _Run(args, enable_labels=False, legacy_output=False):
   for subscription_ref in args.CONCEPTS.subscription.Parse():
 
     try:
-      result = client.Create(subscription_ref, topic_ref, args.ack_deadline,
-                             push_config, retain_acked_messages,
-                             retention_duration, labels=labels,
-                             no_expiration=no_expiration,
-                             expiration_period=expiration_period)
+      result = client.Create(
+          subscription_ref,
+          topic_ref,
+          args.ack_deadline,
+          push_config,
+          retain_acked_messages,
+          retention_duration,
+          labels=labels,
+          no_expiration=no_expiration,
+          expiration_period=expiration_period,
+          enable_message_ordering=enable_message_ordering,
+          dead_letter_topic=dead_letter_topic,
+          max_delivery_attempts=max_delivery_attempts)
     except api_ex.HttpError as error:
       exc = exceptions.HttpException(error)
       log.CreatedResource(subscription_ref.RelativeName(),
@@ -103,13 +114,14 @@ class Create(base.CreateCommand):
         'to create.',
         plural=True)
     resource_args.AddResourceArgs(parser, [topic, subscription])
-    flags.AddSubscriptionSettingsFlags(parser, cls.ReleaseTrack())
+    flags.AddSubscriptionSettingsFlags(parser)
+    labels_util.AddCreateLabelsFlags(parser)
 
   def Run(self, args):
-    return _Run(args)
+    return _Run(args, enable_labels=True)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
   """Creates one or more Cloud Pub/Sub subscriptions."""
 
@@ -123,9 +135,31 @@ class CreateBeta(Create):
         'to create.',
         plural=True)
     resource_args.AddResourceArgs(parser, [topic, subscription])
-    flags.AddSubscriptionSettingsFlags(parser, cls.ReleaseTrack())
+    flags.AddSubscriptionSettingsFlags(parser)
     labels_util.AddCreateLabelsFlags(parser)
 
   def Run(self, args):
     legacy_output = properties.VALUES.pubsub.legacy_output.GetBool()
     return _Run(args, enable_labels=True, legacy_output=legacy_output)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(CreateBeta):
+  """Creates one or more Cloud Pub/Sub subscriptions."""
+
+  @classmethod
+  def Args(cls, parser):
+    topic_help_text = ('from which this subscription is receiving messages. '
+                       'Each subscription is attached to a single topic.')
+    topic = resource_args.CreateTopicResourceArg(
+        topic_help_text, positional=False)
+    subscription = resource_args.CreateSubscriptionResourceArg(
+        'to create.', plural=True)
+    resource_args.AddResourceArgs(parser, [topic, subscription])
+    flags.AddSubscriptionSettingsFlags(
+        parser, support_message_ordering=True, support_dead_letter_queues=True)
+    labels_util.AddCreateLabelsFlags(parser)
+
+  def Run(self, args):
+    flags.ValidateDeadLetterPolicy(args)
+    return super(CreateAlpha, self).Run(args)

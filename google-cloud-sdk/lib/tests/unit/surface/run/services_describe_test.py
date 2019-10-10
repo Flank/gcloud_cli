@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,23 +19,24 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import service
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.run import flags
-from tests.lib import cli_test_base
-from tests.lib import sdk_test_base
 from tests.lib.surface.run import base
 
 
-class DescribeTest(base.ServerlessSurfaceBase,
-                   cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
+class DescribeTestBeta(base.ServerlessSurfaceBase):
   """Tests outputs of describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.mock_service = service.Service.New(
         self.mock_serverless_client, 'us-central1.fake-project')
     self.mock_service.name = 'simon'
     self.mock_service.metadata.creationTimestamp = '2018/01/02 00:00:00'
-    self.mock_service.configuration.env_vars['n1'] = 'v1'
-    self.mock_service.configuration.env_vars['n2'] = 'v2'
+    self.mock_service.configuration.env_vars.literals['n1'] = 'v1'
+    self.mock_service.configuration.env_vars.literals['n2'] = 'v2'
 
   def testDescribe_Succeed_Default(self):
     """Tests successful describe with default output format."""
@@ -51,3 +52,10 @@ class DescribeTest(base.ServerlessSurfaceBase,
     with self.assertRaises(flags.ArgumentError) as context:
       self.Run('run services describe salad')
     self.assertIn('Cannot find service [salad]', str(context.exception))
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+  """Tests outputs of describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

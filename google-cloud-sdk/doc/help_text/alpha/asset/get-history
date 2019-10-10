@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha asset get-history --asset-names=[ASSET_NAMES,...]
         --content-type=CONTENT_TYPE --start-time=START_TIME
-        [--end-time=END_TIME] [--organization=ORGANIZATION_ID]
-        [GCLOUD_WIDE_FLAG ...]
+        (--organization=ORGANIZATION_ID | --project=PROJECT_ID)
+        [--end-time=END_TIME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Get the update history of assets that overlaps a time window.
@@ -18,24 +18,42 @@ REQUIRED FLAGS
         for name format.
 
      --content-type=CONTENT_TYPE
-        Asset content type. Choices are resource, iam-policy. Specifying
-        resource will export resource metadata, and specifying iam-policy will
-        export IAM policy set on assets. CONTENT_TYPE must be one of: resource,
-        iam-policy.
+        Asset content type. Choices are resource, iam-policy and org-policy.
+        Specifying resource will export resource metadata, specifying
+        iam-policy will export IAM policy set on assets, specifying org-policy
+        will export Org Policy set on asset, and specifying access-policy will
+        export Access Policy set on asset. CONTENT_TYPE must be one of:
+        resource, iam-policy, org-policy, access-policy.
 
      --start-time=START_TIME
         Start time of the time window (inclusive) for the asset history. Must
         be later than 2018-10-02T00:00:00Z. See $ gcloud topic datetimes for
         information on time formats.
 
+     Exactly one of these must be specified:
+
+       --organization=ORGANIZATION_ID
+          The ID of the organization which is the root asset.
+
+       --project=PROJECT_ID
+          The project which is the root asset.
+
+          The Google Cloud Platform project name to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
+
 OPTIONAL FLAGS
      --end-time=END_TIME
         End time of the time window (exclusive) for the asset history. Defaults
         to current time if not specified. See $ gcloud topic datetimes for
         information on time formats.
-
-     --organization=ORGANIZATION_ID
-        The ID of the organization which is the root asset.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -69,9 +87,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud asset get-history
         $ gcloud beta asset get-history

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.ml_engine import jobs
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
 
-class JobsClientTest(base.MlGaPlatformTestBase):
+class JobsClientTest(base.MlGaPlatformTestBase, parameterized.TestCase):
 
   def _MakeCreateRequest(self, parent, job):
     return self.msgs.MlProjectsJobsCreateRequest(
@@ -150,6 +151,63 @@ class JobsClientTest(base.MlGaPlatformTestBase):
                 pythonModule='my_module',
                 packageUris=['gs://bucket/program.tar.gz'],
                 region='us-east1')))
+
+  def testBuildTrainingJob_NoPackagesGiven(self):
+    test_yaml = """
+        jobId: rea1
+        trainingInput:
+          args:
+            - --foo
+            - --bar
+          scaleTier: CUSTOM
+          runtimeVersion: '0.12'
+    """
+    with self.assertRaises(jobs.NoPackagesSpecifiedError):
+      self.jobs_client.BuildTrainingJob(
+          path=self.Touch(self.temp_path, 'betaconfigfile.yaml', test_yaml),
+          job_name='asdf23',
+          module_name='my_module',
+          trainer_uri=[],
+          region='us-east1')
+
+  def testBuildTrainingJob_NoPackagesGivenCustom(self):
+    test_yaml = """
+        jobId: rea1
+        trainingInput:
+          masterConfig:
+            imageUri: image
+          scaleTier: CUSTOM
+          runtimeVersion: '0.12'
+    """
+    self.jobs_client.BuildTrainingJob(
+        path=self.Touch(self.temp_path, 'betaconfigfile.yaml', test_yaml),
+        job_name='asdf',
+        module_name='my_module',
+        trainer_uri=[],
+        region='us-east1')
+
+  @parameterized.parameters(
+      ([], False),
+      (['package'], True))
+  def testHasPackageURIs(self, packages, expected):
+    job = self.short_msgs.Job(
+        jobId='the_real_job',
+        trainingInput=self.short_msgs.TrainingInput(
+            packageUris=packages,
+            region='us-east1'))
+    self.assertEqual(self.jobs_client.HasPackageURIs(job), expected)
+
+  @parameterized.parameters(
+      (None, False),
+      ('image_uri', True))
+  def testIsCustomContainerTraining(self, image_uri, expected):
+    job = self.short_msgs.Job(
+        jobId='the_real_job',
+        trainingInput=self.short_msgs.TrainingInput(
+            masterConfig=self.short_msgs.ReplicaConfig(
+                imageUri=image_uri),
+            region='us-east1'))
+    self.assertEqual(self.jobs_client.IsCustomContainerTraining(job), expected)
 
   def testBuildBatchPredictionJob(self):
     result = self.jobs_client.BuildBatchPredictionJob(

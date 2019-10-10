@@ -47,8 +47,8 @@ OPTIONAL FLAGS
             Default (Google-managed) BGP advertisements.
 
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --peer-ip-address=PEER_IP_ADDRESS
         The link-local address of the peer router. Must be a link-local IPv4

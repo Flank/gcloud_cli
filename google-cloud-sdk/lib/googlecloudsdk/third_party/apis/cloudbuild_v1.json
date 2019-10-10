@@ -164,7 +164,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -389,11 +389,11 @@
           "type": "string"
         },
         "branchName": {
-          "description": "Name of the branch to build.",
+          "description": "Regex matching branches to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
           "type": "string"
         },
         "tagName": {
-          "description": "Name of the tag to build.",
+          "description": "Regex matching tags to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
           "type": "string"
         },
         "commitSha": {
@@ -880,6 +880,10 @@
           "description": "Human-readable description of this trigger.",
           "type": "string"
         },
+        "name": {
+          "description": "User assigned name of the trigger. Must be unique within the project.",
+          "type": "string"
+        },
         "tags": {
           "description": "Tags for annotation of a `BuildTrigger`",
           "type": "array",
@@ -941,21 +945,17 @@
       "type": "object",
       "properties": {
         "installationId": {
-          "description": "The installationID that emmits the GitHub event.",
+          "description": "The installationID that emits the GitHub event.",
           "type": "string",
           "format": "int64"
         },
         "owner": {
-          "description": "Owner of the repository.",
+          "description": "Owner of the repository. For example: The owner for\nhttps:\/\/github.com\/googlecloudplatform\/cloud-builders is\n\"googlecloudplatform\".",
           "type": "string"
         },
         "name": {
-          "description": "Name of the repository.",
+          "description": "Name of the repository. For example: The name for\nhttps:\/\/github.com\/googlecloudplatform\/cloud-builders is \"cloud-builders\".",
           "type": "string"
-        },
-        "checkSuite": {
-          "description": "Output only. Indicates that a build was generated from a check suite\nevent.",
-          "$ref": "CheckSuiteFilter"
         },
         "pullRequest": {
           "description": "filter to match changes in pull requests.",
@@ -965,13 +965,6 @@
           "description": "filter to match changes in refs like branches, tags.",
           "$ref": "PushFilter"
         }
-      }
-    },
-    "CheckSuiteFilter": {
-      "id": "CheckSuiteFilter",
-      "description": "A CheckSuiteFilter is a filter that indicates that we should build on all\ncheck suite events.",
-      "type": "object",
-      "properties": {
       }
     },
     "PullRequestFilter": {
@@ -1003,11 +996,11 @@
       "type": "object",
       "properties": {
         "branch": {
-          "description": "Regexes of branches to match.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
+          "description": "Regexes matching branches to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
           "type": "string"
         },
         "tag": {
-          "description": "Regexes of tags to match.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
+          "description": "Regexes matching tags to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https:\/\/github.com\/google\/re2\/wiki\/Syntax",
           "type": "string"
         }
       }
@@ -1170,7 +1163,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project.",
+                  "description": "Required. ID of the project.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1197,13 +1190,13 @@
               "httpMethod": "GET",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project.",
+                  "description": "Required. ID of the project.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "id": {
-                  "description": "ID of the build.",
+                  "description": "Required. ID of the build.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1228,7 +1221,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project.",
+                  "description": "Required. ID of the project.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1268,13 +1261,13 @@
               "httpMethod": "POST",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project.",
+                  "description": "Required. ID of the project.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "id": {
-                  "description": "ID of the build.",
+                  "description": "Required. ID of the build.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1302,13 +1295,13 @@
               "httpMethod": "POST",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project.",
+                  "description": "Required. ID of the project.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "id": {
-                  "description": "Build ID of the original build.",
+                  "description": "Required. Build ID of the original build.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1340,7 +1333,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project for which to configure automatic builds.",
+                  "description": "Required. ID of the project for which to configure automatic builds.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1367,13 +1360,13 @@
               "httpMethod": "GET",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project that owns the trigger.",
+                  "description": "Required. ID of the project that owns the trigger.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "triggerId": {
-                  "description": "ID of the `BuildTrigger` to get.",
+                  "description": "Required. ID of the `BuildTrigger` to get.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1398,7 +1391,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project for which to list BuildTriggers.",
+                  "description": "Required. ID of the project for which to list BuildTriggers.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1433,13 +1426,13 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project that owns the trigger.",
+                  "description": "Required. ID of the project that owns the trigger.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "triggerId": {
-                  "description": "ID of the `BuildTrigger` to delete.",
+                  "description": "Required. ID of the `BuildTrigger` to delete.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1464,13 +1457,13 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project that owns the trigger.",
+                  "description": "Required. ID of the project that owns the trigger.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "triggerId": {
-                  "description": "ID of the `BuildTrigger` to update.",
+                  "description": "Required. ID of the `BuildTrigger` to update.",
                   "location": "path",
                   "required": true,
                   "type": "string"
@@ -1498,13 +1491,13 @@
               "httpMethod": "POST",
               "parameters": {
                 "projectId": {
-                  "description": "ID of the project.",
+                  "description": "Required. ID of the project.",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "triggerId": {
-                  "description": "ID of the trigger.",
+                  "description": "Required. ID of the trigger.",
                   "location": "path",
                   "required": true,
                   "type": "string"

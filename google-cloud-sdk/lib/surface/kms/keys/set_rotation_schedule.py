@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ class SetRotationSchedule(base.UpdateCommand):
   starting at the specified time:
 
     $ {command} frodo \
-        --location global \
-        --keyring fellowship \
-        --rotation-period 30d \
-        --next-rotation-time 2017-10-12T12:34:56.1234Z
+        --location=global \
+        --keyring=fellowship \
+        --rotation-period=30d \
+        --next-rotation-time=2017-10-12T12:34:56.1234Z
   """
 
   @staticmethod

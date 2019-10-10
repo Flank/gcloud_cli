@@ -68,9 +68,9 @@ event\-time is not provided, it will default to UTC version of NOW. For example
 
 .TP 2m
 \fB\-\-external\-uri\fR=\fIEXTERNAL_URI\fR
-URI that, if available, points to a web page outside of Cloud SCC where
-additional information about the finding can be found. This field is guaranteed
-to be either empty or a well formed URL.
+URI that, if available, points to a web page outside of Cloud SCC (Security
+Command Center) where additional information about the finding can be found.
+This field is guaranteed to be either empty or a well formed URL.
 
 .TP 2m
 \fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR
@@ -138,7 +138,6 @@ $ gcloud alpha scc findings create my\-finding \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

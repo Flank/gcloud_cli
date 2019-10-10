@@ -93,7 +93,7 @@ EXAMPLES
 
         $ gcloud beta container binauthz attestors public-keys add \
               --attestor my_attestor \
-              --public-key-file=public_key1.pgp
+              --pgp-public-key-file=public_key1.pgp
 
     To add a subkey to your PGP key:
 
@@ -126,17 +126,18 @@ EXAMPLES
         $ gcloud beta container binauthz attestors public-keys update \
               ${FINGERPRINT} \
               --attestor=my_attestor \
-              --public-key-file=public_key1_updated.pgp
+              --pgp-public-key-file=public_key1_updated.pgp
 
-    To remove this new key to the attestor:
+    To remove this new key from the attestor:
 
         $ gcloud beta container binauthz attestors public-keys remove \
               ${FINGERPRINT} \
               --attestor my_attestor
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud container binauthz attestors public-keys
         $ gcloud alpha container binauthz attestors public-keys
 

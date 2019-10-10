@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,34 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.health_checks import flags
 
 
-def _Run(args, holder, include_l7_internal_load_balancing=False):
+def _DetailedHelp():
+  return {
+      'brief':
+          'Create a TCP health check to monitor load balanced instances.',
+      'DESCRIPTION':
+          """\
+          *{command}* is used to create a TCP health check. TCP health checks
+          monitor instances in a load balancer controlled by a target pool. All
+          arguments to the command are optional except for the name of the
+          health check. For more information on load balancing, see
+          [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
+          """,
+  }
+
+
+def _Args(parser, include_l7_internal_load_balancing):
+  """Set up arguments to create an HTTP2 HealthCheck."""
+  parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
+  flags.HealthCheckArgument(
+      'TCP',
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).AddArgument(
+      parser, operation_type='create')
+  health_checks_utils.AddTcpRelatedCreationArgs(parser)
+  health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'TCP')
+
+
+def _Run(args, holder, include_l7_internal_load_balancing):
   """Issues the request necessary for adding the health check."""
   client = holder.client
   messages = client.messages
@@ -75,55 +102,28 @@ def _Run(args, holder, include_l7_internal_load_balancing=False):
   return client.MakeRequests([(collection, 'Insert', request)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
-  """Create a TCP health check to monitor load balanced instances.
+  """Create a TCP health."""
 
-    *{command}* is used to create a TCP health check. TCP health checks
-  monitor instances in a load balancer controlled by a target pool. All
-  arguments to the command are optional except for the name of the health
-  check. For more information on load balancing, see
-  [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
-  """
+  _include_l7_internal_load_balancing = False
+  detailed_help = _DetailedHelp()
 
   @classmethod
-  def Args(cls,
-           parser,
-           regionalized=False):
-    parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
-    flags.HealthCheckArgument(
-        'TCP', include_l7_internal_load_balancing=regionalized).AddArgument(
-            parser, operation_type='create')
-    health_checks_utils.AddTcpRelatedCreationArgs(parser)
-    health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'TCP')
+  def Args(cls, parser):
+    _Args(parser, cls._include_l7_internal_load_balancing)
 
   def Run(self, args):
-    """Issues the request necessary for adding the health check."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder)
+    return _Run(args, holder, self._include_l7_internal_load_balancing)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+
+  _include_l7_internal_load_balancing = True
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
-  """Create a TCP health check to monitor load balanced instances."""
-
-  @staticmethod
-  def Args(parser):
-    Create.Args(parser, regionalized=True)
-
-  def Run(self, args):
-    """Issues the request necessary for adding the health check."""
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder, include_l7_internal_load_balancing=True)
-
-
-Create.detailed_help = {
-    'brief': 'Create a TCP health check to monitor load balanced instances.',
-    'DESCRIPTION': """\
-        *{command}* is used to create a TCP health check. TCP health checks
-        monitor instances in a load balancer controlled by a target pool. All
-        arguments to the command are optional except for the name of the health
-        check. For more information on load balancing, see
-        [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
-        """,
-}
+class CreateAlpha(CreateBeta):
+  pass

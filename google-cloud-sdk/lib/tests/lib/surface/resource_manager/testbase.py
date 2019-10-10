@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.resource_manager import org_policies
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core.util import http_encoding
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -130,7 +131,7 @@ class FoldersUnitTestBase(CrmUnitTestBase):
                 members=['user:admin@foo.com'],),
         ],
         etag=http_encoding.Encode('someUniqueEtag'),
-        version=1,)
+        version=iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION,)
 
     if clear_fields is None:
       clear_fields = []

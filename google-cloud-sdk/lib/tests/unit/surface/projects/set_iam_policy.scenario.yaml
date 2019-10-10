@@ -42,7 +42,7 @@ actions:
                     title: 'title'
                     description: 'descr'
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '400'

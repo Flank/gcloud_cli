@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,6 +102,7 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
+import six
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
@@ -268,7 +269,7 @@ def _Read(uri):
   except (six.moves.urllib.error.HTTPError, six.moves.urllib.error.URLError,
           calliope_exceptions.BadFileException) as e:
     log.debug('', exc_info=True)
-    raise FileReadError(str(e))
+    raise FileReadError(six.text_type(e))
 
 
 class BuilderReference(object):

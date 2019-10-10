@@ -64,11 +64,11 @@ credentials.
 
 .TP 2m
 \fBprint\-access\-token\fR
-\fB(ALPHA)\fR Print an access token for the active account.
+\fB(ALPHA)\fR Print an access token for the specified account.
 
 .TP 2m
 \fBprint\-identity\-token\fR
-\fB(ALPHA)\fR Print an identity token for the active account.
+\fB(ALPHA)\fR Print an identity token for the specified account.
 
 .TP 2m
 \fBrevoke\fR
@@ -104,9 +104,8 @@ $ gcloud auth revoke test@gmail.com
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud auth

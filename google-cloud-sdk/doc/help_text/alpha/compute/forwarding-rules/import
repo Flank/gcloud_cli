@@ -6,10 +6,7 @@ SYNOPSIS
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) If the specified forwarding rule already exists, it will be
-    overwritten. Otherwise, a new forwarding rule will be created. To edit a
-    forwarding rule you can export the forwarding rule to a file, edit its
-    configuration, and then import the new configuration.
+    (ALPHA) Imports a forwarding rule's configuration from a file.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -55,10 +52,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    A forwarding rule can be imported by running:
+
+        $ gcloud alpha compute forwarding-rules import NAME \
+            --source=<path-to-file>
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute forwarding-rules import
 

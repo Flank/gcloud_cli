@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.cloudbuild import trigger_config as trigger_utils
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions as c_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -28,6 +29,19 @@ from googlecloudsdk.core import resources
 
 class CreateGitHub(base.CreateCommand):
   """Create a build trigger for a GitHub repository."""
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+            To create a push trigger for all branches:
+
+              $ {command} --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --branch-pattern=".*" --build-config="cloudbuild.yaml"
+
+            To create a pull request trigger for master:
+
+              $ {command} --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --pull-request-pattern="^master$" --build-config="cloudbuild.yaml"
+          """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -49,25 +63,28 @@ class CreateGitHub(base.CreateCommand):
     # Allow trigger config to be specified on the command line or file
     trigger_config = parser.add_mutually_exclusive_group(required=True)
     trigger_config.add_argument(
-        '--trigger_config',
-        help='Path to Build Trigger config file. See https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers#BuildTrigger',
+        '--trigger-config',
+        help=('Path to a YAML/JSON file for Build Trigger config. '
+              'See https://cloud.google.com/cloud-build/docs/api/reference'
+              '/rest/v1/projects.triggers#BuildTrigger'),
         metavar='PATH',
     )
 
     # Trigger configuration
     flag_config = trigger_config.add_argument_group(
         help='Flag based trigger configuration')
+    flag_config.add_argument('--description', help='Build trigger description.')
     flag_config.add_argument(
-        '--repo_owner', help='Owner of the GitHub Repository.', required=True)
+        '--repo-owner', help='Owner of the GitHub Repository.', required=True)
 
     flag_config.add_argument(
-        '--repo_name', help='Name of the GitHub Repository.', required=True)
+        '--repo-name', help='Name of the GitHub Repository.', required=True)
     ref_config = flag_config.add_mutually_exclusive_group(required=True)
     trigger_utils.AddBranchPattern(ref_config)
     trigger_utils.AddTagPattern(ref_config)
     pr_config = ref_config.add_argument_group(help='Pull Request settings')
     pr_config.add_argument(
-        '--pull_request_pattern',
+        '--pull-request-pattern',
         metavar='REGEX',
         help="""\
 A regular expression specifying which base git branch to match for
@@ -81,7 +98,7 @@ The syntax of the regular expressions accepted is the syntax accepted by
 RE2 and described at https://github.com/google/re2/wiki/Syntax.
 """)
     pr_config.add_argument(
-        '--comment_control',
+        '--comment-control',
         help='Require a repository collaborator owner to comment \'/gcbrun\' on a pull request before running the build.',
         action='store_true')
 
@@ -91,8 +108,14 @@ RE2 and described at https://github.com/google/re2/wiki/Syntax.
     project = properties.VALUES.core.project.Get(required=True)
     messages = cloudbuild_util.GetMessagesModule()
     trigger = messages.BuildTrigger()
+    trigger.description = args.description
     # GitHub config
     gh = messages.GitHubEventsConfig(owner=args.repo_owner, name=args.repo_name)
+
+    if args.comment_control and not args.pull_request_pattern:
+      raise c_exceptions.RequiredArgumentException(
+          '--comment-control',
+          '--comment-control must be specified with --pull-request-pattern')
     if args.pull_request_pattern:
       gh.pullRequest = messages.PullRequestFilter(
           branch=args.pull_request_pattern)
@@ -144,9 +167,11 @@ RE2 and described at https://github.com/google/re2/wiki/Syntax.
 
     trigger = messages.BuildTrigger()
     if args.trigger_config:
-      trigger = cloudbuild_util.LoadMessageFromPath(args.trigger_config,
-                                                    messages.BuildTrigger,
-                                                    'build trigger config')
+      trigger = cloudbuild_util.LoadMessageFromPath(
+          path=args.trigger_config,
+          msg_type=messages.BuildTrigger,
+          msg_friendly_name='build trigger config',
+          skip_camel_case=['substitutions'])
     else:
       trigger = self.ParseTriggerFromFlags(args)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,8 +64,8 @@ class Update(base.UpdateCommand):
     messages = holder.client.messages
     per_instance_config = configs_getter.get_instance_config(
         igm_ref=igm_ref, instance_ref=instance_ref)
-
     remove_stateful_disks_set = set(remove_stateful_disks or [])
+    removed_stateful_disks_set = set()
     update_stateful_disks_dict = Update._UpdateStatefulDisksToDict(
         update_stateful_disks)
     new_stateful_disks = []
@@ -77,6 +77,7 @@ class Update(base.UpdateCommand):
       disk_name = current_stateful_disk.key
       # Disk to be removed
       if disk_name in remove_stateful_disks_set:
+        removed_stateful_disks_set.add(disk_name)
         continue
       # Disk to be updated
       if disk_name in update_stateful_disks_dict:
@@ -94,12 +95,19 @@ class Update(base.UpdateCommand):
           preserved_disk.source = source
         if mode:
           preserved_disk.mode = instance_configs_messages.GetMode(
-              messages=messages, mode=mode, preserved_state_mode=True)
+              messages=messages, mode=mode)
         if auto_delete:
           preserved_disk.autoDelete = auto_delete.GetAutoDeleteEnumValue(
               messages.PreservedStatePreservedDisk.AutoDeleteValueValuesEnum)
         del update_stateful_disks_dict[disk_name]
       new_stateful_disks.append(current_stateful_disk)
+    unremoved_stateful_disks = (
+        remove_stateful_disks_set.difference(removed_stateful_disks_set))
+    if unremoved_stateful_disks:
+      raise exceptions.InvalidArgumentException(
+          parameter_name='--remove-stateful-disk',
+          message=('The following are invalid stateful disks: `{0}`'
+                   .format(','.join(unremoved_stateful_disks))))
     for update_stateful_disk in update_stateful_disks_dict.values():
       new_stateful_disks.append(
           instance_configs_messages.MakePreservedStateDiskEntry(
@@ -137,13 +145,6 @@ class Update(base.UpdateCommand):
             for key, value in sorted(six.iteritems(new_stateful_metadata))]
     )
     per_instance_config.preservedState = preserved_state
-
-    # Create overrides (only if required)
-    if per_instance_config.override:
-      per_instance_config.override = \
-          instance_configs_messages.MakeOverridesFromPreservedState(
-              messages, preserved_state)
-      per_instance_config.override.reset('origin')
     return per_instance_config
 
   @staticmethod
@@ -225,7 +226,9 @@ class Update(base.UpdateCommand):
     if args.force_instance_update:
       apply_operation_ref = (
           instance_configs_messages.CallApplyUpdatesToInstances)(
-              holder=holder, igm_ref=igm_ref, instances=[str(instance_ref)])
+              holder=holder,
+              igm_ref=igm_ref,
+              instances=[six.text_type(instance_ref)])
       return waiter.WaitFor(operation_poller, apply_operation_ref,
                             'Applying updates to instances.')
 

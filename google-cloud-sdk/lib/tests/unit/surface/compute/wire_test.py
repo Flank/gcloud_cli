@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class WireTest(e2e_base.WithMockHttp, test_case.WithOutputCapture):
 
   def testUnknownEnumHandling(self):
     self.AddHTTPResponse(
-        'https://www.googleapis.com/batch/compute/v1',
+        'https://compute.googleapis.com/batch/compute/v1',
         headers={'Content-type': 'multipart/mixed; boundary=BATCH_BOUNDARY'},
         expected_body=e2e_base.IGNORE,
         body=textwrap.dedent("""\
@@ -88,7 +88,7 @@ class WireTest(e2e_base.WithMockHttp, test_case.WithOutputCapture):
 
   def testUnknownStringFieldHandling(self):
     self.AddHTTPResponse(
-        'https://www.googleapis.com/batch/compute/v1',
+        'https://compute.googleapis.com/batch/compute/v1',
         headers={'Content-type': 'multipart/mixed; boundary=BATCH_BOUNDARY'},
         expected_body=e2e_base.IGNORE,
         body=textwrap.dedent("""\
@@ -126,7 +126,7 @@ class WireTest(e2e_base.WithMockHttp, test_case.WithOutputCapture):
 
   def testUnknownNestedStructureFieldHandling(self):
     self.AddHTTPResponse(
-        'https://www.googleapis.com/batch/compute/v1',
+        'https://compute.googleapis.com/batch/compute/v1',
         headers={'Content-type': 'multipart/mixed; boundary=BATCH_BOUNDARY'},
         expected_body=e2e_base.IGNORE,
         body=textwrap.dedent("""\
@@ -177,7 +177,7 @@ class WireTest(e2e_base.WithMockHttp, test_case.WithOutputCapture):
     # twice to let the polling logic work.
     for _ in range(2):
       self.AddHTTPResponse(
-          'https://www.googleapis.com/batch/compute/v1',
+          'https://compute.googleapis.com/batch/compute/v1',
           headers={'Content-type': 'multipart/mixed; boundary=BATCH_BOUNDARY'},
           expected_body=e2e_base.IGNORE,
           body=textwrap.dedent("""\

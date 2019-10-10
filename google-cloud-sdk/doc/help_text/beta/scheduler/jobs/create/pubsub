@@ -115,12 +115,21 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the cloudscheduler/v1beta1 API. The full documentation
-    for this API can be found at: https://cloud.google.com/scheduler/
+    This command uses the cloudscheduler/v1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/scheduler/
+
+EXAMPLES
+    The following command creates a job that publishes a messgae with the body
+    'Hello' to the Pub/Sub topic 'cron-topic' every 3 hours:
+
+        $ gcloud beta scheduler jobs create pubsub my-job \
+            --schedule="0 */3 * * *"
+          --topic=cron-topic --message-body="Hello"
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud scheduler jobs create pubsub
         $ gcloud alpha scheduler jobs create pubsub
 

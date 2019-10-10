@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class Delete(base.DeleteCommand):
     concept_parsers.ConceptParser([flags.GetInstancePresentationSpec(
         'The instance to delete.')]).AddToParser(parser)
     instances_flags.AddLocationArg(parser)
-    instances_flags.AddAsyncFlag(parser, 'delete')
+    instances_flags.AddAsyncFlag(parser)
 
   def Run(self, args):
     """Delete a Cloud Filestore instance."""
@@ -51,8 +51,8 @@ class Delete(base.DeleteCommand):
       return None
     client = filestore_client.FilestoreClient(version=self._API_VERSION)
     result = client.DeleteInstance(
-        instance_ref, args.async)
-    if args.async:
+        instance_ref, args.async_)
+    if args.async_:
       command = properties.VALUES.metrics.command_name.Get().split('.')
       if command:
         command[-1] = 'list'

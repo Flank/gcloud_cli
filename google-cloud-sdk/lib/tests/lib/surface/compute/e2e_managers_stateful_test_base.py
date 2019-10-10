@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,6 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
   def CreateInstanceGroupManagerStateful(self,
                                          instance_template_name,
                                          size=0,
-                                         stateful_names=False,
                                          stateful_disks=None):
     name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     instance_redistribution_flag = ''
@@ -76,9 +75,6 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
             size=size,
             instance_redistribution_flag=instance_redistribution_flag,
             template=instance_template_name)
-    if stateful_names:
-      command += """\
-        --stateful-names"""
     if stateful_disks:
       for device_name in stateful_disks:
         command += """\
@@ -89,20 +85,12 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
 
   def UpdateInstanceGroupManagerStateful(self,
                                          name,
-                                         add_stateful_names=False,
-                                         remove_stateful_names=False,
                                          add_stateful_disks=None,
                                          remove_stateful_disks=None):
     command = """\
       compute instance-groups managed update {group_name} \
         {scope_flag}""".format(
             group_name=name, scope_flag=self.GetScopeFlag())
-    if add_stateful_names:
-      command += """\
-        --stateful-names"""
-    if remove_stateful_names:
-      command += """\
-        --no-stateful-names"""
     if add_stateful_disks:
       for device_name in add_stateful_disks:
         command += """\

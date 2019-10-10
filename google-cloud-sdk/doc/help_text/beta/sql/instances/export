@@ -28,12 +28,13 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --database=DATABASE,[DATABASE,...], -d DATABASE,[DATABASE,...]
-        Database (for example, guestbook) from which the export is made. If
-        unspecified, all databases are exported.
+        Database(s) from which the export is made. Information on requirements
+        can be found here:
+        https://cloud.google.com/sql/docs/mysql/admin-api/v1beta4/instances/export#exportContext.databases
 
      --table=TABLE,[TABLE,...], -t TABLE,[TABLE,...]
         Tables to export from the specified database. If you specify tables,

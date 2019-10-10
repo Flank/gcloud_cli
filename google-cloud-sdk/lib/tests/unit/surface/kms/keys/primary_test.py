@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,23 +19,20 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysPrimaryTest(base.KmsMockTest):
+class CryptokeysPrimaryTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/3')
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key')
+    self.version_name = self.project_name.Version('global/my_kr/my_key/3')
+    self.key_name = self.project_name.CryptoKey('global/my_kr/my_key')
 
-  def testSet(self, track):
-    self.track = track
+  def testSet(self):
     self.kms.projects_locations_keyRings_cryptoKeys.UpdatePrimaryVersion.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionRequest(
@@ -49,6 +46,18 @@ class CryptokeysPrimaryTest(base.KmsMockTest):
              '--location={0} --keyring={1} {2} --version={3}'.format(
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id, self.version_name.version_id))
+
+
+class CryptokeysPrimaryTestBeta(CryptokeysPrimaryTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptokeysPrimaryTestAlpha(CryptokeysPrimaryTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

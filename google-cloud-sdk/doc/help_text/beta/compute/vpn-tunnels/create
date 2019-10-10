@@ -19,9 +19,11 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute vpn-tunnels create is used to create a VPN
-    tunnel between a VPN Gateway in Google Cloud Platform and an external
-    gateway that is identified by --peer-address.
+    (BETA) gcloud beta compute vpn-tunnels create is used to create a Classic
+    VPN tunnel between a target VPN gateway in Google Cloud Platform and a peer
+    address; or create Highly Available VPN tunnel between HA VPN gateway and
+    another HA VPN gateway, or Highly Available VPN tunnel between HA VPN
+    gateway and an external VPN gateway.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -35,9 +37,9 @@ REQUIRED FLAGS
      Exactly one of these must be specified:
 
        --peer-address=PEER_ADDRESS
-          Valid IP-v4 address representing the remote tunnel endpoint, the peer
+          Valid IPV4 address representing the remote tunnel endpoint, the peer
           address must be specified when creating Classic VPN tunnels from
-          Classic Target VPN Gateway
+          Classic Target VPN gateway
 
        --peer-external-gateway=PEER_EXTERNAL_GATEWAY
           Peer side external VPN gateway representing the remote tunnel
@@ -83,8 +85,8 @@ OPTIONAL FLAGS
      --interface=INTERFACE
         Numeric interface ID of the VPN gateway with which this VPN tunnel is
         associated. This flag is required if the tunnel is being attached to a
-        High Availability VPN gateway. This option is only available for use
-        with High Availability VPN gateway and must be omitted if the tunnel is
+        Highly Available VPN gateway. This option is only available for use
+        with Highly Available VPN gateway and must be omitted if the tunnel is
         going to be connected to a Classic VPN gateway. INTERFACE must be one
         of: 0, 1.
 
@@ -100,12 +102,12 @@ OPTIONAL FLAGS
         Local traffic selector must be specified only for VPN tunnels that do
         not use dynamic routing with a Cloud Router. Omit this flag when
         creating a tunnel using dynamic routing, including a tunnel for a
-        highly available VPN gateway.
+        Highly Available VPN gateway.
 
      --peer-external-gateway-interface=PEER_EXTERNAL_GATEWAY_INTERFACE
         Interface ID of the external VPN gateway to which this VPN tunnel is
         connected to. This flag is required if the tunnel is being created from
-        a High Availability VPN gateway to an External Vpn Gateway.
+        a Highly Available VPN gateway to an External Vpn Gateway.
         PEER_EXTERNAL_GATEWAY_INTERFACE must be one of: 0, 1, 2, 3.
 
      --region=REGION
@@ -139,7 +141,7 @@ OPTIONAL FLAGS
 
         Remote traffic selector must be specified for VPN tunnels that do not
         use dynamic routing with a Cloud Router. Omit this flag when creating a
-        tunnel using dynamic routing, including a tunnel for a highly available
+        tunnel using dynamic routing, including a tunnel for a Highly Available
         VPN gateway.
 
      --router=ROUTER

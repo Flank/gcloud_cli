@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -139,8 +139,8 @@ fake-project-id us-central1 my-networkC my-subnetC 3.3.3.3/10
     self._ExpectListUsableSubnets(resp)
     self.Run(self.subnets_command_base + ' list-usable --uri')
     self.AssertOutputEquals("""\
-https://www.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetA
-https://www.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetB
+https://compute.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetA
+https://compute.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetB
 """, normalize_space=True)
 
 

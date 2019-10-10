@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,6 +57,10 @@ class UnpickleableError(Exception):
 def _PlusOne(num):
   """Adds 1 to num (dummy function for testing)."""
   return num + 1
+
+
+def _Divide(num):
+  return 1./num
 
 
 def _ReturnNone(_):
@@ -272,11 +276,19 @@ class DummyPoolTest(test_case.TestCase):
       self.assertEqual(results, list(range(1, 101)))
 
   def testMapEagerFetchExceptions(self):
+    results = []
+    errs = []
     with self.pool:
-      result_future = self.pool.MapEagerFetch(
-          _RaiseError, (_ASCII_TEST_STRING, _ASCII_TEST_STRING))
-      with self.assertRaisesRegex(MyException, _ASCII_TEST_STRING):
-        list(result_future)
+      results_future = self.pool.MapEagerFetch(
+          _Divide, (1, 0))
+      for result in results_future:
+        if isinstance(result, Exception):
+          errs.append(result)
+        else:
+          results.append(result)
+    self.assertEqual(results, [1])
+    self.assertEqual(len(errs), 1)
+    self.assertIsInstance(errs[0], ZeroDivisionError)
 
 
 class ThreadPoolTest(DummyPoolTest):

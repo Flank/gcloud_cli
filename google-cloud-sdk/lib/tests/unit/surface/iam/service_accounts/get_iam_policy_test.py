@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
@@ -40,7 +41,9 @@ class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
     self.client.projects_serviceAccounts.GetIamPolicy.Expect(
         request=self.msgs.IamProjectsServiceAccountsGetIamPolicyRequest(
             resource=('projects/-/serviceAccounts/'
-                      'test@test-project.iam.gserviceaccount.com')),
+                      'test@test-project.iam.gserviceaccount.com'),
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION),
         response=policy)
 
     result = self.Run('iam service-accounts get-iam-policy --format=disable '
@@ -62,7 +65,9 @@ class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
     self.client.projects_serviceAccounts.GetIamPolicy.Expect(
         request=self.msgs.IamProjectsServiceAccountsGetIamPolicyRequest(
             resource=('projects/-/serviceAccounts/'
-                      'test@test-project.iam.gserviceaccount.com')),
+                      'test@test-project.iam.gserviceaccount.com'),
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION),
         response=policy)
 
     self.Run("""
@@ -89,7 +94,9 @@ class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
     self.client.projects_serviceAccounts.GetIamPolicy.Expect(
         request=self.msgs.IamProjectsServiceAccountsGetIamPolicyRequest(
             resource=('projects/-/serviceAccounts/'
-                      'test@test-project.iam.gserviceaccount.com')),
+                      'test@test-project.iam.gserviceaccount.com'),
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION),
         response=policy)
 
     result = self.Run('iam service-accounts get-iam-policy '
@@ -110,7 +117,9 @@ class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
   def testGetIamPolicyValidUniqueId(self):
     self.client.projects_serviceAccounts.GetIamPolicy.Expect(
         request=self.msgs.IamProjectsServiceAccountsGetIamPolicyRequest(
-            resource='projects/-/serviceAccounts/' + self.sample_unique_id),
+            resource='projects/-/serviceAccounts/' + self.sample_unique_id,
+            options_requestedPolicyVersion=
+            iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION),
         response=self.msgs.Policy())
     try:
       self.Run('iam service-accounts get-iam-policy ' + self.sample_unique_id)

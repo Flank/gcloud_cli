@@ -23,9 +23,12 @@ FLAGS
         information is included by default.
 
      --include-quote
-        If True, the server will attempt to filter out profanities, replacing
-        all but the initial character in each filtered word with asterisks,
-        e.g. "f**".
+        If True, a contextual quote from the data that triggered a finding is
+        included in the response. Even if the content is not text, it may be
+        converted to a textual representation in the response. For example,
+        given the input value 'My phone number is (415) 555-0890' and a search
+        for the infoType PHONE_NUMBER, the contextual quote would be '(415)
+        555-0890.'
 
      --info-types=[INFOTYPE,...]
         Which infoTypes to scan input for. The values must correspond to
@@ -56,7 +59,6 @@ API REFERENCE
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

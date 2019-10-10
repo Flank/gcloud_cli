@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
 
   def CreateHealthCheck(self):
     name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
-    self.Run('compute health-checks create tcp {0}'.format(name))
+    self.Run('compute health-checks create tcp {0} --global'.format(name))
     self.health_check_names.append(name)
     self.AssertNewOutputContains(name)
     return name
@@ -126,7 +126,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
   def DeleteHealthCheck(self, name):
     # Update seek position
     self.GetNewErr()
-    self.Run('compute health-checks delete {0} --quiet'.format(name))
+    self.Run('compute health-checks delete {0} --global --quiet'.format(name))
     stderr = self.GetNewErr()
     self.AssertErrContains(stderr, 'Deleted')
     return stderr

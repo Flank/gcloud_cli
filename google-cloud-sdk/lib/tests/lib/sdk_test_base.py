@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ def _DefaultStatusUpdate(result, unused_status):
 
 
 def Retry(f=None, why=None, **kwargs):
-  """Decorator wraping retry.RetryOnException with testing-specific defaults."""
+  """Decorator wrapping retry.RetryOnException with testing-specific defaults."""
 
   # Wrap a function and retry it up to max_retrials times. It is recommended to
   # retry as little as possible. Don't retry the whole test if just one

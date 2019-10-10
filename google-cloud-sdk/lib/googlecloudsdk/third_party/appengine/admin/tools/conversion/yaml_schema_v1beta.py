@@ -1,4 +1,4 @@
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,7 +66,8 @@ SCHEMA = s.Message(
             'target_read_bytes_per_sec'),
         target_disk_read_ops_per_sec=s.Value(
             'target_read_ops_per_sec'),
-        target_request_count_per_sec=s.Value(),
+        target_request_count_per_sec=s.Value(
+            'target_request_count_per_second'),
         target_concurrent_requests=s.Value(),
         custom_metrics=s.RepeatedField(element=s.Message(
             metric_name=s.Value(converter=c.ToJsonString),

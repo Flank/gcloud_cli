@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class List(base.ListCommand):
   @staticmethod
   def Args(parser):
     """Register flags for this command."""
-    util.AddNonProjectArgs(parser, 'List buckets')
+    util.AddParentArgs(parser, 'List buckets')
     util.AddBucketLocationArg(
         parser, False,
         'Location from which to list buckets. By default, buckets in all '

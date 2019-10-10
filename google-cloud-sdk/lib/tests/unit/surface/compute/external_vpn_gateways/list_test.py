@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import external_vpn_gateways_test_base
 
 
-class ExternalVpnGatewayListBetaTest(
+class ExternalVpnGatewayListGaTest(
     external_vpn_gateways_test_base.ExternalVpnGatewaysTestBase):
 
   def SetUp(self):
@@ -33,7 +33,7 @@ class ExternalVpnGatewayListBetaTest(
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _MakeExternalVpnGateway(self, name, interface_list, description=None):
     gateway_ref = self.GetExternalVpnGatewayRef(name)
@@ -63,6 +63,12 @@ class ExternalVpnGatewayListBetaTest(
 
     results = self.Run('compute external-vpn-gateways list')
     self.assertEqual(results, external_vpn_gateways)
+
+
+class ExternalVpnGatewayListBetaTest(ExternalVpnGatewayListGaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ExternalVpnGatewayListAlphaTest(ExternalVpnGatewayListBetaTest):

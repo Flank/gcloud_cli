@@ -183,11 +183,13 @@ OAuth2
 The service account email to be used for generating an OAuth2 access token to be
 included in the request sent to the target when executing the job. The service
 account must be within the same project as the job. The caller must have
-iam.serviceAccounts.actAs permission for the service account. This flag must be
-specified if any of the other arguments in this group are specified.
+iam.serviceAccounts.actAs permission for the service account. The token must be
+OAuth if the target is a Google APIs service with URL \f5\fB.googleapis.com\fR.
+This flag must be specified if any of the other arguments in this group are
+specified.
 
 .TP 2m
-\fB\-\-oauth\-token\-scope\fR=\fIOAUTH_TOKEN_SCOPE\fR
+\fR\-\-oauth\-token\-scope\fB=\fIOAUTH_TOKEN_SCOPE\fR
 The scope to be used when generating an OAuth2 access token to be included in
 the request sent to the target when executing the job. If not specified,
 "https://www.googleapis.com/auth/cloud\-platform" will be used.
@@ -200,12 +202,14 @@ OpenId Connect
 
 .RS 2m
 .TP 2m
-\fB\-\-oidc\-service\-account\-email\fR=\fIOIDC_SERVICE_ACCOUNT_EMAIL\fR
+\fR\-\-oidc\-service\-account\-email\fB=\fIOIDC_SERVICE_ACCOUNT_EMAIL\fR
 The service account email to be used for generating an OpenId Connect token to
 be included in the request sent to the target when executing the job. The
 service account must be within the same project as the job. The caller must have
-iam.serviceAccounts.actAs permission for the service account. This flag must be
-specified if any of the other arguments in this group are specified.
+iam.serviceAccounts.actAs permission for the service account. The OIDC token is
+generally used \fRexcept\fB for Google APIs hosted on \f5\fR.googleapis.com\fR:
+these APIs expect an OAuth token. This flag must be specified if any of the
+other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-oidc\-token\-audience\fR=\fIOIDC_TOKEN_AUDIENCE\fR
@@ -231,17 +235,31 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBcloudscheduler/v1beta1\fR API. The full documentation
-for this API can be found at: https://cloud.google.com/scheduler/
+This command uses the \fBcloudscheduler/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/scheduler/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a job that sends a HTTP GET request to
+\'http://example.com/path' every 3 hours:
+
+.RS 2m
+$ gcloud beta scheduler jobs create http my\-job \e
+    \-\-schedule="0 */3 * * *"
+  \-\-uri="http://example.com/path" \-\-http\-method=GET
+.RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud scheduler jobs create http
 $ gcloud alpha scheduler jobs create http
 .RE
 

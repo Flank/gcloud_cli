@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class SqlIntegrationTestBaseWithNewInstance(SqlIntegrationTestBase):
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DeleteInstance(self):
-    self.Run('sql instances delete {0}'.format(self.test_instance))
+    self.Run('sql instances delete {0} --async'.format(self.test_instance))
 
   def WaitOnOperation(self, operation_id):
     self.Run('sql operations wait {0} --timeout=unlimited'.format(operation_id))

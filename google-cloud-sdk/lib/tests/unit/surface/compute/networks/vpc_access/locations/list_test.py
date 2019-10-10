@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class LocationsListTestBeta(base.VpcAccessUnitTestBase):
+class LocationsListTestGa(base.VpcAccessUnitTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def testZeroLocationsList(self):
     self.locations_client.List.Expect(
@@ -74,7 +74,14 @@ class LocationsListTestBeta(base.VpcAccessUnitTestBase):
         ]))
 
 
-class LocationsListTestAlpha(LocationsListTestBeta):
+class LocationsListTestBeta(LocationsListTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
+
+
+class LocationsListTestAlpha(LocationsListTestGa):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

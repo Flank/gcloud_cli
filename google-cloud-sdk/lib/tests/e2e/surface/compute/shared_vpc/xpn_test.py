@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,9 +52,8 @@ class ComputeXpnTest(e2e_test_base.BaseTest):
     self.service_project = self._SERVICE_PROJECTS[sys.version_info.major]
 
   def _HostProjectUrl(self):
-    project_ref = self.registry.Parse(
-        self.host_project, collection='compute.projects')
-    return project_ref.SelfLink()
+    project_ref = 'https://www.googleapis.com/compute/v1/projects/{}'.format(self.host_project)
+    return project_ref
 
   @contextlib.contextmanager
   def _EnableXpnProject(self, project_id):

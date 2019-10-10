@@ -23,10 +23,31 @@ class DlpInfoTypesListRequest(_messages.Message):
     languageCode: Optional BCP-47 language code for localized infoType
       friendly names. If omitted, or if localized strings are not available,
       en-US strings will be returned.
+    location: The geographic location to list info types. Reserved for future
+      extensions.
   """
 
   filter = _messages.StringField(1)
   languageCode = _messages.StringField(2)
+  location = _messages.StringField(3)
+
+
+class DlpLocationsInfoTypesListRequest(_messages.Message):
+  r"""A DlpLocationsInfoTypesListRequest object.
+
+  Fields:
+    filter: Optional filter to only return infoTypes supported by certain
+      parts of the API. Defaults to supported_by=INSPECT.
+    languageCode: Optional BCP-47 language code for localized infoType
+      friendly names. If omitted, or if localized strings are not available,
+      en-US strings will be returned.
+    location: The geographic location to list info types. Reserved for future
+      extensions.
+  """
+
+  filter = _messages.StringField(1)
+  languageCode = _messages.StringField(2)
+  location = _messages.StringField(3, required=True)
 
 
 class DlpOrganizationsDeidentifyTemplatesCreateRequest(_messages.Message):
@@ -461,13 +482,17 @@ class DlpProjectsDlpJobsListRequest(_messages.Message):
       `<field> <operator> <value>`. * Supported fields/values for inspect
       jobs:     - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED     -
       `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY     -
-      `trigger_name` - The resource name of the trigger that created job. *
-      Supported fields for risk analysis jobs:     - `state` -
-      RUNNING|CANCELED|FINISHED|FAILED * The operator must be `=` or `!=`.
-      Examples:  * inspected_storage = cloud_storage AND state = done *
+      `trigger_name` - The resource name of the trigger that created job.
+      - 'end_time` - Corresponds to time the job finished.     - 'start_time`
+      - Corresponds to time the job finished. * Supported fields for risk
+      analysis jobs:     - `state` - RUNNING|CANCELED|FINISHED|FAILED     -
+      'end_time` - Corresponds to time the job finished.     - 'start_time` -
+      Corresponds to time the job finished. * The operator must be `=` or
+      `!=`.  Examples:  * inspected_storage = cloud_storage AND state = done *
       inspected_storage = cloud_storage OR inspected_storage = bigquery *
       inspected_storage = cloud_storage AND (state = done OR state = canceled)
-      The length of this field should be no more than 500 characters.
+      * end_time > \"2017-12-12T00:00:00+00:00\"  The length of this field
+      should be no more than 500 characters.
     orderBy: Optional comma separated list of fields to order by, followed by
       `asc` or `desc` postfix. This list is case-insensitive, default sorting
       order is ascending, redundant space characters are insignificant.
@@ -706,6 +731,57 @@ class DlpProjectsJobTriggersPatchRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
 
 
+class DlpProjectsLocationsContentDeidentifyRequest(_messages.Message):
+  r"""A DlpProjectsLocationsContentDeidentifyRequest object.
+
+  Fields:
+    googlePrivacyDlpV2DeidentifyContentRequest: A
+      GooglePrivacyDlpV2DeidentifyContentRequest resource to be passed as the
+      request body.
+    location: The geographic location to process de-identification. Reserved
+      for future extensions.
+    parent: The parent resource name, for example projects/my-project-id.
+  """
+
+  googlePrivacyDlpV2DeidentifyContentRequest = _messages.MessageField('GooglePrivacyDlpV2DeidentifyContentRequest', 1)
+  location = _messages.StringField(2, required=True)
+  parent = _messages.StringField(3, required=True)
+
+
+class DlpProjectsLocationsContentInspectRequest(_messages.Message):
+  r"""A DlpProjectsLocationsContentInspectRequest object.
+
+  Fields:
+    googlePrivacyDlpV2InspectContentRequest: A
+      GooglePrivacyDlpV2InspectContentRequest resource to be passed as the
+      request body.
+    location: The geographic location to process content inspection. Reserved
+      for future extensions.
+    parent: The parent resource name, for example projects/my-project-id.
+  """
+
+  googlePrivacyDlpV2InspectContentRequest = _messages.MessageField('GooglePrivacyDlpV2InspectContentRequest', 1)
+  location = _messages.StringField(2, required=True)
+  parent = _messages.StringField(3, required=True)
+
+
+class DlpProjectsLocationsContentReidentifyRequest(_messages.Message):
+  r"""A DlpProjectsLocationsContentReidentifyRequest object.
+
+  Fields:
+    googlePrivacyDlpV2ReidentifyContentRequest: A
+      GooglePrivacyDlpV2ReidentifyContentRequest resource to be passed as the
+      request body.
+    location: The geographic location to process content reidentification.
+      Reserved for future extensions.
+    parent: The parent resource name.
+  """
+
+  googlePrivacyDlpV2ReidentifyContentRequest = _messages.MessageField('GooglePrivacyDlpV2ReidentifyContentRequest', 1)
+  location = _messages.StringField(2, required=True)
+  parent = _messages.StringField(3, required=True)
+
+
 class DlpProjectsStoredInfoTypesCreateRequest(_messages.Message):
   r"""A DlpProjectsStoredInfoTypesCreateRequest object.
 
@@ -795,6 +871,7 @@ class GooglePrivacyDlpV2Action(_messages.Message):
     jobNotificationEmails: Enable email notification to project owners and
       editors on job's completion/failure.
     pubSub: Publish a notification to a pubsub topic.
+    publishFindingsToCloudDataCatalog: Publish findings to Cloud Datahub.
     publishSummaryToCscc: Publish summary to Cloud Security Command Center
       (Alpha).
     saveFindings: Save resulting findings in a provided location.
@@ -802,8 +879,9 @@ class GooglePrivacyDlpV2Action(_messages.Message):
 
   jobNotificationEmails = _messages.MessageField('GooglePrivacyDlpV2JobNotificationEmails', 1)
   pubSub = _messages.MessageField('GooglePrivacyDlpV2PublishToPubSub', 2)
-  publishSummaryToCscc = _messages.MessageField('GooglePrivacyDlpV2PublishSummaryToCscc', 3)
-  saveFindings = _messages.MessageField('GooglePrivacyDlpV2SaveFindings', 4)
+  publishFindingsToCloudDataCatalog = _messages.MessageField('GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog', 3)
+  publishSummaryToCscc = _messages.MessageField('GooglePrivacyDlpV2PublishSummaryToCscc', 4)
+  saveFindings = _messages.MessageField('GooglePrivacyDlpV2SaveFindings', 5)
 
 
 class GooglePrivacyDlpV2ActivateJobTriggerRequest(_messages.Message):
@@ -1023,6 +1101,7 @@ class GooglePrivacyDlpV2ByteContentItem(_messages.Message):
       IMAGE_PNG: <no description>
       IMAGE_SVG: <no description>
       TEXT_UTF8: <no description>
+      AVRO: <no description>
     """
     BYTES_TYPE_UNSPECIFIED = 0
     IMAGE = 1
@@ -1031,6 +1110,7 @@ class GooglePrivacyDlpV2ByteContentItem(_messages.Message):
     IMAGE_PNG = 4
     IMAGE_SVG = 5
     TEXT_UTF8 = 6
+    AVRO = 7
 
   data = _messages.BytesField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -1202,11 +1282,13 @@ class GooglePrivacyDlpV2CloudStorageOptions(_messages.Message):
       BINARY_FILE: <no description>
       TEXT_FILE: <no description>
       IMAGE: <no description>
+      AVRO: <no description>
     """
     FILE_TYPE_UNSPECIFIED = 0
     BINARY_FILE = 1
     TEXT_FILE = 2
     IMAGE = 3
+    AVRO = 4
 
   class SampleMethodValueValuesEnum(_messages.Enum):
     r"""SampleMethodValueValuesEnum enum type.
@@ -1516,17 +1598,20 @@ class GooglePrivacyDlpV2CryptoDeterministicConfig(_messages.Message):
       'abc', the full replacement value will be: 'MY_TOKEN_INFO_TYPE(3):abc'
       This annotation identifies the surrogate when inspecting content using
       the custom info type 'Surrogate'. This facilitates reversal of the
-      surrogate when it occurs in free text.  In order for inspection to work
-      properly, the name of this info type must not occur naturally anywhere
-      in your data; otherwise, inspection may either  - reverse a surrogate
-      that does not correspond to an actual identifier - be unable to parse
-      the surrogate and result in an error  Therefore, choose your custom info
-      type name carefully after considering what your data looks like. One way
-      to select a name that has a high chance of yielding reliable detection
-      is to include one or more unicode characters that are highly improbable
-      to exist in your data. For example, assuming your data is entered from a
-      regular ASCII keyboard, the symbol with the hex code point 29DD might be
-      used like so: \u29ddMY_TOKEN_TYPE
+      surrogate when it occurs in free text.  Note: For record transformations
+      where the entire cell in a table is being transformed, surrogates are
+      optional to use. Surrogates are used to denote the location of the token
+      and are necessary for re-identification in free form text.  In order for
+      inspection to work properly, the name of this info type must not occur
+      naturally anywhere in your data; otherwise, inspection may either  -
+      reverse a surrogate that does not correspond to an actual identifier -
+      be unable to parse the surrogate and result in an error  Therefore,
+      choose your custom info type name carefully after considering what your
+      data looks like. One way to select a name that has a high chance of
+      yielding reliable detection is to include one or more unicode characters
+      that are highly improbable to exist in your data. For example, assuming
+      your data is entered from a regular ASCII keyboard, the symbol with the
+      hex code point 29DD might be used like so: \u29ddMY_TOKEN_TYPE.
   """
 
   context = _messages.MessageField('GooglePrivacyDlpV2FieldId', 1)
@@ -1857,6 +1942,8 @@ class GooglePrivacyDlpV2DeidentifyContentRequest(_messages.Message):
       corresponding fields in the template. Repeated fields are appended.
       Singular sub-messages and groups are recursively merged.
     item: The item to de-identify. Will be treated as text.
+    location: The geographic location to process de-identification. Reserved
+      for future extensions.
   """
 
   deidentifyConfig = _messages.MessageField('GooglePrivacyDlpV2DeidentifyConfig', 1)
@@ -1864,6 +1951,7 @@ class GooglePrivacyDlpV2DeidentifyContentRequest(_messages.Message):
   inspectConfig = _messages.MessageField('GooglePrivacyDlpV2InspectConfig', 3)
   inspectTemplateName = _messages.StringField(4)
   item = _messages.MessageField('GooglePrivacyDlpV2ContentItem', 5)
+  location = _messages.StringField(6)
 
 
 class GooglePrivacyDlpV2DeidentifyContentResponse(_messages.Message):
@@ -1990,9 +2078,10 @@ class GooglePrivacyDlpV2DeltaPresenceEstimationResult(_messages.Message):
 
 
 class GooglePrivacyDlpV2DetectionRule(_messages.Message):
-  r"""Rule for modifying a CustomInfoType to alter behavior under certain
-  circumstances, depending on the specific details of the rule. Not supported
-  for the `surrogate_type` custom info type.
+  r"""Deprecated; use `InspectionRuleSet` instead. Rule for modifying a
+  `CustomInfoType` to alter behavior under certain circumstances, depending on
+  the specific details of the rule. Not supported for the `surrogate_type`
+  custom infoType.
 
   Fields:
     hotwordRule: Hotword-based detection rule.
@@ -2564,11 +2653,10 @@ class GooglePrivacyDlpV2InspectConfig(_messages.Message):
       https://cloud.google.com/dlp/docs/infotypes-reference.  When no
       InfoTypes or CustomInfoTypes are specified in a request, the system may
       automatically choose what detectors to run. By default this may be all
-      types, but may change over time as detectors are updated.  The special
-      InfoType name "ALL_BASIC" can be used to trigger all detectors, but may
-      change over time as new InfoTypes are added. If you need precise control
-      and predictability as to what detectors are run you should specify
-      specific InfoTypes listed in the reference.
+      types, but may change over time as detectors are updated.  If you need
+      precise control and predictability as to what detectors are run you
+      should specify specific InfoTypes listed in the reference, otherwise a
+      default list will be used, which may change over time.
     limits: A GooglePrivacyDlpV2FindingLimits attribute.
     minLikelihood: Only returns findings equal or above this threshold. The
       default is POSSIBLE. See https://cloud.google.com/dlp/docs/likelihood to
@@ -2631,11 +2719,14 @@ class GooglePrivacyDlpV2InspectContentRequest(_messages.Message):
       corresponding fields in the template. Repeated fields are appended.
       Singular sub-messages and groups are recursively merged.
     item: The item to inspect.
+    location: The geographic location to process content inspection. Reserved
+      for future extensions.
   """
 
   inspectConfig = _messages.MessageField('GooglePrivacyDlpV2InspectConfig', 1)
   inspectTemplateName = _messages.StringField(2)
   item = _messages.MessageField('GooglePrivacyDlpV2ContentItem', 3)
+  location = _messages.StringField(4)
 
 
 class GooglePrivacyDlpV2InspectContentResponse(_messages.Message):
@@ -2778,7 +2869,7 @@ class GooglePrivacyDlpV2JobTrigger(_messages.Message):
       only field.
     name: Unique resource name for the triggeredJob, assigned by the service
       when the triggeredJob is created, for example `projects/dlp-test-
-      project/triggeredJobs/53234423`.
+      project/jobTriggers/53234423`.
     status: A status for this trigger. [required]
     triggers: A list of triggers which will be OR'ed together. Only one in the
       list needs to trigger for a job to be started. The list may contain only
@@ -3102,6 +3193,17 @@ class GooglePrivacyDlpV2LargeCustomDictionaryConfig(_messages.Message):
   bigQueryField = _messages.MessageField('GooglePrivacyDlpV2BigQueryField', 1)
   cloudStorageFileSet = _messages.MessageField('GooglePrivacyDlpV2CloudStorageFileSet', 2)
   outputPath = _messages.MessageField('GooglePrivacyDlpV2CloudStoragePath', 3)
+
+
+class GooglePrivacyDlpV2LargeCustomDictionaryStats(_messages.Message):
+  r"""Summary statistics of a custom dictionary.
+
+  Fields:
+    approxNumPhrases: Approximate number of distinct phrases in the
+      dictionary.
+  """
+
+  approxNumPhrases = _messages.IntegerField(1)
 
 
 class GooglePrivacyDlpV2LikelihoodAdjustment(_messages.Message):
@@ -3446,6 +3548,20 @@ class GooglePrivacyDlpV2Proximity(_messages.Message):
   windowBefore = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
+class GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog(_messages.Message):
+  r"""Publish findings of a DlpJob to Cloud Data Catalog. Labels summarizing
+  the results of the DlpJob will be applied to the entry for the resource
+  scanned in Cloud Data Catalog. Any labels previously written by another
+  DlpJob will be deleted. InfoType naming patterns are strictly enforced when
+  using this feature. Note that the findings will be persisted in Cloud Data
+  Catalog storage and are governed by Data Catalog service-specific policy,
+  see https://cloud.google.com/terms/service-terms Only a single instance of
+  this action can be specified and only allowed if all resources being scanned
+  are BigQuery tables. Compatible with: Inspect
+  """
+
+
+
 class GooglePrivacyDlpV2PublishSummaryToCscc(_messages.Message):
   r"""Publish the result summary of a DlpJob to the Cloud Security Command
   Center (CSCC Alpha). This action is only available for projects which are
@@ -3460,8 +3576,11 @@ class GooglePrivacyDlpV2PublishSummaryToCscc(_messages.Message):
 
 
 class GooglePrivacyDlpV2PublishToPubSub(_messages.Message):
-  r"""Publish the results of a DlpJob to a pub sub channel. Compatible with:
-  Inspect, Risk
+  r"""Publish a message into given Pub/Sub topic when DlpJob has completed.
+  The message contains a single field, `DlpJobName`, which is equal to the
+  finished job's
+  [`DlpJob.name`](/dlp/docs/reference/rest/v2/projects.dlpJobs#DlpJob).
+  Compatible with: Inspect, Risk
 
   Fields:
     topic: Cloud Pub/Sub topic to send notifications to. The topic must have
@@ -3684,6 +3803,8 @@ class GooglePrivacyDlpV2ReidentifyContentRequest(_messages.Message):
       corresponding fields in the template. Repeated fields are appended.
       Singular sub-messages and groups are recursively merged.
     item: The item to re-identify. Will be treated as text.
+    location: The geographic location to process content reidentification.
+      Reserved for future extensions.
     reidentifyConfig: Configuration for the re-identification of the content
       item. This field shares the same proto message type that is used for de-
       identification, however its usage here is for the reversal of the
@@ -3691,7 +3812,7 @@ class GooglePrivacyDlpV2ReidentifyContentRequest(_messages.Message):
       the transformations used to de-identify the items and executing the
       reverse. This requires that only reversible transformations be provided
       here. The reversible transformations are:   -
-      `CryptoReplaceFfxFpeConfig`
+      `CryptoDeterministicConfig`  - `CryptoReplaceFfxFpeConfig`
     reidentifyTemplateName: Optional template to use. References an instance
       of `DeidentifyTemplate`. Any configuration directly specified in
       `reidentify_config` or `inspect_config` will override those set in the
@@ -3703,8 +3824,9 @@ class GooglePrivacyDlpV2ReidentifyContentRequest(_messages.Message):
   inspectConfig = _messages.MessageField('GooglePrivacyDlpV2InspectConfig', 1)
   inspectTemplateName = _messages.StringField(2)
   item = _messages.MessageField('GooglePrivacyDlpV2ContentItem', 3)
-  reidentifyConfig = _messages.MessageField('GooglePrivacyDlpV2DeidentifyConfig', 4)
-  reidentifyTemplateName = _messages.StringField(5)
+  location = _messages.StringField(4)
+  reidentifyConfig = _messages.MessageField('GooglePrivacyDlpV2DeidentifyConfig', 5)
+  reidentifyTemplateName = _messages.StringField(6)
 
 
 class GooglePrivacyDlpV2ReidentifyContentResponse(_messages.Message):
@@ -3882,6 +4004,17 @@ class GooglePrivacyDlpV2StoredInfoTypeConfig(_messages.Message):
   largeCustomDictionary = _messages.MessageField('GooglePrivacyDlpV2LargeCustomDictionaryConfig', 3)
 
 
+class GooglePrivacyDlpV2StoredInfoTypeStats(_messages.Message):
+  r"""Statistics for a StoredInfoType.
+
+  Fields:
+    largeCustomDictionary: StoredInfoType where findings are defined by a
+      dictionary of phrases.
+  """
+
+  largeCustomDictionary = _messages.MessageField('GooglePrivacyDlpV2LargeCustomDictionaryStats', 1)
+
+
 class GooglePrivacyDlpV2StoredInfoTypeVersion(_messages.Message):
   r"""Version of a StoredInfoType, including the configuration used to build
   it, create timestamp, and current state.
@@ -3906,6 +4039,7 @@ class GooglePrivacyDlpV2StoredInfoTypeVersion(_messages.Message):
       it, reusing the same `config` if it was not the source of the error.
     state: Stored info type version state. Read-only, updated by the system
       during dictionary creation.
+    stats: Statistics about this storedInfoType version.
   """
 
   class StateValueValuesEnum(_messages.Enum):
@@ -3933,6 +4067,7 @@ class GooglePrivacyDlpV2StoredInfoTypeVersion(_messages.Message):
   createTime = _messages.StringField(2)
   errors = _messages.MessageField('GooglePrivacyDlpV2Error', 3, repeated=True)
   state = _messages.EnumField('StateValueValuesEnum', 4)
+  stats = _messages.MessageField('GooglePrivacyDlpV2StoredInfoTypeStats', 5)
 
 
 class GooglePrivacyDlpV2StoredType(_messages.Message):
@@ -4100,12 +4235,14 @@ class GooglePrivacyDlpV2TimespanConfig(_messages.Message):
       upper time limit is applied.
     startTime: Exclude files or rows older than this value.
     timestampField: Specification of the field containing the timestamp of
-      scanned items. Used for data sources like Datastore or BigQuery. If not
-      specified for BigQuery, table last modification timestamp is checked
-      against given time span. The valid data types of the timestamp field
-      are: for BigQuery - timestamp, date, datetime; for Datastore -
-      timestamp. Datastore entity will be scanned if the timestamp property
-      does not exist or its value is empty or invalid.
+      scanned items. Used for data sources like Datastore and BigQuery.  For
+      BigQuery: Required to filter out rows based on the given start and end
+      times. If not specified and the table was modified between the given
+      start and end times, the entire table will be scanned. The valid data
+      types of the timestamp field are: `INTEGER`, `DATE`, `TIMESTAMP`, or
+      `DATETIME` BigQuery column.  For Datastore. Valid data types of the
+      timestamp field are: `TIMESTAMP`. Datastore entity will be scanned if
+      the timestamp property does not exist or its value is empty or invalid.
   """
 
   enableAutoPopulationOfTimespanConfig = _messages.BooleanField(1)
@@ -4329,37 +4466,10 @@ class GoogleProtobufEmpty(_messages.Message):
 class GoogleRpcStatus(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.

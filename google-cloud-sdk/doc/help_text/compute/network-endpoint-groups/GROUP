@@ -19,13 +19,13 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Creates a Google Compute Engine network endpoint group.
+        Create a Google Compute Engine network endpoint group.
 
      delete
-        Deletes a Google Compute Engine network endpoint group.
+        Delete a Google Compute Engine network endpoint group.
 
      describe
-        Describes a Google Compute Engine network endpoint group.
+        Describe a Google Compute Engine network endpoint group.
 
      list
         List Google Compute Engine network endpoint groups.

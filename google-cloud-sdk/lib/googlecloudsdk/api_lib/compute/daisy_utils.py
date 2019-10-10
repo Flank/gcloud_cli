@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,10 +27,11 @@ from googlecloudsdk.api_lib.cloudbuild import logs as cb_logs
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.services import enable_api as services_api
-from googlecloudsdk.api_lib.services import services_util
+from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.cloudbuild import execution
+from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
 from googlecloudsdk.command_lib.projects import util as projects_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import execution_utils
@@ -38,12 +39,15 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+import six
 
-_DAISY_BUILDER = 'gcr.io/compute-image-tools/daisy:release'
+_IMAGE_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_import:{}'
 
-_IMAGE_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_import:release'
+_IMAGE_EXPORT_BUILDER = 'gcr.io/compute-image-tools/gce_vm_image_export:{}'
 
-_OVF_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_ovf_import:release'
+_OVF_IMPORT_BUILDER = 'gcr.io/compute-image-tools/gce_ovf_import:{}'
+
+_DEFAULT_BUILDER_VERSION = 'release'
 
 SERVICE_ACCOUNT_ROLES = [
     'roles/iam.serviceAccountUser',
@@ -69,11 +73,13 @@ class FilteredLogTailer(cb_logs.LogTailer):
 class CloudBuildClientWithFiltering(cb_logs.CloudBuildClient):
   """Subclass of CloudBuildClient that allows filtering."""
 
-  def StreamWithFilter(self, build_ref, output_filter=None):
+  def StreamWithFilter(self, build_ref, backoff, output_filter=None):
     """Stream the logs for a build using whitelist filter.
 
     Args:
       build_ref: Build reference, The build whose logs shall be streamed.
+      backoff: A function that takes the current elapsed time
+        and returns the next sleep length. Both are in seconds.
       output_filter: List of strings, The output will only be shown if the line
         starts with one of the strings in the list.
 
@@ -94,10 +100,15 @@ class CloudBuildClientWithFiltering(cb_logs.CloudBuildClient):
         statuses.WORKING,
     ]
 
+    seconds_between_poll = backoff(0)
+    seconds_elapsed = 0
+
     while build.status in working_statuses:
       log_tailer.Poll()
-      time.sleep(1)
+      time.sleep(seconds_between_poll)
       build = self.GetBuild(build_ref)
+      seconds_elapsed += seconds_between_poll
+      seconds_between_poll = backoff(seconds_elapsed)
 
     # Poll the logs one final time to ensure we have everything. We know this
     # final poll will get the full log contents because GCS is strongly
@@ -133,9 +144,9 @@ def AddCommonDaisyArgs(parser, add_log_location=True):
   if add_log_location:
     parser.add_argument(
         '--log-location',
-        help='Directory in Google Cloud Storage to hold build logs. If not '
+        help='Directory in Cloud Storage to hold build logs. If not '
         'set, ```gs://<project num>.cloudbuild-logs.googleusercontent.com/``` '
-        'will be created and used.',
+        'is created and used.',
     )
 
   parser.add_argument(
@@ -143,11 +154,27 @@ def AddCommonDaisyArgs(parser, add_log_location=True):
       type=arg_parsers.Duration(),
       default='2h',
       help="""\
-          Maximum time a build can last before it is failed as "TIMEOUT".
-          For example, specifying ``2h'' will fail the process after  2 hours.
-          See $ gcloud topic datetimes for information on duration formats.
+          Maximum time a build can last before it fails as "TIMEOUT".
+          For example, specifying `2h` fails the process after 2 hours.
+          See $ gcloud topic datetimes for information about duration formats.
           """)
   base.ASYNC_FLAG.AddToParser(parser)
+
+
+def AddExtraCommonDaisyArgs(parser):
+  """Extra common arguments for Daisy builds."""
+
+  parser.add_argument(
+      '--docker-image-tag',
+      default=_DEFAULT_BUILDER_VERSION,
+      hidden=True,
+      help="""\
+          Specify which docker image tag (of tools from compute-image-tools)
+          should be used for this command. By default it's "release", while
+          "latest" is supported as well. There may be more versions supported in
+          the future.
+          """
+  )
 
 
 def _CheckIamPermissions(project_id):
@@ -172,10 +199,7 @@ def _CheckIamPermissions(project_id):
           'Would you like to enable this service?',
           throw_if_unattended=True,
           cancel_on_no=True)
-      operation = services_api.EnableServiceApiCall(project.projectId,
-                                                    service_name)
-      # Wait for the operation to finish.
-      services_util.ProcessOperationResult(operation, is_async=False)
+      services_api.EnableService(project.projectId, service_name)
 
   # Now that we're sure the service account exists, actually check permissions.
   service_account = 'serviceAccount:{0}@cloudbuild.gserviceaccount.com'.format(
@@ -291,113 +315,22 @@ def GetSubnetRegion():
   raise SubnetException('Region or zone should be specified.')
 
 
-def ExtractNetworkAndSubnetDaisyVariables(args, operation):
-  """Extracts network/subnet out of CLI args in the form of Daisy variables.
-
-  Args:
-    args: list of str, CLI args that might contain network/subnet args.
-    operation: ImageOperation, specifies if this call is for import or export
-
-  Returns:
-    list of strs, network/subnet variables, if specified in args. Can be empty.
-  """
-  variables = []
-  network_full_path = None
-  if args.subnet:
-    variables.append('{0}_subnet=regions/{1}/subnetworks/{2}'.format(
-        operation, GetSubnetRegion(), args.subnet.lower()))
-
-    # network variable should be empty string in case subnet is specified
-    # and network is not. Otherwise, Daisy will default network to
-    # `global/networks/default` which will fail except for default networks.
-    network_full_path = ''
-
-  if args.network:
-    network_full_path = 'global/networks/{0}'.format(args.network.lower())
-
-  if network_full_path is not None:
-    variables.append('{0}_network={1}'.format(operation, network_full_path))
-
-  return variables
-
-
-def AppendNetworkAndSubnetArgs(args, import_args):
+def AppendNetworkAndSubnetArgs(args, builder_args):
   """Extracts network/subnet out of CLI args and append for importer.
 
   Args:
     args: list of str, CLI args that might contain network/subnet args.
-    import_args: list of str, args for importer.
+    builder_args: list of str, args for builder.
   """
-  network_full_path = None
   if args.subnet:
-    AppendArg(import_args, 'subnet', 'regions/{0}/subnetworks/{1}'.format(
-        GetSubnetRegion(), args.subnet.lower()))
-
-    # The network variable should be empty string when subnet is specified
-    # and network is not. Otherwise, Daisy will default network to
-    # `global/networks/default` which will fail except for default networks.
-    network_full_path = ''
+    AppendArg(builder_args, 'subnet', args.subnet.lower())
 
   if args.network:
-    network_full_path = 'global/networks/{0}'.format(args.network.lower())
-
-  if network_full_path is not None:
-    AppendArg(import_args, 'network', network_full_path)
+    AppendArg(builder_args, 'network', args.network.lower())
 
 
-def RunDaisyBuild(args,
-                  workflow,
-                  variables,
-                  daisy_bucket,
-                  tags=None,
-                  user_zone=None,
-                  output_filter=None):
-  """Run a build with Daisy on Google Cloud Builder.
-
-  Args:
-    args: An argparse namespace. All the arguments that were provided to this
-      command invocation.
-    workflow: The path to the Daisy workflow to run.
-    variables: A string of key-value pairs to pass to Daisy.
-    daisy_bucket: A string containing the name of the GCS bucket that daisy
-      should use.
-    tags: A list of strings for adding tags to the Argo build.
-    user_zone: The GCP zone to tell Daisy to do work in. If unspecified,
-      defaults to wherever the Argo runner happens to be.
-    output_filter: A list of strings indicating what lines from the log should
-      be output. Only lines that start with one of the strings in output_filter
-      will be displayed.
-
-  Returns:
-    A build object that either streams the output or is displayed as a
-    link to the build.
-
-  Raises:
-    FailedBuildException: If the build is completed and not 'SUCCESS'.
-  """
-  project_id = projects_util.ParseProject(
-      properties.VALUES.core.project.GetOrFail())
-
-  _CheckIamPermissions(project_id)
-
-  daisy_args = [
-      '-gcs_path=gs://{0}/'.format(daisy_bucket),
-      '-default_timeout={0}s'.format(GetDaisyTimeout(args)),
-      '-variables={0}'.format(variables),
-      workflow,
-  ]
-  if user_zone is not None:
-    daisy_args = ['-zone={0}'.format(user_zone)] + daisy_args
-
-  build_tags = ['gce-daisy']
-  if tags:
-    build_tags.extend(tags)
-
-  return _RunCloudBuild(args, _DAISY_BUILDER, daisy_args, build_tags,
-                        output_filter, args.log_location)
-
-
-def RunImageImport(args, import_args, tags, output_filter):
+def RunImageImport(args, import_args, tags, output_filter,
+                   docker_image_tag=_DEFAULT_BUILDER_VERSION):
   """Run a build over gce_vm_image_import on Google Cloud Builder.
 
   Args:
@@ -408,6 +341,56 @@ def RunImageImport(args, import_args, tags, output_filter):
     output_filter: A list of strings indicating what lines from the log should
       be output. Only lines that start with one of the strings in output_filter
       will be displayed.
+    docker_image_tag: Specified docker image tag.
+
+  Returns:
+    A build object that either streams the output or is displayed as a
+    link to the build.
+
+  Raises:
+    FailedBuildException: If the build is completed and not 'SUCCESS'.
+  """
+  builder = _IMAGE_IMPORT_BUILDER.format(docker_image_tag)
+  return RunImageCloudBuild(args, builder, import_args, tags, output_filter)
+
+
+def RunImageExport(args, export_args, tags, output_filter,
+                   docker_image_tag=_DEFAULT_BUILDER_VERSION):
+  """Run a build over gce_vm_image_export on Google Cloud Builder.
+
+  Args:
+    args: An argparse namespace. All the arguments that were provided to this
+      command invocation.
+    export_args: A list of key-value pairs to pass to exporter.
+    tags: A list of strings for adding tags to the Argo build.
+    output_filter: A list of strings indicating what lines from the log should
+      be output. Only lines that start with one of the strings in output_filter
+      will be displayed.
+    docker_image_tag: Specified docker image tag.
+
+  Returns:
+    A build object that either streams the output or is displayed as a
+    link to the build.
+
+  Raises:
+    FailedBuildException: If the build is completed and not 'SUCCESS'.
+  """
+  builder = _IMAGE_EXPORT_BUILDER.format(docker_image_tag)
+  return RunImageCloudBuild(args, builder, export_args, tags, output_filter)
+
+
+def RunImageCloudBuild(args, builder, builder_args, tags, output_filter):
+  """Run a build related to image on Google Cloud Builder.
+
+  Args:
+    args: An argparse namespace. All the arguments that were provided to this
+      command invocation.
+    builder: Path to builder image.
+    builder_args: A list of key-value pairs to pass to builder.
+    tags: A list of strings for adding tags to the Argo build.
+    output_filter: A list of strings indicating what lines from the log should
+      be output. Only lines that start with one of the strings in output_filter
+      will be displayed.
 
   Returns:
     A build object that either streams the output or is displayed as a
@@ -421,7 +404,7 @@ def RunImageImport(args, import_args, tags, output_filter):
 
   _CheckIamPermissions(project_id)
 
-  return _RunCloudBuild(args, _IMAGE_IMPORT_BUILDER, import_args,
+  return _RunCloudBuild(args, builder, builder_args,
                         ['gce-daisy'] + tags, output_filter, args.log_location)
 
 
@@ -438,7 +421,8 @@ def _RunCloudBuild(args,
                    build_args,
                    build_tags=None,
                    output_filter=None,
-                   log_location=None):
+                   log_location=None,
+                   backoff=lambda elapsed: 1):
   """Run a build with a specific builder on Google Cloud Builder.
 
   Args:
@@ -451,6 +435,8 @@ def _RunCloudBuild(args,
       be output. Only lines that start with one of the strings in output_filter
       will be displayed.
     log_location: GCS path to directory where logs will be stored.
+    backoff: A function that takes the current elapsed time and returns
+      the next sleep length. Both are in seconds.
 
   Returns:
     A build object that either streams the output or is displayed as a
@@ -484,7 +470,7 @@ def _RunCloudBuild(args,
   build, build_ref = _CreateCloudBuild(build_config, client, messages)
 
   # If the command is run --async, we just print out a reference to the build.
-  if args.async:
+  if args.async_:
     return build
 
   mash_handler = execution.MashHandler(
@@ -493,7 +479,7 @@ def _RunCloudBuild(args,
   # Otherwise, logs are streamed from GCS.
   with execution_utils.CtrlCSection(mash_handler):
     build = CloudBuildClientWithFiltering(client, messages).StreamWithFilter(
-        build_ref, output_filter=output_filter)
+        build_ref, backoff, output_filter=output_filter)
 
   if build.status == messages.Build.StatusValueValuesEnum.TIMEOUT:
     log.status.Print(
@@ -506,17 +492,19 @@ def _RunCloudBuild(args,
   return build
 
 
-def RunOVFImportBuild(args, instance_names, source_uri, no_guest_environment,
-                      can_ip_forward, deletion_protection, description, labels,
-                      machine_type, network, network_tier, subnet,
-                      private_network_ip, no_restart_on_failure, os, tags, zone,
-                      project, output_filter):
+def RunOVFImportBuild(args, compute_client, instance_name, source_uri,
+                      no_guest_environment, can_ip_forward, deletion_protection,
+                      description, labels, machine_type, network, network_tier,
+                      subnet, private_network_ip, no_restart_on_failure, os,
+                      tags, zone, project, output_filter,
+                      compute_release_track):
   """Run a OVF import build on Google Cloud Builder.
 
   Args:
     args: an argparse namespace. All the arguments that were provided to this
       command invocation.
-    instance_names: A list of instance names to be imported.
+    compute_client: Google Compute Engine client.
+    instance_name: Name of the instance to be imported.
     source_uri: A GCS path to OVA or OVF package.
     no_guest_environment: If set to True, Google Guest Environment won't be
       installed on the boot disk of the VM.
@@ -541,6 +529,8 @@ def RunOVFImportBuild(args, instance_names, source_uri, no_guest_environment,
     output_filter: A list of strings indicating what lines from the log should
       be output. Only lines that start with one of the strings in output_filter
       will be displayed.
+    compute_release_track: release track to be used for Compute API calls. One
+      of - "alpha", "beta" or ""
 
   Returns:
     A build object that either streams the output or is displayed as a
@@ -560,7 +550,7 @@ def RunOVFImportBuild(args, instance_names, source_uri, no_guest_environment,
   ovf_import_timeout = args.timeout - min(two_percent, 300)
 
   ovf_importer_args = []
-  AppendArg(ovf_importer_args, 'instance-names', ','.join(instance_names))
+  AppendArg(ovf_importer_args, 'instance-names', instance_name)
   AppendArg(ovf_importer_args, 'client-id', 'gcloud')
   AppendArg(ovf_importer_args, 'ovf-gcs-path', source_uri)
   AppendBoolArg(ovf_importer_args, 'no-guest-environment',
@@ -584,12 +574,34 @@ def RunOVFImportBuild(args, instance_names, source_uri, no_guest_environment,
   AppendArg(ovf_importer_args, 'zone', zone)
   AppendArg(ovf_importer_args, 'timeout', ovf_import_timeout, '-{0}={1}s')
   AppendArg(ovf_importer_args, 'project', project)
+  _AppendNodeAffinityLabelArgs(ovf_importer_args, args, compute_client.messages)
+  if compute_release_track:
+    AppendArg(ovf_importer_args, 'release-track', compute_release_track)
 
   build_tags = ['gce-ovf-import']
 
-  # print('OVF args: ' + str(list(ovf_importer_args)))
-  return _RunCloudBuild(args, _OVF_IMPORT_BUILDER, ovf_importer_args,
-                        build_tags, output_filter)
+  backoff = lambda elapsed: 2 if elapsed < 30 else 15
+
+  return _RunCloudBuild(args, _OVF_IMPORT_BUILDER.format(args.docker_image_tag),
+                        ovf_importer_args, build_tags, output_filter,
+                        backoff=backoff)
+
+
+def _AppendNodeAffinityLabelArgs(
+    ovf_importer_args, args, compute_client_messages):
+  node_affinities = sole_tenancy_util.GetSchedulingNodeAffinityListFromArgs(
+      args, compute_client_messages)
+  for node_affinity in node_affinities:
+    AppendArg(ovf_importer_args, 'node-affinity-label',
+              _BuildOvfImporterNodeAffinityFlagValue(node_affinity))
+
+
+def _BuildOvfImporterNodeAffinityFlagValue(node_affinity):
+  node_affinity_flag = node_affinity.key + ',' + six.text_type(
+      node_affinity.operator)
+  for value in node_affinity.values:
+    node_affinity_flag += ',' + value
+  return node_affinity_flag
 
 
 def AppendArg(args, name, arg, format_pattern='-{0}={1}'):
@@ -604,3 +616,23 @@ def AppendBoolArg(args, name, arg=True):
 def MakeGcsUri(uri):
   obj_ref = resources.REGISTRY.Parse(uri)
   return 'gs://{0}/{1}'.format(obj_ref.bucket, obj_ref.object)
+
+
+def MakeGcsObjectOrPathUri(uri):
+  """Creates Google Cloud Storage URI for an object or a path.
+
+  Raises storage_util.InvalidObjectNameError if a path contains only bucket
+  name.
+
+  Args:
+    uri: a string to a Google Cloud Storage object or a path. Can be a gs:// or
+         an https:// variant.
+
+  Returns:
+    Google Cloud Storage URI for an object or a path.
+  """
+  obj_ref = resources.REGISTRY.Parse(uri)
+  if hasattr(obj_ref, 'object'):
+    return 'gs://{0}/{1}'.format(obj_ref.bucket, obj_ref.object)
+  else:
+    raise storage_util.InvalidObjectNameError(uri, 'Missing object name')

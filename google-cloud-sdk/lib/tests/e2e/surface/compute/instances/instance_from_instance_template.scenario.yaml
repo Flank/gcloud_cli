@@ -5,37 +5,37 @@ summary:
 - execute:
   - command: compute instance-templates create $$instance-from-instance-template$$
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$].
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$\].
   - stdout: .*$$instance-from-instance-template$$\s\sn1-standard-1.*$
 - execute:
   - command: compute instances create $$gcloud-compute-test$$ --source-instance-template
       $$instance-from-instance-template$$ --format=disable --zone=$$my-zone$$
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$].
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$\].
 - execute:
   - command: compute instances create-with-container $$gcloud-compute-test-container$$
       --source-instance-template $$instance-from-instance-template$$ --format=disable
       --container-image=gcr.io/google-containers/busybox --zone=$$my-zone$$
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$].
+      Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$\].
 - execute:
   - command: compute instance-templates delete $$instance-from-instance-template$$
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$].
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$\].
 - execute:
   - command: compute instances delete $$gcloud-compute-test$$ --zone $$my-zone$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$].
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$\].
 - execute:
   - command: compute instances delete $$gcloud-compute-test-container$$ --zone $$my-zone$$
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$].
+      Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - define_reference:
     reference: my-zone
     value: us-central1-f
@@ -97,7 +97,7 @@ actions:
                 - autoDelete: true
                   boot: true
                   initializeParams:
-                    sourceImage: https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/images/family/debian-9
+                    sourceImage: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-9
                   mode: READ_WRITE
                   type: PERSISTENT
                 machineType: n1-standard-1
@@ -106,7 +106,7 @@ actions:
                 - accessConfigs:
                   - name: external-nat
                     type: ONE_TO_ONE_NAT
-                  network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/default
+                  network: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/default
                 scheduling:
                   automaticRestart: true
                 serviceAccounts:
@@ -136,8 +136,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1540825903544-5795f7ca437db-bec65da2-fc014087
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$?alt=json
@@ -257,7 +258,7 @@ actions:
             kind: compute#project
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fcompute.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
           method: POST
           headers: {}
           body:
@@ -282,8 +283,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1540825909746-5795f7d02da85-0e7a7f82-6aec178d
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$?alt=json
@@ -5939,7 +5941,7 @@ actions:
             kind: compute#imageList
     - api_call:
         expect_request:
-          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fcompute.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
           method: POST
           headers: {}
           body:
@@ -5985,8 +5987,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1540825956850-5795f7fd199de-299a16a6-39335506
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$?alt=json
@@ -6109,8 +6112,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1540826003377-5795f82978bdd-a9be51d5-a2afa45d
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -6141,8 +6145,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1540826008583-5795f82e6fed1-430412f3-05c57209
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -6174,7 +6179,8 @@ actions:
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/operations/operation-1540826139075-5795f8aae223d-b7223009-c8dce225
             kind: compute#operation
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$\].
     - expect_exit:
         code: 0

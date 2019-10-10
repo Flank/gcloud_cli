@@ -19,8 +19,9 @@ POSITIONAL ARGUMENTS
 REQUIRED FLAGS
      --target-pools=[TARGET_POOL,...]
         Compute Engine Target Pools to add the instances to. Target Pools must
-        be specified by name or by URL. Example: --target-pool
-        target-pool-1,target-pool-2.
+        be specified by name or by URL. Example:
+        --target-pools=target-pool-1,target-pool-2. To clear the set of Target
+        Pools pass in an empty list. Example: --target-pools=""
 
 OPTIONAL FLAGS
      At most one of these may be specified:

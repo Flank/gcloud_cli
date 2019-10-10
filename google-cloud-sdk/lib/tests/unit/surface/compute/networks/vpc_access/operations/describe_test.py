@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class OperationsDescribeTestBeta(base.VpcAccessUnitTestBase):
+class OperationsDescribeTestGa(base.VpcAccessUnitTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def _SetExpected(self):
     self.expected_operation = self.messages.Operation(
@@ -52,7 +52,14 @@ class OperationsDescribeTestBeta(base.VpcAccessUnitTestBase):
     self.assertEqual(actual_operation, self.expected_operation)
 
 
-class OperationsDescribeTestAlpha(OperationsDescribeTestBeta):
+class OperationsDescribeTestBeta(OperationsDescribeTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
+
+
+class OperationsDescribeTestAlpha(OperationsDescribeTestGa):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

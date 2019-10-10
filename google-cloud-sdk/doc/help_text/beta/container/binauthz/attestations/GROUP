@@ -24,9 +24,14 @@ COMMANDS
      list
         (BETA) List Binary Authorization attestations.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+     sign-and-create
+        (BETA) Sign and create a Binary Authorization Attestation using a Cloud
+        KMS key.
 
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud container binauthz attestations
         $ gcloud alpha container binauthz attestations
 

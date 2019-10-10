@@ -47,6 +47,10 @@ REQUIRED FLAGS
             5 Gbit/s
          10g
             10 Gbit/s
+         20g
+            20 Gbit/s
+         50g
+            50 Gbit/s
 
      --interconnect=INTERCONNECT
         The interconnect for the interconnect attachment

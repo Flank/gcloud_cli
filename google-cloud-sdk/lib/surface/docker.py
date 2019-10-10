@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -132,6 +132,16 @@ class Docker(base.Command):
     Raises:
       exceptions.ExitCodeNoError: The docker command execution failed.
     """
+    if args.account:
+      # Since the docker binary invokes `gcloud auth docker-helper` through
+      # `docker-credential-gcloud`, it cannot forward the command line
+      # arguments. Subsequently, we are unable to set the account (or any
+      # flag for that matter) used by `docker-credential-gcloud` with
+      # the global `--account` flag.
+      log.warning('Docker uses the account from the gcloud config.'
+                  'To set the account in the gcloud config, run '
+                  '`gcloud config set account <account_name>`.')
+
     base.DisableUserProjectQuota()
     force_refresh = True
     for server in args.server:

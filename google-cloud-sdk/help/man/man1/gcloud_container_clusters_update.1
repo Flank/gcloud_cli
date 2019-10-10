@@ -11,7 +11,7 @@ gcloud container clusters update \- update cluster settings for an existing cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,6 +72,21 @@ Enables autoscaling in the node pool specified by \-\-node\-pool or the default
 node pool if \-\-node\-pool is not provided.
 
 .TP 2m
+\fB\-\-enable\-binauthz\fR
+Enable Binary Authorization for this cluster.
+
+.TP 2m
+\fB\-\-enable\-intra\-node\-visibility\fR
+Enable Intra\-node visibility for this cluster.
+
+Enabling intra\-node visibility makes your intra\-node pod\-to\-pod traffic
+visible to the networking fabric. With this feature, you can use VPC flow
+logging or other VPC features for intra\-node traffic.
+
+Enabling it on an existing cluster causes the cluster master and the cluster
+nodes to restart, which might cause a disruption.
+
+.TP 2m
 \fB\-\-enable\-legacy\-authorization\fR
 Enables the legacy ABAC authentication for the cluster. User rights are granted
 through the use of policies which combine attributes together. For a detailed
@@ -104,18 +119,16 @@ policy on an existing cluster the network policy addon must first be enabled on
 the master by using \-\-update\-addons=NetworkPolicy=ENABLED flag.
 
 .TP 2m
+\fB\-\-enable\-stackdriver\-kubernetes\fR
+Enable Stackdriver Kubernetes monitoring and logging.
+
+.TP 2m
 \fB\-\-generate\-password\fR
 Ask the server to generate a secure password and use that as the basic auth
 password, keeping the existing username.
 
 .TP 2m
-\fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR
-Logging service to use for the cluster. Options are: "logging.googleapis.com"
-(the Google Cloud Logging service), "none" (logs will not be exported from the
-cluster)
-
-.TP 2m
-\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR
+\fB\-\-maintenance\-window\fR=\fISTART_TIME\fR
 Set a time of day when you prefer maintenance to start on this cluster. For
 example:
 
@@ -126,13 +139,7 @@ $ gcloud container clusters update example\-cluster \e
 
 The time corresponds to the UTC time zone, and must be in HH:MM format. To
 remove an existing maintenance window from the cluster, use
-\'\-\-maintenance\-window=None'
-
-.TP 2m
-\fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR
-Monitoring service to use for the cluster. Options are:
-"monitoring.googleapis.com" (the Google Cloud Monitoring service), "none" (no
-metrics will be exported from the cluster)
+\'\-\-maintenance\-window=None'.
 
 .TP 2m
 \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
@@ -213,6 +220,71 @@ $ gcloud container clusters update example\-cluster \e
 
 .TP 2m
 
+Exports cluster's usage of cloud resources At most one of these may be
+specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR
+Disables exporting cluster resource usage to BigQuery.
+
+.TP 2m
+\fB\-\-enable\-network\-egress\-metering\fR
+Enable network egress metering on this cluster.
+
+When enabled, a DaemonSet is deployed into the cluster. Each DaemonSet pod
+meters network egress traffic by collecting data from the conntrack table, and
+exports the metered metrics to the specified destination.
+
+Network egress metering is disabled if this flag is omitted, or when
+\f5\-\-no\-enable\-network\-egress\-metering\fR is set.
+
+.TP 2m
+\fB\-\-enable\-resource\-consumption\-metering\fR
+Enable resource consumption metering on this cluster.
+
+When enabled, a table will be created in the specified BigQuery dataset to store
+resource consumption data. The resulting table can be joined with the resource
+usage table or with BigQuery billing export.
+
+To disable resource consumption metering, set
+\f5\-\-no\-enable\-resource\-consumption\- metering\fR. If this flag is omitted,
+then resource consumption metering will remain enabled or disabled depending on
+what is already configured for this cluster.
+
+.TP 2m
+\fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR
+The name of the BigQuery dataset to which the cluster's usage of cloud resources
+is exported. A table will be created in the specified dataset to store cluster
+resource usage. The resulting table can be joined with BigQuery Billing Export
+to produce a fine\-grained cost breakdown.
+
+Example:
+
+.RS 2m
+$ gcloud container clusters update example\-cluster \e
+    \-\-resource\-usage\-bigquery\-dataset=example_bigquery_dataset_name
+.RE
+
+.RE
+.sp
+.TP 2m
+\fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR
+Logging service to use for the cluster. Options are:
+"logging.googleapis.com/kubernetes" (the Google Cloud Logging service with
+Kubernetes\-native resource model enabled), "logging.googleapis.com" (the Google
+Cloud Logging service), "none" (logs will not be exported from the cluster)
+
+.TP 2m
+\fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR
+Monitoring service to use for the cluster. Options are:
+"monitoring.googleapis.com/kubernetes" (the Google Cloud Monitoring service with
+Kubernetes\-native resource model enabled), "monitoring.googleapis.com" (the
+Google Cloud Monitoring service), "none" (no metrics will be exported from the
+cluster)
+
+.TP 2m
+
 Basic auth
 
 .RS 2m
@@ -254,7 +326,7 @@ specify a password; if not, the server will randomly generate one.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Don't wait for the operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]

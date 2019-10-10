@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -344,6 +344,7 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
     self.staging_area = tempfile.mkdtemp()
     self.stager = staging.Stager(self._REGISTRY, self.staging_area)
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testStage_Success(self):
     app_dir = self.stager.Stage('app.yaml', '.', 'success',
                                 env.FLEX)

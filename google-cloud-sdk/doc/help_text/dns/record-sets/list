@@ -63,23 +63,24 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To see the list of all record-sets in my_zone, run:
 
-        $ gcloud dns record-sets list --zone my_zone
+        $ gcloud dns record-sets list --zone=my_zone
 
     To see the list of first 10 record-sets in my_zone, run:
 
-        $ gcloud dns record-sets list --zone my_zone --limit=10
+        $ gcloud dns record-sets list --zone=my_zone --limit=10
 
     To see the list of 'my.zone.com.' record-sets in my_zone, run:
 
-        $ gcloud dns record-sets list --zone my_zone --name="my.zone.com."
+        $ gcloud dns record-sets list --zone=my_zone --name="my.zone.com."
 
     To see the list of 'my.zone.com.' CNAME record-sets in my_zone, run:
 
-        $ gcloud dns record-sets list --zone my_zone --name="my.zone.com." \
+        $ gcloud dns record-sets list --zone=my_zone --name="my.zone.com." \
             --type="CNAME"
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets list
         $ gcloud beta dns record-sets list
 

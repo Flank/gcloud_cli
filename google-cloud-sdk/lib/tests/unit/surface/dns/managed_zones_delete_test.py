@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ class ManagedZonesDeleteTest(base.DnsMockTest):
     self.Run('dns managed-zones delete {0}'.format(test_zone.name))
     self.AssertOutputContains('')
     self.AssertErrContains("""\
-Deleted [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Deleted [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
 
 class ManagedZonesDeleteBetaTest(base.DnsMockBetaTest):
@@ -55,8 +55,8 @@ class ManagedZonesDeleteBetaTest(base.DnsMockBetaTest):
     self.Run('dns managed-zones delete {0}'.format(test_zone.name))
     self.AssertOutputContains('')
     self.AssertErrContains("""\
-Deleted [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
-""".format(self.api_version, self.Project()))
+Deleted [{0}projects/{1}/managedZones/mz].
+""".format(self.client.BASE_URL, self.Project()))
 
 
 if __name__ == '__main__':

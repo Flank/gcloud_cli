@@ -1,5 +1,5 @@
 title: Jobs Run Test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: compute/zone us-central1
@@ -14,7 +14,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations?alt=json&pageSize=2
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations?alt=json&pageSize=2
           method: GET
           headers: {}
           body: null
@@ -29,7 +29,7 @@ actions:
                 cloud.googleapis.com/region: us-central1
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job:run?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job:run?alt=json
           method: POST
           headers: {}
           body: null
@@ -46,7 +46,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudscheduler.googleapis.com/v1beta1/projects/fake-project/locations/us-central1/jobs/my-job:run?alt=json
+          uri: https://cloudscheduler.googleapis.com/v1/projects/fake-project/locations/us-central1/jobs/my-job:run?alt=json
           method: POST
           body: null
         return_response:

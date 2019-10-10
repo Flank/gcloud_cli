@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -260,29 +260,6 @@ class StoreTests(sdk_test_base.SdkBase):
           os.stat(store_file).st_mode & 0o777, 0o600,
           'File [{}] should be changed back to 0o600 permissions'.format(
               os.path.basename(path)))
-
-  def testMigrateMultistore2Sqlite(self):
-    store = creds.Oauth2ClientCredentialStore(config.Paths().credentials_path)
-    credentials = self._MakeCredentials()
-    store.Store('test_account', credentials)
-
-    service_account_credentials = self._MakeServiceAccountCredentials()
-    store.Store('service_account', service_account_credentials)
-
-    p12_service_account_credentials = self._MakeP12ServiceAccountCredentials()
-    store.Store('p12_service_account', p12_service_account_credentials)
-    self.AssertFileExists(config.Paths().credentials_path)
-
-    store = creds.GetCredentialStore()
-    self.AssertFileNotExists(config.Paths().credentials_path)
-    self.AssertFileExists(config.Paths().credentials_db_path)
-
-    self.AssertCredentialsEqual(credentials,
-                                store.Load('test_account'))
-    self.AssertCredentialsEqual(service_account_credentials,
-                                store.Load('service_account'))
-    self.AssertCredentialsEqual(p12_service_account_credentials,
-                                store.Load('p12_service_account'))
 
 
 class Sqlite3Tests(sdk_test_base.SdkBase, test_case.WithOutputCapture):

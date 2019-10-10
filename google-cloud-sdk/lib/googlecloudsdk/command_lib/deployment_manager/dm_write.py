@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
 from googlecloudsdk.core.resource import resource_printer
+import six
 
 
 def Execute(client, messages, resources, request, is_async, call, logger):
@@ -135,4 +136,4 @@ def WaitForOperation(client, messages, operation_name,
     # Timeout exceeded
     raise exceptions.Error(
         'Wait for Operation [{0}] exceeded timeout [{1}].'.format(
-            operation_name, str(timeout)))
+            operation_name, six.text_type(timeout)))

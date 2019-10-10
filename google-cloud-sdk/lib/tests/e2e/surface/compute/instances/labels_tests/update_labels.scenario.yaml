@@ -6,7 +6,7 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format="text(name,labels)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |
       ---
       name: $$instance$$
@@ -44,11 +44,11 @@ summary:
          - [$$instance$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-update-labels
@@ -122,17 +122,17 @@ actions:
               - autoDelete: true
                 boot: true
                 initializeParams:
-                  sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+                  sourceImage: https://$$compute-uri$$/v1/projects/debian-cloud/global/images/family/debian-9
                 mode: READ_WRITE
                 type: PERSISTENT
-              machineType: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              machineType: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
               metadata: {}
               name: $$instance$$
               networkInterfaces:
               - accessConfigs:
                 - name: external-nat
                   type: ONE_TO_ONE_NAT
-                network: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/default
+                network: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/default
               scheduling:
                 automaticRestart: true
               serviceAccounts:
@@ -165,8 +165,9 @@ actions:
             insertTime: '2018-09-10T08:12:21.730-07:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536592337364-57585c86ee423-44b4c7d6-b929a143
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
@@ -830,8 +831,9 @@ actions:
             insertTime: '2018-09-10T08:12:56.228-07:00'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536592375764-57585cab8d423-65d26047-59e74756
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
     cleanup_for: instance

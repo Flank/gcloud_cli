@@ -17,7 +17,11 @@ gcloud alpha compute resource\-policies create\-snapshot\-schedule \- create a G
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a Google Compute Engine Snapshot Schedule Resource Policy.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR \f5create\-snapshot\-schedule\fR is deprecated.
+Use \f5compute resource\-policies create snapshot\-schedule\fR instead.
+
+
+Create a Google Compute Engine Snapshot Schedule Resource Policy.
 
 
 
@@ -208,9 +212,8 @@ $ gcloud alpha compute resource\-policies create\-snapshot\-schedule \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
 
 .RS 2m
 $ gcloud beta compute resource\-policies create\-snapshot\-schedule

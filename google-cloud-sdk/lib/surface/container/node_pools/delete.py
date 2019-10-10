@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ class Delete(base.DeleteCommand):
       adapter.GetNodePool(pool_ref)
 
       op_ref = adapter.DeleteNodePool(pool_ref)
-      if not args.async:
+      if not args.async_:
         adapter.WaitForOperation(
             op_ref,
             'Deleting node pool {0}'.format(pool_ref.nodePoolId),

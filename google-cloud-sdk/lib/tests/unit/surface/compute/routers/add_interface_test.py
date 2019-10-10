@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,12 +44,12 @@ class AddInterfaceTest(test_base.BaseTest):
                 name='my-if', linkedVpnTunnel='', ipRange='10.0.0.1/24')
         ],
         region='us-central1',
-        network=('https://www.googleapis.com/compute/v1/projects/my-project/'
+        network=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                  'global/networks/default'),
     )
 
   def ComposeLinkedVpnTunnel(self):
-    return ('https://www.googleapis.com/compute/v1/projects/'
+    return ('https://compute.googleapis.com/compute/v1/projects/'
             'my-project/regions/us-central1/vpnTunnels/my-vpn')
 
   def testSimple(self):
@@ -151,7 +151,7 @@ class AddInterfaceWithAttachmentTest(AddInterfaceTest):
     self.api_version = 'v1'
 
   def ComposeLinkedVpnTunnel(self):
-    return ('https://www.googleapis.com/compute/' + self.api_version +
+    return ('https://compute.googleapis.com/compute/' + self.api_version +
             '/projects/my-project/'
             'regions/us-central1/vpnTunnels/my-vpn')
 
@@ -171,13 +171,13 @@ class AddInterfaceWithAttachmentTest(AddInterfaceTest):
                 name='my-if', linkedVpnTunnel='', ipRange='10.0.0.1/24')
         ],
         region='us-central1',
-        network=('https://www.googleapis.com/compute/' + self.api_version +
+        network=('https://compute.googleapis.com/compute/' + self.api_version +
                  '/projects/my-project/'
                  'global/networks/default'),
     )
 
   def composeLinkedInterconnectAttachment(self):
-    return ('https://www.googleapis.com/compute/' + self.api_version +
+    return ('https://compute.googleapis.com/compute/' + self.api_version +
             '/projects/my-project/'
             'regions/us-central1/interconnectAttachments/my-attachment')
 

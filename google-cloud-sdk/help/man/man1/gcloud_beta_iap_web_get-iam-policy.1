@@ -1,0 +1,161 @@
+
+.TH "GCLOUD_BETA_IAP_WEB_GET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iap web get\-iam\-policy \- get IAM policy for an IAP IAM resource
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iap web get\-iam\-policy\fR [\fB\-\-resource\-type\fR=\fIRESOURCE_TYPE\fR\ \fB\-\-service\fR=\fISERVICE\fR\ \fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta iap web get\-iam\-policy\fR displays the IAM policy
+associated with an IAP IAM resource. If formatted as JSON, the output can be
+edited and used as a policy file for set\-iam\-policy. The output includes an
+"etag" field identifying the version emitted and allowing detection of
+concurrent policy updates; see $ gcloud beta iap web set\-iam\-policy for
+additional details.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-resource\-type\fR=\fIRESOURCE_TYPE\fR
+Resource type of the IAP IAM resource. \fIRESOURCE_TYPE\fR must be one of:
+\fBapp\-engine\fR, \fBbackend\-services\fR.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+Service name.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+Service version. Should only be specified with
+\f5\-\-resource\-type=app\-engine\fR.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+the active project, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy
+.RE
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+a project, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy \-\-project=PROJECT_ID
+.RE
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+an App Engine application, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy \-\-resource\-type=app\-engine
+.RE
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+an App Engine service, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy \-\-resource\-type=app\-engine \e
+    \-\-service=SERVICE_ID
+.RE
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+an App Engine service version, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy \-\-resource\-type=app\-engine \e
+    \-\-service=SERVICE_ID
+    \-\-version=VERSION
+.RE
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+all backend services, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy \-\-resource\-type=backend\-services
+.RE
+
+To get the IAM policy for the web accesses to the IAP protected resources within
+a backend service, run:
+
+.RS 2m
+$ gcloud beta iap web get\-iam\-policy \e
+    \-\-resource\-type=backend\-services \-\-service=SERVICE_ID
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha iap web get\-iam\-policy
+.RE
+

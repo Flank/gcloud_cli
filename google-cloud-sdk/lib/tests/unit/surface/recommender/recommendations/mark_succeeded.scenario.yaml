@@ -1,5 +1,5 @@
 title: Mark a recommendation as SUCCEEDED
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -65,12 +65,17 @@ summary:
         state: SUCCEEDED
       userLastUpdateTime: '2019-03-14T22:57:56.781035Z'
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
 - execute_command:
     command: recommender recommendations mark-succeeded my-recommendation --project=my-project --location=my-location --recommender=my-recommender --etag=my-etag
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1alpha1/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markSucceeded?alt=json
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations/my-recommendation:markSucceeded?alt=json
           method: POST
           headers: {}
           body: |

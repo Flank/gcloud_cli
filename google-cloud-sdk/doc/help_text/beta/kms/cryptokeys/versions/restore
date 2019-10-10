@@ -44,7 +44,7 @@ EXAMPLES
     destruction:
 
         $ gcloud beta kms cryptokeys versions restore 9 \
-            --location us-east1 --keyring fellowship --cryptokey frodo
+            --location=us-east1 --keyring=fellowship --cryptokey=frodo
 
 NOTES
     This command is an internal implementation detail and may change or

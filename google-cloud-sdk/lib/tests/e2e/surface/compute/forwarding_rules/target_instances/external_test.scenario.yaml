@@ -4,14 +4,14 @@ summary:
 - execute:
   - command: compute instances create --zone us-central1-f $$instance$$ --format "value(name)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
   - stdout: |
       $$instance$$
 - execute:
   - command: compute target-instances create --zone us-central1-f $$target-instance$$
       --instance $$instance$$ --format "value(name)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$\].
   - stdout: |
       $$target-instance$$
 - execute:
@@ -19,7 +19,7 @@ summary:
       --target-instance $$target-instance$$ --target-instance-zone us-central1-f --load-balancing-scheme
       EXTERNAL --ports 80 --format "value(name)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$\].
   - stdout: |
       $$forwarding-rule$$
 - execute:
@@ -35,7 +35,7 @@ summary:
          - [$$forwarding-rule$$] in [us-central1]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$\].
 - execute:
   - command: compute target-instances delete --zone us-central1-f $$target-instance$$
   - prompt:
@@ -44,7 +44,7 @@ summary:
          - [$$target-instance$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$\].
 - execute:
   - command: compute instances delete --zone us-central1-f $$instance$$
   - prompt:
@@ -53,11 +53,11 @@ summary:
          - [$$instance$$] in [us-central1-f]
     - input: y
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-test-instance
@@ -71,8 +71,9 @@ actions:
     command: compute instances create --zone us-central1-f $$instance$$ --format "value(name)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_stdout: |
         $$instance$$
     - expect_exit:
@@ -82,8 +83,9 @@ actions:
       --instance $$instance$$ --format "value(name)"
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$\].
     - expect_stdout: |
         $$target-instance$$
     - expect_exit:
@@ -103,7 +105,7 @@ actions:
               loadBalancingScheme: EXTERNAL
               name: $$forwarding-rule$$
               portRange: '80'
-              target: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$
+              target: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -124,8 +126,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1540316547053-578e8e4a0f5c9-a03f276a-3f9a238e
             region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
@@ -226,8 +229,9 @@ actions:
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1540316580360-578e8e69d2f41-1846d4cb-1543142b
             region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$\].
     - expect_exit:
         code: 0
     cleanup_for: forwarding-rule
@@ -241,8 +245,9 @@ actions:
           The following target instances will be deleted:
            - [$$target-instance$$] in [us-central1-f]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/targetInstances/$$target-instance$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -255,7 +260,8 @@ actions:
           The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
            - [$$instance$$] in [us-central1-f]
         user_input: y
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0

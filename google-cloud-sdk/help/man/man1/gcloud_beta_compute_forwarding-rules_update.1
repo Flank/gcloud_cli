@@ -11,14 +11,14 @@ gcloud beta compute forwarding\-rules update \- update a Google Compute Engine f
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute forwarding\-rules update\fR \fINAME\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute forwarding\-rules update\fR \fINAME\fR [\fB\-\-allow\-global\-access\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute forwarding\-rules update\fR updates labels
-for a Google Compute Engine forwarding rule. For example:
+and global access for a Google Compute Engine forwarding rule. For example:
 
 .RS 2m
 $ gcloud beta compute forwarding\-rules update example\-fr \e
@@ -59,6 +59,13 @@ Name of the forwarding rule to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-allow\-global\-access\fR
+If True, then clients from all regions can access this internal forwarding rule.
+This can only be specified for forwarding rules with the LOAD_BALANCING_SCHEME
+set to INTERNAL and the target must be either a backend service or a target
+instance.
+
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is

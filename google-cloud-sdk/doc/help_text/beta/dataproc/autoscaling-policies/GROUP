@@ -37,7 +37,7 @@ COMMANDS
         (BETA) List autoscaling policies.
 
      set-iam-policy
-        (BETA) Set IAM policy for an autoscaling-policy.
+        (BETA) Set IAM policy for an autoscaling policy.
 
 EXAMPLES
     To see the list of all autoscaling policies, run:
@@ -63,8 +63,9 @@ EXAMPLES
         $ gcloud beta dataproc autoscaling-policies delete my_policy
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud dataproc autoscaling-policies
         $ gcloud alpha dataproc autoscaling-policies
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ from tests.lib.surface.compute import external_vpn_gateways_test_base
 from tests.lib.surface.compute import utils
 
 
-class ExternalVpnGatewayDeleteBetaTest(
+class ExternalVpnGatewayDeleteGaTest(
     external_vpn_gateways_test_base.ExternalVpnGatewaysTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.api_mock = utils.ComputeApiMock(
@@ -106,6 +106,12 @@ class ExternalVpnGatewayDeleteBetaTest(
         operation_refs[n]), done_operations[n]) for n in range(0, 3)])
 
     self.Run('compute external-vpn-gateways delete {}'.format(' '.join(names)))
+
+
+class ExternalVpnGatewayDeleteBetaTest(ExternalVpnGatewayDeleteGaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ExternalVpnGatewayDeleteAlphaTest(ExternalVpnGatewayDeleteBetaTest):

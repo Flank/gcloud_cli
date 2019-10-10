@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
 
 _LIST_OUTPUT_COLUMN_NAMES = (
-    'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE')
+    'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE SCHEDULED_DELETE')
 
 
 class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
@@ -139,13 +139,6 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     self.ExpectListClusters(self.clusters, region='us-central1')
     next(self.RunDataproc('clusters list'))
 
-
-class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
-  """Tests for dataproc clusters list."""
-
-  def testBeta(self):
-    self.assertEqual(self.messages, self._beta_messages)
-
   def testListClustersOutput_scheduledDeleteCluster(self):
     cluster = self.MakeRunningCluster()
     cluster.config.lifecycleConfig = self.messages.LifecycleConfig(
@@ -153,13 +146,17 @@ class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
 
     self.ExpectListClusters([cluster])
     self.RunDataproc('clusters list', output_format='')
-    self.AssertOutputContains(
-        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE ' +
-        'SCHEDULED_DELETE',
-        normalize_space=True)
+    self.AssertOutputContains(_LIST_OUTPUT_COLUMN_NAMES, normalize_space=True)
     # SCHEDULED_DELETE column should be marked as enabled.
     self.AssertOutputContains(
         'test-cluster 2 RUNNING us-central1-a enabled', normalize_space=True)
+
+
+class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
+  """Tests for dataproc clusters list."""
+
+  def testBeta(self):
+    self.assertEqual(self.messages, self._beta_messages)
 
 
 class ClustersListUnitTestAlpha(ClustersListUnitTestBeta):

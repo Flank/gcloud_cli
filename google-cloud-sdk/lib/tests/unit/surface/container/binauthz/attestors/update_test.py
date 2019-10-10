@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,31 +28,42 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class UpdateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+class UpdateTest(base.WithMockGaBinauthz, base.BinauthzTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.name = 'bar'
     proj = self.Project()
     self.note_ref = 'projects/{}/notes/{}'.format(proj, self.name)
-    self.attestor = self.messages.Attestor(
-        name='projects/{}/attestors/{}'.format(proj, self.name),
-        description='foo',
-        updateTime=times.FormatDateTime(
-            datetime.datetime.utcnow()),
-        userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference=self.note_ref,
-            publicKeys=[],
-        ))
+    try:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          description='foo',
+          updateTime=times.FormatDateTime(
+              datetime.datetime.utcnow()),
+          userOwnedGrafeasNote=self.messages.UserOwnedGrafeasNote(
+              noteReference=self.note_ref,
+              publicKeys=[],
+          ))
+    except AttributeError:
+      self.attestor = self.messages.Attestor(
+          name='projects/{}/attestors/{}'.format(proj, self.name),
+          description='foo',
+          updateTime=times.FormatDateTime(
+              datetime.datetime.utcnow()),
+          userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
+              noteReference=self.note_ref,
+              publicKeys=[],
+          ))
 
   def testSuccess_UpdateDescription(self):
     updated_attestor = copy.deepcopy(self.attestor)
     updated_attestor.description = 'msg'
 
     self.mock_client.projects_attestors.Get.Expect(
-        self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+        self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
             name=self.attestor.name,
         ),
         self.attestor)
@@ -69,7 +80,7 @@ class UpdateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
     updated_attestor.description = ''
 
     self.mock_client.projects_attestors.Get.Expect(
-        self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+        self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
             name=self.attestor.name,
         ),
         self.attestor)
@@ -83,7 +94,7 @@ class UpdateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
 
   def testSuccess_NoUpdate(self):
     self.mock_client.projects_attestors.Get.Expect(
-        self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
+        self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
             name=self.attestor.name,
         ),
         self.attestor)
@@ -96,7 +107,13 @@ class UpdateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
     self.assertEqual(self.attestor, response)
 
 
-class UpdateAlphaTest(base.WithMockAlphaBinauthz, UpdateTest):
+class UpdateBetaTest(base.WithMockBetaBinauthz, UpdateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class UpdateAlphaTest(base.WithMockAlphaBinauthz, UpdateBetaTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

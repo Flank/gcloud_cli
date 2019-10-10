@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ from tests.lib.surface.dns import base
 class PolicyTest(base.DnsTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.id_gen = e2e_utils.GetResourceNameGenerator(
         prefix='dns-cloud', delimiter='-')
     self.delete_retryer = retry.Retryer(

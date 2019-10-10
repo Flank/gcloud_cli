@@ -37,6 +37,10 @@ help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(BETA)\fR Add IAM policy binding to a Google Compute Engine reservation.
+
+.TP 2m
 \fBcreate\fR
 \fB(BETA)\fR Create a Compute Engine reservation.
 
@@ -49,8 +53,20 @@ help\fR for details.
 \fB(BETA)\fR Show details about a Compute Engine reservation.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+\fB(BETA)\fR Get the IAM policy for a Google Compute Engine reservation.
+
+.TP 2m
 \fBlist\fR
 \fB(BETA)\fR List Google Compute Engine reservations.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(BETA)\fR Remove IAM policy binding from a Google Compute Engine reservation.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(BETA)\fR Set the IAM policy for a Google Compute Engine reservation.
 
 .TP 2m
 \fBupdate\fR
@@ -62,10 +78,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute reservations
 $ gcloud alpha compute reservations
 .RE
 

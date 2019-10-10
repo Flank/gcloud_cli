@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class InterconnectsDiagnosticsGaTest(test_base.BaseTest):
 
   def testWithUrl(self):
     self.make_requests.side_effect = [[self.messages.InterconnectDiagnostics()]]
-    self.Run('compute interconnects get-diagnostics https://www.googleapis.com/'
+    self.Run('compute interconnects get-diagnostics https://compute.googleapis.com/'
              'compute/' + self.api_version +
              '/projects/my-project/global/interconnects/'
              'my-interconnect1')

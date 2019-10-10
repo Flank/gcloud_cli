@@ -1,0 +1,107 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ORG\-SECURITY\-POLICIES_RULES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute org\-security\-policies rules update \- update a Google Compute Engine security policy rule
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute org\-security\-policies rules update\fR \fIPRIORITY\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-action\fR=\fIACTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dest\-ip\-ranges\fR=[\fIDEST_IP_RANGE\fR,...]] [\fB\-\-dest\-ports\fR=[\fIDEST_PORTS\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]] [\fB\-\-target\-resources\fR=[\fITARGET_RESOURCES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute org\-security\-policies rules update\fR is
+used to update organization security policy rules.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPRIORITY\fR
+Priority of the security policy rule to update.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
+Resource ID of the security policy into which the rule should be updated.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-action\fR=\fIACTION\fR
+Action to take if the request matches the match condition. \fIACTION\fR must be
+one of: \fBallow\fR, \fBdeny\fR, \fBgoto_next\fR.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the rule.
+
+.TP 2m
+\fB\-\-dest\-ip\-ranges\fR=[\fIDEST_IP_RANGE\fR,...]
+Destination IP ranges to match for this rule. Can only be specified if DIRECTION
+is egress.
+
+.TP 2m
+\fB\-\-dest\-ports\fR=[\fIDEST_PORTS\fR,...]
+A list of destination protocols and ports to which the firewall rule will apply.
+
+.TP 2m
+\fB\-\-direction\fR=\fIDIRECTION\fR
+Direction of the traffic the rule is applied. The default is to apply on
+incoming traffic. \fIDIRECTION\fR must be one of: \fBINGRESS\fR, \fBEGRESS\fR.
+
+.TP 2m
+\fB\-\-enable\-logging\fR
+Use this flag to enable logging of connections that allowed or denied by this
+rule.
+
+.TP 2m
+\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]
+Source IP ranges to match for this rule. Can only be specified if DIRECTION is
+ingress.
+
+.TP 2m
+\fB\-\-target\-resources\fR=[\fITARGET_RESOURCES\fR,...]
+List of URLs of target resources to which the rule is applied.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

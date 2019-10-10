@@ -3,7 +3,7 @@ NAME
         Engine ssl policy
 
 SYNOPSIS
-    gcloud beta compute ssl-policies describe NAME [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute ssl-policies describe SSL_POLICY [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute ssl-policies describe is used to display all
@@ -16,7 +16,7 @@ DESCRIPTION
     balancers and the backends.
 
 POSITIONAL ARGUMENTS
-     NAME
+     SSL_POLICY
         Name of the SSL policy to describe.
 
 GCLOUD WIDE FLAGS

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 
 """Tests for the instances create subcommand."""
 
@@ -60,43 +62,43 @@ _DEFAULT_SCOPES = sorted([
 
 
 def _DefaultMachineTypeOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/zones/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/zones/'
           'central2-a/machineTypes/n1-standard-1').format(ver=api_version)
 
 
 def _DefaultPreemptibleMachineTypeOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/zones/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/zones/'
           'us-central1-b/machineTypes/n1-standard-1').format(ver=api_version)
 
 
 def _DefaultNetworkOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/'
           'global/networks/default').format(ver=api_version)
 
 
 def _DefaultImageOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/debian-cloud/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/debian-cloud/'
           'global/images/family/debian-9').format(ver=api_version)
 
 
 def _NvdimmDiskTypeOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/'
           'zones/central2-a/diskTypes/aep-nvdimm').format(ver=api_version)
 
 
 def _SsdDiskTypeOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/'
           'zones/central2-a/diskTypes/local-ssd').format(ver=api_version)
 
 
 def _OtherImageOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/'
           'some-other-project/global/images/other-image'.format(
               ver=api_version))
 
 
 def _AcceleratorTypeOf(api_version, name):
-  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/my-project/'
           'zones/central2-a/acceleratorTypes/{name}'.format(
               ver=api_version, name=name))
 
@@ -312,6 +314,7 @@ class InstancesCreateGaTest(InstancesCreateTestBase):
     self.CheckRequests(self.zone_get_request)
 
     self.assertMultiLineEqual(
+        'NOTE: The users will be charged for public IPs when VMs are created.\n'
         'Instance creation in progress for [{}]: {}\n'
         'Instance creation in progress for [{}]: {}\n'
         'Use [gcloud compute operations describe URI] command '
@@ -383,7 +386,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         [
             self.messages.Image(
                 name='debian-8-jessie-v20151130',
-                selfLink=('https://www.googleapis.com/compute/v1/'
+                selfLink=('https://compute.googleapis.com/compute/v1/'
                           'projects/debian-cloud/global/'
                           'images/debian-8-jessie-v20151130'),
             )
@@ -410,7 +413,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         [
             self.messages.Image(
                 name='debian-8-jessie-v20151130',
-                selfLink=('https://www.googleapis.com/compute/v1/'
+                selfLink=('https://compute.googleapis.com/compute/v1/'
                           'projects/debian-cloud/global/'
                           'images/debian-8-jessie-v20151130'),
             )
@@ -1362,7 +1365,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
                       boot=True,
                       initializeParams=m.AttachedDiskInitializeParams(
                           sourceImage=(
-                              'https://www.googleapis.com/compute/{0}/projects/'
+                              'https://compute.googleapis.com/compute/{0}/projects/'
                               'my-project/global/images/my-image'.format(
                                   self.api)),
                       ),
@@ -1465,7 +1468,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     self.Run("""
         compute instances create instance-1 --zone central2-a
           --image other-image
-          --image-project https://www.googleapis.com/compute/{0}/projects/some-other-project
+          --image-project https://compute.googleapis.com/compute/{0}/projects/some-other-project
         """.format(self.api))
 
     self.CheckRequests(
@@ -1778,7 +1781,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
               zone='central2-a'))])
 
   def testWithMetadataFromNonExistentFile(self):
-    metdata_file = self.Touch(self.temp_path, 'file-1', contents='hello')
+    metadata_file = self.Touch(self.temp_path, 'file-1', contents='hello')
 
     with self.assertRaisesRegex(
         files.Error,
@@ -1787,7 +1790,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
           compute instances create instance-1
             --metadata-from-file x={},y=garbage
             --zone central2-a
-          """.format(metdata_file))
+          """.format(metadata_file))
 
     self.CheckRequests(
         [(self.compute.zones,
@@ -2067,7 +2070,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         textwrap.dedent("""\
             [
               {{
-                "machineType": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
+                "machineType": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
                 "name": "instance-1",
                 "networkInterfaces": [
                   {{
@@ -2086,10 +2089,10 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
                 }},
                 "selfLink": "{compute_uri}/projects/my-project/zones/zone-1/instances/instance-1",
                 "status": "RUNNING",
-                "zone": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
+                "zone": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
               }},
               {{
-                "machineType": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
+                "machineType": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-1",
                 "name": "instance-2",
                 "networkInterfaces": [
                   {{
@@ -2108,10 +2111,10 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
                 }},
                 "selfLink": "{compute_uri}/projects/my-project/zones/zone-1/instances/instance-2",
                 "status": "RUNNING",
-                "zone": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
+                "zone": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
               }},
               {{
-                "machineType": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-2",
+                "machineType": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/machineTypes/n1-standard-2",
                 "name": "instance-3",
                 "networkInterfaces": [
                   {{
@@ -2130,7 +2133,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
                 }},
                 "selfLink": "{compute_uri}/projects/my-project/zones/zone-1/instances/instance-3",
                 "status": "RUNNING",
-                "zone": "https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
+                "zone": "https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1"
               }}
             ]
             """.format(compute_uri=self.compute_uri)))
@@ -2997,10 +3000,10 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
   def testInvalidUri(self):
     with self.assertRaisesRegex(
         resources.InvalidResourceException, r'could not parse resource '
-        r'\[https://www.googleapis.com/compute/zones/central3-a/instances/'
-        r'instance-2\]: unknown api www'):
+        r'\[https://compute.googleapis.com/compute/zones/central3-a/instances/'
+        r'instance-2\]: unknown api version None'):
       self.Run("""
-         compute instances create https://www.googleapis.com/compute/zones/central3-a/instances/instance-2
+         compute instances create https://compute.googleapis.com/compute/zones/central3-a/instances/instance-2
          """)
 
     self.CheckRequests()
@@ -3456,8 +3459,8 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
 
     self.Run("""
         compute instances create
-          https://www.googleapis.com/compute/{api}/projects/my-project/zones/central1-a/instances/instance-1
-          https://www.googleapis.com/compute/{api}/projects/my-project/zones/central1-b/instances/instance-2
+          https://compute.googleapis.com/compute/{api}/projects/my-project/zones/central1-a/instances/instance-1
+          https://compute.googleapis.com/compute/{api}/projects/my-project/zones/central1-b/instances/instance-2
         """.format(api=self.api))
 
     self.CheckRequests(
@@ -3964,6 +3967,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     custom_cpu = '2'
     custom_ram_mib = '3500'
     project_name = 'my-project'
+    custom_vm_type = 'n2'
     zone_name = 'central2-a'
 
     self.make_requests.side_effect = iter([
@@ -3988,17 +3992,21 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         --custom-cpu {1}
         --custom-memory {2}MiB
         --zone {3}
-        """.format(instance_name, custom_cpu, custom_ram_mib, zone_name))
+        --custom-vm-type {4}
+        """.format(instance_name, custom_cpu, custom_ram_mib, zone_name,
+                   custom_vm_type))
 
     custom_type_string = instance_utils.GetNameForCustom(custom_cpu,
-                                                         custom_ram_mib)
-    custom_machine_type = ('https://www.googleapis.com/compute/v1/projects/{0}/'
+                                                         custom_ram_mib,
+                                                         vm_type=custom_vm_type)
+    custom_machine_type = ('https://compute.googleapis.com/compute/v1/projects/{0}/'
                            'zones/{1}/machineTypes/'
                            '{2}'.format(project_name, zone_name,
                                         custom_type_string))
 
-    custom_machine_type_name = 'custom-{0}-{1}'.format(custom_cpu,
-                                                       custom_ram_mib)
+    custom_machine_type_name = '{0}-custom-{1}-{2}'.format(custom_vm_type,
+                                                           custom_cpu,
+                                                           custom_ram_mib)
 
     self.CheckRequests(
         self.zone_get_request,
@@ -4081,7 +4089,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
 
     custom_type_string = instance_utils.GetNameForCustom(custom_cpu,
                                                          custom_ram_mib)
-    custom_machine_type = ('https://www.googleapis.com/compute/v1/projects/{0}/'
+    custom_machine_type = ('https://compute.googleapis.com/compute/v1/projects/{0}/'
                            'zones/{1}/machineTypes/'
                            '{2}'.format(project_name, zone_name,
                                         custom_type_string))
@@ -4174,7 +4182,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     custom_type_string = instance_utils.GetNameForCustom(custom_cpu,
                                                          custom_ram_mib,
                                                          True)
-    custom_machine_type = ('https://www.googleapis.com/compute/v1/projects/'
+    custom_machine_type = ('https://compute.googleapis.com/compute/v1/projects/'
                            '{0}/zones/{1}/machineTypes/'
                            '{2}'.format(project_name, zone_name,
                                         custom_type_string))
@@ -4289,7 +4297,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
 
     custom_type_string = instance_utils.GetNameForCustom(custom_cpu,
                                                          custom_ram_mib)
-    custom_machine_type = ('https://www.googleapis.com/compute/v1/projects/{0}/'
+    custom_machine_type = ('https://compute.googleapis.com/compute/v1/projects/{0}/'
                            'zones/{1}/machineTypes/'
                            '{2}'.format(project_name, zone_name,
                                         custom_type_string))
@@ -5118,7 +5126,7 @@ class InstancesCreateDiskTestBeta(InstancesCreateTestsMixin):
         '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
         'image-project=debian-cloud,device-name=data,auto-delete=yes,'
         'disk-resource-policy='
-        'https://www.googleapis.com/compute/projects/'
+        'https://compute.googleapis.com/compute/projects/'
         'cloudsdktest/regions/central2-a/resourcePolicies/testpolicy',
         self.track)
 
@@ -5150,7 +5158,7 @@ class InstancesCreateDiskTestBeta(InstancesCreateTestsMixin):
                             diskType=(self.compute_uri +
                                       '/projects/my-project/zones/central2-a/'
                                       'diskTypes/SSD'),
-                            resourcePolicies=['https://www.googleapis.com/'
+                            resourcePolicies=['https://compute.googleapis.com/'
                                               'compute/projects/'
                                               'cloudsdktest/regions/central2-a/'
                                               'resourcePolicies/testpolicy']),
@@ -6017,12 +6025,12 @@ class InstancesWithMultipleNetworkInterfaceCardsTest(
                               networkTier=self._default_network_tier,
                               natIP='8.8.8.8',
                               type=self._one_to_one_nat)],
-                          network=('https://www.googleapis.com/compute/alpha/'
+                          network=('https://compute.googleapis.com/compute/alpha/'
                                    'projects/my-project/global/networks/'
                                    'some-net'),
                           networkIP='10.0.0.1'),
                       msg.NetworkInterface(
-                          subnetwork=('https://www.googleapis.com/compute/'
+                          subnetwork=('https://compute.googleapis.com/compute/'
                                       'alpha/projects/my-project/regions/'
                                       'central2/subnetworks/some-subnet'),
                           accessConfigs=[msg.AccessConfig(
@@ -6132,7 +6140,7 @@ class InstancesWithMultipleNetworkInterfaceCardsTest(
                   name='hamlet',
                   networkInterfaces=[
                       msg.NetworkInterface(
-                          network=('https://www.googleapis.com/compute/alpha/'
+                          network=('https://compute.googleapis.com/compute/alpha/'
                                    'projects/my-project/global/networks/'
                                    'default')),
                   ],
@@ -6201,11 +6209,11 @@ class InstancesWithMultipleNetworkInterfaceCardsTest(
                                 networkTier=(msg.AccessConfig.
                                              NetworkTierValueValuesEnum.SELECT))
                         ],
-                        network=('https://www.googleapis.com/compute/alpha/'
+                        network=('https://compute.googleapis.com/compute/alpha/'
                                  'projects/my-project/global/networks/'
                                  'some-net')),
                     msg.NetworkInterface(
-                        subnetwork=('https://www.googleapis.com/compute/'
+                        subnetwork=('https://compute.googleapis.com/compute/'
                                     'alpha/projects/my-project/regions/'
                                     'central2/subnetworks/some-subnet'),
                         accessConfigs=[
@@ -6474,7 +6482,7 @@ class InstancesWithMultipleNetworkInterfaceCardsTestBeta(
 
 class InstanceWithAliasIpRangesTest(
     InstancesCreateTestsMixin):
-  """Test creation of instace with alias IP ranges."""
+  """Test creation of instance with alias IP ranges."""
 
   def SetUp(self):
     SetUp(self, 'v1')
@@ -6536,7 +6544,7 @@ class InstanceWithAliasIpRangesTest(
                                 natIP='8.8.8.8',
                                 type=self._one_to_one_nat)
                         ],
-                        network=('https://www.googleapis.com/compute/v1/'
+                        network=('https://compute.googleapis.com/compute/v1/'
                                  'projects/my-project/global/networks/'
                                  'some-net'),
                         networkIP='10.0.0.1',
@@ -6546,7 +6554,7 @@ class InstanceWithAliasIpRangesTest(
                                 ipCidrRange='1.2.3.0/24')
                         ]),
                     msg.NetworkInterface(
-                        subnetwork=('https://www.googleapis.com/compute/v1/'
+                        subnetwork=('https://compute.googleapis.com/compute/v1/'
                                     'projects/my-project/regions/central2/'
                                     'subnetworks/some-subnet'),
                         accessConfigs=[
@@ -7988,12 +7996,12 @@ class InstancesCreateMinCpuPlatformGA(InstancesCreateTestsMixin):
     self.AssertErrEquals('')
 
 
-class InstancesCreateTestBeta(InstancesCreateTestsMixin,
+class InstancesCreateReservationTest(InstancesCreateTestsMixin,
                               parameterized.TestCase):
 
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testWithAnyReservationAffinity(self):
     m = self.messages
@@ -8153,8 +8161,14 @@ class InstancesCreateTestBeta(InstancesCreateTestsMixin,
           ))],
     )
 
+class InstancesCreateReservationTestBeta(InstancesCreateReservationTest):
 
-class InstancesCreateTestAlpha(InstancesCreateTestBeta):
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstancesCreateTestAlpha(InstancesCreateReservationTestBeta):
 
   def SetUp(self):
     SetUp(self, 'alpha')
@@ -8458,6 +8472,50 @@ class InstancesCreateTestAlpha(InstancesCreateTestBeta):
                     m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
                 ],
                 scheduling=m.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
+
+  def testWithMinNodeCpus(self):
+    m = self.messages
+
+    self.Run("""
+        compute instances create instance
+          --zone central2-a
+          --min-node-cpus 10
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='instance',
+                networkInterfaces=[
+                    m.NetworkInterface(
+                        accessConfigs=[
+                            m.AccessConfig(
+                                name='external-nat', type=self._one_to_one_nat)
+                        ],
+                        network=self._default_network)
+                ],
+                serviceAccounts=[
+                    m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True,
+                                        minNodeCpus=10),),
             project='my-project',
             zone='central2-a',))],)
 
@@ -8801,8 +8859,9 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateWithKmsTestGa):
 
   def testCreateWithImageAndFamilyFlags(self):
     with self.AssertRaisesToolExceptionRegexp(
-        r'Must specify exactly one of \[image\], \[image-family\] or '
-        r'\[source-snapshot\] for a \[--create-disk\]. '
+        r'Must specify exactly one of \[image\], \[image-family\], '
+        r'\[image-csek-required\], \[source-snapshot\], or '
+        r'\[source-snapshot-csek-required\] for a \[--create-disk\]. '
         r'These fields are mutually exclusive.'):
       self.Run("""
           compute instances create vm
@@ -8984,80 +9043,84 @@ class InstancesCreateDiskFromSnapshotTestGA(InstancesCreateTestsMixin,
   def SetUp(self):
     SetUp(self, self.api_version)
 
-
-class InstancesCreateDiskFromSnapshotTestBeta(
-    InstancesCreateDiskFromSnapshotTestGA):
-  """Test creation of VM instances with create disk(s)."""
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
-
-
-class InstancesCreateDiskFromSnapshotTestAlpha(
-    InstancesCreateDiskFromSnapshotTestBeta):
-  """Test creation of VM instances with create disk(s)."""
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.api_version = 'alpha'
-
-  def testCreateDiskWithAllProperties(self):
+  @parameterized.parameters([
+      ('', 'my-backup'),
+      (('https://compute.googleapis.com/compute/'
+        '{}/projects/my-project/global/snapshots/'), 'my-backup')])
+  def testCreateBootDiskWithSnapshotFlag(
+      self,
+      snapshot_path,
+      snapshot_name):
     m = self.messages
 
-    self.Run(
-        'compute instances create hamlet '
-        '  --zone central2-a '
-        '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,'
-        'source-snapshot=my-snapshot,device-name=data,auto-delete=yes')
+    self.make_requests.side_effect = iter([
+        [
+            m.Zone(name='central2-a')
+        ],
+        [
+            self.messages.Project(
+                defaultServiceAccount='default@service.account'),
+        ],
+        [],
+    ])
+    snapshot_arg = snapshot_path.format(self.api_version) + snapshot_name
+    self.Run("""
+        compute instances create instance-1
+          --source-snapshot {}
+          --zone central2-a
+        """.format(snapshot_arg))
 
     self.CheckRequests(
         self.zone_get_request,
         self.project_get_request,
-        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
-            instance=m.Instance(
-                canIpForward=False,
-                deletionProtection=False,
-                disks=[
-                    m.AttachedDisk(
-                        autoDelete=True,
-                        boot=True,
-                        initializeParams=m.AttachedDiskInitializeParams(
-                            sourceImage=self._default_image,),
-                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                    m.AttachedDisk(
-                        autoDelete=True,
-                        boot=False,
-                        deviceName='data',
-                        initializeParams=m.AttachedDiskInitializeParams(
-                            diskName='disk-1',
-                            diskSizeGb=10,
-                            sourceSnapshot=(self.compute_uri +
-                                            '/projects/my-project/global/'
-                                            'snapshots/my-snapshot'),
-                            diskType=(self.compute_uri +
-                                      '/projects/my-project/zones/central2-a/'
-                                      'diskTypes/SSD')),
-                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-                ],
-                machineType=self._default_machine_type,
-                metadata=m.Metadata(),
-                name='hamlet',
-                networkInterfaces=[m.NetworkInterface(
-                    accessConfigs=[m.AccessConfig(
-                        name='external-nat',
-                        type=self._one_to_one_nat)],
-                    network=self._default_network)],
-                serviceAccounts=[
-                    m.ServiceAccount(
-                        email='default',
-                        scopes=_DEFAULT_SCOPES,),
-                ],
-                scheduling=m.Scheduling(automaticRestart=True),),
-            project='my-project',
-            zone='central2-a',))],)
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[m.AttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      initializeParams=m.AttachedDiskInitializeParams(
+                          sourceSnapshot=(
+                              'https://compute.googleapis.com/compute/{0}/projects/'
+                              'my-project/global/snapshots/{1}'.format(
+                                  self.api, snapshot_name)),
+                      ),
+                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[m.NetworkInterface(
+                      accessConfigs=[m.AccessConfig(
+                          name='external-nat',
+                          type=self._one_to_one_nat)],
+                      network=self._default_network)],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='default',
+                          scopes=_DEFAULT_SCOPES
+                      ),
+                  ],
+                  scheduling=m.Scheduling(
+                      automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+  def testCreateBootDiskWithSnapshotAndImageFlagFails(self):
+    with self.assertRaisesRegex(
+        MockArgumentError,
+        r'argument --image: At most one of --image \| --image-family \| '
+        r'--source-snapshot may be specified.'):
+      self.Run("""
+          compute instances create vm
+            --image=foo --source-snapshot=my-snapshot
+          """)
 
   def testCreateDiskWithSnapshotProperty(self):
     msg = self.messages
@@ -9110,7 +9173,7 @@ class InstancesCreateDiskFromSnapshotTestAlpha(
 
   def testCreateDiskSnapshotAndImagePropertyFails(self):
     with self.AssertRaisesToolExceptionRegexp(
-        r'Must specify exactly one of \[image\], \[image-family\] or '
+        r'Must specify exactly one of \[image\], \[image-family\], or '
         r'\[source-snapshot\] for a \[--create-disk\]. '
         r'These fields are mutually exclusive.'):
       self.Run("""
@@ -9118,91 +9181,101 @@ class InstancesCreateDiskFromSnapshotTestAlpha(
             --create-disk image=foo,source-snapshot=my-snapshot
           """)
 
-  @parameterized.parameters([
-      ('', 'my-backup'),
-      (('https://www.googleapis.com/compute/'
-        'alpha/projects/my-project/global/snapshots/'), 'my-backup')])
-  def testCreateBootDiskWithSnapshotFlag(
-      self,
-      snapshot_path,
-      snapshot_name):
+
+class InstancesCreateDiskFromSnapshotTestBeta(
+    InstancesCreateDiskFromSnapshotTestGA):
+  """Test creation of VM instances with create disk(s)."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class InstancesCreateDiskFromSnapshotTestAlpha(
+    InstancesCreateDiskFromSnapshotTestBeta):
+  """Test creation of VM instances with create disk(s)."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testCreateDiskSnapshotAndImagePropertyFails(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Must specify exactly one of \[image\], \[image-family\], '
+        r'\[image-csek-required\], \[source-snapshot\], or '
+        r'\[source-snapshot-csek-required\] for a \[--create-disk\]. '
+        r'These fields are mutually exclusive.'):
+      self.Run("""
+          compute instances create vm
+            --create-disk image=foo,source-snapshot=my-snapshot
+          """)
+
+  def testCreateDiskWithAllProperties(self):
     m = self.messages
 
-    self.make_requests.side_effect = iter([
-        [
-            m.Zone(name='central2-a')
-        ],
-        [
-            self.messages.Project(
-                defaultServiceAccount='default@service.account'),
-        ],
-        [],
-    ])
-    snapshot_arg = snapshot_path + snapshot_name
-    self.Run("""
-        compute instances create instance-1
-          --source-snapshot {}
-          --zone central2-a
-        """.format(snapshot_arg))
+    self.Run(
+        'compute instances create hamlet '
+        '  --zone central2-a --erase-windows-vss-signature'
+        '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,'
+        'source-snapshot=my-snapshot,device-name=data,auto-delete=yes')
 
     self.CheckRequests(
         self.zone_get_request,
         self.project_get_request,
-        [(self.compute.instances,
-          'Insert',
-          m.ComputeInstancesInsertRequest(
-              instance=m.Instance(
-                  canIpForward=False,
-                  deletionProtection=False,
-                  disks=[m.AttachedDisk(
-                      autoDelete=True,
-                      boot=True,
-                      initializeParams=m.AttachedDiskInitializeParams(
-                          sourceSnapshot=(
-                              'https://www.googleapis.com/compute/{0}/projects/'
-                              'my-project/global/snapshots/{1}'.format(
-                                  self.api, snapshot_name)),
-                      ),
-                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-                  machineType=self._default_machine_type,
-                  metadata=m.Metadata(),
-                  name='instance-1',
-                  networkInterfaces=[m.NetworkInterface(
-                      accessConfigs=[m.AccessConfig(
-                          name='external-nat',
-                          type=self._one_to_one_nat)],
-                      network=self._default_network)],
-                  serviceAccounts=[
-                      m.ServiceAccount(
-                          email='default',
-                          scopes=_DEFAULT_SCOPES
-                      ),
-                  ],
-                  scheduling=m.Scheduling(
-                      automaticRestart=True),
-              ),
-              project='my-project',
-              zone='central2-a',
-          ))],
-    )
-
-  def testCreateBootDiskWithSnapshotAndImageFlagFails(self):
-    with self.assertRaisesRegex(
-        MockArgumentError,
-        r'argument --image: At most one of --image \| --image-family \| '
-        r'--source-snapshot may be specified.'):
-      self.Run("""
-          compute instances create vm
-            --image=foo --source-snapshot=my-snapshot
-          """)
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                eraseWindowsVssSignature=True,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=False,
+                        deviceName='data',
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            diskName='disk-1',
+                            diskSizeGb=10,
+                            sourceSnapshot=(self.compute_uri +
+                                            '/projects/my-project/global/'
+                                            'snapshots/my-snapshot'),
+                            diskType=(self.compute_uri +
+                                      '/projects/my-project/zones/central2-a/'
+                                      'diskTypes/SSD')),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='hamlet',
+                networkInterfaces=[m.NetworkInterface(
+                    accessConfigs=[m.AccessConfig(
+                        name='external-nat',
+                        type=self._one_to_one_nat)],
+                    network=self._default_network)],
+                serviceAccounts=[
+                    m.ServiceAccount(
+                        email='default',
+                        scopes=_DEFAULT_SCOPES,),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
 
 
 class InstancesCreateFromMachineImage(InstancesCreateTestsMixin):
 
-  def testAlpha(self):
+  def SetUp(self):
     SetUp(self, 'alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateFrommachineImage(self):
     m = self.messages
 
     self.Run('compute instances create instance-1 '
@@ -9217,17 +9290,53 @@ class InstancesCreateFromMachineImage(InstancesCreateTestsMixin):
                 name='instance-1',
                 deletionProtection=False,
                 sourceMachineImage=(
-                    'https://www.googleapis.com/compute/alpha/projects/'
+                    'https://compute.googleapis.com/compute/alpha/projects/'
                     'my-project/global/machineImages/machine-image-1')),
             project='my-project',
             zone='central2-a'))])
+
+  def testCreateFrommachineImagewithKey(self):
+    m = self.messages
+    private_key_fname = self.WriteKeyFile(machine_image=True)
+
+    self.Run('compute instances create instance-1 '
+             '--zone central2-a '
+             '--source-machine-image machine-image-1 '
+             '--source-machine-image-csek-key-file {0}'
+             .format(private_key_fname))
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                name='instance-1',
+                deletionProtection=False,
+                sourceMachineImage=(
+                    'https://compute.googleapis.com/compute/alpha/projects/'
+                    'my-project/global/machineImages/machine-image-1'),
+                sourceMachineImageEncryptionKey=m.CustomerEncryptionKey(
+                    rawKey=('aFellowOfInfiniteJestOfMostExcellentFancy01='))),
+            project='my-project',
+            zone='central2-a'))])
+
+  def testCreateFrommachineImagewithoutImage(self):
+    private_key_fname = self.WriteKeyFile(machine_image=True)
+    with self.AssertRaisesExceptionMatches(
+        expected_exception=exceptions.RequiredArgumentException,
+        expected_message='`--source-machine-image-csek-key-file` requires '
+                         '`--source-machine-image` to be specified`'):
+      self.Run('compute instances create instance-1 '
+               '--zone central2-a '
+               '--source-machine-image-csek-key-file {0}'
+               .format(private_key_fname))
 
 
 class InstancesCreateWithDisplayDevice(InstancesCreateTestsMixin):
 
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateWithDisplayDevice(self):
     m = self.messages

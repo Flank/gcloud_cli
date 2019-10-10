@@ -1,0 +1,67 @@
+title: Create a Managed Identities Active Directory domain.
+release_tracks: [ALPHA]
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: managed-identities domains create $$my-domain$$ --reserved-ip-range=10.0.1.0/24
+      --regions=nonexistent-location --authorized-networks=projects/cloud-sdk-integration-testing/global/networks/fake-network
+  - error: |-
+      1: CANCELLED: malformed CreateDomainRequest: region "nonexistent-location" is not supported, supported regions are ["europe-west1" "europe-west4" "asia-southeast1" "us-west2" "us-east1" "europe-north1" "asia-east1" "us-west1" "us-central1" "us-east4"]
+- execute:
+  - command: managed-identities domains describe $$my-domain$$
+  - error: |-
+      1: NOT_FOUND: Resource 'projects/cloud-sdk-integration-testing/locations/global/domains/$$my-domain$$' was not found
+
+actions:
+
+- generate_resource_id:
+    reference: my-domain
+    prefix: ad.test.
+
+- execute_command:
+    command: active-directory domains create $$my-domain$$ --reserved-ip-range=10.0.1.0/24
+      --region=nonexistent-location --authorized-networks=projects/cloud-sdk-integration-testing/global/networks/fake-network
+    events:
+    - api_call:
+        poll_operation: false
+        expect_request:
+          uri: https://managedidentities.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/domains?alt=json&domainName=$$my-domain$$
+          method: POST
+          body:
+            json:
+              authorizedNetworks: [projects/cloud-sdk-integration-testing/global/networks/fake-network]
+              reservedIpRange: 10.0.1.0/24
+              locations: [nonexistent-location]
+        return_response:
+          headers:
+            status: '499'
+          body:
+            error:
+              code: 499
+    - expect_exit:
+        code: 1
+- execute_command:
+    command: active-directory domains describe $$my-domain$$
+    cleanup_for: my-domain
+    events:
+    - api_call:
+        expect_request:
+          uri: https://managedidentities.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/domains/$$my-domain$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3436'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: Resource 'projects/cloud-sdk-integration-testing/locations/global/domains/$$my-domain$$'
+                was not found
+              status: NOT_FOUND
+    - expect_exit:
+        code: 1

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,19 +25,17 @@ import json
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iam import iam_util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.projects import base
 from tests.lib.surface.projects import util as test_util
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ProjectsRemoveIamPolicyBindingTest(base.ProjectsUnitTestBase):
+class ProjectsRemoveIamPolicyBindingTestGA(base.ProjectsUnitTestBase):
 
-  def testRemoveIamPolicyBinding(self, track):
-    self.track = track
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testRemoveIamPolicyBinding(self):
     test_project = test_util.GetTestActiveProject()
     start_policy = copy.deepcopy(test_util.GetTestIamPolicy())
     new_policy = copy.deepcopy(start_policy)
@@ -46,10 +44,15 @@ class ProjectsRemoveIamPolicyBindingTest(base.ProjectsUnitTestBase):
     # In the test policy the first binding is for editors, second for owners.
     new_policy.bindings[1].members.remove(remove_user)
     resource_name = test_project.projectId
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
 
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=resource_name),
+            resource=resource_name,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
         start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
@@ -66,9 +69,18 @@ class ProjectsRemoveIamPolicyBindingTest(base.ProjectsUnitTestBase):
     self.assertEqual(response, new_policy)
 
 
-class ProjectsRemoveIamPolicyBindingTestAlpha(base.ProjectsUnitTestBase):
+class ProjectsRemoveIamPolicyBindingTestBeta(
+    ProjectsRemoveIamPolicyBindingTestGA):
 
   def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectsRemoveIamPolicyBindingTestAlpha(
+    ProjectsRemoveIamPolicyBindingTestBeta):
+
+  def SetUp(self):
+    self.track = self.track = calliope_base.ReleaseTrack.ALPHA
     self.messages = projects_util.GetMessages()
     self.test_iam_policy_with_condition = projects_util.GetMessages().Policy(
         auditConfigs=[
@@ -102,17 +114,23 @@ class ProjectsRemoveIamPolicyBindingTestAlpha(base.ProjectsUnitTestBase):
     remove_role = 'roles/non-primitive'
     self.WriteInput('1')
     new_policy.bindings[:] = new_policy.bindings[1:]
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
 
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=new_policy)), new_policy)
 
-    response = self.RunProjectsAlpha(
+    response = self.RunProjects(
         'remove-iam-policy-binding', test_project.projectId,
         '--role={0}'.format(remove_role), '--member={0}'.format(remove_user))
     self.assertEqual(response, new_policy)
@@ -134,17 +152,23 @@ class ProjectsRemoveIamPolicyBindingTestAlpha(base.ProjectsUnitTestBase):
     remove_role = 'roles/non-primitive'
     self.WriteInput('2')
     new_policy.bindings[:] = new_policy.bindings[:1]
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
 
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=new_policy)), new_policy)
 
-    response = self.RunProjectsAlpha(
+    response = self.RunProjects(
         'remove-iam-policy-binding', test_project.projectId,
         '--role={0}'.format(remove_role), '--member={0}'.format(remove_user))
     self.assertEqual(response, new_policy)
@@ -166,17 +190,23 @@ class ProjectsRemoveIamPolicyBindingTestAlpha(base.ProjectsUnitTestBase):
     remove_role = 'roles/non-primitive'
     self.WriteInput('3')
     new_policy.bindings[:] = []
+    new_policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
 
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=new_policy)), new_policy)
 
-    response = self.RunProjectsAlpha(
+    response = self.RunProjects(
         'remove-iam-policy-binding', test_project.projectId,
         '--role={0}'.format(remove_role), '--member={0}'.format(remove_user))
     self.assertEqual(response, new_policy)
@@ -197,13 +227,18 @@ class ProjectsRemoveIamPolicyBindingTestAlpha(base.ProjectsUnitTestBase):
     remove_role = 'roles/non-primitive'
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId), start_policy)
+            resource=test_project.projectId,
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION))),
+        start_policy)
     with self.AssertRaisesExceptionRegexp(
         iam_util.IamPolicyBindingIncompleteError,
         '.*Removing a binding without specifying a condition from a policy.*'):
-      self.RunProjectsAlpha('remove-iam-policy-binding', test_project.projectId,
-                            '--role={0}'.format(remove_role),
-                            '--member={0}'.format(remove_user))
+      self.RunProjects('remove-iam-policy-binding', test_project.projectId,
+                       '--role={0}'.format(remove_role),
+                       '--member={0}'.format(remove_user))
 
 
 if __name__ == '__main__':

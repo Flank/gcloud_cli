@@ -26,9 +26,9 @@ gcloud beta sql flags list \- list customizable flags for Google Cloud SQL insta
 .RS 2m
 .TP 2m
 \fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR
-Only list flags that apply to the specified database version.
-\fIDATABASE_VERSION\fR must be one of: \fBMYSQL_5_5\fR, \fBMYSQL_5_6\fR,
-\fBMYSQL_5_7\fR, \fBPOSTGRES_9_6\fR.
+The database engine type and version. If left unspecified, the API defaults will
+be used. See the list of database versions at
+https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances#databaseVersion
 
 
 .RE

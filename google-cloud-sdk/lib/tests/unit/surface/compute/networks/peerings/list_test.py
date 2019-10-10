@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,13 +38,13 @@ def MakePeeringsForTest(api_version):
       messages.Network(
           name='network-1',
           autoCreateSubnetworks=True,
-          selfLink=('https://www.googleapis.com/compute/{}/projects/my-project/'
+          selfLink=('https://compute.googleapis.com/compute/{}/projects/my-project/'
                     'global/networks/network-1'.format(api_version)),
           subnetworks=[],
           peerings=[
               messages.NetworkPeering(
                   name='peering-1',
-                  network='https://www.googleapis.com/compute/{}/projects/'
+                  network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project/global/networks/network-2'.format(api_version),
                   autoCreateRoutes=True,
                   exportCustomRoutes=False,
@@ -53,7 +53,7 @@ def MakePeeringsForTest(api_version):
                   stateDetails='Connected.'),
               messages.NetworkPeering(
                   name='peering-2',
-                  network='https://www.googleapis.com/compute/{}/projects/'
+                  network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project-2/global/networks/network-3'.format(api_version),
                   autoCreateRoutes=True,
                   exportCustomRoutes=False,
@@ -62,7 +62,7 @@ def MakePeeringsForTest(api_version):
                   stateDetails='Connected.'),
               messages.NetworkPeering(
                   name='peering-3',
-                  network='https://www.googleapis.com/compute/{}/projects/'
+                  network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project-3/global/networks/network-3'.format(api_version),
                   autoCreateRoutes=True,
                   exportCustomRoutes=True,
@@ -73,13 +73,13 @@ def MakePeeringsForTest(api_version):
       messages.Network(
           name='network-2',
           autoCreateSubnetworks=True,
-          selfLink=('https://www.googleapis.com/compute/{}/projects/my-project/'
+          selfLink=('https://compute.googleapis.com/compute/{}/projects/my-project/'
                     'global/networks/network-2'.format(api_version)),
           subnetworks=[],
           peerings=[
               messages.NetworkPeering(
                   name='my-peering-1',
-                  network='https://www.googleapis.com/compute/{}/projects/'
+                  network='https://compute.googleapis.com/compute/{}/projects/'
                   'my-project/global/networks/network-1'.format(api_version),
                   autoCreateRoutes=True,
                   exportCustomRoutes=True,

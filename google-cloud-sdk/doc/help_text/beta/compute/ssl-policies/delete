@@ -3,7 +3,7 @@ NAME
         policies
 
 SYNOPSIS
-    gcloud beta compute ssl-policies delete NAME [NAME ...]
+    gcloud beta compute ssl-policies delete SSL_POLICY [SSL_POLICY ...]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -19,7 +19,7 @@ DESCRIPTION
     balancers and the backends.
 
 POSITIONAL ARGUMENTS
-     NAME [NAME ...]
+     SSL_POLICY [SSL_POLICY ...]
         Names of the SSL policies to delete.
 
 GCLOUD WIDE FLAGS

@@ -80,6 +80,10 @@ COMMANDS
      update
         (BETA) Update Google Compute Engine managed instance groups.
 
+     update-instances
+        (BETA) Immediately update selected instances in a Google Compute Engine
+        managed instance group.
+
      wait-until
         (BETA) Wait until managed instance group reaches desired state.
 

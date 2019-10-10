@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ class SslCertificatesDescribeTest(test_base.BaseTest,
             creationTimestamp: '2014-09-04T09:56:33.679-07:00'
             description: Certificate one.
             name: ssl-cert-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/sslCertificates/ssl-cert-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/sslCertificates/ssl-cert-1
             """))
 
 
@@ -85,7 +85,7 @@ class SslCertificatesDescribeBetaTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        beta compute ssl-certificates describe ssl-cert-1
+        beta compute ssl-certificates describe --global ssl-cert-1
         """)
 
     self.CheckRequests(
@@ -102,7 +102,7 @@ class SslCertificatesDescribeBetaTest(test_base.BaseTest,
                 description: Self-managed certificate.
                 expireTime: '2018-12-18T11:11:11.000-07:00'
                 name: ssl-cert-1
-                selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-1
+                selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-1
                 selfManaged:
                   certificate: |-
                     -----BEGIN CERTIFICATE-----
@@ -130,13 +130,14 @@ class SslCertificatesDescribeBetaTest(test_base.BaseTest,
     ])
 
     self.Run("""
-        beta compute ssl-certificates describe ssl-cert-2
+        beta compute ssl-certificates describe --region us-west-1 ssl-cert-2
         """)
 
-    self.CheckRequests([(self.compute.sslCertificates, 'Get',
-                         messages.ComputeSslCertificatesGetRequest(
+    self.CheckRequests([(self.compute.regionSslCertificates, 'Get',
+                         messages.ComputeRegionSslCertificatesGetRequest(
                              sslCertificate='ssl-cert-2',
-                             project='my-project'))],)
+                             project='my-project',
+                             region='us-west-1'))],)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -152,7 +153,8 @@ class SslCertificatesDescribeBetaTest(test_base.BaseTest,
                   - xn--8a342mzfam5b18csni3w.certsbridge.com
                   status: ACTIVE
                 name: ssl-cert-2
-                selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/sslCertificates/ssl-cert-2
+                region: us-west-1
+                selfLink: https://compute.googleapis.com/compute/beta/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
                 type: MANAGED
             """))
 
@@ -188,7 +190,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
                 description: Self-managed certificate.
                 expireTime: '2018-12-18T11:11:11.000-07:00'
                 name: ssl-cert-1
-                selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/global/sslCertificates/ssl-cert-1
+                selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/sslCertificates/ssl-cert-1
                 selfManaged:
                   certificate: |-
                     -----BEGIN CERTIFICATE-----
@@ -240,7 +242,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
                   status: ACTIVE
                 name: ssl-cert-2
                 region: us-west-1
-                selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
+                selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/sslCertificates/ssl-cert-2
                 type: MANAGED
             """))
 

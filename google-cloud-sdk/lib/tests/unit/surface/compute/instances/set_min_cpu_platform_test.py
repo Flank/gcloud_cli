@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ class SetMinCpuPlatformTest(sdk_test_base.WithFakeAuth,
         'WARNING: This command is deprecated. Use $ gcloud alpha compute '
         'instances update --set-min-cpu-platform instead.\n'
         'Update in progress for gce instance [instance-1] '
-        '[https://www.googleapis.com/compute/alpha/'
+        '[https://compute.googleapis.com/compute/alpha/'
         'projects/fake-project/zones/central2-a/operations/operation-X] '
         'Use [gcloud compute operations describe] command to check the status '
         'of this operation.\n')

@@ -11,7 +11,7 @@ gcloud beta run services set\-iam\-policy \- set the IAM policy for a service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta run services set\-iam\-policy\fR (\fISERVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta run services set\-iam\-policy\fR (\fISERVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fIPOLICY_FILE\fR [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -47,7 +47,7 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Cloud Run region
+The Cloud Run region.
 
 .RE
 .sp
@@ -58,6 +58,32 @@ Path to a local JSON or YAML formatted file containing a valid policy.
 The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
 or YAML file conforming to the structure of a Policy
 (https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-platform\fR=\fIPLATFORM\fR
+Target platform for running commands. \fIPLATFORM\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBgke\fR
+Cloud Run on Google Kubernetes Engine. This platform is not supported by this
+command.
+
+.TP 2m
+\fBmanaged\fR
+Fully managed version of Cloud Run. Use with the \f5\-\-region\fR flag or set
+the [run/region] property to specify a Cloud Run region.
+
+.RE
+.sp
+
 
 
 .RE

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class PerimetersDescribeTestGA(accesscontextmanager.Base):
@@ -44,32 +45,36 @@ class PerimetersDescribeTestGA(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'must be specified'):
-      self.Run('access-context-manager perimeters describe --policy MY_POLICY')
+      self.Run('access-context-manager perimeters describe --policy 123')
 
   def testDescribe(self):
     self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter('my_perimeter')
     self._ExpectGet(perimeter)
 
-    result = self.Run(
-        'access-context-manager perimeters describe my_perimeter '
-        '--policy MY_POLICY'
-    )
+    result = self.Run('access-context-manager perimeters describe my_perimeter '
+                      '--policy 123')
 
     self.assertEqual(result, perimeter)
 
   def testDescribe_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
     perimeter = self._MakePerimeter('my_perimeter')
-    policy = 'my_acm_policy'
-    perimeter.name = (
-        'accessPolicies/my_acm_policy/servicePerimeters/my_perimeter')
+    policy = '456'
+    perimeter.name = ('accessPolicies/456/servicePerimeters/my_perimeter')
     properties.VALUES.access_context_manager.policy.Set(policy)
     self._ExpectGet(perimeter)
 
     result = self.Run('access-context-manager perimeters describe my_perimeter')
 
     self.assertEqual(result, perimeter)
+
+  def testDescribe_InvalidPolicyArg(self):
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run('access-context-manager perimeters describe MY_PERIMETER '
+               '    --policy accessPolicies/123')
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class PerimetersDescribeTestBeta(PerimetersDescribeTestGA):

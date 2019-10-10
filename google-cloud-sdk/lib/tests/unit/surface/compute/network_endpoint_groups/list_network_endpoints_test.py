@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,12 +31,7 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
                                              cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-
+    self._SetUp()
     self.expected_endpoints = [
         self.messages.NetworkEndpointWithHealthStatus(
             networkEndpoint=self.messages.NetworkEndpoint(
@@ -53,6 +48,13 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
                 instance='my-instance1')),
     ]
 
+  def _SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+
   def testTableOutput(self):
 
     self.client.networkEndpointGroups.ListNetworkEndpoints.Expect(
@@ -65,12 +67,16 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
     self.Run('compute network-endpoint-groups list-network-endpoints my-neg1 '
              '--zone us-central1-a')
 
-    self.AssertOutputEquals("""\
-INSTANCE IP_ADDRESS PORT
-my-instance1 127.0.0.1 8888
-my-instance2 10.0.0.1 10001
+    self.AssertOutputEquals(
+        self._expectedZonalTableOutput(), normalize_space=True)
+
+  def _expectedZonalTableOutput(self):
+    return """\
+INSTANCE     IP_ADDRESS PORT
+my-instance1 127.0.0.1  8888
+my-instance2 10.0.0.1   10001
 my-instance1
-""", normalize_space=True)
+"""
 
   def testCommandOutput(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -86,6 +92,67 @@ my-instance1
                  'my-neg1 --zone us-central1-a'))
 
     self.assertEqual(self.expected_endpoints, result)
+
+
+class AlphaNetworkEndpointGroupsListEndpointsTest(
+    NetworkEndpointGroupsListEndpointsTest):
+
+  def _SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+
+    self.expected_global_endpoints = [
+        self.messages.NetworkEndpointWithHealthStatus(
+            networkEndpoint=self.messages.NetworkEndpoint(
+                fqdn='www.example.com', port=8888)),
+        self.messages.NetworkEndpointWithHealthStatus(
+            networkEndpoint=self.messages.NetworkEndpoint(
+                fqdn='www.example.net', port=10001)),
+    ]
+
+  def _expectedZonalTableOutput(self):
+    return """\
+INSTANCE     IP_ADDRESS PORT FQDN
+my-instance1 127.0.0.1  8888
+my-instance2 10.0.0.1   10001
+my-instance1
+"""
+
+  def testGlobalTableOutput(self):
+    self.client.globalNetworkEndpointGroups.ListNetworkEndpoints.Expect(
+        self.messages
+        .ComputeGlobalNetworkEndpointGroupsListNetworkEndpointsRequest(
+            networkEndpointGroup='my-global-neg1', project=self.Project()),
+        self.messages.NetworkEndpointGroupsListNetworkEndpoints(
+            items=self.expected_global_endpoints))
+    self.Run(
+        'compute network-endpoint-groups list-network-endpoints my-global-neg1'
+        ' --global')
+
+    self.AssertOutputEquals(
+        """\
+INSTANCE IP_ADDRESS PORT  FQDN
+                    8888  www.example.com
+                    10001 www.example.net
+""",
+        normalize_space=True)
+
+  def testGlobalCommandOutput(self):
+    properties.VALUES.core.user_output_enabled.Set(False)
+    self.client.globalNetworkEndpointGroups.ListNetworkEndpoints.Expect(
+        self.messages
+        .ComputeGlobalNetworkEndpointGroupsListNetworkEndpointsRequest(
+            networkEndpointGroup='my-global-neg1', project=self.Project()),
+        self.messages.NetworkEndpointGroupsListNetworkEndpoints(
+            items=self.expected_global_endpoints))
+    result = list(
+        self.Run('compute network-endpoint-groups list-network-endpoints '
+                 'my-global-neg1 --global'))
+
+    self.assertEqual(self.expected_global_endpoints, result)
 
 
 if __name__ == '__main__':

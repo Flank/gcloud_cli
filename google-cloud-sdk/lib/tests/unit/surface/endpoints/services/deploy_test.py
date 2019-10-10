@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,10 +38,12 @@ import os
 
 from apitools.base.py.extra_types import JsonObject
 from apitools.base.py.extra_types import JsonValue
+from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.endpoints import config_reporter
 from googlecloudsdk.api_lib.endpoints import exceptions
 from googlecloudsdk.api_lib.endpoints import services_util
+from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core.console import console_io
@@ -57,7 +59,6 @@ import six.moves.urllib.parse
 import six.moves.urllib.request
 
 
-ENDPOINTS_SERVICE = 'endpoints.googleapis.com'
 SERVICE_NAME = 'service-name.googleapis.com'
 SERVICE_VERSION = 'service-config-version-1'
 TITLE = 'The title of my swagger spec or google service config APIs!'
@@ -124,6 +125,16 @@ SUBMIT_REQUEST = (services_util.GetMessagesModule().
 
 class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
   """Unit tests for endpoints services deploy command."""
+
+  def PreSetUp(self):
+    self.su_services_messages = core_apis.GetMessagesModule(
+        'serviceusage', 'v1')
+    self.su_mocked_client = mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1'),
+        real_client=core_apis.GetClientInstance(
+            'serviceusage', 'v1', no_http=True))
+    self.su_mocked_client.Mock()
+    self.addCleanup(self.su_mocked_client.Unmock)
 
   def SetUp(self):
     prop = self.services_messages.Operation.ResponseValue.AdditionalProperty
@@ -503,35 +514,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # The Endpoints service and produced service are
-    # enabled here because the service was created.
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
-
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        response=self.services_messages.Operation(
-            name=self.operation_name,
-            done=False,
-        )
-    )
-    self.MockOperationWait(self.operation_name)
+    # The produced service is enabled here because the service was created.
+    self._expectEnableService(SERVICE_NAME, self.PROJECT_NAME,
+                              self.operation_name)
 
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
@@ -594,27 +579,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
     self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
     self.MockOperationWait(self.operation_name)
 
-    # The Endpoints service and produced service are
-    # enabled here because the service was created.
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=ENDPOINTS_SERVICE,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        exception=http_error.MakeHttpError(code=403)
-    )
-
-    self.mocked_client.services.Enable.Expect(
-        request=self.services_messages.ServicemanagementServicesEnableRequest(
-            serviceName=SERVICE_NAME,
-            enableServiceRequest=self.services_messages.EnableServiceRequest(
-                consumerId='project:' + self.PROJECT_NAME
-            )
-        ),
-        exception=http_error.MakeHttpError(code=403)
-    )
+    # The produced service is enabled here because the service was created.
+    self._expectEnableService(SERVICE_NAME, self.PROJECT_NAME, None,
+                              http_error.MakeHttpError(code=403))
 
     # A Get call is required to generate the management url
     self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
@@ -628,8 +595,6 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
 
     # This is an abbreviation of the full error message
     # in AttemptToEnableService()
-    self.AssertErrContains(
-        'Attempted to enable service [{0}]'.format(ENDPOINTS_SERVICE))
     self.AssertErrContains(
         'Attempted to enable service [{0}]'.format(SERVICE_NAME))
 
@@ -1298,6 +1263,29 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
       for n in range(2, 2 + num_errors):
         self.AssertErrContains(
             'ERROR: foo{n}: diagnostic error message bar{n}'.format(n=n))
+
+  def _expectEnableService(self, service, project, operation, exception=None):
+    if exception:
+      self.su_mocked_client.services.Enable.Expect(
+          request=self.su_services_messages.ServiceusageServicesEnableRequest(
+              name='projects/%s/services/%s' % (project, service),),
+          exception=exception,
+      )
+    else:
+      self.su_mocked_client.services.Enable.Expect(
+          request=self.su_services_messages.ServiceusageServicesEnableRequest(
+              name='projects/%s/services/%s' % (project, service),),
+          response=self.su_services_messages.Operation(
+              name=operation,
+              done=False,
+          ))
+      self.su_mocked_client.operations.Get.Expect(
+          request=self.su_services_messages.ServiceusageOperationsGetRequest(
+              name=operation),
+          response=self.su_services_messages.Operation(
+              name=operation,
+              done=True,
+          ))
 
 
 class EndpointsBetaDeployTest(EndpointsDeployTest):

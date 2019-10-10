@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class Move(base.SilentCommand):
         params={'project': target_instance.project},
         collection='compute.globalOperations')
 
-    if args.async:
+    if args.async_:
       log.UpdatedResource(
           operation_ref,
           kind='gce instance {0}'.format(target_instance.Name()),

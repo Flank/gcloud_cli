@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
+from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib import init_util
 from googlecloudsdk.core import resources
@@ -29,12 +30,39 @@ from tests.lib import test_case
 from mock import call
 
 
-class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
-
+class PickProjectTestsBase(sdk_test_base.WithLogCapture, test_case.WithInput):
   _PROJECT_IDS = ['foo', 'bar', 'baz']
 
   def SetUp(self):
     self.messages = apis.GetMessagesModule('cloudresourcemanager', 'v1')
+    self.create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
+    self.get_operation_mock = self.StartObjectPatch(operations, 'GetOperation')
+
+  def GetCreateProjectOperation(self, project_id):
+    operation_name = 'pc.1234'
+    proj = self.messages.Project(projectId=project_id)
+    return self.messages.Operation(
+        name='operations/' + operation_name,
+        done=True,
+        response=operations.ToOperationResponse(proj))
+
+  def SetProjectToCreate(self, project_id):
+    op = self.GetCreateProjectOperation(project_id)
+    self.get_operation_mock.return_value = op
+    self.create_projects_mock.return_value = op
+
+  def SetupFailedProjectCreate(self, project_id):
+    op = self.GetCreateProjectOperation(project_id)
+    self.get_operation_mock.return_value = op
+    self.create_projects_mock.return_value = op
+    status = self.messages.Status(code=7, message='Something Bad Happened')
+    op.error = status
+
+
+class PickProjectTests(PickProjectTestsBase):
+
+  def SetUp(self):
+    PickProjectTestsBase.SetUp(self)
     projects = [self.messages.Project(projectId=i) for i in self._PROJECT_IDS]
     self.list_projects_mock = self.StartObjectPatch(projects_api, 'List',
                                                     return_value=iter(projects))
@@ -110,11 +138,11 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
   def testPickProject_CreateProject(self):
     """Should pick the corresponding project."""
-    create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
+    self.SetProjectToCreate('new-project')
     self.WriteInput('4\nnew-project')
 
     self.assertEqual(init_util.PickProject(), 'new-project')
-    self.AssertErrEquals(
+    self.AssertErrContains(
         '{"ux": "PROMPT_CHOICE", "message": "Pick cloud project to use: ", '
         '"choices": ["bar", "baz", "foo", "Create a new project"]}\n'
         '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
@@ -122,13 +150,12 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
         'start with a lowercase letter. "}',
         normalize_space=True)
-    create_projects_mock.assert_called_once_with(
-        resources.REGISTRY.Create('cloudresourcemanager.projects',
-                                  projectId='new-project'))
+    self.create_projects_mock.assert_called_once_with(
+        resources.REGISTRY.Create(
+            'cloudresourcemanager.projects', projectId='new-project'))
 
   def testPickProject_CreateProjectNoInput(self):
     """Should pick the corresponding project."""
-    create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
     self.WriteInput('4')
 
     self.assertEqual(init_util.PickProject(), None)
@@ -140,12 +167,11 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
         'start with a lowercase letter. "}',
         normalize_space=True)
-    create_projects_mock.assert_not_called()
+    self.create_projects_mock.assert_not_called()
 
   def testPickProject_CreateProjectFails(self):
-    """Should pick the corresponding project."""
-    create_projects_mock = self.StartObjectPatch(
-        projects_api, 'Create', side_effect=RuntimeError('blah'))
+    """Should return None because project creation fails."""
+    self.create_projects_mock.side_effect = RuntimeError('blah')
     self.WriteInput('4\nnew-project')
 
     self.assertEqual(init_util.PickProject(), None)
@@ -163,9 +189,22 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
             $ gcloud config set project <PROJECT ID>
         """,
         normalize_space=True)
-    create_projects_mock.assert_called_once_with(
+    self.create_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
                                   projectId='new-project'))
+
+  def testPickProject_CreateProjectFailsAsynchronously(self):
+    """Should pick the corresponding project."""
+    self.SetupFailedProjectCreate('new-project')
+    self.WriteInput('4\nnew-project')
+
+    self.assertEqual(init_util.PickProject(), None)
+    self.AssertErrContains(
+        'Operation [pc.1234] failed: 7: Something Bad Happened',
+        normalize_space=True)
+    self.create_projects_mock.assert_called_once_with(
+        resources.REGISTRY.Create(
+            'cloudresourcemanager.projects', projectId='new-project'))
 
   def testPickProject_OneProject(self):
     projects = [self.messages.Project(projectId='spam')]
@@ -201,12 +240,12 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         '"prompt_string": "Would you like to create one?"}\n')
 
   def testPickProject_NoProjectsCreateAProject(self):
-    create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
+    self.SetProjectToCreate('qux')
     self.WriteInput('y\nqux')
     self.list_projects_mock.return_value = iter([])
 
     self.assertEqual(init_util.PickProject(), 'qux')
-    self.AssertErrEquals(
+    self.AssertErrContains(
         '{"ux": "PROMPT_CONTINUE", "message": "This account has no projects.", '
         '"prompt_string": "Would you like to create one?"}\n'
         '{"ux": "PROMPT_RESPONSE", "message": "Enter a Project ID. Note that a '
@@ -214,7 +253,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         'characters (lowercase ASCII, digits, or\\nhyphens) in length and '
         'start with a lowercase letter. "}',
         normalize_space=True)
-    create_projects_mock.assert_called_once_with(
+    self.create_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
                                   projectId='qux'))
 
@@ -242,8 +281,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         normalize_space=True)
 
 
-class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
-                                    test_case.WithInput):
+class PickProjectTestsLimitExceeded(PickProjectTestsBase):
   """Tests for when a user has more projects than _PROJECT_LIST_LIMIT.
 
   The project list limit changes how users select their projects in PickProject
@@ -251,10 +289,8 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
   be very slow.
   """
 
-  _PROJECT_IDS = ['foo', 'bar', 'baz']
-
   def SetUp(self):
-    self.messages = apis.GetMessagesModule('cloudresourcemanager', 'v1')
+    PickProjectTestsBase.SetUp(self)
     projects = [self.messages.Project(projectId=i) for i in self._PROJECT_IDS]
     # List will at most be called twice and since during each call the iterator
     # is exhausted, the return value has to be instantiated twice and set as a
@@ -294,7 +330,7 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
                                        projectId='qux'))])
 
   def testPickProject_CreateProject(self):
-    create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
+    self.SetProjectToCreate('qux')
 
     self.WriteInput('2\nqux')
     self.assertEqual(init_util.PickProject(), 'qux')
@@ -302,7 +338,7 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
         '{"ux": "PROMPT_CHOICE", "message": "This account has a lot of '
         'projects! Listing them all can take a while.", "choices": '
         '["Enter a project ID", "Create a new project", "List projects"]}')
-    create_projects_mock.assert_called_once_with(
+    self.create_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
                                   projectId='qux'))
 

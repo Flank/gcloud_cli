@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015 Google Inc. All Rights Reserved.
+# -*- coding: utf-8 -*- #
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -217,32 +217,42 @@ class Base(sdk_test_base.WithOutputCapture):
               'full': 'value',
               'Ṳᾔḯ¢◎ⅾℯ': '®ǖɬɘς',
           },
-          'networkInterfaces': [
-              {
-                  'accessConfigs': [
-                      {
-                          'kind': 'compute#accessConfig',
-                          'type': 'ONE_TO_ONE_NAT',
-                          'name': 'External NAT',
-                          'natIP': '74.125.239.110',
-                          },
-                      ],
-                  'networkIP': '10.240.150.{0}'.format(i),
-                  'name': 'nic0',
-                  'network': 'default',
+          'networkInterfaces': [{
+              'accessConfigs': [{
+                  'kind': 'compute#accessConfig',
+                  'type': 'ONE_TO_ONE_NAT',
+                  'name': 'External NAT',
+                  'natIP': '74.125.239.110',
+              },],
+              'networkIP': '10.240.150.{0}'.format(i),
+              'name': 'nic0',
+              'network': 'default',
+          },],
+          'metadata': {
+              'kind':
+                  'compute#metadata.{0}'.format((1001 - i) % 3),
+              'items': [
+                  {
+                      'key': 'a',
+                      'value': 'b'
+                  },
+                  {
+                      'key': 'c',
+                      'value': 'd'
+                  },
+                  {
+                      'key': 'e',
+                      'value': 'f'
+                  },
+                  {
+                      'key': 'g',
+                      'value': 'h'
                   },
               ],
-          'metadata': {
-              'kind': 'compute#metadata.{0}'.format((1001 - i) % 3),
-              'items': [
-                  {'key': 'a', 'value': 'b'},
-                  {'key': 'c', 'value': 'd'},
-                  {'key': 'e', 'value': 'f'},
-                  {'key': 'g', 'value': 'h'},
-                  ],
-              },
+          },
           'unicode': 'python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ',
-          }
+          'size': i if i % 2 == 0 else i * 10 + i,
+      }
 
   @staticmethod
   def CreateObjectResourceList(num):

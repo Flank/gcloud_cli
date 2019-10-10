@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,8 +58,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -102,8 +100,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -166,8 +162,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -233,8 +227,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -290,8 +282,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -360,8 +350,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -418,8 +406,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -502,8 +488,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -552,8 +536,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -681,8 +663,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -767,8 +747,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->
@@ -866,8 +844,6 @@ class DevSiteMarkdownTests(test_base.Markdown):
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="project_path" value="/sdk/_project.yaml">
         <meta name="book_path" value="/sdk/_book.yaml">
-        <!-- Cloud SDK reference documentation consumer survey snippet. -->
-        <script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
         <!--
                 THIS DOC IS GENERATED.  DO NOT EDIT.
           -->

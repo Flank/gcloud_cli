@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ from googlecloudsdk.core.util import files as file_utils
 _BASE_CLOUD_SQL_PROXY_ERROR = 'Failed to start the Cloud SQL Proxy'
 
 _POSTGRES_DATABASE_VERSION_PREFIX = 'POSTGRES'
+_SQLSERVER_DATABASE_VERSION_PREFIX = 'SQLSERVER'
 
 
 def GetRegionFromZone(gce_zone):
@@ -153,12 +154,20 @@ def StartCloudSqlProxy(instance, port, seconds_to_timeout=10):
 def IsInstanceV1(instance):
   """Returns a boolean indicating if the database instance is first gen."""
   return (instance.backendType == 'FIRST_GEN' or
-          (instance.settings and instance.settings.tier.startswith('D')))
+          (instance.settings and instance.settings.tier and
+           instance.settings.tier.startswith('D')))
 
 
 def IsInstanceV2(instance):
   """Returns a boolean indicating if the database instance is second gen."""
   return instance.backendType == 'SECOND_GEN'
+
+
+def GetInstanceState(instance):
+  """Return the default state string unless the instance is stopped."""
+  if instance.settings and instance.settings.activationPolicy == 'NEVER':
+    return 'STOPPED'
+  return instance.state
 
 
 # TODO(b/73648377): Factor out static methods into module-level functions.
@@ -199,8 +208,7 @@ class _BaseInstances(object):
     def YieldInstancesWithAModifiedState():
       for result in yielded:
         # TODO(b/63139112): Investigate impact of instances without settings.
-        if result.settings and result.settings.activationPolicy == 'NEVER':
-          result.state = 'STOPPED'
+        result.state = GetInstanceState(result)
         yield result
 
     return YieldInstancesWithAModifiedState()
@@ -218,6 +226,11 @@ class _BaseInstances(object):
   def IsPostgresDatabaseVersion(database_version):
     """Returns a boolean indicating if the database version is Postgres."""
     return _POSTGRES_DATABASE_VERSION_PREFIX in database_version
+
+  @staticmethod
+  def IsSqlServerDatabaseVersion(database_version):
+    """Returns a boolean indicating if the database version is SQL Server."""
+    return _SQLSERVER_DATABASE_VERSION_PREFIX in database_version
 
 
 class InstancesV1Beta3(_BaseInstances):

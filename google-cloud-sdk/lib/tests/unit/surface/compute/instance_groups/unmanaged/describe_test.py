@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ class UnmanagedInstanceGroupsDescribeTest(test_base.BaseTest,
             creationTimestamp: '2013-09-06T17:54:10.636-07:00'
             description: Test instance group
             fingerprint: MTIz
-            instanceGroupManagerUri: https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-1
+            instanceGroupManagerUri: https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-1
             isManaged: Yes
             name: group-1
             namedPorts:
@@ -70,9 +70,9 @@ class UnmanagedInstanceGroupsDescribeTest(test_base.BaseTest,
               port: 2222
             - name: serv-3
               port: 3333
-            selfLink: https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
+            selfLink: https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
             size: 0
-            zone: https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1
             """.format(API_VERSION)))
 
   def testShowNotManaged(self):
@@ -114,9 +114,9 @@ class UnmanagedInstanceGroupsDescribeTest(test_base.BaseTest,
               port: 2222
             - name: serv-3
               port: 3333
-            selfLink: https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
+            selfLink: https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1/instanceGroups/group-1
             size: 0
-            zone: https://www.googleapis.com/compute/{0}/projects/my-project/zones/zone-1
+            zone: https://compute.googleapis.com/compute/{0}/projects/my-project/zones/zone-1
             """.format(API_VERSION)))
 
 

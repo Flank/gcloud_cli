@@ -6,10 +6,10 @@ bad-arg-name:
 missing-arg-value:
   type:
 
-# Note: the yaml parsing package masks this case, silently giving us the last value.
+# Note: the yaml parsing package masks this case, silently giving us the first value.
 dup-arg-name:
-  type: instrumentation
   type: robo
+  type: instrumentation
 
 three-OBBs:
   obb-files: ["foo/file1.obb", "gs://file2.obb", "bar/file3.obb"]
@@ -66,3 +66,13 @@ other-files.string:
 
 other-files.int:
   other-files: 2
+
+client-details.list:
+  environment-variables: ["k1", "v1", "k2", 2]
+
+client-details.string:
+  environment-variables: "k1"
+
+client-details.int:
+  environment-variables: 2
+

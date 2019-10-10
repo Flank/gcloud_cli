@@ -6,9 +6,6 @@ SYNOPSIS
     gcloud alpha dataproc autoscaling-policies describe
         (AUTOSCALING_POLICY : --region=REGION) [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) Describe an autoscaling policy.
-
 POSITIONAL ARGUMENTS
      Autoscaling policy resource - The autoscaling policy to describe. The
      arguments in this group can be used to specify the attributes of this
@@ -40,12 +37,19 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    The following command prints out the autoscaling policy
+    example-autoscaling-policy:
+
+        $ gcloud alpha dataproc autoscaling-policies describe \
+            example-autoscaling-policy
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud dataproc autoscaling-policies describe
         $ gcloud beta dataproc autoscaling-policies describe
 

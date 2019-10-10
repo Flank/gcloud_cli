@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ class LogFetcherTest(test_case.TestCase):
 
   def testBasicYieldLogs(self):
     log = Log('2017-01-20T17:28:22.929735908Z', 'foo')
-    self.log_fetcher_mock.side_effect = [[log]]
+    self.log_fetcher_mock.return_value = iter([log])
 
     logs = self.fetcher.YieldLogs()
 
@@ -122,7 +122,7 @@ class LogFetcherTest(test_case.TestCase):
   def testMultipleYieldLogs(self):
     log1 = Log('2017-01-20T17:28:22.929735908Z', 'foo')
     log2 = Log('2017-01-20T17:28:22.929735908Z', 'foo2')
-    self.log_fetcher_mock.side_effect = [[log1, log2]]
+    self.log_fetcher_mock.return_value = iter([log1, log2])
 
     logs = self.fetcher.YieldLogs()
 
@@ -131,7 +131,7 @@ class LogFetcherTest(test_case.TestCase):
   def testMultiplePollsYieldLogs(self):
     log1 = Log('2017-01-20T17:28:22.929735908Z', 'foo')
     log2 = Log('2017-01-20T17:28:22.929735908Z', 'foo2')
-    self.log_fetcher_mock.side_effect = [[log1], [log2]]
+    self.log_fetcher_mock.side_effect = [[log1], [log2], [], []]
 
     logs = self.fetcher.YieldLogs()
 
@@ -140,7 +140,7 @@ class LogFetcherTest(test_case.TestCase):
   def testYieldLogsRejectsLateLogs(self):
     log1 = Log('2017-01-20T17:28:22.929735908Z', 'foo')
     log2 = Log('2017-01-20T17:28:21.929735908Z', 'foo2')
-    self.log_fetcher_mock.side_effect = [[log1], [log2]]
+    self.log_fetcher_mock.side_effect = [[log1], [log2], [], []]
 
     logs = self.fetcher.YieldLogs()
 

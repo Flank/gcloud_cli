@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ def PrintPairingKeyEpilog(pairing_key):
   log.status.Print(message)
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
   """Create a Google Compute Engine partner interconnect attachment.
 
@@ -88,9 +89,27 @@ class Create(base.CreateCommand):
         router=router_ref,
         attachment_type='PARTNER',
         edge_availability_domain=args.edge_availability_domain,
-        admin_enabled=args.admin_enabled)
+        admin_enabled=args.admin_enabled,
+        validate_only=getattr(args, 'dry_run', None),
+        mtu=getattr(args, 'mtu', None))
     self._pairing_key = attachment.pairingKey
     return attachment
 
   def Epilog(self, resources_were_displayed=True):
     PrintPairingKeyEpilog(self._pairing_key)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(Create):
+  """Create a Google Compute Engine partner interconnect attachment.
+
+  *{command}* is used to create partner interconnect attachments. A partner
+  interconnect attachment binds the underlying connectivity of a provider's
+  Interconnect to a path into and out of the customer's cloud network.
+  """
+
+  @classmethod
+  def Args(cls, parser):
+    super(CreateAlpha, cls).Args(parser)
+    attachment_flags.AddDryRun(parser)
+    attachment_flags.AddMtu(parser)

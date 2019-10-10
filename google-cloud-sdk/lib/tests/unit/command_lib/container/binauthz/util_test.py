@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
+import json
 
 from googlecloudsdk.command_lib.container.binauthz import util as binauthz_command_util
 from tests.lib import parameterized
@@ -102,14 +104,22 @@ class MakeSignaturePayloadTest(binauthz_test_base.BinauthzTestBase):
         binauthz_test_base.GenerateValidBogusLookingRandomSha256())
 
   def testGoodUrl(self):
-    sig = binauthz_command_util.MakeSignaturePayload(
-        'docker.io/nginblah@{}'.format(self.digest))
+    sig = json.loads(binauthz_command_util.MakeSignaturePayload(
+        'docker.io/nginblah@{}'.format(self.digest)).decode('utf8'))
     self.assertEqual(self.repository,
                      sig['critical']['identity']['docker-reference'])
     self.assertEqual(self.digest,
                      sig['critical']['image']['docker-manifest-digest'])
     self.assertEqual('Google cloud binauthz container signature',
                      sig['critical']['type'])
+
+  def testGoodUrl_DictEquivalence(self):
+    url = 'docker.io/nginblah@{}'.format(self.digest)
+    self.assertEqual(
+        binauthz_command_util.MakeSignaturePayloadDict(url),
+        json.loads(binauthz_command_util.MakeSignaturePayload(
+            url).decode('utf8')),
+    )
 
   def testBadUrl(self):
     with self.assertRaises(binauthz_command_util.BadImageUrlError):

@@ -1,74 +1,8 @@
 {
-  "CLI_VERSION": "v1.11.9-dispatcher",
+  "CLI_VERSION": "v1.13.11-dispatcher",
   "VERSION": "1",
   "capsule": "",
   "commands": {
-    "alpha": {
-      "capsule": "",
-      "commands": {
-        "diff": {
-          "capsule": "",
-          "commands": {},
-          "flags": {
-            "--filename": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Filename, directory, or URL to files contains the configuration to diff",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--filename",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--recursive": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory.",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--recursive",
-              "nargs": "0",
-              "type": "bool",
-              "value": ""
-            }
-          },
-          "groups": {},
-          "is_group": false,
-          "is_hidden": false,
-          "path": [
-            "kubectl",
-            "alpha",
-            "diff"
-          ],
-          "positionals": [],
-          "release": "GA",
-          "sections": {
-            "DESCRIPTION": "Diff configurations specified by filename or stdin between their local, last-applied, live and/or \"merged\" versions.\n\nLOCAL and LIVE versions are diffed by default. Other available keywords are MERGED and LAST.\n\nOutput is always YAML.\n\nKUBERNETES EXTERNAL DIFF environment variable can be used to select your own diff command. By default, the \"diff\" command available in your path will be run with \"-u\" (unicode) and \"-N\" (treat new files as empty) options.",
-            "EXAMPLES": "  # Diff resources included in pod.json. By default, it will diff LOCAL and LIVE versions\n  kubectl alpha diff -f pod.json\n\n  # When one version is specified, diff that version against LIVE\n  cat service.yaml | kubectl alpha diff -f - MERGED\n\n  # Or specify both versions\n  kubectl alpha diff -f pod.json -f service.yaml LAST LOCAL"
-          }
-        }
-      },
-      "flags": {},
-      "groups": {},
-      "is_group": true,
-      "is_hidden": false,
-      "path": [
-        "kubectl",
-        "alpha"
-      ],
-      "positionals": [],
-      "release": "GA",
-      "sections": {
-        "DESCRIPTION": "These commands correspond to alpha features that are not enabled in Kubernetes clusters by default."
-      }
-    },
     "annotate": {
       "capsule": "",
       "commands": {},
@@ -175,7 +109,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -412,6 +346,20 @@
           "capsule": "",
           "commands": {},
           "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--filename": {
               "attr": {},
               "category": "",
@@ -444,7 +392,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: yaml|json.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -481,6 +429,20 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--windows-line-endings": {
               "attr": {},
@@ -576,7 +538,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -838,7 +800,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -931,6 +893,20 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
+        },
+        "--server-dry-run": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, request will be sent to server with dry-run flag, which means the modifications won't be persisted. This is an alpha feature and flag.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--server-dry-run",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
         },
         "--template": {
           "attr": {},
@@ -1193,7 +1169,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -1213,6 +1189,34 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--recursive",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--remove-extra-permissions": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, removes extra permissions added to roles",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--remove-extra-permissions",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--remove-extra-subjects": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, removes extra subjects added to rolebindings",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--remove-extra-subjects",
               "nargs": "0",
               "type": "bool",
               "value": ""
@@ -1382,7 +1386,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -1459,7 +1463,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Creates an autoscaler that automatically chooses and sets the number of pods that run in a kubernetes cluster.\n\nLooks up a Deployment, ReplicaSet, or ReplicationController by name and creates an autoscaler that uses the given resource as a reference. An autoscaler can automatically increase or decrease number of pods deployed within the system as needed.",
+        "DESCRIPTION": "Creates an autoscaler that automatically chooses and sets the number of pods that run in a kubernetes cluster.\n\nLooks up a Deployment, ReplicaSet, StatefulSet, or ReplicationController by name and creates an autoscaler that uses the given resource as a reference. An autoscaler can automatically increase or decrease number of pods deployed within the system as needed.",
         "EXAMPLES": "  # Auto scale a deployment \"foo\", with the number of pods between 2 and 10, no target CPU utilization specified so a default autoscaling policy will be used:\n  kubectl autoscale deployment foo --min=2 --max=10\n\n  # Auto scale a replication controller \"foo\", with the number of pods between 1 and 5, target CPU utilization at 80%:\n  kubectl autoscale rc foo --max=5 --cpu-percent=80"
       }
     },
@@ -1516,7 +1520,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -1619,7 +1623,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -1740,7 +1744,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -1839,7 +1843,7 @@
       "release": "GA",
       "sections": {
         "DESCRIPTION": "Output shell completion code for the specified shell (bash or zsh). The shell code must be evaluated to provide interactive completion of kubectl commands.  This can be done by sourcing it from the .bash _profile.\n\nDetailed instructions on how to do this are available here: https://kubernetes.io/docs/tasks/tools/install-kubectl/#enabling-shell-autocompletion\n\nNote for zsh users: [1] zsh completions are only supported in versions of zsh >= 5.2",
-        "EXAMPLES": "  # Installing bash completion on macOS using homebrew\n  ## If running Bash 3.2 included with macOS\n  brew install bash-completion\n  ## or, if running Bash 4.1+\n  brew install bash-completion@2\n  ## If kubectl is installed via homebrew, this should start working immediately.\n  ## If you've installed via other means, you may need add the completion to your completion directory\n  kubectl completion bash > $(brew --prefix)/etc/bash_completion.d/kubectl\n\n\n  # Installing bash completion on Linux\n  ## Load the kubectl completion code for bash into the current shell\n  source <(kubectl completion bash)\n  ## Write bash completion code to a file and source if from .bash_profile\n  kubectl completion bash > ~/.kube/completion.bash.inc\n  printf \"\n  # Kubectl shell completion\n  source '$HOME/.kube/completion.bash.inc'\n  \" >> $HOME/.bash_profile\n  source $HOME/.bash_profile\n\n  # Load the kubectl completion code for zsh[1] into the current shell\n  source <(kubectl completion zsh)\n  # Set the kubectl completion code for zsh[1] to autoload on startup\n  kubectl completion zsh > \"${fpath[1]}/_kubectl\""
+        "EXAMPLES": "  # Installing bash completion on macOS using homebrew\n  ## If running Bash 3.2 included with macOS\n  brew install bash-completion\n  ## or, if running Bash 4.1+\n  brew install bash-completion@2\n  ## If kubectl is installed via homebrew, this should start working immediately.\n  ## If you've installed via other means, you may need add the completion to your completion directory\n  kubectl completion bash > $(brew --prefix)/etc/bash_completion.d/kubectl\n\n\n  # Installing bash completion on Linux\n  ## If bash-completion is not installed on Linux, please install the 'bash-completion' package\n  ## via your distribution's package manager.\n  ## Load the kubectl completion code for bash into the current shell\n  source <(kubectl completion bash)\n  ## Write bash completion code to a file and source if from .bash_profile\n  kubectl completion bash > ~/.kube/completion.bash.inc\n  printf \"\n  # Kubectl shell completion\n  source '$HOME/.kube/completion.bash.inc'\n  \" >> $HOME/.bash_profile\n  source $HOME/.bash_profile\n\n  # Load the kubectl completion code for zsh[1] into the current shell\n  source <(kubectl completion zsh)\n  # Set the kubectl completion code for zsh[1] to autoload on startup\n  kubectl completion zsh > \"${fpath[1]}/_kubectl\""
       }
     },
     "config": {
@@ -2058,7 +2062,22 @@
         "set-context": {
           "capsule": "",
           "commands": {},
-          "flags": {},
+          "flags": {
+            "--current": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Modify the current context",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--current",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            }
+          },
           "groups": {},
           "is_group": false,
           "is_hidden": false,
@@ -2119,34 +2138,6 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
-            },
-            "--password": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "password for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--password",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
-            },
-            "--username": {
-              "attr": {},
-              "category": "",
-              "default": "",
-              "description": "username for the user entry in kubeconfig",
-              "group": "",
-              "is_global": false,
-              "is_hidden": false,
-              "is_required": false,
-              "name": "--username",
-              "nargs": "1",
-              "type": "string",
-              "value": "VALUE"
             }
           },
           "groups": {},
@@ -2266,7 +2257,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -2332,7 +2323,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Modify kubeconfig files using subcommands like \"kubectl config set current-context my-context\"\n\nThe loading order follows these rules:\n\n  1. If the --kubeconfig flag is set, then only that file is loaded.  The flag may only be set once and no merging takes place.\n  2. If $KUBECONFIG environment variable is set, then it is used a list of paths (normal path delimitting rules for your system).  These paths are merged.  When a value is modified, it is modified in the file that defines the stanza.  When a value is created, it is created in the first file that exists.  If no files in the chain exist, then it creates the last file in the list.\n  3. Otherwise, ${HOME}/.kube/config is used and no merging takes place."
+        "DESCRIPTION": "Modify kubeconfig files using subcommands like \"kubectl config set current-context my-context\"\n\nThe loading order follows these rules:\n\n  1. If the --kubeconfig flag is set, then only that file is loaded. The flag may only be set once and no merging takes place.\n  2. If $KUBECONFIG environment variable is set, then it is used as a list of paths (normal path delimitting rules for your system). These paths are merged. When a value is modified, it is modified in the file that defines the stanza. When a value is created, it is created in the first file that exists. If no files in the chain exist, then it creates the last file in the list.\n  3. Otherwise, ${HOME}/.kube/config is used and no merging takes place."
       }
     },
     "convert": {
@@ -2385,7 +2376,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath-file|jsonpath.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -2399,7 +2390,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output the formatted object with the given group version (for ex: 'extensions/v1beta1').)",
+          "description": "Output the formatted object with the given group version (for ex: 'extensions/v1beta1').",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -2530,6 +2521,20 @@
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
+        },
+        "--no-preserve": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "The copied file/directory's ownership and permissions will not be preserved in the container",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--no-preserve",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
         }
       },
       "groups": {},
@@ -2613,7 +2618,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -2787,7 +2792,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Groups to bind to the role",
+              "description": "Groups to bind to the clusterrole",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -2801,7 +2806,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -2829,7 +2834,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Service accounts to bind to the role, in the format <namespace>:<name>",
+              "description": "Service accounts to bind to the clusterrole, in the format <namespace>:<name>",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -2989,7 +2994,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3121,7 +3126,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3235,11 +3240,25 @@
               "type": "string",
               "value": "VALUE"
             },
+            "--image": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Image name to run.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--image",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
             "--output": {
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3304,7 +3323,7 @@
           "release": "GA",
           "sections": {
             "DESCRIPTION": "Create a job with the specified name.",
-            "EXAMPLES": "  # Create a job from a CronJob named \"a-cronjob\"\n  kubectl create job test-job --from=cronjob/a-cronjob"
+            "EXAMPLES": "  # Create a job\n  kubectl create job my-job --image=busybox\n\n  # Create a job with command\n  kubectl create job my-job --image=busybox -- date\n\n  # Create a job from a CronJob named \"a-cronjob\"\n  kubectl create job test-job --from=cronjob/a-cronjob"
           }
         },
         "namespace": {
@@ -3357,7 +3376,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|go-template-file|templatefile|template|go-template|jsonpath-file|jsonpath.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3503,7 +3522,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3663,7 +3682,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3742,7 +3761,7 @@
           "release": "GA",
           "sections": {
             "DESCRIPTION": "Create a priorityclass with the specified name, value, globalDefault and description\n\nAliases:\npriorityclass, pc",
-            "EXAMPLES": "  # Create a priorityclass named high-priority\n  kubectl create priorityclass default-priority --value=1000 --description=\"high priority\"\n\n  # Create a priorityclass named default-priority that considered as the global default priority\n  kubectl create priorityclass default-priority --value=1000 --global-default=true --description=\"default priority\""
+            "EXAMPLES": "  # Create a priorityclass named high-priority\n  kubectl create priorityclass high-priority --value=1000 --description=\"high priority\"\n\n  # Create a priorityclass named default-priority that considered as the global default priority\n  kubectl create priorityclass default-priority --value=1000 --global-default=true --description=\"default priority\""
           }
         },
         "quota": {
@@ -3809,7 +3828,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -3927,7 +3946,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -4115,7 +4134,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -4348,7 +4367,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -4523,7 +4542,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -4698,7 +4717,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -4850,7 +4869,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|templatefile|template|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -4997,7 +5016,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -5130,7 +5149,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -5277,7 +5296,7 @@
                   "attr": {},
                   "category": "",
                   "default": "",
-                  "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+                  "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
                   "group": "",
                   "is_global": false,
                   "is_hidden": false,
@@ -5426,7 +5445,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -5556,7 +5575,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|go-template-file|templatefile|template|go-template|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -6011,6 +6030,53 @@
         "EXAMPLES": "  # Describe a node\n  kubectl describe nodes kubernetes-node-emt8.c.myproject.internal\n\n  # Describe a pod\n  kubectl describe pods/nginx\n\n  # Describe a pod identified by type and name in \"pod.json\"\n  kubectl describe -f pod.json\n\n  # Describe all pods\n  kubectl describe pods\n\n  # Describe pods by label name=myLabel\n  kubectl describe po -l name=myLabel\n\n  # Describe all pods managed by the 'frontend' replication controller (rc-created pods\n  # get the name of the rc as a prefix in the pod the name).\n  kubectl describe pods frontend"
       }
     },
+    "diff": {
+      "capsule": "",
+      "commands": {},
+      "flags": {
+        "--filename": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Filename, directory, or URL to files contains the configuration to diff",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--recursive": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests organized within the same directory.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--recursive",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        }
+      },
+      "groups": {},
+      "is_group": false,
+      "is_hidden": false,
+      "path": [
+        "kubectl",
+        "diff"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "Diff configurations specified by filename or stdin between the current online configuration, and the configuration as it would be if applied.\n\nOutput is always YAML.\n\nKUBECTL EXTERNAL DIFF environment variable can be used to select your own diff command. By default, the \"diff\" command available in your path will be run with \"-u\" (unicode) and \"-N\" (treat new files as empty) options.",
+        "EXAMPLES": "  # Diff resources included in pod.json.\n  kubectl diff -f pod.json\n\n  # Diff file read from stdin\n  cat service.yaml | kubectl diff -f -"
+      }
+    },
     "drain": {
       "capsule": "",
       "commands": {},
@@ -6138,7 +6204,7 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Drain node in preparation for maintenance.\n\nThe given node will be marked unschedulable to prevent new pods from arriving. 'drain' evicts the pods if the APIServer supports eviction (http://kubernetes.io/docs/admin/disruptions/). Otherwise, it will use normal DELETE to delete the pods. The 'drain' evicts or deletes all pods except mirror pods (which cannot be deleted through the API server).  If there are DaemonSet-managed pods, drain will not proceed without --ignore-daemonsets, and regardless it will not delete any DaemonSet-managed pods, because those pods would be immediately replaced by the DaemonSet controller, which ignores unschedulable markings.  If there are any pods that are neither mirror pods nor managed by ReplicationController, ReplicaSet, DaemonSet, StatefulSet or Job, then drain will not delete any pods unless you use --force.  --force will also allow deletion to proceed if the managing resource of one or more pods is missing.\n\n'drain' waits for graceful termination. You should not operate on the machine until the command completes.\n\nWhen you are ready to put the node back into service, use kubectl uncordon, which will make the node schedulable again.\n\n! http://kubernetes.io/images/docs/kubectl_drain.svg",
+        "DESCRIPTION": "Drain node in preparation for maintenance.\n\nThe given node will be marked unschedulable to prevent new pods from arriving. 'drain' evicts the pods if the APIServer supports  http://kubernetes.io/docs/admin/disruptions/. Otherwise, it will use normal DELETE to delete the pods. The 'drain' evicts or deletes all pods except mirror pods (which cannot be deleted through the API server).  If there are DaemonSet-managed pods, drain will not proceed without --ignore-daemonsets, and regardless it will not delete any DaemonSet-managed pods, because those pods would be immediately replaced by the DaemonSet controller, which ignores unschedulable markings.  If there are any pods that are neither mirror pods nor managed by ReplicationController, ReplicaSet, DaemonSet, StatefulSet or Job, then drain will not delete any pods unless you use --force.  --force will also allow deletion to proceed if the managing resource of one or more pods is missing.\n\n'drain' waits for graceful termination. You should not operate on the machine until the command completes.\n\nWhen you are ready to put the node back into service, use kubectl uncordon, which will make the node schedulable again.\n\n! http://kubernetes.io/images/docs/kubectl_drain.svg",
         "EXAMPLES": "  # Drain node \"foo\", even if there are pods not managed by a ReplicationController, ReplicaSet, Job, DaemonSet or StatefulSet on it.\n  $ kubectl drain foo --force\n\n  # As above, but abort if there are pods not managed by a ReplicationController, ReplicaSet, Job, DaemonSet or StatefulSet, and use a grace period of 15 minutes.\n  $ kubectl drain foo --grace-period=900"
       }
     },
@@ -6192,7 +6258,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -6329,20 +6395,6 @@
           "is_hidden": false,
           "is_required": false,
           "name": "--container",
-          "nargs": "1",
-          "type": "string",
-          "value": "VALUE"
-        },
-        "--pod": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "Pod name",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--pod",
           "nargs": "1",
           "type": "string",
           "value": "VALUE"
@@ -6571,7 +6623,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -7020,20 +7072,6 @@
           "type": "string",
           "value": "VALUE"
         },
-        "--use-openapi-print-columns": {
-          "attr": {},
-          "category": "",
-          "default": "",
-          "description": "If true, use x-kubernetes-print-column metadata (if present) from the OpenAPI schema for displaying a resource.",
-          "group": "",
-          "is_global": false,
-          "is_hidden": false,
-          "is_required": false,
-          "name": "--use-openapi-print-columns",
-          "nargs": "0",
-          "type": "bool",
-          "value": ""
-        },
         "--watch": {
           "attr": {},
           "category": "",
@@ -7197,7 +7235,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath-file|jsonpath.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -7543,7 +7581,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|go-template-file|templatefile|template|go-template|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -7640,10 +7678,44 @@
     },
     "plugin": {
       "capsule": "",
-      "commands": {},
+      "commands": {
+        "list": {
+          "capsule": "",
+          "commands": {},
+          "flags": {
+            "--name-only": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, display only the binary name of each plugin, rather than its full path",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--name-only",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            }
+          },
+          "groups": {},
+          "is_group": false,
+          "is_hidden": false,
+          "path": [
+            "kubectl",
+            "plugin",
+            "list"
+          ],
+          "positionals": [],
+          "release": "GA",
+          "sections": {
+            "DESCRIPTION": "List all available plugin files on a user's PATH.\n\nAvailable plugin files are those that are: - executable - anywhere on the user's PATH - begin with \"kubectl-\""
+          }
+        }
+      },
       "flags": {},
       "groups": {},
-      "is_group": false,
+      "is_group": true,
       "is_hidden": false,
       "path": [
         "kubectl",
@@ -7652,13 +7724,27 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Runs a command-line plugin.\n\nPlugins are subcommands that are not part of the major command-line distribution and can even be provided by third-parties. Please refer to the documentation and examples for more information about how to install and write your own plugins."
+        "DESCRIPTION": "Provides utilities for interacting with plugins.\n\nPlugins provide extended functionality that is not part of the major command-line distribution. Please refer to the documentation and examples for more information about how write your own plugins."
       }
     },
     "port-forward": {
       "capsule": "",
       "commands": {},
       "flags": {
+        "--address": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Addresses to listen on (comma separated)",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--address",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
         "--pod-running-timeout": {
           "attr": {},
           "category": "",
@@ -7685,7 +7771,7 @@
       "release": "GA",
       "sections": {
         "DESCRIPTION": "Forward one or more local ports to a pod.\n\nUse resource type/name such as deployment/mydeployment to select a pod. Resource type defaults to 'pod' if omitted.\n\nIf there are multiple pods matching the criteria, a pod will be selected automatically. The forwarding session ends when the selected pod terminates, and rerun of the command is needed to resume forwarding.",
-        "EXAMPLES": "  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in the pod\n  kubectl port-forward pod/mypod 5000 6000\n\n  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the deployment\n  kubectl port-forward deployment/mydeployment 5000 6000\n\n  # Listen on port 8888 locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod 8888:5000\n\n  # Listen on a random port locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod :5000"
+        "EXAMPLES": "  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in the pod\n  kubectl port-forward pod/mypod 5000 6000\n\n  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the deployment\n  kubectl port-forward deployment/mydeployment 5000 6000\n\n  # Listen on ports 5000 and 6000 locally, forwarding data to/from ports 5000 and 6000 in a pod selected by the service\n  kubectl port-forward service/myservice 5000 6000\n\n  # Listen on port 8888 locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod 8888:5000\n\n  # Listen on port 8888 on all addresses, forwarding to 5000 in the pod\n  kubectl port-forward --address 0.0.0.0 pod/mypod 8888:5000\n\n  # Listen on port 8888 on localhost and selected IP, forwarding to 5000 in the pod\n  kubectl port-forward --address localhost,10.19.21.23 pod/mypod 8888:5000\n\n  # Listen on a random port locally, forwarding to 5000 in the pod\n  kubectl port-forward pod/mypod :5000"
       }
     },
     "proxy": {
@@ -7761,6 +7847,20 @@
           "nargs": "0",
           "type": "bool",
           "value": ""
+        },
+        "--keepalive": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "keepalive specifies the keep-alive period for an active network connection. Set to 0 to disable keepalive.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--keepalive",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
         },
         "--port": {
           "attr": {},
@@ -7939,7 +8039,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -8055,6 +8155,20 @@
           "capsule": "",
           "commands": {},
           "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--filename": {
               "attr": {},
               "category": "",
@@ -8065,6 +8179,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8096,6 +8224,20 @@
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             }
           },
           "groups": {},
@@ -8117,6 +8259,20 @@
           "capsule": "",
           "commands": {},
           "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--filename": {
               "attr": {},
               "category": "",
@@ -8127,6 +8283,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8144,6 +8314,20 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             }
           },
           "groups": {},
@@ -8165,6 +8349,20 @@
           "capsule": "",
           "commands": {},
           "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--filename": {
               "attr": {},
               "category": "",
@@ -8175,6 +8373,20 @@
               "is_hidden": false,
               "is_required": false,
               "name": "--filename",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
@@ -8192,6 +8404,20 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             }
           },
           "groups": {},
@@ -8255,6 +8481,20 @@
               "type": "string",
               "value": "VALUE"
             },
+            "--timeout": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "The length of time to wait before ending watch, zero means never. Any other values should contain a corresponding time unit (e.g. 1s, 2m, 3h).",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--timeout",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
             "--watch": {
               "attr": {},
               "category": "",
@@ -8289,6 +8529,20 @@
           "capsule": "",
           "commands": {},
           "flags": {
+            "--allow-missing-template-keys": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--allow-missing-template-keys",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--dry-run": {
               "attr": {},
               "category": "",
@@ -8317,6 +8571,20 @@
               "type": "string",
               "value": "VALUE"
             },
+            "--output": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--output",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            },
             "--recursive": {
               "attr": {},
               "category": "",
@@ -8330,6 +8598,20 @@
               "nargs": "0",
               "type": "bool",
               "value": ""
+            },
+            "--template": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format is golang templates [http://golang.org/pkg/text/template/#pkg-overview].",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--template",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
             },
             "--to-revision": {
               "attr": {},
@@ -8623,7 +8905,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -8925,7 +9207,7 @@
       "release": "GA",
       "sections": {
         "DESCRIPTION": "Create and run a particular image, possibly replicated.\n\nCreates a deployment or job to manage the created container(s).",
-        "EXAMPLES": "  # Start a single instance of nginx.\n  kubectl run nginx --image=nginx\n\n  # Start a single instance of hazelcast and let the container expose port 5701 .\n  kubectl run hazelcast --image=hazelcast --port=5701\n\n  # Start a single instance of hazelcast and set environment variables \"DNS_DOMAIN=cluster\" and \"POD_NAMESPACE=default\" in the container.\n  kubectl run hazelcast --image=hazelcast --env=\"DNS_DOMAIN=cluster\" --env=\"POD_NAMESPACE=default\"\n\n  # Start a single instance of hazelcast and set labels \"app=hazelcast\" and \"env=prod\" in the container.\n  kubectl run hazelcast --image=nginx --labels=\"app=hazelcast,env=prod\"\n\n  # Start a replicated instance of nginx.\n  kubectl run nginx --image=nginx --replicas=5\n\n  # Dry run. Print the corresponding API objects without creating them.\n  kubectl run nginx --image=nginx --dry-run\n\n  # Start a single instance of nginx, but overload the spec of the deployment with a partial set of values parsed from JSON.\n  kubectl run nginx --image=nginx --overrides='{ \"apiVersion\": \"v1\", \"spec\": { ... } }'\n\n  # Start a pod of busybox and keep it in the foreground, don't restart it if it exits.\n  kubectl run -i -t busybox --image=busybox --restart=Never\n\n  # Start the nginx container using the default command, but use custom arguments (arg1 .. argN) for that command.\n  kubectl run nginx --image=nginx -- <arg1> <arg2> ... <argN>\n\n  # Start the nginx container using a different command and custom arguments.\n  kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>\n\n  # Start the perl container to compute \u03c0 to 2000 places and print it out.\n  kubectl run pi --image=perl --restart=OnFailure -- perl -Mbignum=bpi -wle 'print bpi(2000)'\n\n  # Start the cron job to compute \u03c0 to 2000 places and print it out every 5 minutes.\n  kubectl run pi --schedule=\"0/5 * * * ?\" --image=perl --restart=OnFailure -- perl -Mbignum=bpi -wle 'print bpi(2000)'"
+        "EXAMPLES": "  # Start a single instance of nginx.\n  kubectl run nginx --image=nginx\n\n  # Start a single instance of hazelcast and let the container expose port 5701 .\n  kubectl run hazelcast --image=hazelcast --port=5701\n\n  # Start a single instance of hazelcast and set environment variables \"DNS_DOMAIN=cluster\" and \"POD_NAMESPACE=default\" in the container.\n  kubectl run hazelcast --image=hazelcast --env=\"DNS_DOMAIN=cluster\" --env=\"POD_NAMESPACE=default\"\n\n  # Start a single instance of hazelcast and set labels \"app=hazelcast\" and \"env=prod\" in the container.\n  kubectl run hazelcast --image=hazelcast --labels=\"app=hazelcast,env=prod\"\n\n  # Start a replicated instance of nginx.\n  kubectl run nginx --image=nginx --replicas=5\n\n  # Dry run. Print the corresponding API objects without creating them.\n  kubectl run nginx --image=nginx --dry-run\n\n  # Start a single instance of nginx, but overload the spec of the deployment with a partial set of values parsed from JSON.\n  kubectl run nginx --image=nginx --overrides='{ \"apiVersion\": \"v1\", \"spec\": { ... } }'\n\n  # Start a pod of busybox and keep it in the foreground, don't restart it if it exits.\n  kubectl run -i -t busybox --image=busybox --restart=Never\n\n  # Start the nginx container using the default command, but use custom arguments (arg1 .. argN) for that command.\n  kubectl run nginx --image=nginx -- <arg1> <arg2> ... <argN>\n\n  # Start the nginx container using a different command and custom arguments.\n  kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>\n\n  # Start the perl container to compute \u03c0 to 2000 places and print it out.\n  kubectl run pi --image=perl --restart=OnFailure -- perl -Mbignum=bpi -wle 'print bpi(2000)'\n\n  # Start the cron job to compute \u03c0 to 2000 places and print it out every 5 minutes.\n  kubectl run pi --schedule=\"0/5 * * * ?\" --image=perl --restart=OnFailure -- perl -Mbignum=bpi -wle 'print bpi(2000)'"
       }
     },
     "scale": {
@@ -8992,7 +9274,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -9266,7 +9548,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|go-template-file|templatefile|template|go-template|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -9468,7 +9750,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -9670,7 +9952,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|templatefile|template|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -9858,7 +10140,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -10032,7 +10314,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -10206,7 +10488,7 @@
               "attr": {},
               "category": "",
               "default": "",
-              "description": "Output format. One of: json|yaml|name|templatefile|template|go-template|go-template-file|jsonpath|jsonpath-file.",
+              "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
               "group": "",
               "is_global": false,
               "is_hidden": false,
@@ -10339,7 +10621,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|template|go-template|go-template-file|templatefile|jsonpath-file|jsonpath.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -10483,6 +10765,20 @@
               "type": "string",
               "value": "VALUE"
             },
+            "--no-headers": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If present, print output without headers",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--no-headers",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
             "--selector": {
               "attr": {},
               "category": "",
@@ -10600,6 +10896,20 @@
               "nargs": "1",
               "type": "string",
               "value": "VALUE"
+            },
+            "--no-headers": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If present, print output without headers.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--no-headers",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
             },
             "--selector": {
               "attr": {},
@@ -10818,7 +11128,7 @@
           "attr": {},
           "category": "",
           "default": "",
-          "description": "Output format. One of: json|yaml|name|go-template-file|templatefile|template|go-template|jsonpath|jsonpath-file.",
+          "description": "Output format. One of: json|yaml|name|go-template|go-template-file|template|templatefile|jsonpath|jsonpath-file.",
           "group": "",
           "is_global": false,
           "is_hidden": false,
@@ -10895,7 +11205,8 @@
       "positionals": [],
       "release": "GA",
       "sections": {
-        "DESCRIPTION": "Experimental: Wait for one condition on one or many resources"
+        "DESCRIPTION": "Experimental: Wait for a specific condition on one or many resources.\n\nThe command takes multiple resources and waits until the specified condition is seen in the Status field of every given resource.\n\nAlternatively, the command can wait for the given set of resources to be deleted by providing the \"delete\" keyword as the value to the --for flag.\n\nA successful message will be printed to stdout indicating when the specified condition has been met. One can use -o option to change to output destination.",
+        "EXAMPLES": "  # Wait for the pod \"busybox1\" to contain the status condition of type \"Ready\".\n  kubectl wait --for=condition=Ready pod/busybox1\n\n  # Wait for the pod \"busybox1\" to be deleted, with a timeout of 60s, after having issued the \"delete\" command.\n  kubectl delete pod/busybox1\n  kubectl wait --for=delete pod/busybox1 --timeout=60s"
       }
     }
   },
@@ -11096,6 +11407,20 @@
       "type": "string",
       "value": "VALUE"
     },
+    "--log-file": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "If non-empty, use this log file",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--log-file",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
     "--log-flush-frequency": {
       "attr": {},
       "category": "",
@@ -11152,6 +11477,48 @@
       "type": "string",
       "value": "VALUE"
     },
+    "--password": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "Password for basic authentication to the API server",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--password",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--profile": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "Name of profile to capture. One of (none|cpu|heap|goroutine|threadcreate|block|mutex)",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--profile",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--profile-output": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "Name of the file to write the profile to",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--profile-output",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
     "--request-timeout": {
       "attr": {},
       "category": "",
@@ -11179,6 +11546,20 @@
       "nargs": "1",
       "type": "string",
       "value": "VALUE"
+    },
+    "--skip-headers": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "If true, avoid header prefixes in the log messages",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--skip-headers",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
     },
     "--stderrthreshold": {
       "attr": {},
@@ -11218,6 +11599,20 @@
       "is_hidden": false,
       "is_required": false,
       "name": "--user",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--username": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "Username for basic authentication to the API server",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--username",
       "nargs": "1",
       "type": "string",
       "value": "VALUE"

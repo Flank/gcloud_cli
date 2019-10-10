@@ -6,7 +6,10 @@ SYNOPSIS
     gcloud pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
         [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
+        [--labels=[KEY=VALUE,...]]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
+        [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
+        [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
         [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -54,6 +57,14 @@ OPTIONAL FLAGS
         additionally accepts the special value "never" to indicate that the
         subscription will never expire.
 
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --message-retention-duration=MESSAGE_RETENTION_DURATION
         How long to retain unacknowledged messages in the subscription's
         backlog, from the moment a message is published. If
@@ -63,6 +74,14 @@ OPTIONAL FLAGS
         form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d" for
         seconds, minutes, hours, and days, respectively. If the unit is
         omitted, seconds is assumed.
+
+     --push-auth-service-account=SERVICE_ACCOUNT_EMAIL
+        Service account email used as the identity for the generated Open ID
+        Connect token for authenticated push.
+
+     --push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE
+        Audience used in the generated Open ID Connect token for authenticated
+        push. If not specified, it will be set to the push-endpoint.
 
      --push-endpoint=PUSH_ENDPOINT
         A URL to use as the endpoint for this subscription. This will also

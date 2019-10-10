@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,19 +87,20 @@ class Untag(base.DeleteCommand):
       for tag in tags:
         try:
           # Resolve tags to digests. Throws InvalidImageNameError on 404.
-          digests[tag] = util.GetDigestFromName(str(tag))
+          digests[tag] = util.GetDigestFromName(six.text_type(tag))
         except util.InvalidImageNameError:
           # We already validated the image string in _ParseArgs, this is a 404
           raise util.InvalidImageNameError(
-              'Image could not be found: [{}]'.format(str(tag)))
+              'Image could not be found: [{}]'.format(six.text_type(tag)))
 
       if not tags:
         log.warning('No tags found matching image names [%s].',
                     ', '.join(args.image_names))
         return
       for tag, digest in six.iteritems(digests):
-        log.status.Print('Tag: [{}]'.format(str(tag)))
-        log.status.Print('- referencing digest: [{}]'.format(str(digest)))
+        log.status.Print('Tag: [{}]'.format(six.text_type(tag)))
+        log.status.Print('- referencing digest: [{}]'.format(
+            six.text_type(digest)))
         log.status.Print('')
 
       console_io.PromptContinue(
@@ -113,7 +114,7 @@ class Untag(base.DeleteCommand):
       result = []
       for tag in tags:
         self._DeleteDockerTag(tag, digests, http_obj)
-        result.append({'name': str(tag)})
+        result.append({'name': six.text_type(tag)})
       return result
 
   def _ParseArgs(self, image_names):

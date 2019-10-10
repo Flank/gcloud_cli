@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -108,6 +108,7 @@ class TopicsTest(base.CloudPubsubTestBase):
   def testPublish(self):
     topic_ref = util.ParseTopic('topic1', self.Project())
     message_body = b'Pubsub message'
+    ordering_key = 'in-order'
     attributes = [
         self.msgs.PubsubMessage.AttributesValue.AdditionalProperty(
             key='key',
@@ -116,15 +117,16 @@ class TopicsTest(base.CloudPubsubTestBase):
     message = self.msgs.PubsubMessage(
         attributes=self.msgs.PubsubMessage.AttributesValue(
             additionalProperties=attributes),
-        data=message_body
-    )
+        data=message_body,
+        orderingKey=ordering_key)
     self.topics_service.Publish.Expect(
         self.msgs.PubsubProjectsTopicsPublishRequest(
             publishRequest=self.msgs.PublishRequest(
                 messages=[message]),
             topic=topic_ref.RelativeName()),
         self.msgs.PublishResponse(messageIds=['123']))
-    result = self.topics_client.Publish(topic_ref, message_body, attributes)
+    result = self.topics_client.Publish(topic_ref, message_body, attributes,
+                                        ordering_key)
     self.assertEqual(result.messageIds[0], '123')
 
   def testPatch(self):
@@ -152,4 +154,3 @@ class TopicsTest(base.CloudPubsubTestBase):
 
 if __name__ == '__main__':
   test_case.main()
-

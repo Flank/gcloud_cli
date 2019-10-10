@@ -1,0 +1,116 @@
+title: surface unit test for asset search-iam-policies
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: asset search-iam-policies --query "policy:roles/owner"
+  - stdout: |
+      results:
+      - policy:
+          bindings:
+          - members:
+            - serviceAccount:service-123456789123@gcp-sa-cloudasset.iam.gserviceaccount.com
+            - serviceAccount:service-123456789123@gcp-sa-staging-cloudasset.iam.gserviceaccount.com
+            role: roles/cloudasset.serviceAgent
+          - members:
+            - serviceAccount:service-123456789123@compute-system.iam.gserviceaccount.com
+            role: roles/compute.serviceAgent
+          - members:
+            - serviceAccount:123456789123-compute@developer.gserviceaccount.com
+            - serviceAccount:123456789123@cloudservices.gserviceaccount.com
+            role: roles/editor
+          - members:
+            - serviceAccount:admin-231@iam-policy-test.iam.gserviceaccount.com
+            - serviceAccount:test-owner@iam-policy-test.iam.gserviceaccount.com
+            - serviceAccount:test-editor@iam-policy-test.iam.gserviceaccount.com
+            - user:user1@google.com
+            - user:user2@google.com
+            role: roles/owner
+          etag: a0052064237355214362
+          version: 1
+        project: projects/123456789123
+        resource: //cloudresourcemanager.googleapis.com/projects/iam-policy-test
+actions:
+- execute_command:
+    command: asset search-iam-policies --query "policy:roles/owner"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1p1alpha1/iamPolicies:search?alt=json&query=policy%3Aroles%2Fowner
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "results": {
+                "resource": "//cloudresourcemanager.googleapis.com/projects/iam-policy-test",
+                "project": "projects/123456789123",
+                "policy": {
+                  "version": 1,
+                  "etag": "\\a\\005\\2064\\237\\355\\214\\362",
+                  "bindings": [
+                    {
+                      "role": "roles/cloudasset.serviceAgent",
+                      "members": [
+                        "serviceAccount:service-123456789123@gcp-sa-cloudasset.iam.gserviceaccount.com",
+                        "serviceAccount:service-123456789123@gcp-sa-staging-cloudasset.iam.gserviceaccount.com"
+                      ]
+                    },
+                    {
+                      "role": "roles/compute.serviceAgent",
+                      "members": [
+                        "serviceAccount:service-123456789123@compute-system.iam.gserviceaccount.com"
+                      ]
+                    },
+                    {
+                      "role": "roles/editor",
+                      "members": [
+                        "serviceAccount:123456789123-compute@developer.gserviceaccount.com",
+                        "serviceAccount:123456789123@cloudservices.gserviceaccount.com"
+                      ]
+                    },
+                    {
+                      "role": "roles/owner",
+                      "members": [
+                        "serviceAccount:admin-231@iam-policy-test.iam.gserviceaccount.com",
+                        "serviceAccount:test-owner@iam-policy-test.iam.gserviceaccount.com",
+                        "serviceAccount:test-editor@iam-policy-test.iam.gserviceaccount.com",
+                        "user:user1@google.com",
+                        "user:user2@google.com"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+    - expect_stdout: |
+        results:
+        - policy:
+            bindings:
+            - members:
+              - serviceAccount:service-123456789123@gcp-sa-cloudasset.iam.gserviceaccount.com
+              - serviceAccount:service-123456789123@gcp-sa-staging-cloudasset.iam.gserviceaccount.com
+              role: roles/cloudasset.serviceAgent
+            - members:
+              - serviceAccount:service-123456789123@compute-system.iam.gserviceaccount.com
+              role: roles/compute.serviceAgent
+            - members:
+              - serviceAccount:123456789123-compute@developer.gserviceaccount.com
+              - serviceAccount:123456789123@cloudservices.gserviceaccount.com
+              role: roles/editor
+            - members:
+              - serviceAccount:admin-231@iam-policy-test.iam.gserviceaccount.com
+              - serviceAccount:test-owner@iam-policy-test.iam.gserviceaccount.com
+              - serviceAccount:test-editor@iam-policy-test.iam.gserviceaccount.com
+              - user:user1@google.com
+              - user:user2@google.com
+              role: roles/owner
+            etag: a0052064237355214362
+            version: 1
+          project: projects/123456789123
+          resource: //cloudresourcemanager.googleapis.com/projects/iam-policy-test
+    - expect_exit:
+        code: 0

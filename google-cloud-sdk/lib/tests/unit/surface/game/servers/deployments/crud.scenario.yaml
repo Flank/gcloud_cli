@@ -1,0 +1,643 @@
+title: Cloud Game Services deployments crud test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      game servers deployments create my-deployment --location global --labels a=x,b=y
+  - stderr: |
+      Create request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created deployment [my-deployment].
+- execute:
+  - command: |
+      game servers deployments create my-deployment --location global --spec-file spec.json --template-id template-1
+  - stderr: |
+      Create request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created deployment [my-deployment].
+- execute:
+  - command: |
+      game servers deployments create my-deployment --location global --spec-file spec.yaml --template-id template-1
+  - stderr: |
+      Create request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created deployment [my-deployment].
+- execute:
+  - command: |
+      game servers deployments create my-deployment --location global --spec-file invalid_spec.txt --template-id template-1
+  - error: '1: None'
+- execute:
+  - command: |
+      game servers deployments describe my-deployment --location global
+  - stdout: |
+      createTime: '2019-06-04T06:00:22.223629990Z'
+      labels:
+        a: x
+        b: y
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      updateTime: '2019-06-04T06:00:24.189364972Z'
+- execute:
+  - command: |
+      game servers deployments list --location global
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: |
+      game servers deployments list
+  - stderr: |
+      Listed 0 items.
+- execute:
+  - command: |
+      game servers deployments delete my-deployment --location global
+  - prompt:
+    - message: You are about to delete deployment [my-deployment]
+    - input: y
+  - stderr: |
+      Delete request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted deployment [my-deployment].
+- execute:
+  - command: |
+      game servers deployments update my-deployment --location global --update-labels "key1=val1"
+  - stderr: |
+      Request issued for: [my-deployment]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Updated deployment [my-deployment].
+  - stdout: |
+      createTime: '2019-06-19T01:08:49.202077751Z'
+      labels:
+        key1: val1
+      name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+      updateTime: '2019-06-19T01:23:42.336919018Z'
+actions:
+- write_file:
+    path: spec.json
+    contents: |
+      {
+        "metadata":{"name":"game-server-template-spec-0"},
+        "spec":{
+          "template":{
+            "spec":{
+              "containers":[
+                {
+                  "name":"shruggie",
+                  "image":"gcr.io/agones-images/udp-server:0.8"
+                }
+              ],
+              "restartPolicy": "Never"
+            }
+          }
+        }
+      }
+- write_file:
+    path: spec.yaml
+    contents: |
+      metadata:
+        name: "game-server-template-spec-1"
+      spec:
+        template:
+          spec:
+            containers:
+            - name: shruggie
+              image: gcr.io/agones-images/udp-server:0.11
+            restartPolicy: Never
+- write_file:
+    path: invalid_spec.txt
+    contents: |
+      blah
+- execute_command:
+    command: |
+      game servers deployments create my-deployment --location global --labels a=x,b=y
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments?alt=json&deploymentId=my-deployment
+          method: POST
+          headers: {}
+          body:
+            json:
+              labels:
+                a: x
+                b: y
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+             }
+    - expect_stderr: |
+        Create request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              }
+            }
+    - expect_stderr: |
+        Created deployment [my-deployment].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments create my-deployment --location global --spec-file spec.json --template-id template-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments?alt=json&deploymentId=my-deployment
+          method: POST
+          headers: {}
+          body: |
+            {
+              "newGameServerTemplate": {
+                "spec": {
+                  "metadata": {"name": "game-server-template-spec-0"},
+                  "spec": {
+                    "template": {
+                      "spec": {
+                        "containers": [
+                          {
+                            "name": "shruggie",
+                            "image": "gcr.io/agones-images/udp-server:0.8"
+                          }
+                        ],
+                        "restartPolicy": "Never"
+                      }
+                    }
+                  }
+                }
+                "templateId": "template-1"
+              }
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+             }
+    - expect_stderr: |
+        Create request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z"
+            }
+    - expect_stderr: |
+        Created deployment [my-deployment].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments create my-deployment --location global --spec-file spec.yaml --template-id template-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments?alt=json&deploymentId=my-deployment
+          method: POST
+          headers: {}
+          body: |
+            {
+              "newGameServerTemplate": {
+                "spec": {
+                  "metadata": {"name": "game-server-template-spec-1"},
+                  "spec": {
+                    "template": {
+                      "spec": {
+                        "containers": [
+                          {
+                            "name": "shruggie",
+                            "image": "gcr.io/agones-images/udp-server:0.8"
+                          }
+                        ],
+                        "restartPolicy": "Never"
+                      }
+                    }
+                  }
+                }
+                "templateId": "template-1"
+              }
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "done": true
+             }
+    - expect_stderr: |
+        Create request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:55:25.592630443Z",
+                "endTime": "2019-06-17T17:55:26.143797134Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "create",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-17T17:55:25.580478587Z",
+                "updateTime": "2019-06-17T17:55:25.597731920Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794125570-58b88b36c12e4-1e63667e-fd897e39]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-17T17:55:25.580478587Z",
+              "updateTime": "2019-06-17T17:55:26.151280082Z"
+            }
+    - expect_stderr: |
+        Created deployment [my-deployment].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments create my-deployment --location global --spec-file invalid_spec.txt --template-id template-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments?alt=json&deploymentId=my-deployment
+          method: POST
+          headers: {}
+          body:
+            json:
+              newGameServerTemplate:
+                spec: '"blah"'
+                templateId: template-1
+        return_response:
+          headers:
+            status: '400'
+          body: |
+            {
+              "error": {
+                "code": 400,
+                "message": "new_game_server_template.spec must be json format of GameServerTemplateSpec, defined in https://github.com/googleforgames/agones/blob/master/pkg/apis/stable/v1alpha1/gameserver.go",
+                "status": "INVALID_ARGUMENT",
+              }
+            }
+    - expect_exit:
+        code: 1
+- execute_command:
+    command: |
+      game servers deployments describe my-deployment --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-04T06:00:22.223629990Z",
+              "updateTime": "2019-06-04T06:00:24.189364972Z",
+              "labels": {
+                "a": "x",
+                "b": "y"
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-06-04T06:00:22.223629990Z'
+        labels:
+          a: x
+          b: y
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        updateTime: '2019-06-04T06:00:24.189364972Z'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments list --location global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/-/gameServerDeployments?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments delete my-deployment --location global
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete deployment [my-deployment]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce",
+              "done": true
+            }
+    - expect_stderr: |
+        Delete request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-17T17:59:30.383331409Z",
+                "endTime": "2019-06-17T17:59:30.994963067Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "delete",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560794370352-58b88c203245f-78b8623b-e26181ce]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted deployment [my-deployment].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      game servers deployments update my-deployment --location global --update-labels "key1=val1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-19T01:08:49.202077751Z",
+              "updateTime": "2019-06-19T01:23:42.336919018Z"
+            }
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json&updateMask=labels
+          method: PATCH
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "done": true
+            }
+        repeatable: true
+    - expect_stderr: |
+        Request issued for: [my-deployment]
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.OperationMetadata",
+                "createTime": "2019-06-19T01:23:42.325431698Z",
+                "endTime": "2019-06-19T01:23:51.099152052Z",
+                "target": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "verb": "update",
+                "requestedCancellation": false,
+                "apiVersion": "v1alpha"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.gaming.v1alpha.GameServerDeployment",
+                "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+                "createTime": "2019-06-19T01:08:49.202077751Z",
+                "updateTime": "2019-06-19T01:23:42.336919018Z"
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/global/operations/operation-1560907422296-58ba3146ee9ec-0976a77e-eb4d1d00]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://gameservices.googleapis.com/v1alpha/projects/fake-project/locations/global/gameServerDeployments/my-deployment?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/gameServerDeployments/my-deployment",
+              "createTime": "2019-06-19T01:08:49.202077751Z",
+              "updateTime": "2019-06-19T01:23:42.336919018Z",
+              "labels": {
+                "key1": "val1"
+              }
+            }
+    - expect_stderr: |
+        Updated deployment [my-deployment].
+    - expect_stdout: |
+        createTime: '2019-06-19T01:08:49.202077751Z'
+        labels:
+          key1: val1
+        name: projects/fake-project/locations/global/gameServerDeployments/my-deployment
+        updateTime: '2019-06-19T01:23:42.336919018Z'
+    - expect_exit:
+        code: 0

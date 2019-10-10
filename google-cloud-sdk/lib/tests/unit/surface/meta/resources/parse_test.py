@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
   def testParseTwoGood(self):
     actual = self.Run('meta resources parse'
                       ' '
-                      'https://www.googleapis.com/compute/v1/'
+                      'https://compute.googleapis.com/compute/v1/'
                       'projects/my-project-1/zones/my-zone-1/'
                       'instances/my-instance-1'
                       ' '
-                      'https://www.googleapis.com/compute/v1/'
+                      'https://compute.googleapis.com/compute/v1/'
                       'projects/my-project-2/zones/my-zone-2/'
                       'instances/my-instance-2')
     expected = [
@@ -45,7 +45,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                 'project': 'my-project-1',
                 'zone': 'my-zone-1'
             },
-            'uri': ('https://www.googleapis.com/compute/v1/'
+            'uri': ('https://compute.googleapis.com/compute/v1/'
                     'projects/my-project-1/zones/my-zone-1/'
                     'instances/my-instance-1'),
         },
@@ -58,7 +58,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                 'project': 'my-project-2',
                 'zone': 'my-zone-2'
             },
-            'uri': ('https://www.googleapis.com/compute/v1/'
+            'uri': ('https://compute.googleapis.com/compute/v1/'
                     'projects/my-project-2/zones/my-zone-2/'
                     'instances/my-instance-2'),
         },
@@ -77,7 +77,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                'projects/my-project-1/bars/my-zone-1/'
                'instances/my-instance-1'
                ' '
-               'https://www.googleapis.com/compute/v1/'
+               'https://compute.googleapis.com/compute/v1/'
                'projects/my-project-2/zones/my-zone-2/'
                'instances/my-instance-2')
 
@@ -88,7 +88,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                       'projects/my-project-1/bars/my-zone-1/'
                       'instances/my-instance-1'
                       ' '
-                      'https://www.googleapis.com/compute/v1/'
+                      'https://compute.googleapis.com/compute/v1/'
                       'projects/my-project-2/zones/my-zone-2/'
                       'instances/my-instance-2')
     expected = [
@@ -109,7 +109,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                 'project': 'my-project-2',
                 'zone': 'my-zone-2'
             },
-            'uri': ('https://www.googleapis.com/compute/v1/'
+            'uri': ('https://compute.googleapis.com/compute/v1/'
                     'projects/my-project-2/zones/my-zone-2/'
                     'instances/my-instance-2'),
         },
@@ -146,9 +146,9 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
 
   def testInteractiveParseTwoGood(self):
     self.WriteInput(
-        'https://www.googleapis.com/compute/v1/projects/my-project-1/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-1/'
         'zones/my-zone-1/instances/my-instance-1\n'
-        'https://www.googleapis.com/compute/v1/projects/my-project-2/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-2/'
         'zones/my-zone-2/instances/my-instance-2\n')
     self.Run('meta resources parse')
     self.AssertOutputEquals("""\
@@ -178,7 +178,7 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
       self.WriteInput(
           'https://www.googleapis.com/foo/v1/projects/my-project-1/'
           'bars/my-zone-1/instances/my-instance-1\n'
-          'https://www.googleapis.com/compute/v1/projects/my-project-2/'
+          'https://compute.googleapis.com/compute/v1/projects/my-project-2/'
           'zones/my-zone-2/instances/my-instance-2\n')
       self.Run('meta resources parse')
     self.AssertOutputEquals('')
@@ -193,7 +193,7 @@ class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):
     self.WriteInput(
         'https://www.googleapis.com/foo/v1/projects/my-project-1/'
         'bars/my-zone-1/instances/my-instance-1\n'
-        'https://www.googleapis.com/compute/v1/projects/my-project-2/'
+        'https://compute.googleapis.com/compute/v1/projects/my-project-2/'
         'zones/my-zone-2/instances/my-instance-2\n')
     self.Run('meta resources parse --no-stack-trace')
     self.AssertOutputEquals("""\

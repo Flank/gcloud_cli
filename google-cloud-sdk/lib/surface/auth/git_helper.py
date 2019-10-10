@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 
 from oauth2client import client
+import six
 
 
 _KEYVAL_RE = re.compile(r'(.+)=(.*)')
@@ -120,7 +121,7 @@ class GitHelper(base.Command):
         sys.stderr.write(textwrap.dedent("""\
             ERROR: {error}
             Run 'gcloud auth login' to log in.
-            """.format(error=str(e))))
+            """.format(error=six.text_type(e))))
         return
 
       self._CheckNetrc()

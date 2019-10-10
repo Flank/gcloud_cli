@@ -142,12 +142,25 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To create a Compute Engine reservation, run:
 
 .RS 2m
+$ gcloud beta compute reservations create my\-reservation \e
+  \-\-zone=fake\-zone \-\-vm\-count=1 \-\-machine\-type=n1\-standard\-1 \e
+  \-\-min\-cpu\-platform="Intel Haswell"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute reservations create
 $ gcloud alpha compute reservations create
 .RE
 

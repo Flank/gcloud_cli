@@ -1,0 +1,45 @@
+title: operations list test
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: lifesciences operations list --location us-central1
+  - stdout: |
+      ID                    LOCATION     DONE
+      16119721569294483457  us-central1  True
+actions:
+- execute_command:
+    command: lifesciences operations list --location us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://lifesciences.googleapis.com/v2beta/projects/fake-project/locations/us-central1/operations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "operations": [
+                {
+                  "name": "projects/fake-project/locations/us-central1/operations/16119721569294483457",
+                  "metadata": {
+                    "@type": "type.googleapis.com/google.cloud.lifesciences.v2beta.Metadata",
+                    "createTime": "2019-02-08T16:00:17.687188Z",
+                    "endTime": "2019-02-08T16:00:17.719832Z"
+                  },
+                  "done": true,
+                  "response": {
+                    "@type": "type.googleapis.com/google.cloud.lifesciences.v2beta.RunPipelineResponse"
+                  }
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        ID                    LOCATION     DONE
+        16119721569294483457  us-central1  True
+    - expect_exit:
+        code: 0

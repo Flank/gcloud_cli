@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class ListTest(
 
     image_project = image_project or self.Project()
     resource_url = (
-        'https://www.googleapis.com/compute/v1'
+        'https://compute.googleapis.com/compute/v1'
         '/projects/{}/global/images/{}').format(image_project, image)
 
     return self.messages.Occurrence(
@@ -108,7 +108,7 @@ class ListTest(
   def testListVulnerabilities(self):
     self._MockYieldFromList(
         'kind = "PACKAGE_VULNERABILITY" AND '
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/")')
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/")')
 
     self.Run('compute images vulnerabilities list')
 
@@ -121,7 +121,7 @@ foo2 CVE-2018-2222 MINIMAL 2.71 foobar
   def testListVulnerabilities_OverrideFilter(self):
     self._MockYieldFromList(
         'kind = "PACKAGE_VULNERABILITY" AND '
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/")')
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/")')
 
     self.Run('compute images vulnerabilities list --filter ""')
 
@@ -134,9 +134,9 @@ foo2 CVE-2018-2222 MINIMAL 2.71 foobar
   def testListVulnerabilities_SpecifyImage(self):
     self._MockYieldFromList(
         'kind = "PACKAGE_VULNERABILITY" AND '
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/") AND '
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/") AND '
         'has_prefix(resource_url, '
-        '"https://www.googleapis.com/compute/v1/projects/fake-project/'
+        '"https://compute.googleapis.com/compute/v1/projects/fake-project/'
         'global/images/my-image")')
 
     self.Run('compute images vulnerabilities list --image my-image')
@@ -150,7 +150,7 @@ foo2 CVE-2018-2222 MINIMAL 2.71 foobar
   def testListVulnerabilities_Format(self):
     self._MockYieldFromList(
         'kind = "PACKAGE_VULNERABILITY" AND '
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/")')
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/")')
 
     self.Run('compute images vulnerabilities list')
 

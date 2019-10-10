@@ -1,11 +1,20 @@
 NAME
-    gcloud alpha dataflow - read and manipulate Google Dataflow resources
+    gcloud alpha dataflow - manage Google Cloud Dataflow resources
 
 SYNOPSIS
     gcloud alpha dataflow GROUP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Dataflow resources.
+    (ALPHA) The gcloud dataflow command group lets you manage Google Cloud
+    Dataflow resources.
+
+    Cloud Dataflow is a unified programming model and a managed service for
+    developing and executing a wide range of data processing patterns including
+    ETL, batch computation, and continuous computation.
+
+    More information on Cloud Dataflow can be found here:
+    https://cloud.google.com/dataflow and detailed documentation can be found
+    here: https://cloud.google.com/dataflow/docs/
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -29,9 +38,8 @@ GROUPS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud dataflow
         $ gcloud beta dataflow

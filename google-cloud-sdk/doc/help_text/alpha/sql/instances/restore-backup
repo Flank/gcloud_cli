@@ -17,7 +17,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Do not wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --backup-id=BACKUP_ID
         The ID of the backup run to restore from.
@@ -35,9 +36,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud sql instances restore-backup
         $ gcloud beta sql instances restore-backup

@@ -65,8 +65,7 @@ environments update\fR.
 
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR; default="100GB"
@@ -204,8 +203,8 @@ Cannot be specified unless '\-\-enable\-ip\-alias' is also specified.
 .TP 2m
 \fB\-\-enable\-ip\-alias\fR
 Enable use of alias IPs (https://cloud.google.com/compute/docs/alias\-ip/) for
-pod IPs within the Environment cluster. This will create two secondary ranges,
-one for the pod IPs and another to reserve space for the services range.
+Pod IPs. This will require at least two secondary ranges in the subnetwork, one
+for the pod IPs and another to reserve space for the services range.
 
 .TP 2m
 \fB\-\-enable\-private\-endpoint\fR

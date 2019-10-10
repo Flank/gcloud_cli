@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
         gae_request, exception=gae_exception)
     run_request = (self.run_messages.
                    RunProjectsLocationsAuthorizeddomainsListRequest(
-                       parent=self._FormatRunProject('us-central1')))
+                       parent=self._FormatRunProject('-')))
     response = self.run_messages.ListAuthorizedDomainsResponse(domains=domains)
     self.run_mock_client.projects_locations_authorizeddomains.List.Expect(
         run_request, response=response)
@@ -144,7 +144,7 @@ class DomainsListCommandTest(sdk_test_base.WithFakeAuth,
         exception=api_exceptions.HttpNotFoundError(None, None, None))
     run_request = (self.run_messages.
                    RunProjectsLocationsAuthorizeddomainsListRequest(
-                       parent=self._FormatRunProject('us-central1')))
+                       parent=self._FormatRunProject('-')))
     self.run_mock_client.projects_locations_authorizeddomains.List.Expect(
         run_request,
         exception=api_exceptions.HttpNotFoundError(None, None, None))

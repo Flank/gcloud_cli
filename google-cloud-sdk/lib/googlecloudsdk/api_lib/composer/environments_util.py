@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -158,10 +158,6 @@ def Create(environment_ref,
     )
 
     if private_environment:
-      # TODO(b/128636528): Restore when API bug is addressed.
-      if master_ipv4_cidr is None:
-        master_ipv4_cidr = '172.16.0.0/28'  # Assigns default value.
-
       # Adds a PrivateClusterConfig, if necessary.
       private_cluster_config = None
       if private_endpoint or master_ipv4_cidr:

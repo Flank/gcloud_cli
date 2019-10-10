@@ -9,7 +9,8 @@ summary:
   - stderr: |
       Create request issued for: [$$redis-instance$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation$$] to complete
+    - message: Waiting for operation [projects/cloud-sdk-integration-testing/locations/us-central1/operations/$$operation$$]
+        to complete
     - status: SUCCESS
   - stderr: |
       Created instance [$$redis-instance$$].
@@ -26,7 +27,7 @@ summary:
   - stderr: |
       Request issued for: [$$redis-instance$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Updated instance [$$redis-instance$$].
@@ -39,14 +40,14 @@ summary:
 - execute:
   - command: redis instances failover --region="us-central1" $$redis-instance$$
   - prompt:
-    - message: "WARNING: Failover can result in the loss of unreplicated data. Using
-        'force-data-loss' can potentially cause significant data loss. See manual failover
-        documentation for more details."
+    - message: "WARNING: Failover can result in the loss of unreplicated data. Using\
+        \ 'force-data-loss' can potentially cause significant data loss. See manual\
+        \ failover documentation for more details."
     - input: y
   - stderr: |
       Request issued for: [$$redis-instance$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
 - execute:
   - command: redis instances delete --region="us-central1" $$redis-instance$$
@@ -58,7 +59,8 @@ summary:
   - stderr: |
       Delete request issued for: [$$redis-instance$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation$$] to complete
+    - message: Waiting for operation [projects/cloud-sdk-integration-testing/locations/us-central1/operations/$$operation$$]
+        to complete
     - status: SUCCESS
   - stderr: |
       Deleted instance [$$redis-instance$$].
@@ -108,7 +110,8 @@ actions:
     - expect_stderr: |
         Create request issued for: [$$redis-instance$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation$$] to complete
+        message: Waiting for operation [projects/cloud-sdk-integration-testing/locations/us-central1/operations/$$operation$$]
+          to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -351,7 +354,7 @@ actions:
     - expect_stderr: |
         Request issued for: [$$redis-instance$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -426,9 +429,9 @@ actions:
     command: redis instances failover --region="us-central1" $$redis-instance$$
     events:
     - expect_prompt_continue:
-        message: "WARNING: Failover can result in the loss of unreplicated data. Using
-          'force-data-loss' can potentially cause significant data loss. See manual
-          failover documentation for more details."
+        message: "WARNING: Failover can result in the loss of unreplicated data. Using\
+          \ 'force-data-loss' can potentially cause significant data loss. See manual\
+          \ failover documentation for more details."
         user_input: y
     - api_call:
         expect_request:
@@ -456,7 +459,7 @@ actions:
     - expect_stderr: |
         Request issued for: [$$redis-instance$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -530,7 +533,8 @@ actions:
     - expect_stderr: |
         Delete request issued for: [$$redis-instance$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation$$] to complete
+        message: Waiting for operation [projects/cloud-sdk-integration-testing/locations/us-central1/operations/$$operation$$]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Deleted instance [$$redis-instance$$].

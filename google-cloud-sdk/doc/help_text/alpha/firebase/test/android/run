@@ -7,6 +7,7 @@ SYNOPSIS
         [--device=DIMENSION=VALUE,[...]] [--test=TEST] [--timeout=TIMEOUT]
         [--type=TYPE] [--additional-apks=APK,[APK,...]]
         [--app-package=APP_PACKAGE] [--async] [--auto-google-login]
+        [--client-details=[KEY=VALUE,...]]
         [--directories-to-pull=[DIR_TO_PULL,...]]
         [--environment-variables=[KEY=VALUE,...]]
         [--network-profile=PROFILE_ID] [--num-flaky-test-attempts=int]
@@ -130,6 +131,18 @@ FLAGS
         account before beginning the test. Enabled by default, use
         --no-auto-google-login to disable.
 
+     --client-details=[KEY=VALUE,...]
+        Comma-separated, KEY=VALUE map of additional details to attach to the
+        test matrix. Arbitrary KEY=VALUE pairs may be attached to a test matrix
+        to provide additional context about the tests being run. When consuming
+        the test results, such as in Cloud Functions or a CI system, these
+        details can add additional context such as a link to the corresponding
+        pull request.
+
+        Example:
+
+            --client-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull-request
+
      --directories-to-pull=[DIR_TO_PULL,...]
         A list of paths that will be copied from the device's storage to the
         designated results bucket after the test is complete. These must be
@@ -143,10 +156,9 @@ FLAGS
 
      --environment-variables=[KEY=VALUE,...]
         A comma-separated, key=value map of environment variables and their
-        desired values. This flag is repeatable. The environment variables are
-        mirrored as extra options to the am instrument -e KEY1 VALUE1 ...
-        command and passed to your test runner (typically AndroidJUnitRunner).
-        Examples:
+        desired values. The environment variables are mirrored as extra options
+        to the am instrument -e KEY1 VALUE1 ... command and passed to your test
+        runner (typically AndroidJUnitRunner). Examples:
 
         Break test cases into four shards and run only the first shard:
 
@@ -478,9 +490,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud firebase test android run
         $ gcloud beta firebase test android run

@@ -108,7 +108,7 @@ class FileProjectsLocationsInstancesPatchRequest(_messages.Message):
       projects/{project_id}/locations/{location_id}/instances/{instance_id}.
     updateMask: Mask of fields to update.  At least one path must be supplied
       in this field.  The elements of the repeated paths field may only
-      include these fields: "description"
+      include these fields: "description" "file_shares" "labels"
   """
 
   instance = _messages.MessageField('Instance', 1)
@@ -217,7 +217,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
   "cloud-sql-instance-size": "1G",   },   "provisioned_resources": [     {
   "resource-type": "compute-instance",       "resource-url":
   "https://www.googleapis.com/compute/v1/projects/cloud-sql/zones/us-
-  east1-b/instances/vm-1",     }   ], } ```
+  east1-b/instances/vm-1",     }   ],   "maintenance_schedules": {
+  "csa_rollout": {        "start_time": {           "seconds": 1526406431,
+  },        "end_time": {           "seconds": 1535406431,        },     },
+  "ncsa_rollout": {        "start_time": {           "seconds": 1526406431,
+  },        "end_time": {           "seconds": 1535406431,        },     }
+  },   "consumer_defined_name": "my-sql-instance1", } ```
 
   Enums:
     StateValueValuesEnum: Output only. Current lifecycle state of the resource
@@ -232,6 +237,8 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       policy name defined in MaintenancePolicy, and the referenced policy must
       define the same policy type. For complete details of MaintenancePolicy,
       please refer to go/cloud-saas-mw-ug.
+    MaintenanceSchedulesValue: The MaintenanceSchedule contains the scheduling
+      information of published maintenance schedule.
     ProducerMetadataValue: Output only. Custom string attributes used
       primarily to expose producer-specific information in monitoring
       dashboards. See go/get-instance-metadata.
@@ -245,6 +252,11 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       instance. This can be mutated by rollout services.
 
   Fields:
+    consumerDefinedName: consumer_defined_name is the name that is set by the
+      consumer. On the other hand Name field represents system-assigned id of
+      an instance so consumers are not necessarily aware of it.
+      consumer_defined_name is used for notification/UI purposes for consumer
+      to recognize their instances.
     createTime: Output only. Timestamp when the resource was created.
     labels: Optional. Resource labels to represent user provided metadata.
       Each label is a key-value pair, where both the key and the value are
@@ -254,6 +266,8 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       defined in MaintenancePolicy, and the referenced policy must define the
       same policy type. For complete details of MaintenancePolicy, please
       refer to go/cloud-saas-mw-ug.
+    maintenanceSchedules: The MaintenanceSchedule contains the scheduling
+      information of published maintenance schedule.
     name: Unique name of the resource. It uses the form:
       `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     producerMetadata: Output only. Custom string attributes used primarily to
@@ -356,6 +370,35 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
+  class MaintenanceSchedulesValue(_messages.Message):
+    r"""The MaintenanceSchedule contains the scheduling information of
+    published maintenance schedule.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        MaintenanceSchedulesValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        MaintenanceSchedulesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a MaintenanceSchedulesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A
+          GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule
+          attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
   class ProducerMetadataValue(_messages.Message):
     r"""Output only. Custom string attributes used primarily to expose
     producer-specific information in monitoring dashboards. See go/get-
@@ -441,18 +484,41 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  createTime = _messages.StringField(1)
-  labels = _messages.MessageField('LabelsValue', 2)
-  maintenancePolicyNames = _messages.MessageField('MaintenancePolicyNamesValue', 3)
-  name = _messages.StringField(4)
-  producerMetadata = _messages.MessageField('ProducerMetadataValue', 5)
-  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 6, repeated=True)
-  rolloutMetadata = _messages.MessageField('RolloutMetadataValue', 7)
-  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 8)
-  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 9)
-  state = _messages.EnumField('StateValueValuesEnum', 10)
-  tenantProjectId = _messages.StringField(11)
-  updateTime = _messages.StringField(12)
+  consumerDefinedName = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  labels = _messages.MessageField('LabelsValue', 3)
+  maintenancePolicyNames = _messages.MessageField('MaintenancePolicyNamesValue', 4)
+  maintenanceSchedules = _messages.MessageField('MaintenanceSchedulesValue', 5)
+  name = _messages.StringField(6)
+  producerMetadata = _messages.MessageField('ProducerMetadataValue', 7)
+  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 8, repeated=True)
+  rolloutMetadata = _messages.MessageField('RolloutMetadataValue', 9)
+  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 10)
+  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 11)
+  state = _messages.EnumField('StateValueValuesEnum', 12)
+  tenantProjectId = _messages.StringField(13)
+  updateTime = _messages.StringField(14)
+
+
+class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messages.Message):
+  r"""Maintenance schedule which is exposed to customer and potentially end
+  user, indicating published upcoming future maintenance schedule
+
+  Fields:
+    canReschedule: Can this scheduled update be rescheduled? By default, it's
+      true and API needs to do explicitly check whether it's set, if it's set
+      as false explicitly, it's false
+    endTime: The scheduled end time for the maintenance.
+    rolloutManagementPolicy: The rollout management policy this maintenance
+      schedule is associated with. When doing reschedule update request, the
+      reschedule should be against this given policy.
+    startTime: The scheduled start time for the maintenance.
+  """
+
+  canReschedule = _messages.BooleanField(1)
+  endTime = _messages.StringField(2)
+  rolloutManagementPolicy = _messages.StringField(3)
+  startTime = _messages.StringField(4)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata(_messages.Message):
@@ -467,12 +533,14 @@ class GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata(_messages.M
       semantic see SloMetadata.exclusions. If both instance and node level
       exclusions are present for time period, the node level's reason will be
       reported by Eligibility Exporter.
+    location: The location of the node, if different from instance location.
     nodeId: The id of the node. This should be equal to
       SaasInstanceNode.node_id.
   """
 
   exclusions = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion', 1, repeated=True)
-  nodeId = _messages.StringField(2)
+  location = _messages.StringField(2)
+  nodeId = _messages.StringField(3)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1NotificationMetadata(_messages.Message):
@@ -527,7 +595,8 @@ class GoogleCloudSaasacceleratorManagementProvidersV1RolloutMetadata(_messages.M
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion(_messages.Message):
-  r"""A temporal SLO exclusion specification.
+  r"""SloExclusion represents an excusion in SLI calculation applies to all
+  SLOs.
 
   Fields:
     exclusionDuration: Exclusion duration. No restrictions on the possible
@@ -543,15 +612,15 @@ class GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion(_messages.Mess
     reason: Human-readable reason for the exclusion. This should be a static
       string (e.g. "Disruptive update in progress") and should not contain
       dynamically generated data (e.g. instance name). Can be left empty.
-    sloName: Name of an SLI/SLO that this exclusion applies to. Can be left
-      empty, signaling that the instance should be excluded from all SLI/SLOs
-      defined in the service SLO configuration.
+    sliName: Name of an SLI that this exclusion applies to. Can be left empty,
+      signaling that the instance should be excluded from all SLIs defined in
+      the service SLO configuration.
   """
 
   exclusionDuration = _messages.StringField(1)
   exclusionStartTime = _messages.StringField(2)
   reason = _messages.StringField(3)
-  sloName = _messages.StringField(4)
+  sliName = _messages.StringField(4)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Message):
@@ -1047,37 +1116,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.

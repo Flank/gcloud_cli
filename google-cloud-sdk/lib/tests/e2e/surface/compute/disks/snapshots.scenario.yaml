@@ -8,7 +8,7 @@ summary:
   - command: compute disks create $$disk$$ --image-family=debian-9 --image-project=debian-cloud
       --zone us-central1-f --format 'yaml(name,zone,status)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
   - stdout: |
       ---
       name: $$disk$$
@@ -24,7 +24,7 @@ summary:
   - command: compute disks create $$custom_disk$$ --source-snapshot $$snapshot$$ --zone
       us-central1-f --format 'yaml(name,zone,status)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$].
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$\].
   - stdout: |
       ---
       name: $$custom_disk$$
@@ -33,30 +33,28 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --disk name=$$custom_disk$$,boot=yes
   - stderr: |
-      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
-  - stdout: |
-      NAME                                               ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP    STATUS
-      $$instance$$  us-central1-f  n1-standard-1               10.240.1.75  35.226.17.218  RUNNING
+      Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+  - stdout: .*$$instance$$\s+us-central1-f\s+n1-standard-1.*RUNNING.*$
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute disks delete $$custom_disk$$ --zone us-central1-f -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$\].
 - execute:
   - command: compute snapshots delete $$snapshot$$ -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$\].
 - execute:
   - command: compute disks delete $$disk$$ --zone us-central1-f -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+      Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - set_property:
     container/use_application_default_credentials: true
 
@@ -69,8 +67,9 @@ actions:
       --zone us-central1-f --format 'yaml(name,zone,status)'
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
     - expect_stdout: |
         ---
         name: $$disk$$
@@ -110,9 +109,9 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '534'
+            Content-Length: '510'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"qVJ-GgfQdAR2fb9s2mOHtFi4wE0=/kMTg90DEK8EhyhzN3xwF0Vs5WGc="'
+            ETag: '"bZhdQZXE8tBBNKT6gBExFk4u4PM=/yOeCpZ2JqAwi55LiwNxdsoPJkUI="'
             status: '200'
           body:
             kind: compute#zone
@@ -124,7 +123,6 @@ actions:
             region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             availableCpuPlatforms:
-            - Intel Cascade Lake
             - Intel Skylake
             - Intel Broadwell
             - Intel Haswell
@@ -138,7 +136,7 @@ actions:
           body:
             json:
               name: $$custom_disk$$
-              sourceSnapshot: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
+              sourceSnapshot: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -147,18 +145,18 @@ actions:
             status: '200'
           body:
             kind: compute#operation
-            id: '499532469965780390'
-            name: operation-1555614536605-586d2bbdc9f1e-ac4b94d5-d9a1c0df
+            id: '4852281799248188454'
+            name: operation-1558555337482-5897f7140df5f-5714bc3f-93269891
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: insert
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$
-            targetId: '7065109977334379943'
+            targetId: '494571997490582566'
             status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-04-18T12:08:57.414-07:00'
-            startTime: '2019-04-18T12:08:57.428-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1555614536605-586d2bbdc9f1e-ac4b94d5-d9a1c0df
+            insertTime: '2019-05-22T13:02:17.989-07:00'
+            startTime: '2019-05-22T13:02:17.996-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1558555337482-5897f7140df5f-5714bc3f-93269891
         expect_response:
           extract_references:
           - field: name
@@ -176,26 +174,27 @@ actions:
             Cache-Control: private, max-age=0
             Content-Length: '919'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"5csRzablZCPpuSOiAaEy0lTzduw=/TmInQrtRJ0XpeBejFezj6qE5i34="'
+            ETag: '"CYbrOhOFVGv123vDUpLX0mgd8mk=/W6hq49t0qAea0YPAGLCbzt6CPKk="'
             status: '200'
           body:
             kind: compute#operation
-            id: '499532469965780390'
-            name: operation-1555614536605-586d2bbdc9f1e-ac4b94d5-d9a1c0df
+            id: '4852281799248188454'
+            name: operation-1558555337482-5897f7140df5f-5714bc3f-93269891
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: insert
             targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$
-            targetId: '7065109977334379943'
+            targetId: '494571997490582566'
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 100
-            insertTime: '2019-04-18T12:08:57.414-07:00'
-            startTime: '2019-04-18T12:08:57.428-07:00'
-            endTime: '2019-04-18T12:09:18.535-07:00'
-            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1555614536605-586d2bbdc9f1e-ac4b94d5-d9a1c0df
+            insertTime: '2019-05-22T13:02:17.989-07:00'
+            startTime: '2019-05-22T13:02:17.996-07:00'
+            endTime: '2019-05-22T13:02:39.211-07:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1558555337482-5897f7140df5f-5714bc3f-93269891
         repeatable: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$?alt=json
@@ -205,20 +204,20 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '1124'
+            Content-Length: '1123'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"tiu6XjSfpCvcvrPgMtavTT29NeE=/1c2Y2h1oeC0afaBPYXAwi-97aIg="'
+            ETag: '"H3DldbV5zRGRxqLp8C0QXy7AmNk=/_qz1jmY71S1OOU2zlWTOkQcbabk="'
             status: '200'
           body:
             kind: compute#disk
-            id: '7065109977334379943'
-            creationTimestamp: '2019-04-18T12:08:57.408-07:00'
+            id: '494571997490582566'
+            creationTimestamp: '2019-05-22T13:02:17.991-07:00'
             name: $$custom_disk$$
             sizeGb: '10'
             zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             status: READY
             sourceSnapshot: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
-            sourceSnapshotId: '4313704007111898132'
+            sourceSnapshotId: '4473128524513285246'
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$
             type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
             licenses:
@@ -244,8 +243,9 @@ actions:
     command: compute instances create $$instance$$ --zone us-central1-f --disk name=$$custom_disk$$,boot=yes
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_stdout:
         matches: .*$$instance$$\s+us-central1-f\s+n1-standard-1.*RUNNING.*
     - expect_exit:
@@ -255,8 +255,9 @@ actions:
     cleanup_for: instance
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -264,8 +265,9 @@ actions:
     cleanup_for: custom_disk
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$custom_disk$$\].
     - expect_exit:
         code: 0
 - execute_command:
@@ -273,8 +275,9 @@ actions:
     cleanup_for: snapshot
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$\].
     - expect_exit:
         code: 0
 
@@ -283,7 +286,8 @@ actions:
     cleanup_for: disk
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
     - expect_exit:
         code: 0

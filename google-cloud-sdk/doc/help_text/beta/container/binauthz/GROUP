@@ -24,8 +24,7 @@ GROUPS
         (BETA) Create and manage Google Binary Authorization attestations.
 
      attestors
-        (BETA) Create and manage Google Binary Authorization Attestation
-        Authorities.
+        (BETA) Create and manage Google Binary Authorization Attestors.
 
      policy
         (BETA) Create and manage Google Binary Authorization policy.
@@ -80,7 +79,7 @@ EXAMPLES
     Upload the attestation:
 
         gcloud beta container binauthz attestations create \
-          --pgp-key-fingerprint=${KEY_FINGERPRINT} \
+          --public-key-id=${KEY_FINGERPRINT} \
           --signature-file=example_signature.pgp \
           --artifact-url="${ARTIFACT_URL}" \
           --attestor=${ATTESTOR_NAME}
@@ -128,8 +127,9 @@ EXAMPLES
           ...
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud container binauthz
         $ gcloud alpha container binauthz
 

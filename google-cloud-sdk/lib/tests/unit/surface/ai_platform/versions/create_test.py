@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -338,6 +338,60 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
               '--origin gs://path/to/file '
               '--config {1}').format(module_name, yaml_path))
 
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testServiceAccountFlag(self, module_name):
+    self._ExpectCreate(service_account='testsa@google.com')
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file --service-account testsa@google.com'
+             .format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testServiceAccountFromConfig(self, module_name):
+    yaml_contents = """\
+        description: dummy description
+        deploymentUri: gs://foo/bar
+        runtimeVersion: '1.0'
+        serviceAccount: testsa@google.com
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
+                       description='dummy description',
+                       service_account='testsa@google.com')
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--config {}'.format(module_name, yaml_path))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateAcceleratorFlag(self, module_name):
+    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
+        count=2,
+        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
+              .NVIDIA_TESLA_K80))
+    self._ExpectCreate(accelerator=accelerator_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--accelerator type=nvidia-tesla-k80,count=2'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateNewMachineTypeWithAccelerator(self, module_name):
+    accelerator_config = self.msgs.GoogleCloudMlV1AcceleratorConfig(
+        count=2,
+        type=(self.msgs.GoogleCloudMlV1AcceleratorConfig.TypeValueValuesEnum
+              .NVIDIA_TESLA_K80))
+    self._ExpectCreate(
+        accelerator=accelerator_config, machine_type='n1-standard-4')
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--machine-type=n1-standard-4 '
+             '--accelerator=type=nvidia-tesla-k80,count=2'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
 
 class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
@@ -411,32 +465,6 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self.Run('{} versions create versionId --model modelId '
              '--origin gs://path/to/file '
              '--accelerator type=nvidia-tesla-k80,count=2'.format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testServiceAccountFlag(self, module_name):
-    self._ExpectCreate(service_account='testsa@google.com')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--origin gs://path/to/file --service-account  testsa@google.com'
-             .format(module_name))
-    self.AssertErrContains('Creating version (this might take a few minutes)')
-
-  @parameterized.parameters('ml-engine', 'ai-platform')
-  def testServiceAccountFromConfig(self, module_name):
-    yaml_contents = """\
-        description: dummy description
-        deploymentUri: gs://foo/bar
-        runtimeVersion: '1.0'
-        serviceAccount: testsa@google.com
-    """
-    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
-    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
-                       description='dummy description',
-                       service_account='testsa@google.com')
-    self._ExpectOperationPolling()
-    self.Run('{} versions create versionId --model modelId '
-             '--config {}'.format(module_name, yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
   @parameterized.parameters('ml-engine', 'ai-platform')

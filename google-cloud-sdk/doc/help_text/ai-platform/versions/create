@@ -24,8 +24,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --config=CONFIG
         Path to a YAML configuration file containing configuration parameters
@@ -61,7 +61,7 @@ OPTIONAL FLAGS
 
      --framework=FRAMEWORK
         The ML framework used to train this version of the model. If not
-        specified, defaults to tensorflow. FRAMEWORK must be one of:
+        specified, defaults to 'tensorflow'. FRAMEWORK must be one of:
         scikit-learn, tensorflow, xgboost.
 
      --labels=[KEY=VALUE,...]
@@ -85,8 +85,8 @@ OPTIONAL FLAGS
 
      --python-version=PYTHON_VERSION
         Version of Python used when creating the version. If not set, the
-        default version is 2.7. Python 3.5 is available when runtime_version is
-        set to 1.4 and above. Python 2.7 works with all supported runtime
+        default version is 2.7. Python 3.5 is available when --runtime-version
+        is set to 1.4 and above. Python 2.7 works with all supported runtime
         versions.
 
      --runtime-version=RUNTIME_VERSION

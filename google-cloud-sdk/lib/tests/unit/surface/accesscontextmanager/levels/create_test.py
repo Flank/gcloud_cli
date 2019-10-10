@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six import text_type
 
 
 class LevelsCreateTestGA(accesscontextmanager.Base):
@@ -39,10 +40,7 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
     m = self.messages
     req_type = m.AccesscontextmanagerAccessPoliciesAccessLevelsCreateRequest
     self.client.accessPolicies_accessLevels.Create.Expect(
-        req_type(
-            parent=policy_name,
-            accessLevel=level
-        ),
+        req_type(parent=policy_name, accessLevel=level),
         self.messages.Operation(name='operations/my-op', done=False))
     self._ExpectGetOperation('operations/my-op')
     get_req_type = m.AccesscontextmanagerAccessPoliciesAccessLevelsGetRequest
@@ -52,30 +50,27 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
   def testCreate_InvalidSpec(self):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(
-        yaml.FileLoadError,
-        r'Failed to load YAML from [not-found]'):
-      self.Run(
-          'access-context-manager levels create my_level --policy my_policy '
-          '     --title "My Level" --basic-level-spec not-found')
+        yaml.FileLoadError, r'Failed to load YAML from [not-found]'):
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level" --basic-level-spec not-found')
 
   def testCreate_MissingRequired(self):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
-      self.Run(
-          'access-context-manager levels create my_level --policy my_policy '
-          '     --title "My Level"')
+      self.Run('access-context-manager levels create my_level --policy 123 '
+               '     --title "My Level"')
 
   def testCreate(self):
     self.SetUpForTrack(self.track)
-    level_name = 'accessPolicies/my_policy/accessLevels/my_level'
-    level = self._MakeBasicLevel(level_name, title='My Level',
-                                 combining_function='AND')
-    self._ExpectCreate(level, 'my_policy')
+    level_name = 'accessPolicies/123/accessLevels/my_level'
+    level = self._MakeBasicLevel(
+        level_name, title='My Level', combining_function='AND')
+    self._ExpectCreate(level, '123')
     level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
 
     results = self.Run(
-        'access-context-manager levels create my_level --policy my_policy '
+        'access-context-manager levels create my_level --policy 123 '
         '     --title "My Level"'
         '     --basic-level-spec {}'.format(level_spec_path))
 
@@ -83,16 +78,17 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
 
   def testCreate_AllParams(self):
     self.SetUpForTrack(self.track)
-    level_name = 'accessPolicies/my_policy/accessLevels/my_level'
+    level_name = 'accessPolicies/123/accessLevels/my_level'
     level = self._MakeBasicLevel(
-        level_name, title='My Level',
+        level_name,
+        title='My Level',
         combining_function='OR',
         description='Very long description of my level')
-    self._ExpectCreate(level, 'my_policy')
+    self._ExpectCreate(level, '123')
     level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
 
     results = self.Run(
-        'access-context-manager levels create my_level --policy my_policy '
+        'access-context-manager levels create my_level --policy 123 '
         '     --title "My Level"'
         '     --combine-function or '
         '     --description "Very long description of my level" '
@@ -102,20 +98,33 @@ class LevelsCreateTestGA(accesscontextmanager.Base):
 
   def testCreate_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
-    policy = 'my_acm_policy'
-    level_name = 'accessPolicies/my_acm_policy/accessLevels/my_level'
+    policy = '456'
+    level_name = 'accessPolicies/456/accessLevels/my_level'
     properties.VALUES.access_context_manager.policy.Set(policy)
-    level = self._MakeBasicLevel(level_name, title='My Level',
-                                 combining_function='AND')
+    level = self._MakeBasicLevel(
+        level_name, title='My Level', combining_function='AND')
     self._ExpectCreate(level, policy)
     level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
 
-    results = self.Run(
-        'access-context-manager levels create my_level '
-        '     --title "My Level"'
-        '     --basic-level-spec {}'.format(level_spec_path))
+    results = self.Run('access-context-manager levels create my_level '
+                       '     --title "My Level"'
+                       '     --basic-level-spec {}'.format(level_spec_path))
 
     self.assertEqual(results, level)
+
+  def testCreate_InvalidPolicyArg(self):
+    self.SetUpForTrack(self.track)
+    level_spec_path = self.Touch(self.temp_path, '', contents=self.LEVEL_SPEC)
+
+    with self.assertRaises(properties.InvalidValueError) as ex:
+      # Common error is to specify --policy arg as 'accessPolicies/<num>'
+      self.Run(
+          'access-context-manager levels create my_level --policy accessPolicies/123 '
+          '     --title "My Level"'
+          '     --combine-function or '
+          '     --description "Very long description of my level" '
+          '     --basic-level-spec {}'.format(level_spec_path))
+    self.assertIn('set to the policy number', text_type(ex.exception))
 
 
 class LevelsCreateTestBeta(LevelsCreateTestGA):
@@ -128,6 +137,7 @@ class LevelsCreateTestAlpha(LevelsCreateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

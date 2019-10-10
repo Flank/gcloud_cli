@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,14 +89,15 @@ class TargetHttpProxiesListTest(test_base.BaseTest,
         errors=[])
 
 
-class TargetHttpProxiesListAlphaTest(test_base.BaseTest,
-                                     completer_test_base.CompleterBase):
+class TargetHttpProxiesListBetaTest(test_base.BaseTest,
+                                    completer_test_base.CompleterBase):
 
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
+  URI_PREFIX = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._compute_api = self.compute_alpha
+    self._api = 'beta'
+    self.SelectApi('beta')
+    self._compute_api = self.compute_beta
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
@@ -131,35 +132,36 @@ class TargetHttpProxiesListAlphaTest(test_base.BaseTest,
     ]
 
   def testGlobalOption(self):
-    command = 'alpha compute target-http-proxies list --uri --global'
+    command = self._api + ' compute target-http-proxies list --uri --global'
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/global/targetHttpProxies/target-http-proxy-1
-        https://www.googleapis.com/compute/alpha/projects/my-project/global/targetHttpProxies/target-http-proxy-2
-    """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/global/targetHttpProxies/target-http-proxy-1
+        https://compute.googleapis.com/compute/{0}/projects/my-project/global/targetHttpProxies/target-http-proxy-2
+    """.format(self._api))
 
     self.RequestOnlyGlobal(command, self.target_http_proxies, output)
 
   def testOneRegion(self):
-    command = 'alpha compute target-http-proxies list --uri --regions region-1'
+    command = self._api + (' compute target-http-proxies list --uri --regions '
+                           'region-1')
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
-        """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
+        """.format(self._api))
 
     self.RequestOneRegion(command, self.region_target_http_proxies, output)
 
   def testTwoRegions(self):
-    command = """
-      alpha compute target-http-proxies list --uri --regions region-1,region-2
+    command = self._api + """
+       compute target-http-proxies list --uri --regions region-1,region-2
     """
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-2/targetHttpProxies/target-http-proxy-4
-        """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/targetHttpProxies/target-http-proxy-3
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-2/targetHttpProxies/target-http-proxy-4
+        """.format(self._api))
 
     self.RequestTwoRegions(command, self.region_target_http_proxies, output)
 
   def testPositionalArgsWithSimpleNames(self):
-    command = 'alpha compute target-http-proxies list'
+    command = self._api + ' compute target-http-proxies list'
     return_value = self.target_http_proxies + self.region_target_http_proxies
     output = ("""\
         NAME                URL_MAP
@@ -234,6 +236,16 @@ class TargetHttpProxiesListAlphaTest(test_base.BaseTest,
         errors=[])
 
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+
+class TargetHttpProxiesListAlphaTest(TargetHttpProxiesListBetaTest):
+
+  URI_PREFIX = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi('alpha')
+    self._compute_api = self.compute_alpha
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@
  "name": "sqladmin",
  "canonicalName": "SQL Admin",
  "version": "v1beta4",
- "revision": "20190506",
+ "revision": "20191001",
  "title": "Cloud SQL Admin API",
  "description": "Creates and manages Cloud SQL instances, which provide fully managed MySQL or PostgreSQL databases.",
  "ownerDomain": "google.com",
@@ -137,6 +137,10 @@
      "description": "This is always sql#backupConfiguration.",
      "default": "sql#backupConfiguration"
     },
+    "location": {
+     "type": "string",
+     "description": "The location of the backup."
+    },
     "replicationLogArchivingEnabled": {
      "type": "boolean",
      "description": "Reserved for future use."
@@ -155,6 +159,14 @@
     "description": {
      "type": "string",
      "description": "The description of this run, only applicable to on-demand backups."
+    },
+    "diskEncryptionConfiguration": {
+     "$ref": "DiskEncryptionConfiguration",
+     "description": "Disk encryption configuration specific to a backup. Applies only to Second Generation instances."
+    },
+    "diskEncryptionStatus": {
+     "$ref": "DiskEncryptionStatus",
+     "description": "Disk encryption status specific to a backup. Applies only to Second Generation instances."
     },
     "endTime": {
      "type": "string",
@@ -183,6 +195,10 @@
      "type": "string",
      "description": "This is always sql#backupRun.",
      "default": "sql#backupRun"
+    },
+    "location": {
+     "type": "string",
+     "description": "The location of the backup."
     },
     "selfLink": {
      "type": "string",
@@ -780,6 +796,29 @@
    "type": "object",
    "description": "Database instance import context.",
    "properties": {
+    "bakImportOptions": {
+     "type": "object",
+     "description": "Import parameters specific to SQL Server .BAK files",
+     "properties": {
+      "encryptionOptions": {
+       "type": "object",
+       "properties": {
+        "certPath": {
+         "type": "string",
+         "description": "Path to the Certificate (.cer) in Cloud Storage, in the form gs://bucketName/fileName. The instance must have write permissions to the bucket and read access to the file."
+        },
+        "pvkPassword": {
+         "type": "string",
+         "description": "Password that encrypts the private key"
+        },
+        "pvkPath": {
+         "type": "string",
+         "description": "Path to the Certificate Private Key (.pvk) in Cloud Storage, in the form gs://bucketName/fileName. The instance must have write permissions to the bucket and read access to the file."
+        }
+       }
+      }
+     }
+    },
     "csvImportOptions": {
      "type": "object",
      "description": "Options for importing data as CSV.",
@@ -1002,7 +1041,7 @@
     },
     "type": {
      "type": "string",
-     "description": "The type of this IP address. A PRIMARY address is an address that can accept incoming connections. An OUTGOING address is the source address of connections originating from the instance, if supported."
+     "description": "The type of this IP address. A PRIMARY address is a public address that can accept incoming connections. A PRIVATE address is a private address that can accept incoming connections. An OUTGOING address is the source address of connections originating from the instance, if supported."
     }
    }
   },
@@ -1297,6 +1336,10 @@
      "type": "string",
      "description": "This is always sql#restoreBackupContext.",
      "default": "sql#restoreBackupContext"
+    },
+    "project": {
+     "type": "string",
+     "description": "The full project ID of the source instance."
     }
    }
   },
@@ -3184,7 +3227,7 @@
      "parameters": {
       "host": {
        "type": "string",
-       "description": "Host of the user in the instance.",
+       "description": "Host of the user in the instance. For a MySQL instance, it's required; For a PostgreSQL instance, it's optional.",
        "location": "query"
       },
       "instance": {

@@ -88,8 +88,8 @@ and a managed zone "MANAGED_ZONE", run:
 
 .RS 2m
 $ gcloud beta dns record\-sets transaction add "1.2.3.4" \e
-    \-\-name my.domain. \-\-ttl 1234 \e
-    \-\-type A \-\-zone MANAGED_ZONE
+    \-\-name=my.domain. \-\-ttl=1234 \e
+    \-\-type=A \-\-zone=MANAGED_ZONE
 .RE
 
 To add a TXT record with multiple data values while specifying time to live as
@@ -97,18 +97,19 @@ To add a TXT record with multiple data values while specifying time to live as
 
 .RS 2m
 $ gcloud beta dns record\-sets transaction add "Hello world" \e
-    "Bye world" \-\-name my.domain.
-    \-\-ttl 14400 \-\-type TXT \-\-zone MANAGED_ZONE
+    "Bye world" \-\-name=my.domain.
+    \-\-ttl=14400 \-\-type=TXT \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets transaction add
+$ gcloud alpha dns record\-sets transaction add
 .RE
 

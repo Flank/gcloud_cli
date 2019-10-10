@@ -11,7 +11,7 @@ gcloud alpha compute target\-http\-proxies create \- create a target HTTP proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute target\-http\-proxies create\fR \fINAME\fR \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-url\-map\fR\ |\ \fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute target\-http\-proxies create\fR \fINAME\fR \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-proxy\-bind\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-url\-map\fR\ |\ \fB\-\-url\-map\-region\fR=\fIURL_MAP_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,6 +56,12 @@ target HTTP proxy.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the target HTTP proxy.
+
+.TP 2m
+\fB\-\-proxy\-bind\fR
+This flag only applies when the load_balancing_scheme of the associated backend
+service is INTERNAL_SELF_MANAGED. When specified, the envoy binds to the IP
+address and port specified by the forwarding rule. By default this flag is off.
 
 .TP 2m
 
@@ -147,9 +153,8 @@ $ gcloud alpha compute target\-http\-proxies create PROXY_NAME \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute target\-http\-proxies create

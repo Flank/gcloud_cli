@@ -182,30 +182,58 @@ Defines the strategy for balancing load. \fIBALANCING_MODE\fR must be one of:
 .RS 2m
 .TP 2m
 \fBCONNECTION\fR
-Spreads load based on how many concurrent connections the backend can handle.
-This balancing mode is only available to backend services that use SSL, TCP, or
-UDP protocols. For backend services with \-\-load\-balancing\-scheme EXTERNAL,
-you must specify exactly one of these additional parameters:
-\f5\-\-max\-connections\fR, \f5\-\-max\-connections\-per\-instance\fR, or
-\f5\-\-max\-connections\-per\-endpoint\fR. For backend services with
-\-\-load\-balancing\-scheme INTERNAL, you must omit all of these parameters.
+Available if the backend service's load balancing scheme is either
+\f5INTERNAL\fR or \f5EXTERNAL\fR. Available if the backend service's protocol is
+one of \f5SSL\fR, \f5TCP\fR, or \f5UDP\fR.
+
+.RS 2m
+Spreads load based on how many concurrent connections the backend
+can handle.
+.RE
+
+.RS 2m
+For backend services with \-\-load\-balancing\-scheme `EXTERNAL`, you
+must specify exactly one of these additional parameters:
+`\-\-max\-connections`, `\-\-max\-connections\-per\-instance`, or
+`\-\-max\-connections\-per\-endpoint`.
+.RE
+
+.RS 2m
+For backend services where `\-\-load\-balancing\-scheme` is `INTERNAL`,
+you must omit all of these parameters.
+.RE
 .TP 2m
 \fBRATE\fR
-Spreads load based on how many HTTP requests per second (RPS) the backend can
-handle. This balancing mode is only available to backend services that use HTTP,
-HTTPS, or HTTP/2 protocols. You must specify exactly one of these additional
-parameters: \f5\-\-max\-rate\fR, \f5\-\-max\-rate\-per\-instance\fR,
-or\f5\-\-max\-rate\-per\-endpoint\fR.
+Available if the backend service's load balancing scheme is
+\f5INTERNAL_MANAGED\fR, \f5INTERNAL_SELF_MANAGED\fR, or \f5EXTERNAL\fR.
+Available if the backend service's protocol is one of HTTP, HTTPS, or HTTP/2.
+
+.RS 2m
+Spreads load based on how many HTTP requests per second (RPS) the
+backend can handle.
+.RE
+
+.RS 2m
+You must specify exactly one of these additional parameters:
+`\-\-max\-rate`, `\-\-max\-rate\-per\-instance`, or `\-\-max\-rate\-per\-endpoint`.
+.RE
 .TP 2m
 \fBUTILIZATION\fR
-Spreads load based on the CPU utilization of instances in a backend instance
-group. This balancing mode is only available to backend services with
-\-\-load\-balancing\-scheme EXTERNAL and instance group backends. There is no
-restriction on the backend service protocol. The following additional parameters
-may be specified: \f5\-\-max\-utilization\fR, \f5\-\-max\-rate\fR,
-\f5\-\-max\-rate\-per\-instance\fR, \f5\-\-max\-connections\fR,
-\f5\-\-max\-connections\-per\-instance\fR. For valid combinations, see
-\f5\-\-max\-utilization\fR below.
+Available if the backend service's load balancing scheme is
+\f5INTERNAL_MANAGED\fR, \f5INTERNAL_SELF_MANAGED\fR, or \f5EXTERNAL\fR.
+Available only for managed or unmanaged instance group backends.
+
+.RS 2m
+Spreads load based on the CPU utilization of instances in a backend
+instance group.
+.RE
+
+.RS 2m
+The following additional parameters may be specified:
+`\-\-max\-utilization`, `\-\-max\-rate`, `\-\-max\-rate\-per\-instance`,
+`\-\-max\-connections`, `\-\-max\-connections\-per\-instance`.
+For valid combinations, see `\-\-max\-utilization`.
+.RE
 .RE
 .sp
 
@@ -321,9 +349,9 @@ group and network endpoint group backends.
 Only valid for network endpoint group backends. Defines a maximum number of
 connections per endpoint if all endpoints are healthy. When one or more
 endpoints are unhealthy, an effective maximum number of connections per healthy
-endpoint is calculated by multiplying MAX_CONNECTIONS_PER_ENDPOINT by the number
-of endpoints in the network endpoint group, then dividing by the number of
-healthy endpoints.
+endpoint is calculated by multiplying \f5MAX_CONNECTIONS_PER_ENDPOINT\fR by the
+number of endpoints in the network endpoint group, then dividing by the number
+of healthy endpoints.
 
 .TP 2m
 \fB\-\-max\-connections\-per\-instance\fR=\fIMAX_CONNECTIONS_PER_INSTANCE\fR
@@ -331,8 +359,8 @@ Only valid for instance group backends. Defines a maximum number of concurrent
 connections per instance if all instances in the instance group are healthy.
 When one or more instances are unhealthy, an effective maximum number of
 connections per healthy instance is calculated by multiplying
-MAX_CONNECTIONS_PER_INSTANCE by the number of instances in the instance group,
-then dividing by the number of healthy instances.
+\f5MAX_CONNECTIONS_PER_INSTANCE\fR by the number of instances in the instance
+group, then dividing by the number of healthy instances.
 
 .TP 2m
 \fB\-\-max\-rate\fR=\fIMAX_RATE\fR
@@ -346,16 +374,16 @@ load balancing.
 Only valid for network endpoint group backends. Defines a maximum number of HTTP
 requests per second (RPS) per endpoint if all endpoints are healthy. When one or
 more endpoints are unhealthy, an effective maximum rate per healthy endpoint is
-calculated by multiplying MAX_RATE_PER_ENDPOINT by the number of endpoints in
-the network endpoint group, then dividing by the number of healthy endpoints.
+calculated by multiplying \f5MAX_RATE_PER_ENDPOINT\fR by the number of endpoints
+in the network endpoint group, then dividing by the number of healthy endpoints.
 
 .TP 2m
 \fB\-\-max\-rate\-per\-instance\fR=\fIMAX_RATE_PER_INSTANCE\fR
 Only valid for instance group backends. Defines a maximum number of HTTP
 requests per second (RPS) per instance if all instances in the instance group
 are healthy. When one or more instances are unhealthy, an effective maximum RPS
-per healthy instance is calculated by multiplying MAX_RATE_PER_INSTANCE by the
-number of instances in the instance group, then dividing by the number of
+per healthy instance is calculated by multiplying \f5MAX_RATE_PER_INSTANCE\fR by
+the number of instances in the instance group, then dividing by the number of
 healthy instances. This parameter is compatible with managed instance group
 backends that use autoscaling based on load balancing.
 

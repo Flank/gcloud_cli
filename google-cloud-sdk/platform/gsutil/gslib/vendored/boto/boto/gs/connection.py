@@ -23,7 +23,8 @@ from boto.gs.bucket import Bucket
 from boto.s3.connection import S3Connection
 from boto.s3.connection import SubdomainCallingFormat
 from boto.s3.connection import check_lowercase_bucketname
-from boto.utils import get_utf8_value
+from boto.compat import six
+from boto.utils import get_utf8able_str
 
 class Location(object):
     DEFAULT = 'US'
@@ -45,6 +46,17 @@ class GSConnection(S3Connection):
                  host, debug, https_connection_factory, calling_format, path,
                  "google", Bucket,
                  suppress_consec_slashes=suppress_consec_slashes)
+
+    def _required_auth_capability(self):
+        """
+        Overrides the S3 version of this method to remove the
+        @detect_potential_s3sigv4 decorator to avoid sending v4 headers to
+        gcs.
+        """
+        if self.anon:
+            return ['anon']
+        else:
+            return ['s3']
 
     def create_bucket(self, bucket_name, headers=None,
                       location=Location.DEFAULT, policy=None,
@@ -91,8 +103,8 @@ class GSConnection(S3Connection):
         data = ('<CreateBucketConfiguration>%s%s</CreateBucketConfiguration>'
                  % (location_elem, storage_class_elem))
         response = self.make_request(
-            'PUT', get_utf8_value(bucket_name), headers=headers,
-            data=get_utf8_value(data))
+            'PUT', get_utf8able_str(bucket_name), headers=headers,
+            data=get_utf8able_str(data))
         body = response.read()
         if response.status == 409:
             raise self.provider.storage_create_error(

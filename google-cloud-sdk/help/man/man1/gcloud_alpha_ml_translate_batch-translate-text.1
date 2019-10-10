@@ -1,0 +1,126 @@
+
+.TH "GCLOUD_ALPHA_ML_TRANSLATE_BATCH\-TRANSLATE\-TEXT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml translate batch\-translate\-text \- translates a large volume of text in asynchronous batch mode
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml translate batch\-translate\-text\fR \fB\-\-destination\fR=\fIDESTINATION\fR \fB\-\-source\fR=[\fISOURCE\fR,...] \fB\-\-source\-language\fR=\fISOURCE_LANGUAGE\fR \fB\-\-target\-language\-codes\fR=[\fITARGET_LANGUAGE_CODES\fR,...] [\fB\-\-glossaries\fR=[\fIGLOSSARIES\fR,...]] [\fB\-\-models\fR=[\fIMODELS\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR;\ default="global"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Translates a large volume of text in asynchronous batch mode. This
+command provides real\-time output as the inputs are being processed.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Location to which the results should be written. Must be a Google Cloud Storage
+URI.
+
+.TP 2m
+\fB\-\-source\fR=[\fISOURCE\fR,...]
+Comma\-separated list of entries of the form FILE_PATH[=FILE_TYPE] specifying
+source files and files types for the translation. FILE_PATH must be a Google
+Cloud Storage URI. FILE_TYPE defaults to 'text/html' if not present. Possible
+FILE_TYPES are 'text/html', 'text/plain'.
+
+Usage:
+
+\'\-\-source gs://input/input.txt=text/plain,gs://input/my.html=text/html'
+
+.TP 2m
+\fB\-\-source\-language\fR=\fISOURCE_LANGUAGE\fR
+Source language code of the text.
+
+.TP 2m
+\fB\-\-target\-language\-codes\fR=[\fITARGET_LANGUAGE_CODES\fR,...]
+The languages to which the text is to be translated. Specify up to 10 language
+codes here.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-glossaries\fR=[\fIGLOSSARIES\fR,...]
+Glossaries to be applied for translation. Comma\-separated dictionary where
+map's key is target language code, map's value is glossary name.
+
+.TP 2m
+\fB\-\-models\fR=[\fIMODELS\fR,...]
+Models to use for translation. Comma\-separated dictionary where map's key is
+target language code, map's value is model name. Value can be a built\-in
+general model, or an AutoML Translation model.
+
+Usage:
+
+\'\-\-models es\-ES=TRL321456789,en\-US=general/nmt'
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR; default="global"
+Location to make calls. Non\-global location is required for requests using
+AutoML models. Currently, only 'us\-central1' is supported as a non\-global
+location. Defaults to 'global'.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtranslate/v3beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/translate/docs/quickstarts
+
+
+
+.SH "EXAMPLES"
+
+The following command translates 'input.txt' file into French and Spanish:
+
+.RS 2m
+$ gcloud alpha ml translate batch\-translate\-text \e
+    \-\-source=gs://input.txt=text/plain \-\-zone=us\-central1 \e
+    \-\-target\-language\-codes=fr\-CA,es\-ES \-\-source\-language=en\-US \e
+    \-\-models=fr\-CA=TRL321456,es\-ES=general/base \e
+    \-\-destination=gs://output
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta ml translate batch\-translate\-text
+.RE
+

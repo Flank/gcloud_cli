@@ -42,6 +42,10 @@ GROUPS
      commitments
         (BETA) Manage Google Compute Engine commitments.
 
+     diagnose
+        (BETA) Debugging tools for Google Compute Engine virtual machine
+        instances.
+
      disk-types
         (BETA) Read Google Compute Engine virtual disk types.
 
@@ -206,7 +210,7 @@ COMMANDS
         (BETA) SSH into a virtual machine instance.
 
      start-iap-tunnel
-        (BETA) Starts an IAP TCP forwarding tunnel over WebSocket connection.
+        (BETA) Starts an IAP TCP forwarding tunnel.
 
 NOTES
     This command is currently in BETA and may change without notice. These

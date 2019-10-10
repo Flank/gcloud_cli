@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,6 +61,11 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         calliope_base.ReleaseTrack.BETA: True,
         calliope_base.ReleaseTrack.GA: False
     }[track]
+    self.support_service_filters = {
+        calliope_base.ReleaseTrack.ALPHA: True,
+        calliope_base.ReleaseTrack.BETA: False,
+        calliope_base.ReleaseTrack.GA: False
+    }[track]
     self.client = mock.Client(
         client_class=apis.GetClientClass(self._API_NAME, api_version))
     self.client.Mock()
@@ -70,6 +75,74 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
   LEVEL_SPEC = ('[{"ipSubnetworks": ["127.0.0.1/24"]}, '
                 '{"members": ["user:example@example.com"]}]')
 
+  ACCESS_LEVEL_SPECS = """
+      [
+        {
+          "name": "accessPolicies/1234/accessLevels/myLevel1",
+          "title": "replacement level 1",
+          "description": "level description 1",
+          "basic": {
+            "conditions": [
+                  {"ipSubnetworks": ["127.0.0.1/24"]},
+                  {"members": ["user:example@example.com"]}
+            ],
+            "combiningFunction": "AND"
+          }
+        },
+        {
+          "name": "accessPolicies/1234/accessLevels/myLevel2",
+          "title": "replacement level 2",
+          "description": "level description 2",
+          "basic": {
+            "conditions": [
+              {"ipSubnetworks": ["127.0.0.1/24"]},
+              {"members": ["user:example@example.com"]}
+            ],
+            "combiningFunction": "AND"
+          }
+        }
+      ]
+    """
+
+  SERVICE_PERIMETERS_SPECS = """
+      [
+        {
+          "name": "accessPolicies/123/servicePerimeters/myPerimeter1",
+          "title": "replacement perimeter 1",
+          "description": "Very long description of my service perimeter",
+          "status": {
+            "resources": [
+              "projects/12345",
+              "projects/67890"
+            ],
+            "accessLevels": [
+              "accessPolicies/123/accessLevels/MY_LEVEL",
+              "accessPolicies/123/accessLevels/MY_LEVEL_2"
+            ],
+            "unrestrictedServices": ["*"],
+            "restrictedServices": ["storage.googleapis.com"]
+          }
+        },
+        {
+          "name": "accessPolicies/123/servicePerimeters/myPerimeter2",
+          "title": "replacement perimeter 2",
+          "description": "Very long description of my service perimeter",
+          "status": {
+            "resources": [
+              "projects/12345",
+              "projects/67890"
+            ],
+            "accessLevels": [
+              "accessPolicies/123/accessLevels/MY_LEVEL",
+              "accessPolicies/123/accessLevels/MY_LEVEL_2"
+            ],
+            "unrestrictedServices": ["*"],
+            "restrictedServices": ["storage.googleapis.com"]
+          }
+        }
+      ]
+    """
+
   def _ExpectGetOperation(self, name, resource_name=None):
     if resource_name:
       response = encoding.DictToMessage({'name': resource_name},
@@ -78,12 +151,13 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       response = None
 
     self.client.operations.Get.Expect(
-        self.messages.AccesscontextmanagerOperationsGetRequest(
-            name=name,
-        ),
+        self.messages.AccesscontextmanagerOperationsGetRequest(name=name,),
         self.messages.Operation(name=name, done=True, response=response))
 
-  def _MakeBasicLevel(self, name, combining_function=None, description=None,
+  def _MakeBasicLevel(self,
+                      name,
+                      combining_function=None,
+                      description=None,
                       title=None):
     m = self.messages
     combining_function_enum = m.BasicLevel.CombiningFunctionValueValuesEnum
@@ -94,8 +168,7 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
             conditions=[
                 self.messages.Condition(ipSubnetworks=['127.0.0.1/24']),
                 self.messages.Condition(members=['user:example@example.com']),
-            ]
-        ),
+            ]),
         createTime=None,
         description=description,
         name=name,
@@ -112,26 +185,56 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       access_levels=('MY_LEVEL', 'MY_LEVEL_2'),
       resources=('projects/12345', 'projects/67890'),
       type_=None,
-      policy='MY_POLICY'):
+      policy='123',
+      vpc_allowed_services=None,
+      enable_vpc_service_restriction=None,
+      dry_run=False):
+
     if type_:
       type_ = self.messages.ServicePerimeter.PerimeterTypeValueValuesEnum(type_)
-    status = self.messages.ServicePerimeterConfig(
-        accessLevels=list(map(
-            'accessPolicies/MY_POLICY/accessLevels/{}'.format, access_levels
-        )),
-        resources=resources,
-        restrictedServices=restricted_services,
-        )
-    if self.include_unrestricted_services:
-      status.unrestrictedServices = unrestricted_services
 
-    return self.messages.ServicePerimeter(
-        description=description,
-        name='accessPolicies/MY_POLICY/servicePerimeters/' + id_,
-        title=title,
-        perimeterType=type_,
-        status=status
-        )
+    config = self.messages.ServicePerimeterConfig(
+        accessLevels=list(
+            map('accessPolicies/123/accessLevels/{}'.format, access_levels)),
+        resources=resources,
+        restrictedServices=restricted_services)
+    if self.include_unrestricted_services:
+      config.unrestrictedServices = unrestricted_services
+
+    if self.support_service_filters:
+      self._FillInServiceFilterFields(config,
+                                      vpc_allowed_services,
+                                      enable_vpc_service_restriction)
+
+    if not dry_run:
+      return self.messages.ServicePerimeter(
+          description=description,
+          name='accessPolicies/123/servicePerimeters/' + id_,
+          title=title,
+          perimeterType=type_,
+          status=config)
+    else:
+      return self.messages.ServicePerimeter(
+          description=description,
+          name='accessPolicies/123/servicePerimeters/' + id_,
+          title=title,
+          perimeterType=type_,
+          dryRun=True,
+          spec=config)
+
+  def _FillInServiceFilterFields(self, status, vpc_allowed_services,
+                                 enable_vpc_service_restriction):
+    vpc_config = None
+    if vpc_allowed_services is not None:
+      if vpc_config is None:
+        vpc_config = self.messages.VpcServiceRestriction()
+      vpc_config.allowedServices = vpc_allowed_services
+    if enable_vpc_service_restriction is not None:
+      if vpc_config is None:
+        vpc_config = self.messages.VpcServiceRestriction()
+      vpc_config.enableRestriction = enable_vpc_service_restriction
+    if vpc_config is not None:
+      status.vpcServiceRestriction = vpc_config
 
   def _ExpectListPolicies(self, organization_name, policies):
     if isinstance(policies, Exception):
@@ -139,17 +242,14 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       exception = policies
     else:
       response = self.messages.ListAccessPoliciesResponse(
-          accessPolicies=policies
-      )
+          accessPolicies=policies)
       exception = None
 
     self.client.accessPolicies.List.Expect(
         self.messages.AccesscontextmanagerAccessPoliciesListRequest(
-            parent=organization_name,
-        ),
+            parent=organization_name,),
         response,
-        exception=exception
-    )
+        exception=exception)
 
   def _ExpectSearchOrganizations(self, filter_, organizations):
     if isinstance(organizations, Exception):
@@ -157,14 +257,11 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       exception = organizations
     else:
       response = self.resource_manager_messages.SearchOrganizationsResponse(
-          organizations=organizations
-      )
+          organizations=organizations)
       exception = None
 
     self.resource_manager_client.organizations.Search.Expect(
         self.resource_manager_messages.SearchOrganizationsRequest(
-            filter=filter_,
-        ),
+            filter=filter_,),
         response,
-        exception=exception
-    )
+        exception=exception)

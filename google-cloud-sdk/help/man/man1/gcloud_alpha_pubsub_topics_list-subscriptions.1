@@ -100,21 +100,21 @@ To filter results by subscription name (ie. only show subscription 'mysubs'),
 run:
 
 .RS 2m
-$ gcloud alpha pubsub topics list\-subscriptions \-\-topic mytopic \e
+$ gcloud alpha pubsub topics list\-subscriptions mytopic \e
     \-\-filter=subscriptionId:mysubs
 .RE
 
 To combine multiple filters (with AND or OR), run:
 
 .RS 2m
-$ gcloud alpha pubsub topics list\-subscriptions \-\-topic mytopic \e
+$ gcloud alpha pubsub topics list\-subscriptions mytopic \e
     \-\-filter="subscriptionId:mysubs1 AND subscriptionId:mysubs2"
 .RE
 
 To filter subscriptions that match an expression:
 
 .RS 2m
-$ gcloud alpha pubsub topics list\-subscriptions \-\-topic mytopic \e
+$ gcloud alpha pubsub topics list\-subscriptions mytopic \e
     \-\-filter="subscriptionId:subs_*"
 .RE
 
@@ -124,9 +124,8 @@ $ gcloud alpha pubsub topics list\-subscriptions \-\-topic mytopic \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud pubsub topics list\-subscriptions

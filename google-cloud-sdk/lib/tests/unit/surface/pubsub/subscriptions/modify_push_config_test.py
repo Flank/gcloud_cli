@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,35 +68,6 @@ class SubscriptionsModifyPushConfigTest(base.CloudPubsubTestBase):
     self.AssertErrContains('Updated subscription [{}]'.format(
         sub_ref.RelativeName()))
 
-
-class SubscriptionsModifyPushConfigBetaTest(SubscriptionsModifyPushConfigTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    properties.VALUES.core.user_output_enabled.Set(True)
-    self.svc = self.client.projects_subscriptions.ModifyPushConfig
-
-  def testSubscriptionsModifyWithLegacyOutput(self):
-    properties.VALUES.pubsub.legacy_output.Set(True)
-    new_endpoint = 'https://my.appspot.com/push2'
-    sub_ref = util.ParseSubscription('subs2', self.Project())
-
-    self.svc.Expect(
-        request=self.msgs.PubsubProjectsSubscriptionsModifyPushConfigRequest(
-            modifyPushConfigRequest=self.msgs.ModifyPushConfigRequest(
-                pushConfig=self.msgs.PushConfig(pushEndpoint=new_endpoint)),
-            subscription=sub_ref.RelativeName()),
-        response='')
-
-    self.Run('pubsub subscriptions modify-push-config subs2'
-             ' --push-endpoint https://my.appspot.com/push2')
-
-    self.AssertErrContains(
-        'Updated subscription [{}]'.format(sub_ref.RelativeName()))
-    self.AssertOutputEquals(
-        'pushEndpoint: https://my.appspot.com/push2\n'
-        'subscriptionId: {}\n'.format(sub_ref.RelativeName()))
-
   def testSubscriptionsModifyPushAuthServiceAccountAndAudience(self):
     sub_ref = util.ParseSubscription('subs2', self.Project())
 
@@ -138,6 +109,35 @@ class SubscriptionsModifyPushConfigBetaTest(SubscriptionsModifyPushConfigTest):
 
     self.AssertErrContains('Updated subscription [{}]'.format(
         sub_ref.RelativeName()))
+
+
+class SubscriptionsModifyPushConfigBetaTest(SubscriptionsModifyPushConfigTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    properties.VALUES.core.user_output_enabled.Set(True)
+    self.svc = self.client.projects_subscriptions.ModifyPushConfig
+
+  def testSubscriptionsModifyWithLegacyOutput(self):
+    properties.VALUES.pubsub.legacy_output.Set(True)
+    new_endpoint = 'https://my.appspot.com/push2'
+    sub_ref = util.ParseSubscription('subs2', self.Project())
+
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsSubscriptionsModifyPushConfigRequest(
+            modifyPushConfigRequest=self.msgs.ModifyPushConfigRequest(
+                pushConfig=self.msgs.PushConfig(pushEndpoint=new_endpoint)),
+            subscription=sub_ref.RelativeName()),
+        response='')
+
+    self.Run('pubsub subscriptions modify-push-config subs2'
+             ' --push-endpoint https://my.appspot.com/push2')
+
+    self.AssertErrContains(
+        'Updated subscription [{}]'.format(sub_ref.RelativeName()))
+    self.AssertOutputEquals(
+        'pushEndpoint: https://my.appspot.com/push2\n'
+        'subscriptionId: {}\n'.format(sub_ref.RelativeName()))
 
 
 class SubscriptionsModifyPushConfigAlphaTest(

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ class Update(base.UpdateCommand, dm_base.DmCommand):
         args.deployment_name,
         params={'project': properties.VALUES.core.project.GetOrFail},
         collection='deploymentmanager.deployments')
-    if not args.IsSpecified('format') and args.async:
+    if not args.IsSpecified('format') and args.async_:
       args.format = flags.OPERATION_FORMAT
 
     patch_request = False
@@ -290,7 +290,7 @@ class Update(base.UpdateCommand, dm_base.DmCommand):
           self.client, self.messages, dm_base.GetProject(),
           deployment_ref.deployment)
       if patch_request:
-        if args.async:
+        if args.async_:
           log.warning(
               'Updating Deployment metadata is synchronous, --async flag '
               'is ignored.')
@@ -299,7 +299,7 @@ class Update(base.UpdateCommand, dm_base.DmCommand):
       dm_util.PrintFingerprint(updated_deployment.fingerprint)
     except apitools_exceptions.HttpError as error:
       raise exceptions.HttpException(error, dm_api_util.HTTP_ERROR_FORMAT)
-    if args.async:
+    if args.async_:
       return operation
     else:
       op_name = operation.name

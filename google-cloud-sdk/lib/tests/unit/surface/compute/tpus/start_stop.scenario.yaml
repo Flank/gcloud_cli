@@ -3,38 +3,42 @@ release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
+  - label: Start sync
   - command: compute tpus start mytpu --zone us-central1-b
   - stderr: |
       Request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [start] to complete
+    - message: Waiting for operation [$$start_operation$$] to complete
     - status: SUCCESS
   - stdout: |
       done: true
       name: $$start_operation$$
 - execute:
+  - label: Start async
   - command: compute tpus start mytpu --zone us-central1-b --async
   - stderr: |
       Request issued for: [mytpu]
-      Check operation [start] for status.
+      Check operation [$$start_operation$$] for status.
   - stdout: |
       done: false
       name: $$start_operation$$
 - execute:
+  - label: Stop sync
   - command: compute tpus stop mytpu --zone us-central1-b
   - stderr: |
       Request issued for: [mytpu]
   - progress_tracker:
-    - message: Waiting for operation [stop] to complete
+    - message: Waiting for operation [$$stop_operation$$] to complete
     - status: SUCCESS
   - stdout: |
       done: true
       name: $$stop_operation$$
 - execute:
+  - label: Stop async
   - command: compute tpus stop mytpu --zone us-central1-b --async
   - stderr: |
       Request issued for: [mytpu]
-      Check operation [stop] for status.
+      Check operation [$$stop_operation$$] for status.
   - stdout: |
       done: false
       name: $$stop_operation$$
@@ -76,7 +80,7 @@ actions:
             done: true
             name: $$start_operation$$
     - expect_progress_tracker:
-        message: Waiting for operation [start] to complete
+        message: Waiting for operation [$$start_operation$$] to complete
         status: SUCCESS
     - expect_stdout: |
         done: true
@@ -101,7 +105,7 @@ actions:
             name: $$start_operation$$
     - expect_stderr: |
         Request issued for: [mytpu]
-        Check operation [start] for status.
+        Check operation [$$start_operation$$] for status.
     - expect_stdout: |
         done: false
         name: $$start_operation$$
@@ -138,7 +142,7 @@ actions:
             done: true
             name: $$stop_operation$$
     - expect_progress_tracker:
-        message: Waiting for operation [stop] to complete
+        message: Waiting for operation [$$stop_operation$$] to complete
         status: SUCCESS
     - expect_stdout: |
         done: true
@@ -163,7 +167,7 @@ actions:
             name: $$stop_operation$$
     - expect_stderr: |
         Request issued for: [mytpu]
-        Check operation [stop] for status.
+        Check operation [$$stop_operation$$] for status.
     - expect_stdout: |
         done: false
         name: $$stop_operation$$

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -169,13 +169,13 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
           """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-          https://www.googleapis.com/compute/""" + self.api_version +
+          https://compute.googleapis.com/compute/""" + self.api_version +
                         """/projects/my-project/regions/us-central1/""" +
                         """interconnectAttachments/my-attachment1
-          https://www.googleapis.com/compute/""" + self.api_version +
+          https://compute.googleapis.com/compute/""" + self.api_version +
                         """/projects/my-project/regions/us-central1""" +
                         """/interconnectAttachments/my-attachment2
-          https://www.googleapis.com/compute/""" + self.api_version +
+          https://compute.googleapis.com/compute/""" + self.api_version +
                         """/projects/my-project/regions/us-east1/""" +
                         """interconnectAttachments/my-attachment3
           """),

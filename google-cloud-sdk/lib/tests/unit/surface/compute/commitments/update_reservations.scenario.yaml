@@ -53,7 +53,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment/updateReservations?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment/updateReservations?alt=json
           method: POST
           headers: {}
           body:
@@ -105,7 +105,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment/updateReservations?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment/updateReservations?alt=json
           method: POST
           headers: {}
           body:

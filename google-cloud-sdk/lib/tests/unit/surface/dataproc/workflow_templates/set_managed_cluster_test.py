@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     num_preemptible_workers = 5
     image_version = '1.7'
     network = 'foo-network'
-    network_uri = ('https://www.googleapis.com/compute/v1/projects/'
+    network_uri = ('https://compute.googleapis.com/compute/v1/projects/'
                    'fake-project/global/networks/foo-network')
     action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
     initialization_actions = [
@@ -196,6 +196,7 @@ class WorkflowTemplateSetManagedClusterUnitTest(
         '--zone=""'.format(
             template=workflow_template.id, cluster_name=cluster_name))
     self.AssertMessagesEqual(workflow_template, result)
+    self.AssertErrEquals('')
 
   def testSetManagedClusterNoName(self):
     workflow_template = self.MakeWorkflowTemplate()
@@ -252,7 +253,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
     num_preemptible_workers = 5
     image_version = '1.7'
     network = 'foo-network'
-    network_uri = ('https://www.googleapis.com/compute/beta/projects/'
+    network_uri = ('https://compute.googleapis.com/compute/beta/projects/'
                    'fake-project/global/networks/foo-network')
     action_uris = ['gs://my-bucket/action1.sh', 'gs://my-bucket/action2.sh']
     initialization_actions = [
@@ -339,7 +340,7 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
     worker_accelerator_type = 'bar-gpu'
     zone = 'foo-zone'
     image = 'test-image'
-    image_uri = ('https://www.googleapis.com/compute/beta/projects/'
+    image_uri = ('https://compute.googleapis.com/compute/beta/projects/'
                  'fake-project/global/images/test-image')
     master_machine_type = 'foo-type'
     worker_machine_type = 'bar-type'
@@ -398,33 +399,6 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                    image=image,
                    zone=zone)
 
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(workflow_template, result)
-
-  def testSetManagedClusterWithExpirationTimeAndMaxIdle(self):
-    """Tests TTL cluster related flags."""
-    project = self.Project()
-    cluster_name = 'test-cluster'
-    zone = 'foo-zone'
-
-    managed_cluster = self.MakeManagedCluster(
-        clusterName=cluster_name, projectId=project, zoneUri=zone)
-    managed_cluster.config.lifecycleConfig = (self.messages.LifecycleConfig(
-        idleDeleteTtl='1800s', autoDeleteTime='2017-08-25T00:00:00.000-07:00'))
-    workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectCallSetManagedCluster(
-        workflow_template=workflow_template, managed_cluster=managed_cluster)
-
-    command = ('workflow-templates set-managed-cluster {template} '
-               '--cluster-name {cluster_name} '
-               '--zone {zone} '
-               '--max-idle={max_idle} '
-               '--expiration-time={expiration_time} ').format(
-                   template=self.WORKFLOW_TEMPLATE,
-                   cluster_name=cluster_name,
-                   zone=zone,
-                   max_idle='30m',
-                   expiration_time='2017-08-25T00:00:00-07:00')
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(workflow_template, result)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ class UpdateAppProfile(base.CreateCommand):
     else:
       operation_ref = util.GetOperationRef(result)
 
-      if args.async:
+      if args.async_:
         log.UpdatedResource(
             operation_ref,
             kind='bigtable app profile {0}'.format(app_profile_ref.Name()),

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,3 +38,7 @@ class DomainMapping(k8s_object.KubernetesObject):
   @route_name.setter
   def route_name(self, value):
     self._m.spec.routeName = value
+
+  @property
+  def records(self):
+    return getattr(self._m.status, 'resourceRecords', None)

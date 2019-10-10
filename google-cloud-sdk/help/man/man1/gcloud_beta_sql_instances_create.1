@@ -11,7 +11,7 @@ gcloud beta sql instances create \- creates a new Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR;\ default="PER_USE"] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-[no\-]assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR;\ default="PER_USE"] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -45,15 +45,15 @@ found here: https://cloud.google.com/sql/faq#activation_policy.
 \fBon\-demand\fR.
 
 .TP 2m
-\fB\-\-assign\-ip\fR
+\fB\-\-[no\-]assign\-ip\fR
 Assign an IPv4 external address to this instance. This setting is enabled by
-default. To create an instance which only has a private IP, use
-\-\-no\-assign\-ip and specify a private network.
+default when creating a new instance, but can be disabled to use private IP
+connectivity. Use \fB\-\-assign\-ip\fR to enable and \fB\-\-no\-assign\-ip\fR to
+disable.
 
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]
@@ -68,8 +68,7 @@ Specified in CIDR notation, also known as 'slash' notation (e.g.
 
 .TP 2m
 \fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR
-Specifies level of availability. Only applies to PostgreSQL instances.
-\fIAVAILABILITY_TYPE\fR must be one of:
+Specifies level of availability. \fIAVAILABILITY_TYPE\fR must be one of:
 
 .RS 2m
 .TP 2m
@@ -225,8 +224,9 @@ capacity will stop once this limit has been reached. Default capacity is
 
 .TP 2m
 \fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR
-Amount of storage allocated to the instance. Must be an integer number of GB
-between 10GB and 10230GB inclusive. The default is 10GB.
+Amount of storage allocated to the instance. Must be an integer number of GB.
+The default is 10GB. Information on storage limits can be found here:
+https://cloud.google.com/sql/docs/quotas#storage_limits
 
 .TP 2m
 \fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR

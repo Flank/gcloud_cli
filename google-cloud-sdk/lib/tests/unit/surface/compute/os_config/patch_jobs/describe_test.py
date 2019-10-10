@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute.os_config import test_base
 
 
+# TODO(b/140685325): convert to scenario test
 class DescribeTestAlpha(test_base.OsConfigBaseTest):
 
   def SetUp(self):
@@ -71,7 +72,7 @@ class DescribeTestAlpha(test_base.OsConfigBaseTest):
 
     response = self.Run("""
         compute os-config patch-jobs describe
-        https://osconfig.googleapis.com/v1alpha1/projects/my-project/patchJobs/my-patch-job
+        https://osconfig.googleapis.com/v1alpha2/projects/my-project/patchJobs/my-patch-job
         """)
 
     self.assertEqual(expected_response, response)

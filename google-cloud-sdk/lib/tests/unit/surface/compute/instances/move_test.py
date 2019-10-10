@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ class InstancesMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for gce instance instance-1 '
-        '[https://www.googleapis.com/compute/v1/'
+        '[https://compute.googleapis.com/compute/v1/'
         'projects/fake-project/global/operations/operation-X] '
         'Use [gcloud compute operations describe] command to check the status '
         'of this operation.\n')
@@ -137,7 +137,7 @@ class InstancesMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.AssertErrEquals("""\
 No zone specified. Using zone [us-central1-a] for instance: [instance-1].\n\
 Update in progress for gce instance instance-1 \
-[https://www.googleapis.com/compute/v1/projects/fake-project/global/operations/\
+[https://compute.googleapis.com/compute/v1/projects/fake-project/global/operations/\
 operation-X] Use [gcloud compute operations describe] command to check the \
 status of this operation.
 """)

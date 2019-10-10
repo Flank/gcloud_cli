@@ -47,18 +47,17 @@ found here: https://cloud.google.com/sql/faq#activation_policy.
 .TP 2m
 \fB\-\-[no\-]assign\-ip\fR
 Assign an IPv4 external address to this instance. This setting is enabled by
-default. To create an instance which only has a private IP, use
-\-\-no\-assign\-ip and specify a private network. Use \fB\-\-assign\-ip\fR to
-enable and \fB\-\-no\-assign\-ip\fR to disable.
+default when creating a new instance, but can be disabled to use private IP
+connectivity. Use \fB\-\-assign\-ip\fR to enable and \fB\-\-no\-assign\-ip\fR to
+disable.
 
 .TP 2m
 \fB\-\-async\fR
-Do not wait for the operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR
-Specifies level of availability. Only applies to PostgreSQL instances.
-\fIAVAILABILITY_TYPE\fR must be one of:
+Specifies level of availability. \fIAVAILABILITY_TYPE\fR must be one of:
 
 .RS 2m
 .TP 2m
@@ -166,8 +165,9 @@ enabled by default.
 
 .TP 2m
 \fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR
-Amount of storage allocated to the instance. Must be an integer number of GB
-between 10GB and 10230GB inclusive. The default is 10GB.
+Amount of storage allocated to the instance. Must be an integer number of GB.
+The default is 10GB. Information on storage limits can be found here:
+https://cloud.google.com/sql/docs/quotas#storage_limits
 
 .TP 2m
 \fB\-\-tier\fR=\fITIER\fR, \fB\-t\fR \fITIER\fR

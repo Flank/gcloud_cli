@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,9 +60,9 @@ def _MakeHealthDouble(test_obj):
                                   '/projects/my-project/zones/zone-1/instances/'
                                   'instance-4'))])
 
-GROUP_1 = ('https://www.googleapis.com/resourceviews/v1beta1/'
+GROUP_1 = ('https://compute.googleapis.com/resourceviews/v1beta1/'
            'projects/my-project/zones/zone-1/resourceViews/group-1')
-GROUP_2 = ('https://www.googleapis.com/resourceviews/v1beta1/'
+GROUP_2 = ('https://compute.googleapis.com/resourceviews/v1beta1/'
            'projects/my-project/zones/zone-2/resourceViews/group-2')
 
 
@@ -119,13 +119,13 @@ class BackendServicesGetHealthTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
             status:
               healthStatus:
               - healthState: HEALTHY
                 instance: {uri}/projects/my-project/zones/zone-1/instances/instance-1
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-2/resourceViews/group-2
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-2/resourceViews/group-2
             status:
               healthStatus:
               - healthState: UNHEALTHY
@@ -284,13 +284,13 @@ class BackendServicesGetHealthTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
             status:
               healthStatus:
               - healthState: HEALTHY
                 instance: {uri}/projects/my-project/zones/zone-1/instances/instance-1
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-2/resourceViews/group-2
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-2/resourceViews/group-2
             status:
               healthStatus:
               - healthState: UNHEALTHY
@@ -383,7 +383,7 @@ class BackendServicesGetHealthTest(test_base.BaseTest,
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
             status:
               healthStatus:
               - healthState: HEALTHY
@@ -518,13 +518,13 @@ class BackendServicesGetHealthAlphaTest(BackendServicesGetHealthTest):
         self.GetOutput(),
         textwrap.dedent("""\
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-1/resourceViews/group-1
             status:
               healthStatus:
               - healthState: HEALTHY
                 instance: {uri}/projects/my-project/zones/zone-1/instances/instance-1
             ---
-            backend: https://www.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-2/resourceViews/group-2
+            backend: https://compute.googleapis.com/resourceviews/v1beta1/projects/my-project/zones/zone-2/resourceViews/group-2
             status:
               healthStatus:
               - healthState: UNHEALTHY

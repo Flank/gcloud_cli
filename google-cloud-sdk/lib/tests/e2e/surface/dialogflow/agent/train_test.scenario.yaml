@@ -10,7 +10,7 @@ summary:
   - stderr: |
       Request issued for: [cloud-sdk-integration-testing]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Successfully trained agent.
@@ -37,7 +37,7 @@ actions:
     - expect_stderr: |
         Request issued for: [cloud-sdk-integration-testing]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
         Successfully trained agent.

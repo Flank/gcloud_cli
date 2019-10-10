@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,14 +54,14 @@ class ListTestablePermissionsTest(unit_test_base.BaseTest):
   def testListPermissionsByURI(self):
     self.client.permissions.QueryTestablePermissions.Expect(
         request=self.msgs.QueryTestablePermissionsRequest(
-            fullResourceName=('//compute.googleapis.com/projects/dummy_project'
+            fullResourceName=('//compute.googleapis.com/compute/projects/dummy_project'
                               '/zones/us-central1-f/instances/dummy_instance'),
             pageSize=100),
         response=self.response,)
 
     result = self.Run(
         'iam list-testable-permissions '
-        'https://www.googleapis.com/compute/v1/projects/dummy_project'
+        'https://compute.googleapis.com/compute/v1/projects/dummy_project'
         '/zones/us-central1-f/instances/dummy_instance')
     self.assertEqual(result, self.permissions)
 

@@ -11,13 +11,7 @@ gcloud beta container binauthz attestors public\-keys add \- add a public key to
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container binauthz attestors public\-keys add\fR \fB\-\-attestor\fR=\fIATTESTOR\fR \fB\-\-public\-key\-file\fR=\fIPUBLIC_KEY_FILE\fR [\fB\-\-comment\fR=\fICOMMENT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
-
-
-
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Add a public key to an Attestor.
+\f5gcloud beta container binauthz attestors public\-keys add\fR \fB\-\-attestor\fR=\fIATTESTOR\fR (\fB\-\-pgp\-public\-key\-file\fR=\fIPGP_PUBLIC_KEY_FILE\fR\ |\ (\fB\-\-keyversion\fR=\fIKEYVERSION\fR\ :\ \fB\-\-keyversion\-key\fR=\fIKEYVERSION_KEY\fR\ \fB\-\-keyversion\-keyring\fR=\fIKEYVERSION_KEYRING\fR\ \fB\-\-keyversion\-location\fR=\fIKEYVERSION_LOCATION\fR\ \fB\-\-keyversion\-project\fR=\fIKEYVERSION_PROJECT\fR)\ |\ \fB\-\-pkix\-public\-key\-algorithm\fR=\fIPKIX_PUBLIC_KEY_ALGORITHM\fR\ \fB\-\-pkix\-public\-key\-file\fR=\fIPKIX_PUBLIC_KEY_FILE\fR) [\fB\-\-comment\fR=\fICOMMENT\fR] [\fB\-\-public\-key\-id\-override\fR=\fIPUBLIC_KEY_ID_OVERRIDE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,10 +35,85 @@ ID of the attestor or fully qualified identifier for the attestor.
 .RE
 .sp
 .TP 2m
-\fB\-\-public\-key\-file\fR=\fIPUBLIC_KEY_FILE\fR
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+PGP key definition
+
+.RS 2m
+.TP 2m
+\fB\-\-pgp\-public\-key\-file\fR=\fIPGP_PUBLIC_KEY_FILE\fR
 The path to the file containing the ASCII\-armored PGP public key to add.
 
+.RE
+.sp
+.TP 2m
 
+Cloud KMS key definition
+
+.RS 2m
+.TP 2m
+
+CryptoKeyVersion resource \- The Cloud KMS (Key Management Service)
+CryptoKeyVersion whose public key will be added to the attestor. The arguments
+in this group can be used to specify the attributes of this resource. This must
+be specified.
+
+
+.RS 2m
+.TP 2m
+\fB\-\-keyversion\fR=\fIKEYVERSION\fR
+ID of the CryptoKeyVersion or fully qualified identifier for the
+CryptoKeyVersion. This flag must be specified if any of the other arguments in
+this group are specified.
+
+.TP 2m
+\fB\-\-keyversion\-key\fR=\fIKEYVERSION_KEY\fR
+The key of the CryptoKeyVersion.
+
+.TP 2m
+\fB\-\-keyversion\-keyring\fR=\fIKEYVERSION_KEYRING\fR
+The keyring of the CryptoKeyVersion.
+
+.TP 2m
+\fB\-\-keyversion\-location\fR=\fIKEYVERSION_LOCATION\fR
+The location of the CryptoKeyVersion.
+
+.TP 2m
+\fB\-\-keyversion\-project\fR=\fIKEYVERSION_PROJECT\fR
+The Cloud project for the CryptoKeyVersion.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+PKIX key definition
+
+.RS 2m
+.TP 2m
+\fB\-\-pkix\-public\-key\-algorithm\fR=\fIPKIX_PUBLIC_KEY_ALGORITHM\fR
+The signing algorithm of the associated key. This will be used to verify the
+signatures associated with this key. \fIPKIX_PUBLIC_KEY_ALGORITHM\fR must be one
+of: \fBecdsa\-p256\-sha256\fR, \fBecdsa\-p384\-sha384\fR,
+\fBecdsa\-p521\-sha512\fR, \fBrsa\-pss\-2048\-sha256\fR,
+\fBrsa\-pss\-3072\-sha256\fR, \fBrsa\-pss\-4096\-sha256\fR,
+\fBrsa\-pss\-4096\-sha512\fR, \fBrsa\-sign\-pkcs1\-2048\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-3072\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha512\fR. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-pkix\-public\-key\-file\fR=\fIPKIX_PUBLIC_KEY_FILE\fR
+The path to the file containing the PKIX public key to add. This flag must be
+specified if any of the other arguments in this group are specified.
+
+
+.RE
+.RE
 .RE
 .sp
 
@@ -54,6 +123,14 @@ The path to the file containing the ASCII\-armored PGP public key to add.
 .TP 2m
 \fB\-\-comment\fR=\fICOMMENT\fR
 The comment describing the public key.
+
+.TP 2m
+\fB\-\-public\-key\-id\-override\fR=\fIPUBLIC_KEY_ID_OVERRIDE\fR
+If provided, the ID to replace the default API\-generated one. All IDs must be
+valid URIs as defined by RFC 3986 (https://tools.ietf.org/html/rfc3986).
+
+When creating Attestations to be verified by this key, one must always provide
+this custom ID as the public key ID.
 
 
 .RE
@@ -69,12 +146,37 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To add a new KMS public key to an existing Attestor \f5my_attestor\fR:
 
 .RS 2m
+$ gcloud beta container binauthz attestors public\-keys add \e
+    \-\-attestor=my_attestor \e
+    \-\-keyversion\-project=foo \e
+    \-\-keyversion\-location=us\-west1 \e
+    \-\-keyversion\-keyring=aring \e
+    \-\-keyversion\-key=akey \e
+    \-\-keyversion=1
+.RE
+
+To add a new PGP public key to an existing Attestor \f5my_attestor\fR:
+
+.RS 2m
+$ gcloud beta container binauthz attestors public\-keys add \e
+    \-\-attestor=my_attestor \e
+    \-\-pgp\-public\-key\-file=my_key.pub
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container binauthz attestors public\-keys add
 $ gcloud alpha container binauthz attestors public\-keys add
 .RE
 

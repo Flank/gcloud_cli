@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,16 +38,16 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         self.messages.Address(
             address='10.240.10.11',
             name='address-3',
-            region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+            region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                     'regions/region-1'),
             selfLink=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/region-1/addresses/address-3'),
             addressType=self.messages.Address.AddressTypeValueValuesEnum
             .INTERNAL,
             purpose=self.messages.Address.PurposeValueValuesEnum.GCE_ENDPOINT,
             subnetwork=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'regions/us-east1/subnetworks/fancy'),
             status=self.messages.Address.StatusValueValuesEnum.RESERVED),
         self.messages.Address(
@@ -55,13 +55,13 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             address='10.23.22.0',
             prefixLength=24,
             selfLink=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/addresses/range-1'),
             addressType=self.messages.Address.AddressTypeValueValuesEnum
             .INTERNAL,
             purpose=self.messages.Address.PurposeValueValuesEnum.VPC_PEERING,
             network=(
-                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'https://compute.googleapis.com/compute/v1/projects/my-project/'
                 'global/networks/default'),
             status=self.messages.Address.StatusValueValuesEnum.RESERVED)
     ]
@@ -97,8 +97,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     command = 'compute addresses list --uri --global'
     return_value = test_resources.GLOBAL_ADDRESSES
     output = ("""\
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-2
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-2
         """)
 
     self.RequestOnlyGlobal(command, return_value, output)
@@ -107,8 +107,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     command = 'compute addresses list --uri --regions ""'
     return_value = test_resources.ADDRESSES
     output = ("""\
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
         """)
 
     self.RequestAggregate(command, return_value, output)
@@ -117,8 +117,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     command = 'compute addresses list --uri --regions region-1'
     return_value = test_resources.ADDRESSES
     output = ("""\
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
         """)
 
     self.RequestOneRegion(command, return_value, output)
@@ -127,8 +127,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     command = 'compute addresses list --uri --regions region-1,region-2'
     return_value = test_resources.ADDRESSES
     output = ("""\
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
         """)
 
     self.RequestTwoRegions(command, return_value, output)
@@ -150,8 +150,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """
     return_value = test_resources.ADDRESSES + test_resources.GLOBAL_ADDRESSES
     output = """\
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
         """
 
     self.RequestAggregate(command, return_value, output)
@@ -159,14 +159,14 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
   def testPositionalArgsWithUris(self):
     command = """
         compute addresses list
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-          https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
           --uri
         """
     return_value = test_resources.ADDRESSES + test_resources.GLOBAL_ADDRESSES
     output = """\
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
         """
 
     self.RequestAggregate(command, return_value, output)
@@ -180,8 +180,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """
     return_value = test_resources.ADDRESSES
     output = """\
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/addresses/address-2
         """
 
     self.RequestTwoRegions(command, return_value, output)
@@ -195,8 +195,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """
     return_value = test_resources.GLOBAL_ADDRESSES
     output = """\
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
-        https://www.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-2
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-1
+        https://compute.googleapis.com/compute/v1/projects/my-project/global/addresses/global-address-2
         """
 
     self.RequestOnlyGlobal(command, return_value, output)

@@ -1,23 +1,36 @@
 title: Create and delete a membership
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: container memberships list --format text(name)
+  - stdout: |
+      ---
+      name: projects/cloud-sdk-integration-testing/locations/global/memberships/golden-cluster
 actions:
 
 - execute_command:
-    command: container memberships list
+    command: container memberships list --format text(name)
     events:
     - api_call:
         expect_request:
           uri: https://gkehub.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/memberships?alt=json
           method: GET
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
+            content-length: '309'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            status: RUNNING
-    - expect_stderr:
-        matches: .*Listed 0 items.
+            resources:
+            - name: projects/cloud-sdk-integration-testing/locations/global/memberships/golden-cluster
+              description: cloud-sdk-integration-testing membership
+              createTime: '2019-09-23T19:33:52.788044059Z'
+              updateTime: '2019-09-23T19:33:52.990621047Z'
+    - expect_stdout: |
+        ---
+        name: projects/cloud-sdk-integration-testing/locations/global/memberships/golden-cluster
     - expect_exit:
         code: 0

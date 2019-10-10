@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,15 +29,14 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class UpdateAlphaBeta(base.UpdateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+class Update(base.UpdateCommand):
   """Updates an existing Cloud Pub/Sub subscription."""
 
   @classmethod
   def Args(cls, parser):
     resource_args.AddSubscriptionResourceArg(parser, 'to update.')
-    flags.AddSubscriptionSettingsFlags(parser, cls.ReleaseTrack(),
-                                       is_update=True)
+    flags.AddSubscriptionSettingsFlags(parser, is_update=True)
     labels_util.AddUpdateLabelsFlags(parser)
 
   @exceptions.CatchHTTPErrorRaiseHTTPException()
@@ -59,6 +58,9 @@ class UpdateAlphaBeta(base.UpdateCommand):
     """
     client = subscriptions.SubscriptionsClient()
     subscription_ref = args.CONCEPTS.subscription.Parse()
+    dead_letter_topic = getattr(args, 'dead_letter_topic', None)
+    max_delivery_attempts = getattr(args, 'max_delivery_attempts', None)
+    clear_dead_letter_policy = getattr(args, 'clear_dead_letter_policy', None)
 
     labels_update = labels_util.ProcessUpdateArgsLazy(
         args, client.messages.Subscription.LabelsValue,
@@ -80,7 +82,10 @@ class UpdateAlphaBeta(base.UpdateCommand):
           labels=labels_update.GetOrNone(),
           message_retention_duration=args.message_retention_duration,
           no_expiration=no_expiration,
-          expiration_period=expiration_period)
+          expiration_period=expiration_period,
+          dead_letter_topic=dead_letter_topic,
+          max_delivery_attempts=max_delivery_attempts,
+          clear_dead_letter_policy=clear_dead_letter_policy)
     except subscriptions.NoFieldsSpecifiedError:
       if not any(args.IsSpecified(arg) for arg in ('clear_labels',
                                                    'update_labels',
@@ -93,54 +98,18 @@ class UpdateAlphaBeta(base.UpdateCommand):
     return result
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
-class UpdateGA(base.UpdateCommand):
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class UpdateAlpha(Update):
   """Updates an existing Cloud Pub/Sub subscription."""
 
   @classmethod
   def Args(cls, parser):
     resource_args.AddSubscriptionResourceArg(parser, 'to update.')
-    flags.AddSubscriptionSettingsFlags(parser, cls.ReleaseTrack(),
-                                       is_update=True)
+    flags.AddSubscriptionSettingsFlags(
+        parser, is_update=True, support_dead_letter_queues=True)
+    labels_util.AddUpdateLabelsFlags(parser)
 
   @exceptions.CatchHTTPErrorRaiseHTTPException()
   def Run(self, args):
-    """This is what gets called when the user runs this command.
-
-    Args:
-      args: an argparse namespace. All the arguments that were provided to this
-        command invocation.
-
-    Returns:
-      A serialized object (dict) describing the results of the operation. This
-      description fits the Resource described in the ResourceRegistry under
-      'pubsub.projects.subscriptions'.
-
-    Raises:
-      An HttpException if there was a problem calling the
-      API subscriptions.Patch command.
-    """
-    client = subscriptions.SubscriptionsClient()
-    subscription_ref = args.CONCEPTS.subscription.Parse()
-
-    no_expiration = False
-    expiration_period = getattr(args, 'expiration_period', None)
-    if expiration_period:
-      if expiration_period == subscriptions.NEVER_EXPIRATION_PERIOD_VALUE:
-        no_expiration = True
-        expiration_period = None
-
-    try:
-      result = client.Patch(
-          subscription_ref,
-          ack_deadline=args.ack_deadline,
-          push_config=util.ParsePushConfig(args),
-          retain_acked_messages=args.retain_acked_messages,
-          message_retention_duration=args.message_retention_duration,
-          no_expiration=no_expiration,
-          expiration_period=expiration_period)
-    except subscriptions.NoFieldsSpecifiedError:
-      raise
-    else:
-      log.UpdatedResource(subscription_ref.RelativeName(), kind='subscription')
-    return result
+    flags.ValidateDeadLetterPolicy(args)
+    return super(UpdateAlpha, self).Run(args)

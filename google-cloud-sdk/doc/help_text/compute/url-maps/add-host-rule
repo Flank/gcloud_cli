@@ -3,7 +3,7 @@ NAME
         hosts to a path matcher
 
 SYNOPSIS
-    gcloud compute url-maps add-host-rule URL_MAP_NAME --hosts=HOST,[HOST,...]
+    gcloud compute url-maps add-host-rule URL_MAP --hosts=HOST,[HOST,...]
         --path-matcher-name=PATH_MATCHER_NAME [--description=DESCRIPTION]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -17,7 +17,7 @@ DESCRIPTION
     used to add path matchers.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS

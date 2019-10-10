@@ -20,10 +20,13 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import daisy_utils
+from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.core import resources
+from tests.lib import cli_test_base
 from tests.lib import test_case
 
 
-class DaisyUtilsTest(test_case.TestCase):
+class DaisyUtilsTest(cli_test_base.CliTestBase):
 
   def testSafeBucketNameNoGoogle(self):
     self._AssertSafeBucketName('new-google-maps-storage',
@@ -43,6 +46,24 @@ class DaisyUtilsTest(test_case.TestCase):
     self._AssertSafeBucketName('googgle', 'go-oggle')
     self._AssertSafeBucketName('googoogle', 'go-ogo-ogle')
     self._AssertSafeBucketName('goog-google', 'go-og-go-ogle')
+
+  def testMakeGcsUri(self):
+    uri = 'gs://bucket/file/a'
+    result = daisy_utils.MakeGcsUri(uri)
+    if uri != result:
+      self.fail('%r is not equal to %r' % (result, uri))
+
+  def testMakeGcsUriNotGcsUri(self):
+    with self.AssertRaisesExceptionMatches(
+        resources.InvalidResourceException,
+        r'could not parse resource [http://google.com]: unknown API host'):
+      daisy_utils.MakeGcsUri('http://google.com')
+
+  def testMakeGcsObjectOrPathUriBucketOnly(self):
+    with self.AssertRaisesExceptionMatches(
+        storage_util.InvalidObjectNameError,
+        r'Missing object name'):
+      daisy_utils.MakeGcsObjectOrPathUri('gs://bucket')
 
   def _AssertSafeBucketName(self, original, expected):
     safe_bucket_name = daisy_utils._GetSafeBucketName(original)

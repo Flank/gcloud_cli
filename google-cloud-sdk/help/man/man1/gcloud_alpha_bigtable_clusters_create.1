@@ -65,7 +65,7 @@ https://cloud.google.com/bigtable/docs/locations.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Return immediately, without waiting for operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-num\-nodes\fR=\fINUM_NODES\fR; default=3
@@ -89,9 +89,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud bigtable clusters create

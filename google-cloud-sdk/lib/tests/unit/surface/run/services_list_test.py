@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,12 +23,37 @@ import datetime
 from googlecloudsdk.api_lib.run import global_methods
 from googlecloudsdk.api_lib.run import k8s_object
 from googlecloudsdk.api_lib.run import service
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.run import flags
 from tests.lib.surface.run import base
 
 import six
 
 
-class ServicesListTest(base.ServerlessSurfaceBase):
+class ServicesListNoProjectBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def Project(self):
+    # Overrides the base class Project() to give the user no specified project.
+    return None
+
+  def testServicesListNoProject(self):
+    with self.assertRaises(flags.ArgumentError):
+      self.Run('run services list --region=us-central1')
+
+
+class ServicesListNoProjectAlpha(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ServicesListTestBeta(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.services = [
@@ -45,6 +70,7 @@ class ServicesListTest(base.ServerlessSurfaceBase):
                   i).isoformat() + 'Z')
       ]
       s.labels[k8s_object.REGION_LABEL] = 'us-central1'
+      s.domain = 'https://{}.app'.format(s.name)
       s.status.latestCreatedRevisionName = '{}.{}'.format(s.name, i)
       s.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/services/{}'.format(
           self.namespace.Name(), s.name)
@@ -67,10 +93,41 @@ class ServicesListTest(base.ServerlessSurfaceBase):
     self.operations.ListServices.assert_called_once_with(self.namespace)
     self.assertEqual(out, self.services)
     self.AssertOutputEquals(
-        """  SERVICE REGION LATEST REVISION SERVING REVISION LAST DEPLOYED BY LAST DEPLOYED AT
-           X s0 us-central1 s0.0 1970-01-01T00:00:00Z
-           + s1 us-central1 s1.1 s1.1 bozo1@clown.com 1970-01-01T00:00:01Z
-           ! s2 us-central1 s2.2 s2.0 bozo2@clown.com 1970-01-01T00:00:02Z
+        """  SERVICE REGION URL LAST DEPLOYED BY LAST DEPLOYED AT
+           X s0 us-central1 https://s0.app 1970-01-01T00:00:00Z
+           + s1 us-central1 https://s1.app bozo1@clown.com 1970-01-01T00:00:01Z
+           ! s2 us-central1 https://s2.app bozo2@clown.com 1970-01-01T00:00:02Z
+        """,
+        normalize_space=True)
+
+  def testServicesListGKE(self):
+    """Two services are listable using the Serverless API format."""
+
+    out = self.Run('run services list --platform=gke')
+
+    self.operations.ListServices.assert_called_once_with(
+        self._NamespaceRef(project='default'))
+    self.assertEqual(out, self.services)
+    self.AssertOutputEquals(
+        """  SERVICE NAMESPACE URL LAST DEPLOYED BY LAST DEPLOYED AT
+           X s0 fake-project https://s0.app 1970-01-01T00:00:00Z
+           + s1 fake-project https://s1.app bozo1@clown.com 1970-01-01T00:00:01Z
+           ! s2 fake-project https://s2.app bozo2@clown.com 1970-01-01T00:00:02Z
+        """,
+        normalize_space=True)
+
+  def testServicesListSortOrder(self):
+    """Two services are listable using the Serverless API format."""
+    self.operations.ListServices.return_value = reversed(self.services)
+    out = self.Run('run services list --region=us-central1')
+
+    self.operations.ListServices.assert_called_once_with(self.namespace)
+    self.assertEqual(out, self.services)
+    self.AssertOutputEquals(
+        """  SERVICE REGION URL LAST DEPLOYED BY LAST DEPLOYED AT
+           X s0 us-central1 https://s0.app 1970-01-01T00:00:00Z
+           + s1 us-central1 https://s1.app bozo1@clown.com 1970-01-01T00:00:01Z
+           ! s2 us-central1 https://s2.app bozo2@clown.com 1970-01-01T00:00:02Z
         """,
         normalize_space=True)
 
@@ -86,10 +143,10 @@ class ServicesListTest(base.ServerlessSurfaceBase):
     list_services.assert_called_once()
     self.assertEqual(out, self.services)
     self.AssertOutputEquals(
-        """  SERVICE REGION LATEST REVISION SERVING REVISION LAST DEPLOYED BY LAST DEPLOYED AT
-           X s0 us-central1 s0.0 1970-01-01T00:00:00Z
-           + s1 us-central1 s1.1 s1.1 bozo1@clown.com 1970-01-01T00:00:01Z
-           ! s2 us-central1 s2.2 s2.0 bozo2@clown.com 1970-01-01T00:00:02Z
+        """  SERVICE REGION URL LAST DEPLOYED BY LAST DEPLOYED AT
+           X s0 us-central1 https://s0.app 1970-01-01T00:00:00Z
+           + s1 us-central1 https://s1.app bozo1@clown.com 1970-01-01T00:00:01Z
+           ! s2 us-central1 https://s2.app bozo2@clown.com 1970-01-01T00:00:02Z
         """, normalize_space=True)
 
   def testServicesListYamlFormat(self):
@@ -147,3 +204,9 @@ class ServicesListTest(base.ServerlessSurfaceBase):
         https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/s2
         """,
         normalize_space=True)
+
+
+class ServicesListTestAlpha(base.ServerlessSurfaceBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

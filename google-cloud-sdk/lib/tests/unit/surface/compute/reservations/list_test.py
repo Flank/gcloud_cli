@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,13 +28,13 @@ from tests.lib.surface.compute import reservations_test_base as test_base
 import mock
 
 
-class ListTestBeta(test_base.TestBase):
+class ListTest(test_base.TestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('v1')
     lister_patcher = mock.patch.object(
         lister, 'GetZonalResourcesDicts', autospec=True)
     self.addCleanup(lister_patcher.stop)
@@ -58,10 +58,22 @@ alloc-3 0 1 us-central1-a
         normalize_space=True)
 
 
+class ListTestBeta(ListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi('beta')
+
+
 class ListTestAlpha(ListTestBeta):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def SetUp(self):
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,6 +47,14 @@ class Delete(base.DeleteCommand):
   An external VPN gateway provides the information to Google Cloud Platform
   about your on-premises side or another Cloud provider's VPN gateway.
   """
+
+  detailed_help = {
+      'EXAMPLES':
+          """\
+          To delete an external VPN gateway, run:
+
+              $ {command} my-external-gateway"""
+  }
 
   @staticmethod
   def Args(parser):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +99,18 @@ class UrlMapsDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
     ])
 
 
-class UrlMapsDeleteTestAlpha(UrlMapsDeleteTest):
+class UrlMapsDeleteTestBeta(UrlMapsDeleteTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_api = self.compute_beta.urlMaps
+
+  def RunDelete(self, command):
+    self.Run('beta compute url-maps delete --global ' + command)
+
+
+class UrlMapsDeleteTestAlpha(UrlMapsDeleteTestBeta):
 
   def SetUp(self):
     self.SelectApi('alpha')

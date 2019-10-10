@@ -33,5 +33,9 @@ COMMANDS
         (BETA) Update an existing Cloud DNS policy.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud dns policies
+        $ gcloud alpha dns policies
 

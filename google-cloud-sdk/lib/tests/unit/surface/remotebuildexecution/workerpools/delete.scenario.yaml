@@ -10,7 +10,8 @@ summary:
   - stderr: |
       Delete request issued for: [newpool]
   - progress_tracker:
-    - message: Waiting for operation [delete_operation_id] to complete
+    - message: Waiting for operation [projects/fake-project/operations/delete_operation_id]
+        to complete
     - status: SUCCESS
   - stderr: |
       Deleted workerpool [newpool].
@@ -54,7 +55,8 @@ actions:
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [delete_operation_id] to complete
+        message: Waiting for operation [projects/fake-project/operations/delete_operation_id]
+          to complete
         status: SUCCESS
     - expect_stderr: |
         Deleted workerpool [newpool].

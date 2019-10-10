@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,6 @@ def ModifiedGsutilStateDir(account):
 
   with files.TemporaryDirectory() as temp_dir:
     new_config = '[GSUtil]\nstate_dir = {0}'.format(temp_dir)
-    with open(boto_config_path, 'ab') as boto_config:
+    with open(boto_config_path, 'a') as boto_config:
       boto_config.write(new_config)
     yield temp_dir

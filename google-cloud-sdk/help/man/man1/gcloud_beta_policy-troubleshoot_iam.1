@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_BETA_POLICY\-TROUBLESHOOT_IAM" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta policy\-troubleshoot iam \- troubleshoot the IAM Policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta policy\-troubleshoot iam\fR \fIRESOURCE\fR \fB\-\-permission\fR=\fIPERMISSION\fR \fB\-\-principal\-email\fR=\fIPRINCIPAL_EMAIL\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Performs a check on whether a member is granted a permission on a
+resource and how that grant/deny is determined according to the resource's
+effective IAM policy interpretation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIRESOURCE\fR
+Full resource name that access is checked against. See:
+https://cloud.google.com/apis/design/resource_names#full_resource_name.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-permission\fR=\fIPERMISSION\fR
+Cloud IAM permission to check, e.g. "resourcemanager.projects.get".
+
+.TP 2m
+\fB\-\-principal\-email\fR=\fIPRINCIPAL_EMAIL\fR
+Principal email address of the member to check against. The format is the email
+addresses associated with its gaia account and it must be either a user account
+or a service account, other principal types are not supported.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBpolicytroubleshooter/v1beta\fR API. The full
+documentation for this API can be found at: https://cloud.google.com/iam/
+
+
+
+.SH "EXAMPLES"
+
+To troubleshoot a permission of a member on a resource, run:
+
+.RS 2m
+$ gcloud beta policy\-troubleshoot iam projects/project\-id
+\-\-principal\-email=my\-iam\-account@somedomain.com
+\-\-permission=iam.roles.list
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha policy\-troubleshoot iam
+.RE
+

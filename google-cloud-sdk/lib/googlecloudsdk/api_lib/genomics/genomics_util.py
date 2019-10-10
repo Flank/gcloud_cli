@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -114,7 +114,8 @@ def GetFileAsMessage(path, message, client):
       del download  # Explicitly close the stream so the results are there
     except apitools_exceptions.HttpError as e:
       raise genomics_exceptions.GenomicsInputFileError(
-          'Unable to read remote file [{0}] due to [{1}]'.format(path, str(e)))
+          'Unable to read remote file [{0}] due to [{1}]'.format(
+              path, six.text_type(e)))
     path = tf.name
 
   # Read the file.
@@ -134,7 +135,7 @@ def GetFileAsMessage(path, message, client):
       # DecodeError is raised when a tag is badly formatted (not Base64)
       raise genomics_exceptions.GenomicsInputFileError(
           'Pipeline file [{0}] is not properly formatted YAML or JSON '
-          'due to [{1}]'.format(path, str(e)))
+          'due to [{1}]'.format(path, six.text_type(e)))
   return result
 
 

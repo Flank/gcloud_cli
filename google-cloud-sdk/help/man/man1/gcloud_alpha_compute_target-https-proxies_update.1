@@ -69,7 +69,7 @@ Allows Google to control when QUIC is rolled out.
 References to at most 15 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The
-SSL certificate must exist and cannot be deleted while referenced by a target
+SSL certificates must exist and cannot be deleted while referenced by a target
 HTTPS proxy.
 
 .TP 2m
@@ -205,9 +205,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute target\-https\-proxies update

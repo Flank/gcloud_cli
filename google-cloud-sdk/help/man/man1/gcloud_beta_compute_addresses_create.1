@@ -71,7 +71,8 @@ This field is not applicable to external addresses.
 .TP 2m
 \fB\-\-purpose\fR=\fIPURPOSE\fR
 The purpose of the address resource. This field is not applicable to external
-addresses. \fIPURPOSE\fR must be one of: \fBVPC_PEERING\fR, \fBGCE_ENDPOINT\fR.
+addresses. \fIPURPOSE\fR must be one of: \fBVPC_PEERING\fR,
+\fBSHARED_LOADBALANCER_VIP\fR, \fBGCE_ENDPOINT\fR.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -173,13 +174,22 @@ $ gcloud beta compute addresses create SUBNET\-ADDRESS\-1 \e
     \-\-region us\-central1 \-\-subnet default
 .RE
 
+To reserve an IP address that can be used by multiple internal load balancers
+from the subnet 'default' in the 'us\-central1' region, run:
+
+.RS 2m
+$ gcloud beta compute addresses create SHARED\-ADDRESS\-1 \e
+    \-\-region us\-central1 \-\-subnet default \e
+    \-\-purpose SHARED_LOADBALANCER_VIP
+.RE
+
 To reserve an IP range 10.110.0.0/16 from the network 'default' for VPC_PEERING,
 run:
 
 .RS 2m
 $ gcloud beta compute addresses create IP\-RANGE\-1 \-\-global \e
-    \-\-addresses 10.110.0.0 \-\-prefix\-length 16
-\-\-purpose VPC_PEERING \-\-network default
+    \-\-addresses 10.110.0.0 \-\-prefix\-length 16 \e
+    \-\-purpose VPC_PEERING \-\-network default
 .RE
 
 To reserve any IP range with prefix length 16 from the network 'default' for
@@ -187,8 +197,7 @@ VPC_PEERING, run:
 
 .RS 2m
 $ gcloud beta compute addresses create IP\-RANGE\-1 \-\-global \e
-    \-\-prefix\-length 16 \-\-purpose VPC_PEERING
-\-\-network default
+    \-\-prefix\-length 16 \-\-purpose VPC_PEERING \-\-network default
 .RE
 
 

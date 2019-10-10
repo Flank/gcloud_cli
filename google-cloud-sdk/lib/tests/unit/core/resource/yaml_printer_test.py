@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-# Copyright 2014 Google Inc. All Rights Reserved.
+# -*- coding: utf-8 -*- #
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ class YamlPrinterTest(resource_printer_test_base.Base):
     for resource in self.CreateResourceList(1):
       self._printer.AddRecord(resource)
     self._printer.Finish()
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink: http://g/selfie/a-0
         kind: compute#instance
@@ -72,6 +73,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.0
+        size: 0
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         """))
@@ -79,7 +81,8 @@ class YamlPrinterTest(resource_printer_test_base.Base):
   def testSingleResourceCase(self):
     resource = list(self.CreateResourceList(1))[0]
     self._printer.PrintSingleRecord(resource)
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         SelfLink: http://g/selfie/a-0
         kind: compute#instance
         labels:
@@ -107,6 +110,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.0
+        size: 0
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         """))
@@ -117,7 +121,8 @@ class YamlPrinterTest(resource_printer_test_base.Base):
     self.AssertOutputEquals('')
 
     self._printer.AddRecord(next(generator))
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink: http://g/selfie/a-0
         kind: compute#instance
@@ -146,13 +151,15 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.0
+        size: 0
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         """))
 
     self._printer.AddRecord(next(generator))
 
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink: http://g/selfie/a-0
         kind: compute#instance
@@ -181,6 +188,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.0
+        size: 0
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         ---
@@ -211,12 +219,14 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.1
+        size: 11
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         """))
 
     self._printer.AddRecord(next(generator))
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink: http://g/selfie/a-0
         kind: compute#instance
@@ -245,6 +255,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.0
+        size: 0
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         ---
@@ -275,6 +286,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.1
+        size: 11
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         ---
@@ -305,6 +317,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           name: nic0
           network: default
           networkIP: 10.240.150.2
+        size: 2
         unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
           \\u1E67"
         """))
@@ -569,6 +582,70 @@ class YamlPrintTest(resource_printer_test_base.Base):
         full:
         - PASS
         - FAIL
+        """))
+
+  def testPrintBooleanVersion11(self):
+    resource = [{'falsy': ['false', 'no', 'off', 'other'],
+                 'truthy': ['true', 'yes', 'on', 'other']}]
+    resource_printer.Print(resource, 'yaml[version=1.1]')
+    self.AssertOutputEquals(textwrap.dedent("""\
+        %YAML 1.1
+        ---
+        falsy:
+        - 'false'
+        - 'no'
+        - 'off'
+        - other
+        truthy:
+        - 'true'
+        - 'yes'
+        - 'on'
+        - other
+        """))
+
+  def testPrintBooleanProjectionVersion11(self):
+    resource = [{'truthy': ['true', 'yes', 'on', 'other']}]
+    resource_printer.Print(resource, 'yaml[version=1.1](truthy)')
+    self.AssertOutputEquals(textwrap.dedent("""\
+        %YAML 1.1
+        ---
+        truthy:
+        - 'true'
+        - 'yes'
+        - 'on'
+        - other
+        """))
+
+  def testPrintBooleanVersion12(self):
+    resource = [{'falsy': ['false', 'no', 'off', 'other'],
+                 'truthy': ['true', 'yes', 'on', 'other']}]
+    resource_printer.Print(resource, 'yaml[version=1.2]')
+    self.AssertOutputEquals(textwrap.dedent("""\
+        %YAML 1.2
+        ---
+        falsy:
+        - 'false'
+        - no
+        - off
+        - other
+        truthy:
+        - 'true'
+        - yes
+        - on
+        - other
+        """))
+
+  def testPrintBooleanProjectionVersion12(self):
+    resource = [{'truthy': ['true', 'yes', 'on', 'other']}]
+    resource_printer.Print(resource, 'yaml[version=1.2](truthy)')
+    self.AssertOutputEquals(textwrap.dedent("""\
+        %YAML 1.2
+        ---
+        truthy:
+        - 'true'
+        - yes
+        - on
+        - other
         """))
 
   def testPrintOrderedDictSome(self):

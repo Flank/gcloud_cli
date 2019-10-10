@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -123,9 +123,12 @@ class Create(base.CreateCommand):
     firewall, project = self._CreateFirewall(holder, args)
     request = client.messages.ComputeFirewallsInsertRequest(
         firewall=firewall, project=project)
-    with progress_tracker.ProgressTracker('Creating firewall'):
+    with progress_tracker.ProgressTracker(
+        'Creating firewall',
+        autotick=False
+    ) as tracker:
       return client.MakeRequests([(client.apitools_client.firewalls, 'Insert',
-                                   request)])
+                                   request)], progress_tracker=tracker)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)

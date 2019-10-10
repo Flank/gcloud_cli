@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -110,9 +110,9 @@ class FirewallRulesDescribeTest(test_base.BaseTest,
             - IPProtocol: all
             direction: INGRESS
             name: default-deny-ingress
-            network: https://www.googleapis.com/compute/v1/projects/my-project/global/networks/default
+            network: https://compute.googleapis.com/compute/v1/projects/my-project/global/networks/default
             priority: 65535
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/global/firewalls/default-deny-ingress
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/global/firewalls/default-deny-ingress
             sourceRanges:
             - 0.0.0.0/0
             """))
@@ -151,7 +151,7 @@ class AlphaFirewallRulesDescribeTest(FirewallRulesDescribeTest):
         name='my-firewall',
         network=network_ref.SelfLink(),
         selfLink=(
-            'https://www.googleapis.com/compute/alpha/projects/my-project/'
+            'https://compute.googleapis.com/compute/alpha/projects/my-project/'
             'global/firewalls/my-firewall'),
         destinationRanges=['1.2.3.4/32', '2.3.4.0/24'],
         direction=self.messages.Firewall.DirectionValueValuesEnum.EGRESS,
@@ -183,8 +183,8 @@ class AlphaFirewallRulesDescribeTest(FirewallRulesDescribeTest):
             - 2.3.4.0/24
             direction: EGRESS
             name: my-firewall
-            network: https://www.googleapis.com/compute/alpha/projects/my-project/global/networks/default
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/global/firewalls/my-firewall
+            network: https://compute.googleapis.com/compute/alpha/projects/my-project/global/networks/default
+            selfLink: https://compute.googleapis.com/compute/alpha/projects/my-project/global/firewalls/my-firewall
             targetServiceAccounts:
             - acct1@google.com
             - acct2@google.com

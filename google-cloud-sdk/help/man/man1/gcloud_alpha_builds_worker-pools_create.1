@@ -41,9 +41,9 @@ arguments in this group are specified.
 
 .TP 2m
 \fB\-\-regions\fR=[\fIREGION\fR,...]
-The Cloud region or regions in which to create the WorkerPool.
-
-Choices: us\-central1, us\-west1, us\-east1, us\-east4.
+The Cloud region or regions in which to create the WorkerPool. \fIREGION\fR must
+be one of: \fBus\-central1\fR, \fBus\-east1\fR, \fBus\-east4\fR,
+\fBus\-west1\fR.
 
 .TP 2m
 \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR
@@ -136,7 +136,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

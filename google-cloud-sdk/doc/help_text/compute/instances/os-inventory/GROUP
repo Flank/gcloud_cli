@@ -1,0 +1,32 @@
+NAME
+    gcloud compute instances os-inventory - read Google Compute Engine OS
+        Inventory Data and Related Resources
+
+SYNOPSIS
+    gcloud compute instances os-inventory COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Read Google Compute Engine OS Inventory Data and Related Resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Describe a Google Compute Engine virtual instance's OS inventory data.
+
+     list-instances
+        List instances with specific OS inventory data values.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instances os-inventory
+        $ gcloud beta compute instances os-inventory
+

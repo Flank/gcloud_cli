@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,10 +113,10 @@ class SubnetsExpandIpRangeTest(test_base.BaseTest):
       subnetwork = self.messages.Subnetwork(
           name='my-subnet1',
           network=(
-              'https://www.googleapis.com/compute/v1/projects/my-project/'
+              'https://compute.googleapis.com/compute/v1/projects/my-project/'
               'global/networks/my-network'),
           ipCidrRange=original_ip_range,
-          region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+          region=('https://compute.googleapis.com/compute/v1/projects/my-project/'
                   'regions/us-central1'),
       )
       responses = [[subnetwork], [],]

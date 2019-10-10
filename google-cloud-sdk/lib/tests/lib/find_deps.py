@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+
 import itertools
 import json
 import logging
@@ -48,6 +49,7 @@ import tests
 from tests.lib import with_deps_capture
 from modulegraph import modulegraph  # pylint: disable=g-import-not-at-top
 
+import six
 
 DEPOT_PREFIX = 'depot_path: '
 DEPOT_PREFIX_LEN = len(DEPOT_PREFIX)
@@ -134,8 +136,8 @@ def GetGraph():
 
   graph = modulegraph.ModuleGraph(python_path)
   for root, unused_dirs, files in itertools.chain(
-      os.walk(_PathHelper.googlecloudsdk_root),
-      os.walk(_PathHelper.googlecloudsdk_tests_root)):
+      os.walk(six.text_type(_PathHelper.googlecloudsdk_root)),
+      os.walk(six.text_type(_PathHelper.googlecloudsdk_tests_root))):
     for f in files:
       _ImportPath(graph, root, f)
   return graph

@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instances set-scheduling INSTANCE_NAME
-        [--[no-]restart-on-failure] [--zone=ZONE]
+        [--min-node-cpus=MIN_NODE_CPUS] [--[no-]restart-on-failure]
+        [--zone=ZONE]
         [--maintenance-policy=MAINTENANCE_POLICY
           | --on-host-maintenance=MAINTENANCE_POLICY] [GCLOUD_WIDE_FLAG ...]
 
@@ -17,19 +18,23 @@ POSITIONAL ARGUMENTS
         Name of the instance to operate on.
 
 FLAGS
+     --min-node-cpus=MIN_NODE_CPUS
+        Minimum number of virtual CPUs this instance will consume when running
+        on a sole-tenant node.
+
      --[no-]restart-on-failure
         The instances will be restarted if they are terminated by Compute
         Engine. This does not affect terminations performed by the user. Use
         --restart-on-failure to enable and --no-restart-on-failure to disable.
 
      --zone=ZONE
-        Zone of the instance to operate on. If not specified, you may be
+        Zone of the instance to operate on. If not specified, the user may be
         prompted to select a zone. gcloud will attempt to identify the zone by
-        searching for resources in your project. If the zone cannot be
-        determined, you will then be prompted with all Google Cloud Platform
-        zones.
+        searching for resources in the user's project. If the zone cannot be
+        determined, the user will then be prompted with all Google Cloud
+        Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE
@@ -83,9 +88,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instances set-scheduling
         $ gcloud beta compute instances set-scheduling

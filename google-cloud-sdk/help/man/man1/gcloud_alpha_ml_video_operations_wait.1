@@ -11,7 +11,7 @@ gcloud alpha ml video operations wait \- poll long\-running video analysis opera
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml video operations wait\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml video operations wait\fR (\fIOPERATION\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -28,13 +28,23 @@ analysis.
 .RS 2m
 .TP 2m
 
-Operation resource \- ID for the operation to poll until complete. This
-represents a Cloud resource. This must be specified.
+Operation resource \- ID for the operation to poll until complete. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [operation] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIOPERATION\fR
-ID of the operation or fully qualified identifier for the operation.
+ID of the operation or fully qualified identifier for the operation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the operation.
 
 
 .RE
@@ -62,9 +72,8 @@ this API can be found at: https://cloud.google.com/video\-intelligence/docs/
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud ml video operations wait

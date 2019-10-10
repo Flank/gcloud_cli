@@ -8,7 +8,8 @@ summary:
   - stderr: |
       Request issued for: [set-min-cpu-pool]
   - progress_tracker:
-    - message: Waiting for operation [update_operation_id] to complete
+    - message: Waiting for operation [projects/fake-project/operations/update_operation_id]
+        to complete
     - status: SUCCESS
   - stderr: |
       Updated workerpool [set-min-cpu-pool].
@@ -24,8 +25,8 @@ summary:
           diskType: pd-standard
           machineType: n1-standard-2
           minCpuPlatform: Intel Haswell
+          networkAccess: public
         workerCount: '2'
-
 actions:
 - execute_command:
     command: |
@@ -72,14 +73,16 @@ actions:
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
-                  "minCpuPlatform": "Intel Haswell"
+                  "minCpuPlatform": "Intel Haswell",
+                  "networkAccess": "public"
                 },
                 "workerCount": "2",
                 "state": "RUNNING"
               }
             }
     - expect_progress_tracker:
-        message: Waiting for operation [update_operation_id] to complete
+        message: Waiting for operation [projects/fake-project/operations/update_operation_id]
+          to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -101,7 +104,8 @@ actions:
                   "machineType": "n1-standard-2",
                   "diskType": "pd-standard",
                   "diskSizeGb": "200",
-                  "minCpuPlatform": "Intel Haswell"
+                  "minCpuPlatform": "Intel Haswell",
+                  "networkAccess": "public"
                 },
                 "workerCount": "2",
                 "state": "RUNNING"
@@ -121,6 +125,7 @@ actions:
             diskType: pd-standard
             machineType: n1-standard-2
             minCpuPlatform: Intel Haswell
+            networkAccess: public
           workerCount: '2'
     - expect_exit:
         code: 0

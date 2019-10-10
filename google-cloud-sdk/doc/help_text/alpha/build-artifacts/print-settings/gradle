@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha build-artifacts print-settings gradle - print a snippet to add
+        a repository to the Gradle build.gradle file
+
+SYNOPSIS
+    gcloud alpha build-artifacts print-settings gradle --repository=REPOSITORY
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Print a snippet to add a repository to the Gradle build.gradle
+    file.
+
+FLAGS
+     Repository resource - The Cloud Build Artifacts repository. If not
+     specified, the current build_artifacts/repository is used. This represents
+     a Cloud resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute:
+     provide the argument [--repository] on the command line with a fully
+     specified name; provide the argument [--project] on the command line; set
+     the property [core/project].
+
+       --repository=REPOSITORY
+          ID of the repository or fully qualified identifier for the
+          repository.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

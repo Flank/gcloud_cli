@@ -236,6 +236,37 @@ ASYMMETRIC_DECRYPT.
         supports_download=False,
     )
 
+    def Import(self, request, global_params=None):
+      r"""Imports a new CryptoKeyVersion into an existing CryptoKey using the.
+wrapped key material provided in the request.
+
+The version ID will be assigned the next sequential id within the
+CryptoKey.
+
+      Args:
+        request: (CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsImportRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (CryptoKeyVersion) The response message.
+      """
+      config = self.GetMethodConfig('Import')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Import.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/cryptoKeys/{cryptoKeysId}/cryptoKeyVersions:import',
+        http_method=u'POST',
+        method_id=u'cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions.import',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[],
+        relative_path=u'v1/{+parent}/cryptoKeyVersions:import',
+        request_field=u'importCryptoKeyVersionRequest',
+        request_type_name=u'CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsImportRequest',
+        response_type_name=u'CryptoKeyVersion',
+        supports_download=False,
+    )
+
     def List(self, request, global_params=None):
       r"""Lists CryptoKeyVersions.
 
@@ -255,7 +286,7 @@ ASYMMETRIC_DECRYPT.
         method_id=u'cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken', u'view'],
+        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken', u'view'],
         relative_path=u'v1/{+parent}/cryptoKeyVersions',
         request_field='',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListRequest',
@@ -362,7 +393,7 @@ are required.
         method_id=u'cloudkms.projects.locations.keyRings.cryptoKeys.create',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'cryptoKeyId'],
+        query_params=[u'cryptoKeyId', u'skipInitialVersionCreation'],
         relative_path=u'v1/{+parent}/cryptoKeys',
         request_field=u'cryptoKey',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsCryptoKeysCreateRequest',
@@ -476,7 +507,7 @@ set.
         method_id=u'cloudkms.projects.locations.keyRings.cryptoKeys.getIamPolicy',
         ordered_params=[u'resource'],
         path_params=[u'resource'],
-        query_params=[],
+        query_params=[u'options_requestedPolicyVersion'],
         relative_path=u'v1/{+resource}:getIamPolicy',
         request_field='',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest',
@@ -503,7 +534,7 @@ set.
         method_id=u'cloudkms.projects.locations.keyRings.cryptoKeys.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken', u'versionView'],
+        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken', u'versionView'],
         relative_path=u'v1/{+parent}/cryptoKeys',
         request_field='',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsCryptoKeysListRequest',
@@ -541,6 +572,8 @@ set.
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 
       Args:
         request: (CloudkmsProjectsLocationsKeyRingsCryptoKeysSetIamPolicyRequest) input message
@@ -638,6 +671,62 @@ Returns an error if called on an asymmetric key.
       self._upload_configs = {
           }
 
+    def Create(self, request, global_params=None):
+      r"""Create a new ImportJob within a KeyRing.
+
+ImportJob.import_method is required.
+
+      Args:
+        request: (CloudkmsProjectsLocationsKeyRingsImportJobsCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ImportJob) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/importJobs',
+        http_method=u'POST',
+        method_id=u'cloudkms.projects.locations.keyRings.importJobs.create',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'importJobId'],
+        relative_path=u'v1/{+parent}/importJobs',
+        request_field=u'importJob',
+        request_type_name=u'CloudkmsProjectsLocationsKeyRingsImportJobsCreateRequest',
+        response_type_name=u'ImportJob',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Returns metadata for a given ImportJob.
+
+      Args:
+        request: (CloudkmsProjectsLocationsKeyRingsImportJobsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ImportJob) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/importJobs/{importJobsId}',
+        http_method=u'GET',
+        method_id=u'cloudkms.projects.locations.keyRings.importJobs.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1/{+name}',
+        request_field='',
+        request_type_name=u'CloudkmsProjectsLocationsKeyRingsImportJobsGetRequest',
+        response_type_name=u'ImportJob',
+        supports_download=False,
+    )
+
     def GetIamPolicy(self, request, global_params=None):
       r"""Gets the access control policy for a resource.
 Returns an empty policy if the resource exists and does not have a policy
@@ -659,7 +748,7 @@ set.
         method_id=u'cloudkms.projects.locations.keyRings.importJobs.getIamPolicy',
         ordered_params=[u'resource'],
         path_params=[u'resource'],
-        query_params=[],
+        query_params=[u'options_requestedPolicyVersion'],
         relative_path=u'v1/{+resource}:getIamPolicy',
         request_field='',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsImportJobsGetIamPolicyRequest',
@@ -667,9 +756,38 @@ set.
         supports_download=False,
     )
 
+    def List(self, request, global_params=None):
+      r"""Lists ImportJobs.
+
+      Args:
+        request: (CloudkmsProjectsLocationsKeyRingsImportJobsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListImportJobsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/importJobs',
+        http_method=u'GET',
+        method_id=u'cloudkms.projects.locations.keyRings.importJobs.list',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken'],
+        relative_path=u'v1/{+parent}/importJobs',
+        request_field='',
+        request_type_name=u'CloudkmsProjectsLocationsKeyRingsImportJobsListRequest',
+        response_type_name=u'ListImportJobsResponse',
+        supports_download=False,
+    )
+
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 
       Args:
         request: (CloudkmsProjectsLocationsKeyRingsImportJobsSetIamPolicyRequest) input message
@@ -813,7 +931,7 @@ set.
         method_id=u'cloudkms.projects.locations.keyRings.getIamPolicy',
         ordered_params=[u'resource'],
         path_params=[u'resource'],
-        query_params=[],
+        query_params=[u'options_requestedPolicyVersion'],
         relative_path=u'v1/{+resource}:getIamPolicy',
         request_field='',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest',
@@ -840,7 +958,7 @@ set.
         method_id=u'cloudkms.projects.locations.keyRings.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
+        query_params=[u'filter', u'orderBy', u'pageSize', u'pageToken'],
         relative_path=u'v1/{+parent}/keyRings',
         request_field='',
         request_type_name=u'CloudkmsProjectsLocationsKeyRingsListRequest',
@@ -851,6 +969,8 @@ set.
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 
       Args:
         request: (CloudkmsProjectsLocationsKeyRingsSetIamPolicyRequest) input message

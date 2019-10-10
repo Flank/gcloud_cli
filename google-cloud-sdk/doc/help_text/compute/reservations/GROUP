@@ -1,0 +1,52 @@
+NAME
+    gcloud compute reservations - manage Compute Engine reservations
+
+SYNOPSIS
+    gcloud compute reservations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Compute Engine reservations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        Add IAM policy binding to a Google Compute Engine reservation.
+
+     create
+        Create a Compute Engine reservation.
+
+     delete
+        Delete a Compute Engine reservation.
+
+     describe
+        Show details about a Compute Engine reservation.
+
+     get-iam-policy
+        Get the IAM policy for a Google Compute Engine reservation.
+
+     list
+        List Google Compute Engine reservations.
+
+     remove-iam-policy-binding
+        Remove IAM policy binding from a Google Compute Engine reservation.
+
+     set-iam-policy
+        Set the IAM policy for a Google Compute Engine reservation.
+
+     update
+        Update a Compute Engine reservation.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute reservations
+        $ gcloud beta compute reservations
+

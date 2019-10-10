@@ -26,9 +26,9 @@ FLAGS
 
      --host-port=HOST_PORT
         The host:port to which the emulator should be bound. Can take the form
-        of a single address (hostname, IPv4, or IPv6) and port:
+        of a single address (hostname, IPv4, or IPv6) and/or port:
 
-            ADDRESS[:PORT]
+            [ADDRESS][:PORT]
 
         In this format you must enclose IPv6 addresses in square brackets: e.g.
 
@@ -37,8 +37,11 @@ FLAGS
         The default value is localhost:8081.
 
      --legacy
-        Set to use the legacy emulator which supports Cloud Datastore API
-        v1beta2.
+        (DEPRECATED) Set to use the legacy emulator which supports Cloud
+        Datastore API v1beta2.
+
+        This flag is deprecated due to the legacy Datastore emulator no longer
+        being supported. It will be removed in early October 2019.
 
      --store-on-disk
         Whether data should be persisted to disk. Enabled by default, use

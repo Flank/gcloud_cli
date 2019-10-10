@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,17 +42,17 @@ INSTANCE_WITH_EXTERNAL_ADDRESS = messages.Instance(
         ),
     ],
     status=messages.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 INSTANCE_WITH_NO_EXTERNAL_ADDRESS = messages.Instance(
     name='instance-2',
     status=messages.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 INSTANCE_WITH_OSLOGIN_ENABLED = messages.Instance(
@@ -75,9 +75,9 @@ INSTANCE_WITH_OSLOGIN_ENABLED = messages.Instance(
         ),
     ],
     status=messages.Instance.StatusValueValuesEnum.RUNNING,
-    selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    selfLink=('https://compute.googleapis.com/compute/v1/projects/my-project/'
               'zones/zone-1/instances/instance-1'),
-    zone=('https://www.googleapis.com/compute/v1/projects/my-project/'
+    zone=('https://compute.googleapis.com/compute/v1/projects/my-project/'
           'zones/zone-1'))
 
 
@@ -123,6 +123,11 @@ class SerialPortTest(test_base.BaseSSHTest):
         'StrictHostKeyChecking': 'yes',
         'ControlPath': 'none',
     }
+
+    datetime_patcher = mock.patch('datetime.datetime',
+                                  test_base.FakeDateTimeWithTimeZone)
+    self.addCleanup(datetime_patcher.stop)
+    datetime_patcher.start()
 
   def GetMessages(self):
     return messages
@@ -229,6 +234,124 @@ class SerialPortTest(test_base.BaseSSHTest):
         mock_matchers.TypeMatcher(ssh.SSHCommand),
         ssh.Remote(self.gateway,
                    user='my-project.zone-1.instance-1.hapoo.port=1'),
+        identity_file=self.private_key_file,
+        options=self.options,
+        port='9600')
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+    # Known Hosts
+    self.known_hosts_add.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.KnownHosts),
+        '[ssh-serialport.googleapis.com]:9600', PUBLIC_KEY, overwrite=True)
+    self.known_hosts_write.assert_called_once()
+    self.AssertErrContains('Updating project ssh metadata')
+
+  def testWithRelativeExpiration(self):
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_EXTERNAL_ADDRESS],
+        [self.project_resource_without_metadata],
+        [],
+    ])
+    self.mock_http_request.request.return_value = PUBLIC_KEY_RESPONSE
+
+    self.Run("""
+        compute connect-to-serial-port instance-1 --zone zone-1
+        --ssh-key-expire-after 1d
+        """)
+
+    self.CheckRequests(
+        [(self.GetCompute().instances,
+          'Get',
+          self.GetMessages().ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.GetCompute().projects,
+          'Get',
+          self.GetMessages().ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.GetCompute().projects,
+          'SetCommonInstanceMetadata',
+          self.GetMessages().ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.GetMessages().Metadata(
+                  items=[
+                      self.GetMessages().Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value=('me:{0} google-ssh {{"userName":"me",'
+                                 '"expireOn":'
+                                 '"2014-01-03T03:04:05+0000"}}').format(
+                                     self.pubkey.ToEntry())),
+                  ]),
+
+              project='my-project'))],
+    )
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        ssh.Remote(self.gateway,
+                   user='my-project.zone-1.instance-1.me.port=1'),
+        identity_file=self.private_key_file,
+        options=self.options,
+        port='9600')
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+    # Known Hosts
+    self.known_hosts_add.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.KnownHosts),
+        '[ssh-serialport.googleapis.com]:9600', PUBLIC_KEY, overwrite=True)
+    self.known_hosts_write.assert_called_once()
+    self.AssertErrContains('Updating project ssh metadata')
+
+  def testWithAbsoluteExpiration(self):
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_EXTERNAL_ADDRESS],
+        [self.project_resource_without_metadata],
+        [],
+    ])
+    self.mock_http_request.request.return_value = PUBLIC_KEY_RESPONSE
+
+    self.Run("""
+        compute connect-to-serial-port instance-1 --zone zone-1
+        --ssh-key-expiration 2015-01-23T12:34:56+0000
+        """)
+
+    self.CheckRequests(
+        [(self.GetCompute().instances,
+          'Get',
+          self.GetMessages().ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.GetCompute().projects,
+          'Get',
+          self.GetMessages().ComputeProjectsGetRequest(
+              project='my-project'))],
+        [(self.GetCompute().projects,
+          'SetCommonInstanceMetadata',
+          self.GetMessages().ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=self.GetMessages().Metadata(
+                  items=[
+                      self.GetMessages().Metadata.ItemsValueListEntry(
+                          key='ssh-keys',
+                          value=('me:{0} google-ssh {{"userName":"me",'
+                                 '"expireOn":'
+                                 '"2015-01-23T12:34:56+0000"}}').format(
+                                     self.pubkey.ToEntry())),
+                  ]),
+
+              project='my-project'))],
+    )
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        ssh.Remote(self.gateway,
+                   user='my-project.zone-1.instance-1.me.port=1'),
         identity_file=self.private_key_file,
         options=self.options,
         port='9600')

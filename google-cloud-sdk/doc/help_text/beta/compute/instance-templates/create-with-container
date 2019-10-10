@@ -36,7 +36,7 @@ SYNOPSIS
         [--no-restart-on-failure] [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
         [--address=ADDRESS | --no-address]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
-          : --custom-extensions]
+          : --custom-extensions --custom-vm-type=CUSTOM_VM_TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY] [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
@@ -77,7 +77,7 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        multiple of 1 GB. Limit boot disk size to 2TB to account for MBR
         partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
@@ -95,10 +95,10 @@ FLAGS
         CMD. Each argument must have a separate flag. Arguments are appended in
         the order of flags. Example:
 
-        Assuming the default entry point of your container (or an entry point
+        Assuming the default entry point of the container (or an entry point
         overridden with --container-command flag) is a Bourne shell-compatible
-        executable, in order to execute 'ls -l' command in the container, you
-        could use:
+        executable, in order to execute 'ls -l' command in the container, the
+        user could use:
 
         --container-arg="-c" --container-arg="ls -l"
 
@@ -541,6 +541,13 @@ FLAGS
 
        --custom-extensions
           Use the extended custom machine type.
+
+       --custom-vm-type=CUSTOM_VM_TYPE
+          Specifies VM type. n1 - VMs with CPU platforms Skylake and older, n2
+          - VMs with CPU platform Cascade Lake. n2 offers flexible sizing from
+          2 to 80 vCPUs, and 1 to 640GBs of memory. It also features a number
+          of performance enhancements including exposing a more accurate NUMA
+          topology to the guest OS. The default is n1.
 
      --image-project=IMAGE_PROJECT
         The project against which all image and image family references will be

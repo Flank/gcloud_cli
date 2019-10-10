@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,6 +65,106 @@ class UpdateMessageTest(subtests.Base):
 
     # Test that valid property got added
     self.assertEqual(instance.settings.availabilityType, 'REGIONAL')
+
+
+class DictToMessagesWithErrorCheckTest(test_case.WithContentAssertions):
+
+  def SetUp(self):
+    self.messages = core_apis.GetMessagesModule(
+        'binaryauthorization', 'v1alpha2')
+
+  def testValid(self):
+    self.assertEqual(
+        messages_util.DictToMessageWithErrorCheck(
+            {'name': 'sam'}, self.messages.Policy),
+        self.messages.Policy(name='sam'))
+
+  def testUnknownField(self):
+    with self.assertRaisesRegexp(messages_util.DecodeError, r'\.foo'):
+      messages_util.DictToMessageWithErrorCheck(
+          {'foo': {'bar': 'baz'}}, self.messages.Policy)
+
+  def testRepeatedField(self):
+    with self.assertRaisesRegexp(
+        messages_util.DecodeError, r'\.admissionWhitelistPatterns\[0\]\.foo'):
+      messages_util.DictToMessageWithErrorCheck(
+          {'admissionWhitelistPatterns': [{'foo': 'bar'}]},
+          self.messages.Policy)
+
+  def testMap(self):
+    with self.assertRaisesRegexp(
+        messages_util.DecodeError,
+        r'\.clusterAdmissionRules\[us-east1-b.my-cluster-1\]\.evaluationMode'):
+      messages_util.DictToMessageWithErrorCheck(
+          {
+              'clusterAdmissionRules': {
+                  'us-east1-b.my-cluster-1': {
+                      'evaluationMode': 'NOT_A_REAL_ENUM'
+                  }
+              }
+          },
+          self.messages.Policy)
+
+  def testMultiple_SameMessage(self):
+    with self.assertRaisesRegexp(
+        messages_util.DecodeError,
+        r'\.defaultAdmissionRule\.\{evaluationMode,nonConformanceAction\}'):
+      messages_util.DictToMessageWithErrorCheck(
+          {
+              'defaultAdmissionRule': {
+                  'evaluationMode': 'NOT_A_REAL_ENUM',
+                  'nonConformanceAction': 'NOT_A_REAL_ENUM',
+              }
+          },
+          self.messages.Policy)
+
+  def testMultiple_DifferentMessages(self):
+    with self.assertRaisesRegexp(
+        messages_util.DecodeError,
+        r'\.clusterAdmissionRules\[cluster-[12]\]\.evaluationMode[\w\W]*'
+        r'\.clusterAdmissionRules\[cluster-[12]\]\.evaluationMode'):
+      messages_util.DictToMessageWithErrorCheck(
+          {
+              'clusterAdmissionRules': {
+                  'cluster-1': {
+                      'evaluationMode': 'NOT_A_REAL_ENUM'
+                  },
+                  'cluster-2': {
+                      'evaluationMode': 'NOT_A_REAL_ENUM'
+                  }
+              }
+          },
+          self.messages.Policy)
+
+  def testTypeMismatch_HeterogeneousRepeated(self):
+    with self.assertRaisesRegexp(
+        messages_util.DecodeError,
+        r'\.admissionWhitelistPatterns\[0\]\.namePatterns'):
+      messages_util.DictToMessageWithErrorCheck(
+          {'admissionWhitelistPatterns': [{'namePatterns': ['a', 1]}]},
+          self.messages.Policy)
+
+  def testTypeMismatch_Scalar(self):
+    with self.assertRaisesRegexp(
+        messages_util.ScalarTypeMismatchError,
+        r'Expected type <(type|class).* for field updateTime, found 1'):
+      messages_util.DictToMessageWithErrorCheck(
+          {'updateTime': 1},
+          self.messages.Policy)
+
+  def testTypeMismatch_Message_None(self):
+    # TODO(b/77547931): Improve this error case.
+    with self.assertRaises(AttributeError):
+      messages_util.DictToMessageWithErrorCheck(
+          {'admissionWhitelistPatterns': [None]},
+          self.messages.Policy)
+
+  def testTypeMismatch_Message_Int(self):
+    # TODO(b/77547931): Improve this error case.
+    with self.assertRaises(AttributeError):
+      messages_util.DictToMessageWithErrorCheck(
+          {'admissionWhitelistPatterns': [1]},
+          self.messages.Policy)
 
 
 if __name__ == '__main__':

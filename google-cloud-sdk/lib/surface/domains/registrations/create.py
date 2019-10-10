@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class Create(base.CreateCommand):
     resource_args.AddRegistrationResourceArg(parser, 'to create')
     flags.AddRegistrationSettingsFlagsToParser(parser)
     flags.AddValidateOnlyFlagToParser(parser, 'create')
-    flags.AddAsyncFlagToParser(parser, 'create')
+    flags.AddAsyncFlagToParser(parser)
     labels_util.AddCreateLabelsFlags(parser)
 
   def Run(self, args):
@@ -96,10 +96,8 @@ class Create(base.CreateCommand):
       hsts_notice_accepted = True
 
     console_io.PromptContinue(
-        'Yearly registration price: {}\n'
-        'Yearly renewal price: {}\n'.format(
-            util.TransformMoneyType(availability.registrationPrice),
-            util.TransformMoneyType(availability.renewalPrice)),
+        'Yearly price: {}\n'.format(
+            util.TransformMoneyType(availability.yearlyPrice)),
         throw_if_unattended=True,
         cancel_on_no=True)
 
@@ -109,8 +107,7 @@ class Create(base.CreateCommand):
         name_servers=name_servers,
         registrant_contact=registrant_contact,
         whois_privacy=whois_privacy,
-        registration_price=availability.registrationPrice,
-        renewal_price=availability.renewalPrice,
+        yearly_price=availability.yearlyPrice,
         hsts_notice_accepted=hsts_notice_accepted,
         labels=labels,
         validate_only=args.validate_only)
@@ -119,7 +116,7 @@ class Create(base.CreateCommand):
       # TODO(b/110077203): Log something sensible.
       return
 
-    if args.async:
+    if args.async_:
       # TODO(b/110077203): Log something sensible.
       return response
 

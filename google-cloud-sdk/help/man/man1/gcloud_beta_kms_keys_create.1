@@ -11,13 +11,17 @@ gcloud beta kms keys create \- create a new key
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta kms keys create\fR \fIKEY\fR \fB\-\-purpose\fR=\fIPURPOSE\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta kms keys create\fR \fIKEY\fR \fB\-\-purpose\fR=\fIPURPOSE\fR [\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR;\ default="software"] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fB\-\-skip\-initial\-version\-creation\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR Creates a new key within the given keyring.
+
+The flag 'purpose' is always required when creating a key. The flag
+\'default\-algorithm' is required when creating an asymmetric key. Algorithm and
+purpose should be compatible.
 
 The optional flags \f5rotation\-period\fR and \f5next\-rotation\-time\fR define
 a rotation schedule for the key. A schedule can also be defined by the
@@ -27,8 +31,13 @@ The flag \f5next\-rotation\-time\fR must be in ISO 8601 or RFC3339 format, and
 \f5rotation\-period\fR must be in the form INTEGER[UNIT], where units can be one
 of seconds (s), minutes (m), hours (h) or days (d).
 
-The optional flag 'labels' defines a user specified key/value pair for the given
+The optional flag \f5protection\-level\fR specifies the protection level of the
+created key. The default is software; use "HSM" to create a hardware\-backed
 key.
+
+The flag \f5\-\-skip\-initial\-version\-creation\fR creates a CryptoKey with no
+version, and no primary. If you import into the CryptoKey, or create a new
+version in that CryptoKey, you must set that first version to primary.
 
 
 
@@ -59,6 +68,19 @@ The "purpose" of the key. \fIPURPOSE\fR must be one of:
 
 .RS 2m
 .TP 2m
+\fB\-\-default\-algorithm\fR=\fIDEFAULT_ALGORITHM\fR
+The default algorithm for the crypto key. See
+https://cloud.google.com/kms/docs/algorithms for guidance on choosing an
+algorithm. \fIDEFAULT_ALGORITHM\fR must be one of: \fBec\-sign\-p256\-sha256\fR,
+\fBec\-sign\-p384\-sha384\fR, \fBgoogle\-symmetric\-encryption\fR,
+\fBrsa\-decrypt\-oaep\-2048\-sha256\fR, \fBrsa\-decrypt\-oaep\-3072\-sha256\fR,
+\fBrsa\-decrypt\-oaep\-4096\-sha256\fR, \fBrsa\-decrypt\-oaep\-4096\-sha512\fR,
+\fBrsa\-sign\-pkcs1\-2048\-sha256\fR, \fBrsa\-sign\-pkcs1\-3072\-sha256\fR,
+\fBrsa\-sign\-pkcs1\-4096\-sha256\fR, \fBrsa\-sign\-pkcs1\-4096\-sha512\fR,
+\fBrsa\-sign\-pss\-2048\-sha256\fR, \fBrsa\-sign\-pss\-3072\-sha256\fR,
+\fBrsa\-sign\-pss\-4096\-sha256\fR, \fBrsa\-sign\-pss\-4096\-sha512\fR.
+
+.TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
 Key ring of the key.
 
@@ -81,9 +103,19 @@ Next automatic rotation time of the key. See $ gcloud topic datetimes for
 information on time formats.
 
 .TP 2m
+\fB\-\-protection\-level\fR=\fIPROTECTION_LEVEL\fR; default="software"
+Protection level of the key. \fIPROTECTION_LEVEL\fR must be one of:
+\fBsoftware\fR, \fBhsm\fR.
+
+.TP 2m
 \fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR
 Automatic rotation period of the key. See $ gcloud topic datetimes for
 information on duration formats.
+
+.TP 2m
+\fB\-\-skip\-initial\-version\-creation\fR
+Skip creating the first version in a key and setting it as primary during
+creation.
 
 
 .RE
@@ -106,9 +138,9 @@ The following command creates a key named \f5frodo\fR within the keyring
 
 .RS 2m
 $ gcloud beta kms keys create frodo \e
-    \-\-location us\-east1 \e
-    \-\-keyring fellowship \e
-    \-\-purpose encryption
+    \-\-location=us\-east1 \e
+    \-\-keyring=fellowship \e
+    \-\-purpose=encryption
 .RE
 
 The following command creates a key named \f5strider\fR within the keyring
@@ -116,21 +148,22 @@ The following command creates a key named \f5strider\fR within the keyring
 
 .RS 2m
 $ gcloud beta kms keys create strider \e
-    \-\-location global \-\-keyring rangers \e
-    \-\-purpose encryption \e
-    \-\-rotation\-period 30d \e
-    \-\-next\-rotation\-time 2017\-10\-12T12:34:56.1234Z
+        \-\-location=global \-\-keyring=rangers \e
+        \-\-purpose=encryption \e
+    \-\-rotation\-period=30d \e
+    \-\-next\-rotation\-time=2017\-10\-12T12:34:56.1234Z
 .RE
 
-The following command creates a key named \f5foo\fR within the keyring
-\f5fellowship\fR and location \f5us\-east1\fR with two specified labels:
+The following command creates an asymmetric key named \f5samwise\fR with default
+algorithm 'ec\-sign\-p256\-sha256' within the keyring \f5fellowship\fR and
+location \f5us\-east1\fR:
 
 .RS 2m
-$ gcloud beta kms keys create foo \e
-    \-\-location us\-east1 \e
-    \-\-keyring fellowship \e
-    \-\-purpose encryption \e
-    \-\-labels env=prod,team=kms
+$ gcloud beta kms keys create samwise \e
+    \-\-location=us\-east1 \e
+    \-\-keyring=fellowship \e
+    \-\-purpose=asymmetric\-signing \e
+    \-\-default\-algorithm=ec\-sign\-p256\-sha256
 .RE
 
 

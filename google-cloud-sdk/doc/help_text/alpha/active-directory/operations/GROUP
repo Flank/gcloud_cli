@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha active-directory operations - manage Managed Microsoft AD
+        operations
+
+SYNOPSIS
+    gcloud alpha active-directory operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Managed Microsoft AD operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) Cancel a Managed Microsoft AD operation.
+
+     describe
+        (ALPHA) Describe a Managed Microsoft AD operation.
+
+     list
+        (ALPHA) List Managed Microsoft AD operations.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. This variant is also available:
+
+        $ gcloud beta active-directory operations
+

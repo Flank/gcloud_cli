@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,13 @@ DOCS_URL = 'https://cloud.google.com/data-catalog/docs/'
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
+  CATALOG = (
+      'catalog',
+      'catalog',
+      {},
+      [],
+      True
+  )
   ENTRIES = (
       'entries',
       'entries',
@@ -47,10 +54,13 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS_ENTRYGROUPS = (
       'projects.locations.entryGroups',
-      'projects/{projectsId}/locations/{locationsId}/entryGroups/'
-      '{entryGroupsId}',
-      {},
-      [u'projectsId', u'locationsId', u'entryGroupsId'],
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/entryGroups/'
+              '{entryGroupsId}',
+      },
+      [u'name'],
       True
   )
   PROJECTS_LOCATIONS_ENTRYGROUPS_ENTRIES = (
@@ -62,6 +72,33 @@ class Collections(enum.Enum):
               '{entryGroupsId}/entries/{entriesId}',
       },
       [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_ENTRYGROUPS_ENTRIES_TAGS = (
+      'projects.locations.entryGroups.entries.tags',
+      'projects/{projectsId}/locations/{locationsId}/entryGroups/'
+      '{entryGroupsId}/entries/{entriesId}/tags/{tagsId}',
+      {},
+      [u'projectsId', u'locationsId', u'entryGroupsId', u'entriesId', u'tagsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_TAGTEMPLATES = (
+      'projects.locations.tagTemplates',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/tagTemplates/'
+              '{tagTemplatesId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_TAGTEMPLATES_FIELDS = (
+      'projects.locations.tagTemplates.fields',
+      'projects/{projectsId}/locations/{locationsId}/tagTemplates/'
+      '{tagTemplatesId}/fields/{fieldsId}',
+      {},
+      [u'projectsId', u'locationsId', u'tagTemplatesId', u'fieldsId'],
       True
   )
 

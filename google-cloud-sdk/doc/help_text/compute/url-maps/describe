@@ -2,14 +2,14 @@ NAME
     gcloud compute url-maps describe - describe a URL map
 
 SYNOPSIS
-    gcloud compute url-maps describe URL_MAP_NAME [GCLOUD_WIDE_FLAG ...]
+    gcloud compute url-maps describe URL_MAP [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute url-maps describe displays all data associated with a URL
     map in a project.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to describe.
 
 GCLOUD WIDE FLAGS

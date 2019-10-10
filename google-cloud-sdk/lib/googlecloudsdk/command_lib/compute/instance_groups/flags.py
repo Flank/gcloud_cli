@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.util import completers
+import six
 
 
 # TODO(b/110191362): resign from passing whole args to functions in this file
@@ -67,9 +68,7 @@ class AutoDeleteFlag(enum.Enum):
   """CLI flag values for `auto-delete' flag."""
 
   NEVER = 'never'
-  # The name of the flag needs to be changed to ON_PERMANENT_INSTANCE_DELETION
-  # pending the change in the API.
-  WHEN_NOT_IN_USE = 'on-permanent-instance-deletion'
+  ON_PERMANENT_INSTANCE_DELETION = 'on-permanent-instance-deletion'
 
   def GetAutoDeleteEnumValue(self, base_enum):
     return base_enum(self.name)
@@ -234,10 +233,6 @@ def ValidateStatefulDisksDict(stateful_disks, flag_name):
 
 
 def ValidateManagedInstanceGroupStatefulProperties(args):
-  if args.IsSpecified('stateful_disk') and args.IsSpecified(
-      'stateful_names') and not args.GetValue('stateful_names'):
-    raise exceptions.ConflictingArgumentsException('--stateful-disk',
-                                                   '--no-stateful-names')
   ValidateStatefulDisksDict(args.stateful_disk, '--stateful-disk')
 
 
@@ -312,16 +307,6 @@ AUTO_DELETE_ARG_HELP = """
       """
 
 
-def AddMigStatefulNamesFlag(parser):
-  parser.add_argument(
-      '--stateful-names',
-      action='store_true',
-      default=False,
-      help='Enable stateful names of instances. Whenever instances with those '
-      'names are restarted or recreated, they will have the same names as '
-      'before. Use --no-stateful-names to disable stateful names.')
-
-
 def AddMigCreateStatefulFlags(parser):
   """Adding stateful flags for disks and names to the parser."""
   stateful_disks_help = STATEFUL_DISKS_HELP + """
@@ -341,7 +326,6 @@ def AddMigCreateStatefulFlags(parser):
       action='append',
       help=stateful_disks_help,
   )
-  AddMigStatefulNamesFlag(parser)
 
 
 def AddMigStatefulFlagsForInstanceConfigs(parser, for_update=False):
@@ -391,7 +375,8 @@ def AddMigStatefulFlagsForInstanceConfigs(parser, for_update=False):
 
       *mode*::: Specifies the mode of the disk to attach. Supported options are
       `ro` for read-only and `rw` for read-write. If omitted when source is
-      specified, `rw` is used as a default.
+      specified, `rw` is used as a default. `mode` can only be specified if
+      `source` is given.
       """ + AUTO_DELETE_ARG_HELP
   parser.add_argument(
       stateful_disk_argument_name,
@@ -492,6 +477,7 @@ def AddCreateInstancesFlags(parser):
 
       *mode*::: Specifies the attachment mode of the disk. Supported options are
       'ro' for read-only and 'rw' for read-write. If omitted, defaults to 'rw'.
+      `mode` can only be specified if `source` is given.
       """ + AUTO_DELETE_ARG_HELP
   parser.add_argument(
       '--stateful-disk',
@@ -653,7 +639,6 @@ def AddMigUpdateStatefulFlags(parser):
       type=arg_parsers.ArgList(min_length=1),
       help='Stop considering the disks stateful by the instance group.',
   )
-  AddMigStatefulNamesFlag(parser)
 
 
 def ValidateUpdateStatefulPolicyParams(args, current_stateful_policy):
@@ -688,23 +673,15 @@ def ValidateUpdateStatefulPolicyParams(args, current_stateful_policy):
         parameter_name='update',
         message=
         ('You cannot simultaneously add and remove the same device names {} to '
-         'Stateful Policy.'.format(str(intersection))))
+         'Stateful Policy.'.format(six.text_type(intersection))))
   not_current_device_names = remove_set - current_device_names
   if not_current_device_names:
     raise exceptions.InvalidArgumentException(
         parameter_name='update',
         message=('Disks [{}] are not currently set as stateful, '
                  'so they cannot be removed from Stateful Policy.'.format(
-                     str(not_current_device_names))))
+                     six.text_type(not_current_device_names))))
   final_disks = current_device_names.union(update_set).difference(remove_set)
-  if final_disks and args.IsSpecified(
-      'stateful_names') and not args.GetValue('stateful_names'):
-    raise exceptions.InvalidArgumentException(
-        parameter_name='update',
-        message=(
-            'Stateful Policy is not empty, so you cannot mark instance names '
-            'as non-stateful. Current device names are [{}]'.format(
-                str(final_disks))))
   return final_disks
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ class AlternateAPIHostTest(sdk_test_base.SdkBase):
 
   def testDifferentEndpoint_CanParseExistingApi(self):
     urls = [
-        'https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/i',
+        'https://compute.googleapis.com/compute/v1/projects/p/zones/z/instances/i',
         _ALTENATE_COMPUTE_URL +'projects/p/zones/z/instances/i',
     ]
     registry = resources.Registry()
@@ -138,28 +138,28 @@ class AlternateAPIHostTest(sdk_test_base.SdkBase):
 
 class ResourcePathingTest(sdk_test_base.SdkBase):
 
-  TC1_URL = ('https://www.googleapis.com/compute/v1/'
+  TC1_URL = ('https://compute.googleapis.com/compute/v1/'
              'projects/fake-project%3Afake/'
              'zones/us-central1-a/'
              'instances/tc1')
-  TC1_URL_CLEAN = ('https://www.googleapis.com/compute/v1/'
+  TC1_URL_CLEAN = ('https://compute.googleapis.com/compute/v1/'
                    'projects/fake-project:fake/'
                    'zones/us-central1-a/'
                    'instances/tc1')
-  TC1_URL_BETA = ('https://www.googleapis.com/compute/beta/'
+  TC1_URL_BETA = ('https://compute.googleapis.com/compute/beta/'
                   'projects/fake-project%3Afake/'
                   'zones/us-central1-a/'
                   'instances/tc1')
-  TC1_URL_BETA_CLEAN = ('https://www.googleapis.com/compute/beta/'
+  TC1_URL_BETA_CLEAN = ('https://compute.googleapis.com/compute/beta/'
                         'projects/fake-project:fake/'
                         'zones/us-central1-a/'
                         'instances/tc1')
 
-  BAD_URL = ('https://www.googleapis.com/compute/v1/'
+  BAD_URL = ('https://compute.googleapis.com/compute/v1/'
              'project/proj/'
              'zone/zone/'
              'instance/inst')
-  SHORT_URL = ('https://www.googleapis.com/compute/v1/projects')
+  SHORT_URL = ('https://compute.googleapis.com/compute/v1/projects')
 
   def Project(self):
     return 'fake-project:fake'
@@ -486,7 +486,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     # The provided URL is for an instance, but the constraint says disks.
     with self.assertRaisesRegex(
         resources.WrongResourceCollectionException,
-        urllib.parse.unquote(ResourcePathingTest.TC1_URL)):
+        urllib.parse.unquote(ResourcePathingTest.TC1_URL)):  # pylint:disable=too-many-function-args
       self.registry.Parse(ResourcePathingTest.TC1_URL, {},
                           collection='compute.disks')
 
@@ -501,16 +501,16 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     ref = self.registry.Parse('bs1', params={'project': self.Project()},
                               collection='compute.backendServices')
     self.assertEqual(
-        'https://www.googleapis.com/compute/v1/projects/fake-project:fake/'
+        'https://compute.googleapis.com/compute/v1/projects/fake-project:fake/'
         'global/backendServices/bs1', ref.SelfLink())
 
     # Now parse regional URL even though collections dont match.
-    name = ('https://www.googleapis.com/compute/alpha/'
+    name = ('https://compute.googleapis.com/compute/alpha/'
             'projects/fake-project%3Afake/'
             'regions/us-central1/backendServices/bs1')
     ref = self.registry.Parse(name, collection='compute.backendServices',
                               enforce_collection=False)
-    self.assertEqual(urllib.parse.unquote(name), ref.SelfLink())
+    self.assertEqual(urllib.parse.unquote(name), ref.SelfLink())  # pylint:disable=too-many-function-args
 
     # Confirm that without enforce_collection set to False we get the error.
     with self.assertRaises(resources.WrongResourceCollectionException):
@@ -552,7 +552,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     with self.assertRaisesRegex(
         resources.WrongResourceCollectionException,
         r'wrong collection: expected \[compute.disks\], got '
-        r'\[compute.instances\], for path \[https://www.googleapis.com'
+        r'\[compute.instances\], for path \[https://compute.googleapis.com'
         r'/compute/v1/projects/{0}'
         r'/zones/us-central1-a/instances/tc1\]'.format(self.Project())):
       self.registry.Parse(ResourcePathingTest.TC1_URL_CLEAN, {},
@@ -749,21 +749,21 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     tc1 = self.registry.Parse('tc1', params, collection='compute.instances')
     self.assertEqual(
         tc1.SelfLink(),
-        'https://www.googleapis.com/compute/v1/projects/fake-project:fake/'
+        'https://compute.googleapis.com/compute/v1/projects/fake-project:fake/'
         'zones/us-central1-a/instances/tc1')
     cloned_registry = self.registry.Clone()
     cloned_registry.RegisterApiByName('compute', 'beta')
     tc1 = cloned_registry.Parse('tc1', params, collection='compute.instances')
     self.assertEqual(
         tc1.SelfLink(),
-        'https://www.googleapis.com/compute/beta/projects/fake-project:fake/'
+        'https://compute.googleapis.com/compute/beta/projects/fake-project:fake/'
         'zones/us-central1-a/instances/tc1')
 
   def testCloneAndSwitch_ParseDifferentVersionUrl(self):
     cloned_registry = self.registry.Clone()
     cloned_registry.RegisterApiByName('compute', 'beta')
     tc1v1 = cloned_registry.Parse(
-        'https://www.googleapis.com/compute/v1/'
+        'https://compute.googleapis.com/compute/v1/'
         'projects/fake-project%3Afake/'
         'zones/us-central1-a/'
         'instances/tc1',
@@ -778,7 +778,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     self.assertIsTC1(tc1)
 
   def testCloneAndSwitch_ParseAsOldVersionUrl(self):
-    tcv1_url = ('https://www.googleapis.com/compute/v1/'
+    tcv1_url = ('https://compute.googleapis.com/compute/v1/'
                 'projects/fake-project%3Afake/'
                 'zones/us-central1-a/'
                 'instances/tc1')
@@ -934,7 +934,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
 
   def testParentImplicitErrors(self):
     junk_collection = resource_util.CollectionInfo(
-        'compute', 'v1', 'https://www.googleapis.com/compute/v1/',
+        'compute', 'v1', 'https://compute.googleapis.com/compute/v1/',
         'https://cloud.google.com/docs',
         name='junk',
         path='parentJunk/{parentJunkId}/junk/{junkId}',

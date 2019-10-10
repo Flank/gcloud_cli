@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha pubsub topics publish TOPIC [MESSAGE_BODY]
         [--attribute=[ATTRIBUTE,...]] [--message=MESSAGE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--ordering-key=ORDERING_KEY] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Publishes a message to the specified topic name for testing and
@@ -35,12 +35,17 @@ POSITIONAL ARGUMENTS
 FLAGS
      --attribute=[ATTRIBUTE,...]
         Comma-separated list of attributes. Each ATTRIBUTE has the form
-        name=value". You can specify up to 100 attributes.
+        name="value". You can specify up to 100 attributes.
 
      --message=MESSAGE
         The body of the message to publish to the given topic name. Information
         on message formatting and size limits can be found at:
         https://cloud.google.com/pubsub/docs/publisher#publish
+
+     --ordering-key=ORDERING_KEY
+        The key to use for ordering delivery to subscribers. All messages with
+        the same key will be sent to subcribers in the order in which they were
+        received by Cloud Pub/Sub.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -58,9 +63,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud pubsub topics publish
         $ gcloud beta pubsub topics publish

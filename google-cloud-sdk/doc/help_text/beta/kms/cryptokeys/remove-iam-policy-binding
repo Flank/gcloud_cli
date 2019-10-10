@@ -60,7 +60,7 @@ EXAMPLES
     with the KeyRing fellowship and Location global:
 
         $ gcloud beta kms cryptokeys remove-iam-policy-binding frodo \
-            --keyring fellowship --location global \
+            --keyring=fellowship --location=global \
             --member='user:test-user@gmail.com' \
             --role='roles/editor'
 

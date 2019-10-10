@@ -6,14 +6,14 @@ summary:
   - command: |
       domains registrations search-domains example.com
   - stdout: |
-      DOMAIN        AVAILABILITY  REGISTRATION_PRICE  RENEWAL_PRICE  NOTICES
+      DOMAIN        AVAILABILITY  YEARLY_PRICE  NOTICES
       example.com   UNAVAILABLE
       example.net   UNAVAILABLE
       example.org   UNAVAILABLE
-      example.info  AVAILABLE     12.00 USD           12.00 USD
-      example.app   AVAILABLE     14.00 USD           14.00 USD      HSTS_PRELOADED
-      music.info    AVAILABLE     12.00 USD           12.00 USD
-      xmpl.design   AVAILABLE     40.00 USD           40.00 USD
+      example.info  AVAILABLE     12.00 USD
+      example.app   AVAILABLE     14.00 USD     HSTS_PRELOADED
+      music.info    AVAILABLE     12.00 USD
+      xmpl.design   AVAILABLE     40.00 USD
 actions:
 - execute_command:
     command: |
@@ -57,6 +57,10 @@ actions:
                   "renewalPrice": {
                     "currencyCode": "USD",
                     "units": "12"
+                  },
+                  "yearlyPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
                   }
                 },
                 {
@@ -76,6 +80,10 @@ actions:
                   "renewalPrice": {
                     "currencyCode": "USD",
                     "units": "14"
+                  },
+                  "yearlyPrice": {
+                    "currencyCode": "USD",
+                    "units": "14"
                   }
                 },
                 {
@@ -90,6 +98,10 @@ actions:
                     "USE_WHOIS_PRIVACY_PROXY"
                   ],
                   "renewalPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
+                  },
+                  "yearlyPrice": {
                     "currencyCode": "USD",
                     "units": "12"
                   }
@@ -108,19 +120,23 @@ actions:
                   "renewalPrice": {
                     "currencyCode": "USD",
                     "units": "40"
+                  },
+                  "yearlyPrice": {
+                    "currencyCode": "USD",
+                    "units": "40"
                   }
                 }
               ]
             }
 
     - expect_stdout: |
-        DOMAIN        AVAILABILITY  REGISTRATION_PRICE  RENEWAL_PRICE  NOTICES
+        DOMAIN        AVAILABILITY  YEARLY_PRICE  NOTICES
         example.com   UNAVAILABLE
         example.net   UNAVAILABLE
         example.org   UNAVAILABLE
-        example.info  AVAILABLE     12.00 USD           12.00 USD
-        example.app   AVAILABLE     14.00 USD           14.00 USD      HSTS_PRELOADED
-        music.info    AVAILABLE     12.00 USD           12.00 USD
-        xmpl.design   AVAILABLE     40.00 USD           40.00 USD
+        example.info  AVAILABLE     12.00 USD
+        example.app   AVAILABLE     14.00 USD     HSTS_PRELOADED
+        music.info    AVAILABLE     12.00 USD
+        xmpl.design   AVAILABLE     40.00 USD
     - expect_exit:
         code: 0

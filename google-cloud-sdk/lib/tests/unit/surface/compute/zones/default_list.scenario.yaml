@@ -67,7 +67,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones?alt=json&maxResults=500
           method: GET
           body: null
         return_response:
@@ -85,8 +85,8 @@ actions:
                "name": "us-east1-b",
                "description": "us-east1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -100,8 +100,8 @@ actions:
                "name": "us-east1-c",
                "description": "us-east1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -115,8 +115,8 @@ actions:
                "name": "us-east1-d",
                "description": "us-east1-d",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east1-d",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east1-d",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -130,8 +130,8 @@ actions:
                "name": "us-east2-a",
                "description": "us-east2-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east2-a"
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east2-a"
               },
               {
                "kind": "compute#zone",
@@ -140,8 +140,8 @@ actions:
                "name": "us-east4-c",
                "description": "us-east4-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east4",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east4-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east4",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east4-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -154,8 +154,8 @@ actions:
                "name": "us-east4-b",
                "description": "us-east4-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east4",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east4-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east4",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east4-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -168,8 +168,8 @@ actions:
                "name": "us-east4-a",
                "description": "us-east4-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east4",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east4-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-east4",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-east4-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -182,8 +182,8 @@ actions:
                "name": "us-central1-c",
                "description": "us-central1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -197,8 +197,8 @@ actions:
                "name": "us-central1-a",
                "description": "us-central1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -212,8 +212,8 @@ actions:
                "name": "us-central1-f",
                "description": "us-central1-f",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-f",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-f",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -228,8 +228,8 @@ actions:
                "name": "us-central1-b",
                "description": "us-central1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -243,8 +243,8 @@ actions:
                "name": "us-central2-a",
                "description": "us-central2-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central2-a"
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-central2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-central2-a"
               },
               {
                "kind": "compute#zone",
@@ -253,8 +253,8 @@ actions:
                "name": "us-west1-b",
                "description": "us-west1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -267,8 +267,8 @@ actions:
                "name": "us-west1-c",
                "description": "us-west1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -281,8 +281,8 @@ actions:
                "name": "us-west1-a",
                "description": "us-west1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -295,8 +295,8 @@ actions:
                "name": "europe-west4-a",
                "description": "europe-west4-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west4",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west4-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west4",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west4-a",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -308,8 +308,8 @@ actions:
                "name": "europe-west4-b",
                "description": "europe-west4-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west4",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west4-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west4",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west4-b",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -321,8 +321,8 @@ actions:
                "name": "europe-west4-c",
                "description": "europe-west4-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west4",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west4-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west4",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west4-c",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -334,8 +334,8 @@ actions:
                "name": "europe-west1-b",
                "description": "europe-west1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -350,8 +350,8 @@ actions:
                "name": "europe-west1-d",
                "description": "europe-west1-d",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west1-d",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west1-d",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -365,8 +365,8 @@ actions:
                "name": "europe-west1-c",
                "description": "europe-west1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -381,8 +381,8 @@ actions:
                "name": "europe-west3-b",
                "description": "europe-west3-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west3",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west3-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west3",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west3-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -395,8 +395,8 @@ actions:
                "name": "europe-west3-c",
                "description": "europe-west3-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west3",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west3-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west3",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west3-c",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -408,8 +408,8 @@ actions:
                "name": "europe-west3-a",
                "description": "europe-west3-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west3",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west3-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west3",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west3-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -422,8 +422,8 @@ actions:
                "name": "europe-west2-c",
                "description": "europe-west2-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west2-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west2-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -436,8 +436,8 @@ actions:
                "name": "europe-west2-b",
                "description": "europe-west2-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west2-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west2-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -450,8 +450,8 @@ actions:
                "name": "europe-west2-a",
                "description": "europe-west2-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west2-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-west2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-west2-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -464,8 +464,8 @@ actions:
                "name": "asia-east1-b",
                "description": "asia-east1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-east1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-east1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Ivy Bridge"
@@ -478,8 +478,8 @@ actions:
                "name": "asia-east1-a",
                "description": "asia-east1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-east1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-east1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -494,8 +494,8 @@ actions:
                "name": "asia-east1-c",
                "description": "asia-east1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-east1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-east1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell",
@@ -509,8 +509,8 @@ actions:
                "name": "asia-southeast1-b",
                "description": "asia-southeast1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-southeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-southeast1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-southeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-southeast1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -523,8 +523,8 @@ actions:
                "name": "asia-southeast1-a",
                "description": "asia-southeast1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-southeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-southeast1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-southeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-southeast1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -537,8 +537,8 @@ actions:
                "name": "asia-southeast1-c",
                "description": "asia-southeast1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-southeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-southeast1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-southeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-southeast1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -550,8 +550,8 @@ actions:
                "name": "asia-northeast1-b",
                "description": "asia-northeast1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-northeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-northeast1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-northeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-northeast1-b",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -563,8 +563,8 @@ actions:
                "name": "asia-northeast1-c",
                "description": "asia-northeast1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-northeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-northeast1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-northeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-northeast1-c",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -576,8 +576,8 @@ actions:
                "name": "asia-northeast1-a",
                "description": "asia-northeast1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-northeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-northeast1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-northeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-northeast1-a",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -589,8 +589,8 @@ actions:
                "name": "asia-south1-c",
                "description": "asia-south1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-south1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-south1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-south1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-south1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -602,8 +602,8 @@ actions:
                "name": "asia-south1-b",
                "description": "asia-south1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-south1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-south1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-south1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-south1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -615,8 +615,8 @@ actions:
                "name": "asia-south1-a",
                "description": "asia-south1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-south1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-south1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/asia-south1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/asia-south1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -628,8 +628,8 @@ actions:
                "name": "australia-southeast1-b",
                "description": "australia-southeast1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/australia-southeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/australia-southeast1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/australia-southeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/australia-southeast1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -642,8 +642,8 @@ actions:
                "name": "australia-southeast1-c",
                "description": "australia-southeast1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/australia-southeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/australia-southeast1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/australia-southeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/australia-southeast1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -656,8 +656,8 @@ actions:
                "name": "australia-southeast1-a",
                "description": "australia-southeast1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/australia-southeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/australia-southeast1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/australia-southeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/australia-southeast1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -670,8 +670,8 @@ actions:
                "name": "southamerica-east1-b",
                "description": "southamerica-east1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/southamerica-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/southamerica-east1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/southamerica-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/southamerica-east1-b",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -683,8 +683,8 @@ actions:
                "name": "southamerica-east1-c",
                "description": "southamerica-east1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/southamerica-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/southamerica-east1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/southamerica-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/southamerica-east1-c",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -696,8 +696,8 @@ actions:
                "name": "southamerica-east1-a",
                "description": "southamerica-east1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/southamerica-east1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/southamerica-east1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/southamerica-east1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/southamerica-east1-a",
                "availableCpuPlatforms": [
                 "Intel Broadwell"
                ]
@@ -709,8 +709,8 @@ actions:
                "name": "europe-north1-a",
                "description": "europe-north1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-north1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-north1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-north1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-north1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -722,8 +722,8 @@ actions:
                "name": "europe-north1-b",
                "description": "europe-north1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-north1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-north1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-north1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-north1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -736,8 +736,8 @@ actions:
                "name": "europe-north1-c",
                "description": "europe-north1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-north1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-north1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/europe-north1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/europe-north1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake",
                 "Intel Broadwell"
@@ -750,8 +750,8 @@ actions:
                "name": "northamerica-northeast1-a",
                "description": "northamerica-northeast1-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/northamerica-northeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/northamerica-northeast1-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/northamerica-northeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/northamerica-northeast1-a",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -763,8 +763,8 @@ actions:
                "name": "northamerica-northeast1-b",
                "description": "northamerica-northeast1-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/northamerica-northeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/northamerica-northeast1-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/northamerica-northeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/northamerica-northeast1-b",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -776,8 +776,8 @@ actions:
                "name": "northamerica-northeast1-c",
                "description": "northamerica-northeast1-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/northamerica-northeast1",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/northamerica-northeast1-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/northamerica-northeast1",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/northamerica-northeast1-c",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -789,8 +789,8 @@ actions:
                "name": "us-west2-a",
                "description": "us-west2-a",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west2-a",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west2-a",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -802,8 +802,8 @@ actions:
                "name": "us-west2-b",
                "description": "us-west2-b",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west2-b",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west2-b",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
@@ -815,14 +815,14 @@ actions:
                "name": "us-west2-c",
                "description": "us-west2-c",
                "status": "UP",
-               "region": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west2",
-               "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west2-c",
+               "region": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/regions/us-west2",
+               "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones/us-west2-c",
                "availableCpuPlatforms": [
                 "Intel Skylake"
                ]
               }
              ],
-             "selfLink": "https://www.googleapis.com/compute/v1/projects/cloudsdktest/zones"
+             "selfLink": "https://compute.googleapis.com/compute/v1/projects/cloudsdktest/zones"
             }
 
     - expect_stdout: |

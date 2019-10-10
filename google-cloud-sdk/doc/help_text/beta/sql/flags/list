@@ -12,9 +12,9 @@ DESCRIPTION
 
 FLAGS
      --database-version=DATABASE_VERSION
-        Only list flags that apply to the specified database version.
-        DATABASE_VERSION must be one of: MYSQL_5_5, MYSQL_5_6, MYSQL_5_7,
-        POSTGRES_9_6.
+        The database engine type and version. If left unspecified, the API
+        defaults will be used. See the list of database versions at
+        https://cloud.google.com/sql/docs/mysql/admin-api/v1beta4/instances#databaseVersion
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

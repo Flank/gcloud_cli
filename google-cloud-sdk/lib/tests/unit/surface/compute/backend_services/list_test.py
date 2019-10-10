@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class BackendServicesListGATest(test_base.BaseTest,
             backends=[],
             description='my backend service',
             healthChecks=[
-                ('https://www.googleapis.com/compute/{0}/projects/'
+                ('https://compute.googleapis.com/compute/{0}/projects/'
                  'my-project/global/healthChecks/my-health-check'.format(
                      self.resource_api))
             ],
@@ -59,7 +59,7 @@ class BackendServicesListGATest(test_base.BaseTest,
             backends=[],
             description='my backend service',
             healthChecks=[
-                ('https://www.googleapis.com/compute/{0}/projects/'
+                ('https://compute.googleapis.com/compute/{0}/projects/'
                  'my-project/global/healthChecks/my-health-check'.format(
                      self.resource_api))
             ],

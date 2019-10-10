@@ -38,7 +38,7 @@ Cloud SQL instance ID.
 .RS 2m
 .TP 2m
 \fB\-\-database\fR=\fIDATABASE\fR, \fB\-d\fR \fIDATABASE\fR
-The PostgreSQL database to connect to.
+The PostgreSQL or SQL Server database to connect to.
 
 .TP 2m
 \fB\-\-port\fR=\fIPORT\fR; default=9470
@@ -77,9 +77,8 @@ $ gcloud alpha sql connect my\-instance \-\-user=root
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud sql connect

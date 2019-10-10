@@ -32,7 +32,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Return immediately, without waiting for operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --num-nodes=NUM_NODES; default=3
         Number of nodes to serve.

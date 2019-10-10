@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysVersionsListTest(base.KmsMockTest):
+class CryptokeysVersionsListTestGA(base.KmsMockTest):
 
-  def testList(self, track):
-    self.track = track
-    version_1 = self.project_name.Descendant('global/my_kr/my_key/1')
-    version_2 = self.project_name.Descendant('global/my_kr/my_key/2')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testList(self):
+    version_1 = self.project_name.Version('global/my_kr/my_key/1')
+    version_2 = self.project_name.Version('global/my_kr/my_key/2')
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.List.Expect(
@@ -62,9 +59,8 @@ class CryptokeysVersionsListTest(base.KmsMockTest):
 """.format(version_1.RelativeName(), version_2.RelativeName()),
         normalize_space=True)
 
-  def testListParentFlag(self, track):
-    self.track = track
-    version_1 = self.project_name.Descendant('global/my_kr/my_key/1')
+  def testListParentFlag(self):
+    version_1 = self.project_name.Version('global/my_kr/my_key/1')
 
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.List.Expect(
@@ -85,6 +81,18 @@ class CryptokeysVersionsListTest(base.KmsMockTest):
 {0} ENABLED
 """.format(version_1.RelativeName()),
         normalize_space=True)
+
+
+class CryptokeysVersionsListTestBeta(CryptokeysVersionsListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptokeysVersionsListTestAlpha(CryptokeysVersionsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

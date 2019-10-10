@@ -1,0 +1,98 @@
+
+.TH "GCLOUD_COMPUTE_RESERVATIONS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute reservations delete \- delete a Compute Engine reservation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute reservations delete\fR (\fIRESERVATION\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Delete a Compute Engine reservation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Reservation resource \- The name of the reservation to delete. The arguments in
+this group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [reservation] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIRESERVATION\fR
+ID of the reservation or fully qualified identifier for the reservation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The name of the Google Compute Engine zone.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/v1\fR API. The full documentation for this API
+can be found at: https://developers.google.com/compute/docs/reference/latest/
+
+
+
+.SH "EXAMPLES"
+
+To delete a given Compute Engine reservation, run:
+
+.RS 2m
+$ gcloud compute reservations delete my\-reservation \-\-zone=ZONE
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute reservations delete
+$ gcloud beta compute reservations delete
+.RE
+

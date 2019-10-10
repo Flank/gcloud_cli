@@ -151,11 +151,27 @@ this API can be found at: https://cloud.google.com/healthcare
 
 
 
+.SH "EXAMPLES"
+
+To remove an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on the annotation store 'test\-annotation\-store', run:
+
+.RS 2m
+$ gcloud alpha healthcare annotation\-stores \e
+    remove\-iam\-policy\-binding test\-annotation\-store \e
+    \-\-dataset=test\-dataset \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

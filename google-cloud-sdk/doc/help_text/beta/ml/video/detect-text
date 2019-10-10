@@ -16,8 +16,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Display information about the operation in progress, without waiting
-        for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --language-hints=[LANGUAGE_HINTS,...]
         Language hints can be specified if the languages to be detected are

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -287,9 +287,8 @@ class TestCase(unittest.TestCase, object):
         cls.TearDownClass()
 
   def setUp(self):
-    # TODO(b/77644889): Figure out what's going on and remove this warning skip.
-    # This gets reset by unittest after each test case so it needs to be done
-    # here in setUp().
+    # The unittest module was updated in Python 3.2 to set the warning filter to
+    # default. We can safely ignore these warnings during tests.
     if not six.PY2:
       warnings.filterwarnings(
           action='ignore',
@@ -652,7 +651,7 @@ class WithContentAssertions(TestCase):
     """Calls self.fail() showing the reason and expected and actual values.
 
     Args:
-      reason: string, The reason for the assrtion failure.
+      reason: string, The reason for the assertion failure.
       expected: string, The expected value.
       actual: string, The actual value.
     """
@@ -669,6 +668,20 @@ class WithContentAssertions(TestCase):
     # TODO(b/73656229): We should not need to encode here, but
     # assertRaisesRegexp() doesn't handle unicode correctly.
     self.fail(console_attr.SafeText(msg))
+
+  def _CompareFailBytes(self, reason, expected, actual):
+    """Calls self.fail() showing the reason and expected and actual values.
+
+    Args:
+      reason: string, The reason for the assertion failure.
+      expected: bytes, The expected value.
+      actual: bytes, The actual value.
+    """
+    msg_template = '{reason} [{expected}]: [{actual}]'
+    if six.PY2:
+      msg_template = str(msg_template)  # Do not change str to six.text_type
+    msg = msg_template.format(reason=reason, expected=expected, actual=actual)
+    self.fail(msg)
 
   def _AssertCompare(self, expected, actual, name, normalize_space=False,
                      actual_filter=None, compare=None, success=None,
@@ -755,6 +768,49 @@ class WithContentAssertions(TestCase):
         actual_filter=actual_filter,
         compare=lambda expected, actual: re.search(expected, actual, re.M|re.S),
         description='match', success=success)
+
+  def _AssertCompareBytes(self,
+                          expected,
+                          actual,
+                          name,
+                          description,
+                          compare,
+                          success=True,
+                          golden=False):
+    """Assert comparison of expected and actual stdout or stderr bytes contents.
+
+    Args:
+      expected: bytes, The the expected comparison value.
+      actual: bytes, The actual comparison value.
+      name: The contents name.
+      description: str, A word or phrase describing "compare", used in
+        self.fail().
+      compare: f(expected, actual), A comparison function that returns True on
+        success and False on failure.
+      success: bool, The successful compare(expected, actual) return value.
+      golden: bool, The expected value is from a golden file that can be updated
+        by update-regressions.sh.
+    """
+    if bool(compare(expected, actual)) == success:
+      return
+
+    self._show_contents_on_failure = False
+    reason = '{name} {word} not {description} the expected {value}'.format(
+        name=name if os.path.sep == '/' else name.replace(os.path.sep, '/'),
+        word='does' if success else 'should',
+        description=description,
+        value='pattern' if description == 'match' else 'value')
+    if golden:
+      reason += ('\n(see update-regressions.sh --help)')
+    self._CompareFailBytes(reason, expected, actual)
+
+  def _AssertEqualsBytes(self, expected, actual, name):
+    self._AssertCompareBytes(
+        expected,
+        actual,
+        name,
+        description='equal',
+        compare=lambda x, y: x == y)
 
 
 class Base(WithContentAssertions):
@@ -871,11 +927,10 @@ class Base(WithContentAssertions):
                        normalize_space=normalize_space,
                        actual_filter=actual_filter, success=success)
 
-  def AssertBinaryFileEquals(self, expected, path, success=True):
+  def AssertBinaryFileEquals(self, expected, path):
     with io.open(path, mode='rb') as f:
       contents = f.read()
-    self._AssertEquals(
-        expected, contents, path, normalize_space=False, success=success)
+    self._AssertEqualsBytes(expected, contents, path)
 
   def AssertFileNotEquals(self, expected, path, normalize_space=False,
                           actual_filter=None, success=False):
@@ -1434,6 +1489,57 @@ class Filters(object):
         'This test requires features not available on Mac.')
 
   @staticmethod
+  def SkipOnMacAndPy3(reason, issue):
+    """A decorator that skips a test on MacOS when running with python3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test on Mac when running with python3.
+    """
+    return Filters.skipIf(Filters._IS_ON_MAC and six.PY3, reason, issue)
+
+  @staticmethod
+  def SkipOnWindowsAndPy3(reason, issue):
+    """A decorator that skips a test on Windows when running with python3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test on Windows when running with python3.
+    """
+    return Filters.skipIf(Filters._IS_ON_WINDOWS and six.PY3, reason, issue)
+
+  @staticmethod
+  def SkipOnLinuxAndPy3(reason, issue):
+    """A decorator that skips a test on Linux when running with python3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test on Linux when running with python3.
+    """
+    return Filters.skipIf(Filters._IS_ON_LINUX and six.PY3, reason, issue)
+
+  @staticmethod
   def RunOnlyOnMac(reason_or_function):
     """A decorator for tests designed to only run on Mac.
 
@@ -1984,19 +2090,8 @@ class WithOutputCapture(WithContentAssertions):
                          actual_filter=actual_filter, success=success,
                          golden=True)
 
-  def AssertOutputBytesEquals(self,
-                              expected,
-                              name=OUT,
-                              normalize_space=False,
-                              actual_filter=None,
-                              success=True):
-    self._AssertEquals(
-        expected,
-        self.GetOutputBytes(),
-        name,
-        normalize_space=normalize_space,
-        actual_filter=actual_filter,
-        success=success)
+  def AssertOutputBytesEquals(self, expected, name=OUT):
+    self._AssertEqualsBytes(expected, self.GetOutputBytes(), name)
 
   def AssertErrContains(self, expected, name=ERR, normalize_space=False,
                         actual_filter=None, success=True):
@@ -2118,7 +2213,7 @@ class WithOutputCapture(WithContentAssertions):
     buf = io.StringIO()
     buf.write('<<<DIRECTORY {directory}>>>\n'.format(
         directory=os.path.basename(directory)))
-    for dirpath, _, files in sorted(os.walk(directory)):
+    for dirpath, _, files in sorted(os.walk(six.text_type(directory))):
       for name in sorted(files):
         path = os.path.join(dirpath, name)
         if _IsBinaryMediaPath(path):

@@ -15,12 +15,6 @@ gcloud alpha container binauthz attestors delete \- delete an Attestor
 
 
 
-.SH "DESCRIPTION"
-
-\fB(ALPHA)\fR Delete an Attestor.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -53,15 +47,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To delete an existing Attestor \f5my_attestor\fR:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors delete my_attestor
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud container binauthz attestors delete
 $ gcloud beta container binauthz attestors delete
 .RE
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,13 +29,13 @@ from tests.lib.surface.compute import forwarding_rules_test_base
 from tests.lib.surface.compute import test_resources
 
 
-class ForwardingRulesExportTestAlpha(
+class ForwardingRulesExportTestBeta(
     forwarding_rules_test_base.ForwardingRulesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.ALPHA
-    self._api = 'alpha'
-    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_ALPHA
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
+    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_BETA
 
   def RunExport(self, command):
     self.Run('compute forwarding-rules export ' + command)
@@ -54,8 +54,8 @@ class ForwardingRulesExportTestAlpha(
             IPProtocol: TCP
             name: global-forwarding-rule-1
             portRange: 1-65535
-            selfLink: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/forwardingRules/global-forwarding-rule-1
-            target: https://www.googleapis.com/compute/%(api)s/projects/my-project/global/targetHttpProxies/proxy-1
+            selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/forwardingRules/global-forwarding-rule-1
+            target: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/targetHttpProxies/proxy-1
             """ % {'api': self._api}))
 
   def testExportToFile(self):
@@ -74,6 +74,15 @@ class ForwardingRulesExportTestAlpha(
         message_type=self.messages.ForwardingRule, stream=data)
     self.AssertMessagesEqual(self._forwarding_rules[0],
                              exported_forwarding_rule)
+
+
+class ForwardingRulesExportTestAlpha(ForwardingRulesExportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+    self._api = 'alpha'
+    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

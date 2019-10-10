@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class List(base.ListCommand):
     filters = [
         'kind = "PACKAGE_VULNERABILITY"',  # Display only vulnerabilities
         # Display only compute metadata
-        'has_prefix(resource_url,"https://www.googleapis.com/compute/")',
+        'has_prefix(resource_url,"https://compute.googleapis.com/compute/")',
     ]
     if args.image:
       image_ref = self._image_arg.ResolveAsResource(

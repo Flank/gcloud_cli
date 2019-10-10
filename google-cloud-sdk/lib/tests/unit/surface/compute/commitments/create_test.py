@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -129,56 +129,6 @@ class CommitmentsCreateTestGA(test_base.TestBase):
         --region erech-stone
         """)
 
-
-class CommitmentsCreateTestBeta(CommitmentsCreateTestGA):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testCreateWithLocalSsd(self):
-    resources = [
-        self.MakeVCPUResourceCommitment(),
-        self.MakeMemoryResourceCommitment(),
-        self.MakeLocalSsdResourceCommitment()
-    ]
-    self.Run("""
-        compute commitments create pledge
-        --plan 12-month
-        --resources vcpu=500,memory=12,local-ssd=1
-        --region erech-stone
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionCommitments, 'Insert',
-          self.messages.ComputeRegionCommitmentsInsertRequest(
-              commitment=self.MakeCommitment(resource_commitments=resources),
-              project='my-project',
-              region='erech-stone',
-          ))])
-
-  def testCreateWithAllResources(self):
-    resources = [
-        self.MakeVCPUResourceCommitment(),
-        self.MakeMemoryResourceCommitment(),
-        self.MakeLocalSsdResourceCommitment(),
-        self.MakeAcceleratorResourceCommitment(),
-    ]
-    self.Run("""
-        compute commitments create pledge
-        --plan 12-month
-        --resources vcpu=500,memory=12,local-ssd=1
-        --resources-accelerator count=3,type=ace-type
-        --region erech-stone
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionCommitments, 'Insert',
-          self.messages.ComputeRegionCommitmentsInsertRequest(
-              commitment=self.MakeCommitment(resource_commitments=resources),
-              project='my-project',
-              region='erech-stone',
-          ))])
-
   def testCreateWithReservation(self):
     commitment = self.MakeCommitment(
         reservations=[self.MakeReservation('my-reservation')])
@@ -265,11 +215,55 @@ class CommitmentsCreateTestBeta(CommitmentsCreateTestGA):
           ))],)
 
 
-class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta,
-                                 parameterized.TestCase):
+class CommitmentsCreateTestBeta(CommitmentsCreateTestGA,
+                                parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreateWithLocalSsd(self):
+    resources = [
+        self.MakeVCPUResourceCommitment(),
+        self.MakeMemoryResourceCommitment(),
+        self.MakeLocalSsdResourceCommitment()
+    ]
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources vcpu=500,memory=12,local-ssd=1
+        --region erech-stone
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments, 'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=self.MakeCommitment(resource_commitments=resources),
+              project='my-project',
+              region='erech-stone',
+          ))])
+
+  def testCreateWithAllResources(self):
+    resources = [
+        self.MakeVCPUResourceCommitment(),
+        self.MakeMemoryResourceCommitment(),
+        self.MakeLocalSsdResourceCommitment(),
+        self.MakeAcceleratorResourceCommitment(),
+    ]
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources vcpu=500,memory=12,local-ssd=1
+        --resources-accelerator count=3,type=ace-type
+        --region erech-stone
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments, 'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=self.MakeCommitment(resource_commitments=resources),
+              project='my-project',
+              region='erech-stone',
+          ))])
 
   @parameterized.named_parameters(
       ('DefaultSpecified', '--type general-purpose', 'GENERAL_PURPOSE'),
@@ -297,6 +291,12 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta,
           )
          )],
     )
+
+
+class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

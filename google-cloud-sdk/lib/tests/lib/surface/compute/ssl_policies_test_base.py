@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ class SslPoliciesTestBase(sdk_test_base.WithFakeAuth,
   def ExpectInsertRequest(self,
                           ssl_policy_ref,
                           ssl_policy,
-                          response=None,
+                          response,
                           exception=None):
     """Expects the SSL policy Insert request to be invoked."""
     request = self.messages.ComputeSslPoliciesInsertRequest(

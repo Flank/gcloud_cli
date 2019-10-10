@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute os-config patch-jobs list [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+        [--limit=LIMIT; default=10] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -15,10 +15,10 @@ LIST COMMAND FLAGS
         This flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
-     --limit=LIMIT
-        Maximum number of resources to list. The default is unlimited. This
-        flag interacts with other flags that are applied in this order:
-        --flatten, --sort-by, --filter, --limit.
+     --limit=LIMIT; default=10
+        Maximum number of resources to list. The default is 10. This flag
+        interacts with other flags that are applied in this order: --flatten,
+        --sort-by, --filter, --limit.
 
      --page-size=PAGE_SIZE
         Some services group resource list output into pages. This flag
@@ -51,7 +51,6 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

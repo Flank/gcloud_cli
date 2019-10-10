@@ -6,7 +6,7 @@ summary:
       ml video detect-labels gs://do-not-delete-ml-video-test/toy.mp4
       --format="value(@type)"
   - progress_tracker:
-    - message: Waiting for operation [$$operation-id$$] to complete
+    - message: Waiting for operation [$$operation-name$$] to complete
     - status: SUCCESS
   - stdout: |
       type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
@@ -37,16 +37,16 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-east1.6600132925222558946
+            name: projects/462803083913/locations/us-east1/operations/7790247678687925769
         expect_response:
           extract_references:
           - field: name
-            reference: operation-id
+            reference: operation-name
           body:
             json: {}
     - api_call:
         expect_request:
-          uri: https://videointelligence.googleapis.com/v1/operations/$$operation-id$$?alt=json
+          uri: https://videointelligence.googleapis.com/v1/$$operation-name$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -57,7 +57,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-east1.6600132925222558946
+            name: projects/462803083913/locations/us-east1/operations/7790247678687925769
             metadata:
               '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress
               annotationProgress:
@@ -150,7 +150,7 @@ actions:
                     confidence: 0.925718
         repeatable: true
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-id$$] to complete
+        message: Waiting for operation [$$operation-name$$] to complete
         status: SUCCESS
     - expect_stdout: |
         type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse

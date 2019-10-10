@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as api_mock
-from googlecloudsdk.api_lib.compute.os_config import osconfig_utils
+from googlecloudsdk.api_lib.compute.os_config import utils as osconfig_api_utils
+from googlecloudsdk.command_lib.compute.os_config import utils as osconfig_command_utils
 from tests.lib import cli_test_base
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
@@ -33,33 +34,38 @@ class OsConfigBaseTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     """Overrides."""
     return 'my-project'
 
-  def SetUpMockApis(self, release_track):
-    self.messages = osconfig_utils.GetClientMessages(release_track)
+  def SetUpMockApis(self, release_track, api_version_override=None):
+    self.messages = osconfig_api_utils.GetClientMessages(
+        release_track, api_version_override)
     self.mock_osconfig_client = api_mock.Client(
-        osconfig_utils.GetClientClass(release_track),
-        real_client=osconfig_utils.GetClientInstance(release_track))
+        osconfig_api_utils.GetClientClass(release_track, api_version_override),
+        real_client=osconfig_api_utils.GetClientInstance(
+            release_track, api_version_override))
     self.mock_osconfig_client.Mock()
     self.addCleanup(self.mock_osconfig_client.Unmock)
 
-  def CreatePatchJob(self,
-                     project,
-                     name,
-                     filter='id=*',
-                     description=None,
-                     dry_run=False,
-                     duration=None,
-                     patch_config=None,
-                     state=None):
+  def CreatePatchJob(
+      self,
+      project,
+      name,
+      filter='id=*',
+      description=None,
+      dry_run=False,
+      duration=None,
+      patch_config=None,
+      state=None,
+  ):
     return self.messages.PatchJob(
-        name=osconfig_utils.GetPatchJobUriPath(project, name),
+        name=osconfig_command_utils.GetPatchJobUriPath(project, name),
         filter=filter,
         description=description,
         dryRun=dry_run,
         duration=duration,
         patchConfig=patch_config,
         state=state,
-        instanceDetailsSummary=self.messages.InstanceDetailsSummary(
-            instancesSucceeded=1))
+        instanceDetailsSummary=self.messages.PatchJobInstanceDetailsSummary(
+            instancesSucceeded=1),
+    )
 
 
 class OsConfigE2EBaseTest(e2e_test_base.BaseTest):

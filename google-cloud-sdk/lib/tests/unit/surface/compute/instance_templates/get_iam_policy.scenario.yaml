@@ -32,12 +32,19 @@ actions:
       BETA: beta
       ALPHA: alpha
 
+- define_reference:
+    reference: query-params
+    track_values:
+      GA: alt=json
+      BETA: alt=json&optionsRequestedPolicyVersion=3
+      ALPHA: alt=json&optionsRequestedPolicyVersion=3
+
 - execute_command:
     command: compute instance-templates get-iam-policy my-template
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?$$query-params$$
           method: GET
           body: null
         return_response:
@@ -58,7 +65,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?$$query-params$$
           method: GET
           body: null
         return_response:
@@ -100,7 +107,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?$$query-params$$
           method: GET
           body: null
         return_response:

@@ -11,7 +11,7 @@ gcloud alpha spanner databases execute\-sql \- executes a SQL query against a Cl
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha spanner databases execute\-sql\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-sql\fR=\fISQL\fR [\fB\-\-enable\-partitioned\-dml\fR] [\fB\-\-query\-mode\fR=\fIQUERY_MODE\fR;\ default="NORMAL"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha spanner databases execute\-sql\fR (\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-sql\fR=\fISQL\fR [\fB\-\-enable\-partitioned\-dml\fR] [\fB\-\-query\-mode\fR=\fIQUERY_MODE\fR;\ default="NORMAL"] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -89,6 +89,11 @@ rows.
 .sp
 
 
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR; default="10m"
+Maximum time to wait for the SQL query to complete. See $ gcloud topic datetimes
+for information on duration formats.
+
 
 .RE
 .sp
@@ -122,9 +127,8 @@ $ gcloud alpha spanner databases execute\-sql example\-database \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud spanner databases execute\-sql

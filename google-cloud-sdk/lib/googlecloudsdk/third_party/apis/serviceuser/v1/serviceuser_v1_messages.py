@@ -184,20 +184,6 @@ class AuthenticationRule(_messages.Message):
   selector = _messages.StringField(4)
 
 
-class AuthorizationConfig(_messages.Message):
-  r"""Configuration of authorization.  This section determines the
-  authorization provider, if unspecified, then no authorization check will be
-  done.  Example:      experimental:       authorization:         provider:
-  firebaserules.googleapis.com
-
-  Fields:
-    provider: The name of the authorization provider, such as
-      firebaserules.googleapis.com.
-  """
-
-  provider = _messages.StringField(1)
-
-
 class Backend(_messages.Message):
   r"""`Backend` defines the backend configuration for a service.
 
@@ -466,6 +452,10 @@ class Documentation(_messages.Message):
     rules: A list of documentation rules that apply to individual API
       elements.  **NOTE:** All service configuration rules follow "last one
       wins" order.
+    serviceRootUrl: Specifies the service root url if the default one (the
+      service name from the yaml file) is not suitable. This can be seen in
+      any fully specified service urls as well as sections that show a base
+      that other urls are relative to.
     summary: A short summary of what the service does. Can only be provided by
       plain text.
   """
@@ -474,7 +464,8 @@ class Documentation(_messages.Message):
   overview = _messages.StringField(2)
   pages = _messages.MessageField('Page', 3, repeated=True)
   rules = _messages.MessageField('DocumentationRule', 4, repeated=True)
-  summary = _messages.StringField(5)
+  serviceRootUrl = _messages.StringField(5)
+  summary = _messages.StringField(6)
 
 
 class DocumentationRule(_messages.Message):
@@ -582,17 +573,6 @@ class EnumValue(_messages.Message):
   name = _messages.StringField(1)
   number = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   options = _messages.MessageField('Option', 3, repeated=True)
-
-
-class Experimental(_messages.Message):
-  r"""Experimental service configuration. These configuration options can only
-  be used by whitelisted users.
-
-  Fields:
-    authorization: Authorization configuration.
-  """
-
-  authorization = _messages.MessageField('AuthorizationConfig', 1)
 
 
 class Field(_messages.Message):
@@ -1056,6 +1036,8 @@ class MetricDescriptor(_messages.Message):
   type's existing data unusable.
 
   Enums:
+    LaunchStageValueValuesEnum: Optional. The launch stage of the metric
+      definition.
     MetricKindValueValuesEnum: Whether the metric records instantaneous
       values, changes to a value, etc. Some combinations of `metric_kind` and
       `value_type` might not be supported.
@@ -1075,11 +1057,17 @@ class MetricDescriptor(_messages.Message):
       `appengine.googleapis.com/http/server/response_latencies` metric type
       has a label for the HTTP response code, `response_code`, so you can look
       at latencies for successful responses or just for responses that failed.
+    launchStage: Optional. The launch stage of the metric definition.
     metadata: Optional. Metadata which can be used to guide usage of the
       metric.
     metricKind: Whether the metric records instantaneous values, changes to a
       value, etc. Some combinations of `metric_kind` and `value_type` might
       not be supported.
+    monitoredResourceTypes: Read-only. If present, then a time series, which
+      is identified partially by a metric type and a
+      MonitoredResourceDescriptor, that is associated with this metric type
+      can only be associated with one of the monitored resource types listed
+      here.
     name: The resource name of the metric descriptor.
     type: The metric type, including its DNS name prefix. The type is not URL-
       encoded.  All user-defined metric types have the DNS name
@@ -1118,6 +1106,45 @@ class MetricDescriptor(_messages.Message):
       etc. Some combinations of `metric_kind` and `value_type` might not be
       supported.
   """
+
+  class LaunchStageValueValuesEnum(_messages.Enum):
+    r"""Optional. The launch stage of the metric definition.
+
+    Values:
+      LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
+      EARLY_ACCESS: Early Access features are limited to a closed group of
+        testers. To use these features, you must sign up in advance and sign a
+        Trusted Tester agreement (which includes confidentiality provisions).
+        These features may be unstable, changed in backward-incompatible ways,
+        and are not guaranteed to be released.
+      ALPHA: Alpha is a limited availability test for releases before they are
+        cleared for widespread use. By Alpha, all significant design issues
+        are resolved and we are in the process of verifying functionality.
+        Alpha customers need to apply for access, agree to applicable terms,
+        and have their projects whitelisted. Alpha releases don't have to be
+        feature complete, no SLAs are provided, and there are no technical
+        support obligations, but they will be far enough along that customers
+        can actually use them in test environments or for limited-use tests --
+        just like they would in normal production cases.
+      BETA: Beta is the point at which we are ready to open a release for any
+        customer to use. There are no SLA or technical support obligations in
+        a Beta release. Products will be complete from a feature perspective,
+        but may have some open outstanding issues. Beta releases are suitable
+        for limited production use cases.
+      GA: GA features are open to all developers and are considered stable and
+        fully qualified for production use.
+      DEPRECATED: Deprecated features are scheduled to be shut down and
+        removed. For more information, see the "Deprecation Policy" section of
+        our [Terms of Service](https://cloud.google.com/terms/) and the
+        [Google Cloud Platform Subject to the Deprecation
+        Policy](https://cloud.google.com/terms/deprecation) documentation.
+    """
+    LAUNCH_STAGE_UNSPECIFIED = 0
+    EARLY_ACCESS = 1
+    ALPHA = 2
+    BETA = 3
+    GA = 4
+    DEPRECATED = 5
 
   class MetricKindValueValuesEnum(_messages.Enum):
     r"""Whether the metric records instantaneous values, changes to a value,
@@ -1165,25 +1192,29 @@ class MetricDescriptor(_messages.Message):
   description = _messages.StringField(1)
   displayName = _messages.StringField(2)
   labels = _messages.MessageField('LabelDescriptor', 3, repeated=True)
-  metadata = _messages.MessageField('MetricDescriptorMetadata', 4)
-  metricKind = _messages.EnumField('MetricKindValueValuesEnum', 5)
-  name = _messages.StringField(6)
-  type = _messages.StringField(7)
-  unit = _messages.StringField(8)
-  valueType = _messages.EnumField('ValueTypeValueValuesEnum', 9)
+  launchStage = _messages.EnumField('LaunchStageValueValuesEnum', 4)
+  metadata = _messages.MessageField('MetricDescriptorMetadata', 5)
+  metricKind = _messages.EnumField('MetricKindValueValuesEnum', 6)
+  monitoredResourceTypes = _messages.StringField(7, repeated=True)
+  name = _messages.StringField(8)
+  type = _messages.StringField(9)
+  unit = _messages.StringField(10)
+  valueType = _messages.EnumField('ValueTypeValueValuesEnum', 11)
 
 
 class MetricDescriptorMetadata(_messages.Message):
   r"""Additional annotations that can be used to guide the usage of a metric.
 
   Enums:
-    LaunchStageValueValuesEnum: The launch stage of the metric definition.
+    LaunchStageValueValuesEnum: Deprecated. Must use the
+      MetricDescriptor.launch_stage instead.
 
   Fields:
     ingestDelay: The delay of data points caused by ingestion. Data points
       older than this age are guaranteed to be ingested and available to be
       read, excluding data loss due to errors.
-    launchStage: The launch stage of the metric definition.
+    launchStage: Deprecated. Must use the MetricDescriptor.launch_stage
+      instead.
     samplePeriod: The sampling period of metric data points. For metrics which
       are written periodically, consecutive data points are stored at this
       time interval, excluding data loss due to errors. Metrics with a higher
@@ -1191,7 +1222,7 @@ class MetricDescriptorMetadata(_messages.Message):
   """
 
   class LaunchStageValueValuesEnum(_messages.Enum):
-    r"""The launch stage of the metric definition.
+    r"""Deprecated. Must use the MetricDescriptor.launch_stage instead.
 
     Values:
       LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
@@ -1782,11 +1813,8 @@ class QuotaLimit(_messages.Message):
       set, the UI will provide a default display name based on the quota
       configuration. This field can be used to override the default display
       name generated from the configuration.
-    duration: Duration of this limit in textual notation. Example: "100s",
-      "24h", "1d". For duration longer than a day, only multiple of days is
-      supported. We support only "100s" and "1d" for now. Additional support
-      will be added in the future. "0" indicates indefinite duration.  Used by
-      group-based quotas only.
+    duration: Duration of this limit in textual notation. Must be "100s" or
+      "1d".  Used by group-based quotas only.
     freeTier: Free tier value displayed in the Developers Console for this
       limit. The free tier is the number of tokens that will be subtracted
       from the billed amount when billing is enabled. This field can only be
@@ -1911,7 +1939,6 @@ class Service(_messages.Message):
       included.  Enums which are not referenced but shall be included should
       be listed here by name. Example:      enums:     - name:
       google.someapi.v1.SomeEnum
-    experimental: Experimental configuration.
     http: HTTP configuration.
     id: A unique ID for a specific instance of this message, typically
       assigned by the client for tracking purpose. If empty, the server may
@@ -1957,23 +1984,22 @@ class Service(_messages.Message):
   documentation = _messages.MessageField('Documentation', 9)
   endpoints = _messages.MessageField('Endpoint', 10, repeated=True)
   enums = _messages.MessageField('Enum', 11, repeated=True)
-  experimental = _messages.MessageField('Experimental', 12)
-  http = _messages.MessageField('Http', 13)
-  id = _messages.StringField(14)
-  logging = _messages.MessageField('Logging', 15)
-  logs = _messages.MessageField('LogDescriptor', 16, repeated=True)
-  metrics = _messages.MessageField('MetricDescriptor', 17, repeated=True)
-  monitoredResources = _messages.MessageField('MonitoredResourceDescriptor', 18, repeated=True)
-  monitoring = _messages.MessageField('Monitoring', 19)
-  name = _messages.StringField(20)
-  producerProjectId = _messages.StringField(21)
-  quota = _messages.MessageField('Quota', 22)
-  sourceInfo = _messages.MessageField('SourceInfo', 23)
-  systemParameters = _messages.MessageField('SystemParameters', 24)
-  systemTypes = _messages.MessageField('Type', 25, repeated=True)
-  title = _messages.StringField(26)
-  types = _messages.MessageField('Type', 27, repeated=True)
-  usage = _messages.MessageField('Usage', 28)
+  http = _messages.MessageField('Http', 12)
+  id = _messages.StringField(13)
+  logging = _messages.MessageField('Logging', 14)
+  logs = _messages.MessageField('LogDescriptor', 15, repeated=True)
+  metrics = _messages.MessageField('MetricDescriptor', 16, repeated=True)
+  monitoredResources = _messages.MessageField('MonitoredResourceDescriptor', 17, repeated=True)
+  monitoring = _messages.MessageField('Monitoring', 18)
+  name = _messages.StringField(19)
+  producerProjectId = _messages.StringField(20)
+  quota = _messages.MessageField('Quota', 21)
+  sourceInfo = _messages.MessageField('SourceInfo', 22)
+  systemParameters = _messages.MessageField('SystemParameters', 23)
+  systemTypes = _messages.MessageField('Type', 24, repeated=True)
+  title = _messages.StringField(25)
+  types = _messages.MessageField('Type', 26, repeated=True)
+  usage = _messages.MessageField('Usage', 27)
 
 
 class ServiceuserProjectsServicesDisableRequest(_messages.Message):
@@ -2159,37 +2185,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.

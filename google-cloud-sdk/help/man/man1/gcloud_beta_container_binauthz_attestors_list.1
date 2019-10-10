@@ -15,12 +15,6 @@ gcloud beta container binauthz attestors list \- list Attestors associated with 
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR List Attestors associated with the current project.
-
-
-
 .SH "LIST COMMAND FLAGS"
 
 .RS 2m
@@ -71,12 +65,30 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To list attestors:
 
 .RS 2m
+$ gcloud beta container binauthz attestors list
+.RE
+
+To list attestors in a verbose format (including information about public keys
+associated with each attestor:
+
+.RS 2m
+$ gcloud beta container binauthz attestors list \-\-format=yaml
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container binauthz attestors list
 $ gcloud alpha container binauthz attestors list
 .RE
 

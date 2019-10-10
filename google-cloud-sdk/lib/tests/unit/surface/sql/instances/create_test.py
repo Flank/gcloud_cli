@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -232,6 +232,11 @@ NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PR
 create-replica1  MYSQL_5_7         us-west1 db-n1-standard-2  0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
+    # Ensure that the CMEK message doesn't show up by default.
+    self.AssertErrNotContains(
+        'Your replica will be encrypted with the master instance\'s '
+        'customer-managed encryption key. If anyone destroys this key, all '
+        'data encrypted with it will be permanently lost.')
 
   def testCreateReadReplicaOverridingTier(self):
     # This test ensures that the user is able to specify a tier different than
@@ -270,6 +275,42 @@ NAME             DATABASE_VERSION  LOCATION TIER              PRIMARY_ADDRESS PR
 create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0         -               RUNNABLE
 """,
         normalize_space=True)
+
+  def testCreateReadReplicaWithCmek(self):
+    # This test ensures that a warning shows up when a replica of a instance
+    # with a customer-managed encryption key is being created.
+
+    master_diff = {
+        'name':
+            'create-instance1',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(kmsKeyName='some-key'),
+        'settings': {
+            'replicationType': 'ASYNCHRONOUS'
+        },
+        'databaseVersion':
+            'MYSQL_5_7',
+    }
+    replica_diff = {
+        'name': 'create-replica1',
+        'settings': {
+            'replicationType': 'ASYNCHRONOUS',
+        },
+        'databaseVersion': 'MYSQL_5_7',
+        'masterInstanceName': 'create-instance1'
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+
+    self.Run('sql instances create create-replica1 --master-instance-name '
+             'create-instance1')
+    # Ensure that the CMEK message is showing up.
+    self.AssertErrContains(
+        'Your replica will be encrypted with the master instance\'s '
+        'customer-managed encryption key. If anyone destroys this key, all '
+        'data encrypted with it will be permanently lost.')
 
   def testCreateNoMaster(self):
     self.mocked_client.instances.Get.Expect(
@@ -523,11 +564,6 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
     self.Run('sql instances create custom-instance1 '
              '--database-version=POSTGRES_9_6 --memory=1024MiB --cpu=1 '
              '--availability-type=REGIONAL')
-
-  def testMySQLHighAvailabilityError(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run('sql instances create custom-instance1 '
-               '--database-version=MYSQL_5_7 --availability-type=REGIONAL')
 
   # TODO(b/122660263): Remove when V1 instances are no longer supported.
   def testV1WarningAndPrompt(self):
@@ -867,7 +903,7 @@ class _BaseInstancesCreateBetaTest(_BaseInstancesCreateTest):
                     ipv4Enabled=None,
                     requireSsl=None,
                     privateNetwork=(
-                        'https://www.googleapis.com/compute/v1/projects/'
+                        'https://compute.googleapis.com/compute/v1/projects/'
                         'fake-project/global/networks/somenetwork')),
             'tier':
                 'D1'
@@ -887,6 +923,13 @@ create-instance1  MYSQL_5_7         us-central  D1    -               -         
 """,
         normalize_space=True)
 
+  def testCreateSqlServerWithoutRootPassword(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.RequiredArgumentException, r'Missing required argument '
+        r'\[--root-password\]'):
+      self.Run('sql instances create some-instance '
+               '--database-version=SQLSERVER_2017_STANDARD')
+
 
 class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
                               base.SqlMockTestBeta):
@@ -896,8 +939,38 @@ class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
 class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
                                base.SqlMockTestAlpha):
 
-  pass
+  def testCreateWithEncryptionKey(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    key = 'projects/example/locations/us-central1/keyRings/somekey/cryptoKeys/a'
+    diff = {
+        'name':
+            'create-instance1',
+        'region':
+            'us-central1',
+        'settings': {
+            'tier': 'db-n1-standard-1'
+        },
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(kmsKeyName=key)
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV1Instance(), diff)
 
+    self.Run('sql instances create create-instance1 --region=us-central1 '
+             '--disk-encryption-key="{}"'.format(key))
+    # Check that the CMEK prompt was displayed.
+    self.assertEqual(prompt_mock.call_count, 1)
+    self.AssertErrContains(
+        'You are creating a Cloud SQL instance encrypted with a '
+        'customer-managed key. If anyone destroys a customer-managed key, all '
+        'data encrypted with it will be permanently lost.')
+
+  def testCreateWithInvalidEncryptionKey(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run('sql instances create custom-instance1 --region=us-central1 '
+               '--disk-encryption-key=projects/whatever')
 
 if __name__ == '__main__':
   test_case.main()

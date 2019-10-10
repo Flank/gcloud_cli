@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,19 +23,16 @@ import re
 
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class SetIamPolicyTest(base.SpannerTestBase):
+class SetIamPolicyTestGA(base.SpannerTestBase):
 
   def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
     self.database_ref = resources.REGISTRY.Parse(
         'dbId',
         params={
@@ -46,19 +43,18 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
-                role='roles/spanner.databaseAdmin',
-                members=['domain:foo.com']), self.msgs.Binding(
-                    role='roles/spanner.viewer',
-                    members=['user:admin@foo.com'])
+                role='roles/spanner.databaseAdmin', members=['domain:foo.com']),
+            self.msgs.Binding(
+                role='roles/spanner.viewer', members=['user:admin@foo.com'])
         ],
         etag=b'someUniqueEtag',
         version=1)
     json = encoding.MessageToJson(self.policy)
     self.temp_file = self.Touch(self.temp_path, contents=json)
 
-  def testSetIamPolicy(self, track):
-    self.track = track
+  def testSetIamPolicy(self):
     set_request = self.msgs.SetIamPolicyRequest(policy=self.policy)
+    set_request.policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
     self.client.projects_instances_databases.SetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesSetIamPolicyRequest(
             resource=self.database_ref.RelativeName(),
@@ -70,9 +66,9 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.assertEqual(set_policy_request, self.policy)
     self.AssertErrContains('Updated IAM policy for database [dbId].')
 
-  def testSetIamPolicyWithDefaultInstance(self, track):
-    self.track = track
+  def testSetIamPolicyWithDefaultInstance(self):
     set_request = self.msgs.SetIamPolicyRequest(policy=self.policy)
+    set_request.policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION
     self.client.projects_instances_databases.SetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesSetIamPolicyRequest(
             resource=self.database_ref.RelativeName(),
@@ -84,8 +80,7 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.assertEqual(set_policy_request, self.policy)
     self.AssertErrContains('Updated IAM policy for database [dbId].')
 
-  def testBadJsonOrYamlSetIamPolicyProject(self, track):
-    self.track = track
+  def testBadJsonOrYamlSetIamPolicyProject(self):
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')
 
     with self.AssertRaisesExceptionRegexp(
@@ -94,8 +89,7 @@ class SetIamPolicyTest(base.SpannerTestBase):
           'spanner databases set-iam-policy dbId {0} --instance=insId'.format(
               temp_file))
 
-  def testBadJsonSetIamPolicyProject(self, track):
-    self.track = track
+  def testBadJsonSetIamPolicyProject(self):
     temp_file = os.path.join(self.temp_path, 'doesnotexist')
 
     with self.AssertRaisesExceptionRegexp(
@@ -104,3 +98,15 @@ class SetIamPolicyTest(base.SpannerTestBase):
       self.Run(
           'spanner databases set-iam-policy dbId {0} --instance=insId'.format(
               temp_file))
+
+
+class SetIamPolicyTestBeta(SetIamPolicyTestGA):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SetIamPolicyTestAlpha(SetIamPolicyTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

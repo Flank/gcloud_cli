@@ -11,14 +11,15 @@ gcloud alpha compute forwarding\-rules update \- update a Google Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute forwarding\-rules update\fR \fINAME\fR [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute forwarding\-rules update\fR \fINAME\fR [\fB\-\-allow\-global\-access\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute forwarding\-rules update\fR updates labels
-and network tier for a Google Compute Engine forwarding rule.
+\fB(ALPHA)\fR \fBgcloud alpha compute forwarding\-rules update\fR updates
+labels, global access and network tier for a Google Compute Engine forwarding
+rule.
 
 Example to update labels:
 
@@ -61,6 +62,13 @@ Name of the forwarding rule to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-allow\-global\-access\fR
+If True, then clients from all regions can access this internal forwarding rule.
+This can only be specified for forwarding rules with the LOAD_BALANCING_SCHEME
+set to INTERNAL and the target must be either a backend service or a target
+instance.
+
 .TP 2m
 \fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
 Update the network tier of a forwarding rule. It does not allow to change from
@@ -160,9 +168,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
 
 .RS 2m
 $ gcloud beta compute forwarding\-rules update

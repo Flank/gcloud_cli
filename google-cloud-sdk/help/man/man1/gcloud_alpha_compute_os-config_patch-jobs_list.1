@@ -11,7 +11,7 @@ gcloud alpha compute os\-config patch\-jobs list \- list ongoing and completed p
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute os\-config patch\-jobs list\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute os\-config patch\-jobs list\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=10] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,8 +27,8 @@ interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
-\fB\-\-limit\fR=\fILIMIT\fR
-Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+\fB\-\-limit\fR=\fILIMIT\fR; default=10
+Maximum number of resources to list. The default is \fB10\fR. This flag
 interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
@@ -79,7 +79,6 @@ $ gcloud alpha compute os\-config patch\-jobs list
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

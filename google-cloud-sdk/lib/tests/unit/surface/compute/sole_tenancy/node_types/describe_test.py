@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class NodeTypesDescribeTest(test_base.BaseTest):
     localSsdGb: 0
     memoryMb: 256
     name: iAPX-286
-    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/\
+    selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/\
 zone-1/nodeTypes/iAPX-286
     zone: zone-1
     """,

@@ -11,7 +11,7 @@ gcloud alpha scc assets run\-discovery \- scan an organization for new/modified/
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scc assets run\-discovery\fR \fIORGANIZATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scc assets run\-discovery\fR [\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,11 +29,11 @@ called too frequently the caller will receive a TOO_MANY_REQUESTS error.
 .TP 2m
 
 Organization resource \- The organization for which scan should be run. This
-represents a Cloud resource. This must be specified.
+represents a Cloud resource.
 
 .RS 2m
 .TP 2m
-\fIORGANIZATION\fR
+[\fIORGANIZATION\fR]
 ID of the organization or fully qualified identifier for the organization.
 
 
@@ -73,7 +73,6 @@ $ gcloud alpha scc assets run\-discovery 123456
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

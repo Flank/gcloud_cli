@@ -1,0 +1,531 @@
+title: guest-policies lookup.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute os-config guest-policies lookup instance-no-inventory --zone us-central1-f --project my-project
+  - stdout: |
+      +----------------------------------------------------------------------------------------------------------+
+      |                                                 PACKAGES                                                 |
+      +---------------------------------------------------+------------------+---------------+---------+---------+
+      |                       SOURCE                      |       NAME       | DESIRED_STATE | MANAGER | VERSION |
+      +---------------------------------------------------+------------------+---------------+---------+---------+
+      | projects/my-project/guestPolicies/my-guest-policy | google-cloud-sdk | INSTALLED     |         |         |
+      | projects/my-project/guestPolicies/my-guest-policy | another-package  | REMOVED       |         |         |
+      +---------------------------------------------------+------------------+---------------+---------+---------+
+      +---------------------------------------------------+
+      |                PACKAGE REPOSITORIES               |
+      +---------------------------------------------------+
+      |                       SOURCE                      |
+      +---------------------------------------------------+
+      | projects/my-project/guestPolicies/my-guest-policy |
+      +---------------------------------------------------+
+          +-------------------------------------------------------------------------------------+
+          |                                         YUM                                         |
+          +------------------+------------------------------------------------------------------+
+          |        ID        |                             BASE_URL                             |
+          +------------------+------------------------------------------------------------------+
+          | google-cloud-sdk | https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64 |
+          +------------------+------------------------------------------------------------------+
+      +---------------------------------------------------+
+      | projects/my-project/guestPolicies/my-guest-policy |
+      +---------------------------------------------------+
+          +----------------------------------------------------------------------+
+          |                                 APT                                  |
+          +--------------------------------------+------------------+------------+
+          |                 URI                  |   DISTRIBUTION   | COMPONENTS |
+          +--------------------------------------+------------------+------------+
+          | http://packages.cloud.google.com/apt | cloud-sdk-streth | main       |
+          +--------------------------------------+------------------+------------+
+      +----------------------------------------------------------------------------------------------------+
+      |                                          SOFTWARE RECIPES                                          |
+      +---------------------------------------------------+----------------------+---------+---------------+
+      |                       SOURCE                      |         NAME         | VERSION | DESIRED_STATE |
+      +---------------------------------------------------+----------------------+---------+---------------+
+      | projects/my-project/guestPolicies/my-guest-policy | test-software-recipe | 1.2.3   | INSTALLED     |
+      +---------------------------------------------------+----------------------+---------+---------------+
+- execute:
+  - command: |
+      compute os-config guest-policies lookup instance-with-inventory --zone us-central1-f --project my-project
+  - stdout: |
+      +----------------------------------------------------------------------------------------------------------+
+      |                                                 PACKAGES                                                 |
+      +---------------------------------------------------+------------------+---------------+---------+---------+
+      |                       SOURCE                      |       NAME       | DESIRED_STATE | MANAGER | VERSION |
+      +---------------------------------------------------+------------------+---------------+---------+---------+
+      | projects/my-project/guestPolicies/my-guest-policy | google-cloud-sdk | INSTALLED     |         |         |
+      | projects/my-project/guestPolicies/my-guest-policy | another-package  | REMOVED       |         |         |
+      +---------------------------------------------------+------------------+---------------+---------+---------+
+      +---------------------------------------------------+
+      |                PACKAGE REPOSITORIES               |
+      +---------------------------------------------------+
+      |                       SOURCE                      |
+      +---------------------------------------------------+
+      | projects/my-project/guestPolicies/my-guest-policy |
+      +---------------------------------------------------+
+          +-------------------------------------------------------------------------------------+
+          |                                         YUM                                         |
+          +------------------+------------------------------------------------------------------+
+          |        ID        |                             BASE_URL                             |
+          +------------------+------------------------------------------------------------------+
+          | google-cloud-sdk | https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64 |
+          +------------------+------------------------------------------------------------------+
+      +---------------------------------------------------+
+      | projects/my-project/guestPolicies/my-guest-policy |
+      +---------------------------------------------------+
+          +----------------------------------------------------------------------+
+          |                                 APT                                  |
+          +--------------------------------------+------------------+------------+
+          |                 URI                  |   DISTRIBUTION   | COMPONENTS |
+          +--------------------------------------+------------------+------------+
+          | http://packages.cloud.google.com/apt | cloud-sdk-streth | main       |
+          +--------------------------------------+------------------+------------+
+      +----------------------------------------------------------------------------------------------------+
+      |                                          SOFTWARE RECIPES                                          |
+      +---------------------------------------------------+----------------------+---------+---------------+
+      |                       SOURCE                      |         NAME         | VERSION | DESIRED_STATE |
+      +---------------------------------------------------+----------------------+---------+---------------+
+      | projects/my-project/guestPolicies/my-guest-policy | test-software-recipe | 1.2.3   | INSTALLED     |
+      +---------------------------------------------------+----------------------+---------+---------------+
+- execute:
+  - command: |
+      compute os-config guest-policies lookup instance-with-inventory --zone us-central1-f --project my-project --format json
+  - stdout: |
+      {
+        "packageRepositories": [
+          {
+            "packageRepository": {
+              "yum": {
+                "baseUrl": "https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64",
+                "displayName": "Google Cloud SDK",
+                "gpgKeys": [
+                  "https://packages.cloud.google.com/yum/doc/yum-key.gpg"
+                ],
+                "id": "google-cloud-sdk"
+              }
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          },
+          {
+            "packageRepository": {
+              "apt": {
+                "archiveType": "DEB",
+                "components": [
+                  "main"
+                ],
+                "distribution": "cloud-sdk-streth",
+                "uri": "http://packages.cloud.google.com/apt"
+              }
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          }
+        ],
+        "packages": [
+          {
+            "package": {
+              "desiredState": "INSTALLED",
+              "name": "google-cloud-sdk"
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          },
+          {
+            "package": {
+              "desiredState": "REMOVED",
+              "name": "another-package"
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          }
+        ],
+        "softwareRecipes": [
+          {
+            "softwareRecipe": {
+              "desiredState": "INSTALLED",
+              "name": "test-software-recipe",
+              "version": "1.2.3"
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          }
+        ]
+      }
+- execute:
+  - command: |
+      compute os-config guest-policies lookup instance-no-policy --zone us-central1-f --project my-project
+  - stderr: |
+      No effective guest policy found for [projects/my-project/zones/us-central1-f/instances/instance-no-policy].
+actions:
+- define_reference:
+    reference: compute-uri
+    value: compute.googleapis.com/compute
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+- define_reference:
+    reference: guest-attributes
+    value: |
+      {
+        "queryPath": "guestInventory/",
+        "queryValue": {
+          "items": [
+            {
+              "key": "Architecture",
+              "namespace": "guestInventory/",
+              "value": "x86_64"
+            },
+            {
+              "key": "ShortName",
+              "namespace": "guestInventory/",
+              "value": "debian"
+            },
+            {
+              "key": "Version",
+              "namespace": "guestInventory/",
+              "value": "8"
+            }
+          ]
+        }
+      }
+- define_reference:
+    reference: guest-configs
+    value: |
+      {
+        "packageRepositories": [
+          {
+            "packageRepository": {
+              "yum": {
+                "baseUrl": "https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64",
+                "displayName": "Google Cloud SDK",
+                "gpgKeys": [
+                  "https://packages.cloud.google.com/yum/doc/yum-key.gpg"
+                ],
+                "id": "google-cloud-sdk"
+              }
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          },
+          {
+            "packageRepository": {
+              "apt": {
+                "archiveType": "DEB",
+                "components": [
+                  "main"
+                ],
+                "distribution": "cloud-sdk-streth",
+                "uri": "http://packages.cloud.google.com/apt"
+              }
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          }
+        ],
+        "packages": [
+          {
+            "package": {
+              "name": "google-cloud-sdk",
+              "desiredState": "INSTALLED"
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          },
+          {
+            "package": {
+              "name": "another-package",
+              "desiredState": "REMOVED"
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          }
+        ],
+        "softwareRecipes": [
+          {
+            "softwareRecipe": {
+              "name": "test-software-recipe",
+              "version": "1.2.3",
+              "desiredState": "INSTALLED"
+            },
+            "source": "projects/my-project/guestPolicies/my-guest-policy"
+          }
+        ]
+      }
+- execute_command:
+    command: |
+      compute os-config guest-policies lookup instance-no-inventory --zone us-central1-f --project my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/my-project/zones/us-central1-f/instances/instance-no-inventory/getGuestAttributes?alt=json&queryPath=guestInventory%2F
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - error
+          headers:
+            cache-control: private, max-age=0
+            content-length: '289'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body: |
+            {
+              "error": {
+                "errors": [
+                  {
+                    "domain": "global",
+                    "reason": "notFound",
+                    "message": "The resource 'guestInventory/' of type 'Guest Attribute' was not found."
+                  }
+                ],
+                "code": 404,
+                "message": "The resource 'guestInventory/' of type 'Guest Attribute' was not found."
+              }
+            }
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/zones/us-central1-f/instances/instance-no-inventory:lookupGuestPolicies?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$guest-configs$$
+    - expect_stdout: |
+        +----------------------------------------------------------------------------------------------------------+
+        |                                                 PACKAGES                                                 |
+        +---------------------------------------------------+------------------+---------------+---------+---------+
+        |                       SOURCE                      |       NAME       | DESIRED_STATE | MANAGER | VERSION |
+        +---------------------------------------------------+------------------+---------------+---------+---------+
+        | projects/my-project/guestPolicies/my-guest-policy | google-cloud-sdk | INSTALLED     |         |         |
+        | projects/my-project/guestPolicies/my-guest-policy | another-package  | REMOVED       |         |         |
+        +---------------------------------------------------+------------------+---------------+---------+---------+
+        +---------------------------------------------------+
+        |                PACKAGE REPOSITORIES               |
+        +---------------------------------------------------+
+        |                       SOURCE                      |
+        +---------------------------------------------------+
+        | projects/my-project/guestPolicies/my-guest-policy |
+        +---------------------------------------------------+
+            +-------------------------------------------------------------------------------------+
+            |                                         YUM                                         |
+            +------------------+------------------------------------------------------------------+
+            |        ID        |                             BASE_URL                             |
+            +------------------+------------------------------------------------------------------+
+            | google-cloud-sdk | https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64 |
+            +------------------+------------------------------------------------------------------+
+        +---------------------------------------------------+
+        | projects/my-project/guestPolicies/my-guest-policy |
+        +---------------------------------------------------+
+            +----------------------------------------------------------------------+
+            |                                 APT                                  |
+            +--------------------------------------+------------------+------------+
+            |                 URI                  |   DISTRIBUTION   | COMPONENTS |
+            +--------------------------------------+------------------+------------+
+            | http://packages.cloud.google.com/apt | cloud-sdk-streth | main       |
+            +--------------------------------------+------------------+------------+
+        +----------------------------------------------------------------------------------------------------+
+        |                                          SOFTWARE RECIPES                                          |
+        +---------------------------------------------------+----------------------+---------+---------------+
+        |                       SOURCE                      |         NAME         | VERSION | DESIRED_STATE |
+        +---------------------------------------------------+----------------------+---------+---------------+
+        | projects/my-project/guestPolicies/my-guest-policy | test-software-recipe | 1.2.3   | INSTALLED     |
+        +---------------------------------------------------+----------------------+---------+---------------+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config guest-policies lookup instance-with-inventory --zone us-central1-f --project my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/my-project/zones/us-central1-f/instances/instance-with-inventory/getGuestAttributes?alt=json&queryPath=guestInventory%2F
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$guest-attributes$$
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/zones/us-central1-f/instances/instance-with-inventory:lookupGuestPolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              osArchitecture: x86_64
+              osShortName: debian
+              osVersion: '8'
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$guest-configs$$
+    - expect_stdout: |
+        +----------------------------------------------------------------------------------------------------------+
+        |                                                 PACKAGES                                                 |
+        +---------------------------------------------------+------------------+---------------+---------+---------+
+        |                       SOURCE                      |       NAME       | DESIRED_STATE | MANAGER | VERSION |
+        +---------------------------------------------------+------------------+---------------+---------+---------+
+        | projects/my-project/guestPolicies/my-guest-policy | google-cloud-sdk | INSTALLED     |         |         |
+        | projects/my-project/guestPolicies/my-guest-policy | another-package  | REMOVED       |         |         |
+        +---------------------------------------------------+------------------+---------------+---------+---------+
+        +---------------------------------------------------+
+        |                PACKAGE REPOSITORIES               |
+        +---------------------------------------------------+
+        |                       SOURCE                      |
+        +---------------------------------------------------+
+        | projects/my-project/guestPolicies/my-guest-policy |
+        +---------------------------------------------------+
+            +-------------------------------------------------------------------------------------+
+            |                                         YUM                                         |
+            +------------------+------------------------------------------------------------------+
+            |        ID        |                             BASE_URL                             |
+            +------------------+------------------------------------------------------------------+
+            | google-cloud-sdk | https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64 |
+            +------------------+------------------------------------------------------------------+
+        +---------------------------------------------------+
+        | projects/my-project/guestPolicies/my-guest-policy |
+        +---------------------------------------------------+
+            +----------------------------------------------------------------------+
+            |                                 APT                                  |
+            +--------------------------------------+------------------+------------+
+            |                 URI                  |   DISTRIBUTION   | COMPONENTS |
+            +--------------------------------------+------------------+------------+
+            | http://packages.cloud.google.com/apt | cloud-sdk-streth | main       |
+            +--------------------------------------+------------------+------------+
+        +----------------------------------------------------------------------------------------------------+
+        |                                          SOFTWARE RECIPES                                          |
+        +---------------------------------------------------+----------------------+---------+---------------+
+        |                       SOURCE                      |         NAME         | VERSION | DESIRED_STATE |
+        +---------------------------------------------------+----------------------+---------+---------------+
+        | projects/my-project/guestPolicies/my-guest-policy | test-software-recipe | 1.2.3   | INSTALLED     |
+        +---------------------------------------------------+----------------------+---------+---------------+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config guest-policies lookup instance-with-inventory --zone us-central1-f --project my-project --format json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/my-project/zones/us-central1-f/instances/instance-with-inventory/getGuestAttributes?alt=json&queryPath=guestInventory%2F
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$guest-attributes$$
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/zones/us-central1-f/instances/instance-with-inventory:lookupGuestPolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              osArchitecture: x86_64
+              osShortName: debian
+              osVersion: '8'
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$guest-configs$$
+    - expect_stdout: |
+        {
+          "packageRepositories": [
+            {
+              "packageRepository": {
+                "yum": {
+                  "baseUrl": "https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64",
+                  "displayName": "Google Cloud SDK",
+                  "gpgKeys": [
+                    "https://packages.cloud.google.com/yum/doc/yum-key.gpg"
+                  ],
+                  "id": "google-cloud-sdk"
+                }
+              },
+              "source": "projects/my-project/guestPolicies/my-guest-policy"
+            },
+            {
+              "packageRepository": {
+                "apt": {
+                  "archiveType": "DEB",
+                  "components": [
+                    "main"
+                  ],
+                  "distribution": "cloud-sdk-streth",
+                  "uri": "http://packages.cloud.google.com/apt"
+                }
+              },
+              "source": "projects/my-project/guestPolicies/my-guest-policy"
+            }
+          ],
+          "packages": [
+            {
+              "package": {
+                "desiredState": "INSTALLED",
+                "name": "google-cloud-sdk"
+              },
+              "source": "projects/my-project/guestPolicies/my-guest-policy"
+            },
+            {
+              "package": {
+                "desiredState": "REMOVED",
+                "name": "another-package"
+              },
+              "source": "projects/my-project/guestPolicies/my-guest-policy"
+            }
+          ],
+          "softwareRecipes": [
+            {
+              "softwareRecipe": {
+                "desiredState": "INSTALLED",
+                "name": "test-software-recipe",
+                "version": "1.2.3"
+              },
+              "source": "projects/my-project/guestPolicies/my-guest-policy"
+            }
+          ]
+        }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute os-config guest-policies lookup instance-no-policy --zone us-central1-f --project my-project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/v1/projects/my-project/zones/us-central1-f/instances/instance-no-policy/getGuestAttributes?alt=json&queryPath=guestInventory%2F
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            $$guest-attributes$$
+    - api_call:
+        expect_request:
+          uri: https://osconfig.googleapis.com/$$api-version$$/projects/my-project/zones/us-central1-f/instances/instance-no-policy:lookupGuestPolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              osArchitecture: x86_64
+              osShortName: debian
+              osVersion: '8'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "packageRepositories": [],
+              "packages": [],
+              "softwareRecipes": []
+            }
+    - expect_stderr: |
+        No effective guest policy found for [projects/my-project/zones/us-central1-f/instances/instance-no-policy].
+    - expect_exit:
+        code: 0

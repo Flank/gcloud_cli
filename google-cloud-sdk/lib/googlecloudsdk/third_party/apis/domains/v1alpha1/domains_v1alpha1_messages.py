@@ -23,16 +23,16 @@ class AuditConfig(_messages.Message):
   multiple AuditConfigs:      {       "audit_configs": [         {
   "service": "allServices"           "audit_log_configs": [             {
   "log_type": "DATA_READ",               "exempted_members": [
-  "user:foo@gmail.com"               ]             },             {
+  "user:jose@example.com"               ]             },             {
   "log_type": "DATA_WRITE",             },             {
   "log_type": "ADMIN_READ",             }           ]         },         {
-  "service": "fooservice.googleapis.com"           "audit_log_configs": [
+  "service": "sampleservice.googleapis.com"           "audit_log_configs": [
   {               "log_type": "DATA_READ",             },             {
   "log_type": "DATA_WRITE",               "exempted_members": [
-  "user:bar@gmail.com"               ]             }           ]         }
-  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
-  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
-  and bar@gmail.com from DATA_WRITE logging.
+  "user:aliya@example.com"               ]             }           ]         }
+  ]     }  For sampleservice, this policy enables DATA_READ, DATA_WRITE and
+  ADMIN_READ logging. It also exempts jose@example.com from DATA_READ logging,
+  and aliya@example.com from DATA_WRITE logging.
 
   Fields:
     auditLogConfigs: The configuration for logging of each type of permission.
@@ -50,10 +50,10 @@ class AuditConfig(_messages.Message):
 class AuditLogConfig(_messages.Message):
   r"""Provides the configuration for logging a type of permissions. Example:
   {       "audit_log_configs": [         {           "log_type": "DATA_READ",
-  "exempted_members": [             "user:foo@gmail.com"           ]
+  "exempted_members": [             "user:jose@example.com"           ]
   },         {           "log_type": "DATA_WRITE",         }       ]     }
   This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-  foo@gmail.com from DATA_READ logging.
+  jose@example.com from DATA_READ logging.
 
   Enums:
     LogTypeValueValuesEnum: The log type that this config enables.
@@ -61,6 +61,7 @@ class AuditLogConfig(_messages.Message):
   Fields:
     exemptedMembers: Specifies the identities that do not cause logging for
       this type of permission. Follows the same format of Binding.members.
+    ignoreChildExemptions: A boolean attribute.
     logType: The log type that this config enables.
   """
 
@@ -79,7 +80,19 @@ class AuditLogConfig(_messages.Message):
     DATA_READ = 3
 
   exemptedMembers = _messages.StringField(1, repeated=True)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
+  ignoreChildExemptions = _messages.BooleanField(2)
+  logType = _messages.EnumField('LogTypeValueValuesEnum', 3)
+
+
+class AuthorizationCode(_messages.Message):
+  r"""Defines an authorization code. Output only.
+
+  Fields:
+    code: The Authorization Code in ASCII. It can be used to e.g. transfer the
+      domain to another registrar.
+  """
+
+  code = _messages.StringField(1)
 
 
 class AuthorizationLoggingOptions(_messages.Message):
@@ -126,9 +139,9 @@ class Binding(_messages.Message):
       with or without a Google account.  * `allAuthenticatedUsers`: A special
       identifier that represents anyone    who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
-      represents a specific Google    account. For example, `alice@gmail.com`
-      .   * `serviceAccount:{emailid}`: An email address that represents a
-      service    account. For example, `my-other-
+      represents a specific Google    account. For example,
+      `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
+      that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
       * `domain:{domain}`: The G Suite domain (primary) that represents all
@@ -143,10 +156,10 @@ class Binding(_messages.Message):
 
 
 class CheckDomainAvailabilityResponse(_messages.Message):
-  r"""A CheckDomainAvailabilityResponse object.
+  r"""Response for the `CheckDomainAvailability` method.
 
   Fields:
-    availability: A DomainAvailability attribute.
+    availability: Information about domain availability.
   """
 
   availability = _messages.MessageField('DomainAvailability', 1)
@@ -226,11 +239,12 @@ class Condition(_messages.Message):
         context (e.g. ALLOW/IN or DENY/NOT_IN).
       JUSTIFICATION_TYPE: What types of justifications have been supplied with
         this request. String values should match enum names from
-        tech.iam.JustificationType, e.g. "MANUAL_STRING". It is not permitted
-        to grant access based on the *absence* of a justification, so
-        justification conditions can only be used in a "positive" context
-        (e.g., ALLOW/IN or DENY/NOT_IN).  Multiple justifications, e.g., a
-        Buganizer ID and a manually-entered reason, are normal and supported.
+        security.credentials.JustificationType, e.g. "MANUAL_STRING". It is
+        not permitted to grant access based on the *absence* of a
+        justification, so justification conditions can only be used in a
+        "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).  Multiple
+        justifications, e.g., a Buganizer ID and a manually-entered reason,
+        are normal and supported.
       CREDENTIALS_TYPE: What type of credentials have been supplied with this
         request. String values should match enum names from
         security_loas_l2.CredentialsType - currently, only
@@ -309,12 +323,29 @@ class CounterOptions(_messages.Message):
   support multiple field names (though this may be supported in the future).
 
   Fields:
+    customFields: Custom fields.
     field: The field value to attribute.
     metric: The metric to update.
   """
 
-  field = _messages.StringField(1)
-  metric = _messages.StringField(2)
+  customFields = _messages.MessageField('CustomField', 1, repeated=True)
+  field = _messages.StringField(2)
+  metric = _messages.StringField(3)
+
+
+class CustomField(_messages.Message):
+  r"""Custom fields. These can be used to create a counter with arbitrary
+  field/value pairs. See: go/rpcsp-custom-fields.
+
+  Fields:
+    name: Name is the field name.
+    value: Value is the field value. It is important that in contrast to the
+      CounterOptions.field, the value here is a constant that is not derived
+      from the IAMContext.
+  """
+
+  name = _messages.StringField(1)
+  value = _messages.StringField(2)
 
 
 class DataAccessOptions(_messages.Message):
@@ -356,44 +387,45 @@ class DataAccessOptions(_messages.Message):
 
 
 class DetachRegistrationRequest(_messages.Message):
-  r"""A DetachRegistrationRequest object."""
+  r"""Request for the `DetachRegistration` method."""
 
 
 class DnsConfig(_messages.Message):
-  r"""A DnsConfig object.
+  r"""Defines DNS configuration of the Registration.
 
   Fields:
-    nameServers: A string attribute.
+    glueRecords: A list of glue records this registration has.
+    nameServers: Name servers that store the configuration of the domain.
   """
 
-  nameServers = _messages.StringField(1, repeated=True)
+  glueRecords = _messages.MessageField('GlueRecord', 1, repeated=True)
+  nameServers = _messages.StringField(2, repeated=True)
 
 
 class DomainAvailability(_messages.Message):
-  r"""A DomainAvailability object.
+  r"""Provides information of domain availability. Output only.
 
   Enums:
-    AvailableValueValuesEnum:
+    AvailableValueValuesEnum: Availability of the domain.
     NoticesValueListEntryValuesEnum:
     SupportedWhoisPrivacyValueListEntryValuesEnum:
 
   Fields:
-    available: A AvailableValueValuesEnum attribute.
-    domainName: A string attribute.
-    notices: A NoticesValueListEntryValuesEnum attribute.
-    registrationPrice: A Money attribute.
-    renewalPrice: A Money attribute.
-    supportedWhoisPrivacy: A SupportedWhoisPrivacyValueListEntryValuesEnum
-      attribute.
+    available: Availability of the domain.
+    domainName: The domain name. Unicode domain names are converted to
+      Punycode.
+    notices: Notices about special properties of certain domains.
+    supportedWhoisPrivacy: Supported whois privacy settings.
+    yearlyPrice: Yearly price to register or renew the domain.
   """
 
   class AvailableValueValuesEnum(_messages.Enum):
-    r"""AvailableValueValuesEnum enum type.
+    r"""Availability of the domain.
 
     Values:
       AVAILABILITY_UNSPECIFIED: The system might return
         AVAILABILITY_UNSPECIFIED if something prevents the service from being
-        able to determine availability.
+        able to determine domain availability.
       AVAILABLE: Domain is available for registration.
       UNAVAILABLE: Domain is not available for registration, e.g. it is
         registered by someone else.
@@ -432,9 +464,8 @@ class DomainAvailability(_messages.Message):
   available = _messages.EnumField('AvailableValueValuesEnum', 1)
   domainName = _messages.StringField(2)
   notices = _messages.EnumField('NoticesValueListEntryValuesEnum', 3, repeated=True)
-  registrationPrice = _messages.MessageField('Money', 4)
-  renewalPrice = _messages.MessageField('Money', 5)
-  supportedWhoisPrivacy = _messages.EnumField('SupportedWhoisPrivacyValueListEntryValuesEnum', 6, repeated=True)
+  supportedWhoisPrivacy = _messages.EnumField('SupportedWhoisPrivacyValueListEntryValuesEnum', 4, repeated=True)
+  yearlyPrice = _messages.MessageField('Money', 5)
 
 
 class DomainsProjectsLocationsGetRequest(_messages.Message):
@@ -489,12 +520,29 @@ class DomainsProjectsLocationsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class DomainsProjectsLocationsRegistrationsAuthorizationCodeResetRequest(_messages.Message):
+  r"""A DomainsProjectsLocationsRegistrationsAuthorizationCodeResetRequest
+  object.
+
+  Fields:
+    name: Required. A name of the Registration to reset Authorization Code
+      for. Must be in the format `projects/*/locations/*/registrations/*`.
+    resetAuthorizationCodeRequest: A ResetAuthorizationCodeRequest resource to
+      be passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  resetAuthorizationCodeRequest = _messages.MessageField('ResetAuthorizationCodeRequest', 2)
+
+
 class DomainsProjectsLocationsRegistrationsCheckAvailabilityRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsCheckAvailabilityRequest object.
 
   Fields:
-    domainName: A string attribute.
-    parent: A string attribute.
+    domainName: Required. The domain name in ASCII-only format, without a dot
+      at the end. Unicode domain names have to be converted to Punycode.
+    parent: Required. The parent resource of the Registration. Must be in the
+      format `projects/*/locations/*`.
   """
 
   domainName = _messages.StringField(1)
@@ -505,7 +553,8 @@ class DomainsProjectsLocationsRegistrationsCreateRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsCreateRequest object.
 
   Fields:
-    parent: A string attribute.
+    parent: Required. The parent resource of the Registration. Must be in the
+      format `projects/*/locations/*`.
     registration: A Registration resource to be passed as the request body.
     validateOnly: When true, only validation will be performed, without
       actually registering the domain. Follows:
@@ -521,7 +570,8 @@ class DomainsProjectsLocationsRegistrationsDeleteRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsDeleteRequest object.
 
   Fields:
-    name: A string attribute.
+    name: Required. A name of the Registration to delete. Must be in the
+      format `projects/*/locations/*/registrations/*`.
   """
 
   name = _messages.StringField(1, required=True)
@@ -533,30 +583,50 @@ class DomainsProjectsLocationsRegistrationsDetachRequest(_messages.Message):
   Fields:
     detachRegistrationRequest: A DetachRegistrationRequest resource to be
       passed as the request body.
-    name: A string attribute.
+    name: Required. A name of the Registration to detach. Must be in the
+      format `projects/*/locations/*/registrations/*`.
   """
 
   detachRegistrationRequest = _messages.MessageField('DetachRegistrationRequest', 1)
   name = _messages.StringField(2, required=True)
 
 
+class DomainsProjectsLocationsRegistrationsGetAuthorizationCodeRequest(_messages.Message):
+  r"""A DomainsProjectsLocationsRegistrationsGetAuthorizationCodeRequest
+  object.
+
+  Fields:
+    name: Required. A name of the Registration to get Authorization Code for.
+      Must be in the format `projects/*/locations/*/registrations/*`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class DomainsProjectsLocationsRegistrationsGetIamPolicyRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsGetIamPolicyRequest object.
 
   Fields:
+    options_requestedPolicyVersion: Optional. The policy format version to be
+      returned.  Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.  Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
     resource: REQUIRED: The resource for which the policy is being requested.
       See the operation documentation for the appropriate value for this
       field.
   """
 
-  resource = _messages.StringField(1, required=True)
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
 
 
 class DomainsProjectsLocationsRegistrationsGetRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsGetRequest object.
 
   Fields:
-    name: A string attribute.
+    name: Required. A name of the Registration to get. Must be in the format
+      `projects/*/locations/*/registrations/*`.
   """
 
   name = _messages.StringField(1, required=True)
@@ -566,10 +636,14 @@ class DomainsProjectsLocationsRegistrationsListRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsListRequest object.
 
   Fields:
-    filter: A string attribute.
-    pageSize: A integer attribute.
-    pageToken: A string attribute.
-    parent: A string attribute.
+    filter: Filter expression to restrict the Registrations returned. For
+      details see https://cloud.google.com/sdk/gcloud/reference/topic/filters.
+    pageSize: Maximum number of Registrations to return per call.
+    pageToken: The value returned by the last `ListRegistrationsResponse`.
+      Indicates that this is a continuation of a prior `ListRegistrations`
+      call, and that the system should return the next page of data.
+    parent: Required. The project and location from which the Registrations
+      should be listed, specified in the format `projects/*/locations/*`.
   """
 
   filter = _messages.StringField(1)
@@ -582,11 +656,12 @@ class DomainsProjectsLocationsRegistrationsPatchRequest(_messages.Message):
   r"""A DomainsProjectsLocationsRegistrationsPatchRequest object.
 
   Fields:
-    name: A string attribute.
+    name: Output only. Name of the Registration resource. It matches pattern
+      `projects/*/locations/*/registrations/<domain_name>`.
     registration: A Registration resource to be passed as the request body.
-    updateMask: The update mask applies to the resource. For the `FieldMask`
-      definition, see https://developers.google.com/protocol-
-      buffers/docs/reference/google.protobuf#fieldmask Required.
+    updateMask: Required. The update mask applies to the resource. For the
+      `FieldMask` definition, see https://developers.google.com/protocol-
+      buffers/docs/reference/google.protobuf#fieldmask
     validateOnly: When true, only validation will be performed, without
       actually updating the domain. Follows:
       https://cloud.google.com/apis/design/design_patterns#request_validation
@@ -602,8 +677,10 @@ class DomainsProjectsLocationsRegistrationsSearchAvailabilityRequest(_messages.M
   r"""A DomainsProjectsLocationsRegistrationsSearchAvailabilityRequest object.
 
   Fields:
-    parent: A string attribute.
-    query: A string attribute.
+    parent: Required. The parent resource of the Registration. Must be in the
+      format `projects/*/locations/*`.
+    query: Required. Nonempty string used to search for available domain
+      names.
   """
 
   parent = _messages.StringField(1, required=True)
@@ -664,6 +741,29 @@ class Expr(_messages.Message):
   title = _messages.StringField(4)
 
 
+class GlueRecord(_messages.Message):
+  r"""Defines a GlueRecord. Glue Records or "Registered Hosts" are a way of
+  making the IP address of the name server known when it is a subdomain of the
+  domain for which it serves. For example, If your domain is example.com and
+  your name servers are ns1.example.com, ns2.example.com, ns3.example.com, and
+  ns4.example.com, you would create four registered host records linking each
+  name server to its IP address. Use glue records when your name servers are
+  subdomains of your domain.
+
+  Fields:
+    hostName: Required. Fully qualified host name, from least to most
+      significant order, e.g. "subdomain.domain.com".
+    ipv4Addresses: List of IPv4 addresses corresponding to this host. At least
+      one of ipv4_address and ipv6_address must be set.
+    ipv6Addresses: List of IPv6 addresses corresponding to this host. At least
+      one of ipv4_address and ipv6_address must be set.
+  """
+
+  hostName = _messages.StringField(1)
+  ipv4Addresses = _messages.StringField(2, repeated=True)
+  ipv6Addresses = _messages.StringField(3, repeated=True)
+
+
 class ListLocationsResponse(_messages.Message):
   r"""The response message for Locations.ListLocations.
 
@@ -691,11 +791,14 @@ class ListOperationsResponse(_messages.Message):
 
 
 class ListRegistrationsResponse(_messages.Message):
-  r"""A ListRegistrationsResponse object.
+  r"""Response for the `ListRegistrations` method.
 
   Fields:
-    nextPageToken: A string attribute.
-    registrations: A Registration attribute.
+    nextPageToken: If there might be more results than those appearing in this
+      response, then `next_page_token` is included. To get the next set of
+      results, call this method again using the value of `next_page_token` as
+      `page_token`.
+    registrations: List of Registrations.
   """
 
   nextPageToken = _messages.StringField(1)
@@ -925,16 +1028,15 @@ class Operation(_messages.Message):
 
 
 class OperationMetadata(_messages.Message):
-  r"""Represents the metadata of the long-running operation.
+  r"""Represents the metadata of the long-running operation. Output only.
 
   Fields:
-    apiVersion: Output only. API version used to start the operation.
-    createTime: Output only. The time the operation was created.
-    endTime: Output only. The time the operation finished running.
-    statusDetail: Output only. Human-readable status of the operation, if any.
-    target: Output only. Server-defined resource path for the target of the
-      operation.
-    verb: Output only. Name of the verb executed by the operation.
+    apiVersion: API version used to start the operation.
+    createTime: The time the operation was created.
+    endTime: The time the operation finished running.
+    statusDetail: Human-readable status of the operation, if any.
+    target: Server-defined resource path for the target of the operation.
+    verb: Name of the verb executed by the operation.
   """
 
   apiVersion = _messages.StringField(1)
@@ -948,27 +1050,38 @@ class OperationMetadata(_messages.Message):
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.   A `Policy`
-  consists of a list of `bindings`. A `binding` binds a list of `members` to a
-  `role`, where the members can be user accounts, Google groups, Google
-  domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **JSON Example**      {       "bindings": [         {
-  "role": "roles/owner",           "members": [
+  is a collection of `bindings`. A `binding` binds one or more `members` to a
+  single `role`. Members can be user accounts, service accounts, Google
+  groups, and domains (such as G Suite). A `role` is a named list of
+  permissions (defined by IAM or configured by users). A `binding` can
+  optionally specify a `condition`, which is a logic expression that further
+  constrains the role binding based on attributes about the request and/or
+  target resource.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
-  "domain:google.com",             "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com"           ]         },         {
-  "role": "roles/viewer",           "members": ["user:sean@example.com"]
-  }       ]     }  **YAML Example**      bindings:     - members:       -
-  user:mike@example.com       - group:admins@example.com       -
-  domain:google.com       - serviceAccount:my-other-
-  app@appspot.gserviceaccount.com       role: roles/owner     - members:
-  - user:sean@example.com       role: roles/viewer   For a description of IAM
-  and its features, see the [IAM developer's
+  "domain:google.com",             "serviceAccount:my-project-
+  id@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/resourcemanager.organizationViewer",           "members":
+  ["user:eve@example.com"],           "condition": {             "title":
+  "expirable access",             "description": "Does not grant access after
+  Sep 2020",             "expression": "request.time <
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
+  **YAML Example**      bindings:     - members:       - user:mike@example.com
+  - group:admins@example.com       - domain:google.com       - serviceAccount
+  :my-project-id@appspot.gserviceaccount.com       role:
+  roles/resourcemanager.organizationAdmin     - members:       -
+  user:eve@example.com       role: roles/resourcemanager.organizationViewer
+  condition:         title: expirable access         description: Does not
+  grant access after Sep 2020         expression: request.time <
+  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
+  features, see the [IAM developer's
   guide](https://cloud.google.com/iam/docs).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members` to a `role`. `bindings` with no
-      members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally may
+      specify a `condition` that determines when binding is in effect.
+      `bindings` with no members will result in an error.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -977,7 +1090,9 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
       policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten blindly.
+      the existing policy is overwritten. Due to blind-set semantics of an
+      etag-less policy, 'setIamPolicy' will not fail even if either of
+      incoming or stored policy does not meet the version requirements.
     iamOwned: A boolean attribute.
     rules: If more than one rule is specified, the rules are applied in the
       following manner: - All matching LOG rules are always applied. - If any
@@ -986,7 +1101,15 @@ class Policy(_messages.Message):
       any ALLOW/ALLOW_WITH_LOG rule matches, permission is   granted.
       Logging will be applied if one or more matching rule requires logging. -
       Otherwise, if no rule applies, permission is denied.
-    version: Deprecated.
+    version: Specifies the format of the policy.  Valid values are 0, 1, and
+      3. Requests specifying an invalid value will be rejected.  Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.  If no etag is provided in the call to
+      `setIamPolicy`, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
@@ -1004,11 +1127,10 @@ class PostalAddress(_messages.Message):
   locations (roads, towns, mountains).  In typical usage an address would be
   created via user input or from importing existing data, depending on the
   type of process.  Advice on address input / editing:  - Use an i18n-ready
-  address widget such as    https://github.com/googlei18n/libaddressinput) -
-  Users should not be presented with UI elements for input or editing of
-  fields outside countries where that field is used.  For more guidance on how
-  to use this schema, please see:
-  https://support.google.com/business/answer/6397478
+  address widget such as    https://github.com/google/libaddressinput) - Users
+  should not be presented with UI elements for input or editing of   fields
+  outside countries where that field is used.  For more guidance on how to use
+  this schema, please see: https://support.google.com/business/answer/6397478
 
   Fields:
     addressLines: Unstructured address lines describing the lower levels of an
@@ -1088,38 +1210,40 @@ class PostalAddress(_messages.Message):
 
 
 class Registration(_messages.Message):
-  r"""A Registration object.
+  r"""Defines a domain registration.
 
   Enums:
     NoticesValueListEntryValuesEnum:
-    StateValueValuesEnum:
+    StateValueValuesEnum: Output only. The State of the Registration.
 
   Messages:
-    LabelsValue: A LabelsValue object.
+    LabelsValue: Set of labels associated with the Registration.
 
   Fields:
-    createTime: A string attribute.
-    detachTime: A string attribute.
-    dnsConfig: A DnsConfig attribute.
-    domainName: A string attribute.
-    expireTime: A string attribute.
-    labels: A LabelsValue attribute.
-    name: A string attribute.
-    notices: [Create only] List of accepted Notices about the domain. Needed
-      e.g. for accepting the HSTS notice when registering .app domains. The
-      list of notices for each domain can be retrieved with
+    createTime: Output only. The creation timestamp of the Registration.
+    detachTime: Output only. The detach timestamp of the Registration. Set
+      only for Registrations in state DETACHED.
+    dnsConfig: DNS configuration of the Registration.
+    domainName: Required. Immutable. The domain name in ASCII-only format,
+      without a dot at the end. Unicode domain names have to be converted to
+      Punycode.
+    expireTime: Output only. The expiration timestamp of the Registration. For
+      registrations in state DETACHED this is the expiration timestamp at
+      detach time.
+    labels: Set of labels associated with the Registration.
+    name: Output only. Name of the Registration resource. It matches pattern
+      `projects/*/locations/*/registrations/<domain_name>`.
+    notices: Input only. Create only. List of accepted Notices about the
+      domain. Needed e.g. for accepting the HSTS notice when registering .app
+      domains. The list of notices for each domain can be retrieved with
       CheckDomainAvailability call.
-    registrationPrice: [Create only] Registration price. Required for
-      confirmation of the price when creating new registration. Price that
-      should be put here can be obtained from CheckAvailability or
-      SearchAvailability calls.
-    renewalPrice: [Create only] Renewal price. Required for confirmation of
-      the price when creating new registration. Renewal price that should be
-      put here can be obtained from CheckAvailability or SearchAvailability
-      calls.
-    state: A StateValueValuesEnum attribute.
-    updateTime: A string attribute.
-    whoisConfig: A WhoisConfig attribute.
+    state: Output only. The State of the Registration.
+    updateTime: Output only. The update timestamp of the Registration.
+    whoisConfig: Required. Whois configuration of the Registration.
+    yearlyPrice: Required. Input only. Create only. Yearly price to register
+      or renew the domain. Used for confirmation of the price when creating a
+      new registration. Yearly price that should be put here can be obtained
+      from CheckAvailability or SearchAvailability calls.
   """
 
   class NoticesValueListEntryValuesEnum(_messages.Enum):
@@ -1133,33 +1257,35 @@ class Registration(_messages.Message):
     HSTS_PRELOADED = 1
 
   class StateValueValuesEnum(_messages.Enum):
-    r"""StateValueValuesEnum enum type.
+    r"""Output only. The State of the Registration.
 
     Values:
-      STATE_UNSPECIFIED: <no description>
+      STATE_UNSPECIFIED: The state is undefined.
       PROVISIONING: The registration operation is not yet completed.
       ACTIVE: The domain is registered and operational. It will automatically
-        renew around expire_time.
+        renew around expire_time. Check the outstanding_issues list to see if
+        there are any unresolved issues with the registration.
       SUSPENDED: The registration is suspended and the domain is inaccessible.
-        This probably means that the registrant email has not been verified.
-        Check the emails received from the registrar and follow the provided
-        steps.
-      TRANSFERRED: The registration has been detached from Cloud and
-        transferred directly to Google Domains for individual management. The
-        domain will remain valid until it expires and during that period
-        you'll be able to reclaim it at https://domains.google.com/ using
-        WHOIS contact information. For more information, see
+        This may mean e.g. that the registrant email has not been verified for
+        too long. Check the outstanding_issues list to learn the exact
+        problem. Check emails received from the registrar and follow the
+        provided steps to resolve the problem.
+      DETACHED: The registration has been detached from Cloud and moved
+        directly to Google Domains for individual management. The domain will
+        remain valid until it expires and during that period you'll be able to
+        reclaim it at https://domains.google.com/ using WHOIS contact
+        information. For more information, see
         https://support.google.com/domains/answer/6339340.
     """
     STATE_UNSPECIFIED = 0
     PROVISIONING = 1
     ACTIVE = 2
     SUSPENDED = 3
-    TRANSFERRED = 4
+    DETACHED = 4
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""A LabelsValue object.
+    r"""Set of labels associated with the Registration.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.
@@ -1189,11 +1315,14 @@ class Registration(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 6)
   name = _messages.StringField(7)
   notices = _messages.EnumField('NoticesValueListEntryValuesEnum', 8, repeated=True)
-  registrationPrice = _messages.MessageField('Money', 9)
-  renewalPrice = _messages.MessageField('Money', 10)
-  state = _messages.EnumField('StateValueValuesEnum', 11)
-  updateTime = _messages.StringField(12)
-  whoisConfig = _messages.MessageField('WhoisConfig', 13)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
+  updateTime = _messages.StringField(10)
+  whoisConfig = _messages.MessageField('WhoisConfig', 11)
+  yearlyPrice = _messages.MessageField('Money', 12)
+
+
+class ResetAuthorizationCodeRequest(_messages.Message):
+  r"""Request for the `ResetAuthorizationCode` method."""
 
 
 class Rule(_messages.Message):
@@ -1251,10 +1380,11 @@ class Rule(_messages.Message):
 
 
 class SearchDomainAvailabilityResponse(_messages.Message):
-  r"""A SearchDomainAvailabilityResponse object.
+  r"""Response for the `SearchDomainAvailability` method.
 
   Fields:
-    availability: A DomainAvailability attribute.
+    availability: Information about availability of domains with names similar
+      to the query.
   """
 
   availability = _messages.MessageField('DomainAvailability', 1, repeated=True)
@@ -1344,37 +1474,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.
@@ -1444,21 +1547,22 @@ class TestIamPermissionsResponse(_messages.Message):
 
 
 class WhoisConfig(_messages.Message):
-  r"""A WhoisConfig object.
+  r"""Defines Whois configuration of the Registration.
 
   Enums:
-    PrivacyValueValuesEnum:
+    PrivacyValueValuesEnum: Required. Whois privacy settings of the
+      Registration.
 
   Fields:
-    privacy: A PrivacyValueValuesEnum attribute.
-    registrantContact: A WhoisContact attribute.
+    privacy: Required. Whois privacy settings of the Registration.
+    registrantContact: Required. Registrant whois contact of the Registration.
   """
 
   class PrivacyValueValuesEnum(_messages.Enum):
-    r"""PrivacyValueValuesEnum enum type.
+    r"""Required. Whois privacy settings of the Registration.
 
     Values:
-      WHOIS_PRIVACY_UNSPECIFIED: <no description>
+      WHOIS_PRIVACY_UNSPECIFIED: The Privacy settings are undefined.
       PUBLISH_CONTACT_DATA: All the data from WHOIS config is publicly
         available (not supported yet).
       USE_WHOIS_PRIVACY_PROXY: Your contact info won't be available to the
@@ -1478,12 +1582,12 @@ class WhoisConfig(_messages.Message):
 
 
 class WhoisContact(_messages.Message):
-  r"""A WhoisContact object.
+  r"""Defines Whois contact details of the Registration.
 
   Fields:
-    email: A string attribute.
-    phoneNumber: A string attribute.
-    postalAddress: A PostalAddress attribute.
+    email: Email address associated with the Registration.
+    phoneNumber: Phone number associated with the Registration.
+    postalAddress: Postal address associated with the Registration.
   """
 
   email = _messages.StringField(1)

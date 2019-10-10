@@ -6,7 +6,9 @@ SYNOPSIS
         [--container=CONTAINER] [--dry-run] [--force-key-file-overwrite]
         [--plain] [--ssh-flag=SSH_FLAG] [--ssh-key-file=SSH_KEY_FILE]
         [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING] [--zone=ZONE]
-        [--internal-ip | --tunnel-through-iap] [GCLOUD_WIDE_FLAG ...]
+        [--internal-ip | --tunnel-through-iap]
+        [--ssh-key-expiration=SSH_KEY_EXPIRATION
+          | --ssh-key-expire-after=SSH_KEY_EXPIRE_AFTER] [GCLOUD_WIDE_FLAG ...]
         [-- SSH_ARGS ...]
 
 DESCRIPTION
@@ -34,8 +36,8 @@ POSITIONAL ARGUMENTS
      [USER@]INSTANCE
         Specifies the instance to SSH into.
 
-        USER specifies the username with which to SSH. If omitted, $USER from
-        the environment is selected.
+        USER specifies the username with which to SSH. If omitted, the user
+        login name is used.
 
         INSTANCE specifies the name of the virtual machine instance to SSH
         into.
@@ -144,6 +146,19 @@ FLAGS
        --tunnel-through-iap
           Tunnel the ssh connection through the Cloud Identity-Aware Proxy.
 
+     At most one of these may be specified:
+
+       --ssh-key-expiration=SSH_KEY_EXPIRATION
+          The time when the ssh key will be valid until, such as
+          "2017-08-29T18:52:51.142Z." This is only valid if the instance is not
+          using OS Login. See $ gcloud topic datetimes for information on time
+          formats.
+
+       --ssh-key-expire-after=SSH_KEY_EXPIRE_AFTER
+          The maximum length of time an SSH key is valid for once created and
+          installed, e.g. 2m for 2 minutes. See $ gcloud topic datetimes for
+          information on duration formats.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -168,12 +183,22 @@ EXAMPLES
         $ gcloud alpha compute ssh example-instance --zone us-central1-a \
             --container CONTAINER
 
+    You can limit the allowed time to ssh. For example, to allow a key to be
+    used through 2019:
+
+        $ gcloud alpha compute ssh example-instance --zone us-central1-a \
+            --ssh-key-expiration "2020-01-01T00:00:00:00Z"
+
+    Or alternatively, allow access for the next two minutes:
+
+        $ gcloud alpha compute ssh example-instance --zone us-central1-a \
+            --ssh-key-expire-after 2m
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute ssh
         $ gcloud beta compute ssh

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,9 +24,19 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.functions import flags
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class GetIamPolicy(base.ListCommand):
   """Get IAM policy for a Google Cloud Function."""
+
+  detailed_help = {
+      'DESCRIPTION': '{description}',
+      'EXAMPLES':
+          """\
+          To get the iam policy for `FUNCTION-1` run:
+
+            $ {command} FUNCTION-1
+          """,
+  }
 
   @staticmethod
   def Args(parser):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,9 @@ class HadoopBase(job_base.JobBase):
         type=arg_parsers.ArgList(),
         metavar='FILE',
         default=[],
-        help='Comma separated list of files to be provided to the job.')
+        help='Comma separated list of file paths to be provided to the job. '
+             'A file path can either be a path to a local file or a path '
+             'to a file already in a Cloud Storage bucket.')
     parser.add_argument(
         '--archives',
         type=arg_parsers.ArgList(),

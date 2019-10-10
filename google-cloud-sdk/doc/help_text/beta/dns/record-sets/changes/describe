@@ -29,8 +29,9 @@ EXAMPLES
         $ gcloud beta dns record-sets changes describe change_id
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns record-sets changes describe
+        $ gcloud alpha dns record-sets changes describe
 

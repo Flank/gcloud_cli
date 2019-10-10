@@ -40,7 +40,7 @@ FLAGS
         References to at most 15 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is
         considered the primary SSL certificate associated with the load
-        balancer. The SSL certificate must exist and cannot be deleted while
+        balancer. The SSL certificates must exist and cannot be deleted while
         referenced by a target SSL proxy.
 
      At most one of these may be specified:
@@ -64,9 +64,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute target-ssl-proxies update
         $ gcloud beta compute target-ssl-proxies update

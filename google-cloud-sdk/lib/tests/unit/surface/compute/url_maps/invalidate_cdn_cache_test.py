@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,14 +93,14 @@ class UrlMapsInvalidateCacheAlphaTest(UrlMapsInvalidateCacheTest):
     self.Run('alpha compute url-maps invalidate-cdn-cache --global ' + command)
 
 
-class RegionUrlMapsInvalidateCacheTest(test_base.BaseTest):
+class RegionUrlMapsInvalidateCacheBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
     self._url_maps_api = self.compute.regionUrlMaps
 
   def RunInvalidateCache(self, command):
-    self.Run('alpha compute url-maps invalidate-cdn-cache --region us-west-1 ' +
+    self.Run('beta compute url-maps invalidate-cdn-cache --region us-west-1 ' +
              command)
 
   def testSimpleCase(self):
@@ -153,6 +153,18 @@ class RegionUrlMapsInvalidateCacheTest(test_base.BaseTest):
               urlMap='my-url-map',
               cacheInvalidationRule=self.messages.CacheInvalidationRule(
                   path='/oops.html', host='oops.com')))])
+
+
+class RegionUrlMapsInvalidateCacheAlphaTest(RegionUrlMapsInvalidateCacheBetaTest
+                                           ):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._url_maps_api = self.compute.regionUrlMaps
+
+  def RunInvalidateCache(self, command):
+    self.Run('alpha compute url-maps invalidate-cdn-cache --region us-west-1 ' +
+             command)
 
 
 class UrlMapsInvalidateCacheAsyncTest(test_base.BaseTest):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,14 +36,13 @@ from tests.lib.surface.projects import util
 class ProjectsCreateTest(base.ProjectsUnitTestBase):
 
   def SetUp(self):
-    self.sm_messages = core_apis.GetMessagesModule('servicemanagement', 'v1')
-    self.mocked_sm_client = mock.Client(
-        core_apis.GetClientClass('servicemanagement', 'v1'),
-        real_client=core_apis.GetClientInstance('servicemanagement',
-                                                'v1',
-                                                no_http=True))
-    self.mocked_sm_client.Mock()
-    self.addCleanup(self.mocked_sm_client.Unmock)
+    self.su_messages = core_apis.GetMessagesModule('serviceusage', 'v1')
+    self.mocked_su_client = mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1'),
+        real_client=core_apis.GetClientInstance(
+            'serviceusage', 'v1', no_http=True))
+    self.mocked_su_client.Mock()
+    self.addCleanup(self.mocked_su_client.Unmock)
 
   def _expectCreationCall(self, test_project, labels=None, exception=None):
     operation_name = 'pc.1234'
@@ -72,38 +71,29 @@ class ProjectsCreateTest(base.ProjectsUnitTestBase):
 
   def _expectServiceEnableCall(self, project_id):
     operation_name = 'operation-12345'
-    self.mocked_sm_client.services.Enable.Expect(
-        request=self.sm_messages.ServicemanagementServicesEnableRequest(
-            serviceName='cloudapis.googleapis.com',
-            enableServiceRequest=self.sm_messages.EnableServiceRequest(
-                consumerId='project:' + project_id
-            )
-        ),
-        response=self.sm_messages.Operation(
+    self.mocked_su_client.services.Enable.Expect(
+        request=self.su_messages.ServiceusageServicesEnableRequest(
+            name='projects/%s/services/cloudapis.googleapis.com' % project_id,),
+        response=self.su_messages.Operation(
             name=operation_name,
             done=False,
-        )
-    )
+        ))
 
-    self.mocked_sm_client.operations.Get.Expect(
-        request=self.sm_messages.ServicemanagementOperationsGetRequest(
-            operationsId=operation_name,
-        ),
-        response=self.sm_messages.Operation(
+    self.mocked_su_client.operations.Get.Expect(
+        request=self.su_messages.ServiceusageOperationsGetRequest(
+            name=operation_name,),
+        response=self.su_messages.Operation(
             name=operation_name,
             done=True,
             response=None,
-        )
-    )
+        ))
 
-  _PROGRESS_TRACKER_OUT = (
-      '{{"ux": "PROGRESS_TRACKER", "message": "Waiting for '
-      '[operations/pc.1234] to finish", "status": "SUCCESS"}}')
-
-  _CREATE_STDERR_FMT = (
-      """Create in progress for """
-      """[https://cloudresourcemanager.googleapis.com/v1/projects/{}].
-""") + _PROGRESS_TRACKER_OUT + '\n'
+  _CREATE_STDERR_FMT = """\
+Create in progress for [https://cloudresourcemanager.googleapis.com/v1/projects/{0}].
+{{"ux": "PROGRESS_TRACKER", "message": "Waiting for [operations/pc.1234] to finish", "status": "SUCCESS"}}
+Enabling service [cloudapis.googleapis.com] on project [{0}]...
+Operation "operation-12345" finished successfully.
+"""
 
   _MISSING_ID_STDERR = ("""ERROR: (gcloud.projects.create) """
                         """Missing required argument [PROJECT_ID]: """
@@ -205,6 +195,8 @@ Create in progress for [https://cloudresourcemanager.googleapis.com"""
 {"ux": "PROGRESS_TRACKER", """
                          """"message": "Waiting for [operations/pc.1234] """
                          """to finish", "status": "SUCCESS"}
+Enabling service [cloudapis.googleapis.com] on project [abcdefghijklmnopqrstuvwxyz]...
+Operation "operation-12345" finished successfully.
 """)
 
   def createProjectWithBothFolderAndOrganizationSpecifiedHelper(

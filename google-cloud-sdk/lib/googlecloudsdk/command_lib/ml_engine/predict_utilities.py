@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ from __future__ import unicode_literals
 import io
 import json
 
-
+from googlecloudsdk.api_lib.ml_engine import models
+from googlecloudsdk.api_lib.ml_engine import versions_api
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -62,7 +63,7 @@ def ReadInstances(input_file, data_format, limit=None):
                                       'instances file.')
     if limit and line_num >= limit:
       raise InvalidInstancesFileError(
-          'Online prediction can process no more than ' + str(limit) +
+          'Online prediction can process no more than ' + six.text_type(limit) +
           ' instances per file. Please use batch prediction instead.')
     if data_format == 'json':
       try:
@@ -155,3 +156,23 @@ def GetDefaultFormat(predictions):
 
   else:
     return 'table[no-heading](predictions)'
+
+
+def GetRuntimeVersion(model=None, version=None):
+  if version:
+    version_ref = ParseModelOrVersionRef(model, version)
+    version_data = versions_api.VersionsClient().Get(version_ref)
+  else:
+    version_data = models.ModelsClient().Get(model).defaultVersion
+  return version_data.framework, version_data.runtimeVersion
+
+
+def CheckRuntimeVersion(model=None, version=None):
+  """Check if runtime-version is more than 1.8."""
+  framework, runtime_version = GetRuntimeVersion(model, version)
+  if framework == 'TENSORFLOW':
+    release, version = map(int, (runtime_version.split('.')))
+    return (release == 1 and version >= 8) or (release > 1)
+  else:
+    return False
+

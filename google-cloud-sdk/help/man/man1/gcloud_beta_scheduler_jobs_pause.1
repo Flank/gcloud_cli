@@ -56,8 +56,8 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBcloudscheduler/v1beta1\fR API. The full documentation
-for this API can be found at: https://cloud.google.com/scheduler/
+This command uses the \fBcloudscheduler/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/scheduler/
 
 
 
@@ -66,17 +66,18 @@ for this API can be found at: https://cloud.google.com/scheduler/
 The following command pauses the execution of a job:
 
 .RS 2m
-$ gcloud beta scheduler jobs pause JOB
+$ gcloud beta scheduler jobs pause my\-job
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud scheduler jobs pause
 $ gcloud alpha scheduler jobs pause
 .RE
 

@@ -1,20 +1,19 @@
 title: custom instance creation errors scenario test
-release_tracks:
-- ALPHA
-- BETA
+release_tracks: [ALPHA, BETA, GA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instances get-guest-attributes my-instance --query-path=foo --zone
       us-east1-c
-  - stderr: |
-      ERROR: (gcloud.$$track$$.compute.instances.get-guest-attributes) argument --query-path: Bad value [foo]: Must be empty or of the form `<namespace>/` or `<namespace>/<key>`.
-      Usage: gcloud $$track$$ compute instances get-guest-attributes (INSTANCE : --zone=ZONE) [optional flags]
+  - stderr: |-
+      ERROR: \(gcloud.*\.compute\.instances\.get-guest-attributes\) argument --query-path: Bad value \[foo\]: Must be empty or of the form `<namespace>/` or `<namespace>/<key>`\.
+      Usage: gcloud.* compute instances get-guest-attributes \(INSTANCE : --zone=ZONE\) \[optional flags\]
         optional flags may be  --help | --query-path | --zone
 
       For detailed information on this command and its flags, run:
-        gcloud $$track$$ compute instances get-guest-attributes --help
+        gcloud.* compute instances get-guest-attributes --help
+      $
   - error: '1: argument --query-path: Bad value [foo]: Must be empty or of the form
       `<namespace>/` or `<namespace>/<key>`.'
 - execute:
@@ -32,28 +31,24 @@ summary:
       foo        bar  baz
 actions:
 - define_reference:
-    reference: track
-    track_values:
-      ALPHA: alpha
-      BETA: beta
-
-- define_reference:
     reference: api_version
     track_values:
       ALPHA: alpha
       BETA: beta
+      GA: v1
 
 - execute_command:
     command: compute instances get-guest-attributes my-instance --query-path=foo --zone
       us-east1-c
     events:
-    - expect_stderr: |
-        ERROR: (gcloud.$$track$$.compute.instances.get-guest-attributes) argument --query-path: Bad value [foo]: Must be empty or of the form `<namespace>/` or `<namespace>/<key>`.
-        Usage: gcloud $$track$$ compute instances get-guest-attributes (INSTANCE : --zone=ZONE) [optional flags]
-          optional flags may be  --help | --query-path | --zone
+    - expect_stderr:
+        matches: |
+          ERROR: \(gcloud.*\.compute\.instances\.get-guest-attributes\) argument --query-path: Bad value \[foo\]: Must be empty or of the form `<namespace>/` or `<namespace>/<key>`\.
+          Usage: gcloud.* compute instances get-guest-attributes \(INSTANCE : --zone=ZONE\) \[optional flags\]
+            optional flags may be  --help | --query-path | --zone
 
-        For detailed information on this command and its flags, run:
-          gcloud $$track$$ compute instances get-guest-attributes --help
+          For detailed information on this command and its flags, run:
+            gcloud.* compute instances get-guest-attributes --help
     - expect_exit:
         code: 1
         message: 'argument --query-path: Bad value [foo]: Must be empty or of the
@@ -64,7 +59,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api_version$$/projects/fake-project/zones/us-central1-f/instances/my-instance/getGuestAttributes?alt=json&queryPath=foo%2F
+          uri: https://compute.googleapis.com/compute/$$api_version$$/projects/fake-project/zones/us-central1-f/instances/my-instance/getGuestAttributes?alt=json&queryPath=foo%2F
           method: GET
           headers: {}
           body: null
@@ -84,7 +79,7 @@ actions:
               - namespace: foo
                 key: baz
                 value: bar
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/my-instance/guestAttributes/foo/
+            selfLink: https://compute.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/my-instance/guestAttributes/foo/
             kind: compute#guestAttributes
     - expect_stdout: |
         NAMESPACE  KEY  VALUE
@@ -98,7 +93,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api_version$$/projects/fake-project/zones/us-central1-f/instances/my-instance/getGuestAttributes?alt=json&queryPath=foo%2Fbar
+          uri: https://compute.googleapis.com/compute/$$api_version$$/projects/fake-project/zones/us-central1-f/instances/my-instance/getGuestAttributes?alt=json&queryPath=foo%2Fbar
           method: GET
           headers: {}
           body: null
@@ -115,7 +110,7 @@ actions:
               - namespace: foo
                 key: bar
                 value: baz
-            selfLink: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/my-instance/guestAttributes/foo/bar
+            selfLink: https://compute.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/my-instance/guestAttributes/foo/bar
             kind: compute#guestAttributes
     - expect_stdout: |
         NAMESPACE  KEY  VALUE

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -261,8 +261,9 @@ def _ValidateListOfStringToStringDicts(arg_internal_name, arg_value):
 # Any arg not appearing in this map is assumed to be a simple string.
 _FILE_ARG_VALIDATORS = {
     'additional_apks': _ValidateAdditionalApksList,
-    'async': _ValidateBool,
+    'async_': _ValidateBool,
     'auto_google_login': _ValidateBool,
+    'client_details': _ValidateKeyValueStringPairs,
     'device': _ValidateListOfStringToStringDicts,
     'device_ids': ValidateStringList,
     'directories_to_pull': ValidateStringList,
@@ -287,6 +288,10 @@ _FILE_ARG_VALIDATORS = {
 
 def InternalArgNameFrom(arg_external_name):
   """Converts a user-visible arg name into its corresponding internal name."""
+  if arg_external_name == 'async':
+    # The async flag has a special destination in the argparse namespace since
+    # 'async' is a reserved keyword as of Python 3.7.
+    return 'async_'
   return arg_external_name.replace('-', '_')
 
 
@@ -349,7 +354,8 @@ def ValidateResultsBucket(args):
     bucket_ref = storage_util.BucketReference.FromArgument(args.results_bucket,
                                                            require_prefix=False)
   except Exception as err:
-    raise exceptions.InvalidArgumentException('results-bucket', str(err))
+    raise exceptions.InvalidArgumentException('results-bucket',
+                                              six.text_type(err))
   args.results_bucket = bucket_ref.bucket
 
 

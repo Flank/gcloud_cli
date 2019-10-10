@@ -16,10 +16,10 @@ class AcknowledgeTaskRequest(_messages.Message):
   r"""Request message for acknowledging a task using AcknowledgeTask.
 
   Fields:
-    scheduleTime: Required.  The task's current schedule time, available in
-      the schedule_time returned by LeaseTasks response or RenewLease
-      response. This restriction is to ensure that your worker currently holds
-      the lease.
+    scheduleTime: Required. The task's current schedule time, available in the
+      schedule_time returned by LeaseTasks response or RenewLease response.
+      This restriction is to ensure that your worker currently holds the
+      lease.
   """
 
   scheduleTime = _messages.StringField(1)
@@ -54,10 +54,14 @@ class AppEngineHttpRequest(_messages.Message):
   ud.google.com/appengine/docs/standard/python/config/appref) Task dispatches
   also do not follow redirects.  The task attempt has succeeded if the app's
   request handler returns an HTTP response code in the range [`200` - `299`].
-  `503` is considered an App Engine system error instead of an application
-  error. Requests returning error `503` will be retried regardless of retry
-  configuration and not counted against retry counts. Any other response code
-  or a failure to receive a response before the deadline is a failed attempt.
+  The task attempt has failed if the app's handler returns a non-2xx response
+  code or Cloud Tasks does not receive response before the deadline. Failed
+  tasks will be retried according to the retry configuration. `503` (Service
+  Unavailable) is considered an App Engine system error instead of an
+  application error and will cause Cloud Tasks' traffic congestion control to
+  temporarily throttle the queue's dispatches. Unlike other types of task
+  targets, a `429` (Too Many Requests) response from an app handler does not
+  cause traffic congestion control to throttle the queue.
 
   Enums:
     HttpMethodValueValuesEnum: The HTTP method to use for the request. The
@@ -358,9 +362,9 @@ class Binding(_messages.Message):
       with or without a Google account.  * `allAuthenticatedUsers`: A special
       identifier that represents anyone    who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
-      represents a specific Google    account. For example, `alice@gmail.com`
-      .   * `serviceAccount:{emailid}`: An email address that represents a
-      service    account. For example, `my-other-
+      represents a specific Google    account. For example,
+      `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
+      that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
       * `domain:{domain}`: The G Suite domain (primary) that represents all
@@ -394,10 +398,10 @@ class CancelLeaseRequest(_messages.Message):
       because of the sensitivity of data that it contains.  Authorization for
       FULL requires `cloudtasks.tasks.fullView` [Google
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
-    scheduleTime: Required.  The task's current schedule time, available in
-      the schedule_time returned by LeaseTasks response or RenewLease
-      response. This restriction is to ensure that your worker currently holds
-      the lease.
+    scheduleTime: Required. The task's current schedule time, available in the
+      schedule_time returned by LeaseTasks response or RenewLease response.
+      This restriction is to ensure that your worker currently holds the
+      lease.
   """
 
   class ResponseViewValueValuesEnum(_messages.Enum):
@@ -458,7 +462,7 @@ class CloudtasksProjectsLocationsQueuesCreateRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesCreateRequest object.
 
   Fields:
-    parent: Required.  The location name in which the queue will be created.
+    parent: Required. The location name in which the queue will be created.
       For example: `projects/PROJECT_ID/locations/LOCATION_ID`  The list of
       allowed locations can be obtained by calling Cloud Tasks' implementation
       of ListLocations.
@@ -473,7 +477,7 @@ class CloudtasksProjectsLocationsQueuesDeleteRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesDeleteRequest object.
 
   Fields:
-    name: Required.  The queue name. For example:
+    name: Required. The queue name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
   """
 
@@ -499,7 +503,7 @@ class CloudtasksProjectsLocationsQueuesGetRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesGetRequest object.
 
   Fields:
-    name: Required.  The resource name of the queue. For example:
+    name: Required. The resource name of the queue. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
   """
 
@@ -526,7 +530,7 @@ class CloudtasksProjectsLocationsQueuesListRequest(_messages.Message):
       page of results, page_token must be the value of next_page_token
       returned from the previous call to ListQueues method. It is an error to
       switch the value of the filter while iterating through pages.
-    parent: Required.  The location name. For example:
+    parent: Required. The location name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID`
   """
 
@@ -566,7 +570,7 @@ class CloudtasksProjectsLocationsQueuesPauseRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesPauseRequest object.
 
   Fields:
-    name: Required.  The queue name. For example:
+    name: Required. The queue name. For example:
       `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     pauseQueueRequest: A PauseQueueRequest resource to be passed as the
       request body.
@@ -580,7 +584,7 @@ class CloudtasksProjectsLocationsQueuesPurgeRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesPurgeRequest object.
 
   Fields:
-    name: Required.  The queue name. For example:
+    name: Required. The queue name. For example:
       `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     purgeQueueRequest: A PurgeQueueRequest resource to be passed as the
       request body.
@@ -594,7 +598,7 @@ class CloudtasksProjectsLocationsQueuesResumeRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesResumeRequest object.
 
   Fields:
-    name: Required.  The queue name. For example:
+    name: Required. The queue name. For example:
       `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     resumeQueueRequest: A ResumeQueueRequest resource to be passed as the
       request body.
@@ -625,7 +629,7 @@ class CloudtasksProjectsLocationsQueuesTasksAcknowledgeRequest(_messages.Message
   Fields:
     acknowledgeTaskRequest: A AcknowledgeTaskRequest resource to be passed as
       the request body.
-    name: Required.  The task name. For example:
+    name: Required. The task name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `
   """
@@ -640,7 +644,7 @@ class CloudtasksProjectsLocationsQueuesTasksCancelLeaseRequest(_messages.Message
   Fields:
     cancelLeaseRequest: A CancelLeaseRequest resource to be passed as the
       request body.
-    name: Required.  The task name. For example:
+    name: Required. The task name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `
   """
@@ -655,7 +659,7 @@ class CloudtasksProjectsLocationsQueuesTasksCreateRequest(_messages.Message):
   Fields:
     createTaskRequest: A CreateTaskRequest resource to be passed as the
       request body.
-    parent: Required.  The queue name. For example:
+    parent: Required. The queue name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`  The queue
       must already exist.
   """
@@ -668,7 +672,7 @@ class CloudtasksProjectsLocationsQueuesTasksDeleteRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesTasksDeleteRequest object.
 
   Fields:
-    name: Required.  The task name. For example:
+    name: Required. The task name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `
   """
@@ -689,7 +693,7 @@ class CloudtasksProjectsLocationsQueuesTasksGetRequest(_messages.Message):
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
 
   Fields:
-    name: Required.  The task name. For example:
+    name: Required. The task name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `
     responseView: The response_view specifies which subset of the Task will be
@@ -729,7 +733,7 @@ class CloudtasksProjectsLocationsQueuesTasksLeaseRequest(_messages.Message):
   Fields:
     leaseTasksRequest: A LeaseTasksRequest resource to be passed as the
       request body.
-    parent: Required.  The queue name. For example:
+    parent: Required. The queue name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
   """
 
@@ -759,7 +763,7 @@ class CloudtasksProjectsLocationsQueuesTasksListRequest(_messages.Message):
       page of results, page_token must be the value of next_page_token
       returned from the previous call to ListTasks method.  The page token is
       valid for only 2 hours.
-    parent: Required.  The queue name. For example:
+    parent: Required. The queue name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     responseView: The response_view specifies which subset of the Task will be
       returned.  By default response_view is BASIC; not all information is
@@ -798,7 +802,7 @@ class CloudtasksProjectsLocationsQueuesTasksRenewLeaseRequest(_messages.Message)
   r"""A CloudtasksProjectsLocationsQueuesTasksRenewLeaseRequest object.
 
   Fields:
-    name: Required.  The task name. For example:
+    name: Required. The task name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `
     renewLeaseRequest: A RenewLeaseRequest resource to be passed as the
@@ -813,7 +817,7 @@ class CloudtasksProjectsLocationsQueuesTasksRunRequest(_messages.Message):
   r"""A CloudtasksProjectsLocationsQueuesTasksRunRequest object.
 
   Fields:
-    name: Required.  The task name. For example:
+    name: Required. The task name. For example:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `
     runTaskRequest: A RunTaskRequest resource to be passed as the request
@@ -859,7 +863,7 @@ class CreateTaskRequest(_messages.Message):
       because of the sensitivity of data that it contains.  Authorization for
       FULL requires `cloudtasks.tasks.fullView` [Google
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
-    task: Required.  The task to add.  Task names have the following format:
+    task: Required. The task to add.  Task names have the following format:
       `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID
       `. The user can optionally specify a task name. If a name is not
       specified then the system will generate a random unique task id, which
@@ -946,7 +950,28 @@ class Expr(_messages.Message):
 
 
 class GetIamPolicyRequest(_messages.Message):
-  r"""Request message for `GetIamPolicy` method."""
+  r"""Request message for `GetIamPolicy` method.
+
+  Fields:
+    options: OPTIONAL: A `GetPolicyOptions` object for specifying options to
+      `GetIamPolicy`. This field is only used by Cloud IAM.
+  """
+
+  options = _messages.MessageField('GetPolicyOptions', 1)
+
+
+class GetPolicyOptions(_messages.Message):
+  r"""Encapsulates settings provided to GetIamPolicy.
+
+  Fields:
+    requestedPolicyVersion: Optional. The policy format version to be
+      returned.  Valid values are 0, 1, and 3. Requests specifying an invalid
+      value will be rejected.  Requests for policies with any conditional
+      bindings must specify version 3. Policies without any conditional
+      bindings may specify any valid value or leave the field unset.
+  """
+
+  requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class LeaseTasksRequest(_messages.Message):
@@ -977,7 +1002,11 @@ class LeaseTasksRequest(_messages.Message):
       encoded tags can be used in Cloud Tasks. Tag which aren't UTF-8 encoded
       can't be used in the filter and the task's tag will be displayed as
       empty in Cloud Tasks.
-    leaseDuration:  After the worker has successfully finished the work
+    leaseDuration: Required. The duration of the lease.  Each task returned in
+      the response will have its schedule_time set to the current time plus
+      the `lease_duration`. The task is leased until its schedule_time; thus,
+      the task will not be returned to another LeaseTasks call before its
+      schedule_time.   After the worker has successfully finished the work
       associated with the task, the worker must call via AcknowledgeTask
       before the schedule_time. Otherwise the task will be returned to a later
       LeaseTasks call so that another worker can retry it.  The maximum lease
@@ -1166,26 +1195,37 @@ class PauseQueueRequest(_messages.Message):
 class Policy(_messages.Message):
   r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.   A `Policy`
-  consists of a list of `bindings`. A `binding` binds a list of `members` to a
-  `role`, where the members can be user accounts, Google groups, Google
-  domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **JSON Example**      {       "bindings": [         {
-  "role": "roles/owner",           "members": [
+  is a collection of `bindings`. A `binding` binds one or more `members` to a
+  single `role`. Members can be user accounts, service accounts, Google
+  groups, and domains (such as G Suite). A `role` is a named list of
+  permissions (defined by IAM or configured by users). A `binding` can
+  optionally specify a `condition`, which is a logic expression that further
+  constrains the role binding based on attributes about the request and/or
+  target resource.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/resourcemanager.organizationAdmin",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
-  "domain:google.com",             "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com"           ]         },         {
-  "role": "roles/viewer",           "members": ["user:sean@example.com"]
-  }       ]     }  **YAML Example**      bindings:     - members:       -
-  user:mike@example.com       - group:admins@example.com       -
-  domain:google.com       - serviceAccount:my-other-
-  app@appspot.gserviceaccount.com       role: roles/owner     - members:
-  - user:sean@example.com       role: roles/viewer   For a description of IAM
-  and its features, see the [IAM developer's
+  "domain:google.com",             "serviceAccount:my-project-
+  id@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/resourcemanager.organizationViewer",           "members":
+  ["user:eve@example.com"],           "condition": {             "title":
+  "expirable access",             "description": "Does not grant access after
+  Sep 2020",             "expression": "request.time <
+  timestamp('2020-10-01T00:00:00.000Z')",           }         }       ]     }
+  **YAML Example**      bindings:     - members:       - user:mike@example.com
+  - group:admins@example.com       - domain:google.com       - serviceAccount
+  :my-project-id@appspot.gserviceaccount.com       role:
+  roles/resourcemanager.organizationAdmin     - members:       -
+  user:eve@example.com       role: roles/resourcemanager.organizationViewer
+  condition:         title: expirable access         description: Does not
+  grant access after Sep 2020         expression: request.time <
+  timestamp('2020-10-01T00:00:00.000Z')  For a description of IAM and its
+  features, see the [IAM developer's
   guide](https://cloud.google.com/iam/docs).
 
   Fields:
-    bindings: Associates a list of `members` to a `role`. `bindings` with no
-      members will result in an error.
+    bindings: Associates a list of `members` to a `role`. Optionally may
+      specify a `condition` that determines when binding is in effect.
+      `bindings` with no members will result in an error.
     etag: `etag` is used for optimistic concurrency control as a way to help
       prevent simultaneous updates of a policy from overwriting each other. It
       is strongly suggested that systems make use of the `etag` in the read-
@@ -1194,8 +1234,18 @@ class Policy(_messages.Message):
       systems are expected to put that etag in the request to `setIamPolicy`
       to ensure that their change will be applied to the same version of the
       policy.  If no `etag` is provided in the call to `setIamPolicy`, then
-      the existing policy is overwritten blindly.
-    version: Deprecated.
+      the existing policy is overwritten. Due to blind-set semantics of an
+      etag-less policy, 'setIamPolicy' will not fail even if either of
+      incoming or stored policy does not meet the version requirements.
+    version: Specifies the format of the policy.  Valid values are 0, 1, and
+      3. Requests specifying an invalid value will be rejected.  Operations
+      affecting conditional bindings must specify version 3. This can be
+      either setting a conditional policy, modifying a conditional binding, or
+      removing a conditional binding from the stored conditional policy.
+      Operations on non-conditional policies may specify any valid value or
+      leave the field unset.  If no etag is provided in the call to
+      `setIamPolicy`, any version compliance checks on the incoming and/or
+      stored policy is skipped.
   """
 
   bindings = _messages.MessageField('Binding', 1, repeated=True)
@@ -1399,7 +1449,7 @@ class RenewLeaseRequest(_messages.Message):
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
 
   Fields:
-    leaseDuration: Required.  The desired new lease duration, starting from
+    leaseDuration: Required. The desired new lease duration, starting from
       now.   The maximum lease duration is 1 week. `lease_duration` will be
       truncated to the nearest second.
     responseView: The response_view specifies which subset of the Task will be
@@ -1409,10 +1459,10 @@ class RenewLeaseRequest(_messages.Message):
       because of the sensitivity of data that it contains.  Authorization for
       FULL requires `cloudtasks.tasks.fullView` [Google
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
-    scheduleTime: Required.  The task's current schedule time, available in
-      the schedule_time returned by LeaseTasks response or RenewLease
-      response. This restriction is to ensure that your worker currently holds
-      the lease.
+    scheduleTime: Required. The task's current schedule time, available in the
+      schedule_time returned by LeaseTasks response or RenewLease response.
+      This restriction is to ensure that your worker currently holds the
+      lease.
   """
 
   class ResponseViewValueValuesEnum(_messages.Enum):
@@ -1636,37 +1686,10 @@ class StandardQueryParameters(_messages.Message):
 class Status(_messages.Message):
   r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
-  used by [gRPC](https://github.com/grpc). The error model is designed to be:
-  - Simple to use and understand for most users - Flexible enough to meet
-  unexpected needs  # Overview  The `Status` message contains three pieces of
-  data: error code, error message, and error details. The error code should be
-  an enum value of google.rpc.Code, but it may accept additional error codes
-  if needed.  The error message should be a developer-facing English message
-  that helps developers *understand* and *resolve* the error. If a localized
-  user-facing error message is needed, put the localized message in the error
-  details or localize it in the client. The optional error details may contain
-  arbitrary information about the error. There is a predefined set of error
-  detail types in the package `google.rpc` that can be used for common error
-  conditions.  # Language mapping  The `Status` message is the logical
-  representation of the error model, but it is not necessarily the actual wire
-  format. When the `Status` message is exposed in different client libraries
-  and different wire protocols, it can be mapped differently. For example, it
-  will likely be mapped to some exceptions in Java, but more likely mapped to
-  some error codes in C.  # Other uses  The error model and the `Status`
-  message can be used in a variety of environments, either with or without
-  APIs, to provide a consistent developer experience across different
-  environments.  Example uses of this error model include:  - Partial errors.
-  If a service needs to return partial errors to the client,     it may embed
-  the `Status` in the normal response to indicate the partial     errors.  -
-  Workflow errors. A typical workflow has multiple steps. Each step may
-  have a `Status` message for error reporting.  - Batch operations. If a
-  client uses batch request and batch response, the     `Status` message
-  should be used directly inside batch response, one for     each error sub-
-  response.  - Asynchronous operations. If an API call embeds asynchronous
-  operation     results in its response, the status of those operations should
-  be     represented directly using the `Status` message.  - Logging. If some
-  API errors are stored in logs, the message `Status` could     be used
-  directly after any stripping needed for security/privacy reasons.
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details.  You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
 
   Messages:
     DetailsValueListEntry: A DetailsValueListEntry object.

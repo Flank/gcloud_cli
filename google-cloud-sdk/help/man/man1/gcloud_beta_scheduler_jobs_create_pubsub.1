@@ -167,17 +167,31 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBcloudscheduler/v1beta1\fR API. The full documentation
-for this API can be found at: https://cloud.google.com/scheduler/
+This command uses the \fBcloudscheduler/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/scheduler/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a job that publishes a messgae with the body
+\'Hello' to the Pub/Sub topic 'cron\-topic' every 3 hours:
+
+.RS 2m
+$ gcloud beta scheduler jobs create pubsub my\-job \e
+    \-\-schedule="0 */3 * * *"
+  \-\-topic=cron\-topic \-\-message\-body="Hello"
+.RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud scheduler jobs create pubsub
 $ gcloud alpha scheduler jobs create pubsub
 .RE
 

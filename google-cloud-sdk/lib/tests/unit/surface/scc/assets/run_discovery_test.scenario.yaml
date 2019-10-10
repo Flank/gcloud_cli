@@ -5,16 +5,20 @@ summary:
 - execute:
   - command: |
       scc assets run-discovery 252600681248
-  - stdout: |
-      metadata:
-        '@type': type.googleapis.com/google.protobuf.Empty
-      name: 31ea99e9-fa7a-4c10-a9f3-c1b7540d480e
+  - stdout: .*type.googleapis.com/google.protobuf.Empty.*name:.*$
+- execute:
   - command: |
       scc assets run-discovery organizations/252600681248
-  - stdout: |
-      metadata:
-        '@type': type.googleapis.com/google.protobuf.Empty
-      name: 31ea99e9-fa7a-4c10-a9f3-c1b7540d480e
+  - stdout: .*type.googleapis.com/google.protobuf.Empty.*name:.*$
+- execute:
+  - command: |
+      config set scc/organization 252600681248
+  - stderr: |
+      Updated property [scc/organization].
+- execute:
+  - command: |
+      scc assets run-discovery
+  - stdout: .*type.googleapis.com/google.protobuf.Empty.*name:.*$
 actions:
 - execute_command:
     command: |
@@ -40,10 +44,42 @@ actions:
         matches: .*type.googleapis.com/google.protobuf.Empty.*name:.*
     - expect_exit:
         code: 0
-# Uses resource name.
 - execute_command:
     command: |
       scc assets run-discovery organizations/252600681248
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/252600681248/assets:runDiscovery?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "31ea99e9-fa7a-4c10-a9f3-c1b7540d480e",
+              "metadata": {
+                "@type": "type.googleapis.com/google.protobuf.Empty"
+              }
+            }
+    - expect_stdout:
+        matches: .*type.googleapis.com/google.protobuf.Empty.*name:.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      config set scc/organization 252600681248
+    events:
+    - expect_stderr: |
+        Updated property [scc/organization].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      scc assets run-discovery
     events:
     - api_call:
         expect_request:

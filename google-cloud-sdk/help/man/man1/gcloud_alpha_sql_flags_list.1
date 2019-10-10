@@ -26,9 +26,9 @@ gcloud alpha sql flags list \- list customizable flags for Google Cloud SQL inst
 .RS 2m
 .TP 2m
 \fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR
-Only list flags that apply to the specified database version.
-\fIDATABASE_VERSION\fR must be one of: \fBMYSQL_5_5\fR, \fBMYSQL_5_6\fR,
-\fBMYSQL_5_7\fR, \fBPOSTGRES_9_6\fR.
+The database engine type and version. If left unspecified, the API defaults will
+be used. See the list of database versions at
+https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances#databaseVersion
 
 
 .RE
@@ -88,9 +88,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud sql flags list

@@ -47,12 +47,24 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To describe an external VPN gateway, run:
 
 .RS 2m
+$ gcloud beta compute external\-vpn\-gateways describe \e
+  my\-external\-gateway
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute external\-vpn\-gateways describe
 $ gcloud alpha compute external\-vpn\-gateways describe
 .RE
 

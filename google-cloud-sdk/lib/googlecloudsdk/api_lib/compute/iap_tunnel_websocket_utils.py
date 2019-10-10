@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import os
 import struct
 import sys
 
+from googlecloudsdk.core import context_aware
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
@@ -35,6 +36,7 @@ import socks
 
 URL_SCHEME = 'wss'
 URL_HOST = 'tunnel.cloudproxy.app'
+MTLS_URL_HOST = 'mtls.tunnel.cloudproxy.app'
 URL_PATH_ROOT = '/v4'
 CONNECT_ENDPOINT = 'connect'
 RECONNECT_ENDPOINT = 'reconnect'
@@ -140,7 +142,10 @@ def CreateWebSocketReconnectUrl(tunnel_target, sid, ack_bytes):
 
 def _CreateWebSocketUrl(endpoint, url_query_pieces, url_override):
   """Create URL for WebSocket connection."""
-  scheme, hostname, path_root = (URL_SCHEME, URL_HOST, URL_PATH_ROOT)
+  scheme = URL_SCHEME
+  use_mtls = context_aware.Config().use_client_certificate
+  hostname = MTLS_URL_HOST if use_mtls else URL_HOST
+  path_root = URL_PATH_ROOT
   if url_override:
     url_override_parts = parse.urlparse(url_override)
     scheme, hostname, path_override = url_override_parts[:3]
@@ -155,12 +160,14 @@ def _CreateWebSocketUrl(endpoint, url_query_pieces, url_override):
 
 def CreateSubprotocolAckFrame(ack_bytes):
   try:
+    # TODO(b/139055137) Remove str(...)
     return struct.pack(str('>HQ'), SUBPROTOCOL_TAG_ACK, ack_bytes)
   except struct.error:
     raise InvalidWebSocketSubprotocolData('Invalid Ack [%r]' % ack_bytes)
 
 
 def CreateSubprotocolDataFrame(bytes_to_send):
+  # TODO(b/139055137) Remove str(...)
   return struct.pack(str('>HI%ds' % len(bytes_to_send)),
                      SUBPROTOCOL_TAG_DATA, len(bytes_to_send), bytes_to_send)
 
@@ -190,6 +197,7 @@ def ExtractSubprotocolTag(binary_data):
 def _ExtractUnsignedInt16(binary_data):
   if len(binary_data) < 2:
     raise IncompleteData()
+  # TODO(b/139055137) Remove str(...)
   return (struct.unpack(str('>H'), binary_data[:2])[0],
           binary_data[2:])
 
@@ -197,6 +205,7 @@ def _ExtractUnsignedInt16(binary_data):
 def _ExtractUnsignedInt32(binary_data):
   if len(binary_data) < 4:
     raise IncompleteData()
+  # TODO(b/139055137) Remove str(...)
   return (struct.unpack(str('>I'), binary_data[:4])[0],
           binary_data[4:])
 
@@ -204,6 +213,7 @@ def _ExtractUnsignedInt32(binary_data):
 def _ExtractUnsignedInt64(binary_data):
   if len(binary_data) < 8:
     raise IncompleteData()
+  # TODO(b/139055137) Remove str(...)
   return (struct.unpack(str('>Q'), binary_data[:8])[0],
           binary_data[8:])
 
@@ -211,5 +221,6 @@ def _ExtractUnsignedInt64(binary_data):
 def _ExtractBinaryArray(binary_data, data_len):
   if len(binary_data) < data_len:
     raise IncompleteData()
+  # TODO(b/139055137) Remove str(...)
   return (struct.unpack(str('%ds' % data_len), binary_data[:data_len])[0],
           binary_data[data_len:])

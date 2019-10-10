@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests that exercise the 'gcloud alpha kms asymmetric-sign' command."""
+"""Tests that exercise the 'gcloud kms asymmetric-sign' command."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,11 +27,13 @@ from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-class AsymmetricSignTest(base.KmsMockTest):
+class AsymmetricSignTestGa(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/2')
+    self.version_name = self.project_name.Version('global/my_kr/my_key/2')
 
   def testAsymmetricSignSuccess(self):
     input_path = self.Touch(
@@ -93,6 +95,18 @@ class AsymmetricSignTest(base.KmsMockTest):
                    version=self.version_name.version_id,
                    file=input_path,
                    signature=signature_path))
+
+
+class AsymmetricSignTestBeta(AsymmetricSignTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AsymmetricSignTestAlpha(AsymmetricSignTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

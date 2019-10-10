@@ -5,13 +5,13 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute network\-endpoint\-groups describe \- describes a Google Compute Engine network endpoint group
+gcloud alpha compute network\-endpoint\-groups describe \- describe a Google Compute Engine network endpoint group
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute network\-endpoint\-groups describe\fR \fINAME\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute network\-endpoint\-groups describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,6 +29,15 @@ Name of the network endpoint group to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the network endpoint group is global.
+
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the network endpoint group to operate on. If not specified and the
@@ -59,6 +68,7 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
@@ -86,9 +96,8 @@ $ gcloud alpha compute network\-endpoint\-groups describe my\-neg \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute network\-endpoint\-groups describe

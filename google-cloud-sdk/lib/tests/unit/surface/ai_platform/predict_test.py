@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@ class PredictTestBase(object):
   def SetUp(self):
     self.mock_predict = self.StartObjectPatch(predict, 'Predict')
     self.command = '{} predict --model my_model'
+    self.StartPatch('googlecloudsdk.command_lib.ml_engine.'
+                    'predict_utilities.CheckRuntimeVersion',
+                    return_value=False)
 
   def _RunWithInstances(self, contents, type_, module_name, version='v1'):
     command = self.command.format(module_name)

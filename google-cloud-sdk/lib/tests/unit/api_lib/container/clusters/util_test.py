@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -228,7 +228,7 @@ class KubeconfigTestGA(base.GATestBase, base.UnitTestBase):
         'cluster2', 'https://2.2.2.2', ca_data=None)
     user = kconfig.User('user', cert_data='FAKECERTDATA',
                         key_data='FAKE_KEY_DATA')
-    context = kconfig.Context('context1', 'cluster1', 'user')
+    context = kconfig.Context('context', 'cluster1', 'user')
     kubeconfig.clusters['cluster1'] = cluster1
     kubeconfig.clusters['cluster2'] = cluster2
     kubeconfig.users['user'] = user
@@ -251,6 +251,46 @@ class KubeconfigTestGA(base.GATestBase, base.UnitTestBase):
     with self.AssertRaisesExceptionMatches(
         kconfig.Error, kconfig.SDK_BIN_PATH_NOT_FOUND):
       kconfig._AuthProvider('gcp')
+
+  def testMergeKubeconfig(self):
+    kubeconfig = kconfig.Kubeconfig.Default()
+    cluster1 = kconfig.Cluster(
+        'cluster1', 'https://1.1.1.1', ca_data='FAKE_CA_DATA')
+    cluster2 = kconfig.Cluster(
+        'cluster2', 'https://2.2.2.2', ca_data=None)
+    user = kconfig.User('user', cert_data='FAKECERTDATA',
+                        key_data='FAKE_KEY_DATA')
+    context = kconfig.Context('context', 'cluster1', 'user')
+    kubeconfig.clusters['cluster1'] = cluster1
+    kubeconfig.clusters['cluster2'] = cluster2
+    kubeconfig.users['user'] = user
+    kubeconfig.contexts['context'] = context
+    kubeconfig.SetCurrentContext('context')
+
+    other_kubeconfig = kconfig.Kubeconfig.Default()
+    modified_cluster1 = kconfig.Cluster(
+        'cluster1', 'https://2.2.2.2', ca_data=None)
+    other_cluster2 = kconfig.Cluster(
+        'other_cluster2', 'https://3.3.3.3', ca_data='FAKE_CA_DATA')
+    user = kconfig.User('user', cert_data='FAKECERTDATA',
+                        key_data='FAKE_KEY_DATA')
+    other_context = kconfig.Context('other_context', 'cluster1', 'user')
+    other_kubeconfig.clusters['cluster1'] = modified_cluster1
+    other_kubeconfig.clusters['other_cluster2'] = other_cluster2
+    other_kubeconfig.users['user'] = user
+    other_kubeconfig.contexts['other_context'] = other_context
+    other_kubeconfig.SetCurrentContext('other_context')
+
+    kubeconfig.Merge(other_kubeconfig)
+    self.assertEqual(kubeconfig.current_context, 'context')
+    self.assertEqual(len(kubeconfig.users), 1)
+    self.assertEqual(kubeconfig.users[user['name']], user)
+    self.assertEqual(len(kubeconfig.contexts), 2)
+    for c in context, other_context:
+      self.assertEqual(kubeconfig.contexts[c['name']], c)
+    self.assertEqual(len(kubeconfig.clusters), 3)
+    for c in cluster1, cluster2, other_cluster2:
+      self.assertEqual(kubeconfig.clusters[c['name']], c)
 
 
 class KubeconfigTestBeta(base.BetaTestBase, KubeconfigTestGA):

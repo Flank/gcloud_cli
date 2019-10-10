@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,12 +54,13 @@ class UrlMapsListCacheInvalidationsTest(test_base.BaseTest):
 
     self.Run("""
         beta compute url-maps list-cdn-cache-invalidations url-map
+        --region us-west1
         """)
 
     self.CheckRequests(
-        [(self.compute_beta.urlMaps, 'Get',
-          messages.ComputeUrlMapsGetRequest(project='my-project',
-                                            urlMap='url-map'))],
+        [(self.compute_beta.regionUrlMaps, 'Get',
+          messages.ComputeRegionUrlMapsGetRequest(
+              project='my-project', urlMap='url-map', region='us-west1'))],
         [(self.compute_beta.globalOperations, 'AggregatedList',
           messages.ComputeGlobalOperationsAggregatedListRequest(
               filter=EXPECTED_FILTER_EXPR,
@@ -78,6 +79,7 @@ class UrlMapsListCacheInvalidationsTest(test_base.BaseTest):
 
     self.Run("""
         beta compute url-maps list-cdn-cache-invalidations url-map --limit 10
+        --global
         """)
 
     self.CheckRequests(

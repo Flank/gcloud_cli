@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ class ScanConfigsCreateTestAlpha(base.WebSecurityScannerScanConfigsBase):
             self.platforms['app_engine'], self.platforms['compute']
         ],  # Default
         exportToSecurityCommandCenter=self.export['ENABLED'],  # Default
+        riskLevel=self.risk_level['normal'],  # Default
     )
     response = self.messages.ScanConfig(
         name='/projects/{}/scanConfigs/123'.format(self.Project()),
@@ -63,6 +64,7 @@ class ScanConfigsCreateTestAlpha(base.WebSecurityScannerScanConfigsBase):
             self.platforms['app_engine'], self.platforms['compute']
         ],
         exportToSecurityCommandCenter=self.export['ENABLED'],
+        riskLevel=self.risk_level['normal'],
         displayName='Display',
         startingUrls=['http://example.com/'])
     self.client.projects_scanConfigs.Create.Expect(
@@ -89,6 +91,7 @@ class ScanConfigsCreateTestAlpha(base.WebSecurityScannerScanConfigsBase):
         maxQps=1,
         schedule=self.createSchedule(7, '2019-01-01T00:00:00Z'),
         userAgent=self.user_agent['safari_iphone'],
+        riskLevel=self.risk_level['low'],
     )
     response = self.messages.ScanConfig(
         displayName='Display',
@@ -117,7 +120,8 @@ class ScanConfigsCreateTestAlpha(base.WebSecurityScannerScanConfigsBase):
         ' --max-qps=1'
         ' --schedule-interval-days=7'
         ' --schedule-next-start=2019-01-01T00:00:00Z'
-        ' --user-agent=safari_iphone').format(self.Project()))
+        ' --user-agent=safari_iphone'
+        ' --risk-level=low').format(self.Project()))
 
     self.assertEqual(result, response)
 
@@ -135,6 +139,7 @@ class ScanConfigsCreateTestAlpha(base.WebSecurityScannerScanConfigsBase):
             self.platforms['app_engine'], self.platforms['compute']
         ],  # Default
         exportToSecurityCommandCenter=self.export['ENABLED'],  # Default
+        riskLevel=self.risk_level['normal'],  # Default
     )
     response = copy.deepcopy(expected)
     response.authentication.customAccount.password = ''
@@ -167,6 +172,7 @@ class ScanConfigsCreateTestAlpha(base.WebSecurityScannerScanConfigsBase):
             self.platforms['app_engine'], self.platforms['compute']
         ],  # Default
         exportToSecurityCommandCenter=self.export['ENABLED'],  # Default
+        riskLevel=self.risk_level['normal'],  # Default
     )
     response = copy.deepcopy(expected)
     response.authentication.googleAccount.password = ''

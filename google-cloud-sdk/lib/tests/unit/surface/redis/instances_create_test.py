@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ class CreateTestGA(redis_test_base.InstancesUnitTestBase):
     self.AssertErrContains('Create request issued for: [{}]'.format(
         self.instance_id))
     self.AssertErrContains('Check operation [{}] for status.'.format(
-        self.wait_operation_id))
+        self.wait_operation_relative_name))
 
   def _ExpectCreate(self,
                     instance_to_create,

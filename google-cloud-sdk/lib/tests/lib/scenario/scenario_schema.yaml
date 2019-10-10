@@ -1,4 +1,4 @@
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -396,9 +396,9 @@ definitions:
       track_values:
         additionalProperties: false
         properties:
-          GA: {type: string}
-          BETA: {type: string}
-          ALPHA: {type: string}
+          GA: {type: [string, number, boolean]}
+          BETA: {type: [string, number, boolean]}
+          ALPHA: {type: [string, number, boolean]}
 
   # Executes a gcloud command repeatedly until all the given exit conditions are
   # met. This is useful for waiting until some condition is true before
@@ -445,7 +445,7 @@ definitions:
       stdin: {type: string}
       expect_stdout: {$ref: "#/definitions/events/expect_stdout"}
       expect_stderr: {$ref: "#/definitions/events/expect_stderr"}
-      expect_exit_code: {type: number}
+      expect_exit: {$ref: "#/definitions/events/expect_exit"}
 
   # Executes a gcloud command and allows you to make various assertions about
   # the operations the command performs.

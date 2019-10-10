@@ -11,7 +11,7 @@ gcloud app deploy \- deploy the local code and/or configuration of your app to A
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud app deploy\fR [\fIDEPLOYABLES\fR\ ...] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-image\-url\fR=\fIIMAGE_URL\fR] [\fB\-\-no\-promote\fR] [\fB\-\-no\-stop\-previous\-version\fR] [\fB\-\-version\fR=\fIVERSION\fR,\ \fB\-v\fR\ \fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,10 +24,12 @@ configuration's .yaml file (for more information about configuration files
 specific to your App Engine environment, refer to
 https://cloud.google.com/appengine/docs/standard/python/configuration\-files or
 https://cloud.google.com/appengine/docs/flexible/python/configuration\-files).
-Note, for Java Standard apps, you must add the path to the
+Note, for Java8 Standard apps, you must add the path to the
 \f5appengine\-web.xml\fR file inside the WEB\-INF directory. gcloud app deploy
 skips files specified in the .gcloudignore file (see \f5gcloud topic
-gcloudignore\fR for more information).
+gcloudignore\fR for more information). For Java11 Standard, you can either use
+the yaml file, or, if the application is a single self\-contained jar, you can
+give the path to the jar and a simple service configuration will be generated.
 
 
 
@@ -53,6 +55,10 @@ app.yaml) in the current directory.
 The Google Cloud Storage bucket used to stage files associated with the
 deployment. If this argument is not specified, the application's default code
 bucket is used.
+
+.TP 2m
+\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR
+Override the .gcloudignore file and use the specified file instead.
 
 .TP 2m
 \fB\-\-image\-url\fR=\fIIMAGE_URL\fR
@@ -105,10 +111,16 @@ To deploy a single service, run:
 $ gcloud app deploy ~/my_app/app.yaml
 .RE
 
-To deploy an App Engine Standard Java service, run:
+To deploy an App Engine Standard Java8 service, run:
 
 .RS 2m
 $ gcloud app deploy ~/my_app/WEB\-INF/appengine\-web.xml
+.RE
+
+To deploy an App Engine Standard Java11 single jar, run:
+
+.RS 2m
+$ gcloud app deploy ~/my_app/my_jar.jar
 .RE
 
 By default, the service is deployed the current project configured via:

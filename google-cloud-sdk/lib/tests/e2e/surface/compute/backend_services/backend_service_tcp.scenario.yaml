@@ -7,23 +7,23 @@ summary:
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instance-groups unmanaged create $$ig$$ --zone us-central1-f
       --format none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute health-checks create tcp $$tcp-hc$$ $$global-flag$$ --format
       none
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
 - execute:
   - command: compute backend-services create $$tcp-bs$$ --protocol TCP --health-checks
       $$tcp-hc$$ --connection-draining-timeout 10 --global $$global-hc-flag$$ --format
       'text(name)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
   - stdout: |
       ---
       name: $$tcp-bs$$
@@ -31,19 +31,19 @@ summary:
   - command: compute instance-groups unmanaged add-instances $$ig$$ --instances $$instance$$
       --zone us-central1-f
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 - execute:
   - command: compute backend-services add-backend $$tcp-bs$$ --instance-group $$ig$$
       --instance-group-zone us-central1-f --balancing-mode CONNECTION --max-connections-per-instance
       100 --global
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
 - execute:
   - command: compute backend-services update-backend $$tcp-bs$$ --instance-group $$ig$$
       --instance-group-zone us-central1-f --balancing-mode UTILIZATION --max-connections
       200 --global --format 'text(name,backends[0].balancingMode,backends[0].maxConnections,backends[0].maxConnectionsPerInstance)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
   - stdout: |
       ---
       backends[0].balancingMode:  UTILIZATION
@@ -54,7 +54,7 @@ summary:
       --instance-group-zone us-central1-f --balancing-mode CONNECTION --global --format
       'text(name,backends[0].balancingMode,backends[0].maxConnections)'
   - stderr: |
-      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
   - stdout: |
       ---
       backends[0].balancingMode:  CONNECTION
@@ -63,26 +63,26 @@ summary:
 - execute:
   - command: compute backend-services delete $$tcp-bs$$ --global --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
 - execute:
   - command: compute health-checks delete $$tcp-hc$$ $$global-flag$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: compute instance-groups unmanaged delete $$ig$$ --zone us-central1-f
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
 
 
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -97,6 +97,7 @@ actions:
     value: ""
     track_values:
       ALPHA: --global
+      BETA: --global
 
 
 - define_reference:
@@ -104,6 +105,7 @@ actions:
     value: ""
     track_values:
       ALPHA: --global-health-checks
+      BETA: --global-health-checks
 
 
 - generate_resource_id:
@@ -113,8 +115,9 @@ actions:
     command: compute instances create $$instance$$ --zone us-central1-f --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+            Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 
@@ -127,8 +130,9 @@ actions:
       --format none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+            Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0
 
@@ -141,8 +145,9 @@ actions:
       none
     validation_only: true
     events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+    - expect_stderr:
+        matches: |
+            Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
     - expect_exit:
         code: 0
 
@@ -163,7 +168,7 @@ actions:
           body:
             json:
               healthChecks:
-              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$
+              - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$
               name: $$tcp-bs$$
               portName: tcp
               protocol: TCP
@@ -179,16 +184,17 @@ actions:
             id: '7402689974443055914'
             name: operation-1537975744405-576c7e1eb1e0a-7cc147db-3f7a9ae3
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$
+            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$
             targetId: '5606780314795252522'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-26T08:29:09.637-07:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537975744405-576c7e1eb1e0a-7cc147db-3f7a9ae3
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537975744405-576c7e1eb1e0a-7cc147db-3f7a9ae3
         poll_operation: true
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+            Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
@@ -208,9 +214,9 @@ actions:
             creationTimestamp: '2018-09-26T08:29:09.628-07:00'
             name: $$tcp-bs$$
             description: ''
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$
             healthChecks:
-            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$
+            - https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$
             timeoutSec: 30
             port: 80
             protocol: TCP
@@ -241,7 +247,7 @@ actions:
           body:
             json:
               instances:
-              - instance: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+              - instance: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -252,9 +258,9 @@ actions:
             kind: compute#operation
             id: '4773678292845075263'
             name: operation-1537975757197-576c7e2ae4eca-32b127da-ae18bbce
-            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: compute.instanceGroups.addInstances
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+            targetLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
             targetId: '1260947712518789980'
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
@@ -262,10 +268,11 @@ actions:
             insertTime: '2018-09-26T08:29:20.698-07:00'
             startTime: '2018-09-26T08:29:20.701-07:00'
             endTime: '2018-09-26T08:29:20.701-07:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537975757197-576c7e2ae4eca-32b127da-ae18bbce
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1537975757197-576c7e2ae4eca-32b127da-ae18bbce
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+            Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$?alt=json
@@ -285,10 +292,10 @@ actions:
             creationTimestamp: '2018-09-26T08:28:51.568-07:00'
             name: $$ig$$
             description: ''
-            network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+            network: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
             fingerprint: 42WmSpB8rSM=
-            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+            zone: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
             size: 1
     - expect_exit:
         code: 0
@@ -342,7 +349,7 @@ actions:
               affinityCookieTtlSec: 0
               backends:
               - balancingMode: CONNECTION
-                group: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
+                group: https://compute.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$
               connectionDraining:
                 drainingTimeoutSec: 10
               description: ''
@@ -377,8 +384,9 @@ actions:
             insertTime: '2018-09-26T08:29:29.655-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537975761816-576c7e2f4c9c3-bc94dd2f-c6c922c3
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+            Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
@@ -511,8 +519,9 @@ actions:
             insertTime: '2018-09-26T08:29:48.397-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537975786659-576c7e46fdcbb-bd23dc70-80f9567a
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+            Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
@@ -649,8 +658,9 @@ actions:
             insertTime: '2018-09-26T08:29:56.752-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537975796067-576c7e4ff6aba-dd188c1a-8797e3b4
         poll_operation: true
-    - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+            Updated \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
@@ -727,8 +737,9 @@ actions:
             insertTime: '2018-09-26T08:30:06.170-07:00'
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1537975804177-576c7e57b2a69-36c19ff4-1e2138b1
         poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
+    - expect_stderr:
+        matches: |
+            Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$\].
     - expect_exit:
         code: 0
 
@@ -738,8 +749,9 @@ actions:
     cleanup_for: tcp-hc
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$].
+    - expect_stderr:
+        matches: |
+            Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$tcp-hc$$\].
     - expect_exit:
         code: 0
 
@@ -749,8 +761,9 @@ actions:
     cleanup_for: instance
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stderr:
+        matches: |
+            Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
     - expect_exit:
         code: 0
 
@@ -761,7 +774,8 @@ actions:
     cleanup_for: ig
     validation_only: true
     events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
+    - expect_stderr:
+        matches: |
+            Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$\].
     - expect_exit:
         code: 0

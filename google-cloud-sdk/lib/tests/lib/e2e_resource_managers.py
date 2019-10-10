@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@ from __future__ import unicode_literals
 
 import abc
 import copy
-import traceback
+import sys
 
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import resources
-from googlecloudsdk.core.util import encoding
 from tests.lib import e2e_utils
 
 
@@ -141,16 +140,10 @@ class ResourceContexManagerBase(object):
     try:
       self._runner(self._GetDeleteCommand())
     except:  # pylint: disable=bare-except
-      if not prev_exc_type:
-        raise
-      message = (
-          'Got exception {0}'
-          'while another exception was active {1} [{2}]'
-          .format(
-              encoding.Decode(traceback.format_exc()),
-              prev_exc_type,
-              encoding.Decode(prev_exc_val)))
-      exceptions.reraise(prev_exc_type(message), tb=prev_exc_trace)
+      exceptions.RaiseWithContext(
+          prev_exc_type, prev_exc_val, prev_exc_trace, *sys.exc_info())
+    # Always return False so any previous exception will be re-raised.
+    return False
 
   @abc.abstractmethod
   def _GetCreateCommand(self):

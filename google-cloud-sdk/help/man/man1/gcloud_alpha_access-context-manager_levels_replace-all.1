@@ -1,0 +1,109 @@
+
+.TH "GCLOUD_ALPHA_ACCESS\-CONTEXT\-MANAGER_LEVELS_REPLACE\-ALL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha access\-context\-manager levels replace\-all \- replace all existing access levels
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha access\-context\-manager levels replace\-all\fR [\fIPOLICY\fR] \fB\-\-source\-file\fR=\fISOURCE_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Replace all existing access level in specified access policy with
+access levels specified in a file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy resource \- The access policy that contains the levels you want to
+replace. This represents a Cloud resource.
+
+.RS 2m
+.TP 2m
+[\fIPOLICY\fR]
+ID of the policy or fully qualified identifier for the policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-file\fR=\fISOURCE_FILE\fR
+Path to a file containing a list of access levels.
+
+An access level file is a YAML\-formatted list of access levels, which are YAML
+objects representing a Condition as described in the API reference. For example:
+
+.RS 2m
+\- name: accessPolicies/my_policy/accessLevels/my_level
+  title: My Level
+  description: Level for foo.
+  basic:
+    combiningFunction: AND
+    conditions:
+    \- ipSubnetworks:
+      \- 192.168.100.14/24
+      \- 2001:db8::/48
+    \- members
+      \- user1:user1@example.com
+\- name: accessPolicies/my_policy/accessLevels/my_other_level
+  title: My Other Level
+  description: Level for bar.
+  basic:
+    combiningFunction: OR
+    conditions:
+    \- ipSubnetworks:
+      \- 192.168.100.14/24
+      \- 2001:db8::/48
+    \- members
+      \- user2:user2@example.com
+.RE
+
+For more information, see:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/v1beta/accessPolicies.accessLevels
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBaccesscontextmanager/v1beta\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

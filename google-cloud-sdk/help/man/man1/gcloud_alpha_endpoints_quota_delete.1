@@ -1,0 +1,121 @@
+
+.TH "GCLOUD_ALPHA_ENDPOINTS_QUOTA_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha endpoints quota delete \- delete a quota override for a consumer
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha endpoints quota delete\fR \fB\-\-consumer\fR=\fICONSUMER\fR \fB\-\-metric\fR=\fIMETRIC\fR \fB\-\-override\-id\fR=\fIOVERRIDE_ID\fR \fB\-\-service\fR=\fISERVICE\fR \fB\-\-unit\fR=\fIUNIT\fR [\fB\-\-force\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command deletes a quota override for a consumer. The
+supported consumers are projects, folders, and organizations. The override ID
+can be found from list command output.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-consumer\fR=\fICONSUMER\fR
+The consumer to delete a quota override for.
+
+.TP 2m
+\fB\-\-metric\fR=\fIMETRIC\fR
+The metric to delete a quota override for.
+
+.TP 2m
+\fB\-\-override\-id\fR=\fIOVERRIDE_ID\fR
+The override ID of the override previous created.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+The service to delete a quota override for.
+
+.TP 2m
+\fB\-\-unit\fR=\fIUNIT\fR
+The unit of a metric to delete a quota override for.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-force\fR
+Force override deletion even if the change results in a substantial decrease in
+available quota.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a quota override for a project with project number, run:
+
+.RS 2m
+$ gcloud alpha endpoints quota delete \e
+    \-\-service=example.googleapis.com \-\-consumer=projects/12321
+  \-\-metric=example.googleapis.com/default_requests
+  \-\-unit=1/min/{project}
+.RE
+
+To delete a quota override for a project with project ID, run:
+
+.RS 2m
+$ gcloud alpha endpoints quota delete \e
+    \-\-service=example.googleapis.com \-\-consumer=projects/hello
+  \-\-metric=example.googleapis.com/default_requests
+  \-\-unit=1/min/{project}
+.RE
+
+To delete a quota override for an organization, run:
+
+.RS 2m
+$ gcloud alpha endpoints quota delete \e
+    \-\-service=example.googleapis.com \-\-consumer=organizations/555
+  \-\-metric=example.googleapis.com/default_requests
+  \-\-unit=1/min/{project}
+.RE
+
+To force the deletion of a quota override, run:
+
+.RS 2m
+$ gcloud alpha endpoints quota delete \e
+    \-\-service=example.googleapis.com \-\-consumer=projects/12321
+  \-\-metric=example.googleapis.com/default_requests
+  \-\-unit=1/min/{project} \-\-force
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

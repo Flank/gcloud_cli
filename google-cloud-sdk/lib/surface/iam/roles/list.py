@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ class List(base.ListCommand):
         '--show-deleted',
         action='store_true',
         help='Show deleted roles by specifying this flag.')
-    flags.GetOrgFlag('list').AddToParser(parser)
+    flags.AddParentFlags(parser, 'list', required=False)
     base.ASYNC_FLAG.RemoveFromParser(parser)
     base.PAGE_SIZE_FLAG.RemoveFromParser(parser)
     base.URI_FLAG.RemoveFromParser(parser)

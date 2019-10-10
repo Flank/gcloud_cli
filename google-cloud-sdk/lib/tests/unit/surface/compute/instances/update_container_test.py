@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -578,7 +578,7 @@ class UpdateContainerAlphaTest(
         licenses=[],
         mode=mode or self.messages.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
         type=(self.messages.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-        source='https://www.googleapis.com/compute/v1/projects/{}/zones'
+        source='https://compute.googleapis.com/compute/v1/projects/{}/zones'
         '/central2-a/disks/{}'.format(self.Project(), disk_name))
 
   def _GetMetadataRequestWithMetadata(self, metadata):

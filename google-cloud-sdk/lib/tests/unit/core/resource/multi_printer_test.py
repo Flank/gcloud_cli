@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -361,6 +361,96 @@ nic0  default  10.240.150.0
   ],
   "kind": "compute#metadata.1"
 }
+NAME  NETWORK  NETWORK_IP
+nic0  default  10.240.150.1
+""")
+
+  def testPrintWithSeparatorSingleResource(self):
+    resource_printer.Print(
+        list(self.CreateResourceList(1))[0],
+        'multi[separator="---\n"](metadata:format=json, networkInterfaces:format="table(name, '
+        'network, networkIP)")')
+    self.AssertOutputEquals("""\
+{
+  "items": [
+    {
+      "key": "a",
+      "value": "b"
+    },
+    {
+      "key": "c",
+      "value": "d"
+    },
+    {
+      "key": "e",
+      "value": "f"
+    },
+    {
+      "key": "g",
+      "value": "h"
+    }
+  ],
+  "kind": "compute#metadata.2"
+}
+---
+NAME  NETWORK  NETWORK_IP
+nic0  default  10.240.150.0
+""")
+
+  def testPrintWithSeparatorMultipleResources(self):
+    resource_printer.Print(
+        self.CreateResourceList(2),
+        'multi[separator="---\n"](metadata:format=json, networkInterfaces:format="table(name, '
+        'network, networkIP)")')
+    self.AssertOutputEquals("""\
+---
+{
+  "items": [
+    {
+      "key": "a",
+      "value": "b"
+    },
+    {
+      "key": "c",
+      "value": "d"
+    },
+    {
+      "key": "e",
+      "value": "f"
+    },
+    {
+      "key": "g",
+      "value": "h"
+    }
+  ],
+  "kind": "compute#metadata.2"
+}
+---
+NAME  NETWORK  NETWORK_IP
+nic0  default  10.240.150.0
+---
+{
+  "items": [
+    {
+      "key": "a",
+      "value": "b"
+    },
+    {
+      "key": "c",
+      "value": "d"
+    },
+    {
+      "key": "e",
+      "value": "f"
+    },
+    {
+      "key": "g",
+      "value": "h"
+    }
+  ],
+  "kind": "compute#metadata.1"
+}
+---
 NAME  NETWORK  NETWORK_IP
 nic0  default  10.240.150.1
 """)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
@@ -139,7 +138,9 @@ class ListTest(unit_test_base.BaseTest):
       self.Run('iam roles list --organization 1 --limit -1')
 
   def testInvalidArgument(self):
-    with self.assertRaises(exceptions.ConflictingArgumentsException):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --organization: At most one of --organization | --project '
+        'may be specified.'):
       self.Run('iam roles list --organization 123 --project myproject')
 
 

@@ -38,7 +38,7 @@ EXAMPLES
     location global:
 
         $ gcloud kms keys set-iam-policy frodo policy.json \
-            --keyring fellowship --location global
+            --keyring=fellowship --location=global
 
 NOTES
     These variants are also available:

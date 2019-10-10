@@ -3,7 +3,7 @@ NAME
         service or default bucket of a URL map
 
 SYNOPSIS
-    gcloud alpha compute url-maps set-default-service URL_MAP_NAME
+    gcloud alpha compute url-maps set-default-service URL_MAP
         (--default-backend-bucket=DEFAULT_BACKEND_BUCKET
           | --default-service=DEFAULT_SERVICE) [--global | --region=REGION]
         [GCLOUD_WIDE_FLAG ...]
@@ -15,7 +15,7 @@ DESCRIPTION
     the URL map.
 
 POSITIONAL ARGUMENTS
-     URL_MAP_NAME
+     URL_MAP
         Name of the URL map to operate on.
 
 REQUIRED FLAGS
@@ -65,9 +65,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute url-maps set-default-service
         $ gcloud beta compute url-maps set-default-service

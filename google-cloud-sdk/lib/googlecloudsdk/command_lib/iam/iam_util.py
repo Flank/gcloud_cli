@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,8 +35,30 @@ from googlecloudsdk.core import resources
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
+import six
+
+
+# TODO: (b/124063772) Kluge for fixing inconsistency in python message
+# generation from proto.
+kms_message = core_apis.GetMessagesModule('cloudkms', 'v1')
+encoding.AddCustomJsonFieldMapping(
+    kms_message.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest,
+    'options_requestedPolicyVersion', 'options.requestedPolicyVersion')
+
+encoding.AddCustomJsonFieldMapping(
+    kms_message.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest,
+    'options_requestedPolicyVersion', 'options.requestedPolicyVersion')
+
+encoding.AddCustomJsonFieldMapping(
+    kms_message.CloudkmsProjectsLocationsKeyRingsImportJobsGetIamPolicyRequest,
+    'options_requestedPolicyVersion', 'options.requestedPolicyVersion')
 
 msgs = core_apis.GetMessagesModule('iam', 'v1')
+encoding.AddCustomJsonFieldMapping(
+    msgs.IamProjectsServiceAccountsGetIamPolicyRequest,
+    'options_requestedPolicyVersion', 'options.requestedPolicyVersion')
+
+
 MANAGED_BY = (msgs.IamProjectsServiceAccountsKeysListRequest
               .KeyTypesValueValuesEnum)
 CREATE_KEY_TYPES = (msgs.CreateServiceAccountKeyRequest
@@ -68,6 +90,8 @@ CONDITION_FILE_FORMAT_EXCEPTION = gcloud_exceptions.InvalidArgumentException(
     'condition-from-file must be a path to a YAML or JSON file containing the '
     'condition. `expression` and `title` are required keys. `description` is '
     'optional. To specify a `None` condition, use --condition=None.')
+
+MAX_LIBRARY_IAM_SUPPORTED_VERSION = 3
 
 _ALL_CONDITIONS = {'All': None}
 
@@ -165,7 +189,7 @@ To see available fields, see the help for `--condition`."""
 
   condition_group.add_argument(
       '--condition-from-file',
-      type=arg_parsers.BufferedFileInput(),
+      type=arg_parsers.FileContents(),
       help=help_str_condition_from_file)
 
 
@@ -194,7 +218,7 @@ conditions."""
 
   condition_group.add_argument(
       '--condition-from-file',
-      type=arg_parsers.BufferedFileInput(),
+      type=arg_parsers.FileContents(),
       help=help_str_condition_from_file)
 
   condition_group.add_argument(
@@ -539,10 +563,12 @@ def _AddBindingToIamPolicyWithCondition(binding_message_type,
         binding.members.append(member)
       return
 
-  condition_message = None if condition is None else condition_message_type(
-      expression=condition.get('expression'),
-      title=condition.get('title'),
-      description=condition.get('description'))
+  condition_message = None
+  if condition is not None:
+    condition_message = condition_message_type(
+        expression=condition.get('expression'),
+        title=condition.get('title'),
+        description=condition.get('description'))
   policy.bindings.append(
       binding_message_type(
           members=[member], role='{}'.format(role),
@@ -775,12 +801,12 @@ def ParseYamlOrJsonPolicyFile(policy_file_path, policy_message_type):
     raise gcloud_exceptions.BadFileException(
         'Policy file [{0}] is not a properly formatted YAML or JSON '
         'policy file. {1}'
-        .format(policy_file_path, str(e)))
+        .format(policy_file_path, six.text_type(e)))
   except (apitools_messages.DecodeError, binascii.Error) as e:
     # DecodeError is raised when etag is badly formatted (not proper Base64)
     raise IamEtagReadError(
         'The etag of policy file [{0}] is not properly formatted. {1}'
-        .format(policy_file_path, str(e)))
+        .format(policy_file_path, six.text_type(e)))
   return (policy, update_mask)
 
 
@@ -826,12 +852,12 @@ def ParseYamlToRole(file_path, role_message_type):
     # Raised when the YAML file is not properly formatted YAML role file.
     raise gcloud_exceptions.BadFileException(
         'Role file {0} is not a properly formatted YAML role file. {1}'
-        .format(file_path, str(e)))
+        .format(file_path, six.text_type(e)))
   except (apitools_messages.DecodeError, binascii.Error) as e:
     # DecodeError is raised when etag is badly formatted (not proper Base64)
     raise IamEtagReadError(
         'The etag of role file {0} is not properly formatted. {1}'
-        .format(file_path, str(e)))
+        .format(file_path, six.text_type(e)))
   return role
 
 

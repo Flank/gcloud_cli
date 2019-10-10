@@ -6,6 +6,7 @@ SYNOPSIS
     gcloud alpha compute sole-tenancy node-templates create NAME
         (--node-requirements=[localSSD=LOCALSSD],[memory=MEMORY],[vCPU=VCPU]
           | --node-type=NODE_TYPE) [--description=DESCRIPTION]
+        [--disk=[count=COUNT],[size=SIZE],[type=TYPE]]
         [--node-affinity-labels=[KEY=VALUE,...]] [--region=REGION]
         [--server-binding=SERVER_BINDING; default="restart-node-on-any-server"]
         [GCLOUD_WIDE_FLAG ...]
@@ -55,6 +56,24 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional description of this resource.
+
+     --disk=[count=COUNT],[size=SIZE],[type=TYPE]
+        Option to specify disk properties. It is mutually exclusive with
+        '--node-requirements=[localSSD=LOCALSSD]' but
+        '--node-requirements=[memory=MEMORY],[vCPU=VCPU],any' are still
+        available.
+
+         type
+            Specifies the desired disk type on the node. This disk type must be
+            a local storage type. This should be the name of the disk type.
+            Currently only local-ssd is allowed.
+
+         size
+            The size of the disk in GiB. Currently you can specify only 375 GiB
+            or no value at all.
+
+         count
+            Specifies the number of such disks.
 
      --node-affinity-labels=[KEY=VALUE,...]
         Labels to use for node affinity, which will be used in instance
@@ -114,9 +133,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute sole-tenancy node-templates create
         $ gcloud beta compute sole-tenancy node-templates create

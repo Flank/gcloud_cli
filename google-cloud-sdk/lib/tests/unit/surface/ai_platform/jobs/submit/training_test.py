@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -78,8 +78,560 @@ class Log(object):
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')
-class TrainTestCustomServer(object):
-  """Mix-in for testing custom server flags."""
+class TrainTestBase(object):
+
+  _LOG_ENTRIES = [
+      Log(
+          severity=LogSeverity('INFO'),
+          timestamp='2016-01-01T00:00:00Z',
+          textPayload='message',
+          resourceLabels={'task_name': 'service'},
+          labels={'ml.googleapis.com/trial_id': '10'}),
+      Log(
+          severity=LogSeverity('INFO'),
+          timestamp='2016-01-01T01:00:00Z',
+          textPayload='message2',
+          resourceLabels={'task_name': 'service'},
+          labels={'ml.googleapis.com/trial_id': '20'}),
+  ]
+
+  def _MakeCreateRequest(self, job, parent):
+    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
+                                                 parent=parent)
+
+  @property
+  def state_enum(self):
+    # Because this is hard to fit on one line.
+    return self.short_msgs.Job.StateValueValuesEnum
+
+  @contextlib.contextmanager
+  def _AssertRaisesExitCode(self, exc_type, exit_code):
+    try:
+      yield
+    except exc_type as err:
+      self.assertEqual(err.exit_code, exit_code)
+    else:
+      self.fail('Should have raised googlecloudsdk.exceptions.Error')
+
+  def _MakeLabels(self, **kwargs):
+    labels_cls = self.short_msgs.Job.LabelsValue
+    return labels_cls(additionalProperties=[
+        labels_cls.AdditionalProperty(key=k, value=v) for k, v in
+        sorted(kwargs.items())
+    ])
+
+  def _ExpectCreate(self, scale_tier=None, runtime_version=None,
+                    python_version=None, job_dir='gs://job-bucket/job-prefix',
+                    args=None, labels=None):
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                labels=labels,
+                trainingInput=self.short_msgs.TrainingInput(
+                    pythonModule='my_module',
+                    packageUris=['gs://bucket/stuff.tar.gz'],
+                    scaleTier=scale_tier,
+                    region='us-central1',
+                    jobDir=job_dir,
+                    runtimeVersion=runtime_version,
+                    pythonVersion=python_version,
+                    args=args or [])),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(
+            jobId='my_job',
+            trainingInput=self.short_msgs.TrainingInput(
+                pythonModule='my_module',
+                packageUris=['gs://bucket/stuff.tar.gz'],
+                scaleTier=scale_tier,
+                region='us-central1',
+                jobDir=job_dir,
+                runtimeVersion=runtime_version,
+                pythonVersion=python_version),
+            state=self.state_enum.QUEUED,
+            labels=labels,
+            startTime='2016-01-01T00:00:00Z')
+    )
+
+  def _ExpectGet(self, state):
+    scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
+    self.client.projects_jobs.Get.Expect(
+        self.msgs.MlProjectsJobsGetRequest(
+            name='projects/{}/jobs/my_job'.format(self.Project())),
+        self.short_msgs.Job(
+            jobId='my_job',
+            trainingInput=self.short_msgs.TrainingInput(
+                pythonModule='my_module',
+                packageUris=['gs://bucket/stuff.tar.gz'],
+                region='us-central1',
+                jobDir='gs://job-bucket/job-prefix',
+                scaleTier=scale_tier_enum.CUSTOM),
+            state=state,
+            startTime='2016-01-01T00:00:00Z',
+            endTime='2016-01-02T00:00:00Z'))
+
+  def _BaseSetUp(self):
+    self.upload_mock = self.StartObjectPatch(
+        jobs_prep, 'UploadPythonPackages',
+        return_value=['gs://bucket/stuff.tar.gz'])
+    self.staging_location = storage_util.ObjectReference.FromUrl(
+        'gs://bucket/my_job')
+    # For consistent output of times
+    self.StartObjectPatch(times, 'LOCAL', times.GetTimeZone('PST'))
+
+  def testTrain_Async(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate(args=['--foo'])
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    -- --foo'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertOutputEquals("""\
+        jobId: my_job
+        startTime: '2015-12-31T16:00:00'
+        state: QUEUED
+        """, normalize_space=True)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_AsyncDeprecated(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate(args=['--foo'])
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --async '
+             '    -- --foo'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertOutputEquals("""\
+        jobId: my_job
+        startTime: '2015-12-31T16:00:00'
+        state: QUEUED
+        """, normalize_space=True)
+    self.AssertErrContains(
+        """\
+        {}WARNING: The --async flag is deprecated, as the default behavior is \
+        to submit the job asynchronously; it can be omitted. For synchronous \
+        behavior, please pass --stream-logs.
+
+        Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_AsyncConfig(self, module_name):
+    self._BaseSetUp()
+    config_file = self.Touch(
+        self.temp_path, 'config.yaml',
+        contents=json.dumps({
+            'trainingInput': {'args': ['foo']},
+            'labels': {'key': 'value'}}))
+    self._ExpectCreate(args=['foo'], labels=self._MakeLabels(key='value'))
+
+    self.Run(('{} jobs submit training my_job '
+              '    --module-name my_module '
+              '    --package-path stuff/ '
+              '    --staging-bucket gs://bucket '
+              '    --job-dir gs://job-bucket/job-prefix '
+              '    --region us-central1 '
+              '    --config {}').format(module_name, config_file))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_AsyncConfigEmptyArgs(self, module_name):
+    self._BaseSetUp()
+    config_file = self.Touch(
+        self.temp_path, 'config.yaml',
+        contents=json.dumps({'trainingInput': {'args': ['foo']}}))
+    self._ExpectCreate(args=[])
+
+    self.Run(('{} jobs submit training my_job '
+              '    --module-name my_module '
+              '    --package-path stuff/ '
+              '    --staging-bucket gs://bucket '
+              '    --job-dir gs://job-bucket/job-prefix '
+              '    --region us-central1 '
+              '    --config {} '
+              '    --').format(module_name, config_file))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_AsyncNoJobDir(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate(job_dir=None)
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --region us-central1'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+    self.AssertOutputEquals("""\
+        jobId: my_job
+        startTime: '2015-12-31T16:00:00'
+        state: QUEUED
+        """, normalize_space=True)
+
+  def testTrain_AsyncRuntimeVersion(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate(runtime_version='0.12')
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --runtime-version 0.12'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_AsyncPythonVersion(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate(python_version='2.7')
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --python-version 2.7'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_AsyncLabels(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate(labels=self._MakeLabels(key='value'))
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --labels key=value'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+
+  def testTrain_AsyncScaleTier(self, module_name):
+    self._BaseSetUp()
+    scale_tier = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum.BASIC_GPU
+    self._ExpectCreate(scale_tier=scale_tier)
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --scale-tier BASIC_GPU'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_Logs(self, module_name):
+    self._BaseSetUp()
+    # Check that the polling_interval property is respected
+    properties.VALUES.ml_engine.polling_interval.Set(20)
+    self._ExpectCreate()
+    self._ExpectGet(self.state_enum.SUCCEEDED)
+    log_fetcher_mock = mock.Mock()
+    log_fetcher_constructor_mock = self.StartObjectPatch(
+        stream, 'LogFetcher', return_value=log_fetcher_mock)
+    log_fetcher_mock.YieldLogs.return_value = iter(self._LOG_ENTRIES)
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --stream-logs'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains("""\
+        Job [my_job] submitted successfully.
+        INFO 2015-12-31 16:00:00 -0800 service 10 message
+        INFO 2015-12-31 17:00:00 -0800 service 20 message2
+        """, normalize_space=True)
+    self.AssertOutputEquals("""\
+        endTime: '2016-01-01T16:00:00'
+        jobId: my_job
+        startTime: '2015-12-31T16:00:00'
+        state: SUCCEEDED
+        """, normalize_space=True)
+    log_fetcher_constructor_mock.assert_called_once_with(
+        continue_func=mock.ANY, filters=mock.ANY,
+        polling_interval=20, continue_interval=10)
+
+  def testTrain_LogsError(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate()
+    self._ExpectGet(self.state_enum.FAILED)
+    self.log_fetcher_mock = self.StartObjectPatch(
+        stream.LogFetcher, 'YieldLogs', return_value=iter(self._LOG_ENTRIES))
+
+    with self._AssertRaisesExitCode(calliope_exceptions.ExitCodeNoError, 1):
+      self.Run('{} jobs submit training my_job '
+               '    --module-name my_module '
+               '    --package-path stuff/ '
+               '    --staging-bucket gs://bucket '
+               '    --job-dir gs://job-bucket/job-prefix '
+               '    --region us-central1 '
+               '    --stream-logs'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains("""\
+        Job [my_job] submitted successfully.
+        INFO 2015-12-31 16:00:00 -0800 service 10 message
+        INFO 2015-12-31 17:00:00 -0800 service 20 message2
+        """, normalize_space=True)
+    self.AssertOutputEquals("""\
+        endTime: '2016-01-01T16:00:00'
+        jobId: my_job
+        startTime: '2015-12-31T16:00:00'
+        state: FAILED
+        """, normalize_space=True)
+
+  def testTrain_LogsCtrlC(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate()
+    self._ExpectGet(self.state_enum.QUEUED)
+    self.log_fetcher_mock = self.StartObjectPatch(
+        stream.LogFetcher, 'YieldLogs', side_effect=KeyboardInterrupt)
+
+    with self._AssertRaisesExitCode(calliope_exceptions.ExitCodeNoError, 1):
+      self.Run('{} jobs submit training my_job '
+               '    --module-name my_module '
+               '    --package-path stuff/ '
+               '    --staging-bucket gs://bucket '
+               '    --job-dir gs://job-bucket/job-prefix '
+               '    --region us-central1 '
+               '    --stream-logs'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Received keyboard interrupt.
+
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+
+  def testTrain_LogsPollingError(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate()
+    self._ExpectGet(self.state_enum.QUEUED)
+    http_err = http_error.MakeHttpError(
+        code=403, url='http://googleapis.com/endpoint')
+    self.log_fetcher_mock = self.StartObjectPatch(
+        stream.LogFetcher, 'YieldLogs', side_effect=http_err)
+
+    with self._AssertRaisesExitCode(calliope_exceptions.ExitCodeNoError, 1):
+      self.Run('{} jobs submit training my_job '
+               '    --module-name my_module '
+               '    --package-path stuff/ '
+               '    --staging-bucket gs://bucket '
+               '    --job-dir gs://job-bucket/job-prefix '
+               '    --region us-central1 '
+               '    --stream-logs'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Polling logs failed:
+        HttpError accessing <http://googleapis.com/endpoint>:\
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
+    self.AssertErrContains(
+        """\
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """,
+        normalize_space=True)
+
+  def testTrain_LogsCtrlCSuccess(self, module_name):
+    self._BaseSetUp()
+    self._ExpectCreate()
+    self._ExpectGet(self.state_enum.SUCCEEDED)
+    self.log_fetcher_mock = self.StartObjectPatch(
+        stream.LogFetcher, 'YieldLogs', side_effect=KeyboardInterrupt)
+
+    self.Run('{} jobs submit training my_job '
+             '    --module-name my_module '
+             '    --package-path stuff/ '
+             '    --staging-bucket gs://bucket '
+             '    --job-dir gs://job-bucket/job-prefix '
+             '    --region us-central1 '
+             '    --stream-logs'.format(module_name))
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains(
+        """\
+        {}Job [my_job] submitted successfully.
+        Received keyboard interrupt.
+
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ai-platform jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ai-platform jobs stream-logs my_job
+        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
+        normalize_space=True)
 
   def testTrain_Container(self, module_name):
     config_file = self.Touch(
@@ -266,570 +818,6 @@ class TrainTestCustomServer(object):
 
 
 @parameterized.parameters('ml-engine', 'ai-platform')
-class TrainTestBase(object):
-
-  _LOG_ENTRIES = [
-      Log(
-          severity=LogSeverity('INFO'),
-          timestamp='2016-01-01T00:00:00Z',
-          textPayload='message',
-          resourceLabels={'task_name': 'service'},
-          labels={'ml.googleapis.com/trial_id': '10'}),
-      Log(
-          severity=LogSeverity('INFO'),
-          timestamp='2016-01-01T01:00:00Z',
-          textPayload='message2',
-          resourceLabels={'task_name': 'service'},
-          labels={'ml.googleapis.com/trial_id': '20'}),
-  ]
-
-  def _MakeCreateRequest(self, job, parent):
-    raise NotImplementedError()
-
-  @property
-  def state_enum(self):
-    # Because this is hard to fit on one line.
-    return self.short_msgs.Job.StateValueValuesEnum
-
-  @contextlib.contextmanager
-  def _AssertRaisesExitCode(self, exc_type, exit_code):
-    try:
-      yield
-    except exc_type as err:
-      self.assertEqual(err.exit_code, exit_code)
-    else:
-      self.fail('Should have raised googlecloudsdk.exceptions.Error')
-
-  def _MakeLabels(self, **kwargs):
-    labels_cls = self.short_msgs.Job.LabelsValue
-    return labels_cls(additionalProperties=[
-        labels_cls.AdditionalProperty(key=k, value=v) for k, v in
-        sorted(kwargs.items())
-    ])
-
-  def _ExpectCreate(self, scale_tier=None, runtime_version=None,
-                    python_version=None, job_dir='gs://job-bucket/job-prefix',
-                    args=None, labels=None):
-    self.client.projects_jobs.Create.Expect(
-        self._MakeCreateRequest(
-            self.short_msgs.Job(
-                jobId='my_job',
-                labels=labels,
-                trainingInput=self.short_msgs.TrainingInput(
-                    pythonModule='my_module',
-                    packageUris=['gs://bucket/stuff.tar.gz'],
-                    scaleTier=scale_tier,
-                    region='us-central1',
-                    jobDir=job_dir,
-                    runtimeVersion=runtime_version,
-                    pythonVersion=python_version,
-                    args=args or [])),
-            parent='projects/{}'.format(self.Project())),
-        self.short_msgs.Job(
-            jobId='my_job',
-            trainingInput=self.short_msgs.TrainingInput(
-                pythonModule='my_module',
-                packageUris=['gs://bucket/stuff.tar.gz'],
-                scaleTier=scale_tier,
-                region='us-central1',
-                jobDir=job_dir,
-                runtimeVersion=runtime_version,
-                pythonVersion=python_version),
-            state=self.state_enum.QUEUED,
-            labels=labels,
-            startTime='2016-01-01T00:00:00Z')
-    )
-
-  def _ExpectGet(self, state):
-    scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
-    self.client.projects_jobs.Get.Expect(
-        self.msgs.MlProjectsJobsGetRequest(
-            name='projects/{}/jobs/my_job'.format(self.Project())),
-        self.short_msgs.Job(
-            jobId='my_job',
-            trainingInput=self.short_msgs.TrainingInput(
-                pythonModule='my_module',
-                packageUris=['gs://bucket/stuff.tar.gz'],
-                region='us-central1',
-                jobDir='gs://job-bucket/job-prefix',
-                scaleTier=scale_tier_enum.CUSTOM),
-            state=state,
-            startTime='2016-01-01T00:00:00Z',
-            endTime='2016-01-02T00:00:00Z'))
-
-  def SetUp(self):
-    self.upload_mock = self.StartObjectPatch(
-        jobs_prep, 'UploadPythonPackages',
-        return_value=['gs://bucket/stuff.tar.gz'])
-
-    self.expected_request = self.short_msgs.Job(
-        jobId='my_job',
-        trainingInput=self.short_msgs.TrainingInput(
-            pythonModule='my_module',
-            packageUris=['gs://bucket/stuff.tar.gz'],
-            region='us-central1',
-            jobDir='gs://job-bucket/job-prefix'))
-    self.staging_location = storage_util.ObjectReference.FromUrl(
-        'gs://bucket/my_job')
-    # For consistent output of times
-    self.StartObjectPatch(times, 'LOCAL', times.GetTimeZone('PST'))
-
-  def testTrain_Async(self, module_name):
-    self._ExpectCreate(args=['--foo'])
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    -- --foo'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertOutputEquals("""\
-        jobId: my_job
-        startTime: '2015-12-31T16:00:00'
-        state: QUEUED
-        """, normalize_space=True)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_AsyncDeprecated(self, module_name):
-    self._ExpectCreate(args=['--foo'])
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --async '
-             '    -- --foo'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertOutputEquals("""\
-        jobId: my_job
-        startTime: '2015-12-31T16:00:00'
-        state: QUEUED
-        """, normalize_space=True)
-    self.AssertErrContains(
-        """\
-        {}WARNING: The --async flag is deprecated, as the default behavior is \
-        to submit the job asynchronously; it can be omitted. For synchronous \
-        behavior, please pass --stream-logs.
-
-        Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_AsyncConfig(self, module_name):
-    config_file = self.Touch(
-        self.temp_path, 'config.yaml',
-        contents=json.dumps({
-            'trainingInput': {'args': ['foo']},
-            'labels': {'key': 'value'}}))
-    self._ExpectCreate(args=['foo'], labels=self._MakeLabels(key='value'))
-
-    self.Run(('{} jobs submit training my_job '
-              '    --module-name my_module '
-              '    --package-path stuff/ '
-              '    --staging-bucket gs://bucket '
-              '    --job-dir gs://job-bucket/job-prefix '
-              '    --region us-central1 '
-              '    --config {}').format(module_name, config_file))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_AsyncConfigEmptyArgs(self, module_name):
-    config_file = self.Touch(
-        self.temp_path, 'config.yaml',
-        contents=json.dumps({'trainingInput': {'args': ['foo']}}))
-    self._ExpectCreate(args=[])
-
-    self.Run(('{} jobs submit training my_job '
-              '    --module-name my_module '
-              '    --package-path stuff/ '
-              '    --staging-bucket gs://bucket '
-              '    --job-dir gs://job-bucket/job-prefix '
-              '    --region us-central1 '
-              '    --config {} '
-              '    --').format(module_name, config_file))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_AsyncNoJobDir(self, module_name):
-    self._ExpectCreate(job_dir=None)
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --region us-central1'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-    self.AssertOutputEquals("""\
-        jobId: my_job
-        startTime: '2015-12-31T16:00:00'
-        state: QUEUED
-        """, normalize_space=True)
-
-  def testTrain_AsyncRuntimeVersion(self, module_name):
-    self._ExpectCreate(runtime_version='0.12')
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --runtime-version 0.12'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_AsyncPythonVersion(self, module_name):
-    self._ExpectCreate(python_version='2.7')
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --python-version 2.7'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_AsyncLabels(self, module_name):
-    self._ExpectCreate(labels=self._MakeLabels(key='value'))
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --labels key=value'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-
-  def testTrain_AsyncScaleTier(self, module_name):
-    scale_tier = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum.CUSTOM
-    self._ExpectCreate(scale_tier=scale_tier)
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --scale-tier CUSTOM'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_Logs(self, module_name):
-    # Check that the polling_interval property is respected
-    properties.VALUES.ml_engine.polling_interval.Set(20)
-    self._ExpectCreate()
-    self._ExpectGet(self.state_enum.SUCCEEDED)
-    log_fetcher_mock = mock.Mock()
-    log_fetcher_constructor_mock = self.StartObjectPatch(
-        stream, 'LogFetcher', return_value=log_fetcher_mock)
-    log_fetcher_mock.YieldLogs.return_value = iter(self._LOG_ENTRIES)
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --stream-logs'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains("""\
-        Job [my_job] submitted successfully.
-        INFO 2015-12-31 16:00:00 -0800 service 10 message
-        INFO 2015-12-31 17:00:00 -0800 service 20 message2
-        """, normalize_space=True)
-    self.AssertOutputEquals("""\
-        endTime: '2016-01-01T16:00:00'
-        jobId: my_job
-        startTime: '2015-12-31T16:00:00'
-        state: SUCCEEDED
-        """, normalize_space=True)
-    log_fetcher_constructor_mock.assert_called_once_with(
-        continue_func=mock.ANY, filters=mock.ANY,
-        polling_interval=20, continue_interval=10)
-
-  def testTrain_LogsError(self, module_name):
-    self._ExpectCreate()
-    self._ExpectGet(self.state_enum.FAILED)
-    self.log_fetcher_mock = self.StartObjectPatch(
-        stream.LogFetcher, 'YieldLogs', return_value=iter(self._LOG_ENTRIES))
-
-    with self._AssertRaisesExitCode(calliope_exceptions.ExitCodeNoError, 1):
-      self.Run('{} jobs submit training my_job '
-               '    --module-name my_module '
-               '    --package-path stuff/ '
-               '    --staging-bucket gs://bucket '
-               '    --job-dir gs://job-bucket/job-prefix '
-               '    --region us-central1 '
-               '    --stream-logs'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains("""\
-        Job [my_job] submitted successfully.
-        INFO 2015-12-31 16:00:00 -0800 service 10 message
-        INFO 2015-12-31 17:00:00 -0800 service 20 message2
-        """, normalize_space=True)
-    self.AssertOutputEquals("""\
-        endTime: '2016-01-01T16:00:00'
-        jobId: my_job
-        startTime: '2015-12-31T16:00:00'
-        state: FAILED
-        """, normalize_space=True)
-
-  def testTrain_LogsCtrlC(self, module_name):
-    self._ExpectCreate()
-    self._ExpectGet(self.state_enum.QUEUED)
-    self.log_fetcher_mock = self.StartObjectPatch(
-        stream.LogFetcher, 'YieldLogs', side_effect=KeyboardInterrupt)
-
-    with self._AssertRaisesExitCode(calliope_exceptions.ExitCodeNoError, 1):
-      self.Run('{} jobs submit training my_job '
-               '    --module-name my_module '
-               '    --package-path stuff/ '
-               '    --staging-bucket gs://bucket '
-               '    --job-dir gs://job-bucket/job-prefix '
-               '    --region us-central1 '
-               '    --stream-logs'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Received keyboard interrupt.
-
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-  def testTrain_LogsPollingError(self, module_name):
-    self._ExpectCreate()
-    self._ExpectGet(self.state_enum.QUEUED)
-    http_err = http_error.MakeHttpError(
-        code=403, url='http://googleapis.com/endpoint')
-    self.log_fetcher_mock = self.StartObjectPatch(
-        stream.LogFetcher, 'YieldLogs', side_effect=http_err)
-
-    with self._AssertRaisesExitCode(calliope_exceptions.ExitCodeNoError, 1):
-      self.Run('{} jobs submit training my_job '
-               '    --module-name my_module '
-               '    --package-path stuff/ '
-               '    --staging-bucket gs://bucket '
-               '    --job-dir gs://job-bucket/job-prefix '
-               '    --region us-central1 '
-               '    --stream-logs'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Polling logs failed:
-        HttpError accessing <http://googleapis.com/endpoint>:\
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-    self.AssertErrContains(
-        """\
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """,
-        normalize_space=True)
-
-  def testTrain_LogsCtrlCSuccess(self, module_name):
-    self._ExpectCreate()
-    self._ExpectGet(self.state_enum.SUCCEEDED)
-    self.log_fetcher_mock = self.StartObjectPatch(
-        stream.LogFetcher, 'YieldLogs', side_effect=KeyboardInterrupt)
-
-    self.Run('{} jobs submit training my_job '
-             '    --module-name my_module '
-             '    --package-path stuff/ '
-             '    --staging-bucket gs://bucket '
-             '    --job-dir gs://job-bucket/job-prefix '
-             '    --region us-central1 '
-             '    --stream-logs'.format(module_name))
-
-    self.upload_mock.assert_called_once_with(
-        packages=[], package_path='stuff/',
-        staging_location=self.staging_location,
-        supports_container_training=False)
-    self.AssertErrContains(
-        """\
-        {}Job [my_job] submitted successfully.
-        Received keyboard interrupt.
-
-        Your job is still active. \
-        You may view the status of your job with the command
-
-          $ gcloud ai-platform jobs describe my_job
-
-        or continue streaming the logs with the command
-
-          $ gcloud ai-platform jobs stream-logs my_job
-        """.format(ML_ENGINE_WARNING_MSG if module_name == 'ml-engine' else ''),
-        normalize_space=True)
-
-
-@parameterized.parameters('ml-engine', 'ai-platform')
 class TrainIntegrationTestBase(object):
   """Integration tests for `ml-engine jobs submit training`.
 
@@ -871,6 +859,10 @@ if __name__ == '__main__':
   # for our package.
   _EMPTY_CHECKSUM = (
       'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
+
+  def _MakeCreateRequest(self, job, parent):
+    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
+                                                 parent=parent)
 
   def _StoragePath(self, package_name):
     return 'gs://train-bucket/my-job/{}/{}'.format(
@@ -1139,50 +1131,92 @@ if __name__ == '__main__':
                    module_name, 'junk/junk'))
 
 
-class TrainTestGAonly(base.MlGaPlatformTestBase, TrainTestBase):
+class TrainTestGA(base.MlGaPlatformTestBase, TrainTestBase):
+  pass
+
+
+@parameterized.parameters('ml-engine', 'ai-platform')
+class TrainTestBeta(TrainTestBase, base.MlBetaPlatformTestBase):
+
+  def _MakeCreateRequest(self, job, parent):
+    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
+                                                 parent=parent)
+
+  def testTrain_CustomContainer(self, module_name):
+    scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
+    accelerator_type_enum = (self.short_msgs.AcceleratorConfig.
+                             TypeValueValuesEnum)
+    training_input = self.short_msgs.TrainingInput(
+        scaleTier=scale_tier_enum.CUSTOM,
+        region='us-central1',
+        args=['--model-dir=gs://my-bucket'],
+        masterConfig=self.short_msgs.ReplicaConfig(
+            imageUri='gcr.io/project/containerimage',
+            acceleratorConfig=self.short_msgs.AcceleratorConfig(
+                type=accelerator_type_enum.NVIDIA_TESLA_K80, count=2)),
+        masterType='complex_model_m',
+        parameterServerConfig=self.short_msgs.ReplicaConfig(
+            imageUri='gcr.io/project/containerimage2',
+            acceleratorConfig=self.short_msgs.AcceleratorConfig(
+                type=accelerator_type_enum.NVIDIA_TESLA_P100, count=2)),
+        parameterServerCount=2,
+        parameterServerType='large_model',
+        workerConfig=self.short_msgs.ReplicaConfig(
+            imageUri='gcr.io/project/containerimage3',
+            acceleratorConfig=self.short_msgs.AcceleratorConfig(
+                type=accelerator_type_enum.NVIDIA_TESLA_V100, count=2),
+            tpuTfVersion='1.13'),
+        workerCount=2,
+        workerType='large_model'
+        )
+    self.client.projects_jobs.Create.Expect(
+        self._MakeCreateRequest(
+            self.short_msgs.Job(
+                jobId='my_job',
+                trainingInput=training_input),
+            parent='projects/{}'.format(self.Project())),
+        self.short_msgs.Job(jobId='my_job'))
+    self.Run('{} jobs submit training my_job '
+             '    --scale-tier CUSTOM  '
+             '    --region us-central1 '
+             '    --master-machine-type complex_model_m'
+             '    --master-accelerator type=nvidia-tesla-k80,count=2'
+             '    --master-image-uri gcr.io/project/containerimage'
+             '    --parameter-server-machine-type large_model'
+             '    --parameter-server-count 2'
+             '    --parameter-server-accelerator type=nvidia-tesla-p100,count=2'
+             '    --parameter-server-image-uri gcr.io/project/containerimage2'
+             '    --tpu-tf-version=1.13'
+             '    --worker-machine-type large_model'
+             '    --worker-count 2'
+             '    --worker-accelerator type=nvidia-tesla-v100,count=2'
+             '    --worker-image-uri gcr.io/project/containerimage3'
+             '    -- --model-dir=gs://my-bucket '.format(module_name))
+
+
+class TrainTestAlpha(base.MlAlphaPlatformTestBase, TrainTestBeta):
+  pass
+
+
+class TrainIntegrationGaTest(base.MlGaPlatformTestBase,
+                             TrainIntegrationTestBase):
 
   def SetUp(self):
-    TrainTestBase.SetUp(self)
-
-  def _MakeCreateRequest(self, job, parent):
-    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
-                                                 parent=parent)
+    TrainIntegrationTestBase.SetUp(self)
 
 
-class TrainTestBeta(base.MlBetaPlatformTestBase, TrainTestCustomServer):
-
-  def _MakeCreateRequest(self, job, parent):
-    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
-                                                 parent=parent)
-
-
-class TrainTestAlpha(base.MlAlphaPlatformTestBase, TrainTestCustomServer):
-
-  def _MakeCreateRequest(self, job, parent):
-    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
-                                                 parent=parent)
-
-
-class TrainIntegrationGaTest(TrainIntegrationTestBase,
-                             base.MlGaPlatformTestBase):
-
-  def _MakeCreateRequest(self, job, parent):
-    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
-                                                 parent=parent)
+class TrainIntegrationBetaTest(base.MlBetaPlatformTestBase,
+                               TrainIntegrationTestBase):
 
   def SetUp(self):
-    super(TrainIntegrationGaTest, self).SetUp()
+    TrainIntegrationTestBase.SetUp(self)
 
 
-class TrainIntegrationBetaTest(TrainIntegrationTestBase,
-                               base.MlBetaPlatformTestBase):
-
-  def _MakeCreateRequest(self, job, parent):
-    return self.msgs.MlProjectsJobsCreateRequest(googleCloudMlV1Job=job,
-                                                 parent=parent)
+class TrainIntegrationAlphaTest(base.MlAlphaPlatformTestBase,
+                                TrainIntegrationTestBase):
 
   def SetUp(self):
-    super(TrainIntegrationBetaTest, self).SetUp()
+    TrainIntegrationTestBase.SetUp(self)
 
 
 if __name__ == '__main__':

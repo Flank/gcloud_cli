@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class Delete(base.DeleteCommand):
 
     operation = dataproc.client.projects_regions_clusters.Delete(request)
 
-    if args.async:
+    if args.async_:
       log.status.write(
           'Deleting [{0}] with operation [{1}].'.format(
               cluster_ref, operation.name))

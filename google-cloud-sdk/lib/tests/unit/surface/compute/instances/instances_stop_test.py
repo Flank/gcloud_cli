@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -127,12 +127,12 @@ class InstancesStopTest(InstancesStopTestBase):
     ]
 
     self.api_mock.batch_responder.ExpectBatch(
-        [((self.compute.instances, 'Stop', self._CreateInstancesStopRequest(
+        [((self.compute.instances, 'Stop', self._CreateInstancesStopRequest(  # pylint:disable=g-complex-comprehension
             stop_refs[i])),
           (self._GetOperationMessage(op_refs[i], self.status_enum.PENDING)))
          for i in range(num_instances)])
 
-    self.api_mock.batch_responder.ExpectBatch([(self._GetOperationGetRequest(
+    self.api_mock.batch_responder.ExpectBatch([(self._GetOperationGetRequest(  # pylint:disable=g-complex-comprehension
         op_refs[i]), self._GetOperationMessage(op_refs[i],
                                                self.status_enum.DONE))
                                                for i in range(num_instances)])
@@ -173,7 +173,7 @@ class InstancesStopTest(InstancesStopTestBase):
 
     self.Run("""
         compute instances stop
-          https://www.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/instance-1
+          https://compute.googleapis.com/compute/{0}/projects/my-project/zones/central2-a/instances/instance-1
         """.format(self.resource_api))
 
     self.AssertOutputEquals('')
@@ -206,7 +206,7 @@ class InstancesStopTest(InstancesStopTestBase):
     ]
 
     self.api_mock.batch_responder.ExpectBatch(
-        [((self.compute.instances, 'Stop', self._CreateInstancesStopRequest(
+        [((self.compute.instances, 'Stop', self._CreateInstancesStopRequest(  # pylint:disable=g-complex-comprehension
             stop_refs[i])),
           (self._GetOperationMessage(op_refs[i], self.status_enum.PENDING)))
          for i in range(num_instances)])

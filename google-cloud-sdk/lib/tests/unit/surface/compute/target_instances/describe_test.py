@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ class TargetInstancesDescribeTest(test_base.BaseTest,
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            instance: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            instance: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             name: target-instance-1
             natPolicy: NO_NAT
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/targetInstances/target-instance-1
-            zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/targetInstances/target-instance-1
+            zone: https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
 

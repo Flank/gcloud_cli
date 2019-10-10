@@ -36,7 +36,7 @@ SYNOPSIS
         [--source-instance-template=SOURCE_INSTANCE_TEMPLATE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
-          : --custom-extensions]
+          : --custom-extensions --custom-vm-type=CUSTOM_VM_TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY]
         [--maintenance-policy=MAINTENANCE_POLICY
@@ -94,7 +94,7 @@ FLAGS
         unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB for
         terabyte. For example, 10GB will produce a 10 gigabyte disk. The
         minimum size a boot disk can have is 10 GB. Disk size must be a
-        multiple of 1 GB. Limit your boot disk size to 2TB to account for MBR
+        multiple of 1 GB. Limit boot disk size to 2TB to account for MBR
         partition table limitations.
 
      --boot-disk-type=BOOT_DISK_TYPE
@@ -112,10 +112,10 @@ FLAGS
         CMD. Each argument must have a separate flag. Arguments are appended in
         the order of flags. Example:
 
-        Assuming the default entry point of your container (or an entry point
+        Assuming the default entry point of the container (or an entry point
         overridden with --container-command flag) is a Bourne shell-compatible
-        executable, in order to execute 'ls -l' command in the container, you
-        could use:
+        executable, in order to execute 'ls -l' command in the container, the
+        user could use:
 
         --container-arg="-c" --container-arg="ls -l"
 
@@ -536,12 +536,13 @@ FLAGS
             $ gcloud compute instances list --filter='tags:tag1'
 
      --zone=ZONE
-        Zone of the instances to create. If not specified, you may be prompted
-        to select a zone. gcloud will attempt to identify the zone by searching
-        for resources in your project. If the zone cannot be determined, you
-        will then be prompted with all Google Cloud Platform zones.
+        Zone of the instances to create. If not specified, the user may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in the user's project. If the zone cannot be
+        determined, the user will then be prompted with all Google Cloud
+        Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE
@@ -584,6 +585,13 @@ FLAGS
 
        --custom-extensions
           Use the extended custom machine type.
+
+       --custom-vm-type=CUSTOM_VM_TYPE
+          Specifies VM type. n1 - VMs with CPU platforms Skylake and older, n2
+          - VMs with CPU platform Cascade Lake. n2 offers flexible sizing from
+          2 to 80 vCPUs, and 1 to 640GBs of memory. It also features a number
+          of performance enhancements including exposing a more accurate NUMA
+          topology to the guest OS. The default is n1.
 
      --image-project=IMAGE_PROJECT
         The project against which all image and image family references will be
@@ -768,9 +776,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instances create-with-container
         $ gcloud beta compute instances create-with-container

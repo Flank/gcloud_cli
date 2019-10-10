@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from tests.lib.surface.compute import vpn_gateways_test_base
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-class VpnGatewayDeleteBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
+class VpnGatewayDeleteGaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
 
   def SetUp(self):
     self._SetUpReleaseTrack()
@@ -37,7 +37,7 @@ class VpnGatewayDeleteBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
     self.api_mock.batch_responder.AssertDone()
 
   def _SetUpReleaseTrack(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def _MakeOperationGetRequest(self, operation_ref):
     return (self.region_operations, 'Get',
@@ -93,6 +93,12 @@ class VpnGatewayDeleteBetaTest(vpn_gateways_test_base.VpnGatewaysTestBase):
 
     self.Run('compute vpn-gateways delete {} --region {}'.format(
         ' '.join(names), self.REGION))
+
+
+class VpnGatewayDeleteBetaTest(VpnGatewayDeleteGaTest):
+
+  def _SetUpReleaseTrack(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class VpnGatewayDeleteAlphaTest(VpnGatewayDeleteBetaTest):

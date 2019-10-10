@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,6 +111,63 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     # test-topic is created automatically and automatically cleaned-up
     self.Run('functions list')
     self.AssertOutputContains(self.function_name)
+
+  def testDeployRespectingIgnoreFileToSucceed(self):
+    self._dirs_size_limit_method = 513 * (2 **20)
+    self._CreateOversizedFile(self.function_path, 'trash')
+    with open(os.path.join(self.function_path, '.ignore_file_test'), 'w') as f:
+      f.write('trash')
+    # The deployment will fail if it doesn't skip trash file because it's
+    # uncompressed size will be over allowed max of 512MB.
+    self.Run(
+        'functions deploy {0} '
+        '--source {1} '
+        '--runtime=nodejs6 '
+        '--stage-bucket e2e-input-functions '
+        '--trigger-http --entry-point function '
+        '--ignore-file .ignore_file_test'.format(
+            self.function_name, self.function_path))
+    # test-topic is created automatically and automatically cleaned-up
+    self.Run('functions list')
+    self.AssertOutputContains(self.function_name)
+
+  def testDeployRespectingIgnoreFileToFail(self):
+    self._dirs_size_limit_method = 513 * (2 **20)
+    self.delete_function_on_tear_down = False
+    self._CreateOversizedFile(self.function_path, 'trash')
+    with open(os.path.join(self.function_path, '.ignore_file_test'), 'w') as f:
+      f.write('debris')
+    # The deployment will fail if because it doesn't skip trash file, it's
+    # uncompressed size is over allowed max of 512MB.
+    with self.assertRaisesRegex(
+        exceptions.OversizedDeployment,
+        (r'Uncompressed deployment is \d+B, bigger than maximum allowed '
+         r'size of \d+B')):
+      self.Run(
+          'functions deploy {0} '
+          '--source {1} '
+          '--runtime=nodejs6 '
+          '--stage-bucket e2e-input-functions '
+          '--trigger-http --entry-point function '
+          '--ignore-file .ignore_file_test'.format(
+              self.function_name, self.function_path))
+    # test-topic is created automatically and automatically cleaned-up
+    self.Run('functions list')
+    self. AssertOutputNotContains(self.function_name)
+
+  def testDeployInvalidIgnoreFile(self):
+    self.delete_function_on_tear_down = False
+    with self.assertRaisesRegex(
+        exceptions.FileNotFoundError,
+        ('File .ignore_file_test referenced by --ignore-file does not exist.')):
+      self.Run(
+          'functions deploy {0} '
+          '--source {1} '
+          '--runtime=nodejs6 '
+          '--stage-bucket e2e-input-functions '
+          '--trigger-http --entry-point function '
+          '--ignore-file .ignore_file_test'.format(
+              self.function_name, self.function_path))
 
   def testDeployRespectingGcloudIgnoreToSucceed(self):
     self._dirs_size_limit_method = 513 * (2 **20)

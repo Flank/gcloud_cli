@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class Move(base.UpdateCommand):
         moveFolderRequest=messages.MoveFolderRequest(
             destinationParent=flags.GetParentFromFlags(args)))
     operation = folders.FoldersService().Move(move_request)
-    if args.async:
+    if args.async_:
       return operation
     else:
       if operation.done and not operation.name:

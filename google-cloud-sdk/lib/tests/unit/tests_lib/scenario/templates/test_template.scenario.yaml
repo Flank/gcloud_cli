@@ -89,3 +89,12 @@ actions:
         Deleted registry [my-registry].
     - expect_exit:
         code: 0
+
+- execute_binary:
+    args:
+    - echo
+    - foo
+    expect_exit:
+      code: 0
+    expect_stdout: |
+      foo

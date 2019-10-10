@@ -6,40 +6,25 @@ summary:
   - command: compute addresses create $$address-name$$ --global --prefix-length 24
       --purpose VPC_PEERING --network default
   - stderr: |
-      Created [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+      Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$\].
 - execute:
   - command: |
       compute addresses describe $$address-name$$ --global --format
       "text(name,address,prefixLength,addressType,purpose,network,status)"
-  - stdout: |
-      address:      $$my-ip-address$$
-      addressType:  INTERNAL
-      name:         $$address-name$$
-      network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
-      prefixLength: 24
-      purpose:      VPC_PEERING
-      status:       RESERVED
+  - stdout: .*$$address-name$$.*$
 - execute:
   - command: |
       compute addresses list --global --filter 'name:$$address-name$$' --format
       "text(name,address,prefixLength,addressType,purpose,network,status)"
-  - stdout: |
-      ---
-      address:      $$my-ip-address$$
-      addressType:  INTERNAL
-      name:         $$address-name$$
-      network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
-      prefixLength: 24
-      purpose:      VPC_PEERING
-      status:       RESERVED
+  - stdout: .*$$address-name$$.*$
 - execute:
   - command: compute addresses delete $$address-name$$ --global -q
   - stderr: |
-      Deleted [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$\].
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
@@ -72,99 +57,96 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '744'
+            Content-Length: '743'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '9154370159617360581'
-            name: operation-1556118569502-587481690455d-5a3999e8-1c62b868
+            id: '4001379684774318824'
+            name: operation-1558031366325-5890572238437-47bd29de-5c519aa6
             operationType: insert
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
-            targetId: '3070881728834683589'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
+            targetId: '388931397037855464'
             status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2019-04-24T08:09:30.542-07:00'
-            startTime: '2019-04-24T08:09:30.548-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/operations/operation-1556118569502-587481690455d-5a3999e8-1c62b868
-        poll_operation: true
-    - expect_stderr: |
-        Created [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+            insertTime: '2019-05-16T11:29:27.289-07:00'
+            startTime: '2019-05-16T11:29:27.297-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/operations/operation-1558031366325-5890572238437-47bd29de-5c519aa6
+        poll_operation: false
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/operations/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '787'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"fm-K2-lbPDptcTf-re0PDAew6yU=/cZs72DCPgz4UlqR7y8xrxH5CKkY="'
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '4001379684774318824'
+            name: operation-1558031366325-5890572238437-47bd29de-5c519aa6
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
+            targetId: '388931397037855464'
+            status: DONE
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 100
+            insertTime: '2019-05-16T11:29:27.289-07:00'
+            startTime: '2019-05-16T11:29:27.297-07:00'
+            endTime: '2019-05-16T11:29:29.046-07:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/operations/operation-1558031366325-5890572238437-47bd29de-5c519aa6
+        repeatable: true
+    - expect_stderr:
+        matches: |
+          Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$\].
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
           method: GET
           headers: {}
           body: null
-        expect_response:
-          extract_references:
-          - field: address
-            reference: my-ip-address
-          body:
-            json:
-              kind: compute#address
         return_response:
           headers:
             Cache-Control: private, max-age=0
             Content-Length: '597'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"JBdgaK0KLXvHt8pMDpWPIEPks7g=/PA3leRLSFoxzenwdvETJS35oIQ4="'
+            ETag: '"iWWVp8nxcmUjU60_zeRhrbSJV5o=/G3JEi9932rGwNMHyEoptUhy8qEM="'
             status: '200'
           body:
             kind: compute#address
-            id: '3070881728834683589'
-            creationTimestamp: '2019-04-24T08:09:30.537-07:00'
+            id: '388931397037855464'
+            creationTimestamp: '2019-05-16T11:29:27.284-07:00'
             name: $$address-name$$
             description: ''
-            address: 10.82.68.0
+            address: 10.254.69.0
             prefixLength: 24
             status: RESERVED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
             addressType: INTERNAL
             purpose: VPC_PEERING
-            network: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
+            network: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/networks/default
     - expect_exit:
         code: 0
 - execute_command:
     command: |
       compute addresses describe $$address-name$$ --global --format
       "text(name,address,prefixLength,addressType,purpose,network,status)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '597'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"L9AoXmnPInReulWGXvLMwi0ee94=/uUoLTK4nWC0jpp4V3NHIxcaxG_o="'
-            status: '200'
-          body:
-            kind: compute#address
-            id: '3070881728834683589'
-            creationTimestamp: '2019-04-24T08:09:30.537-07:00'
-            name: $$address-name$$
-            description: ''
-            address: 10.82.68.0
-            prefixLength: 24
-            status: RESERVED
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
-            addressType: INTERNAL
-            purpose: VPC_PEERING
-            network: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
-    - expect_stdout: |
-        address:      $$my-ip-address$$
-        addressType:  INTERNAL
-        name:         $$address-name$$
-        network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
-        prefixLength: 24
-        purpose:      VPC_PEERING
-        status:       RESERVED
+    - expect_stdout:
+        matches: .*$$address-name$$.*
     - expect_exit:
         code: 0
 - execute_command:
@@ -173,48 +155,17 @@ actions:
       "text(name,address,prefixLength,addressType,purpose,network,status)"
     validation_only: true
     events:
-    - expect_stdout: |
-        ---
-        address:      $$my-ip-address$$
-        addressType:  INTERNAL
-        name:         $$address-name$$
-        network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
-        prefixLength: 24
-        purpose:      VPC_PEERING
-        status:       RESERVED
+    - expect_stdout:
+        matches: .*$$address-name$$.*
     - expect_exit:
         code: 0
 - execute_command:
     cleanup_for: address-name
     command: compute addresses delete $$address-name$$ --global -q
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '744'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '3086183164007006940'
-            name: operation-1556118578691-58748171c7c60-acd06b12-c37158e4
-            operationType: delete
-            targetLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
-            targetId: '3070881728834683589'
-            status: RUNNING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-04-24T08:09:39.454-07:00'
-            startTime: '2019-04-24T08:09:39.467-07:00'
-            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/operations/operation-1556118578691-58748171c7c60-acd06b12-c37158e4
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$\].
     - expect_exit:
         code: 0

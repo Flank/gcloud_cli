@@ -20,6 +20,9 @@ COMMANDS
      ack
         Acknowledges one or more messages on the specified subscription.
 
+     add-iam-policy-binding
+        Add IAM policy binding to a subscription.
+
      create
         Creates one or more Cloud Pub/Sub subscriptions.
 
@@ -28,6 +31,9 @@ COMMANDS
 
      describe
         Describes a Cloud Pub/Sub subscription.
+
+     get-iam-policy
+        Get the IAM policy for a Cloud Pub/Sub Subscription.
 
      list
         Lists Cloud Pub/Sub subscriptions.
@@ -41,9 +47,15 @@ COMMANDS
      pull
         Pulls one or more Cloud Pub/Sub messages from a subscription.
 
+     remove-iam-policy-binding
+        Remove IAM policy binding of a subscription.
+
      seek
         Resets a subscription's backlog to a point in time or to a given
         snapshot.
+
+     set-iam-policy
+        Set IAM policy for a subscription.
 
      update
         Updates an existing Cloud Pub/Sub subscription.

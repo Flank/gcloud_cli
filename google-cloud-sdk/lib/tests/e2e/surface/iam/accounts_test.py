@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import time
 
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import sdk_test_base
 from tests.lib.surface.iam import e2e_test_base
 
 
@@ -36,6 +37,7 @@ class AccountsTestGA(e2e_test_base.ServiceAccountBaseTest):
     self.DescribeAccount()
     self.UpdateAccount()
     self.ListAccount()
+    self.GetIamPolicy()
     self.DeleteAccount()
 
   def ClearOutputs(self):
@@ -70,9 +72,20 @@ class AccountsTestGA(e2e_test_base.ServiceAccountBaseTest):
 
   def ListAccount(self):
     time.sleep(5)  # Wait for sync to Cloud Gaia
+
+    @sdk_test_base.Retry(why='Waiting for list result to reconcile',
+                         max_retrials=10, sleep_ms=4000)
+    def ListCheck():
+      self.ClearOutputs()
+      self.Run('iam service-accounts list')
+      self.AssertOutputContains(self.email)
+
+    ListCheck()
+
+  def GetIamPolicy(self):
     self.ClearOutputs()
-    self.Run('iam service-accounts list')
-    self.AssertOutputContains(self.email)
+    self.RunFormat('iam service-accounts get-iam-policy {email}')
+    self.AssertOutputContains('etag: ACAB')
 
   def DeleteAccount(self):
     self.ClearOutputs()

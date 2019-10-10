@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,6 +71,10 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
             'r/file2': '/sdcard/dir2'
         },
         num_flaky_test_attempts=1,
+        client_details={
+            'branch': 'my-branch',
+            'buildNumber': '1234',
+        },
     )
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('id-3')
@@ -138,6 +142,15 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
     self.assertEqual(devices.androidVersionIds, ['10'])
     self.assertEqual(devices.locales, ['en_SEA'])
     self.assertEqual(devices.orientations, ['I-formation'])
+
+    client_details = matrix.clientInfo.clientInfoDetails
+    client_detail1 = TESTING_V1_MESSAGES.ClientInfoDetail(
+        key='branch', value='my-branch')
+    client_detail2 = TESTING_V1_MESSAGES.ClientInfoDetail(
+        key='buildNumber', value='1234')
+
+    self.assertIn(client_detail1, client_details)
+    self.assertIn(client_detail2, client_details)
 
   def testMatrixCreator_AndroidRoboTest_ValidateRequestFields(self):
     args = self.NewTestArgs(

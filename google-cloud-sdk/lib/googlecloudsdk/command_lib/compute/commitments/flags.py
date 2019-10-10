@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ def MakeCommitmentArg(plural):
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION)
 
 
-def AddCreateFlags(parser, enable_ssd_and_accelerator_support=False):
+def AddCreateFlags(parser):
   """Add general arguments for `commitments create` flag."""
   parser.add_argument(
       '--plan',
@@ -105,29 +105,8 @@ def AddCreateFlags(parser, enable_ssd_and_accelerator_support=False):
       choices=VALID_PLANS,
       help='Duration of the commitment.')
 
-  if enable_ssd_and_accelerator_support:
-    AddResourcesArgGroup(parser)
-  else:
-    AddResourcesFlag(parser)
-
-
-def AddResourcesFlag(parser):
-  """Add --resources flag in `commitments create`."""
-  resources_help = """\
-Resources to be included in the commitment, the ratio between number of vCPU cores and memory must conform to limits described at:
-https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#specifications.
-*memory*::: The size of the memory, should include units (e.g. 3072MB or 9GB). If no units are specified, GB is assumed.
-*vcpu*::: The number of the vCPU cores."""
-  parser.add_argument(
-      '--resources',
-      required=True,
-      help=resources_help,
-      type=arg_parsers.ArgDict(
-          spec={
-              'vcpu': int,
-              'memory': arg_parsers.BinarySize()
-          },
-          required_keys=['vcpu', 'memory']))
+  AddReservationArgGroup(parser)
+  AddResourcesArgGroup(parser)
 
 
 # TODO(b/129054682): fix the format in text render.
@@ -137,7 +116,7 @@ def AddResourcesArgGroup(parser):
       'Manage the commitment for particular resources.', required=True)
 
   resources_help = """\
-Resources to be included in the commitment, the ratio between number of vCPU cores and memory must conform to limits described at:
+Resources to be included in the commitment. The ratio between the number of vCPU cores and memory must conform to limits described at:
 https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#specifications.
 *memory*::: The size of the memory, should include units (e.g. 3072MB or 9GB). If no units are specified, GB is assumed.
 *vcpu*::: The number of the vCPU cores.
@@ -147,14 +126,12 @@ https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-ma
   resources_group.add_argument(
       '--resources',
       help=resources_help,
-      required=True,
       type=arg_parsers.ArgDict(
           spec={
               'vcpu': int,
               'local-ssd': int,
               'memory': arg_parsers.BinarySize()
-          },
-          required_keys=['vcpu', 'memory']))
+          }))
   accelerator_help = """\
 Manage the configuration of the type and number of accelerator cards to include in the commitment.
 *count*::: The number of accelerators to include.
@@ -188,7 +165,7 @@ def AddReservationArgGroup(parser):
 
   reservations_manage_group.add_argument(
       '--reservations-from-file',
-      type=arg_parsers.BufferedFileInput(),
+      type=arg_parsers.FileContents(),
       help='Path to a YAML file of multiple reservations\' configuration.')
 
   single_reservation_group = reservations_manage_group.add_argument_group(

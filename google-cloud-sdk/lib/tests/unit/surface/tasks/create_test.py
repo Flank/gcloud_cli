@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -271,6 +271,172 @@ class CreateAppEngineTaskTestBeta(CreateAppEngineTaskTest):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateHttpTaskTestBeta(test_base.CloudTasksTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.queue_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue')
+    self.queue_name = self.queue_ref.RelativeName()
+    self.task_ref = resources.REGISTRY.Create(
+        'cloudtasks.projects.locations.queues.tasks', locationsId='us-central1',
+        projectsId=self.Project(), queuesId='my-queue', tasksId='my-task')
+    self.task_name = self.task_ref.RelativeName()
+
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation('us-central1').SelfLink())
+
+    self.schedule_time = time_util.CalculateExpiration(20)
+
+  def testCreate_BaseOptions(self):
+    expected_task = self.messages.Task(
+        httpRequest=self.messages.HttpRequest(
+            url='http://somehost.com/paths/a/'))
+    self.tasks_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
+            parent=self.queue_name,
+            createTaskRequest=self.messages.CreateTaskRequest(
+                task=expected_task)),
+        response=expected_task)
+
+    actual_task = self.Run('tasks create-http-task --queue my-queue '
+                           '--url=http://somehost.com/paths/a/')
+
+    self.assertEqual(actual_task, expected_task)
+
+  def testCreate_AllOptions_BodyContent_NoAuth(self):
+    http_method = self.messages.HttpRequest.HttpMethodValueValuesEnum('POST')
+    expected_task = self.messages.Task(
+        name=self.task_name, scheduleTime=self.schedule_time,
+        httpRequest=self.messages.HttpRequest(
+            headers=encoding.DictToAdditionalPropertyMessage(
+                {'header1': 'value1', 'header2': 'value2'},
+                self.messages.HttpRequest.HeadersValue),
+            httpMethod=http_method, body=b'body',
+            url='http://somehost.com/paths/a/'))
+    self.tasks_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
+            parent=self.queue_name,
+            createTaskRequest=self.messages.CreateTaskRequest(
+                task=expected_task)),
+        response=expected_task)
+
+    actual_task = self.Run('tasks create-http-task --queue my-queue '
+                           'my-task --schedule-time={} '
+                           '--body-content=body --method=POST '
+                           '--url=http://somehost.com/paths/a/ '
+                           '--header=header1:value1 '
+                           '--header=header2:value2'
+                           .format(self.schedule_time))
+
+    self.assertEqual(actual_task, expected_task)
+
+  def testCreate_AllOptions_BodyFile_NoAuth(self):
+    http_method = self.messages.HttpRequest.HttpMethodValueValuesEnum('POST')
+    expected_task = self.messages.Task(
+        name=self.task_name, scheduleTime=self.schedule_time,
+        httpRequest=self.messages.HttpRequest(
+            headers=encoding.DictToAdditionalPropertyMessage(
+                {'header1': 'value1', 'header2': 'value2'},
+                self.messages.HttpRequest.HeadersValue),
+            httpMethod=http_method, body=b'body',
+            url='http://somehost.com/paths/a/'))
+    self.tasks_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
+            parent=self.queue_name,
+            createTaskRequest=self.messages.CreateTaskRequest(
+                task=expected_task)),
+        response=expected_task)
+
+    with files.TemporaryDirectory() as tmp_dir:
+      self.Touch(tmp_dir, 'body.txt', contents='body')
+      body = os.path.join(tmp_dir, 'body.txt')
+      actual_task = self.Run('tasks create-http-task --queue my-queue '
+                             'my-task --schedule-time={} '
+                             '--body-file={} --method=POST '
+                             '--url=http://somehost.com/paths/a/ '
+                             '--header=header1:value1 '
+                             '--header=header2:value2'
+                             .format(self.schedule_time, body))
+
+    self.assertEqual(actual_task, expected_task)
+
+  def testCreate_AllOptions_Oidc(self):
+    http_method = self.messages.HttpRequest.HttpMethodValueValuesEnum('POST')
+    expected_task = self.messages.Task(
+        name=self.task_name, scheduleTime=self.schedule_time,
+        httpRequest=self.messages.HttpRequest(
+            headers=encoding.DictToAdditionalPropertyMessage(
+                {'header1': 'value1', 'header2': 'value2'},
+                self.messages.HttpRequest.HeadersValue),
+            httpMethod=http_method, body=b'body',
+            url='http://somehost.com/paths/a/',
+            oidcToken=self.messages.OidcToken(
+                serviceAccountEmail='some.email@org.com',
+                audience='some-audience')))
+    self.tasks_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
+            parent=self.queue_name,
+            createTaskRequest=self.messages.CreateTaskRequest(
+                task=expected_task)),
+        response=expected_task)
+
+    actual_task = self.Run('tasks create-http-task --queue my-queue '
+                           'my-task --schedule-time={} '
+                           '--body-content=body --method=POST '
+                           '--url=http://somehost.com/paths/a/ '
+                           '--header=header1:value1 '
+                           '--header=header2:value2 '
+                           '--oidc-service-account-email=some.email@org.com '
+                           '--oidc-token-audience=some-audience'
+                           .format(self.schedule_time))
+
+    self.assertEqual(actual_task, expected_task)
+
+  def testCreate_AllOptions_OAuth(self):
+    http_method = self.messages.HttpRequest.HttpMethodValueValuesEnum('POST')
+    expected_task = self.messages.Task(
+        name=self.task_name, scheduleTime=self.schedule_time,
+        httpRequest=self.messages.HttpRequest(
+            headers=encoding.DictToAdditionalPropertyMessage(
+                {'header1': 'value1', 'header2': 'value2'},
+                self.messages.HttpRequest.HeadersValue),
+            httpMethod=http_method, body=b'body',
+            url='http://somehost.com/paths/a/',
+            oauthToken=self.messages.OAuthToken(
+                serviceAccountEmail='some.email@org.com',
+                scope='some-scope')))
+    self.tasks_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
+            parent=self.queue_name,
+            createTaskRequest=self.messages.CreateTaskRequest(
+                task=expected_task)),
+        response=expected_task)
+
+    actual_task = self.Run('tasks create-http-task --queue my-queue '
+                           'my-task --schedule-time={} '
+                           '--body-content=body --method=POST '
+                           '--url=http://somehost.com/paths/a/ '
+                           '--header=header1:value1 '
+                           '--header=header2:value2 '
+                           '--oauth-service-account-email=some.email@org.com '
+                           '--oauth-token-scope=some-scope'
+                           .format(self.schedule_time))
+
+    self.assertEqual(actual_task, expected_task)
+
+
+class CreateHttpTaskTestAlpha(CreateHttpTaskTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 """Test utils for compute routers unit tests."""
 
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
 
 
@@ -60,7 +62,7 @@ def CreateMinimalRouterMessage(messages, api_version='v1'):
   return messages.Router(
       name='my-router',
       bgp=messages.RouterBgp(asn=65000),
-      network=('https://www.googleapis.com/compute/{0}/projects/fake-project/'
+      network=('https://compute.googleapis.com/compute/{0}/projects/fake-project/'
                'global/networks/default').format(api_version))
 
 
@@ -76,7 +78,7 @@ def CreateEmptyRouterMessage(messages, track='v1'):
   """
   return messages.Router(
       name='my-router',
-      network=('https://www.googleapis.com/compute/{0}/projects/fake-project/'
+      network=('https://compute.googleapis.com/compute/{0}/projects/fake-project/'
                'global/networks/default').format(track))
 
 
@@ -97,7 +99,7 @@ def CreateBaseRouterMessage(messages):
           messages.RouterInterface(
               name='my-if', linkedVpnTunnel='', ipRange='10.0.0.1/24')
       ],
-      network=('https://www.googleapis.com/compute/v1/projects/fake-project/'
+      network=('https://compute.googleapis.com/compute/v1/projects/fake-project/'
                'global/networks/default'))
 
 

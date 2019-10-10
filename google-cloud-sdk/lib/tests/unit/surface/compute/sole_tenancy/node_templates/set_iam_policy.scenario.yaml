@@ -27,7 +27,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/REGION/nodeTemplates/my-node-template/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/REGION/nodeTemplates/my-node-template/setIamPolicy?alt=json
           method: POST
           body:
             json:
@@ -36,7 +36,7 @@ actions:
                 - role: roles/owner
                   members: ["user:testuser@google.com"]
                 etag: ACAB
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'

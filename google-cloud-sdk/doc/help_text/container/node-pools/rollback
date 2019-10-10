@@ -17,7 +17,8 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --async
-        Don't wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --cluster=CLUSTER
         The cluster from which to rollback the node pool. Overrides the default

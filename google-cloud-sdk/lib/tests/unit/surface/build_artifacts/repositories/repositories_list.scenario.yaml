@@ -1,0 +1,110 @@
+title: build-artifacts repositories list
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: build-artifacts repositories list
+  - stderr: ^Listing items under project fake-project..*$
+  - stdout: |
+      REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+      gcloud-repo2  MAVEN   test                   2019-05-17T15:30:40  2019-05-17T15:30:40
+      gcloud-repo3  NPM                            2019-05-20T14:36:22  2019-05-20T14:36:22
+- execute:
+  - command: build-artifacts repositories list --limit=1 --format=json
+  - stderr: ^Listing items under project fake-project..*$
+  - stdout: |
+      [
+        {
+          "createTime": "2019-05-17T22:30:40.996826Z",
+          "description": "test",
+          "format": "MAVEN",
+          "name": "projects/kayla-npm/repositories/gcloud-repo2",
+          "updateTime": "2019-05-17T22:30:40.996826Z"
+        }
+      ]
+actions:
+- execute_command:
+    command: build-artifacts repositories list
+    events:
+    - expect_stderr:
+        matches: ^Listing items under project fake-project..*
+    - api_call:
+        expect_request:
+          uri: https://buildartifacts.googleapis.com/v1alpha2/projects/fake-project/repositories?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: asdf
+            repositories:
+            - name: projects/kayla-npm/repositories/gcloud-repo2
+              format: MAVEN
+              description: test
+              updateTime: '2019-05-17T22:30:40.996826Z'
+              createTime: '2019-05-17T22:30:40.996826Z'
+            - name: projects/kayla-npm/repositories/gcloud-repo3
+              format: NPM
+              updateTime: '2019-05-20T21:36:22.491339Z'
+              createTime: '2019-05-20T21:36:22.491339Z'
+    - api_call:
+        expect_request:
+          uri: https://buildartifacts.googleapis.com/v1alpha2/projects/fake-project/repositories?alt=json&pageToken=asdf
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stdout: |
+        REPOSITORY    FORMAT  DESCRIPTION  LOCATION  CREATE_TIME          UPDATE_TIME
+        gcloud-repo2  MAVEN   test                   2019-05-17T15:30:40  2019-05-17T15:30:40
+        gcloud-repo3  NPM                            2019-05-20T14:36:22  2019-05-20T14:36:22
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: build-artifacts repositories list --limit=1 --format=json
+    events:
+    - expect_stderr:
+        matches: ^Listing items under project fake-project..*
+    - api_call:
+        expect_request:
+          uri: https://buildartifacts.googleapis.com/v1alpha2/projects/fake-project/repositories?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            nextPageToken: null
+            repositories:
+            - name: projects/kayla-npm/repositories/gcloud-repo2
+              format: MAVEN
+              description: test
+              updateTime: '2019-05-17T22:30:40.996826Z'
+              createTime: '2019-05-17T22:30:40.996826Z'
+            - name: projects/kayla-npm/repositories/gcloud-repo3
+              format: NPM
+              updateTime: '2019-05-20T21:36:22.491339Z'
+              createTime: '2019-05-20T21:36:22.491339Z'
+            - name: projects/kayla-npm/repositories/mvn-repo
+              format: MAVEN
+              updateTime: '2019-04-11T17:07:58.828698Z'
+              createTime: '2019-04-11T17:07:58.828698Z'
+    - expect_stdout: |
+        [
+          {
+            "createTime": "2019-05-17T22:30:40.996826Z",
+            "description": "test",
+            "format": "MAVEN",
+            "name": "projects/kayla-npm/repositories/gcloud-repo2",
+            "updateTime": "2019-05-17T22:30:40.996826Z"
+          }
+        ]
+    - expect_exit:
+        code: 0

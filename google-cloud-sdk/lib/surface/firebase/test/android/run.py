@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ from googlecloudsdk.api_lib.firebase.test.android import arg_manager
 from googlecloudsdk.api_lib.firebase.test.android import matrix_creator
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
+import six
 
 
 @base.UnicodeIsSupported
@@ -183,7 +184,7 @@ class _BaseRun(object):
         - a list of TestOutcome tuples (if ToolResults are available).
         - a URL string pointing to the user's results in ToolResults or GCS.
     """
-    if args.async and not args.IsSpecified('format'):
+    if args.async_ and not args.IsSpecified('format'):
       args.format = """
           value(format(
             'Final test results will be available at [{0}].', [])
@@ -212,7 +213,9 @@ class _BaseRun(object):
     additional_apks = getattr(args, 'additional_apks', None) or []
     for additional_apk in additional_apks:
       bucket_ops.UploadFileToGcs(additional_apk)
-    for other_files in getattr(args, 'other-files', None) or {}:
+    # TODO(b/137674653): add a unit test that would have caught the typo fixed
+    #  by CL/249286171.
+    for other_files in getattr(args, 'other_files', None) or {}:
       bucket_ops.UploadFileToGcs(other_files)
     bucket_ops.LogGcsResultsUrl()
 
@@ -223,7 +226,7 @@ class _BaseRun(object):
 
     matrix = matrix_creator.CreateMatrix(args, self.context, history_id,
                                          bucket_ops.gcs_results_root,
-                                         str(self.ReleaseTrack()))
+                                         six.text_type(self.ReleaseTrack()))
     monitor = matrix_ops.MatrixMonitor(
         matrix.testMatrixId, args.type, self.context)
 
@@ -233,7 +236,7 @@ class _BaseRun(object):
 
       url = tool_results.CreateToolResultsUiUrl(project, tr_ids)
       log.status.Print('')
-      if args.async:
+      if args.async_:
         return url
       log.status.Print('Test results will be streamed to [{0}].'.format(url))
 
@@ -283,6 +286,7 @@ class RunBeta(_BaseRun, base.ListCommand):
     arg_util.AddMatrixArgs(parser)
     arg_util.AddAndroidTestArgs(parser)
     arg_util.AddAndroidBetaArgs(parser)
+    arg_util.AddBetaArgs(parser)
     base.URI_FLAG.RemoveFromParser(parser)
     parser.display_info.AddFormat(util.OUTCOMES_FORMAT)
 

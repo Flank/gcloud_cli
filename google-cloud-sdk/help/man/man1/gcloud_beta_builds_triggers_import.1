@@ -1,0 +1,70 @@
+
+.TH "GCLOUD_BETA_BUILDS_TRIGGERS_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta builds triggers import \- import a build trigger
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta builds triggers import\fR \fB\-\-source\fR=\fIPATH\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Import a build trigger.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fIPATH\fR
+File path where trigger should be imported from.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To import a trigger from a file:.RS 2m
+$ cat > trigger.yaml <<EOF
+name: my\-trigger
+github:
+  owner: GoogleCloudPlatform
+  name: cloud\-builders
+  push:
+    branch: .*
+EOF
+$ gcloud beta builds triggers import \-\-source=trigger.yaml
+
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha builds triggers import
+.RE
+

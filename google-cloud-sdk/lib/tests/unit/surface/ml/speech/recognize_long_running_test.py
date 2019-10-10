@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   _VERSIONS_FOR_RELEASE_TRACKS = {
       calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
-      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.BETA: 'v1p1beta1',
       calliope_base.ReleaseTrack.GA: 'v1'
   }
 
@@ -260,18 +260,19 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
                '--sample-rate 16000'.format(self.long_file + 'x'))
 
 
+@parameterized.named_parameters(
+    ('Alpha', calliope_base.ReleaseTrack.ALPHA),
+    ('Beta', calliope_base.ReleaseTrack.BETA))
 class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
                                             parameterized.TestCase):
   """Class to test `gcloud ml speech recognize-long-running`."""
 
   _VERSIONS_FOR_RELEASE_TRACKS = {
       calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
-      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.BETA: 'v1p1beta1',
       calliope_base.ReleaseTrack.GA: 'v1'
   }
 
-  @parameterized.named_parameters(
-      ('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testIncludeWordConfidence_Async(self, track):
     """Test recognize-long-running command that requests word confidence."""
     self.SetUpForTrack(track)
@@ -298,9 +299,8 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
     self.assertEqual(json.loads(self.GetOutput()),
                      encoding.MessageToPyValue(expected))
 
-  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testSpeakerDiarizationRequest_Async(self, track):
-    """Test diarization flag values mapped in Recognize request."""
+    """Test diarization flag values mapped in request."""
     self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
@@ -322,7 +322,6 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
     self.assertEqual(
         json.loads(self.GetOutput()), encoding.MessageToPyValue(expected))
 
-  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testInvalidSpeakerDiarizationRequest_Async(self, track):
     """Test invalid diarization flag values."""
     self.SetUpForTrack(track)
@@ -339,7 +338,6 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
                '    --enable-speaker-diarization '
                '    --diarization-speaker-count catsanddogs')
 
-  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testAdditionalLanguages_Async(self, track):
     """Test additional_language_codes flag."""
     self.SetUpForTrack(track)
@@ -362,6 +360,240 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
     self.assertEqual(expected, actual)
     self.assertEqual(
         json.loads(self.GetOutput()), encoding.MessageToPyValue(expected))
+
+
+class RecognizeAlpha(speech_base.MlSpeechTestBase,
+                     parameterized.TestCase):
+
+  _VERSIONS_FOR_RELEASE_TRACKS = {
+      calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
+  }
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+    self.SetUpForTrack(self.track)
+
+  @parameterized.parameters(
+      ('discussion', 'DISCUSSION'),
+      ('phone-call', 'PHONE_CALL'),
+      ('voicemail', 'VOICEMAIL'),
+      ('professionally-produced', 'PROFESSIONALLY_PRODUCED'),
+      ('voice-search', 'VOICE_SEARCH'),
+      ('voice-command', 'VOICE_COMMAND'),
+      ('dictation', 'DICTATION'),
+  )
+  def testRecognizeMetadataInteractionType(self, choice, value):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        interaction_type=value
+    )
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --interaction-type {} '.format(choice))
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testRecognizePunctuation(self):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        max_alternatives=1,
+        result='12345',
+        sample_rate=16000,
+        enable_punctuation=True)
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --enable-automatic-punctuation ')
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testRecognizeNaics(self):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        max_alternatives=1,
+        result='12345',
+        sample_rate=16000,
+        naics_code=123456)
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --naics-code 123456')
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  @parameterized.parameters(
+      ('nearfield', 'NEARFIELD'),
+      ('midfield', 'MIDFIELD'),
+      ('farfield', 'FARFIELD')
+  )
+  def testRecognizeMicrophoneDistance(self, choice, value):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        microphone_distance=value)
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --microphone-distance {}'.format(choice))
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  @parameterized.parameters(
+      ('audio', 'AUDIO'),
+      ('video', 'VIDEO')
+  )
+  def testRecognizeMediaType(self, choice, value):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        media_type=value)
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --original-media-type {}'.format(choice))
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  @parameterized.parameters(
+      ('smartphone', 'SMARTPHONE'),
+      ('pc', 'PC'),
+      ('phone-line', 'PHONE_LINE'),
+      ('vehicle', 'VEHICLE'),
+      ('outdoor', 'OTHER_OUTDOOR_DEVICE'),
+      ('indoor', 'OTHER_INDOOR_DEVICE'),
+  )
+  def testRecognizeDeviceType(self, choice, value):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        device_type=value)
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --recording-device-type {}'.format(choice))
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testRecordingDeviceName(self):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        device_name='Nexus 5X')
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --recording-device-name "Nexus 5X"')
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testRecordingMimeType(self):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        mime_type='audio/mp3')
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --original-mime-type "audio/mp3"')
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testRecordingAudioTopic(self):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        audio_topic='Recordings of federal supreme court')
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --audio-topic '
+                      '"Recordings of federal supreme court"')
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testSeparateChannelRecognition(self):
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        audio_channel_count=3,
+        enable_separate_recognition=True
+    )
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --audio-channel-count 3 '
+                      '    --separate-channel-recognition ')
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+
+  def testInvalidSeparateRecognitionRequest(self):
+    """Test invalid separate recognition flag values."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        '--separate-channel-recognition: Must be specified.'):
+      self.Run('ml speech recognize-long-running gs://bucket/object '
+               '    --language-code en-US '
+               '    --sample-rate 16000 '
+               '    --async '
+               '    --audio-channel-count 3')
+
+  def testInvalidAudioChannelCountRequest(self):
+    """Test invalid separate recognition flag values."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        '-audio-channel-count: Must be specified.'):
+      self.Run('ml speech recognize-long-running gs://bucket/object '
+               '    --language-code en-US '
+               '    --sample-rate 16000 '
+               '    --async '
+               '    --separate-channel-recognition ')
 
 
 if __name__ == '__main__':

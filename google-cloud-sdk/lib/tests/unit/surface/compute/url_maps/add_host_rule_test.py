@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class UrlMapsAddHostRuleTest(test_base.BaseTest):
     self._api = 'v1'
     self._url_maps_collection = self.compute_v1.urlMaps
     self._backend_services_uri_prefix = (
-        'https://www.googleapis.com/compute/%s/projects/my-project/'
+        'https://compute.googleapis.com/compute/%s/projects/my-project/'
         'global/backendServices/' % self._api)
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -172,7 +172,7 @@ class UrlMapsAddHostRuleTest(test_base.BaseTest):
     ])
 
     self._RunAddHostRule("""
-          https://www.googleapis.com/compute/%s/projects/my-project/global/urlMaps/url-map-1
+          https://compute.googleapis.com/compute/%s/projects/my-project/global/urlMaps/url-map-1
           --hosts a.b.com,c.d.com
           --path-matcher-name youtube
         """ % self._api)
@@ -263,6 +263,72 @@ class UrlMapsAddHostRuleTest(test_base.BaseTest):
     self.CheckRequests()
 
 
+class UrlMapsAddHostRuleTestBeta(UrlMapsAddHostRuleTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_collection = self.compute_beta.urlMaps
+    self._backend_services_uri_prefix = (
+        'https://compute.googleapis.com/compute/%s/projects/my-project/'
+        'global/backendServices/' % self._api)
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_services_uri_prefix + 'default-service',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.google.com', 'google.com'], pathMatcher='www'),
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
+                pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='www',
+                defaultService=self._backend_services_uri_prefix +
+                'www-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._backend_services_uri_prefix + 'search'),
+                    self.messages.PathRule(
+                        paths=['/search/ads', '/search/ads/*'],
+                        service=self._backend_services_uri_prefix + 'ads'),
+                    self.messages.PathRule(
+                        paths=['/images'],
+                        service=self._backend_services_uri_prefix + 'images'),
+                ]),
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._backend_services_uri_prefix +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=(self._backend_services_uri_prefix +
+                                 'youtube-search')),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._backend_services_uri_prefix +
+                        'youtube-watch'),
+                ]),
+        ],
+        tests=[
+            self.messages.UrlMapTest(
+                host='www.google.com',
+                path='/search/ads/inline?q=flowers',
+                service=self._backend_services_uri_prefix + 'ads'),
+            self.messages.UrlMapTest(
+                host='youtube.com',
+                path='/watch/this',
+                service=self._backend_services_uri_prefix + 'youtube-default'),
+        ])
+
+  def _RunAddHostRule(self, command):
+    self.Run("""
+        beta compute url-maps add-host-rule --global """ + command)
+
+
 class UrlMapsAddHostRuleTestAlpha(UrlMapsAddHostRuleTest):
 
   def SetUp(self):
@@ -270,7 +336,7 @@ class UrlMapsAddHostRuleTestAlpha(UrlMapsAddHostRuleTest):
     self._api = 'alpha'
     self._url_maps_collection = self.compute_alpha.urlMaps
     self._backend_services_uri_prefix = (
-        'https://www.googleapis.com/compute/%s/projects/my-project/'
+        'https://compute.googleapis.com/compute/%s/projects/my-project/'
         'global/backendServices/' % self._api)
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -329,14 +395,14 @@ class UrlMapsAddHostRuleTestAlpha(UrlMapsAddHostRuleTest):
         alpha compute url-maps add-host-rule --global """ + command)
 
 
-class RegionalUrlMapsAddHostRuleTest(test_base.BaseTest):
+class RegionalUrlMapsAddHostRuleTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._api = 'alpha'
-    self._url_maps_collection = self.compute_alpha.regionUrlMaps
+    self.SelectApi('beta')
+    self._api = 'beta'
+    self._url_maps_collection = self.compute_beta.regionUrlMaps
     self._backend_services_uri_prefix = (
-        'https://www.googleapis.com/compute/alpha/projects/my-project/'
+        'https://compute.googleapis.com/compute/beta/projects/my-project/'
         'regions/us-west-1/backendServices/')
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
@@ -392,8 +458,9 @@ class RegionalUrlMapsAddHostRuleTest(test_base.BaseTest):
         ])
 
   def _RunAddHostRule(self, command):
-    self.Run("""
-        alpha compute url-maps add-host-rule --region us-west-1 """ + command)
+    self.Run(self._api +
+             """ compute url-maps add-host-rule --region us-west-1 """ +
+             command)
 
   def testAddHostRule(self):
     self.make_requests.side_effect = iter([
@@ -483,7 +550,7 @@ class RegionalUrlMapsAddHostRuleTest(test_base.BaseTest):
     ])
 
     self._RunAddHostRule("""
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/urlMaps/url-map-1
+          https://compute.googleapis.com/compute/beta/projects/my-project/regions/us-west-1/urlMaps/url-map-1
           --hosts a.b.com,c.d.com
           --path-matcher-name youtube
         """)
@@ -575,6 +642,69 @@ class RegionalUrlMapsAddHostRuleTest(test_base.BaseTest):
           """)
 
     self.CheckRequests()
+
+
+class RegionalUrlMapsAddHostRuleTestAlpha(RegionalUrlMapsAddHostRuleTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self._api = 'alpha'
+    self._url_maps_collection = self.compute_alpha.regionUrlMaps
+    self._backend_services_uri_prefix = (
+        'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+        'regions/us-west-1/backendServices/')
+    self._url_map = self.messages.UrlMap(
+        name='url-map-1',
+        defaultService=self._backend_services_uri_prefix + 'default-service',
+        region='us-west-1',
+        hostRules=[
+            self.messages.HostRule(
+                hosts=['*.google.com', 'google.com'], pathMatcher='www'),
+            self.messages.HostRule(
+                hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
+                pathMatcher='youtube'),
+        ],
+        pathMatchers=[
+            self.messages.PathMatcher(
+                name='www',
+                defaultService=self._backend_services_uri_prefix +
+                'www-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=self._backend_services_uri_prefix + 'search'),
+                    self.messages.PathRule(
+                        paths=['/search/ads', '/search/ads/*'],
+                        service=self._backend_services_uri_prefix + 'ads'),
+                    self.messages.PathRule(
+                        paths=['/images'],
+                        service=self._backend_services_uri_prefix + 'images'),
+                ]),
+            self.messages.PathMatcher(
+                name='youtube',
+                defaultService=self._backend_services_uri_prefix +
+                'youtube-default',
+                pathRules=[
+                    self.messages.PathRule(
+                        paths=['/search', '/search/*'],
+                        service=(self._backend_services_uri_prefix +
+                                 'youtube-search')),
+                    self.messages.PathRule(
+                        paths=['/watch', '/view', '/preview'],
+                        service=self._backend_services_uri_prefix +
+                        'youtube-watch'),
+                ]),
+        ],
+        tests=[
+            self.messages.UrlMapTest(
+                host='www.google.com',
+                path='/search/ads/inline?q=flowers',
+                service=self._backend_services_uri_prefix + 'ads'),
+            self.messages.UrlMapTest(
+                host='youtube.com',
+                path='/watch/this',
+                service=self._backend_services_uri_prefix + 'youtube-default'),
+        ])
 
 
 if __name__ == '__main__':

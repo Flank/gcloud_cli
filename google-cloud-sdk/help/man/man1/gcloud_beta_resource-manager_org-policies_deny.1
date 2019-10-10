@@ -11,7 +11,7 @@ gcloud beta resource\-manager org\-policies deny \- add values to an Organizatio
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta resource\-manager org\-policies deny\fR \fIORG_POLICY_ID\fR \fIDENIED_VALUE\fR [\fIDENIED_VALUE\fR\ ...] [\fB\-\-folder\fR=\fIFOLDER_ID\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta resource\-manager org\-policies deny\fR \fIORG_POLICY_ID\fR \fIDENIED_VALUE\fR [\fIDENIED_VALUE\fR\ ...] (\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,18 +37,30 @@ The values to add to the denied_values list policy.
 .RE
 .sp
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Resource that is associated with the organization policy. Exactly one of these
+must be specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-folder\fR=\fIFOLDER_ID\fR
-Folder ID for Org Policies.
+Folder ID.
 
 .TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION_ID\fR
-Organization ID for Org Policies.
+Organization ID.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+Project ID. Overrides the default \fBcore/project\fR property value for this
+command invocation.
 
 
+.RE
 .RE
 .sp
 

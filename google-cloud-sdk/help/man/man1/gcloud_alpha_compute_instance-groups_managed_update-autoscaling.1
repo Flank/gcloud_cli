@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed update\-autoscaling \- update auto
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-scale\-down\-control\fR=[\fImax\-scaled\-down\-replicas\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\fR],[\fImax\-scaled\-down\-replicas\-percent\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -82,6 +82,34 @@ to permit autoscaling to scale only up and not down.
 
 
 .TP 2m
+\fB\-\-scale\-down\-control\fR=[\fImax\-scaled\-down\-replicas\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\fR],[\fImax\-scaled\-down\-replicas\-percent\fR=\fIMAX\-SCALED\-DOWN\-REPLICAS\-PERCENT\fR],[\fItime\-window\fR=\fITIME\-WINDOW\fR]
+Configuration that allows slower scale down so that even if Autoscaler
+recommends an abrupt scale down of a managed instance group, it will be
+throttled as specified by the parameters.
+
+.RS 2m
+.TP 2m
+\fBmax\-scaled\-down\-replicas\fR
+Maximum allowed number of VMs that can be deducted from the peak recommendation
+during the window. Possibly all these VMs can be deleted at once so user service
+needs to be prepared to lose that many VMs in one step. Mutually exclusive with
+\'max\-scaled\-down\-replicas\-percent'.
+
+.TP 2m
+\fBmax\-scaled\-down\-replicas\-percent\fR
+Maximum allowed percent of VMs that can be deducted from the peak recommendation
+during the window. Possibly all these VMs can be deleted at once so user service
+needs to be prepared to lose that many VMs in one step. Mutually exclusive with
+\'max\-scaled\-down\-replicas'.
+
+.TP 2m
+\fBtime\-window\fR
+How long back autoscaling should look when computing recommendations to include
+directives regarding slower scale down. Measured in seconds.
+
+.RE
+.sp
+.TP 2m
 
 At most one of these may be specified:
 
@@ -133,7 +161,6 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

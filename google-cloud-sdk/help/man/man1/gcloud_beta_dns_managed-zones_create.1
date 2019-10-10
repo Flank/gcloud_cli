@@ -76,7 +76,8 @@ Enable DNSSEC and allow transferring a signed zone in or out.
 .TP 2m
 \fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]
 List of IPv4 addresses of target name servers that the zone will forward queries
-to. Ignored for \f5public\fR visibility.
+to. Ignored for \f5public\fR visibility. Non\-RFC1918 addresses will forward to
+the target through the Internet. RFC1918 addresses will forward through the VPC.
 
 .TP 2m
 \fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR
@@ -123,13 +124,11 @@ Length of the zone\-signing key in bits. Requires DNSSEC enabled.
 
 .TP 2m
 \fB\-\-target\-network\fR=\fITARGET_NETWORK\fR
-The network id of the Google Compute Engine private network to forward queries
-to.
+Network ID of the Google Compute Engine private network to forward queries to.
 
 .TP 2m
 \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR
-The project id of the Google Compute Engine private network to forward queries
-to.
+Project ID of the Google Compute Engine private network to forward queries to.
 
 
 .RE
@@ -167,10 +166,11 @@ $ gcloud beta dns managed\-zones create my_zone_2 \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns managed\-zones create
+$ gcloud alpha dns managed\-zones create
 .RE
 

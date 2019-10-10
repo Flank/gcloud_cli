@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015 Google Inc. All Rights Reserved.
+# -*- coding: utf-8 -*- #
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
   def testSingleResourceCase(self):
     [resource] = self.CreateResourceList(1)
     self._printer.PrintSingleRecord(resource)
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         SelfLink:                                    http://g/selfie/a-0
         kind:                                        compute#instance
         labels.empty:                                \
@@ -67,6 +68,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.0
+        size:                                        0
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
@@ -74,7 +76,8 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
     for resource in self.CreateResourceList(1):
       self._printer.AddRecord(resource)
     self._printer.Finish()
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink:                                    http://g/selfie/a-0
         kind:                                        compute#instance
@@ -99,6 +102,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.0
+        size:                                        0
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
@@ -108,7 +112,8 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
     self.AssertOutputEquals('')
 
     self._printer.AddRecord(next(generator))
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink:                                    http://g/selfie/a-0
         kind:                                        compute#instance
@@ -133,11 +138,13 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.0
+        size:                                        0
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
     self._printer.AddRecord(next(generator))
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink:                                    http://g/selfie/a-0
         kind:                                        compute#instance
@@ -162,6 +169,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.0
+        size:                                        0
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         ---
         SelfLink:                                    http://g/selfie/az-1
@@ -187,12 +195,14 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.1
+        size:                                        11
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
     self._printer.AddRecord(next(generator))
     self._printer.Finish()
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
         ---
         SelfLink:                                    http://g/selfie/a-0
         kind:                                        compute#instance
@@ -217,6 +227,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.0
+        size:                                        0
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         ---
         SelfLink:                                    http://g/selfie/az-1
@@ -242,6 +253,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.1
+        size:                                        11
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         ---
         SelfLink:                                    http://g/selfie/azz-2
@@ -267,6 +279,7 @@ class FlattenedPrinterTest(resource_printer_test_base.Base):
         networkInterfaces[0].name:                   nic0
         networkInterfaces[0].network:                default
         networkInterfaces[0].networkIP:              10.240.150.2
+        size:                                        2
         unicode:                                     python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 

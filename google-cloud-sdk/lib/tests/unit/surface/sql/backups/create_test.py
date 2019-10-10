@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from tests.lib.surface.sql import base
 class _BaseBackupsCreateTest(object):
 
   def testBackupsCreate(self):
+    self.ExpectInstanceGet(self.GetV2Instance('my-instance'))
     self.mocked_client.backupRuns.Insert.Expect(
         request=self.messages.SqlBackupRunsInsertRequest(
             project=self.Project(),
@@ -39,8 +40,14 @@ class _BaseBackupsCreateTest(object):
         response=self.messages.Operation(name='opName', status='DONE'))
     self.Run('sql backups create --instance my-instance '
              '--description "my description"')
+    # Ensure that the CMEK message is not showing up.
+    self.AssertErrNotContains(
+        'Your backup will be encrypted with this instance\'s customer-managed '
+        'encryption key. If anyone destroys this key, all data encrypted with '
+        'it will be permanently lost.')
 
   def testBackupsCreateAsync(self):
+    self.ExpectInstanceGet(self.GetV2Instance('my-instance'))
     self.mocked_client.backupRuns.Insert.Expect(
         request=self.messages.SqlBackupRunsInsertRequest(
             project=self.Project(),
@@ -56,6 +63,35 @@ class _BaseBackupsCreateTest(object):
         response=self.messages.Operation(name='opName', status='DONE'))
     self.Run('sql backups create --instance my-instance '
              '--description "my description" --async')
+
+  def testBackupsCreateWithCmek(self):
+    diff = {
+        'name':
+            'my-instance',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(kmsKeyName='some-kms-key')
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.mocked_client.backupRuns.Insert.Expect(
+        request=self.messages.SqlBackupRunsInsertRequest(
+            project=self.Project(),
+            instance='my-instance',
+            backupRun=self.messages.BackupRun(
+                description='my description',
+                instance='my-instance',
+                kind='sql#backupRun')),
+        response=self.messages.Operation(name='opName'))
+    self.mocked_client.operations.Get.Expect(
+        request=self.messages.SqlOperationsGetRequest(
+            project=self.Project(), operation='opName'),
+        response=self.messages.Operation(name='opName', status='DONE'))
+    self.Run('sql backups create --instance my-instance '
+             '--description "my description"')
+    # Ensure that the CMEK message is showing up.
+    self.AssertErrContains(
+        'Your backup will be encrypted with this instance\'s customer-managed '
+        'encryption key. If anyone destroys this key, all data encrypted with '
+        'it will be permanently lost.')
 
 
 class BackupsCreateGATest(_BaseBackupsCreateTest, base.SqlMockTestGA):

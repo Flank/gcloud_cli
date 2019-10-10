@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,10 +51,10 @@ class TargetPoolsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            backupPool: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
+            backupPool: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
             name: pool-1
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
             sessionAffinity: CLIENT_IP
             """))
 
@@ -65,7 +65,7 @@ class TargetPoolsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
 
     self.Run("""
         compute target-pools describe
-          https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
         """)
 
     self.CheckRequests(
@@ -79,10 +79,10 @@ class TargetPoolsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            backupPool: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
+            backupPool: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
             name: pool-1
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
             sessionAffinity: CLIENT_IP
             """))
 
@@ -120,10 +120,10 @@ class TargetPoolsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
-            backupPool: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
+            backupPool: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-2
             name: pool-1
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
+            region: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1
+            selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/regions/region-1/targetPools/pool-1
             sessionAffinity: CLIENT_IP
             """))
 

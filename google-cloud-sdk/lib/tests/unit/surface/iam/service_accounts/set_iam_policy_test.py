@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class SetIamPolicy(unit_test_base.BaseTest):
     else:
       etag_field = ''
     policy = self.msgs.Policy(
-        version=1,
+        version=3,
         bindings=[
             self.msgs.Binding(
                 role='roles/owner',
@@ -61,7 +61,7 @@ class SetIamPolicy(unit_test_base.BaseTest):
         self.temp_path,
         contents=
         '''{{
-          "version": 1,
+          "version": 3,
           "bindings": [
             {{
               "role": "roles/owner",
@@ -129,7 +129,7 @@ class SetIamPolicy(unit_test_base.BaseTest):
 
   def testSetIamPolicyYaml(self):
     policy = self.msgs.Policy(
-        version=1,
+        version=3,
         bindings=[
             self.msgs.Binding(
                 role='roles/owner', members=['user:test-user@gmail.com']),
@@ -139,7 +139,7 @@ class SetIamPolicy(unit_test_base.BaseTest):
         etag=None)
     in_file = self.Touch(
         self.temp_path,
-        contents='version: 1\n'
+        contents='version: 3\n'
                  'bindings:\n'
                  '- members:\n'
                  '  - user:test-user@gmail.com\n'

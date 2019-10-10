@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha auth print\-access\-token \- print an access token for the active account
+gcloud alpha auth print\-access\-token \- print an access token for the specified account
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha auth print\-access\-token\fR [\fIACCOUNT\fR] [\fB\-\-force\-auth\-refresh\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha auth print\-access\-token\fR [\fIACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Print an access token for the active account.
+\fB(ALPHA)\fR Print an access token for the specified account.
 
 
 
@@ -26,19 +26,8 @@ gcloud alpha auth print\-access\-token \- print an access token for the active a
 .RS 2m
 .TP 2m
 [\fIACCOUNT\fR]
-The account to get the access token for. Leave empty for the active account.
-
-
-.RE
-.sp
-
-.SH "FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-force\-auth\-refresh\fR
-Force a refresh of the credentials even if they have not expired yet. By
-default, credentials will only be refreshed when necessary.
+Account to get the access token for. If not specified, the current active
+account will be used.
 
 
 .RE
@@ -68,9 +57,8 @@ $ gcloud alpha auth print\-access\-token
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud auth print\-access\-token

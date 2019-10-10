@@ -69,8 +69,8 @@ The following command disables version 3 of key \f5frodo\fR within keyring
 \f5fellowship\fR and location \f5us\-east1\fR:
 
 .RS 2m
-$ gcloud alpha kms keys versions disable 3 \-\-location us\-east1 \e
-    \-\-keyring fellowship \-\-key frodo
+$ gcloud alpha kms keys versions disable 3 \-\-location=us\-east1 \e
+    \-\-keyring=fellowship \-\-key=frodo
 .RE
 
 
@@ -79,9 +79,8 @@ $ gcloud alpha kms keys versions disable 3 \-\-location us\-east1 \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud kms keys versions disable

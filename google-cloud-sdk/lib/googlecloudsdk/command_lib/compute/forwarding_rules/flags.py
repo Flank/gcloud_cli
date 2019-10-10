@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,114 +29,66 @@ from googlecloudsdk.command_lib.util import completers
 
 
 FORWARDING_RULES_OVERVIEW = """\
-        A forwarding rule directs traffic that matches a bound IP address to a
-        forwarding target (load balancer, VPN gateway or VM instance).
+        A forwarding rule directs traffic that matches a destination IP address
+        to a forwarding target (load balancer, VPN gateway or VM instance).
 
         Forwarding rules can be either global or regional, specified with the
-        ``--global'' or ``--region=REGION'' flag. Global forwarding rules work
-        with global load balancers, which include target HTTP proxies, target
-        HTTPS proxies, target SSL proxies and target TCP proxies; regional
-        forwarding rules work with regional or zonal targets, which include
-        target pools, target instances and target VPN gateways and backend
-        services.
+        ``--global'' or ``--region=REGION'' flags. For more information about
+        the scope of a forwarding rule, refer to
+        https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
 
-        Forwarding rules can be either external or internal, specified with the
-        ``--load-balancing-scheme=[EXTERNAL|INTERNAL]'' flag. External
-        forwarding rules are accessible from the internet, while internal
-        forwarding rules are only accessible from within their VPC networks. You
-        can specify a reserved static external or internal IP address with the
-        ``--address=ADDRESS'' flag for the forwarding rule. Otherwise if the
-        flag is unspecified, an external forwarding rule will be automatically
-        assigned an ephemeral external IP address (global IP addresses for
-        global forwarding rules and regional IP addresses for regional
-        forwarding rules); an internal forwarding rule will be automatically
-        assigned an ephemeral internal IP address from the subnet specified with
-        the ``--subnet'' flag.
-
-        There are different types of load balancer working at different layers
-        of the OSI networking model
-        (http://en.wikipedia.org/wiki/Network_layer). Layer 3 load balancer
-        targets include target pools, target SSL proxies, target TCP proxies and
-        backend services. Layer 7 load balancer targets include target HTTP
-        proxies and target HTTPS proxies. For more information on load
-        balancing, see
-        https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/.
-        """
-
-
-FORWARDING_RULES_OVERVIEW_ALPHA = """\
-        A forwarding rule directs traffic that matches a bound IP address to a
-        forwarding target (load balancer, VPN gateway or VM instance).
-
-        Forwarding rules can be either global or regional, specified with the
-        ``--global'' or ``--region=REGION'' flag. Global forwarding rules work
-        with global load balancers, which include target HTTP proxies, target
-        HTTPS proxies, target SSL proxies and target TCP proxies; regional
-        forwarding rules work with regional or zonal targets, which include
-        target pools, target instances and target VPN gateways and backend
-        services.
-
-        Forwarding rules can be either external, internal or internal self
-        managed, specified with the
+        Forwarding rules can be external, internal, internal managed, or
+        internal self-managed, specified with the
         ``--load-balancing-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]''
         flag. External forwarding rules are accessible from the internet, while
         internal forwarding rules are only accessible from within their VPC
         networks. You can specify a reserved static external or internal IP
         address with the ``--address=ADDRESS'' flag for the forwarding rule.
-        Otherwise if the flag is unspecified, an external forwarding rule will
-        be automatically assigned an ephemeral external IP address (global IP
-        addresses for global forwarding rules and regional IP addresses for
-        regional forwarding rules); an internal forwarding rule will be
-        automatically assigned an ephemeral internal IP address from the subnet
-        specified with the ``--subnet'' flag. An IP Address must be provided for
-        an internal self managed forwarding rule.
+        Otherwise, if the flag is unspecified, an ephemeral IP address is
+        automatically assigned (global IP addresses for global forwarding rules
+        and regional IP addresses for regional forwarding rules); an internal
+        forwarding rule is automatically assigned an ephemeral internal IP
+        address from the subnet specified with the ``--subnet'' flag. You must
+        provide an IP address for an internal self-managed forwarding rule.
 
-        There are different types of load balancers working at different layers
-        of the OSI networking model
-        (http://en.wikipedia.org/wiki/Network_layer). Layer 3 load balancer
-        targets include target pools, target SSL proxies, target TCP proxies and
-        backend services. Layer 7 load balancer targets include target HTTP
-        proxies and target HTTPS proxies. For more information on load
-        balancing, see
-        https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/.
+        Different types of load balancers work at different layers of the OSI
+        networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3
+        targets include target pools, target SSL proxies, target TCP proxies,
+        and backend services. Layer 7 targets include target HTTP proxies and
+        target HTTPS proxies. For more information, refer to
+        https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
         """
 
 
-FORWARDING_RULES_OVERVIEW_BETA = """\
-        A forwarding rule directs traffic that matches a bound IP address to a
-        forwarding target (load balancer, VPN gateway or VM instance).
+FORWARDING_RULES_OVERVIEW_ALPHA = """\
+        A forwarding rule directs traffic that matches a destination IP address
+        to a forwarding target (load balancer, VPN gateway or VM instance).
 
         Forwarding rules can be either global or regional, specified with the
-        ``--global'' or ``--region=REGION'' flag. Global forwarding rules work
-        with global load balancers, which include target HTTP proxies, target
-        HTTPS proxies, target SSL proxies and target TCP proxies; regional
-        forwarding rules work with regional or zonal targets, which include
-        target pools, target instances and target VPN gateways and backend
-        services.
+        ``--global'' or ``--region=REGION'' flag. For more information about
+        the scope of a forwarding rule, refer to
+        https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
 
-        Forwarding rules can be either external, internal or internal self
-        managed, specified with the
-        ``--load-balancing-scheme=[EXTERNAL|INTERNAL|INTERNAL_SELF_MANAGED]''
+        Forwarding rules can be external, internal, internal managed, or
+        internal self-managed, specified with the
+        ``--load-balancing-scheme=[EXTERNAL|INTERNAL|INTERNAL_MANAGED|INTERNAL_SELF_MANAGED]''
         flag. External forwarding rules are accessible from the internet, while
         internal forwarding rules are only accessible from within their VPC
         networks. You can specify a reserved static external or internal IP
         address with the ``--address=ADDRESS'' flag for the forwarding rule.
-        Otherwise if the flag is unspecified, an external forwarding rule will
-        be automatically assigned an ephemeral external IP address (global IP
-        addresses for global forwarding rules and regional IP addresses for
-        regional forwarding rules); an internal forwarding rule will be
-        automatically assigned an ephemeral internal IP address from the subnet
-        specified with the ``--subnet'' flag. An IP Address must be provided for
-        an internal self managed forwarding rule.
+        Otherwise, if the flag is unspecified, an ephemeral IP address is
+        automatically assigned (global IP addresses for global forwarding rules
+        and regional IP addresses for regional forwarding rules); an internal
+        forwarding rule is automatically assigned an ephemeral internal IP
+        address from the subnet specified with the ``--subnet'' flag. You must
+        provide an IP address for an internal self-managed forwarding rule.
 
-        There are different types of load balancers working at different layers
-        of the OSI networking model
-        (http://en.wikipedia.org/wiki/Network_layer). Layer 3 load balancer
-        targets include target pools, target SSL proxies, target TCP proxies and
-        backend services. Layer 7 load balancer targets include target HTTP
-        proxies and target HTTPS proxies. For more information on load
-        balancing, see
-        https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/.
+        Different types of load balancers work at different layers of the OSI
+        networking model (http://en.wikipedia.org/wiki/Network_layer). Layer 3
+        targets include target pools, target SSL proxies, target TCP proxies,
+        and backend services. Layer 7 targets include target HTTP proxies and
+        target HTTPS proxies. For more information, refer to
+        https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts.
         """
 
 
@@ -198,7 +150,7 @@ def ForwardingRuleArgumentForRoute(required=True):
       required=required,
       regional_collection='compute.forwardingRules',
       short_help=
-      'Target forwarding rule that will receive forwarded traffic.',
+      'Target forwarding rule that receives forwarded traffic.',
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION)
 
 
@@ -208,33 +160,30 @@ BACKEND_SERVICE_ARG = compute_flags.ResourceArgument(
     resource_name='backend service',
     regional_collection='compute.regionBackendServices',
     global_collection='compute.targetBackendServices',
-    short_help='Target backend service that will receive the traffic.',
-    region_explanation=('If not specified, it will be set to the'
+    short_help='Target backend service that receives the traffic.',
+    region_explanation=('If not specified, the region is set to the'
                         ' region of the forwarding rule.'))
 
 
-def NetworkArg(include_traffic_director, include_l7_internal_load_balancing):
+def NetworkArg(include_l7_internal_load_balancing):
   """Returns the network parameter."""
 
-  load_balancing_scheme = '--load-balancing-scheme=INTERNAL'
-  if include_traffic_director and not include_l7_internal_load_balancing:
-    load_balancing_scheme += ("""
-        or --load-balancing-scheme=INTERNAL_SELF_MANAGED""")
-  elif include_traffic_director and include_l7_internal_load_balancing:
-    load_balancing_scheme += (""",
-        --load-balancing-scheme=INTERNAL_MANAGED, or
-        --load-balancing-scheme=INTERNAL_SELF_MANAGED""")
+  load_balancing_scheme = ('--load-balancing-scheme=INTERNAL or ' +
+                           '--load-balancing-scheme=INTERNAL_SELF_MANAGED')
+
+  if include_l7_internal_load_balancing:
+    load_balancing_scheme += ' or --load-balancing-scheme=INTERNAL_MANAGED'
 
   return compute_flags.ResourceArgument(
       name='--network',
       required=False,
-      resource_name='networks',
+      resource_name='network',
       global_collection='compute.networks',
       short_help='Network that this forwarding rule applies to.',
-      detailed_help="""\
+      detailed_help="""
           (Only for %s) Network that this
           forwarding rule applies to. If this field is not specified, the default
-          network will be used. In the absence of the default network, this field
+          network is used. In the absence of the default network, this field
           must be specified.
           """ % load_balancing_scheme)
 
@@ -249,10 +198,10 @@ SUBNET_ARG = compute_flags.ResourceArgument(
         (Only for --load-balancing-scheme=INTERNAL) Subnetwork that this
         forwarding rule applies to. If the network configured for this
         forwarding rule is in auto subnet mode, this flag is optional and the
-        subnet in the same region of the forwarding rule will be used. However,
+        subnet in the same region of the forwarding rule is used. However,
         if the network is in custom subnet mode, a subnetwork must be specified.
         """,
-    region_explanation=('If not specified, it will be set to the'
+    region_explanation=('If not specified, the region is set to the'
                         ' region of the forwarding rule.'))
 
 
@@ -266,8 +215,8 @@ def TargetHttpProxyArg(include_l7_internal_load_balancing=False):
       global_collection='compute.targetHttpProxies',
       regional_collection='compute.regionTargetHttpProxies'
       if include_l7_internal_load_balancing else None,
-      short_help='Target HTTP proxy that will receive the traffic.',
-      detailed_help=('Target HTTP proxy that will receive the traffic. '
+      short_help='Target HTTP proxy that receives the traffic.',
+      detailed_help=('Target HTTP proxy that receives the traffic. '
                      'Acceptable values for --ports flag are: 80, 8080.'),
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
       if include_l7_internal_load_balancing else None)
@@ -284,8 +233,8 @@ def TargetHttpsProxyArg(include_l7_internal_load_balancing=False):
       global_collection='compute.targetHttpsProxies',
       regional_collection='compute.regionTargetHttpsProxies'
       if include_l7_internal_load_balancing else None,
-      short_help='Target HTTPS proxy that will receive the traffic.',
-      detailed_help=('Target HTTPS proxy that will receive the traffic. '
+      short_help='Target HTTPS proxy that receives the traffic.',
+      detailed_help=('Target HTTPS proxy that receives the traffic. '
                      'Acceptable values for --ports flag are: 443.'),
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
       if include_l7_internal_load_balancing else None)
@@ -296,11 +245,11 @@ TARGET_INSTANCE_ARG = compute_flags.ResourceArgument(
     required=False,
     resource_name='target instance',
     zonal_collection='compute.targetInstances',
-    short_help='Name of the target instance that will receive the traffic.',
+    short_help='Name of the target instance that receives the traffic.',
     detailed_help=textwrap.dedent("""\
-      Name of the target instance that will receive the traffic. The
-      target instance must be in a zone that's in the forwarding rule's
-      region. Global forwarding rules may not direct traffic to target
+      Name of the target instance that receives the traffic. The
+      target instance must be in a zone in the forwarding rule's
+      region. Global forwarding rules cannot direct traffic to target
       instances.
       """) + compute_flags.ZONE_PROPERTY_EXPLANATION)
 
@@ -309,13 +258,13 @@ TARGET_POOL_ARG = compute_flags.ResourceArgument(
     required=False,
     resource_name='target pool',
     regional_collection='compute.targetPools',
-    short_help='Target pool that will receive the traffic.',
+    short_help='Target pool that receives the traffic.',
     detailed_help="""\
-      Target pool that will receive the traffic. The target pool
+      Target pool that receives the traffic. The target pool
       must be in the same region as the forwarding rule. Global
-      forwarding rules may not direct traffic to target pools.
+      forwarding rules cannot direct traffic to target pools.
       """,
-    region_explanation=('If not specified, it will be set to the'
+    region_explanation=('If not specified, the region is set to the'
                         ' region of the forwarding rule.'))
 
 TARGET_SSL_PROXY_ARG = compute_flags.ResourceArgument(
@@ -323,8 +272,8 @@ TARGET_SSL_PROXY_ARG = compute_flags.ResourceArgument(
     required=False,
     resource_name='ssl proxy',
     global_collection='compute.targetSslProxies',
-    short_help='Target SSL proxy that will receive the traffic.',
-    detailed_help=('Target SSL proxy that will receive the traffic. '
+    short_help='Target SSL proxy that receives the traffic.',
+    detailed_help=('Target SSL proxy that receives the traffic. '
                    'Acceptable values for --ports flag are: '
                    '25, 43, 110, 143, 195, 443, 465, 587, '
                    '700, 993, 995, 1883, 5222.'))
@@ -334,8 +283,8 @@ TARGET_TCP_PROXY_ARG = compute_flags.ResourceArgument(
     required=False,
     resource_name='tcp proxy',
     global_collection='compute.targetTcpProxies',
-    short_help='Target TCP proxy that will receive the traffic.',
-    detailed_help=('Target TCP proxy that will receive the traffic. '
+    short_help='Target TCP proxy that receives the traffic.',
+    detailed_help=('Target TCP proxy that receives the traffic. '
                    'Acceptable values for --ports flag are: '
                    '25, 43, 110, 143, 195, 443, 465, 587, '
                    '700, 993, 995, 1883, 5222.'))
@@ -345,73 +294,49 @@ TARGET_VPN_GATEWAY_ARG = compute_flags.ResourceArgument(
     required=False,
     resource_name='VPN gateway',
     regional_collection='compute.targetVpnGateways',
-    short_help='Target VPN gateway that will receive forwarded traffic.',
+    short_help='Target VPN gateway that receives forwarded traffic.',
     detailed_help=(
-        'Target VPN gateway that will receive forwarded traffic. '
+        'Target VPN gateway (Cloud VPN Classic gateway) that receives forwarded'
+        'traffic. '
         'Acceptable values for --ports flag are: 500, 4500.'),
-    region_explanation=('If not specified, it will be set to the'
+    region_explanation=('If not specified, the region is set to the'
                         ' region of the forwarding rule.'))
 
 
-def AddressArgHelp(include_l7_internal_load_balancing,
-                   include_traffic_director):
+def AddressArgHelp(include_l7_internal_load_balancing):
   """Build the help text for the address argument."""
 
-  lb_schemes = '(EXTERNAL, INTERNAL'
+  lb_schemes = '(EXTERNAL, INTERNAL, INTERNAL_MANAGED'
   if include_l7_internal_load_balancing:
     lb_schemes += ', INTERNAL_MANAGED'
-  if include_traffic_director:
-    lb_schemes += ', INTERNAL_SELF_MANAGED'
   lb_schemes += ')'
 
-  address_help = ''
-  if include_traffic_director:
-    address_help = """
-    When the --load-balancing-scheme is INTERNAL_SELF_MANAGED, this must
-    be a URL reference to an existing Address resource.
-    """
-
   detailed_help = """\
-    IP address that the forwarding rule will serve. All
-    traffic sent to this IP address is directed to the target
-    pointed to by the forwarding rule. Assigned IP addresses can be
-    reserved or unreserved.
+    IP address that the forwarding rule serves. When a client sends traffic
+    to this IP address, the forwarding rule directs the traffic to the target
+    that you specify in the forwarding rule.
 
-    IP addresses are restricted based on the forwarding rule's load balancing
-    scheme (%s) and scope (global or regional).
-
-    When the --load-balancing-scheme is EXTERNAL, if the address is reserved,
-    it must either (1) reside in the global scope if the forwarding rule is
-    being configured to point to a global target (target HTTP proxy, target
-    HTTPS proxy, target SSL proxy and target TCP proxy) or (2) reside in the
-    same region as the forwarding rule if the forwarding rule is being
-    configured to point to a regional target (target pool) or zonal target
-    (target instance). If this flag is omitted, an ephemeral external IP
-    address is automatically assigned.
-
-    When the --load-balancing-scheme is INTERNAL or INTERNAL_MANAGED, this can
-    only be an RFC 1918 IP address belonging to the network/subnet configured
-    for the forwarding rule. If this flag is omitted, an ephemeral internal IP
-    address will be automatically allocated from the IP range of the subnet or
-    network configured for this forwarding rule.
-    %s
-    Note: An IP address must be specified if the traffic is being forwarded to
-    a VPN.
-
-    This flag can be specified either by a literal IP address or a reference
-    to an existing Address resource. The following examples are all valid:
+    If you don't specify a reserved IP address, an ephemeral IP address is
+    assigned. You can specify the IP address as a literal IP address or a
+    reference to an existing Address resource. The following examples are all
+    valid:
     - 100.1.2.3
-    - https://www.googleapis.com/compute/v1/projects/project-1/regions/us-central1/addresses/address-1
+    - https://compute.googleapis.com/compute/v1/projects/project-1/regions/us-central1/addresses/address-1
     - projects/project-1/regions/us-central1/addresses/address-1
     - regions/us-central1/addresses/address-1
     - global/addresses/address-1
     - address-1
-  """ % (lb_schemes, address_help)
+
+    The load-balancing-scheme (%s) and the forwarding rule's target determine
+    the type of IP address that you can use. For detailed information, refer to
+    https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts#ip_address_specifications.
+  """ % (
+      lb_schemes)
 
   return textwrap.dedent(detailed_help)
 
 
-def AddressArg(include_traffic_director, include_l7_internal_load_balancing):
+def AddressArg(include_l7_internal_load_balancing):
   return compute_flags.ResourceArgument(
       name='--address',
       required=False,
@@ -422,12 +347,11 @@ def AddressArg(include_traffic_director, include_l7_internal_load_balancing):
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION,
       short_help='IP address that the forwarding rule will serve.',
       detailed_help=AddressArgHelp(
-          include_l7_internal_load_balancing=include_l7_internal_load_balancing,
-          include_traffic_director=include_traffic_director))
+          include_l7_internal_load_balancing=include_l7_internal_load_balancing)
+  )
 
 
 def AddUpdateArgs(parser,
-                  include_traffic_director=False,
                   include_l7_internal_load_balancing=False):
   """Adds common flags for mutating forwarding rule targets."""
   target = parser.add_mutually_exclusive_group(required=True)
@@ -448,20 +372,16 @@ def AddUpdateArgs(parser,
 
   BACKEND_SERVICE_ARG.AddArgument(parser, mutex_group=target)
   NetworkArg(
-      include_traffic_director=include_traffic_director,
       include_l7_internal_load_balancing=include_l7_internal_load_balancing
   ).AddArgument(parser)
   SUBNET_ARG.AddArgument(parser)
 
   AddLoadBalancingScheme(
       parser,
-      include_traffic_director=include_traffic_director,
       include_l7_ilb=include_l7_internal_load_balancing)
 
 
-def AddLoadBalancingScheme(parser,
-                           include_l7_ilb=False,
-                           include_traffic_director=False):
+def AddLoadBalancingScheme(parser, include_l7_ilb=False):
   """Adds the load-balancing-scheme flag."""
   load_balancing_choices = {
       'EXTERNAL':
@@ -471,13 +391,10 @@ def AddLoadBalancingScheme(parser,
           '--target-instance.',
       'INTERNAL': 'Internal load balancing or forwarding, used with '
                   '--backend-service.',
+      'INTERNAL_SELF_MANAGED':
+          'Traffic director load balancing or forwarding, used with '
+          '--target-http-proxy, --target-https-proxy.'
   }
-  if include_traffic_director:
-    load_balancing_choices.update({
-        'INTERNAL_SELF_MANAGED':
-            'Traffic director load balancing or forwarding, used with '
-            '--target-http-proxy, --target-https-proxy.'
-    })
 
   if include_l7_ilb:
     load_balancing_choices.update({
@@ -490,7 +407,7 @@ def AddLoadBalancingScheme(parser,
       choices=load_balancing_choices,
       type=lambda x: x.replace('-', '_').upper(),
       default='EXTERNAL',
-      help='This signifies what the forwarding rule will be used for.')
+      help='This defines the forwarding rule\'s load balancing scheme.')
 
 
 def AddAllowGlobalAccess(parser):
@@ -539,13 +456,12 @@ def AddIpVersionGroup(parser):
       """)
 
 
-def AddAddressesAndIPVersions(parser, required, include_traffic_director,
+def AddAddressesAndIPVersions(parser, required,
                               include_l7_internal_load_balancing):
   """Adds Addresses and IP versions flag."""
 
   address_arg = AddressArg(
-      include_l7_internal_load_balancing=include_l7_internal_load_balancing,
-      include_traffic_director=include_traffic_director)
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing)
   group = parser.add_mutually_exclusive_group(required=required)
   AddIpVersionGroup(group)
   address_arg.AddArgument(parser, mutex_group=group)
@@ -565,20 +481,10 @@ def AddPortsAndPortRange(parser):
   ports_scope = parser.add_mutually_exclusive_group()
   ports_metavar = 'ALL | [PORT | START_PORT-END_PORT],[...]'
   ports_help = """\
-  List of comma separated ports and/or port ranges or the value `all`.
-  If a list is provided, only packets addressed to ports in the list
-  will be forwarded. If unspecified or `all` for regional forwarding
-  rules, all ports are matched. This flag is required for global
-  forwarding rules and accepts a single set of contiguous ports (i.e.
-  `--ports=80,82` is not valid because 80 and 82 are not contiguous).
-
-  A list can consist of individual ports and ranges. For example,
-  `--ports 8000-8004` or `--ports 80`.
-
-  Some forwarding targets have restriction on acceptable ports, e.g., if
-  --target-http-proxy is specified, the acceptable values for --ports
-  are: 80, 8080. For internal load balancing, the allowed ports can be
-  `all` or a set of at most 5 ports.
+  List of comma-separated ports. The forwarding rule forwards packets with
+  matching destination ports. Port specification requirements vary
+  depending on the load-balancing scheme and target.
+  For more information, refer to https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts#port_specifications.
   """
 
   ports_scope.add_argument(
@@ -594,12 +500,8 @@ def AddPortsAndPortRange(parser):
       metavar='[PORT | START_PORT-END_PORT]',
       help="""\
       DEPRECATED, use --ports. If specified, only packets addressed to ports in
-      the specified range will be forwarded. If not specified for regional
-      forwarding rules, all ports are matched. This flag is required for global
-      forwarding rules.
-
-      Either an individual port (`--port-range 80`) or a range of ports
-      (`--port-range 3000-3100`) may be specified.
+      the specified range are forwarded. For more information, refer to
+      https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts#port_specifications.
       """)
 
 
@@ -625,6 +527,18 @@ def AddNetworkTier(parser, supports_network_tier_flag, for_update):
           Network tier to assign to the forwarding rules. ``NETWORK_TIER''
           must be one of: `PREMIUM`, `STANDARD`. The default value is `PREMIUM`.
           """)
+
+
+def AddIsMirroringCollector(parser):
+  parser.add_argument(
+      '--is-mirroring-collector',
+      action='store_true',
+      default=None,
+      help="""\
+      If set, this forwarding rule can be used as a collector for packet
+      mirroring. This can only be specified for forwarding rules with the
+      LOAD_BALANCING_SCHEME set to INTERNAL.
+      """)
 
 
 class PortRangesWithAll(object):

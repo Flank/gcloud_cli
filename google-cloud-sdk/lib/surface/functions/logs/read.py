@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.functions import flags
 from googlecloudsdk.core import properties
+import six
 
 
 class GetLogs(base.ListCommand):
@@ -119,7 +120,7 @@ class GetLogs(base.ListCommand):
     for entry in entries:
       row = {'log': entry.textPayload}
       if entry.severity:
-        severity = str(entry.severity)
+        severity = six.text_type(entry.severity)
         if severity in flags.SEVERITIES:
           # Use short form (first letter) for expected severities.
           row['level'] = severity[0]

@@ -45,7 +45,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/net1/listPeeringRoutes?alt=json&direction=INCOMING&maxResults=500&peeringName=peer1&region=us-central1
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/net1/listPeeringRoutes?alt=json&direction=INCOMING&maxResults=500&peeringName=peer1&region=us-central1
           method: GET
           headers: {}
           body: null
@@ -78,7 +78,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/net1/listPeeringRoutes?alt=json&direction=OUTGOING&maxResults=500&peeringName=peer1&region=us-central1
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/net1/listPeeringRoutes?alt=json&direction=OUTGOING&maxResults=500&peeringName=peer1&region=us-central1
           method: GET
           headers: {}
           body: null

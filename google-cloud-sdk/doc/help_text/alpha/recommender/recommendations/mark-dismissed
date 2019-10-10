@@ -1,0 +1,62 @@
+NAME
+    gcloud alpha recommender recommendations mark-dismissed - mark the
+        Recommendation State as DISMISSED. Can only be performed on
+        recommendations in ACTIVE state
+
+SYNOPSIS
+    gcloud alpha recommender recommendations mark-dismissed
+        (RECOMMENDATION : --location=LOCATION --recommender=RECOMMENDER)
+        --etag=ETAG [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Mark the Recommendation State as DISMISSED. Can only be performed
+    on recommendations in ACTIVE state.
+
+POSITIONAL ARGUMENTS
+     Recommendation resource - The Cloud Recommendation to mark as dismissed.
+     The arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [recommendation] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
+
+       RECOMMENDATION
+          ID of the recommendation or fully qualified identifier for the
+          recommendation. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The location ID.
+
+       --recommender=RECOMMENDER
+          The recommender ID.
+
+REQUIRED FLAGS
+     --etag=ETAG
+        The fingerprint of the recommendation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the recommender/v1alpha2 API. The full documentation for
+    this API can be found at: https://cloud.google.com/recommender/docs/
+
+EXAMPLES
+    To mark a recommendation as DISMISSED:
+
+        $ gcloud alpha recommender recommendations mark-dismissed \
+          abcd-1234 --project=project-name --location=global \
+          --recommender=google.iam.policy.Recommender --etag=abc123
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

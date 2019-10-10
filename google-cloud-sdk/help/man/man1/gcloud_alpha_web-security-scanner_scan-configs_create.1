@@ -11,7 +11,7 @@ gcloud alpha web\-security\-scanner scan\-configs create \- create a Web Securit
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha web\-security\-scanner scan\-configs create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR \fB\-\-starting\-urls\fR=[\fISTARTING_URLS\fR,...] [\fB\-\-blacklist\-patterns\fR=[\fIBLACKLIST_PATTERNS\fR,...]] [\fB\-\-no\-export\-to\-security\-center\fR] [\fB\-\-max\-qps\fR=\fIMAX_QPS\fR] [\fB\-\-target\-platforms\fR=[\fITARGET_PLATFORMS\fR,...];\ default="app_engine,compute"] [\fB\-\-user\-agent\fR=\fIUSER_AGENT\fR] [\fB\-\-auth\-password\fR=\fIAUTH_PASSWORD\fR\ \fB\-\-auth\-type\fR=\fIAUTH_TYPE\fR\ \fB\-\-auth\-url\fR=\fIAUTH_URL\fR\ \fB\-\-auth\-user\fR=\fIAUTH_USER\fR] [\fB\-\-schedule\-interval\-days\fR=\fISCHEDULE_INTERVAL_DAYS\fR\ \fB\-\-schedule\-next\-start\fR=\fISCHEDULE_NEXT_START\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha web\-security\-scanner scan\-configs create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR \fB\-\-starting\-urls\fR=[\fISTARTING_URLS\fR,...] [\fB\-\-blacklist\-patterns\fR=[\fIBLACKLIST_PATTERNS\fR,...]] [\fB\-\-no\-export\-to\-security\-center\fR] [\fB\-\-max\-qps\fR=\fIMAX_QPS\fR] [\fB\-\-risk\-level\fR=\fIRISK_LEVEL\fR;\ default="normal"] [\fB\-\-target\-platforms\fR=[\fITARGET_PLATFORMS\fR,...];\ default="app_engine,compute"] [\fB\-\-user\-agent\fR=\fIUSER_AGENT\fR] [\fB\-\-auth\-password\fR=\fIAUTH_PASSWORD\fR\ \fB\-\-auth\-type\fR=\fIAUTH_TYPE\fR\ \fB\-\-auth\-url\fR=\fIAUTH_URL\fR\ \fB\-\-auth\-user\fR=\fIAUTH_USER\fR] [\fB\-\-schedule\-interval\-days\fR=\fISCHEDULE_INTERVAL_DAYS\fR\ \fB\-\-schedule\-next\-start\fR=\fISCHEDULE_NEXT_START\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,6 +55,11 @@ Defaults to true. Enabled by default, use
 \fB\-\-max\-qps\fR=\fIMAX_QPS\fR
 Maximum queries per second (QPS) of the scanners. Defaults to 15, with a maximum
 of 20.
+
+.TP 2m
+\fB\-\-risk\-level\fR=\fIRISK_LEVEL\fR; default="normal"
+The risk level selected for the scan. Defaults to normal scanning.
+\fIRISK_LEVEL\fR must be one of: \fBlow\fR, \fBnormal\fR.
 
 .TP 2m
 \fB\-\-target\-platforms\fR=[\fITARGET_PLATFORMS\fR,...]; default="app_engine,compute"
@@ -148,7 +153,6 @@ $ gcloud alpha web\-security\-scanner scan\-configs create \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

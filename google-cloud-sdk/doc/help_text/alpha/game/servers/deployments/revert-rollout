@@ -1,0 +1,76 @@
+NAME
+    gcloud alpha game servers deployments revert-rollout - start rollback of
+        the ongoing Deployment rollout in the specified clusters
+
+SYNOPSIS
+    gcloud alpha game servers deployments revert-rollout
+        (DEPLOYMENT : --location=LOCATION) [--async] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Start rollback of the ongoing Deployment rollout in the specified
+    clusters.
+
+    A Deployment rollout updates game servers with a new image. The new image
+    is specified through the spec field of game server template. It is a string
+    field and follows the format of the spec field in Agones GameServer custom
+    resource. Please see https://agones.dev for more details.
+
+    The new game server template can be specified either through creating a new
+    Deployment resource or through the start-rollout verb on an existing
+    Deployment resource (gcloud game servers deployments start-rollout).
+
+    Once the new game server template is specified, you can start the rollout
+    by changing the percentage of game servers that run the new image through
+    the set-rollout-target verb (gcloud game servers deployments
+    set-rollout-target). The set-rollout-target verb specifies labels for
+    clusters that should get the new image. It also specifies what percentage
+    of game servers in each of the specified clusters should run the new image.
+
+    Finally, you can finish the rollout using the commit verb (gcloud game
+    servers deployments commit). This will set the rollout percentage to 100 in
+    all clusters whose labels were previously specified by calling the
+    set-rollout-target verb.
+
+    If you need to revert a rollout, you can use the revert-rollout verb
+    (gcloud game servers deployments revert-rollout) which deletes game servers
+    running the new image.
+
+POSITIONAL ARGUMENTS
+     Deployment resource - Cloud Game Server Deployment resource to start
+     rollout for. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [deployment] on the command line with a
+     fully specified name; set the property [core/project]; provide the
+     argument [--project] on the command line. This must be specified.
+
+       DEPLOYMENT
+          ID of the deployment or fully qualified identifier for the
+          deployment. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          Google Cloud location.
+
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the gameservices/v1alpha API. The full documentation for
+    this API can be found at: https://cloud.google.com/solutions/gaming/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

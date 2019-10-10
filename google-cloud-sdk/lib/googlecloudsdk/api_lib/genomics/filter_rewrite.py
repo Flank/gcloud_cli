@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ def _RewriteTimeTerm(key, op, operand):
   except ValueError as e:
     raise ValueError(
         '{operand}: date-time value expected for {key}: {error}'
-        .format(operand=operand, key=key, error=str(e)))
+        .format(operand=operand, key=key, error=six.text_type(e)))
 
   if op == ':':
     op = '='

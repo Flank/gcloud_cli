@@ -4,7 +4,7 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - label: Lookup by SQL name
-  - command: data-catalog entries lookup pubsub.project1.topic1
+  - command: data-catalog entries lookup pubsub.topic.project1.topic1
   - stdout: |
       linkedResource: //pubsub.googleapis.com/projects/fake-project/topics/topic1
       name: projects/fake-project/locations/global/entryGroups/@pubsub/entries/fake-entry
@@ -25,11 +25,11 @@ summary:
 actions:
 - execute_command:
     label: Lookup by SQL name
-    command: data-catalog entries lookup pubsub.project1.topic1
+    command: data-catalog entries lookup pubsub.topic.project1.topic1
     events:
     - api_call:
         expect_request:
-          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.project1.topic1
+          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.topic.project1.topic1
           method: GET
           headers: {}
           body: null

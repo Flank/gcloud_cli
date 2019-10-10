@@ -11,7 +11,7 @@ gcloud alpha compute sole\-tenancy node\-groups create \- creates a Google Compu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute sole\-tenancy node\-groups create\fR \fINAME\fR \fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR \fB\-\-target\-size\fR=\fITARGET_SIZE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute sole\-tenancy node\-groups create\fR \fINAME\fR \fB\-\-node\-template\fR=\fINODE_TEMPLATE\fR \fB\-\-target\-size\fR=\fITARGET_SIZE\fR [\fB\-\-autoscaling\-policy\fR=[\fImax\-size\fR=\fIMAX\-SIZE\fR],[\fImin\-size\fR=\fIMIN\-SIZE\fR],[\fImode\fR=\fIMODE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,8 +51,53 @@ The target initial number of nodes in the node group.
 
 .RS 2m
 .TP 2m
+\fB\-\-autoscaling\-policy\fR=[\fImax\-size\fR=\fIMAX\-SIZE\fR],[\fImin\-size\fR=\fIMIN\-SIZE\fR],[\fImode\fR=\fIMODE\fR]
+Option to specify the autoscaling policy for node groups.
+
+.RS 2m
+.TP 2m
+\fBmode\fR
+Options for mode are 'on' or 'off'. When set to 'on', the autoscaler will
+increase or decrease the size of the node group in response to capacity needs.
+If set to 'off', the autoscaler will not update the size of the node group.
+
+.TP 2m
+\fBmin\-size\fR
+The minimum size of the node group. Default is 0 and must be an integer value
+smaller than or equal to max\-size.
+
+.TP 2m
+\fBmax\-size\fR
+The maximum size of the node group. Default is 100 and must be smaller or equal
+to 100 and larger than or equal to min\-size.
+
+
+.RE
+.sp
+.TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional description of this resource.
+
+.TP 2m
+\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR
+Determines the maintenance behavior during host maintenance events.
+\fIMAINTENANCE_POLICY\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBdefault\fR
+VM instances on the host are live migrated to a new physical server.
+.TP 2m
+\fBmigrate\-within\-node\-group\fR
+VM instances on the host are live migrated to another node within the same node
+group.
+.TP 2m
+\fBrestart\-in\-place\fR
+VM instances on the host are terminated and then restarted on the same physical
+server after the maintenance event has completed.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -100,9 +145,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute sole\-tenancy node\-groups create

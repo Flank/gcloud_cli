@@ -18,7 +18,7 @@ gcloud beta compute external\-vpn\-gateways create \- create a new Google Comput
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute external\-vpn\-gateways create\fR creates a
-new External VPN gateway.
+new external VPN gateway.
 
 External VPN gateway is the on\-premises VPN gateway or another cloud provider's
 VPN gateway that connects to your Google Cloud VPN gateway. To create a highly
@@ -105,12 +105,24 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To create an external VPN gateway, run:
 
 .RS 2m
+$ gcloud beta compute external\-vpn\-gateways create \e
+  my\-external\-gateway \-\-interfaces=0=8.9.9.9
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute external\-vpn\-gateways create
 $ gcloud alpha compute external\-vpn\-gateways create
 .RE
 

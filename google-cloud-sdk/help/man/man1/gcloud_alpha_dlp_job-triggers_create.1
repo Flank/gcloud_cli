@@ -54,8 +54,8 @@ ID of the job_trigger or fully qualified identifier for the job_trigger.
 \fB\-\-trigger\-schedule\fR=\fITRIGGER_SCHEDULE\fR
 Duration specifying how often the triggered job will be run. A scheduled start
 time will be skipped if the previous execution has not ended when its scheduled
-time occurs. Value must be a time duration greater than or equal to 60 minutes
-and can be no longer than 60 days.
+time occurs. Value must be a time duration greater than or equal to 1 day and
+can be no longer than 60 days.
 
 See \f5$ gcloud topic datetimes for information on duration formats.\fR
 
@@ -124,35 +124,37 @@ included by default.
 
 .TP 2m
 \fB\-\-include\-quote\fR
-If True, the server will attempt to filter out profanities, replacing all but
-the initial character in each filtered word with asterisks, e.g. "f**\fB".
+If True, a contextual quote from the data that triggered a finding is included
+in the response. Even if the content is not text, it may be converted to a
+textual representation in the response. For example, given the input value 'My
+phone number is (415) 555\-0890' and a search for the infoType PHONE_NUMBER, the
+contextual quote would be '(415) 555\-0890.'
 
 .TP 2m
-\fR\-\-info\-types\fB=[\fIINFOTYPE\fR,...]
+\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
 Which infoTypes to scan input for. The values must correspond to infoType values
 found in documentation. For more information about valid infoTypes, see
 infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
 
 .TP 2m
-\fR\-\-max\-findings\fB=\fIMAX_FINDINGS\fR
+\fB\-\-max\-findings\fR=\fIMAX_FINDINGS\fR
 Maximum number of findings that will be returned per execution.
 
 If not specified, no limits are applied.
 
 .TP 2m
-\fR\-\-max\-findings\-per\-item\fB=\fIMAX_FINDINGS_PER_ITEM\fR
+\fB\-\-max\-findings\-per\-item\fR=\fIMAX_FINDINGS_PER_ITEM\fR
 Maximum number of findings that will be returned for each item scanned.
 
 If not specified, no limits are applied.
 
 .TP 2m
-\fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
+\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR; default="possible"
 Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
-be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB, \fRvery\-likely\fB,
-\fRvery\-unlikely\fB.
+be one of: \fBlikely\fR, \fBpossible\fR, \fBunlikely\fR, \fBvery\-likely\fR,
+\fBvery\-unlikely\fR.
 
 
-\fR
 .RE
 .sp
 
@@ -195,7 +197,6 @@ $ gcloud alpha dlp job\-triggers create my_job_trigger \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

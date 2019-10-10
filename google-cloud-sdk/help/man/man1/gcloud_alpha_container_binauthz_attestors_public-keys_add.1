@@ -15,12 +15,6 @@ gcloud alpha container binauthz attestors public\-keys add \- add a public key t
 
 
 
-.SH "DESCRIPTION"
-
-\fB(ALPHA)\fR Add a public key to an Attestor.
-
-
-
 .SH "REQUIRED FLAGS"
 
 .RS 2m
@@ -46,9 +40,21 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
+
+PGP key definition
+
+.RS 2m
+.TP 2m
 \fB\-\-pgp\-public\-key\-file\fR=\fIPGP_PUBLIC_KEY_FILE\fR
 The path to the file containing the ASCII\-armored PGP public key to add.
 
+.RE
+.sp
+.TP 2m
+
+Cloud KMS key definition
+
+.RS 2m
 .TP 2m
 
 CryptoKeyVersion resource \- The Cloud KMS (Key Management Service)
@@ -81,7 +87,13 @@ The location of the CryptoKeyVersion.
 The Cloud project for the CryptoKeyVersion.
 
 .RE
+.RE
 .sp
+.TP 2m
+
+PKIX key definition
+
+.RS 2m
 .TP 2m
 \fB\-\-pkix\-public\-key\-algorithm\fR=\fIPKIX_PUBLIC_KEY_ALGORITHM\fR
 The signing algorithm of the associated key. This will be used to verify the
@@ -100,6 +112,7 @@ The path to the file containing the PKIX public key to add. This flag must be
 specified if any of the other arguments in this group are specified.
 
 
+.RE
 .RE
 .RE
 .sp
@@ -133,15 +146,39 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To add a new KMS public key to an existing Attestor \f5my_attestor\fR:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors public\-keys add \e
+    \-\-attestor=my_attestor \e
+    \-\-keyversion\-project=foo \e
+    \-\-keyversion\-location=us\-west1 \e
+    \-\-keyversion\-keyring=aring \e
+    \-\-keyversion\-key=akey \e
+    \-\-keyversion=1
+.RE
+
+To add a new PGP public key to an existing Attestor \f5my_attestor\fR:
+
+.RS 2m
+$ gcloud alpha container binauthz attestors public\-keys add \e
+    \-\-attestor=my_attestor \e
+    \-\-pgp\-public\-key\-file=my_key.pub
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud container binauthz attestors public\-keys add
 $ gcloud beta container binauthz attestors public\-keys add
 .RE
 

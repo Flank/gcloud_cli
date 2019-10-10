@@ -38,21 +38,22 @@ EXAMPLES
     To export record-sets into a yaml file, run:
 
         $ gcloud beta dns record-sets export records.yaml \
-            --zone examplezonename
+            --zone=examplezonename
 
     To export record-sets into a BIND zone formatted file instead, run:
 
         $ gcloud beta dns record-sets export pathto.zonefile \
-            --zone examplezonename --zone-file-format
+            --zone=examplezonename --zone-file-format
 
     Similarly, to import record-sets into a BIND zone formatted zone file, run:
 
         $ gcloud dns record-sets import pathto.zonefile --zone-file-format \
-          --zone examplezonename
+          --zone=examplezonename
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dns record-sets export
+        $ gcloud alpha dns record-sets export
 

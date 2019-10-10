@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ def DeleteServices(api_client, services):
       operations_util.CallAndCollectOpErrors(
           api_client.DeleteService, service.id)
     except operations_util.MiscOperationError as err:
-      errors[service.id] = str(err)
+      errors[service.id] = six.text_type(err)
 
   if errors:
     printable_errors = {}

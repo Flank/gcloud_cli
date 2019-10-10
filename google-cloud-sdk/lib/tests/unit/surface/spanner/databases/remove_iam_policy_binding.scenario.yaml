@@ -10,7 +10,10 @@ actions:
         expect_request:
           uri: https://spanner.googleapis.com/v1/projects/fake-project/instances/my-instance/databases/my-database:getIamPolicy?alt=json
           method: POST
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
@@ -39,7 +42,7 @@ actions:
                 - role: 'roles/owner'
                   members: ['user:newowner@gmail.com']
                 etag: 'etag'
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'

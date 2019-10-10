@@ -10,14 +10,13 @@ DESCRIPTION
     (ALPHA) Set IAM policy for a Google Compute Engine instance.
 
 POSITIONAL ARGUMENTS
-     Instance resource - Instance resource - The instance to set the IAM policy
-     of. The arguments in this group can be used to specify the attributes of
-     this resource. The arguments in this group can be used to specify the
-     attributes of this resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: provide the argument [instance] on the command line with a
-     fully specified name; set the property [core/project]; provide the
-     argument [--project] on the command line. This must be specified.
+     Instance resource - The instance to set the IAM policy of. The arguments
+     in this group can be used to specify the attributes of this resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: provide the argument
+     [instance] on the command line with a fully specified name; set the
+     property [core/project]; provide the argument [--project] on the command
+     line. This must be specified.
 
        INSTANCE
           ID of the instance or fully qualified identifier for the instance.
@@ -56,9 +55,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instances set-iam-policy
         $ gcloud beta compute instances set-iam-policy

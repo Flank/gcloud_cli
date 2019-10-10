@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_CONTAINER_BINAUTHZ_POLICY_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container binauthz policy add\-iam\-policy\-binding \- add IAM policy binding to a Binary Authorization policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container binauthz policy add\-iam\-policy\-binding\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Add an IAM policy binding to a Binary Authorization policy.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBbinaryauthorization/v1alpha2\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/binary\-authorization/
+
+
+
+.SH "EXAMPLES"
+
+To add an IAM policy binding for the role of
+\'roles/binaryauthorization.attestationAuthoritiesEditor' for the user
+\'test\-user@gmail.com' on the current project's Binary Authorization policy,
+run:
+
+.RS 2m
+$ gcloud container binauthz policy add\-iam\-policy\-binding \e
+    \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/binaryauthorization.attestationAuthoritiesEditor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container binauthz policy add\-iam\-policy\-binding
+$ gcloud beta container binauthz policy add\-iam\-policy\-binding
+.RE
+

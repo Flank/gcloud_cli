@@ -15,6 +15,9 @@
 """Implementation of mb command for creating cloud storage buckets."""
 
 from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
 
 import re
 import textwrap
@@ -32,7 +35,6 @@ from gslib.utils.retention_util import RetentionInSeconds
 from gslib.utils.text_util import InsistAscii
 from gslib.utils.text_util import InsistOnOrOff
 from gslib.utils.text_util import NormalizeStorageClass
-
 
 _SYNOPSIS = """
   gsutil mb [-b <on|off>] [-c class] [-l location] [-p proj_id]
@@ -83,9 +85,7 @@ _DETAILED_HELP_TEXT = ("""
   `SLA <https://cloud.google.com/storage/sla>`_ details.
 
   If you don't specify a -c option, the bucket is created with the
-  default storage class Standard Storage, which is equivalent to Multi-Regional
-  Storage or Regional Storage, depending on whether the bucket was created in
-  a multi-regional location or regional location, respectively.
+  default storage class Standard Storage.
 
 <B>BUCKET LOCATIONS</B>
   You can specify one of the `available locations
@@ -96,7 +96,7 @@ _DETAILED_HELP_TEXT = ("""
 
     gsutil mb -l asia gs://some-bucket
 
-    gsutil mb -c regional -l us-east1 gs://some-bucket
+    gsutil mb -c standard -l us-east1 gs://some-bucket
 
   If you don't specify a -l option, the bucket is created in the default
   location (US).
@@ -142,8 +142,8 @@ _DETAILED_HELP_TEXT = ("""
   -c class               Specifies the default storage class.
                          Default is "Standard".
 
-  -l location            Can be any multi-regional or regional location. See
-                         https://cloud.google.com/storage/docs/bucket-locations
+  -l location            Can be any supported location. See
+                         https://cloud.google.com/storage/docs/locations
                          for a discussion of this distinction. Default is US.
                          Locations are case insensitive.
 
@@ -156,7 +156,6 @@ _DETAILED_HELP_TEXT = ("""
                          policy. This can only be set on gs:// buckets and
                          requires using the JSON API.
 """)
-
 
 # Regex to disallow buckets violating charset or not [3..255] chars total.
 BUCKET_NAME_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9\._-]{1,253}[a-zA-Z0-9]$')
@@ -186,15 +185,28 @@ class MbCommand(Command):
       gs_default_api=ApiSelector.JSON,
       argparse_arguments=[
           CommandArgument.MakeZeroOrMoreCloudBucketURLsArgument()
-      ]
+      ],
   )
   # Help specification. See help_provider.py for documentation.
   help_spec = Command.HelpSpec(
       help_name='mb',
       help_name_aliases=[
-          'createbucket', 'makebucket', 'md', 'mkdir', 'location', 'dra',
-          'dras', 'reduced_availability', 'durable_reduced_availability', 'rr',
-          'reduced_redundancy', 'standard', 'storage class', 'nearline', 'nl'],
+          'createbucket',
+          'makebucket',
+          'md',
+          'mkdir',
+          'location',
+          'dra',
+          'dras',
+          'reduced_availability',
+          'durable_reduced_availability',
+          'rr',
+          'reduced_redundancy',
+          'standard',
+          'storage class',
+          'nearline',
+          'nl',
+      ],
       help_type='command_help',
       help_one_line_summary='Make buckets',
       help_text=_DETAILED_HELP_TEXT,
@@ -249,26 +261,28 @@ class MbCommand(Command):
                                'bucket.\n"%s" is not valid.' % bucket_url)
       if (not BUCKET_NAME_RE.match(bucket_url.bucket_name) or
           TOO_LONG_DNS_NAME_COMP.search(bucket_url.bucket_name)):
-        raise InvalidUrlError(
-            'Invalid bucket name in URL "%s"' % bucket_url.bucket_name)
+        raise InvalidUrlError('Invalid bucket name in URL "%s"' %
+                              bucket_url.bucket_name)
 
       self.logger.info('Creating %s...', bucket_url)
       # Pass storage_class param only if this is a GCS bucket. (In S3 the
       # storage class is specified on the key object.)
       try:
-        self.gsutil_api.CreateBucket(
-            bucket_url.bucket_name, project_id=self.project_id,
-            metadata=bucket_metadata, provider=bucket_url.scheme)
+        self.gsutil_api.CreateBucket(bucket_url.bucket_name,
+                                     project_id=self.project_id,
+                                     metadata=bucket_metadata,
+                                     provider=bucket_url.scheme)
       except BadRequestException as e:
         if (e.status == 400 and e.reason == 'DotfulBucketNameNotUnderTld' and
             bucket_url.scheme == 'gs'):
           bucket_name = bucket_url.bucket_name
-          final_comp = bucket_name[bucket_name.rfind('.')+1:]
-          raise CommandException('\n'.join(textwrap.wrap(
-              'Buckets with "." in the name must be valid DNS names. The bucket'
-              ' you are attempting to create (%s) is not a valid DNS name,'
-              ' because the final component (%s) is not currently a valid part'
-              ' of the top-level DNS tree.' % (bucket_name, final_comp))))
+          final_comp = bucket_name[bucket_name.rfind('.') + 1:]
+          raise CommandException('\n'.join(
+              textwrap.wrap(
+                  'Buckets with "." in the name must be valid DNS names. The bucket'
+                  ' you are attempting to create (%s) is not a valid DNS name,'
+                  ' because the final component (%s) is not currently a valid part'
+                  ' of the top-level DNS tree.' % (bucket_name, final_comp))))
         else:
           raise
 

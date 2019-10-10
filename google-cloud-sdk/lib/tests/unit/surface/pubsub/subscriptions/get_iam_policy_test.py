@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,40 +21,35 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.pubsub import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class SubscriptionsGetIamPolicyTest(base.CloudPubsubTestBase):
+class SubscriptionsGetIamPolicyTestGA(base.CloudPubsubTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(True)
     self.svc = self.client.projects_subscriptions.GetIamPolicy
 
-  def testGetIamPolicy(self, track):
-    self.track = track
+  def testGetIamPolicy(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     self.svc.Expect(
         self.msgs.PubsubProjectsSubscriptionsGetIamPolicyRequest(
-            resource=sub_ref.RelativeName()),
-        self.policy)
+            resource=sub_ref.RelativeName()), self.policy)
 
     result = self.Run(
         'pubsub subscriptions get-iam-policy subs1')
 
     self.assertEqual(result, self.policy)
 
-  def testGetIamPolicy_Filter(self, track):
-    self.track = track
+  def testGetIamPolicy_Filter(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     self.svc.Expect(
         self.msgs.PubsubProjectsSubscriptionsGetIamPolicyRequest(
-            resource=sub_ref.RelativeName()),
-        self.policy)
+            resource=sub_ref.RelativeName()), self.policy)
 
     self.Run(
         'pubsub subscriptions get-iam-policy subs1 '
@@ -63,6 +58,18 @@ class SubscriptionsGetIamPolicyTest(base.CloudPubsubTestBase):
         '--format=value(bindings.members)')
 
     self.AssertOutputEquals('user:test-user@gmail.com\n')
+
+
+class SubscriptionsGetIamPolicyTestBeta(SubscriptionsGetIamPolicyTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SubscriptionsGetIamPolicyTestAlpha(SubscriptionsGetIamPolicyTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

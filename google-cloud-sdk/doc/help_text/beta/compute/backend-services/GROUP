@@ -39,8 +39,14 @@ COMMANDS
      edit
         (BETA) Modify backend services.
 
+     export
+        (BETA) Export a backend service.
+
      get-health
         (BETA) Get backend health statuses from a backend service.
+
+     import
+        (BETA) Import a backend service.
 
      list
         (BETA) List Google Compute Engine backend services.

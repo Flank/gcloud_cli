@@ -184,7 +184,7 @@ set.
         method_id=u'pubsub.projects.snapshots.getIamPolicy',
         ordered_params=[u'resource'],
         path_params=[u'resource'],
-        query_params=[],
+        query_params=[u'options_requestedPolicyVersion'],
         relative_path=u'v1/{+resource}:getIamPolicy',
         request_field='',
         request_type_name=u'PubsubProjectsSnapshotsGetIamPolicyRequest',
@@ -259,6 +259,8 @@ captured by a snapshot.
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 
       Args:
         request: (PubsubProjectsSnapshotsSetIamPolicyRequest) input message
@@ -478,7 +480,7 @@ set.
         method_id=u'pubsub.projects.subscriptions.getIamPolicy',
         ordered_params=[u'resource'],
         path_params=[u'resource'],
-        query_params=[],
+        query_params=[u'options_requestedPolicyVersion'],
         relative_path=u'v1/{+resource}:getIamPolicy',
         request_field='',
         request_type_name=u'PubsubProjectsSubscriptionsGetIamPolicyRequest',
@@ -670,6 +672,8 @@ must be on the same topic.
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 
       Args:
         request: (PubsubProjectsSubscriptionsSetIamPolicyRequest) input message
@@ -925,7 +929,7 @@ set.
         method_id=u'pubsub.projects.topics.getIamPolicy',
         ordered_params=[u'resource'],
         path_params=[u'resource'],
-        query_params=[],
+        query_params=[u'options_requestedPolicyVersion'],
         relative_path=u'v1/{+resource}:getIamPolicy',
         request_field='',
         request_type_name=u'PubsubProjectsTopicsGetIamPolicyRequest',
@@ -1019,6 +1023,8 @@ does not exist.
     def SetIamPolicy(self, request, global_params=None):
       r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
+
+Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 
       Args:
         request: (PubsubProjectsTopicsSetIamPolicyRequest) input message

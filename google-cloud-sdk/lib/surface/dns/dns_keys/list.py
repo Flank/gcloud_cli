@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,3 +56,10 @@ class ListBeta(ListBase, base.ListCommand):
 
   def GetApiVersion(self):
     return 'v1beta2'
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListAlpha(ListBase, base.ListCommand):
+
+  def GetApiVersion(self):
+    return 'v1alpha2'

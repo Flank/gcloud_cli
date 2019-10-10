@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ from tests.lib import test_case
 
 class GrpcTest(test_case.TestCase):
 
-  @test_case.Filters.SkipOnPy3('Not yet modernized', 'b/80532599')
+  @test_case.Filters.SkipOnPy3('py3 grpc', 'b/78118402')
   def testCanLoadExtension(self):
     # pylint: disable=g-import-not-at-top
     from grpc._cython import cygrpc
@@ -31,6 +31,7 @@ class GrpcTest(test_case.TestCase):
     metadata = cygrpc.Operation()
     del metadata
 
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   @test_case.Filters.RunOnlyOnWindows('crcmod extension is only available on '
                                       'windows when using bundled python.')
   def testCrcmodCompiledExtension(self):

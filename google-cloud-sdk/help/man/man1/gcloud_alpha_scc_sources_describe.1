@@ -11,7 +11,7 @@ gcloud alpha scc sources describe \- describe a source given its display name or
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scc sources describe\fR \fIORGANIZATION\fR (\fB\-\-source\fR=\fISOURCE\fR\ |\ \fB\-\-source\-display\-name\fR=\fISOURCE_DISPLAY_NAME\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scc sources describe\fR [\fIORGANIZATION\fR] (\fB\-\-source\fR=\fISOURCE\fR\ |\ \fB\-\-source\-display\-name\fR=\fISOURCE_DISPLAY_NAME\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,12 +26,12 @@ gcloud alpha scc sources describe \- describe a source given its display name or
 .RS 2m
 .TP 2m
 
-Organization resource \- The organization to be used for the SCC command. This
-represents a Cloud resource. This must be specified.
+Organization resource \- The organization to be used for the SCC (Security
+Command Center) command. This represents a Cloud resource.
 
 .RS 2m
 .TP 2m
-\fIORGANIZATION\fR
+[\fIORGANIZATION\fR]
 ID of the organization or fully qualified identifier for the organization.
 
 
@@ -110,7 +110,6 @@ $ gcloud alpha scc sources describe 123456 \-\-source 5678
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist.
 

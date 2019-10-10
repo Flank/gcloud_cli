@@ -11,6 +11,7 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [--licenses=[LICENSES,...]]
         [--no-require-csek-key-create] [--source-disk-zone=SOURCE_DISK_ZONE]
         [--source-image-project=SOURCE_IMAGE_PROJECT]
+        [--storage-location=LOCATION]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [GCLOUD_WIDE_FLAG ...]
@@ -121,7 +122,7 @@ OPTIONAL FLAGS
           is a Windows image.
 
     GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, SECURE_BOOT,
-    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
+    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -168,6 +169,11 @@ OPTIONAL FLAGS
      --source-image-project=SOURCE_IMAGE_PROJECT
         The project name of the source image. Must also specify either
         --source-image or --source-image-family when using this flag.
+
+     --storage-location=LOCATION
+        Google Cloud Storage location, either regional or multi-regional, where
+        image content is to be stored. If absent, the multi-region location
+        closest to the source is chosen automatically.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the image. The arguments in this group can be used to

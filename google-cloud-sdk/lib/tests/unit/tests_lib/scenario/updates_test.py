@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ a:
     c: d
     e: f
 """
-    data = yaml.load(data_string, round_trip=True)
+    data = yaml.load(data_string, round_trip=True, version=yaml.VERSION_1_2)
     context = updates.Context(data, 'a', updates.Mode.RESULT)
     self.assertEqual(('1', '0'), context.Location())
 
@@ -113,7 +113,7 @@ a:
 a:
   b:
 """
-    data = yaml.load(data_string, round_trip=True)
+    data = yaml.load(data_string, round_trip=True, version=yaml.VERSION_1_2)
     data['a']['b'] = {'c': {'d': 'value'}}
     context = updates.Context(data, 'a', updates.Mode.RESULT)
     context = context.ForKey('b.c.d')
@@ -125,7 +125,7 @@ a:
   b: "this\\nis\\nsomething\\nwith\\nnewlines"
   c: d
 """
-    data = yaml.load(data_string, round_trip=True)
+    data = yaml.load(data_string, round_trip=True, version=yaml.VERSION_1_2)
     self.assertEqual(
         'a:\n  b: "this\\nis\\nsomething\\nwith\\nnewlines"\n  c: d\n',
         yaml.dump(data, round_trip=True))

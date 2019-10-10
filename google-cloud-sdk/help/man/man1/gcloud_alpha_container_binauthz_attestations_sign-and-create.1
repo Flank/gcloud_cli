@@ -19,7 +19,7 @@ gcloud alpha container binauthz attestations sign\-and\-create \- sign and creat
 
 \fB(ALPHA)\fR This command signs and creates a Binary Authorization attestation
 for your project. The attestation is created for the specified artifact (e.g. a
-grc.io container URL), associate with the specified attestor, and stored under
+gcr.io container URL), associate with the specified attestor, and stored under
 the specified project.
 
 
@@ -142,7 +142,10 @@ $ gcloud alpha container binauthz attestations sign\-and\-create \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+you may be trying to access an API with an invitation\-only early access
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta container binauthz attestations sign\-and\-create
+.RE
 

@@ -67,12 +67,24 @@ https://developers.google.com/compute/docs/reference/latest/
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To describe a given Compute Engine reservation, run:
 
 .RS 2m
+$ gcloud beta compute reservations describe my\-reservation \e
+    \-\-zone=ZONE
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute reservations describe
 $ gcloud alpha compute reservations describe
 .RE
 

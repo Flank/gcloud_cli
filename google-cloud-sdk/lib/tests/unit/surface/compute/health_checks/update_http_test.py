@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ class HealthChecksUpdateHttpTest(
 
     self.Run("""
         compute health-checks update http
-          https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
           --host www.google.com
         """)
 
@@ -1004,11 +1004,15 @@ class HealthChecksUpdateHttpBetaTest(HealthChecksUpdateHttpTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
+  def Run(self, command):
+    return super(HealthChecksUpdateHttpBetaTest,
+                 self).Run(command + ' --global')
 
-class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
+
+class RegionHealthChecksUpdateHttpBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testNoArgs(self):
@@ -1034,7 +1038,7 @@ class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
 
     self.Run("""
         compute health-checks update http
-          https://www.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
+          https://compute.googleapis.com/compute/alpha/projects/my-project/regions/us-west-1/healthChecks/my-health-check
           --host www.google.com
         """)
 
@@ -1861,6 +1865,14 @@ class RegionHealthChecksCreateHttpTest(test_base.BaseTest):
               project='my-project',
               region='us-west-1'))],
     )
+
+
+class RegionHealthChecksUpdateHttpAlphaTest(RegionHealthChecksUpdateHttpBetaTest
+                                           ):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
 
 if __name__ == '__main__':

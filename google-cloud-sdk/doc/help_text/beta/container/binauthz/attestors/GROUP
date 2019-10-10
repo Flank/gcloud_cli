@@ -1,14 +1,13 @@
 NAME
     gcloud beta container binauthz attestors - create and manage Google Binary
-        Authorization Attestation Authorities
+        Authorization Attestors
 
 SYNOPSIS
     gcloud beta container binauthz attestors GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Create and manage Google Binary Authorization Attestation
-    Authorities.
+    (BETA) Create and manage Google Binary Authorization Attestors.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -55,8 +54,9 @@ COMMANDS
         (BETA) Update an existing Attestor.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud container binauthz attestors
         $ gcloud alpha container binauthz attestors
 

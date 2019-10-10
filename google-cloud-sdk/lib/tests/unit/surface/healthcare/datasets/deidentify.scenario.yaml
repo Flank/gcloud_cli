@@ -1,20 +1,27 @@
 title: healthcare datasets deidentify test
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       healthcare datasets deidentify my-dataset
       --destination-dataset=projects/cloudsdktest/locations/us-central1/datasets/deid-dataset
-      --dicom-filter-tags="SamplesPerPixel,MediaStorageSOPInstanceUID,HighBit,BitsAllocated,Rows,PixelData,SOPInstanceUID,TransferSyntaxUID,MediaStorageSOPClassUID,SeriesInstanceUID,StudyInstanceUID,Columns,PixelRepresentation,NumberOfFrames,PhotometricInterpretation,BitsStored" --deid-fhir
+      --dicom-filter-tags="SamplesPerPixel,MediaStorageSOPInstanceUID,HighBit,BitsAllocated,Rows,PixelData,SOPInstanceUID,TransferSyntaxUID,MediaStorageSOPClassUID,SeriesInstanceUID,StudyInstanceUID,Columns,PixelRepresentation,NumberOfFrames,PhotometricInterpretation,BitsStored"
+      --default-fhir-config
   - stderr: |
       Request issued for: [my-dataset]
   - progress_tracker:
-    - message: Waiting for operation [17704671978780098561] to complete
+    - message: Waiting for operation [projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/17704671978780098561]
+        to complete
     - status: SUCCESS
   - stdout: |
       name: projects/cloudsdktest/locations/us-central1/datasets/my-dataset
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+      BETA: v1beta1
 - execute_command:
     command: |
       healthcare datasets deidentify my-dataset
@@ -24,7 +31,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset:deidentify?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset:deidentify?alt=json
           method: POST
           headers: {}
           body:
@@ -62,7 +69,7 @@ actions:
         Request issued for: [my-dataset]
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/17704671978780098561?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/17704671978780098561?alt=json
           method: GET
           headers: {}
           body: null
@@ -73,19 +80,20 @@ actions:
             {
               "name": "projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/17704671978780098561",
               "metadata": {
-                "@type": "type.googleapis.com/google.cloud.healthcare.v1alpha2.OperationMetadata",
-                "apiMethodName": "google.cloud.healthcare.v1alpha2.dataset.DatasetService.DeidentifyDataset",
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata",
+                "apiMethodName": "google.cloud.healthcare.$$api-version$$.dataset.DatasetService.DeidentifyDataset",
                 "createTime": "2019-02-20T21:18:05.760258Z",
                 "endTime": "2019-02-20T21:18:15.864646Z"
               },
               "done": true
             }
     - expect_progress_tracker:
-        message: Waiting for operation [17704671978780098561] to complete
+        message: Waiting for operation [projects/cloudsdktest/locations/us-central1/datasets/my-dataset/operations/17704671978780098561]
+          to complete
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset?alt=json
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset?alt=json
           method: GET
           headers: {}
           body: null

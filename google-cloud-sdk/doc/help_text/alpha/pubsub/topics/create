@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha pubsub topics create TOPIC [TOPIC ...]
         [--labels=[KEY=VALUE,...]]
+        [--message-storage-policy-allowed-regions=[REGION,...]]
         [--topic-encryption-key=TOPIC_ENCRYPTION_KEY
           : --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
           --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
@@ -34,11 +35,15 @@ FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     --message-storage-policy-allowed-regions=[REGION,...]
+        A list of one or more Cloud regions where messages are allowed to be
+        stored at rest.
+
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
-     be used to protect the topic. The specified CloudKMS key should have
+     be used to protect the topic. The specified Cloud KMS key should have
      purpose set to "ENCRYPT_DECRYPT". The service account,
      "service-${CONSUMER_PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com"
-     requires the IAM cryptoKeyEncrypterDecrypter role for the given CloudKMS
+     requires the IAM cryptoKeyEncrypterDecrypter role for the given Cloud KMS
      key. CONSUMER_PROJECT_NUMBER is the project number of the project that is
      the parent of the topic being created. The arguments in this group can be
      used to specify the attributes of this resource.
@@ -72,9 +77,8 @@ EXAMPLES
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud pubsub topics create
         $ gcloud beta pubsub topics create

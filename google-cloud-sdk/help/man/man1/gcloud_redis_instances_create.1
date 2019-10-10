@@ -11,7 +11,7 @@ gcloud redis instances create \- create a Memorystore Redis instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-redis\-version\fR=\fIVERSION\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -73,16 +73,20 @@ provided through \f5\-\-zone\fR.
 
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 A human\-readable name for the instance.
 
 .TP 2m
-\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
-A list of label KEY=VALUE pairs to add.
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR; default="default"
@@ -94,6 +98,21 @@ connected. If left unspecified, the default network will be used.
 A list of Redis config KEY=VALUE pairs to set on the instance according to
 http://redis.io/topics/config. Currently, the only supported parameters are:
 maxmemory\-policy, notify\-keyspace\-events.
+
+.TP 2m
+\fB\-\-redis\-version\fR=\fIVERSION\fR
+The version of Redis software. \fIVERSION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBredis_3_2\fR
+Redis 3.2 compatibility
+.TP 2m
+\fBredis_4_0\fR
+Redis 4.0 compatibility
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR

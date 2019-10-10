@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import enum
 
 
-BASE_URL = 'https://www.googleapis.com/compute/beta/'
+BASE_URL = 'https://compute.googleapis.com/compute/beta/'
 DOCS_URL = 'https://developers.google.com/compute/docs/reference/latest/'
 
 
@@ -256,6 +256,13 @@ class Collections(enum.Enum):
       'projects/{project}/zones/{zone}/nodeTypes/{nodeType}',
       {},
       [u'project', u'zone', u'nodeType'],
+      True
+  )
+  PACKETMIRRORINGS = (
+      'packetMirrorings',
+      'projects/{project}/regions/{region}/packetMirrorings/{packetMirroring}',
+      {},
+      [u'project', u'region', u'packetMirroring'],
       True
   )
   PROJECTS = (

@@ -17,7 +17,7 @@ summary:
         - user:newowner@gmail.com
         role: roles/non-primitive
       etag: etag
-      version: 1
+      version: 3
 
 actions:
 - execute_command:
@@ -29,13 +29,16 @@ actions:
           uri: https://cloudresourcemanager.googleapis.com/v2/folders/folder-id:getIamPolicy?alt=json
           method: POST
           headers: {}
-          body: null
+          body:
+            json:
+              options:
+                requestedPolicyVersion: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -69,13 +72,13 @@ actions:
                   - user:newowner@gmail.com
                   role: roles/non-primitive
                 etag: etag
-                version: 1
+                version: 3
         return_response:
           headers:
             status: '200'
           body: |-
             {
-              "version": 1,
+              "version": 3,
               "etag": "etag",
               "bindings": [
                 {
@@ -103,6 +106,6 @@ actions:
           - user:newowner@gmail.com
           role: roles/non-primitive
         etag: etag
-        version: 1
+        version: 3
     - expect_exit:
         code: 0

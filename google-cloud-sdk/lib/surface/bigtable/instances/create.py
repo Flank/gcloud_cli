@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class CreateInstance(base.CreateCommand):
     result = cli.projects_instances.Create(msg)
     operation_ref = bigtable_util.GetOperationRef(result)
 
-    if args.async:
+    if args.async_:
       log.CreatedResource(
           operation_ref,
           kind='bigtable instance {0}'.format(ref.Name()),

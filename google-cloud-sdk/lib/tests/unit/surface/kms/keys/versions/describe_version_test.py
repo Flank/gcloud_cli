@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,23 +22,20 @@ import os
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysVersionsDescribeTest(base.KmsMockTest):
+class CryptokeysVersionsDescribeTestGa(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key/')
-    self.version_name = self.key_name.Descendant('3')
+    self.key_name = self.project_name.CryptoKey('global/my_kr/my_key/')
+    self.version_name = self.key_name.Version('3')
 
-  def testDescribe(self, track):
-    self.track = track
+  def testDescribe(self):
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Get.Expect(
         self.messages.
@@ -56,21 +53,12 @@ class CryptokeysVersionsDescribeTest(base.KmsMockTest):
         'name: {0}'.format(self.version_name.RelativeName()),
         normalize_space=True)
 
-  def testMissingId(self, track):
-    self.track = track
+  def testMissingId(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'Invalid value for [version]: version id must be non-empty.'):
       self.Run('kms keys versions describe {0}/cryptoKeyVersions/'
                .format(self.key_name.RelativeName()))
-
-
-class CryptokeysVersionsDescribeAlphaTest(base.KmsMockTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.key_name = self.project_name.Descendant('global/my_kr/my_key/')
-    self.version_name = self.key_name.Descendant('3')
 
   def testDescribeHsmKeyVersionWithAttestation(self):
     attestation_file_path = self.Touch(self.temp_path)
@@ -228,6 +216,18 @@ class CryptokeysVersionsDescribeAlphaTest(base.KmsMockTest):
           .format(self.version_name.version_id, self.version_name.location_id,
                   self.version_name.key_ring_id,
                   self.version_name.crypto_key_id, attestation_file_path))
+
+
+class CryptokeysVersionsDescribeTestBeta(CryptokeysVersionsDescribeTestGa):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptokeysVersionsDescribeTestAlpha(CryptokeysVersionsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

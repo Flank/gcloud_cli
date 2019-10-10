@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ class TestResourceParameters(unittest.TestCase):
     return r'{}/projects/{}/zones/{}/instances/{}[\w-]+'.format(
         self.compute_uri, self.project, self.zone, name)
 
-  def setUp(self):
+  def setUp(self):  # pylint:disable=g-missing-super-call
     self.registry = resources.Registry()
-    self.compute_uri = 'https://www.googleapis.com/compute/v1'
+    self.compute_uri = 'https://compute.googleapis.com/compute/v1'
     self.project = 'long-island'
     self.zone = 'local-group'
 

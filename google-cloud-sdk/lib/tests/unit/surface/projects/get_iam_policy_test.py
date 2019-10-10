@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,35 +22,40 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.projects import base
 from tests.lib.surface.projects import util as test_util
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ProjectsGetIamPolicyTest(base.ProjectsUnitTestBase):
+class ProjectsGetIamPolicyTestGA(base.ProjectsUnitTestBase):
 
-  def testGetIamPolicyProject(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testGetIamPolicyProject(self):
     properties.VALUES.core.user_output_enabled.Set(False)
     test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
             resource=test_project.projectId),
         copy.deepcopy(test_util.GetTestIamPolicy()))
     response = self.RunProjects('get-iam-policy', test_project.projectId)
     self.assertEqual(response, test_util.GetTestIamPolicy())
 
-  def testGetIamPolicyProjectOutput(self, track):
-    self.track = track
+  def testGetIamPolicyProjectOutput(self):
     test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
             resource=test_project.projectId),
         copy.deepcopy(test_util.GetTestIamPolicy()))
     self.RunProjects('get-iam-policy', test_project.projectId)
@@ -68,14 +73,16 @@ bindings:
   - user:slick@gmail.com
   role: roles/owner
 etag: PDwgVW5pcXVlIHZlcnNpb25pbmcgZXRhZyBieXRlZmllbGQgPj4=
-version: 0
 """)
 
-  def testListCommandFilter(self, track):
-    self.track = track
+  def testListCommandFilter(self):
     test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
+            getIamPolicyRequest=self.messages.GetIamPolicyRequest(
+                options=self.messages.GetPolicyOptions(
+                    requestedPolicyVersion=
+                    iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION)),
             resource=test_project.projectId),
         copy.deepcopy(test_util.GetTestIamPolicy()))
     command = [
@@ -87,6 +94,18 @@ version: 0
     ]
     self.RunProjects(*command)
     self.AssertOutputEquals('user:slick@gmail.com\nuser:tester@gmail.com\n')
+
+
+class ProjectsGetIamPolicyTestBeta(ProjectsGetIamPolicyTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectsGetIamPolicyTestAlpha(ProjectsGetIamPolicyTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

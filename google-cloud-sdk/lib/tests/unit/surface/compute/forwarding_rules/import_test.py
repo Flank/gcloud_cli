@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,12 +31,12 @@ from tests.lib.surface.compute import forwarding_rules_test_base
 from tests.lib.surface.compute import test_resources
 
 
-class ForwardingRulesImportTestAlpha(
+class ForwardingRulesImportTestBeta(
     forwarding_rules_test_base.ForwardingRulesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.ALPHA
-    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_ALPHA
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_BETA
 
   def RunImport(self, command):
     self.Run('compute forwarding-rules import ' + command)
@@ -91,6 +91,14 @@ class ForwardingRulesImportTestAlpha(
         "('id' was unexpected)"):
       self.RunImport('fr-1 --source {0} --global'
                      .format(file_name))
+
+
+class ForwardingRulesImportTestAlpha(ForwardingRulesImportTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

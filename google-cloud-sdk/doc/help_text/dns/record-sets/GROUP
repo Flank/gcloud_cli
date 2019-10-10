@@ -38,12 +38,12 @@ COMMANDS
 EXAMPLES
     To import record-sets from a BIND zone file, run:
 
-        $ gcloud dns record-sets import --zone MANAGED_ZONE \
+        $ gcloud dns record-sets import --zone=MANAGED_ZONE \
             --zone-file-format ZONE_FILE
 
     To export record-sets in yaml format, run:
 
-        $ gcloud dns record-sets export --zone MANAGED_ZONE
+        $ gcloud dns record-sets export --zone=MANAGED_ZONE
 
     To see how to make scriptable changes to your record-sets through
     transactions, run:
@@ -52,19 +52,20 @@ EXAMPLES
 
     To list all changes, run:
 
-        $ gcloud dns record-sets changes list --zone MANAGED_ZONE
+        $ gcloud dns record-sets changes list --zone=MANAGED_ZONE
 
     To see change details, run:
 
         $ gcloud dns record-sets changes describe CHANGE_ID \
-            --zone MANAGED_ZONE
+            --zone=MANAGED_ZONE
 
     To see the list of all record-sets, run:
 
-        $ gcloud dns record-sets list --zone MANAGED_ZONE
+        $ gcloud dns record-sets list --zone=MANAGED_ZONE
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dns record-sets
         $ gcloud beta dns record-sets
 

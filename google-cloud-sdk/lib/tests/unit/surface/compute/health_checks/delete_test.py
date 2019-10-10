@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -118,23 +118,31 @@ class HealthChecksDeleteTest(test_base.BaseTest,
         'health-check-tcp',
         'health-check-ssl',
         'health-check-https',
+        'health-check-http2',
     ])
 
 
-class HealthChecksDeleteAlphaTest(HealthChecksDeleteTest):
+class HealthChecksDeleteBetaTest(HealthChecksDeleteTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def RunDelete(self, command):
     self.Run('compute health-checks delete --global ' + command)
 
 
-class RegionHealthsCheckDeleteTest(HealthChecksDeleteTest):
+class HealthChecksDeleteAlphaTest(HealthChecksDeleteBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+
+class RegionHealthsCheckDeleteBetaTest(HealthChecksDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def RunDelete(self, command):
@@ -209,7 +217,15 @@ class RegionHealthsCheckDeleteTest(HealthChecksDeleteTest):
             'health-check-tcp',
             'health-check-ssl',
             'health-check-https',
+            'health-check-http2',
         ])
+
+
+class RegionHealthsCheckDeleteAlphaTest(RegionHealthsCheckDeleteBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
 
 if __name__ == '__main__':

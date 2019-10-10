@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute.os_config import test_base
 
 
+# TODO(b/140685325): convert to scenario test
 class ListTest(test_base.OsConfigBaseTest):
 
   def SetUp(self):
@@ -57,6 +58,38 @@ class ListTest(test_base.OsConfigBaseTest):
             NAME           DESCRIPTION      CREATE_TIME STATE                 NUM_INSTANCES
             my-patch-job-1 Patch instance-1             SUCCEEDED
             my-patch-job-2 Patch all                    COMPLETED_WITH_ERRORS
+            """),
+        normalize_space=True)
+    self.AssertErrEquals('')
+
+  def testListWithDefaultLimit(self):
+    input_patch_jobs = [
+        self.messages.PatchJob(
+            name='projects/my-project/patchJobs/my-patch-job-{}'.format(i),
+            filter='id=*') for i in range(0, 15)
+    ]
+
+    self.mock_osconfig_client.projects_patchJobs.List.Expect(
+        request=self.messages.OsconfigProjectsPatchJobsListRequest(
+            parent='projects/my-project'),
+        response=self.messages.ListPatchJobsResponse(
+            patchJobs=input_patch_jobs))
+
+    self.Run("""compute os-config patch-jobs list""")
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME           DESCRIPTION CREATE_TIME STATE NUM_INSTANCES
+            my-patch-job-0
+            my-patch-job-1
+            my-patch-job-2
+            my-patch-job-3
+            my-patch-job-4
+            my-patch-job-5
+            my-patch-job-6
+            my-patch-job-7
+            my-patch-job-8
+            my-patch-job-9
             """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -142,8 +175,8 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://osconfig.googleapis.com/v1alpha1/projects/my-project/patchJobs/my-patch-job-1
-            https://osconfig.googleapis.com/v1alpha1/projects/my-project/patchJobs/my-patch-job-2
+            https://osconfig.googleapis.com/v1alpha2/projects/my-project/patchJobs/my-patch-job-1
+            https://osconfig.googleapis.com/v1alpha2/projects/my-project/patchJobs/my-patch-job-2
             """),
         normalize_space=True)
     self.AssertErrEquals('')

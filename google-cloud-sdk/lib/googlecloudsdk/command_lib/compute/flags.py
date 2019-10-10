@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 import functools
 
 from googlecloudsdk.api_lib.compute import filter_rewrite
-from googlecloudsdk.api_lib.compute import kms_utils
 from googlecloudsdk.api_lib.compute.regions import service as regions_service
 from googlecloudsdk.api_lib.compute.zones import service as zones_service
 from googlecloudsdk.calliope import actions
@@ -347,21 +346,31 @@ class ResourceResolver(object):
           .format(default_scope,
                   ' or '.join([s.scope_enum.name for s in self.scopes])))
 
-  def _GetResourceScopeParam(
-      self, resource_scope, scope_value, project, api_resource_registry):
+  def _GetResourceScopeParam(self,
+                             resource_scope,
+                             scope_value,
+                             project,
+                             api_resource_registry,
+                             with_project=True):
+    """Gets the resource scope parameters."""
+
     if scope_value is not None:
       if resource_scope.scope_enum == compute_scope.ScopeEnum.GLOBAL:
         return None
       else:
         collection = compute_scope.ScopeEnum.CollectionForScope(
             resource_scope.scope_enum)
-        return api_resource_registry.Parse(
-            scope_value,
-            params={'project': project},
-            collection=collection).Name()
+        if with_project:
+          return api_resource_registry.Parse(
+              scope_value, params={
+                  'project': project
+              }, collection=collection).Name()
+        else:
+          return api_resource_registry.Parse(
+              scope_value, params={}, collection=collection).Name()
     else:
-      if resource_scope and (
-          resource_scope.scope_enum != compute_scope.ScopeEnum.GLOBAL):
+      if resource_scope and (resource_scope.scope_enum !=
+                             compute_scope.ScopeEnum.GLOBAL):
         return resource_scope.scope_enum.property_func
 
   def _GetRefsAndUnderspecifiedNames(
@@ -393,9 +402,13 @@ class ResourceResolver(object):
       refs.append(ref)
     return refs, underspecified_names
 
-  def _ResolveUnderspecifiedNames(
-      self, underspecified_names, default_scope, scope_lister, project,
-      api_resource_registry):
+  def _ResolveUnderspecifiedNames(self,
+                                  underspecified_names,
+                                  default_scope,
+                                  scope_lister,
+                                  project,
+                                  api_resource_registry,
+                                  with_project=True):
     """Attempt to resolve scope for unresolved names.
 
     If unresolved_names was generated with _GetRefsAndUnderspecifiedNames
@@ -407,6 +420,8 @@ class ResourceResolver(object):
       scope_lister: callback used to list potential scopes for the resources
       project: str, id of the project
       api_resource_registry: resources Registry
+      with_project: indicates whether or not project is associated. It should be
+        False for flexible resource APIs
 
     Raises:
       UnderSpecifiedResourceError: when resource scope can't be resolved.
@@ -427,7 +442,12 @@ class ResourceResolver(object):
       raise UnderSpecifiedResourceError(names, [s.flag for s in self.scopes])
 
     resource_scope = self.scopes[resource_scope_enum]
-    params = {'project': project,}
+    if with_project:
+      params = {
+          'project': project,
+      }
+    else:
+      params = {}
 
     if resource_scope.scope_enum != compute_scope.ScopeEnum.GLOBAL:
       params[resource_scope.scope_enum.param_name] = scope_value
@@ -445,7 +465,8 @@ class ResourceResolver(object):
                        scope_value,
                        api_resource_registry,
                        default_scope=None,
-                       scope_lister=None):
+                       scope_lister=None,
+                       with_project=True):
     """Resolve this resource against the arguments.
 
     Args:
@@ -469,6 +490,8 @@ class ResourceResolver(object):
           specify default_scope.
       scope_lister: func(scope, underspecified_names), a callback which returns
         list of items (with 'name' attribute) for given scope.
+      with_project: indicates whether or not project is associated. It should be
+        False for flexible resource APIs.
     Returns:
       Resource reference or list of references if plural.
     Raises:
@@ -484,14 +507,22 @@ class ResourceResolver(object):
     if default_scope is not None:
       default_scope = self.scopes[default_scope]
     project = properties.VALUES.core.project.GetOrFail
-    params = {
-        'project': project,
-    }
+    if with_project:
+      params = {
+          'project': project,
+      }
+    else:
+      params = {}
+
     if scope_value is None:
       resource_scope = self.scopes.GetImplicitScope(default_scope)
 
     resource_scope_param = self._GetResourceScopeParam(
-        resource_scope, scope_value, project, api_resource_registry)
+        resource_scope,
+        scope_value,
+        project,
+        api_resource_registry,
+        with_project=with_project)
     if resource_scope_param is not None:
       params[resource_scope.scope_enum.param_name] = resource_scope_param
 
@@ -505,8 +536,12 @@ class ResourceResolver(object):
     # If we still have some resources which need to be resolve see if we can
     # prompt the user and try to resolve these again.
     self._ResolveUnderspecifiedNames(
-        underspecified_names, default_scope, scope_lister, project,
-        api_resource_registry)
+        underspecified_names,
+        default_scope,
+        scope_lister,
+        project,
+        api_resource_registry,
+        with_project=with_project)
 
     # Now unpack each element.
     refs = [ref[0] for ref in refs]
@@ -717,10 +752,12 @@ class ResourceArgument(object):
           help='If set, the {0} global.'
           .format(resource_mention))
 
-  def ResolveAsResource(self, args,
+  def ResolveAsResource(self,
+                        args,
                         api_resource_registry,
                         default_scope=None,
-                        scope_lister=None):
+                        scope_lister=None,
+                        with_project=True):
     """Resolve this resource against the arguments.
 
     Args:
@@ -732,6 +769,8 @@ class ResourceArgument(object):
           specify default_scope.
       scope_lister: func(scope, underspecified_names), a callback which returns
         list of items (with 'name' attribute) for given scope.
+      with_project: indicates whether or not project is associated. It should be
+        False for flexible resource APIs.
     Returns:
       Resource reference or list of references if plural.
     """
@@ -750,8 +789,13 @@ class ResourceArgument(object):
             'Can\'t specify {0} without specifying resource via {1}'.format(
                 flag, self.name))
     refs = self._resource_resolver.ResolveResources(
-        names, resource_scope, scope_value, api_resource_registry,
-        default_scope, scope_lister)
+        names,
+        resource_scope,
+        scope_value,
+        api_resource_registry,
+        default_scope,
+        scope_lister,
+        with_project=with_project)
     if self.plural:
       return refs
     if refs:
@@ -870,61 +914,6 @@ def RewriteFilter(args, message=None, frontend_fields=None):
   return client_filter, server_filter
 
 
-def AddSourceDiskKmsKeyArg(parser):
-  spec = {
-      'disk': str,
-      'kms-key': str,
-      'kms-project': str,
-      'kms-location': str,
-      'kms-keyring': str,
-  }
-
-  parser.add_argument(
-      '--source-disk-kms-key',
-      type=arg_parsers.ArgDict(spec=spec),
-      action='append',
-      metavar='PROPERTY=VALUE',
-      help="""
-              KMS encryption key of the disk attached to the
-              source instance. Required if the source disk is protected by
-              a KMS encryption key. This flag may be repeated to specify
-              multiple attached disks.
-
-              *disk*::: URL of the disk attached to the source instance.
-              This can be a full or valid partial URL
-
-              *kms-key*::: Fully qualified Cloud KMS cryptokey name that
-              protects the {resource}.
-              This can either be the fully qualified path or the name.
-              The fully qualified Cloud KMS cryptokey name format is:
-              ``projects/<kms-project>/locations/<kms-location>/keyRings/<kms-keyring>/
-              cryptoKeys/<key-name>''.
-              If the value is not fully qualified then kms-location, kms-keyring, and
-              optionally kms-project are required.
-              See {kms_help} for more details.
-
-              *kms-project*::: Project that contains the Cloud KMS cryptokey that
-              protects the {resource}.
-               If the project is not specified then the project where the
-               {resource} is being created will be used.
-               If this flag is set then key-location, kms-keyring, and kms-key
-               are required.
-               See {kms_help} for more details.
-
-              *kms-location*::: Location of the Cloud KMS cryptokey to be used for
-               protecting the {resource}.
-               All Cloud KMS cryptokeys are reside in a 'location'.
-              To get a list of possible locations run 'gcloud kms locations list'.
-              If this flag is set then kms-keyring and kms-key are required.
-              See {kms_help} for more details.
-
-              *kms-keyring*::: The keyring which contains the Cloud KMS cryptokey that
-              will protect the {resource}.
-                If this flag is set then kms-location and kms-key are required.
-                See {kms_help} for more details.
-              """.format(resource='disk', kms_help=kms_utils.KMS_HELP_URL))
-
-
 def AddSourceDiskCsekKeyArg(parser):
   spec = {
       'disk': str,
@@ -946,4 +935,17 @@ def AddSourceDiskCsekKeyArg(parser):
 
               *csek-key-file*::: path to customer-supplied encryption key.
             """
+  )
+
+
+def AddEraseVssSignature(parser, resource):
+  parser.add_argument(
+      '--erase-windows-vss-signature',
+      action='store_true',
+      default=False,
+      help="""
+              Specifies whether the disk restored from {resource} should
+              erase Windows specific VSS signature.
+              See https://cloud.google.com/sdk/gcloud/reference/compute/disks/snapshot#--guest-flush
+           """.format(resource=resource)
   )

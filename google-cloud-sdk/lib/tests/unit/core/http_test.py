@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -322,7 +322,7 @@ total round trip time (request+response): 4.000 secs
     request_mock = self.StartObjectPatch(httplib2.Http, 'request')
     def run(url, extra_headers):
       request_mock.return_value = (
-          {'header1': 'value1', 'header2': 'value2'}, 'response content')
+          {'header1': 'value1', 'header2': 'value2'}, b'response content')
       properties.VALUES.core.log_http.Set(True)
       http_client = http.Http()
       http_client.request(url, method='GET', body='request content',
@@ -359,7 +359,7 @@ total round trip time (request+response): 4.000 secs
     properties.VALUES.core.request_reason.Set('my request justification')
     request_mock = self.StartObjectPatch(httplib2.Http, 'request')
     request_mock.return_value = (
-        {'header1': 'value1', 'header2': 'value2'}, 'response content')
+        {'header1': 'value1', 'header2': 'value2'}, b'response content')
     http_client = http.Http()
 
     http_client.request(

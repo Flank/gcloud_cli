@@ -83,8 +83,13 @@ Display detailed help.
 The Google Cloud Platform project name to use for this invocation. If omitted,
 then the current project is assumed; the current project can be listed using
 \f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
-\f5gcloud config set project PROJECTID\fR. Overrides the default
-\fBcore/project\fR property value for this command invocation.
+\f5gcloud config set project PROJECTID\fR.
+
+\f5\-\-project\fR and its fallback \f5core/project\fR property play two roles in
+the invocation. It specifies the project of the resource to operate on. It also
+specifies the project for API enablement check, quota, and billing. To specify a
+different project for quota and billing, use \f5\-\-billing\-project\fR or
+\f5billing/quota_project\fR property.
 
 .TP 2m
 \fB\-\-quiet\fR, \fB\-q\fR
@@ -96,10 +101,10 @@ variable \f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1.
 
 .TP 2m
 \fB\-\-verbosity\fR=\fIVERBOSITY\fR; default="warning"
-Override the default verbosity for this command with any of the supported
-standard verbosity levels: \f5debug\fR, \f5info\fR, \f5warning\fR, \f5error\fR,
-\f5critical\fR, \f5none\fR. Overrides the default \fBcore/verbosity\fR property
-value for this command invocation.
+Override the default verbosity for this command. Overrides the default
+\fBcore/verbosity\fR property value for this command invocation. \fIVERBOSITY\fR
+must be one of: \fBdebug\fR, \fBinfo\fR, \fBwarning\fR, \fBerror\fR,
+\fBcritical\fR, \fBnone\fR.
 
 .TP 2m
 \fB\-\-version\fR, \fB\-v\fR
@@ -213,7 +218,7 @@ Deploy and manage clusters of machines for running containers.
 
 .TP 2m
 \fBdataflow\fR
-Manage Google Cloud Dataflow jobs.
+Manage Google Cloud Dataflow resources.
 
 .TP 2m
 \fBdataproc\fR
@@ -298,6 +303,10 @@ Manage Cloud Memorystore Redis resources.
 .TP 2m
 \fBresource\-manager\fR
 Manage Cloud Resources.
+
+.TP 2m
+\fBscheduler\fR
+Manage Cloud Scheduler jobs and schedules.
 
 .TP 2m
 \fBservices\fR

@@ -43,7 +43,7 @@ EXAMPLES
     CryptoKey samwise within KeyRing fellowship and location global:
 
         $ gcloud beta kms cryptokeys set-primary-version samwise \
-            --version 9 --keyring fellowship --location global
+            --version=9 --keyring=fellowship --location=global
 
 NOTES
     This command is an internal implementation detail and may change or

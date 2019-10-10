@@ -10,8 +10,29 @@ summary:
   - command: |
       dialogflow agent import --source="agent.zip" --replace-all
   - stderr: |
+      Request issued for: [fake-project]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
       Successfully imported agent from [agent.zip].
       Replaced all existing resources.
+- execute:
+  - command: |
+      dialogflow agent import --source="agent.zip" --async
+  - stderr: |
+      Request issued for: [fake-project]
+      Check operation [$$operation$$] for status.
+- execute:
+  - command: |
+      dialogflow agent import --source="gs://fake-bucket/agent.zip"
+  - stderr: |
+      Request issued for: [fake-project]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Successfully imported agent from [gs://fake-bucket/agent.zip].
 actions:
 - load_resource:
     path: tests/e2e/surface/dialogflow/agent/testdata/agent.zip
@@ -41,7 +62,7 @@ actions:
     - expect_stderr: |
         Request issued for: [fake-project]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
         Successfully imported agent from [agent.zip].
@@ -74,7 +95,7 @@ actions:
         poll_operation: true
     - expect_stderr: |
         Request issued for: [fake-project]
-        Check operation [$$operation-basename$$] for status.
+        Check operation [$$operation$$] for status.
     - expect_exit:
         code: 0
 - execute_command:
@@ -101,7 +122,7 @@ actions:
     - expect_stderr: |
         Request issued for: [fake-project]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
         Successfully imported agent from [gs://fake-bucket/agent.zip].

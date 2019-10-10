@@ -6,11 +6,12 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      dialogflow agent import --source="agent.zip" --replace-all
+      dialogflow agent export --destination="gs://fake-bucket/exported_agent.zip"
   - stderr: |
-      Successfully imported agent from [agent.zip].
-      Replaced all existing resources.
-
+      Request issued for: [fake-project]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation$$] to complete
+    - status: SUCCESS
 actions:
 - execute_command:
     command: |
@@ -36,7 +37,7 @@ actions:
     - expect_stderr: |
         Request issued for: [fake-project]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_exit:
         code: 0

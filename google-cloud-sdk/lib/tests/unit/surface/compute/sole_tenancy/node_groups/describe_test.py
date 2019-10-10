@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,9 +42,9 @@ class NodeGroupsDescribeTest(test_base.BaseTest):
     description: description1
     kind: compute#nodeGroup
     name: group-1
-    nodeTemplate: https://www.googleapis.com/compute/v1/projects/my-project/\
+    nodeTemplate: https://compute.googleapis.com/compute/v1/projects/my-project/\
 regions/region-1/nodeTemplates/template-1
-    selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/\
+    selfLink: https://compute.googleapis.com/compute/v1/projects/my-project/zones/\
 zone-1/nodeGroups/group-1
     size: 2
     zone: zone-1

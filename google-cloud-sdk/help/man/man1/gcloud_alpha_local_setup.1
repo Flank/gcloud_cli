@@ -1,0 +1,72 @@
+
+.TH "GCLOUD_ALPHA_LOCAL_SETUP" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha local setup \- command for creating a skaffold local development environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha local setup\fR [\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR] [\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR;\ default="Dockerfile"] [\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR] [\fB\-\-kubernetes\-file\fR=\fIKUBERNETES_FILE\fR;\ default="pods_and_services.yaml"] [\fB\-\-service\-name\fR=\fISERVICE_NAME\fR] [\fB\-\-skaffold\-file\fR=\fISKAFFOLD_FILE\fR;\ default="skaffold.yaml"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Command for creating a skaffold local development environment.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-build\-context\-directory\fR=\fIBUILD_CONTEXT_DIRECTORY\fR
+If set, use this as the context directory when building the container image.
+Otherwise, the directory of the Dockerfile will be used.
+
+.TP 2m
+\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR; default="Dockerfile"
+The Dockerfile for the service image.
+
+.TP 2m
+\fB\-\-image\-name\fR=\fIIMAGE_NAME\fR
+Name for the built docker image.
+
+.TP 2m
+\fB\-\-kubernetes\-file\fR=\fIKUBERNETES_FILE\fR; default="pods_and_services.yaml"
+File containing yaml specifications for kubernetes resources.
+
+.TP 2m
+\fB\-\-service\-name\fR=\fISERVICE_NAME\fR
+Name of the service.
+
+.TP 2m
+\fB\-\-skaffold\-file\fR=\fISKAFFOLD_FILE\fR; default="skaffold.yaml"
+Location of the generated skaffold.yaml file.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

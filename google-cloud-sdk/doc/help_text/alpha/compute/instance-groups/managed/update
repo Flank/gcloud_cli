@@ -6,7 +6,6 @@ SYNOPSIS
     gcloud alpha compute instance-groups managed update NAME
         [--instance-redistribution-type=TYPE]
         [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
-        [--stateful-names]
         [--update-stateful-disk=[auto-delete=AUTO-DELETE],
           [device-name=DEVICE-NAME]]
         [--clear-autohealing
@@ -65,11 +64,6 @@ FLAGS
 
      --remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
         Stop considering the disks stateful by the instance group.
-
-     --stateful-names
-        Enable stateful names of instances. Whenever instances with those names
-        are restarted or recreated, they will have the same names as before.
-        Use --no-stateful-names to disable stateful names.
 
      --update-stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME]
         Disks considered stateful by the instance group. Usually, the managed
@@ -158,9 +152,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud compute instance-groups managed update
         $ gcloud beta compute instance-groups managed update

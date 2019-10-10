@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ORG\-SECURITY\-POLICIES_ASSOCIATIONS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute org\-security\-policies associations create \- create a new association between a security policy and an organization or folder resource
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute org\-security\-policies associations create\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR (\fB\-\-folder\fR=\fIFOLDER\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION\fR) [\fB\-\-name\fR=\fINAME\fR] [\fB\-\-replace\-association\-on\-target\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute org\-security\-policies associations
+create\fR is used to create organization security policy associations. An
+organization security policy is a set of rules that controls access to various
+resources.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
+Security policy ID of the association.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER\fR
+ID of the folder with which the association is created.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+ID of the organization with which the association is created.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-name\fR=\fINAME\fR
+Name to identify this association. If unspecified, the name will be set to
+"organization\-{ORGANIZATION_ID}" or "folder\-{FOLDER_ID}".
+
+.TP 2m
+\fB\-\-replace\-association\-on\-target\fR
+By default, if you attempt to insert an association to an organization or folder
+resource that is already associated with a security policy the method will fail.
+If this is set, the existing association will be deleted at the same time that
+the new association is created.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

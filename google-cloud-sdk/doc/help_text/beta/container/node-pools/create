@@ -13,9 +13,11 @@ SYNOPSIS
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
-        [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
-        [--num-nodes=NUM_NODES; default=3] [--preemptible]
-        [--sandbox=[type=TYPE]] [--tags=TAG,[TAG,...]]
+        [--node-locations=ZONE,[ZONE,...]] [--node-taints=[NODE_TAINT,...]]
+        [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
+        [--preemptible] [--sandbox=[type=TYPE]]
+        [--shielded-integrity-monitoring] [--shielded-secure-boot]
+        [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE]
@@ -58,20 +60,20 @@ FLAGS
         be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
-        Enable node autorepair feature for a node-pool.
+        Enable node autorepair feature for a node pool.
 
             $ gcloud beta container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autorepair
 
-        Node autorepair is enabled by default for node pools using COS as a
-        base image, use --no-enable-autorepair to disable.
+        Node autorepair is enabled by default for node pools using COS or
+        COS_CONTAINERD as a base image, use --no-enable-autorepair to disable.
 
         See
         https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
         for more info.
 
      --enable-autoupgrade
-        Sets autoupgrade feature for a node-pool.
+        Sets autoupgrade feature for a node pool.
 
             $ gcloud beta container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autoupgrade
@@ -181,7 +183,7 @@ FLAGS
         CPU platform selection is available only in selected zones.
 
      --node-labels=[NODE_LABEL,...]
-        Applies the given kubernetes labels on all nodes in the new node-pool.
+        Applies the given kubernetes labels on all nodes in the new node pool.
         Example:
 
             $ gcloud beta container node-pools create node-pool-1 \
@@ -198,8 +200,16 @@ FLAGS
         different from Kubernetes Engine labels that are used for the purpose
         of tracking billing and usage information.
 
+     --node-locations=ZONE,[ZONE,...]
+        The set of zones in which the node pool's nodes should be located.
+
+        Multiple locations can be specified, separated by commas. For example:
+
+            $ gcloud beta container node-pools create node-pool-1 \
+                --node-locations=us-central1-a,us-central1-b
+
      --node-taints=[NODE_TAINT,...]
-        Applies the given kubernetes taints on all nodes in the new node-pool,
+        Applies the given kubernetes taints on all nodes in the new node pool,
         which can be used with tolerations for pod scheduling. Example:
 
             $ gcloud beta container node-pools create node-pool-1 \
@@ -225,7 +235,7 @@ FLAGS
         The number of nodes in the node pool in each of the cluster's zones.
 
      --preemptible
-        Create nodes using preemptible VM instances in the new nodepool.
+        Create nodes using preemptible VM instances in the new node pool.
 
             $ gcloud beta container node-pools create node-pool-1 \
                 --cluster=example-cluster --preemptible
@@ -236,12 +246,21 @@ FLAGS
         information on how to use Preemptible VMs with Kubernetes Engine.
 
      --sandbox=[type=TYPE]
-        Enables the requested sandbox on all nodes in the node-pool. Example:
+        Enables the requested sandbox on all nodes in the node pool. Example:
 
             $ gcloud beta container node-pools create node-pool-1 \
                 --cluster=example-cluster --sandbox="type=gvisor"
 
         The only supported type is 'gvisor'.
+
+     --shielded-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created.
+
+     --shielded-secure-boot
+        The instance will boot with secure boot enabled.
 
      --tags=TAG,[TAG,...]
         Applies the given Compute Engine tags (comma separated) on all nodes in
@@ -257,11 +276,11 @@ FLAGS
         for examples.
 
      --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-        Type of metadata server available to pods running in the nodepool.
+        Type of metadata server available to pods running in the node pool.
         WORKLOAD_METADATA_FROM_NODE must be one of:
 
          EXPOSED
-            Pods running in this nodepool have access to the node's underlying
+            Pods running in this node pool have access to the node's underlying
             Compute Engine Metadata Server.
          GKE_METADATA_SERVER
             Run the Kubernetes Engine Metadata Server on this node. The

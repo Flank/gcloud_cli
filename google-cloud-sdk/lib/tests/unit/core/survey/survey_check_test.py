@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -164,7 +164,17 @@ class SurveyPrompterTest(sdk_test_base.WithOutputCapture,
     prompter = survey_check.SurveyPrompter()
     self.assertFalse(prompter.ShouldPrompt())
 
+  def testPromptForSurvey_NoCacheFile(self):
+    prompter = survey_check.SurveyPrompter()
+    prompter.PromptForSurvey()
+    self.AssertErrEquals('')
+    with survey_check.PromptRecord() as pr:
+      self.assertEqual(pr.last_prompt_time, 1544651979)
+      self.assertEqual(pr.last_answer_survey_time, None)
+
   def testPromptForSurvey(self):
+    with survey_check.PromptRecord() as pr:
+      pr.last_prompt_time = 0
     prompter = survey_check.SurveyPrompter()
     prompter.PromptForSurvey()
     self.AssertErrEquals(

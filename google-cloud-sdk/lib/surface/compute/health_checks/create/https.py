@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,40 @@ from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute.health_checks import flags
 
 
-def _Run(args, holder, include_l7_internal_load_balancing=False):
+def _DetailedHelp():
+  return {
+      'brief':
+          'Create a HTTPS health check to monitor load balanced instances',
+      'DESCRIPTION':
+          """\
+        *{command}* is used to create an HTTPS non-legacy health check. HTTPS
+        health checks monitor instances in a load balancer controlled by a
+        target pool. All arguments to the command are optional except for the
+        name of the health check. Note, by default, this health check monitors
+        TCP port 80.
+        For more information on load balancing, see
+        [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
+        """,
+  }
+
+
+def _Args(parser, include_l7_internal_load_balancing):
+  """Set up arguments to create an HTTPS HealthCheck."""
+  parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
+  flags.HealthCheckArgument(
+      'HTTPS',
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).AddArgument(
+      parser, operation_type='create')
+  health_checks_utils.AddHttpRelatedCreationArgs(parser)
+  health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'HTTPS')
+  health_checks_utils.AddHttpRelatedResponseArg(parser)
+  parser.display_info.AddCacheUpdater(completers.HealthChecksCompleterAlpha
+                                      if include_l7_internal_load_balancing else
+                                      completers.HttpsHealthChecksCompleter)
+
+
+def _Run(args, holder, include_l7_internal_load_balancing):
   """Issues the request necessary for adding the health check."""
   client = holder.client
   messages = client.messages
@@ -79,54 +112,28 @@ def _Run(args, holder, include_l7_internal_load_balancing=False):
   return client.MakeRequests([(collection, 'Insert', request)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
-  """Create HTTPS non-legacy health check to monitor load balanced instances."""
+  """Create a HTTPS health check."""
+
+  _include_l7_internal_load_balancing = False
+  detailed_help = _DetailedHelp()
 
   @classmethod
-  def Args(cls,
-           parser,
-           regionalized=False):
-    parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
-    flags.HealthCheckArgument(
-        'HTTPS', include_l7_internal_load_balancing=regionalized).AddArgument(
-            parser, operation_type='create')
-    health_checks_utils.AddHttpRelatedCreationArgs(parser)
-    health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'HTTPS')
-    health_checks_utils.AddHttpRelatedResponseArg(parser)
-    parser.display_info.AddCacheUpdater(completers.HealthChecksCompleterAlpha
-                                        if regionalized else
-                                        completers.HttpsHealthChecksCompleter)
+  def Args(cls, parser):
+    _Args(parser, cls._include_l7_internal_load_balancing)
 
   def Run(self, args):
-    """Issues the request necessary for adding the health check."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder)
+    return _Run(args, holder, self._include_l7_internal_load_balancing)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+
+  _include_l7_internal_load_balancing = True
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
-  """Create HTTPS non-legacy health check to monitor load balanced instances."""
-
-  @staticmethod
-  def Args(parser):
-    Create.Args(parser, regionalized=True)
-
-  def Run(self, args):
-    """Issues the request necessary for adding the health check."""
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder, include_l7_internal_load_balancing=True)
-
-
-Create.detailed_help = {
-    'brief': ('Create a HTTPS health check to monitor load balanced instances'),
-    'DESCRIPTION': """\
-        *{command}* is used to create an HTTPS non-legacy health check. HTTPS
-        health checks monitor instances in a load balancer controlled by a
-        target pool. All arguments to the command are optional except for the
-        name of the health check. Note, by default, this health check monitors
-        TCP port 80.
-        For more information on load balancing, see
-        [](https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/)
-        """,
-}
+class CreateAlpha(CreateBeta):
+  pass

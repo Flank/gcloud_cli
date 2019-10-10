@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ _FORMAT = """\
 table(
     domainName:label=DOMAIN,
     available:label=AVAILABILITY,
-    registrationPrice.price():label=REGISTRATION_PRICE,
-    renewalPrice.price():label=RENEWAL_PRICE,
+    yearlyPrice.price():label=YEARLY_PRICE,
     notices.list():label=NOTICES
 )
 """

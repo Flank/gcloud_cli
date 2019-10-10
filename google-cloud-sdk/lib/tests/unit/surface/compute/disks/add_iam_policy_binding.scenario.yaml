@@ -25,6 +25,20 @@ actions:
       BETA: beta
       ALPHA: alpha
 
+- define_reference:
+    reference: policy-version-parameter
+    track_values:
+      GA: ''
+      BETA: '&optionsRequestedPolicyVersion=3'
+      ALPHA: '&optionsRequestedPolicyVersion=3'
+
+- define_reference:
+    reference: policy-version
+    track_values:
+      GA: '1'
+      BETA: '3'
+      ALPHA: '3'
+
 # add binding without condition to a policy without condition
 - execute_command:
     command: compute disks add-iam-policy-binding my-disk --zone=ZONE --member=user:test@gmail.com
@@ -32,7 +46,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/disks/my-disk/getIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/disks/my-disk/getIamPolicy?alt=json$$policy-version-parameter$$
           method: GET
           body: null
         return_response:
@@ -53,18 +67,11 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/disks/my-disk/setIamPolicy?alt=json
+          uri: https://compute.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/disks/my-disk/setIamPolicy?alt=json
           method: POST
           body:
-            json:
-              policy:
-                bindings:
-                - role: roles/another-non-primitive
-                  members: ["user:owner@gmail.com"]
-                - role: roles/non-primitive
-                  members: ["user:test@gmail.com"]
-                etag: etag
-                version: 1
+            text: |-
+              {"policy": {"bindings": [{"members": ["user:owner@gmail.com"], "role": "roles/another-non-primitive"}, {"members": ["user:test@gmail.com"], "role": "roles/non-primitive"}], "etag": "etag", "version": $$policy-version$$}}
         return_response:
           headers:
             status: '200'

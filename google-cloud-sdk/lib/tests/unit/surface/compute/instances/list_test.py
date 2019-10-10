@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,11 +33,14 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute import utils
 
+import mock
+import six
+
 mbeta = core_apis.GetMessagesModule('compute', 'beta')
 
 
 def _DefaultImageOf(api_version):
-  return ('https://www.googleapis.com/compute/{ver}/projects/debian-cloud/'
+  return ('https://compute.googleapis.com/compute/{ver}/projects/debian-cloud/'
           'global/images/'
           'debian-9-stretch-v20170619').format(ver=api_version)
 
@@ -63,9 +66,9 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
             """))
     self.AssertErrEquals('')
 
@@ -81,8 +84,8 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
             """))
 
   def testPositionalArgsWithUri(self):
@@ -92,12 +95,12 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         with_implementation=self.implementation)
     self.Run("""
         compute instances list
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
           --uri
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             """))
 
   def testPositionalArgsWithUriAndSimpleName(self):
@@ -107,14 +110,14 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         with_implementation=self.implementation)
     self.Run("""
         compute instances list
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
           instance-3
           --uri
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
             """))
 
   def testPositionalArgsWithSimpleNamesAndZoneFlag(self):
@@ -130,8 +133,8 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
             """))
 
   def testPositionalArgsWithSimpleNameAndUriAndZoneFlag(self):
@@ -142,14 +145,14 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     self.Run("""
         compute instances list
           instance-1
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
           --zones zone-1
           --uri
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
             """))
 
   def testNameRegexes(self):
@@ -164,9 +167,9 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
             """))
 
   def testAscendingSortByOfAPIField(self):
@@ -248,7 +251,7 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
             """))
 
   def testLimitWithZero(self):
@@ -283,9 +286,9 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
             """))
 
   def testWithManyZones(self):
@@ -298,9 +301,9 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
-            https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-1
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-2
+            https://compute.googleapis.com/compute/v1/projects/my-project/zones/zone-1/instances/instance-3
             """))
 
   def testZoneCannotBeEmpty(self):
@@ -332,7 +335,7 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
       # One preemptible VM instance
       mbeta.Instance(
           machineType=(
-              'https://www.googleapis.com/compute/beta/projects/my-project/'
+              'https://compute.googleapis.com/compute/beta/projects/my-project/'
               'zones/zone-1/machineTypes/n1-standard-1'),
           name='preemptible-1',
           networkInterfaces=[
@@ -349,14 +352,14 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
               OnHostMaintenanceValueValuesEnum.TERMINATE,
               preemptible=True),
           status=mbeta.Instance.StatusValueValuesEnum.RUNNING,
-          selfLink=('https://www.googleapis.com/compute/beta/projects/'
+          selfLink=('https://compute.googleapis.com/compute/beta/projects/'
                     'my-project/zones/zone-1/instances/preemptible-1'),
-          zone=('https://www.googleapis.com/compute/beta/projects/'
+          zone=('https://compute.googleapis.com/compute/beta/projects/'
                 'my-project/zones/zone-1')),
       # One non-preemptible (premium) VM instance
       mbeta.Instance(
           machineType=(
-              'https://www.googleapis.com/compute/beta/projects/my-project/'
+              'https://compute.googleapis.com/compute/beta/projects/my-project/'
               'zones/zone-1/machineTypes/n1-standard-1'),
           name='premium-1',
           networkInterfaces=[
@@ -373,9 +376,9 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
               OnHostMaintenanceValueValuesEnum.MIGRATE,
               preemptible=False),
           status=mbeta.Instance.StatusValueValuesEnum.RUNNING,
-          selfLink=('https://www.googleapis.com/compute/beta/projects/'
+          selfLink=('https://compute.googleapis.com/compute/beta/projects/'
                     'my-project/zones/zone-1/instances/premium-1'),
-          zone=('https://www.googleapis.com/compute/beta/projects/'
+          zone=('https://compute.googleapis.com/compute/beta/projects/'
                 'my-project/zones/zone-1')),
   ]
 
@@ -554,6 +557,68 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             '--zone': 'us-east1-c',
         },
     )
+
+
+class InstancesListTestWithNoFiltering(test_base.BaseTest,
+                                       completer_test_base.CompleterBase):
+
+  def SetUp(self):
+    api_mock = utils.ComputeApiMock('v1').Start()
+    self.addCleanup(api_mock.Stop)
+
+    self.implementation = lister.ZonalParallelLister(
+        api_mock.adapter, api_mock.adapter.apitools_client.instances,
+        api_mock.resources)
+
+    self.test_resources = resource_projector.MakeSerializable(
+        test_resources.INSTANCES_V1)
+
+    self.all_project_requests = [(self.compute_v1.instances, 'List',
+                                  self.messages.ComputeInstancesListRequest(
+                                      project='my-project', zone='zone-1')),
+                                 (self.compute_v1.instances, 'List',
+                                  self.messages.ComputeInstancesListRequest(
+                                      project='my-project', zone='zone-2')),
+                                 (self.compute_v1.instances, 'List',
+                                  self.messages.ComputeInstancesListRequest(
+                                      project='my-project', zone='zone-3'))]
+
+    def ReplicatePartialError(requests, http, batch_url, errors):  # pylint: disable=unused-argument
+
+      for i, resource in enumerate(self.test_resources):
+        if i == 1:
+          errors.append((400, six.text_type('Internal error')))
+          continue
+        elif i >= len(self.test_resources):
+          return
+        else:
+          yield resource
+
+    list_json_patcher = mock.patch(
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
+
+    self.addCleanup(list_json_patcher.stop)
+    self.list_json = list_json_patcher.start()
+    self.list_json.side_effect = ReplicatePartialError
+
+  def testListWithPartialError(self):
+    self.Run("""compute instances list --zones=zone-1,zone-2,zone-3""")
+
+    self.list_json.assert_called_once_with(
+        requests=self.all_project_requests,
+        http=self.mock_http(),
+        batch_url=self.batch_url,
+        errors=[(400, 'Internal error')])
+
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME       ZONE   MACHINE_TYPE  PREEMPTIBLE INTERNAL_IP EXTERNAL_IP   STATUS
+            instance-1 zone-1 n1-standard-1             10.0.0.1    23.251.133.75 RUNNING
+            instance-3 zone-1 n1-standard-2             10.0.0.3    23.251.133.76 RUNNING
+            """),
+        normalize_space=True)
+
+    self.AssertErrContains('Internal error')
 
 
 if __name__ == '__main__':

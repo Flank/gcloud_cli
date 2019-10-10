@@ -11,7 +11,7 @@ gcloud compute routers nats update \- update a NAT on a Google Compute Engine ro
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute routers nats update\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-async\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]] [\fB\-\-clear\-icmp\-idle\-timeout\fR\ |\ \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-clear\-min\-ports\-per\-vm\fR\ |\ \fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-clear\-tcp\-established\-idle\-timeout\fR\ |\ \fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-clear\-tcp\-transitory\-idle\-timeout\fR\ |\ \fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-clear\-udp\-idle\-timeout\fR\ |\ \fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute routers nats update\fR \fINAME\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-async\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-auto\-allocate\-nat\-external\-ips\fR\ |\ \fB\-\-nat\-external\-ip\-pool\fR=\fIIP_ADDRESS\fR,[\fIIP_ADDRESS\fR,...]] [\fB\-\-clear\-icmp\-idle\-timeout\fR\ |\ \fB\-\-icmp\-idle\-timeout\fR=\fIICMP_IDLE_TIMEOUT\fR] [\fB\-\-clear\-min\-ports\-per\-vm\fR\ |\ \fB\-\-min\-ports\-per\-vm\fR=\fIMIN_PORTS_PER_VM\fR] [\fB\-\-clear\-tcp\-established\-idle\-timeout\fR\ |\ \fB\-\-tcp\-established\-idle\-timeout\fR=\fITCP_ESTABLISHED_IDLE_TIMEOUT\fR] [\fB\-\-clear\-tcp\-transitory\-idle\-timeout\fR\ |\ \fB\-\-tcp\-transitory\-idle\-timeout\fR=\fITCP_TRANSITORY_IDLE_TIMEOUT\fR] [\fB\-\-clear\-udp\-idle\-timeout\fR\ |\ \fB\-\-udp\-idle\-timeout\fR=\fIUDP_IDLE_TIMEOUT\fR] [\fB\-\-nat\-all\-subnet\-ip\-ranges\fR\ |\ \fB\-\-nat\-custom\-subnet\-ip\-ranges\fR=\fISUBNETWORK\fR[:\fIRANGE_NAME\fR],[...]\ |\ \fB\-\-nat\-primary\-subnet\-ip\-ranges\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -49,8 +49,41 @@ The Router to use for NAT.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
+
+.TP 2m
+\fB\-\-enable\-logging\fR
+Enable logging for the NAT. Logs will be exported to Stackdriver. NAT logging is
+disabled by default. To disable logging for the NAT, use $ gcloud compute
+routers nats update MY\-NAT \-\-no\-enable\-logging \e \-\-router ROUTER
+\-\-region REGION
+
+.TP 2m
+\fB\-\-log\-filter\fR=\fILOG_FILTER\fR
+Filter for logs exported to stackdriver.
+
+The default is ALL.
+
+If logging is not enabled, filter settings will be persisted but will have no
+effect.
+
+Use \-\-[no\-]enable\-logging to enable and disable logging.
+
+\fILOG_FILTER\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBALL\fR
+Export logs for all connections handled by this NAT.
+.TP 2m
+\fBERRORS_ONLY\fR
+Export logs for connection failures only.
+.TP 2m
+\fBTRANSLATIONS_ONLY\fR
+Export logs for successful connections only.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR

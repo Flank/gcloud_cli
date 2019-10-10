@@ -26,8 +26,7 @@ POSITIONAL ARGUMENTS
 
          --regions=[REGION,...]
             The Cloud region or regions in which to create the WorkerPool.
-
-            Choices: us-central1, us-west1, us-east1, us-east4.
+            REGION must be one of: us-central1, us-east1, us-east4, us-west1.
 
          --worker-count=WORKER_COUNT
             Total number of workers to be created across all requested regions.
@@ -94,7 +93,6 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

@@ -77,17 +77,17 @@ The following command returns metadata for version 2 within key \f5frodo\fR
 within the keyring \f5fellowship\fR in the location \f5us\-east1\fR:
 
 .RS 2m
-$ gcloud alpha kms keys versions describe 2 \-\-key frodo \e
-    \-\-keyring fellowship \-\-location us\-east1
+$ gcloud alpha kms keys versions describe 2 \-\-key=frodo \e
+    \-\-keyring=fellowship \-\-location=us\-east1
 .RE
 
 For key versions with protection level \f5HSM\fR, use the
 \f5\-\-attestation\-file\fR flag to save the attestation to a local file.
 
 .RS 2m
-$ gcloud alpha kms keys versions describe 2 \-\-key frodo \e
-    \-\-keyring fellowship \-\-location us\-east1 \e
-    \-\-attestation\-file path/to/attestation.dat
+$ gcloud alpha kms keys versions describe 2 \-\-key=frodo \e
+    \-\-keyring=fellowship \-\-location=us\-east1 \e
+    \-\-attestation\-file=path/to/attestation.dat
 .RE
 
 
@@ -96,9 +96,8 @@ $ gcloud alpha kms keys versions describe 2 \-\-key frodo \e
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud kms keys versions describe

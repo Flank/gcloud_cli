@@ -11,7 +11,7 @@ gcloud pubsub subscriptions modify\-push\-config \- modifies the push configurat
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud pubsub subscriptions modify\-push\-config\fR \fISUBSCRIPTION\fR \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud pubsub subscriptions modify\-push\-config\fR \fISUBSCRIPTION\fR \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -50,6 +50,23 @@ ID of the subscription or fully qualified identifier for the subscription.
 \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR
 A URL to use as the endpoint for this subscription. This will also automatically
 set the subscription type to PUSH.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR
+Service account email used as the identity for the generated Open ID Connect
+token for authenticated push.
+
+.TP 2m
+\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR
+Audience used in the generated Open ID Connect token for authenticated push. If
+not specified, it will be set to the push\-endpoint.
 
 
 .RE

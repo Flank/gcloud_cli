@@ -105,6 +105,9 @@
         "https://www.googleapis.com/auth/bigquery": {
           "description": "View and manage your data in Google BigQuery"
         },
+        "https://www.googleapis.com/auth/bigquery.readonly": {
+          "description": "View your data in Google BigQuery"
+        },
         "https://www.googleapis.com/auth/cloud-platform": {
           "description": "View and manage your data across Google Cloud Platform services"
         },
@@ -323,6 +326,10 @@
         "recurse": {
           "description": "Deprecated. This field has no effect.",
           "type": "boolean"
+        },
+        "deprecated": {
+          "description": "If true, it should not be used in new transfers, and it should not be\nvisible to users.",
+          "type": "boolean"
         }
       }
     },
@@ -483,12 +490,12 @@
       "type": "object",
       "properties": {
         "startTime": {
-          "description": "Start time of the range of transfer runs. For example,\n`\"2017-05-25T00:00:00+00:00\"`.",
+          "description": "Required. Start time of the range of transfer runs. For example,\n`\"2017-05-25T00:00:00+00:00\"`.",
           "type": "string",
           "format": "google-datetime"
         },
         "endTime": {
-          "description": "End time of the range of transfer runs. For example,\n`\"2017-05-30T00:00:00+00:00\"`.",
+          "description": "Required. End time of the range of transfer runs. For example,\n`\"2017-05-30T00:00:00+00:00\"`.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -523,7 +530,7 @@
           "format": "google-datetime"
         },
         "runTime": {
-          "description": "For batch transfer runs, specifies the date and time that\ndata should be ingested.",
+          "description": "For batch transfer runs, specifies the date and time of the data should be\ningested.",
           "type": "string",
           "format": "google-datetime"
         },
@@ -595,7 +602,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
       "type": "object",
       "properties": {
         "code": {
@@ -818,7 +825,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
+                  "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/dataSources\/[^\/]+$",
@@ -833,6 +840,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -845,7 +853,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects\/{project_id}`",
+                  "description": "Required. The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects\/{project_id}`",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -871,6 +879,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -883,7 +892,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "name": {
-                  "description": "The data source in the form:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
+                  "description": "Required. The data source in the form:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/dataSources\/[^\/]+$",
@@ -901,6 +910,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -917,7 +927,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects\/{project_id}\/locations\/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
+                  "description": "Required. The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects\/{project_id}\/locations\/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -929,7 +939,7 @@
                   "type": "string"
                 },
                 "versionInfo": {
-                  "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \u201Cnone+gsession\u201D response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
+                  "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \"none+gsession\" response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
                   "location": "query",
                   "type": "string"
                 }
@@ -967,13 +977,13 @@
                   "type": "string"
                 },
                 "updateMask": {
-                  "description": "Required list of fields to be updated in this request.",
+                  "description": "Required. Required list of fields to be updated in this request.",
                   "location": "query",
                   "type": "string",
                   "format": "google-fieldmask"
                 },
                 "versionInfo": {
-                  "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \u201Cnone+gsession\u201D response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
+                  "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \"none+gsession\" response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
                   "location": "query",
                   "type": "string"
                 }
@@ -999,7 +1009,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
+                  "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1025,7 +1035,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
+                  "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1040,6 +1050,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -1052,7 +1063,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The BigQuery project id for which data sources\nshould be returned: `projects\/{project_id}`.",
+                  "description": "Required. The BigQuery project id for which data sources\nshould be returned: `projects\/{project_id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -1084,6 +1095,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -1096,7 +1108,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Transfer configuration name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
+                  "description": "Required. Transfer configuration name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1159,7 +1171,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+\/runs\/[^\/]+$",
@@ -1174,6 +1186,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1186,7 +1199,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+\/runs\/[^\/]+$",
@@ -1212,7 +1225,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
+                      "description": "Required. Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1261,6 +1274,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1278,7 +1292,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "parent": {
-                          "description": "Transfer run name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_Id}\/runs\/{run_id}`.",
+                          "description": "Required. Transfer run name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_Id}\/runs\/{run_id}`.",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/transferConfigs\/[^\/]+\/runs\/[^\/]+$",
@@ -1316,6 +1330,7 @@
                       },
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/bigquery.readonly",
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only"
                       ],
@@ -1367,6 +1382,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -1394,6 +1410,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ],
@@ -1411,7 +1428,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/dataSources\/[^\/]+$",
@@ -1426,6 +1443,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1438,7 +1456,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects\/{project_id}`",
+                      "description": "Required. The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects\/{project_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1464,6 +1482,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1476,7 +1495,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "The data source in the form:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
+                      "description": "Required. The data source in the form:\n`projects\/{project_id}\/dataSources\/{data_source_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/dataSources\/[^\/]+$",
@@ -1494,6 +1513,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1510,7 +1530,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects\/{project_id}\/locations\/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
+                      "description": "Required. The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects\/{project_id}\/locations\/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1522,7 +1542,7 @@
                       "type": "string"
                     },
                     "versionInfo": {
-                      "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \u201Cnone+gsession\u201D response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
+                      "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \"none+gsession\" response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
                       "location": "query",
                       "type": "string"
                     }
@@ -1560,13 +1580,13 @@
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Required list of fields to be updated in this request.",
+                      "description": "Required. Required list of fields to be updated in this request.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
                     },
                     "versionInfo": {
-                      "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \u201Cnone+gsession\u201D response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
+                      "description": "Optional version info. If users want to find a very recent access token,\nthat is, immediately after approving access, users have to set the\nversion_info claim in the token request. To obtain the version_info, users\nmust use the \"none+gsession\" response type. which be return a\nversion_info back in the authorization response which be be put in a JWT\nclaim in the token request.",
                       "location": "query",
                       "type": "string"
                     }
@@ -1592,7 +1612,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1618,7 +1638,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}`",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1633,6 +1653,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1645,7 +1666,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "The BigQuery project id for which data sources\nshould be returned: `projects\/{project_id}`.",
+                      "description": "Required. The BigQuery project id for which data sources\nshould be returned: `projects\/{project_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
@@ -1677,6 +1698,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ],
@@ -1689,7 +1711,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "Transfer configuration name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
+                      "description": "Required. Transfer configuration name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1752,7 +1774,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "name": {
-                          "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
+                          "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+\/runs\/[^\/]+$",
@@ -1767,6 +1789,7 @@
                       },
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/bigquery.readonly",
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only"
                       ],
@@ -1779,7 +1802,7 @@
                       "httpMethod": "DELETE",
                       "parameters": {
                         "name": {
-                          "description": "The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
+                          "description": "Required. The field will contain name of the resource requested, for example:\n`projects\/{project_id}\/transferConfigs\/{config_id}\/runs\/{run_id}`",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+\/runs\/[^\/]+$",
@@ -1805,7 +1828,7 @@
                       "httpMethod": "GET",
                       "parameters": {
                         "parent": {
-                          "description": "Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
+                          "description": "Required. Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects\/{project_id}\/transferConfigs\/{config_id}`.",
                           "location": "path",
                           "required": true,
                           "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+$",
@@ -1854,6 +1877,7 @@
                       },
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/bigquery.readonly",
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only"
                       ],
@@ -1871,7 +1895,7 @@
                           "httpMethod": "GET",
                           "parameters": {
                             "parent": {
-                              "description": "Transfer run name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_Id}\/runs\/{run_id}`.",
+                              "description": "Required. Transfer run name in the form:\n`projects\/{project_id}\/transferConfigs\/{config_Id}\/runs\/{run_id}`.",
                               "location": "path",
                               "required": true,
                               "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/transferConfigs\/[^\/]+\/runs\/[^\/]+$",
@@ -1909,6 +1933,7 @@
                           },
                           "scopes": [
                             "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/bigquery.readonly",
                             "https://www.googleapis.com/auth/cloud-platform",
                             "https://www.googleapis.com/auth/cloud-platform.read-only"
                           ],

@@ -11,8 +11,7 @@ platform/bq/bq_flags.py
 platform/bq/bq_utils.py
 platform/bq/discovery/httpswwwgoogleapiscom.bigquery.v2.rest.json
 platform/bq/discovery_next/bigquery.json
-platform/bq/discovery_next/bigqueryconnection-discovery.json
-platform/bq/discovery_next/routines-discovery.json
+platform/bq/discovery_next/iam-policy.json
 platform/bq/remove_pyreadline.py
 platform/bq/table_formatter.py
 platform/bq/table_formatter_test.py

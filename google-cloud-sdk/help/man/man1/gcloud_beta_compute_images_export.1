@@ -60,8 +60,7 @@ image, the latest non\-deprecated image associated with that family is used.
 .RS 2m
 .TP 2m
 \fB\-\-async\fR
-Display information about the operation in progress, without waiting for the
-operation to complete.
+Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
 \fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR
@@ -88,9 +87,8 @@ default project is used.
 .RS 2m
 .TP 2m
 \fB\-\-log\-location\fR=\fILOG_LOCATION\fR
-Directory in Google Cloud Storage to hold build logs. If not set,
-\f5gs://<project num>.cloudbuild\-logs.googleusercontent.com/\fR will be created
-and used.
+Directory in Cloud Storage to hold build logs. If not set, \f5gs://<project
+num>.cloudbuild\-logs.googleusercontent.com/\fR is created and used.
 
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR
@@ -107,9 +105,9 @@ in custom subnet mode, then this field should be specified.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="2h"
-Maximum time a build can last before it is failed as "TIMEOUT". For example,
-specifying \f5\fI2h\fR\fR will fail the process after 2 hours. See $ gcloud
-topic datetimes for information on duration formats.
+Maximum time a build can last before it fails as "TIMEOUT". For example,
+specifying \f52h\fR fails the process after 2 hours. See $ gcloud topic
+datetimes for information about duration formats.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR

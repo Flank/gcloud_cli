@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -62,6 +61,7 @@ class HealthChecksListTest(test_base.BaseTest,
             health-check-https  HTTPS
             health-check-tcp    TCP
             health-check-ssl    SSL
+            health-check-http2  HTTP2
             """), normalize_space=True)
 
   def testTableOutputHttp(self):
@@ -98,6 +98,24 @@ class HealthChecksListTest(test_base.BaseTest,
         textwrap.dedent("""\
             NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
             health-check-https  HTTPS    www.example.com 443  /            PROXY_V1
+            """),
+        normalize_space=True)
+
+  def testTableOutputHttp2(self):
+    self.Run("""
+        compute health-checks list --protocol http2
+        """)
+    self.mock_get_global_resources.assert_called_once_with(
+        service=self.compute.healthChecks,
+        project='my-project',
+        http=self.mock_http(),
+        filter_expr=None,
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
+            health-check-http2  HTTP2    www.example.com 443  /            PROXY_V1
             """),
         normalize_space=True)
 
@@ -225,6 +243,7 @@ class HealthChecksListTest(test_base.BaseTest,
             'health-check-https',
             'health-check-ssl',
             'health-check-tcp',
+            'health-check-http2',
         ],
         cli=self.cli,
     )
@@ -240,80 +259,14 @@ class HealthChecksListTest(test_base.BaseTest,
 class HealthChecksListBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
-    lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
-    self.addCleanup(lister_patcher.stop)
-    self.mock_get_global_resources = lister_patcher.start()
-    self.mock_get_global_resources.return_value = (
-        resource_projector.MakeSerializable(test_resources.HEALTH_CHECKS_BETA))
+    self._api = 'beta'
+    self.SelectApi('beta')
+    self._compute_api = self.compute_beta
+    self._uri_prefix = 'https://compute.googleapis.com/compute/beta/projects/my-project/'
 
-  def testTableOutputNoProtocol(self):
-    self.Run("""
-        compute health-checks list
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL
-            health-check-http2  HTTP2
-            """),
-        normalize_space=True)
+    self._Setup()
 
-  def testTableOutputHttp2(self):
-    self.Run("""
-        compute health-checks list --protocol http2
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL HOST            PORT REQUEST_PATH PROXY_HEADER
-            health-check-http2  HTTP2    www.example.com 80   /            NONE
-            """),
-        normalize_space=True)
-
-  def testTableOutputListByNameHTTP2(self):
-    # List a specific health check by name.
-    self.Run("""
-        compute health-checks list health-check-http2
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL
-            health-check-http2  HTTP2
-            """),
-        normalize_space=True)
-
-
-class HealthChecksListAlphaTest(test_base.BaseTest):
-
-  URI_PREFIX = 'https://www.googleapis.com/compute/alpha/projects/my-project/'
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self._compute_api = self.compute_alpha
-
+  def _Setup(self):
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)
@@ -328,10 +281,10 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
                 port=8080,
                 portName='happy-http-port',
                 requestPath='/testpath',
-                proxyHeader=(self.messages.HTTPHealthCheck.
-                             ProxyHeaderValueValuesEnum.PROXY_V1)),
-            selfLink=(
-                self.URI_PREFIX + 'global/healthChecks/health-check-http-1')),
+                proxyHeader=(self.messages.HTTPHealthCheck
+                             .ProxyHeaderValueValuesEnum.PROXY_V1)),
+            selfLink=(self._uri_prefix +
+                      'global/healthChecks/health-check-http-1')),
         self.messages.HealthCheck(
             name='health-check-http-2',
             type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP,
@@ -339,10 +292,10 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
                 host='www.example.com',
                 port=80,
                 requestPath='/',
-                proxyHeader=self.messages.HTTPHealthCheck.
-                ProxyHeaderValueValuesEnum.NONE),
-            selfLink=(
-                self.URI_PREFIX + 'global/healthChecks/health-check-http-2')),
+                proxyHeader=self.messages.HTTPHealthCheck
+                .ProxyHeaderValueValuesEnum.NONE),
+            selfLink=(self._uri_prefix +
+                      'global/healthChecks/health-check-http-2')),
     ]
     self.region_health_checks = [
         self.messages.HealthCheck(
@@ -353,9 +306,9 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
                 portName='happy-tcp-port',
                 request='req',
                 response='ack',
-                proxyHeader=self.messages.TCPHealthCheck.
-                ProxyHeaderValueValuesEnum.NONE),
-            selfLink=(self.URI_PREFIX +
+                proxyHeader=self.messages.TCPHealthCheck
+                .ProxyHeaderValueValuesEnum.NONE),
+            selfLink=(self._uri_prefix +
                       'regions/region-1/healthChecks/health-check-tcp'),
             region='region-1'),
         self.messages.HealthCheck(
@@ -366,43 +319,44 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
                 portName='happy-ssl-port',
                 request='req',
                 response='ack',
-                proxyHeader=(self.messages.SSLHealthCheck.
-                             ProxyHeaderValueValuesEnum.PROXY_V1)),
-            selfLink=(self.URI_PREFIX +
+                proxyHeader=(self.messages.SSLHealthCheck
+                             .ProxyHeaderValueValuesEnum.PROXY_V1)),
+            selfLink=(self._uri_prefix +
                       'regions/region-1/healthChecks/health-check-ssl'),
             region='region-1')
     ]
 
   def testGlobalOption(self):
-    command = 'alpha compute health-checks list --uri --global'
+    command = self._api + ' compute health-checks list --uri --global'
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-http-1
-        https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-http-2
-    """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/global/healthChecks/health-check-http-1
+        https://compute.googleapis.com/compute/{0}/projects/my-project/global/healthChecks/health-check-http-2
+    """.format(self._api))
 
     self.RequestOnlyGlobal(command, self.health_checks, output)
 
   def testOneRegion(self):
-    command = 'alpha compute health-checks list --uri --regions region-1'
+    command = self._api + ' compute health-checks list --uri --regions region-1'
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/healthChecks/health-check-tcp
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/healthChecks/health-check-ssl
-        """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-tcp
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-ssl
+        """.format(self._api))
 
     self.RequestOneRegion(command, self.region_health_checks, output)
 
   def testTwoRegions(self):
-    command = ('alpha compute health-checks list --uri --regions '
-               'region-1,region-2')
+    command = (
+        self._api + ' compute health-checks list --uri --regions '
+        'region-1,region-2')
     output = ("""\
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/healthChecks/health-check-tcp
-        https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/healthChecks/health-check-ssl
-        """)
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-tcp
+        https://compute.googleapis.com/compute/{0}/projects/my-project/regions/region-1/healthChecks/health-check-ssl
+        """.format(self._api))
 
     self.RequestTwoRegions(command, self.region_health_checks, output)
 
   def testAggregateList(self):
-    command = 'alpha compute health-checks list'
+    command = self._api + ' compute health-checks list'
     return_value = self.health_checks + self.region_health_checks
     output = ("""\
         NAME PROTOCOL
@@ -415,7 +369,7 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
     self.RequestAggregate(command, return_value, output)
 
   def testAggregateListWithProtocol(self):
-    command = 'alpha compute health-checks list --protocol http'
+    command = self._api + ' compute health-checks list --protocol http'
     return_value = self.health_checks + self.region_health_checks
     output = ("""\
         NAME PROTOCOL HOST PORT REQUEST_PATH PROXY_HEADER
@@ -491,6 +445,17 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
         errors=[])
 
     self.AssertOutputEquals(textwrap.dedent(output), normalize_space=True)
+
+
+class HealthChecksListAlphaTest(HealthChecksListBetaTest):
+
+  def SetUp(self):
+    self._api = 'alpha'
+    self.SelectApi('alpha')
+    self._compute_api = self.compute_alpha
+    self._uri_prefix = 'https://compute.googleapis.com/compute/alpha/projects/my-project/'
+
+    self._Setup()
 
 
 if __name__ == '__main__':

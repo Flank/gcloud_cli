@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2019 Google Inc. All Rights Reserved.
+# Copyright 2019 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ class ScanConfigsUpdateTestAlpha(base.WebSecurityScannerScanConfigsBase):
         exportToSecurityCommandCenter=self.export['ENABLED'],
         targetPlatforms=[
             self.platforms['app_engine'], self.platforms['compute']
-        ])
+        ],
+        riskLevel=self.risk_level['normal'])
 
   def testUpdate_changeDisplayName(self):
     response = copy.deepcopy(self.base_scan_config)
@@ -194,6 +195,22 @@ class ScanConfigsUpdateTestAlpha(base.WebSecurityScannerScanConfigsBase):
     result = self.Run(
         ('web-security-scanner scan-configs update {} '
          '--user-agent=chrome_android').format(self.scan_config_name))
+
+    self.assertEqual(result, response)
+
+  def testUpdate_changeRiskLevel(self):
+    response = copy.deepcopy(self.base_scan_config)
+    response.riskLevel = self.risk_level['low']
+    modified = copy.deepcopy(self.default_scan_config)
+    modified.riskLevel = self.risk_level['low']
+    self.client.projects_scanConfigs.Patch.Expect(
+        self.messages.WebsecurityscannerProjectsScanConfigsPatchRequest(
+            name=self.scan_config_name,
+            scanConfig=modified,
+            updateMask='riskLevel'), response)
+
+    result = self.Run(('web-security-scanner scan-configs update {} '
+                       '--risk-level=low').format(self.scan_config_name))
 
     self.assertEqual(result, response)
 

@@ -11,7 +11,7 @@ gcloud beta compute networks update \- update a Google Compute Engine network
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute networks update\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute networks update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,10 @@ Name of the network to operate on.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
 .TP 2m
 
 At most one of these may be specified:

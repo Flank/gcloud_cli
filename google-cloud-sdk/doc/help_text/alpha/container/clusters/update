@@ -5,26 +5,39 @@ NAME
 SYNOPSIS
     gcloud alpha container clusters update NAME
         (--complete-credential-rotation | --complete-ip-rotation
-          | --enable-autoscaling | --enable-binauthz
+          | --database-encryption-key=DATABASE_ENCRYPTION_KEY
+          | --disable-database-encryption | --disable-default-snat
+          | --disable-workload-identity | --enable-autoscaling
+          | --enable-binauthz | --enable-cost-management
           | --enable-intra-node-visibility | --enable-legacy-authorization
           | --enable-master-authorized-networks | --enable-network-policy
           | --enable-peering-route-sharing | --enable-pod-security-policy
+          | --enable-shielded-nodes | --enable-stackdriver-kubernetes
           | --enable-vertical-pod-autoscaling | --generate-password
-          | --maintenance-window=MAINTENANCE_WINDOW | --remove-labels=[KEY,...]
+          | --identity-namespace=IDENTITY_NAMESPACE
+          | --maintenance-window=START_TIME | --remove-labels=[KEY,...]
           | --security-profile=SECURITY_PROFILE | --set-password
           | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
-          | --node-locations=ZONE,[ZONE,...]
+          | --node-locations=ZONE,[ZONE,...] | --clear-maintenance-window
+          | --remove-maintenance-exclusion=NAME
+          | [--add-maintenance-exclusion-end=TIME_STAMP
+          : --add-maintenance-exclusion-name=NAME
+          --add-maintenance-exclusion-start=TIME_STAMP]
+          | --maintenance-window-end=TIME_STAMP
+          --maintenance-window-recurrence=RRULE
+          --maintenance-window-start=TIME_STAMP
           | --clear-resource-usage-bigquery-dataset
           | --enable-network-egress-metering
+          --enable-resource-consumption-metering
           --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
           | [--enable-autoprovisioning
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
-          | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY : --min-cpu=MIN_CPU
-          --min-memory=MIN_MEMORY
+          | --autoprovisioning-locations=ZONE,[ZONE,...] --max-cpu=MAX_CPU
+          --max-memory=MAX_MEMORY --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
           [--max-accelerator=[type=TYPE,count=COUNT,...]
-          : --min-accelerator=[type=TYPE,count=COUNT,...]]]]
+          : --min-accelerator=[type=TYPE,count=COUNT,...]]]
           | --logging-service=LOGGING_SERVICE
           --monitoring-service=MONITORING_SERVICE
           | --password=PASSWORD --enable-basic-auth
@@ -63,6 +76,40 @@ REQUIRED FLAGS
           This causes the cluster to stop serving its old IP, and return to a
           single IP state.
 
+       --database-encryption-key=DATABASE_ENCRYPTION_KEY
+          Enable Database Encryption.
+
+          Enable database encryption that will be used to encrypt Kubernetes
+          Secrets at the application layer. The key provided should be the
+          resource ID in the format of
+          projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+          For more information, see
+          <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+
+       --disable-database-encryption
+          Disable database encryption.
+
+          Disable Database Encryption which encrypt Kubernetes Secrets at the
+          application layer. For more information, see
+          <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+
+       --disable-default-snat
+          Disable default source NAT rules applied in cluster nodes.
+
+          By default, network traffic sending from Pods to outside of VPC will
+          get masqueraded by the node external IP. When this flag is set, no
+          default sNAT will be enforced on the cluster. The flag must be set if
+          the cluster uses privately used public IPs.
+
+          Can only be used with private cluster in VPC Native network mode.
+
+       --disable-workload-identity
+          Disable Workload Identity on the cluster.
+
+          For more information on Workload Identity, see
+
+              https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+
        --enable-autoscaling
           Enables autoscaling for a node pool.
 
@@ -72,16 +119,25 @@ REQUIRED FLAGS
        --enable-binauthz
           Enable Binary Authorization for this cluster.
 
+       --enable-cost-management
+          Enable the cost management feature.
+
+          When enabled, you can get informational GKE cost breakdowns by
+          cluster, namespace and label in your billing data exported to
+          BigQuery
+          (https://cloud.google.com/billing/docs/how-to/export-data-bigquery).
+
+          Use --no-enable-cost-management to disable this feature.
+
        --enable-intra-node-visibility
           Enable Intra-node visibility for this cluster.
 
-          Enabling intra-node visibility makes your intra-node pod to pod
+          Enabling intra-node visibility makes your intra-node pod-to-pod
           traffic visible to the networking fabric. With this feature, you can
           use VPC flow logging or other VPC features for intra-node traffic.
 
-          This is a beta feature, enabling it on existing cluster causes the
-          cluster master and the cluster nodes to restart, which might cause
-          disruption.
+          Enabling it on an existing cluster causes the cluster master and the
+          cluster nodes to restart, which might cause a disruption.
 
        --enable-legacy-authorization
           Enables the legacy ABAC authentication for the cluster. User rights
@@ -124,6 +180,13 @@ REQUIRED FLAGS
           PodSecurityPolicy API objects. For more information, see
           https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies.
 
+       --enable-shielded-nodes
+          Enable Shielded Nodes for this cluster. Enabling Shielded Nodes will
+          enable a more secure Node credential bootstrapping implementation.
+
+       --enable-stackdriver-kubernetes
+          Enable Stackdriver Kubernetes monitoring and logging.
+
        --enable-vertical-pod-autoscaling
           Enables vertical pod autoscaling for a cluster.
 
@@ -131,7 +194,21 @@ REQUIRED FLAGS
           Ask the server to generate a secure password and use that as the
           basic auth password, keeping the existing username.
 
-       --maintenance-window=MAINTENANCE_WINDOW
+       --identity-namespace=IDENTITY_NAMESPACE
+          Enable Workload Identity on the cluster.
+
+          When enabled, Kubernetes service accounts will be able to act as
+          Cloud IAM Service Accounts, through the provided identity namespace.
+
+          Currently, the only accepted identity namespace is the identity
+          namespace of the Cloud project containing the cluster,
+          PROJECT_NAME.svc.id.goog.
+
+          For more information on Workload Identity, see
+
+              https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+
+       --maintenance-window=START_TIME
           Set a time of day when you prefer maintenance to start on this
           cluster. For example:
 
@@ -140,7 +217,14 @@ REQUIRED FLAGS
 
           The time corresponds to the UTC time zone, and must be in HH:MM
           format. To remove an existing maintenance window from the cluster,
-          use '--maintenance-window=None'
+          use '--maintenance-window=None'.
+
+          Non-emergency maintenance will occur in the 4 hour block starting at
+          the specified time.
+
+          This is mutually exclusive with the recurring maintenance windows and
+          will overwrite any existing window. Compatible with maintenance
+          exclusions.
 
        --remove-labels=[KEY,...]
           Labels to remove from the Google Cloud resources in use by the
@@ -246,6 +330,84 @@ REQUIRED FLAGS
                     --zone us-central1-a \
                     --node-locations us-central1-a,us-central1-b
 
+       At most one of these may be specified:
+
+         --clear-maintenance-window
+            If set, remove the maintenance window that was set with
+            --maintenance-window family of flags.
+
+         --remove-maintenance-exclusion=NAME
+            Name of a maintenance exclusion to remove. If you hadn't specified
+            a name, one was auto-generated. Get it with $ gcloud container
+            clusters describe.
+
+         Sets a period of time in which maintenance should not occur. This is
+         compatible with both daily and recurring maintenance windows.
+
+         Example:
+
+             $ gcloud alpha container clusters update example-cluster   \
+                 --add-maintenance-exclusion-name=holidays-2000   \
+                 --add-maintenance-exclusion-start=2000-11-20T00:00:00   \
+                 --add-maintenance-exclusion-end=2000-12-31T23:59:59
+
+           --add-maintenance-exclusion-end=TIME_STAMP
+              End time of the exclusion window. Must take place after the start
+              time. See $ gcloud topic datetimes for information on time
+              formats. This flag must be specified if any of the other
+              arguments in this group are specified.
+
+           --add-maintenance-exclusion-name=NAME
+              A descriptor for the exclusion that can be used to remove it. If
+              not specified, it will be autogenerated.
+
+           --add-maintenance-exclusion-start=TIME_STAMP
+              Start time of the exclusion window (can occur in the past). If
+              not specified, the current time will be used. See $ gcloud topic
+              datetimes for information on time formats.
+
+         Set a flexible maintenance window by specifying a window that recurs
+         per an RFC 5545 RRULE. Non-emergency maintenance will occur in the
+         recurring windows.
+
+         Examples:
+
+         For a 9-5 Mon-Wed UTC-4 maintenance window:
+
+             $ gcloud alpha container clusters update example-cluster   \
+                 --maintenance-window-start=2000-01-01T09:00:00-04:00   \
+                 --maintenance-window-end=2000-01-01T17:00:00-04:00   \
+                 --maintenance-window-recurrence='FREQ=WEEKLY;BYDAY=MO,TU,WE'
+
+         For a daily window from 22:00 - 04:00 UTC:
+
+             $ gcloud alpha container clusters update example-cluster   \
+                 --maintenance-window-start=2000-01-01T22:00:00Z   \
+                 --maintenance-window-end=2000-01-02T04:00:00Z   \
+                 --maintenance-window-recurrence=FREQ=DAILY
+
+           --maintenance-window-end=TIME_STAMP
+              End time of the first window (can occur in the past). Must take
+              place after the start time. The difference in start and end time
+              specifies the length of each recurrence. See $ gcloud topic
+              datetimes for information on time formats. This flag must be
+              specified if any of the other arguments in this group are
+              specified.
+
+           --maintenance-window-recurrence=RRULE
+              An RFC 5545 RRULE, specifying how the window will recur. Note
+              that minimum requirements for maintenance periods will be
+              enforced. Note that FREQ=SECONDLY, MINUTELY, and HOURLY are not
+              supported. This flag must be specified if any of the other
+              arguments in this group are specified.
+
+           --maintenance-window-start=TIME_STAMP
+              Start time of the first window (can occur in the past). The start
+              time influences when the window will start for recurrences. See $
+              gcloud topic datetimes for information on time formats. This flag
+              must be specified if any of the other arguments in this group are
+              specified.
+
        Exports cluster's usage of cloud resources At most one of these may be
        specified:
 
@@ -262,6 +424,19 @@ REQUIRED FLAGS
 
             Network egress metering is disabled if this flag is omitted, or
             when --no-enable-network-egress-metering is set.
+
+         --enable-resource-consumption-metering
+            Enable resource consumption metering on this cluster.
+
+            When enabled, a table will be created in the specified BigQuery
+            dataset to store resource consumption data. The resulting table can
+            be joined with the resource usage table or with BigQuery billing
+            export.
+
+            To disable resource consumption metering, set
+            --no-enable-resource-consumption- metering. If this flag is
+            omitted, then resource consumption metering will remain enabled or
+            disabled depending on what is already configured for this cluster.
 
          --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET
             The name of the BigQuery dataset to which the cluster's usage of
@@ -290,8 +465,8 @@ REQUIRED FLAGS
            --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
               Path of the JSON/YAML file which contains information about the
               cluster's node autoprovisioning configuration. Currently it
-              contains a list of resource limits and identity defaults for
-              autoprovisioning.
+              contains a list of resource limits, identity defaults for
+              autoprovisioning and node locations for autoprovisioning.
 
               Resource limits are specified in the field 'resourceLimits'. Each
               resource limits definition contains three fields: resourceType,
@@ -311,21 +486,29 @@ REQUIRED FLAGS
               information on defaults, look at:
               https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
 
+              Autoprovisioning locations is a set of zones where new node pools
+              can be created by Autoprovisioning. Autoprovisioning locations
+              are specified in the field 'autoprovisioningLocations'. All zones
+              must be in the same region as the cluster's master(s).
+
            Flags to configure autoprovisioned nodes
+
+             --autoprovisioning-locations=ZONE,[ZONE,...]
+                Set of zones where new node pools can be created by
+                autoprovisioning. All zones must be in the same region as the
+                cluster's master(s). Multiple locations can be specified,
+                separated by commas.
 
              --max-cpu=MAX_CPU
                 Maximum number of cores in the cluster.
 
-                Maximum number of cores to which the cluster can scale. This
-                flag must be specified if any of the other arguments in this
-                group are specified.
+                Maximum number of cores to which the cluster can scale.
 
              --max-memory=MAX_MEMORY
                 Maximum memory in the cluster.
 
                 Maximum number of gigabytes of memory to which the cluster can
-                scale. This flag must be specified if any of the other
-                arguments in this group are specified.
+                scale.
 
              --min-cpu=MIN_CPU
                 Minimum number of cores in the cluster.
@@ -410,7 +593,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --async
-        Don't wait for the operation to complete.
+        Return immediately, without waiting for the operation in progress to
+        complete.
 
      --istio-config=[auth=MTLS_PERMISSIVE,...]
         Configurations for Istio addon, requires --addons contains Istio for
@@ -466,9 +650,8 @@ GCLOUD WIDE FLAGS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. These variants are also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
         $ gcloud container clusters update
         $ gcloud beta container clusters update

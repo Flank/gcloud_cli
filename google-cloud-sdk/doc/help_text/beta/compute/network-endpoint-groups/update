@@ -3,39 +3,18 @@ NAME
         Compute Engine network endpoint group
 
 SYNOPSIS
-    gcloud beta compute network-endpoint-groups update NAME [--zone=ZONE]
-        [--add-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]
-          | --remove-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute network-endpoint-groups update NAME
+        (--add-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]
+          | --remove-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT])
+        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 POSITIONAL ARGUMENTS
      NAME
         Name of the network endpoint group to operate on.
 
-FLAGS
-     --zone=ZONE
-        Zone of the network endpoint group to operate on. If not specified and
-        the compute/zone property isn't set, you may be prompted to select a
-        zone.
-
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
-
-            $ gcloud config set compute/zone ZONE
-
-        A list of zones can be fetched by running:
-
-            $ gcloud compute zones list
-
-        To unset the property, run:
-
-            $ gcloud config unset compute/zone
-
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
-
+REQUIRED FLAGS
      These flags can be specified multiple times to add/remove multiple
-     endpoints. At most one of these may be specified:
+     endpoints. Exactly one of these must be specified:
 
        --add-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]
           The network endpoint to add to the network endpoint group. Allowed
@@ -76,6 +55,28 @@ FLAGS
 
             + port - Optional port for the network endpoint. Required if the
               network endpoint type is GCE_VM_IP_PORT.
+
+OPTIONAL FLAGS
+     --zone=ZONE
+        Zone of the network endpoint group to operate on. If not specified and
+        the compute/zone property isn't set, you may be prompted to select a
+        zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

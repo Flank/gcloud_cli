@@ -13,7 +13,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/fake-project/zones?alt=json&maxResults=500
+          uri: https://compute.googleapis.com/compute/v1/projects/fake-project/zones?alt=json&maxResults=500
           method: GET
           body: null
         return_response:
@@ -24,7 +24,7 @@ actions:
              "id": "projects/fake-project/zones",
              "items": [],
              "kind": "compute#zoneList",
-             "selfLink": "https://www.googleapis.com/compute/v1/projects/fake-project/zones"
+             "selfLink": "https://compute.googleapis.com/compute/v1/projects/fake-project/zones"
             }
 
     - expect_stderr: |

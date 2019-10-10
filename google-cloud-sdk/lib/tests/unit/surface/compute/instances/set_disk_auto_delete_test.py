@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
             disks=[
                 messages.AttachedDisk(
                     deviceName='device-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/us-central1-a/disks/disk-1')),
                 messages.AttachedDisk(
                     deviceName='device-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/us-central1-a/disks/disk-2')),
             ])],
 
@@ -153,8 +153,8 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute instances set-disk-auto-delete
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/instance-1
-          --disk https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/disks/disk-1
+          https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/instance-1
+          --disk https://compute.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/disks/disk-1
           --auto-delete
         """)
 
@@ -189,11 +189,11 @@ class InstancesSetDiskAutoDeleteTest(test_base.BaseTest):
             disks=[
                 messages.AttachedDisk(
                     deviceName='device-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/us-central1-a/disks/disk-1')),
                 messages.AttachedDisk(
                     deviceName='device-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=('https://compute.googleapis.com/compute/v1/projects/'
                             'my-project/zones/us-central1-a/disks/disk-2')),
             ])],
 

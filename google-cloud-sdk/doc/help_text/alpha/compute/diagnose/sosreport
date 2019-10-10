@@ -11,30 +11,32 @@ SYNOPSIS
           default="/tmp/git-sosreport"] [--ssh-flag=SSH_FLAG]
         [--ssh-key-file=SSH_KEY_FILE]
         [--strict-host-key-checking=STRICT_HOST_KEY_CHECKING] [--user=USER]
-        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--zone=ZONE]
+        [--ssh-key-expiration=SSH_KEY_EXPIRATION
+          | --ssh-key-expire-after=SSH_KEY_EXPIRE_AFTER] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command is designed to obtain relevant debug information from
-    a VM in a        stardard way for expediting support cases.
+    a VM in a standard way for expediting support cases.
 
-        The actual information scraping is done by the Sosreport tool
-        (https://github.com/sosreport/sos). This command is a wrapper that handles
-        installation, running and (optionally) copying the result.
+    The actual information scraping is done by the Sosreport tool
+    (https://github.com/sosreport/sos). This command is a wrapper that handles
+    installation, running and (optionally) copying the result.
 
-        The location of the tool download and report generation are defaulted to the
-        /tmp directory, but can be modified through flags. You can use the
-        --download-dir flag to specify a location where the command can download the
-        resulting from the VM.
+    The location of the tool download and report generation are defaulted to
+    the /tmp directory, but can be modified through flags. The user can use the
+    --download-dir flag to specify a location where the command can download
+    the resulting from the VM.
 
-        NOTE: For this command to work, git needs to be installed within the VM, in
-        order to clone the repository and run the code from there.
+    NOTE: For this command to work, git needs to be installed within the VM, in
+    order to clone the repository and run the code from there.
 
-        NOTE: Sosreport is somewhat geared towards Python 3.x, as it uses APIs that
-        had to be back-ported to Python 2.7 (notably concurrent). If the default
-        installation of Python is 2.7, it is possible that the Sosreport run fails.
-        To fix this either install the dependencies for Python 2.7 or use
-    --python-path to specify the path to another Python installation that
-    works,        normally it being a Python 3.x binary.
+    NOTE: Sosreport is somewhat geared towards Python 3.x, as it uses APIs that
+    had to be back-ported to Python 2.7 (notably concurrent). If the default
+    installation of Python is 2.7, it is possible that the Sosreport run fails.
+    To fix this either install the dependencies for Python 2.7 or use
+    python-path to specify the path to another Python installation that works,
+    normally it being a Python 3.x binary.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
@@ -106,13 +108,13 @@ FLAGS
         will be used.
 
      --zone=ZONE
-        Zone of the instance to run Sosreport on. If not specified, you may be
-        prompted to select a zone. gcloud will attempt to identify the zone by
-        searching for resources in your project. If the zone cannot be
-        determined, you will then be prompted with all Google Cloud Platform
-        zones.
+        Zone of the instance to run Sosreport on. If not specified, the user
+        may be prompted to select a zone. gcloud will attempt to identify the
+        zone by searching for resources in the user's project. If the zone
+        cannot be determined, the user will then be prompted with all Google
+        Cloud Platform zones.
 
-        To avoid prompting when this flag is omitted, you can set the
+        To avoid prompting when this flag is omitted, the user can set the
         compute/zone property:
 
             $ gcloud config set compute/zone ZONE
@@ -128,6 +130,19 @@ FLAGS
         Alternatively, the zone can be stored in the environment variable
         CLOUDSDK_COMPUTE_ZONE.
 
+     At most one of these may be specified:
+
+       --ssh-key-expiration=SSH_KEY_EXPIRATION
+          The time when the ssh key will be valid until, such as
+          "2017-08-29T18:52:51.142Z." This is only valid if the instance is not
+          using OS Login. See $ gcloud topic datetimes for information on time
+          formats.
+
+       --ssh-key-expire-after=SSH_KEY_EXPIRE_AFTER
+          The maximum length of time an SSH key is valid for once created and
+          installed, e.g. 2m for 2 minutes. See $ gcloud topic datetimes for
+          information on duration formats.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
     --configuration, --flags-file, --flatten, --format, --help,
@@ -135,11 +150,14 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To obtain relevant debug information from a VM, run:
+
+        $ gcloud alpha compute diagnose sosreport
+
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
 

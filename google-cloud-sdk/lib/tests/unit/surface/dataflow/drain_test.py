@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,15 +37,6 @@ class DrainUnitTest(base.DataflowMockingTestBase,
     pass
 
   def testDrainSuccess(self):
-    self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._DrainReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
-
-    self.Run('beta dataflow jobs drain ' + JOB_1_ID)
-    self.AssertErrEquals("""\
-Started draining job [{0}]
-""".format(JOB_1_ID, normalize_space=True))
-
-  def testDrainSuccessWithRegion(self):
     my_region = 'europe-west1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
         request=self._DrainReq(JOB_1_ID, region=my_region),
@@ -56,21 +47,37 @@ Started draining job [{0}]
 Started draining job [{0}]
 """.format(JOB_1_ID, normalize_space=True))
 
+  def testDrainSuccessNoRegion(self):
+    self.mocked_client.projects_locations_jobs.Update.Expect(
+        request=self._DrainReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
+
+    self.Run('beta dataflow jobs drain ' + JOB_1_ID)
+    self.AssertErrEquals("""\
+WARNING: `--region` not set; defaulting to 'us-central1'. In an upcoming \
+release, users must specify a region explicitly. See \
+https://cloud.google.com/dataflow/docs/concepts/regional-endpoints \
+for additional details.
+Started draining job [{0}]
+""".format(JOB_1_ID, normalize_space=True))
+
   def testDrainContinuesOnFailure(self):
     my_region = 'us-central1'
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._DrainReq(JOB_1_ID), response=self.SampleJob(JOB_1_ID))
+        request=self._DrainReq(JOB_1_ID, region=my_region),
+        response=self.SampleJob(JOB_1_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._DrainReq(JOB_2_ID),
+        request=self._DrainReq(JOB_2_ID, region=my_region),
         exception=http_error.MakeHttpError(404))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._DrainReq(JOB_3_ID), response=self.SampleJob(JOB_3_ID))
+        request=self._DrainReq(JOB_3_ID, region=my_region),
+        response=self.SampleJob(JOB_3_ID))
     self.mocked_client.projects_locations_jobs.Update.Expect(
-        request=self._DrainReq(JOB_4_ID),
+        request=self._DrainReq(JOB_4_ID, region=my_region),
         exception=http_error.MakeHttpError(403))
 
-    self.Run('beta dataflow jobs drain {0} {1} {2} {3}'.format(
-        JOB_1_ID, JOB_2_ID, JOB_3_ID, JOB_4_ID, normalize_space=True))
+    self.Run('beta dataflow jobs drain --region={0} {1} {2} {3} {4}'.format(
+        my_region, JOB_1_ID, JOB_2_ID, JOB_3_ID, JOB_4_ID,
+        normalize_space=True))
     self.AssertErrEquals("""\
 Started draining job [{0}]
 Failed to drain job [{1}]: Resource not found. Please ensure you have \

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -135,22 +135,6 @@ class NatsTest(e2e_test_base.BaseTest):
     cmd = 'compute addresses delete {0} {1} --region {2}'.format(
         self.address_name_1, self.address_name_2, self.region)
     Retry(lambda: self.Run(cmd))
-
-
-class NatsTestBeta(NatsTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.network_name = next(e2e_utils.GetResourceNameGenerator(
-        prefix='routers-test-network'))
-    self.router_name = next(e2e_utils.GetResourceNameGenerator(
-        prefix='routers-test-router'))
-    self.nat_name = next(e2e_utils.GetResourceNameGenerator(
-        prefix='routers-test-nat'))
-    self.address_name_1 = next(
-        e2e_utils.GetResourceNameGenerator(prefix='routers-test-address-1'))
-    self.address_name_2 = next(
-        e2e_utils.GetResourceNameGenerator(prefix='routers-test-address-2'))
 
   def testLogging(self):
     self.Run('compute networks create {0} --subnet-mode custom'.format(

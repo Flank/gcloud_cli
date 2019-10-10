@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ class _BaseInstancesCloneTest(object):
   messages = core_apis.GetMessagesModule('sqladmin', 'v1beta4')
 
   def testSimpleClone(self):
+    self.ExpectInstanceGet(self.GetV2Instance('clone-instance-7'))
     self.mocked_client.instances.Clone.Expect(
         self.messages.SqlInstancesCloneRequest(
             instancesCloneRequest=self.messages.InstancesCloneRequest(
@@ -269,9 +270,16 @@ class _BaseInstancesCloneTest(object):
 NAME               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_ADDRESS  STATUS
 clone-instance-7a  MYSQL_5_5         us-central  D1    -               -                RUNNABLE
 """,
-        normalize_space=True)
+        normalize_space=True)\
+    # Ensure that the CMEK message doesn't show up by default.
+
+    self.AssertErrNotContains(
+        'Your clone will be encrypted with the source instance\'s '
+        'customer-managed encryption key. If anyone destroys this key, all '
+        'data encrypted with it will be permanently lost.')
 
   def testSimpleAsyncClone(self):
+    self.ExpectInstanceGet(self.GetV2Instance('clone-instance-7'))
     self.mocked_client.instances.Clone.Expect(
         self.messages.SqlInstancesCloneRequest(
             instancesCloneRequest=self.messages.InstancesCloneRequest(
@@ -398,7 +406,14 @@ targetProject: fake-project
 user: 170350250316@developer.gserviceaccount.com
 """)
 
-  def testCloneBinLog(self):
+  def testCloneBinLogFromCmekInstance(self):
+    diff = {
+        'name':
+            'clone-instance-7',
+        'diskEncryptionConfiguration':
+            self.messages.DiskEncryptionConfiguration(kmsKeyName='some-kms-key')
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
     self.mocked_client.instances.Clone.Expect(
         self.messages.SqlInstancesCloneRequest(
             instancesCloneRequest=self.messages.InstancesCloneRequest(
@@ -637,6 +652,11 @@ NAME               DATABASE_VERSION  LOCATION    TIER  PRIMARY_ADDRESS PRIVATE_A
 clone-instance-7a  MYSQL_5_5         us-central  D1    -               -               RUNNABLE
 """,
         normalize_space=True)
+    # Ensure that the CMEK message is showing up.
+    self.AssertErrContains(
+        'Your clone will be encrypted with the source instance\'s '
+        'customer-managed encryption key. If anyone destroys this key, all '
+        'data encrypted with it will be permanently lost.')
 
   def testCloneBinLogInvalidArgs(self):
     with self.assertRaisesRegex(

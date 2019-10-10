@@ -1,18 +1,33 @@
+skip:
+  reason: Failing
+  bug: b/141719694
 title: List recommendations
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: recommender recommendations list --project=cloud-sdk-integration-testing --location=global --recommender=google.iam.policy.RoleRecommender
+  - command: recommender recommendations list --project=cloud-sdk-integration-testing
+      --location=global --recommender=$$recommender$$
   - stderr: |
       matches: .*Listed 0 items.
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
+- define_reference:
+    reference: recommender
+    track_values:
+      ALPHA: google.iam.policy.RoleRecommender
+      BETA: google.iam.policy.Recommender
 - execute_command:
-    command: recommender recommendations list --project=cloud-sdk-integration-testing --location=global --recommender=google.iam.policy.RoleRecommender
+    command: recommender recommendations list --project=cloud-sdk-integration-testing
+      --location=global --recommender=$$recommender$$
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1alpha1/projects/cloud-sdk-integration-testing/locations/global/recommenders/google.iam.policy.RoleRecommender/recommendations?alt=json
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/global/recommenders/$$recommender$$/recommendations?alt=json
           method: GET
           headers: {}
           body: null

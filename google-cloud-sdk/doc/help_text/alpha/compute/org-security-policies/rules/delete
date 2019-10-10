@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha compute org-security-policies rules delete - delete a Google
+        Compute Engine organization security policy rule
+
+SYNOPSIS
+    gcloud alpha compute org-security-policies rules delete PRIORITY
+        --security-policy=SECURITY_POLICY [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute org-security-policies rules delete is used to
+    delete organization security policy rule.
+
+POSITIONAL ARGUMENTS
+     PRIORITY
+        Priority of the security policy rule to delete.
+
+REQUIRED FLAGS
+     --security-policy=SECURITY_POLICY
+        Resource ID of the security policy into which the rule should be
+        deleted.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

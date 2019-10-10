@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ from googlecloudsdk.command_lib.dataproc import flags
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import times
+import six
 
 
 def _CommonArgs(parser):
@@ -60,6 +61,60 @@ def _CommonArgs(parser):
             decommission), and the maximum allowed timeout is 1 day.
             See $ gcloud topic datetimes for information on duration formats.
             """)
+
+  idle_delete_group = parser.add_mutually_exclusive_group()
+  idle_delete_group.add_argument(
+      '--max-idle',
+      type=arg_parsers.Duration(),
+      help="""\
+      The duration before cluster is auto-deleted after last job finished,
+      such as "2h" or "1d".
+      See $ gcloud topic datetimes for information on duration formats.
+      """)
+  idle_delete_group.add_argument(
+      '--no-max-idle',
+      action='store_true',
+      help="""\
+      Cancels the cluster auto-deletion by cluster idle duration (configured
+       by --max-idle flag)
+      """)
+
+  auto_delete_group = parser.add_mutually_exclusive_group()
+  auto_delete_group.add_argument(
+      '--max-age',
+      type=arg_parsers.Duration(),
+      help="""\
+      The lifespan of the cluster before it is auto-deleted, such as
+      "2h" or "1d".
+      See $ gcloud topic datetimes for information on duration formats.
+      """)
+  auto_delete_group.add_argument(
+      '--expiration-time',
+      type=arg_parsers.Datetime.Parse,
+      help="""\
+      The time when cluster will be auto-deleted, such as
+      "2017-08-29T18:52:51.142Z". See $ gcloud topic datetimes for
+      information on time formats.
+      """)
+  auto_delete_group.add_argument(
+      '--no-max-age',
+      action='store_true',
+      help="""\
+      Cancels the cluster auto-deletion by maximum cluster age (configured by
+       --max-age or --expiration-time flags)
+      """)
+
+  # Can only specify one of --autoscaling-policy or --disable-autoscaling
+  autoscaling_group = parser.add_mutually_exclusive_group()
+  flags.AddAutoscalingPolicyResourceArgForCluster(
+      autoscaling_group, api_version='v1')
+  autoscaling_group.add_argument(
+      '--disable-autoscaling',
+      action='store_true',
+      help="""\
+      Disable autoscaling, if it is enabled. This is an alias for passing the
+      empty string to --autoscaling-policy',
+      """)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -121,44 +176,43 @@ class Update(base.UpdateCommand):
           'config.secondary_worker_config.num_instances')
       has_changes = True
 
-    if self.ReleaseTrack() == base.ReleaseTrack.BETA:
-      if args.autoscaling_policy:
-        cluster_config.autoscalingConfig = dataproc.messages.AutoscalingConfig(
-            policyUri=args.CONCEPTS.autoscaling_policy.Parse().RelativeName())
-        changed_fields.append('config.autoscaling_config.policy_uri')
-        has_changes = True
-      elif args.autoscaling_policy == '' or args.disable_autoscaling:  # pylint: disable=g-explicit-bool-comparison
-        # Disabling autoscaling. Don't need to explicitly set
-        # cluster_config.autoscaling_config to None.
-        changed_fields.append('config.autoscaling_config.policy_uri')
-        has_changes = True
+    if args.autoscaling_policy:
+      cluster_config.autoscalingConfig = dataproc.messages.AutoscalingConfig(
+          policyUri=args.CONCEPTS.autoscaling_policy.Parse().RelativeName())
+      changed_fields.append('config.autoscaling_config.policy_uri')
+      has_changes = True
+    elif args.autoscaling_policy == '' or args.disable_autoscaling:  # pylint: disable=g-explicit-bool-comparison
+      # Disabling autoscaling. Don't need to explicitly set
+      # cluster_config.autoscaling_config to None.
+      changed_fields.append('config.autoscaling_config.policy_uri')
+      has_changes = True
 
-      lifecycle_config = dataproc.messages.LifecycleConfig()
-      changed_config = False
-      if args.max_age is not None:
-        lifecycle_config.autoDeleteTtl = str(args.max_age) + 's'
-        changed_fields.append('config.lifecycle_config.auto_delete_ttl')
-        changed_config = True
-      if args.expiration_time is not None:
-        lifecycle_config.autoDeleteTime = times.FormatDateTime(
-            args.expiration_time)
-        changed_fields.append('config.lifecycle_config.auto_delete_time')
-        changed_config = True
-      if args.max_idle is not None:
-        lifecycle_config.idleDeleteTtl = str(args.max_idle) + 's'
-        changed_fields.append('config.lifecycle_config.idle_delete_ttl')
-        changed_config = True
-      if args.no_max_age:
-        lifecycle_config.autoDeleteTtl = None
-        changed_fields.append('config.lifecycle_config.auto_delete_ttl')
-        changed_config = True
-      if args.no_max_idle:
-        lifecycle_config.idleDeleteTtl = None
-        changed_fields.append('config.lifecycle_config.idle_delete_ttl')
-        changed_config = True
-      if changed_config:
-        cluster_config.lifecycleConfig = lifecycle_config
-        has_changes = True
+    lifecycle_config = dataproc.messages.LifecycleConfig()
+    changed_config = False
+    if args.max_age is not None:
+      lifecycle_config.autoDeleteTtl = six.text_type(args.max_age) + 's'
+      changed_fields.append('config.lifecycle_config.auto_delete_ttl')
+      changed_config = True
+    if args.expiration_time is not None:
+      lifecycle_config.autoDeleteTime = times.FormatDateTime(
+          args.expiration_time)
+      changed_fields.append('config.lifecycle_config.auto_delete_time')
+      changed_config = True
+    if args.max_idle is not None:
+      lifecycle_config.idleDeleteTtl = six.text_type(args.max_idle) + 's'
+      changed_fields.append('config.lifecycle_config.idle_delete_ttl')
+      changed_config = True
+    if args.no_max_age:
+      lifecycle_config.autoDeleteTtl = None
+      changed_fields.append('config.lifecycle_config.auto_delete_ttl')
+      changed_config = True
+    if args.no_max_idle:
+      lifecycle_config.idleDeleteTtl = None
+      changed_fields.append('config.lifecycle_config.idle_delete_ttl')
+      changed_config = True
+    if changed_config:
+      cluster_config.lifecycleConfig = lifecycle_config
+      has_changes = True
 
     # Put in a thunk so we only make this call if needed
     def _GetCurrentLabels():
@@ -201,11 +255,11 @@ class Update(base.UpdateCommand):
 
     if args.graceful_decommission_timeout is not None:
       request.gracefulDecommissionTimeout = (
-          str(args.graceful_decommission_timeout) + 's')
+          six.text_type(args.graceful_decommission_timeout) + 's')
 
     operation = dataproc.client.projects_regions_clusters.Patch(request)
 
-    if args.async:
+    if args.async_:
       log.status.write(
           'Updating [{0}] with operation [{1}].'.format(
               cluster_ref, operation.name))
@@ -259,57 +313,3 @@ class UpdateBeta(Update):
   @staticmethod
   def Args(parser):
     _CommonArgs(parser)
-
-    # Can only specify one of --autoscaling-policy or --disable-autoscaling
-    autoscaling_group = parser.add_mutually_exclusive_group()
-    flags.AddAutoscalingPolicyResourceArgForCluster(
-        autoscaling_group, api_version='v1beta2')
-    autoscaling_group.add_argument(
-        '--disable-autoscaling',
-        action='store_true',
-        help="""\
-        Disable autoscaling, if it is enabled. This is an alias for passing the
-        empty string to --autoscaling-policy',
-        """)
-
-    idle_delete_group = parser.add_mutually_exclusive_group()
-    idle_delete_group.add_argument(
-        '--max-idle',
-        type=arg_parsers.Duration(),
-        help="""\
-        The duration before cluster is auto-deleted after last job finished,
-        such as "2h" or "1d".
-        See $ gcloud topic datetimes for information on duration formats.
-        """)
-    idle_delete_group.add_argument(
-        '--no-max-idle',
-        action='store_true',
-        help="""\
-        Cancels the cluster auto-deletion by cluster idle duration (configured
-         by --max-idle flag)
-        """)
-
-    auto_delete_group = parser.add_mutually_exclusive_group()
-    auto_delete_group.add_argument(
-        '--max-age',
-        type=arg_parsers.Duration(),
-        help="""\
-        The lifespan of the cluster before it is auto-deleted, such as
-        "2h" or "1d".
-        See $ gcloud topic datetimes for information on duration formats.
-        """)
-    auto_delete_group.add_argument(
-        '--expiration-time',
-        type=arg_parsers.Datetime.Parse,
-        help="""\
-        The time when cluster will be auto-deleted, such as
-        "2017-08-29T18:52:51.142Z". See $ gcloud topic datetimes for
-        information on time formats.
-        """)
-    auto_delete_group.add_argument(
-        '--no-max-age',
-        action='store_true',
-        help="""\
-        Cancels the cluster auto-deletion by maximum cluster age (configured by
-         --max-age or --expiration-time flags)
-        """)

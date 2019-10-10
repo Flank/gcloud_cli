@@ -99,17 +99,18 @@ help\fR for details.
 To execute the transaction, run:
 
 .RS 2m
-$ gcloud beta dns record\-sets transaction execute \-\-zone MANAGED_ZONE
+$ gcloud beta dns record\-sets transaction execute \-\-zone=MANAGED_ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dns record\-sets transaction execute
+$ gcloud alpha dns record\-sets transaction execute
 .RE
 

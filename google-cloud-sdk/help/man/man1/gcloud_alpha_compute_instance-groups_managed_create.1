@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed create \- create a Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-stateful\-names\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -132,12 +132,6 @@ group is resized down). If omitted, 'never' is used as the default.
 .RE
 .sp
 .TP 2m
-\fB\-\-stateful\-names\fR
-Enable stateful names of instances. Whenever instances with those names are
-restarted or recreated, they will have the same names as before. Use
-\-\-no\-stateful\-names to disable stateful names.
-
-.TP 2m
 \fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]
 Specifies any target pools you want the instances of this managed instance group
 to be part of.
@@ -236,9 +230,8 @@ help\fR for details.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud compute instance\-groups managed create

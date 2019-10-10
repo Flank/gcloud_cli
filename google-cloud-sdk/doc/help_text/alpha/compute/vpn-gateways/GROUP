@@ -19,7 +19,8 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a new Google Compute Engine High Available VPN gateway.
+        (ALPHA) Create a new Google Compute Engine Highly Available VPN
+        gateway.
 
      delete
         (ALPHA) Delete Google Compute Engine Highly Available VPN Gateways.
@@ -28,7 +29,8 @@ COMMANDS
         (ALPHA) Describe a Google Compute Engine Highly Available VPN Gateway.
 
      get-status
-        (ALPHA) Get status of a Google Compute Engine VPN Gateway.
+        (ALPHA) Get status of a Google Compute Engine Highly Available VPN
+        Gateway.
 
      list
         (ALPHA) List Google Compute Engine Highly Available VPN Gateways.
@@ -39,9 +41,9 @@ COMMANDS
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist. These variants are also available:
 
+        $ gcloud compute vpn-gateways
         $ gcloud beta compute vpn-gateways
 

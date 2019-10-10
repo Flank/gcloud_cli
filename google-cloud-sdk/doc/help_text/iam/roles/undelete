@@ -3,7 +3,8 @@ NAME
         a project
 
 SYNOPSIS
-    gcloud iam roles undelete ROLE_ID [--organization=ORGANIZATION]
+    gcloud iam roles undelete ROLE_ID
+        (--organization=ORGANIZATION | --project=PROJECT_ID)
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -19,9 +20,25 @@ POSITIONAL ARGUMENTS
         The id of the custom role to undelete. For example: CustomRole. You
         must also specify the --organization or --project flag.
 
-FLAGS
-     --organization=ORGANIZATION
-        The organization of the role you want to undelete.
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --organization=ORGANIZATION
+          The organization of the role you want to undelete.
+
+       --project=PROJECT_ID
+          The project of the role you want to undelete.
+
+          The Google Cloud Platform project name to use for this invocation. If
+          omitted, then the current project is assumed; the current project can
+          be listed using gcloud config list --format='text(core.project)' and
+          can be set using gcloud config set project PROJECTID.
+
+          --project and its fallback core/project property play two roles in
+          the invocation. It specifies the project of the resource to operate
+          on. It also specifies the project for API enablement check, quota,
+          and billing. To specify a different project for quota and billing,
+          use --billing-project or billing/quota_project property.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

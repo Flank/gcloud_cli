@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -128,12 +128,14 @@ class RunUnitTest(base.DataflowMockingTestBase,
         num_workers=5,
         worker_machine_type='n1-standard-1',
         network='network',
-        subnetwork='subnetwork')
+        subnetwork='subnetwork',
+        kms_key_name='cloud-kms-key-foobar')
     result = self.Run(
         'beta dataflow jobs run myjob --gcs-location=gs://foo '
         '--service-account-email=a@b.com --zone=us-foo1-a --max-workers=5 '
         '--num-workers=5 --worker-machine-type=n1-standard-1 '
-        '--network=network --subnetwork=subnetwork')
+        '--network=network --subnetwork=subnetwork '
+        '--dataflow-kms-key=cloud-kms-key-foobar')
     self.assertEqual(JOB_1_ID, result.id)
 
 if __name__ == '__main__':

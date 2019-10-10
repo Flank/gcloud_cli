@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,13 +99,13 @@ class SslCertificatesDeleteTest(test_base.BaseTest):
     self.CheckRequests()
 
 
-class SslCertificatesDeleteAlphaTest(SslCertificatesDeleteTest):
+class SslCertificatesDeleteBetaTest(SslCertificatesDeleteTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
 
   def RunDelete(self, command):
-    self.Run('alpha compute ssl-certificates delete ' + command)
+    self.Run('beta compute ssl-certificates delete ' + command)
 
   def testWithSingleNetwork(self):
     messages = self.messages
@@ -156,6 +156,15 @@ class SslCertificatesDeleteAlphaTest(SslCertificatesDeleteTest):
       self.RunDelete('--global cert-1 cert-2 cert-3')
 
     self.CheckRequests()
+
+
+class SslCertificatesDeleteAlphaTest(SslCertificatesDeleteBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+
+  def RunDelete(self, command):
+    self.Run('alpha compute ssl-certificates delete ' + command)
 
 
 if __name__ == '__main__':

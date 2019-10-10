@@ -20,6 +20,9 @@ gcloud alpha endpoints services remove\-iam\-policy\-binding \- remove IAM polic
 \fB(ALPHA)\fR Remove an IAM policy binding from the IAM policy of a service. One
 binding consists of a member, a role, and an optional condition.
 
+Note: The 'roles/servicemanagement.serviceConsumer' role can only exist on a
+member which is a user, group, or service account.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -148,16 +151,6 @@ $ gcloud alpha endpoints services remove\-iam\-policy\-binding \e
     \-\-role='roles/servicemanagement.serviceConsumer'
 .RE
 
-To remove an IAM policy binding for the role of
-\'roles/servicemanagement.serviceConsumer' from all authenticated users on
-service 'my\-service', run:
-
-.RS 2m
-$ gcloud alpha endpoints services remove\-iam\-policy\-binding \e
-    my\-service \-\-member='allAuthenticatedUsers' \e
-    \-\-role='roles/servicemanagement.serviceConsumer'
-.RE
-
 To remove an IAM policy binding which expires at the end of the year 2018 for
 the role of 'roles/servicemanagement.quotaAdmin' and the user
 \'test\-user@gmail.com' with service 'my\-service', run:
@@ -182,9 +175,8 @@ conditions.
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
-you will have to apply for early access and have your projects registered on the
-API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. These variants are also available:
+you may be trying to access an API with an invitation\-only early access
+whitelist. These variants are also available:
 
 .RS 2m
 $ gcloud endpoints services remove\-iam\-policy\-binding

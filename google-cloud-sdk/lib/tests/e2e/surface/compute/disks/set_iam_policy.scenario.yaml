@@ -4,21 +4,22 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute disks create $$disk$$ --zone us-central1-f --size=10 --format
-      'yaml(name,zone,status)'
+      'yaml(name,zone,status)' -q
   - stderr: |
       WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
-  - stderr: |
       Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
-  - stdout: |
+  - stdout: |-
       ---
       name: $$disk$$
       status: READY
-      zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+      zone: https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+      $
 - execute:
   - command: compute disks set-iam-policy $$disk$$ --zone=us-central1-f policy.json
       --format="yaml(bindings)"
-  - stderr: |
-      Updated IAM policy for disk [$$disk$$].
+  - stderr: |-
+      Updated IAM policy for disk \[$$disk$$\].
+      $
   - stdout: |
       bindings:
       - members:
@@ -32,25 +33,20 @@ summary:
         - user:testuser@google.com
         role: roles/owner
 - execute:
-  - command: compute disks delete $$disk$$ --zone us-central1-f
-  - prompt:
-    - message: |
-        The following disks will be deleted:
-         - [$$disk$$] in [us-central1-f]
-    - input: y
-  - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+  - command: compute disks delete $$disk$$ --zone us-central1-f -q
+  - stderr: |-
+      Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
-    value: www.googleapis.com/compute
+    value: compute.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
       GA: v1
       BETA: beta
       ALPHA: alpha
-
 - write_file:
     path: policy.json
     contents: |
@@ -68,99 +64,18 @@ actions:
     prefix: disk-set-iam-policy-test
 - execute_command:
     command: compute disks create $$disk$$ --zone us-central1-f --size=10 --format
-      'yaml(name,zone,status)'
+      'yaml(name,zone,status)' -q
+    validation_only: true
     events:
     - expect_stderr: |
         WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '533'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"q-1zVE9vvTX76Ext8o-VNTk5Fro=/rJPXyTqcyPGY9PqY2tfQeohHPCM="'
-            status: '200'
-          body:
-            kind: compute#zone
-            id: '2004'
-            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
-            name: us-central1-f
-            description: us-central1-f
-            status: UP
-            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            availableCpuPlatforms:
-            - Intel Cascadelake
-            - Intel Skylake
-            - Intel Broadwell
-            - Intel Haswell
-            - Intel Ivy Bridge
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks?alt=json
-          method: POST
-          headers: {}
-          body:
-            json:
-              name: $$disk$$
-              sizeGb: '10'
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '825'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '7100023375652740988'
-            name: operation-1550705034448-5825ba6bace78-bd30edb9-06a89baa
-            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            operationType: insert
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            targetId: '4811151736435662693'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-02-20T15:24:03.781-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1550705034448-5825ba6bace78-bd30edb9-06a89baa
-        poll_operation: true
-    - expect_stderr: |
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '685'
-            Content-Type: application/json; charset=UTF-8
-            ETag: '"pzGynr1IMgoUnSt_0xkrepbdukw=/BCXq6l2_8NR66xcvsWWpLaugT0c="'
-            status: '200'
-          body:
-            kind: compute#disk
-            id: '4811151736435662693'
-            creationTimestamp: '2019-02-20T15:24:03.312-08:00'
-            name: $$disk$$
-            sizeGb: '10'
-            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            status: READY
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            type: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
-            labelFingerprint: 42WmSpB8rSM=
-            physicalBlockSizeBytes: '4096'
-    - expect_stdout: |
-        ---
-        name: $$disk$$
-        status: READY
-        zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+    - expect_stdout:
+        matches: |
+          ---
+          name: $$disk$$
+          status: READY
+          zone: https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
     - expect_exit:
         code: 0
 - execute_command:
@@ -180,22 +95,23 @@ actions:
                   - user:testuser@google.com
                   role: roles/owner
                 etag: ACAB
-                version: 1
+                version: 3
         return_response:
           headers:
-            cache-control: no-cache, no-store, max-age=0, must-revalidate
-            content-length: '133'
+            cache-control: private
+            content-length: '169'
             content-type: application/json; charset=UTF-8
-            pragma: no-cache
             status: '200'
           body:
+            version: 1
+            etag: BwWRvTLF_mg=
             bindings:
             - role: roles/owner
               members:
               - user:testuser@google.com
-            etag: BwWCW6fIERM=
-    - expect_stderr: |
-        Updated IAM policy for disk [$$disk$$].
+    - expect_stderr:
+        matches: |
+          Updated IAM policy for disk \[$$disk$$\].
     - expect_stdout: |
         bindings:
         - members:
@@ -205,25 +121,8 @@ actions:
         code: 0
 - execute_command:
     command: compute disks get-iam-policy $$disk$$ --zone=us-central1-f --format="yaml(bindings)"
+    validation_only: true
     events:
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$/getIamPolicy?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private, max-age=0, must-revalidate, no-transform
-            content-length: '133'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            bindings:
-            - role: roles/owner
-              members:
-              - user:testuser@google.com
-            etag: BwWCW6fIERM=
     - expect_stdout: |
         bindings:
         - members:
@@ -232,41 +131,12 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute disks delete $$disk$$ --zone us-central1-f
+    command: compute disks delete $$disk$$ --zone us-central1-f -q
     cleanup_for: disk
+    validation_only: true
     events:
-    - expect_prompt_continue:
-        message: |
-          The following disks will be deleted:
-           - [$$disk$$] in [us-central1-f]
-        user_input: y
-    - api_call:
-        expect_request:
-          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
-          method: DELETE
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            Cache-Control: private, max-age=0
-            Content-Length: '825'
-            Content-Type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            kind: compute#operation
-            id: '2132786409545686898'
-            name: operation-1550705052922-5825ba7d4b3d7-ca70b764-f54779c1
-            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
-            operationType: delete
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            targetId: '4811151736435662693'
-            status: PENDING
-            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
-            progress: 0
-            insertTime: '2019-02-20T15:24:13.539-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1550705052922-5825ba7d4b3d7-ca70b764-f54779c1
-        poll_operation: true
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+    - expect_stderr:
+        matches: |
+          Deleted \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$\].
     - expect_exit:
         code: 0

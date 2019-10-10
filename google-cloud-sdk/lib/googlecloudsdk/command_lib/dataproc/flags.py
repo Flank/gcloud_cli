@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -90,14 +90,14 @@ def AddParametersFlag(parser):
       dest='parameters')
 
 
-def AddMinCpuPlatformArgs(parser, track):
+def AddMinCpuPlatformArgs(parser):
   """Add mininum CPU platform flags for both master and worker instances."""
   help_text = """\
       When specified, the VM will be scheduled on host with specified CPU
       architecture or a newer one. To list available CPU platforms in given
       zone, run:
 
-          $ gcloud {}compute zones describe ZONE
+          $ gcloud compute zones describe ZONE
 
       CPU platform selection is available only in selected zones; zones that
       allow CPU platform selection will have an `availableCpuPlatforms` field
@@ -105,7 +105,7 @@ def AddMinCpuPlatformArgs(parser, track):
 
       You can find more information online:
       https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
-      """.format(track.prefix + ' ' if track.prefix else '')
+      """
   parser.add_argument(
       '--master-min-cpu-platform',
       metavar='PLATFORM',

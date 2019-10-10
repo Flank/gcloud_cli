@@ -24,17 +24,19 @@ COMMANDS
      list
         (ALPHA) List available Configurations.
 
+     update
+        (ALPHA) (REMOVED) Update Cloud Run environment variables and other
+        configuration settings.
+
 EXAMPLES
     To describe the configuration managed by the service foo:
 
         $ gcloud alpha run configurations describe foo
 
 NOTES
-    This command is currently in ALPHA and may change without notice. If this
-    command fails with API permission errors despite specifying the right
-    project, you will have to apply for early access and have your projects
-    registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
-
-        $ gcloud beta run configurations
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
 

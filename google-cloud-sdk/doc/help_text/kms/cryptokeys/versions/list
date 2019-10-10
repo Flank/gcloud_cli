@@ -65,9 +65,9 @@ EXAMPLES
     The following command lists all CryptoKeyVersions within the CryptoKey
     frodo, KeyRing fellowship, and Location global:
 
-        $ gcloud kms cryptokeys versions list --location global \
-            --keyring fellowship \
-            --cryptokey frodo
+        $ gcloud kms cryptokeys versions list --location=global \
+            --keyring=fellowship \
+            --cryptokey=frodo
 
 NOTES
     This command is an internal implementation detail and may change or

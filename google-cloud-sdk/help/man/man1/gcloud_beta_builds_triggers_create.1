@@ -1,0 +1,59 @@
+
+.TH "GCLOUD_BETA_BUILDS_TRIGGERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta builds triggers create \- create build triggers for Google Cloud Build
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta builds triggers create\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create build triggers for Google Cloud Build.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcloud\-source\-repositories\fR
+\fB(BETA)\fR Create a build trigger from a Cloud Source Repository.
+
+.TP 2m
+\fBgithub\fR
+\fB(BETA)\fR Create a build trigger for a GitHub repository.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha builds triggers create
+.RE
+

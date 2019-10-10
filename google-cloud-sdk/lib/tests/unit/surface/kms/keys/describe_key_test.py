@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,23 +20,21 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class CryptokeysDescribeTest(base.KmsMockTest):
+class CryptokeysDescribeTestGA(base.KmsMockTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.kr_name = self.project_name.Descendant('global/my_kr')
-    self.key_name = self.kr_name.Descendant('my_key')
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/1')
+    self.kr_name = self.project_name.KeyRing('global/my_kr')
+    self.key_name = self.kr_name.CryptoKey('my_key')
+    self.version_name = self.project_name.Version('global/my_kr/my_key/1')
 
-  def testDescribeSuccess(self, track):
-    self.track = track
+  def testDescribeSuccess(self):
 
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysGetRequest(
@@ -61,8 +59,7 @@ class CryptokeysDescribeTest(base.KmsMockTest):
     # assert that the attestation field is empty.
     self.AssertOutputNotContains('attestation: ')
 
-  def testMissingId(self, track):
-    self.track = track
+  def testMissingId(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'Invalid value for [key]: key id must be non-empty.'):
@@ -74,9 +71,9 @@ class CryptokeysDescribeAlphaTest(base.KmsMockTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.kr_name = self.project_name.Descendant('global/my_kr')
-    self.key_name = self.kr_name.Descendant('my_key')
-    self.version_name = self.project_name.Descendant('global/my_kr/my_key/1')
+    self.kr_name = self.project_name.KeyRing('global/my_kr')
+    self.key_name = self.kr_name.CryptoKey('my_key')
+    self.version_name = self.project_name.Version('global/my_kr/my_key/1')
 
   def testDescribeHsmKeySuccess(self):
     self.kms.projects_locations_keyRings_cryptoKeys.Get.Expect(
@@ -111,6 +108,18 @@ class CryptokeysDescribeAlphaTest(base.KmsMockTest):
     self.AssertOutputContains('algorithm: GOOGLE_SYMMETRIC_ENCRYPTION')
     self.AssertOutputNotContains('format:')
     self.AssertOutputNotContains('content:')
+
+
+class CryptokeysDescribeTestBeta(CryptokeysDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CryptokeysDescribeTestAlpha(CryptokeysDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

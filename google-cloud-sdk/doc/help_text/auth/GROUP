@@ -46,10 +46,10 @@ COMMANDS
         credentials.
 
      print-access-token
-        Print an access token for the active account.
+        Print an access token for the specified account.
 
      print-identity-token
-        Print an identity token for the active account.
+        Print an identity token for the specified account.
 
      revoke
         Revoke access credentials for an account.

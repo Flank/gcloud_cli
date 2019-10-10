@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class ValidateScenarioTests(cli_test_base.CliTestBase):
 
   def testValidateTemplate(self):
     val = pkg_resources.GetResourceFromFile(SCENARIO_TEMPLATE_PATH)
-    template = yaml.load(val)
+    template = yaml.load(val, version=yaml.VERSION_1_2)
     validator = scenario_schema.Validator(template)
     try:
       validator.Validate()
@@ -50,7 +50,8 @@ class ValidateScenarioTests(cli_test_base.CliTestBase):
 
   def testValidateDescribeExample(self):
     example = yaml.load(
-        pkg_resources.GetResourceFromFile(DESCRIBE_EXAMPLE_PATH))
+        pkg_resources.GetResourceFromFile(DESCRIBE_EXAMPLE_PATH),
+        version=yaml.VERSION_1_2)
     validator = scenario_schema.Validator(example)
     try:
       validator.Validate()
@@ -59,7 +60,8 @@ class ValidateScenarioTests(cli_test_base.CliTestBase):
 
   def testValidateCreateExample(self):
     example = yaml.load(
-        pkg_resources.GetResourceFromFile(CREATE_EXAMPLE_PATH))
+        pkg_resources.GetResourceFromFile(CREATE_EXAMPLE_PATH),
+        version=yaml.VERSION_1_2)
     validator = scenario_schema.Validator(example)
     try:
       validator.Validate()

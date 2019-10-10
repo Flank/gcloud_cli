@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,14 @@ from googlecloudsdk.core import properties
 _MISSING_COMMITMENTS_QUOTA_REGEX = r'Quota .COMMITMENTS. exceeded.+'
 
 
+def _CommonArgsAlphaBeta(track, parser):
+  """Add common flags for Alpha, Beta track."""
+  flags.MakeCommitmentArg(False).AddArgument(parser, operation_type='create')
+  flags.AddCreateFlags(parser)
+  messages = apis.GetMessagesModule('compute', track)
+  flags.GetTypeMapperFlag(messages).choice_arg.AddToParser(parser)
+
+
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.Command):
   """Create Google Compute Engine commitments."""
@@ -44,11 +52,13 @@ class Create(base.Command):
     flags.AddCreateFlags(parser)
 
   def _MakeCreateRequest(
-      self, args, messages, project, region, commitment_ref, unused_holder):
+      self, args, messages, project, region, commitment_ref, holder):
     commitment = messages.Commitment(
+        reservations=reservation_helper.MakeReservations(
+            args, messages, holder),
         name=commitment_ref.Name(),
         plan=flags.TranslatePlanArg(messages, args.plan),
-        resources=flags.TranslateResourcesArg(messages, args.resources),
+        resources=flags.TranslateResourcesArgGroup(messages, args)
     )
     return messages.ComputeRegionCommitmentsInsertRequest(
         commitment=commitment,
@@ -97,39 +107,10 @@ class CreateBeta(Create):
 
   @classmethod
   def Args(cls, parser):
-    flags.MakeCommitmentArg(False).AddArgument(parser, operation_type='create')
-    flags.AddCreateFlags(parser, enable_ssd_and_accelerator_support=True)
-    flags.AddReservationArgGroup(parser)
+    _CommonArgsAlphaBeta('beta', parser)
 
   def _MakeCreateRequest(self, args, messages, project, region, commitment_ref,
                          holder):
-    commitment = messages.Commitment(
-        reservations=reservation_helper.MakeReservations(
-            args, messages, holder),
-        name=commitment_ref.Name(),
-        plan=flags.TranslatePlanArg(messages, args.plan),
-        resources=flags.TranslateResourcesArgGroup(messages, args))
-    return messages.ComputeRegionCommitmentsInsertRequest(
-        commitment=commitment,
-        project=project,
-        region=commitment_ref.region,
-    )
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
-  """Create Google Compute Engine commitments."""
-
-  @classmethod
-  def Args(cls, parser):
-    flags.MakeCommitmentArg(False).AddArgument(parser, operation_type='create')
-    flags.AddCreateFlags(parser, enable_ssd_and_accelerator_support=True)
-    flags.AddReservationArgGroup(parser)
-    messages = apis.GetMessagesModule('compute', 'alpha')
-    flags.GetTypeMapperFlag(messages).choice_arg.AddToParser(parser)
-
-  def _MakeCreateRequest(
-      self, args, messages, project, region, commitment_ref, holder):
     commitment_type_flag = flags.GetTypeMapperFlag(messages)
     commitment_type = commitment_type_flag.GetEnumForChoice(args.type)
     commitment = messages.Commitment(
@@ -144,3 +125,12 @@ class CreateAlpha(Create):
         project=project,
         region=commitment_ref.region,
     )
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(CreateBeta):
+  """Create Google Compute Engine commitments."""
+
+  @classmethod
+  def Args(cls, parser):
+    _CommonArgsAlphaBeta('alpha', parser)

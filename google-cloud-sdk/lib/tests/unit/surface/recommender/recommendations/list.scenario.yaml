@@ -1,5 +1,5 @@
 title: List recommendations
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -8,12 +8,17 @@ summary:
       ID                 LOCATION     RECOMMENDER     PRIMARY_IMPACT_CATEGORY  STATE      LAST_REFRESH_TIME
       my-recommendation  my-location  my-recommender  SECURITY                 SUCCEEDED  2019-02-06T06:42:31Z
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha1
+      BETA: v1beta1
 - execute_command:
     command: recommender recommendations list --project=my-project --location=my-location --recommender=my-recommender
     events:
     - api_call:
         expect_request:
-          uri: https://recommender.googleapis.com/v1alpha1/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations?alt=json
+          uri: https://recommender.googleapis.com/$$api-version$$/projects/my-project/locations/my-location/recommenders/my-recommender/recommendations?alt=json
           method: GET
           headers: {}
           body: null
