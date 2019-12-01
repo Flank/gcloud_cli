@@ -20,9 +20,6 @@ COMMANDS
      describe
         Describes an operation resource for a given operation name.
 
-     list
-        (DEPRECATED) List operations for a project.
-
      wait
         Waits for an operation to complete for a given operation name.
 

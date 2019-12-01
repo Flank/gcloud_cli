@@ -10,7 +10,7 @@ SYNOPSIS
           --keyversion-keyring=KEYVERSION_KEYRING
           --keyversion-location=KEYVERSION_LOCATION
           --keyversion-project=KEYVERSION_PROJECT)
-        [--public-key-id-override=PUBLIC_KEY_ID_OVERRIDE]
+        [--public-key-id-override=PUBLIC_KEY_ID_OVERRIDE] [--validate]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -38,7 +38,7 @@ REQUIRED FLAGS
           group are specified.
 
        --attestor-project=ATTESTOR_PROJECT
-          The Cloud project for the attestor.
+          Project ID of the Google Cloud Platform project for the attestor.
 
      CryptoKeyVersion resource - The Cloud KMS (Key Management Service)
      CryptoKeyVersion to use to sign the attestation payload. The arguments in
@@ -60,7 +60,8 @@ REQUIRED FLAGS
           The location of the CryptoKeyVersion.
 
        --keyversion-project=KEYVERSION_PROJECT
-          The Cloud project for the CryptoKeyVersion.
+          Project ID of the Google Cloud Platform project for the
+          CryptoKeyVersion.
 
 OPTIONAL FLAGS
      --public-key-id-override=PUBLIC_KEY_ID_OVERRIDE
@@ -71,6 +72,10 @@ OPTIONAL FLAGS
 
         This parameter is only necessary if the --public-key-id-override flag
         was provided when this KMS key was added to the Attestor.
+
+     --validate
+        Whether to validate that the Attestation can be verified by the
+        provided Attestor.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

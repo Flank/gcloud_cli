@@ -67,14 +67,33 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To import all collection groups from \f5mybucket/my/path\fR, run:
+
+.RS 2m
+$ gcloud alpha firestore import gs://mybucket/my/path
+.RE
+
+To import a specific set of collections groups asynchronously, run:
+
+.RS 2m
+$ gcloud alpha firestore import gs://mybucket/my/path \e
+    \-\-collection\-ids='specific collection group1','specific
+ collection group2' \-\-async
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud firestore import
 $ gcloud beta firestore import
 .RE
 

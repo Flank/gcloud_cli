@@ -35,6 +35,12 @@ COMMANDS
      edit
         Modify URL maps.
 
+     export
+        Export a URL map.
+
+     import
+        Import a URL map.
+
      invalidate-cdn-cache
         Invalidate specified objects for a URL map in Cloud CDN caches.
 

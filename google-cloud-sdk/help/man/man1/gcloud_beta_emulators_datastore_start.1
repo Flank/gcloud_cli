@@ -11,7 +11,7 @@ gcloud beta emulators datastore start \- start a local datastore emulator
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta emulators datastore start\fR [\fB\-\-consistency\fR=\fICONSISTENCY\fR;\ default=0.9] [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fB\-\-legacy\fR] [\fB\-\-no\-store\-on\-disk\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta emulators datastore start\fR [\fB\-\-consistency\fR=\fICONSISTENCY\fR;\ default=0.9] [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fB\-\-no\-store\-on\-disk\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,14 +56,6 @@ In this format you must enclose IPv6 addresses in square brackets: e.g.
 .RE
 
 The default value is localhost:8081.
-
-.TP 2m
-\fB\-\-legacy\fR
-(DEPRECATED) Set to use the legacy emulator which supports Cloud Datastore API
-v1beta2.
-
-This flag is deprecated due to the legacy Datastore emulator no longer being
-supported. It will be removed in early October 2019.
 
 .TP 2m
 \fB\-\-store\-on\-disk\fR

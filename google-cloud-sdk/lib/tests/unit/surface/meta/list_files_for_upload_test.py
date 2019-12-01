@@ -144,7 +144,6 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
     uploaded_files = self._RunListFilesForUpload(self.temp_path)
     self.assertEqual(set(uploaded_files), set(git_uploaded_files))
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   @parameterized.named_parameters(
       T('NoGitFiles', ['a', 'b'], None),
       T('NoMatches', ['a', 'b'], '.gitignore'),
@@ -213,7 +212,6 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
   def testSameResultsAsGit(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   # The version of Git used in our .deb and .rpm packaging tests don't conform
   # to https://git-scm.com/docs/gitignore.
   #

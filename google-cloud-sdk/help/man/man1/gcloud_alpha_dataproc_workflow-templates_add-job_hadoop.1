@@ -11,7 +11,7 @@ gcloud alpha dataproc workflow\-templates add\-job hadoop \- add a hadoop job to
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dataproc workflow\-templates add\-job hadoop\fR  \fB\-\-step\-id\fR=\fISTEP_ID\fR \fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR (\fB\-\-class\fR=\fIMAIN_CLASS\fR\ |\ \fB\-\-jar\fR=\fIMAIN_JAR\fR) [\fB\-\-archives\fR=[\fIARCHIVE\fR,...]] [\fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]] [\fB\-\-files\fR=[\fIFILE\fR,...]] [\fB\-\-jars\fR=[\fIJAR\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIJOB_ARGS\fR\ ...]
+\f5gcloud alpha dataproc workflow\-templates add\-job hadoop\fR  \fB\-\-step\-id\fR=\fISTEP_ID\fR (\fB\-\-class\fR=\fIMAIN_CLASS\fR\ |\ \fB\-\-jar\fR=\fIMAIN_JAR\fR) (\fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-archives\fR=[\fIARCHIVE\fR,...]] [\fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]] [\fB\-\-files\fR=[\fIFILE\fR,...]] [\fB\-\-jars\fR=[\fIJAR\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIJOB_ARGS\fR\ ...]
 
 
 
@@ -43,10 +43,6 @@ and JOB_ARGS on the right.
 The step ID of the job in the workflow template.
 
 .TP 2m
-\fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR
-The dataproc workflow template ID.
-
-.TP 2m
 
 Exactly one of these must be specified:
 
@@ -59,6 +55,34 @@ jar that is already on the classpath
 .TP 2m
 \fB\-\-jar\fR=\fIMAIN_JAR\fR
 The HCFS URI of jar file containing the driver jar.
+
+.RE
+.sp
+.TP 2m
+
+Template resource \- The name of the workflow template to add job to. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[\-\-workflow\-template] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR
+ID of the template or fully qualified identifier for the template. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region for the template. Each Cloud Dataproc region constitutes
+an independent resource namespace constrained to deploying instances into Google
+Compute Engine zones inside the region. The default value of \f5global\fR is a
+special multi\-region namespace which is capable of deploying instances into all
+Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
+regions. Overrides the default \f5dataproc/region\fR property value for this
+command invocation.
 
 
 .RE
@@ -101,13 +125,6 @@ numbers.
 .TP 2m
 \fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
 A list of key value pairs to configure Hadoop.
-
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. Overrides the default \fBdataproc/region\fR
-property value for this command invocation.
 
 .TP 2m
 \fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]

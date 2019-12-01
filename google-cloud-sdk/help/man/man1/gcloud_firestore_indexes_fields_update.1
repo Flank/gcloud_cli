@@ -1,0 +1,171 @@
+
+.TH "GCLOUD_FIRESTORE_INDEXES_FIELDS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud firestore indexes fields update \- update the index configuration of the given field
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud firestore indexes fields update\fR (\fIFIELD\fR\ :\ \fB\-\-collection\-group\fR=\fICOLLECTION_GROUP\fR) (\fB\-\-clear\-exemption\fR\ |\ \fB\-\-disable\-indexes\fR\ |\ \fB\-\-index\fR=[\fIarray\-config\fR=\fIARRAY\-CONFIG\fR],[\fIorder\fR=\fIORDER\fR]) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Update the index configuration of the given field.
+
+This creates an exemption for the field in question, allowing one to modify the
+field's index settings and override the defaults.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Field resource \- Field to update. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [field] on the command line with a fully
+specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. To set the [database] attribute: provide the
+argument [field] on the command line with a fully specified name; provide the
+argument [\-\-database] on the command line (currently '(default)' is the only
+supported value). This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIFIELD\fR
+ID of the field or fully qualified identifier for the field. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-collection\-group\fR=\fICOLLECTION_GROUP\fR
+Collection group of the field.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-exemption\fR
+If provided, the field's current index configuration will be reverted to inherit
+from its ancestor index configurations.
+
+.TP 2m
+\fB\-\-disable\-indexes\fR
+If provided, the field will no longer be indexed at all.
+
+.TP 2m
+\fB\-\-index\fR=[\fIarray\-config\fR=\fIARRAY\-CONFIG\fR],[\fIorder\fR=\fIORDER\fR]
+An index for the field.
+
+This flag can be repeated to provide multiple indexes. Any existing indexes will
+be overwritten with the ones provided. Any omitted indexes will be deleted if
+they currently exist.
+
+The following keys are allowed:
+
+.RS 2m
+.TP 2m
+\fBorder\fR
+Specifies the order. Valid options are: 'ascending', 'descending'. Exactly one
+of 'order' or 'array\-config' must be specified.
+
+.TP 2m
+\fBarray\-config\fR
+Specifies the configuration for an array field. The only valid option is
+\'contains'. Exactly one of 'order' or 'array\-config' must be specified.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for the operation in progress to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBfirestore/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/firestore
+
+
+
+.SH "EXAMPLES"
+
+The following command creates an exemption for the \f5timestamp\fR field in the
+\f5Events\fR collection group, in which all indexes are disabled:
+
+.RS 2m
+$ gcloud firestore indexes fields update timestamp \e
+    \-\-collection\-group=Events
+    \-\-disable\-indexes
+.RE
+
+The following command creates an exemption for the \f5timestamp\fR field in the
+\f5Events\fR collection group, in which the list of indexes is explicitly set to
+[ASCENDING, DESCENDING]:
+
+.RS 2m
+$ gcloud firestore indexes fields update timestamp \e
+    \-\-collection\-group=Events \e
+    \-\-index=order=ASCENDING \e
+    \-\-index=order=DESCENDING
+.RE
+
+The following command clears the exemption on the \f5timestamp\fR field in the
+\f5Events\fR collection group, so that the field will return to inheriting its
+index settings from its ancestors:
+
+.RS 2m
+$ gcloud firestore indexes fields update timestamp \e
+    \-\-collection\-group=Events \-\-clear\-exemption
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha firestore indexes fields update
+$ gcloud beta firestore indexes fields update
+.RE
+

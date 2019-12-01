@@ -378,6 +378,35 @@ class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest):
     self._api = 'alpha'
     self._health_check_api = self.compute_alpha.healthChecks
 
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.RunCreate("""my-health-check {0}""".format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Insert',
+          self.messages.ComputeHealthChecksInsertRequest(
+              healthCheck=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
+                  tcpHealthCheck=self.messages.TCPHealthCheck(
+                      port=80,
+                      portSpecification=(
+                          self.messages.TCPHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      proxyHeader=(self.messages.TCPHealthCheck
+                                   .ProxyHeaderValueValuesEnum.NONE)),
+                  checkIntervalSec=5,
+                  timeoutSec=5,
+                  healthyThreshold=2,
+                  unhealthyThreshold=2,
+                  logConfig=expected_log_config),
+              project='my-project'))],)
+
 
 class RegionHealthChecksCreateTcpBetaTest(test_base.BaseTest,
                                           parameterized.TestCase):

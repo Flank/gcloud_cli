@@ -45,6 +45,13 @@ apis:
     v1:
       discovery_doc: accesscontextmanager_v1.json
       default: true
+  admin:
+    v1:
+      discovery_doc: admin_v1.json
+      default: true
+      resources:
+        customer:
+          path: customer/{customerId}
   appengine:
     v1alpha:
       discovery_doc: appengine_v1alpha.json
@@ -58,24 +65,16 @@ apis:
       resources:
         projects:
           path: projects/{projectId}
+  artifactregistry:
+    v1beta1:
+      discovery_doc: artifactregistry_v1beta1.json
+      default: true
   bigtableadmin:
     v2:
       discovery_doc: bigtableadmin_v2.json
       resources:
         projects:
           path: projects/{projectId}
-  bigtableclusteradmin:
-    v1:
-      discovery_doc: bigtableclusteradmin_v1.json
-      resources:
-        operations:
-          path: operations/{+operationId}
-        projects:
-          path: projects/{projectId}
-        projects.zones:
-          path: projects/{projectId}/zones/{zoneId}
-        projects.zones.clusters:
-          path: projects/{projectId}/zones/{zoneId}/clusters/{clusterId}
   binaryauthorization:
     v1alpha2:
       default: true
@@ -99,10 +98,6 @@ apis:
     v1alpha1:
       discovery_doc: billingbudgets_v1alpha1.json
       default: true
-  bio:
-    v1:
-      discovery_doc: bio_v1.json
-      default: true
   buildartifacts:
     v1alpha2:
       discovery_doc: buildartifacts_v1alpha2.json
@@ -120,6 +115,8 @@ apis:
           path: iamPolicies
     v1p2beta1:
       discovery_doc: cloudasset_v1p2beta1.json
+    v1p4alpha1:
+      discovery_doc: cloudasset_v1p4alpha1.json
   cloudbilling:
     v1:
       discovery_doc: cloudbilling_v1.json
@@ -167,8 +164,15 @@ apis:
   cloudidentity:
     v1alpha1:
       discovery_doc: cloudidentity_v1alpha1.json
+      resources:
+    v1beta1:
+      discovery_doc: cloudidentity_v1beta1.json
       default: true
       resources:
+        groups:
+          path: groups/{groupId}
+        groups.memberships:
+          path: groups/{groupId}/memberships/{membershipId}
   cloudiot:
     v1:
       discovery_doc: cloudiot_v1.json
@@ -386,7 +390,6 @@ apis:
   firestore:
     v1beta2:
       discovery_doc: firestore_v1beta2.json
-      default: true
       resources:
         projects.databases.operations:
           path: projects/{projectsId}/databases/{databasesId}/operations/{operationsId}
@@ -394,6 +397,7 @@ apis:
       discovery_doc: firestore_v1beta1.json
     v1:
       discovery_doc: firestore_v1.json
+      default: true
   genomics:
     v1:
       discovery_doc: genomics_v1.json
@@ -494,6 +498,8 @@ apis:
       discovery_doc: managedidentities_v1alpha1.json
     v1beta1:
       discovery_doc: managedidentities_v1beta1.json
+    v1:
+      discovery_doc: managedidentities_v1.json
       default: true
   logging:
     v2:
@@ -548,6 +554,9 @@ apis:
   secretmanager:
     v1alpha:
       discovery_doc: secretmanager_v1alpha.json
+      default: true
+    v1beta1:
+      discovery_doc: secretmanager_v1beta1.json
   securitycenter:
     v1beta1:
       discovery_doc: securitycenter_v1beta1.json

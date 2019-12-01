@@ -139,6 +139,7 @@ actions:
     command: compute os-config guest-policies describe $$guest-policy-id$$
     events:
     - api_call:
+        repeatable: true
         expect_request:
           uri: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/guestPolicies/$$guest-policy-id$$?alt=json
           method: GET
@@ -202,6 +203,7 @@ actions:
     - expect_stdout: |
         https://osconfig.googleapis.com/$$api-version$$/projects/462803083913/guestPolicies/$$guest-policy-id$$
     - api_call:
+        repeatable: true
         expect_request:
           uri:
             matches: https://osconfig.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/guestPolicies.*

@@ -88,7 +88,7 @@ class PatchJobsTestAlpha(test_base.OsConfigE2EBaseTest):
 
     self.Run('compute os-config patch-jobs list --limit 10')
 
-    self.AssertNewOutputContainsAll(['NUM_INSTANCES', patch_job_id])
+    self.AssertNewOutputContainsAll(['TARGETED_INSTANCES', patch_job_id])
 
 
 if __name__ == '__main__':

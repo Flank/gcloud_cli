@@ -44,7 +44,8 @@ OPTIONAL FLAGS
      --condition=CONDITION
         Condition expression for filtering the resources the policy applies to.
         At the moment, the only allowed syntax for a condition is
-        'resource.matchLabels(label_key_id, label_value_id)'.
+        'resource.matchLabels("labelKeys/{label_key_id}",
+        "labelValues/{label_value_id}")'.
 
      --remove
         Remove the specified values from the list of denied values instead of
@@ -70,7 +71,7 @@ EXAMPLES
 
         $ gcloud alpha org-policies deny gcp.resourceLocations us-east1 \
             us-west1 --project=foo-project \
-        --condition='resource.matchLabels(1111, 2222)'
+        --condition='resource.matchLabels("labelKeys/1111", "labelValues/2222")'
 
 NOTES
     This command is an internal implementation detail and may change or

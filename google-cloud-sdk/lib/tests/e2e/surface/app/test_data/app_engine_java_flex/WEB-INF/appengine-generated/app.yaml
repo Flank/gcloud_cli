@@ -13,8 +13,6 @@ env_variables:
 beta_settings:
   'machine_type': 'n1-standard-1'
   'java_quickstart': 'true'
-health_check:
-  enable_health_check: true
 api_version: '1.0'
 handlers:
 - url: (/_ah/queue/__deferred__)

@@ -9,22 +9,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute addresses update updates labels for a Google
-    Compute Engine address. For example:
-
-        $ gcloud beta compute addresses update example-address \
-            --region us-central1 \
-          --update-labels=k0=value1,k1=value2 --remove-labels=k3
-
-    will add/update labels k0 and k1 and remove labels with key k3.
-
-    Labels can be used to identify the address and to filter them as in
-
-        $ gcloud beta compute addresses list --filter='labels.k1:value2'
-
-    To list existing labels
-
-        $ gcloud beta compute addresses describe example-address \
-            --format='default(labels)'
+    Compute Engine address.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -74,6 +59,23 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To add/update labels 'k0' and 'k1' and remove labels with key 'k3' for
+    address 'example-address', run:
+
+        $ gcloud beta compute addresses update example-address \
+            --region=us-central1 \
+          --update-labels=k0=value1,k1=value2 --remove-labels=k3
+
+    Labels can be used to identify the address and to filter them as in:
+
+        $ gcloud beta compute addresses list --filter='labels.k1:value2'
+
+    To list existing labels for address 'example-address', run:
+
+        $ gcloud beta compute addresses describe example-address \
+            --format='default(labels)'
 
 NOTES
     This command is currently in BETA and may change without notice. This

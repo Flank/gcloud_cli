@@ -1,5 +1,5 @@
 title: Create, describe, list, and delete a composite index
-release_tracks: [BETA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: core/project das-fs-us-c-gcloud
@@ -63,7 +63,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes?alt=json
           method: POST
           headers: {}
           body:
@@ -101,7 +101,7 @@ actions:
           body:
             name: projects/das-fs-us-c-gcloud/databases/(default)/operations/S1lwc0lqTGdBQ0lDDCoDIGQ0OTk1MTNmN2VlOC1lNDZhLTY0NzQtOTY1ZC02N2IwMTA0NSQadGx1YWZlZAcSMXJoLXJleGVkbmktbmltZGERClIS
             metadata:
-              '@type': type.googleapis.com/google.firestore.admin.v1beta2.IndexOperationMetadata
+              '@type': type.googleapis.com/google.firestore.admin.v1.IndexOperationMetadata
               startTime: '2018-12-06T09:58:35.759Z'
               index: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes/CICAgLjIspYK
               state: INITIALIZING
@@ -126,7 +126,7 @@ actions:
           body:
             name: projects/das-fs-us-c-gcloud/databases/(default)/operations/S1lwc0lqTGdBQ0lDDCoDIGQ0OTk1MTNmN2VlOC1lNDZhLTY0NzQtOTY1ZC02N2IwMTA0NSQadGx1YWZlZAcSMXJoLXJleGVkbmktbmltZGERClIS
             metadata:
-              '@type': type.googleapis.com/google.firestore.admin.v1beta2.IndexOperationMetadata
+              '@type': type.googleapis.com/google.firestore.admin.v1.IndexOperationMetadata
               startTime: '2019-03-18T15:03:48Z'
               endTime: '2019-03-18T15:03:51.596919Z'
               index: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes/CICAgLjIspYK
@@ -134,7 +134,7 @@ actions:
               progressDocuments: {}
             done: true
             response:
-              '@type': type.googleapis.com/google.firestore.admin.v1beta2.Index
+              '@type': type.googleapis.com/google.firestore.admin.v1.Index
               name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes/CICAgLjIspYK
               queryScope: COLLECTION
               fields:
@@ -161,7 +161,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/-/indexes?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/-/indexes?alt=json
           method: GET
           headers: {}
           body: null
@@ -272,7 +272,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/-/indexes/$$my-index$$?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/-/indexes/$$my-index$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -314,7 +314,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/-/indexes/$$my-index$$?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/-/indexes/$$my-index$$?alt=json
           method: DELETE
           headers: {}
           body: null

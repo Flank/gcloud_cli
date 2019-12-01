@@ -4,19 +4,19 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --state ACTIVE
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --state ACTIVE --category 'SomeCategory' --resource-name '//cloudresourcemanager.googleapis.com/v1/projects/example-project'
   - stderr: |
       Created finding [gcloudcsccfinding1].
 - execute:
   - command: |
-      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --category 'SomeCategory' --resource-name '//cloudresourcemanager.googleapis.com/v1/projects/example-project'
   - stderr: |
       Created finding [gcloudcsccfinding1].
 actions:
 - execute_command:
     # Won't actually create the finding but mimic calling the server as if finding existed.
     command: |
-      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --state ACTIVE
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --state ACTIVE --category 'SomeCategory' --resource-name '//cloudresourcemanager.googleapis.com/v1/projects/example-project'
     events:
     - api_call:
         expect_request:
@@ -51,7 +51,7 @@ actions:
 - execute_command:
     # Uses full resource path.
     command: |
-      scc findings create organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1 --state ACTIVE
+      scc findings create organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1 --state ACTIVE --category 'SomeCategory' --resource-name '//cloudresourcemanager.googleapis.com/v1/projects/example-project'
     events:
     - api_call:
         expect_request:
@@ -86,7 +86,7 @@ actions:
 - execute_command:
     # Missing state
     command: |
-      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --category SomeCategory --resource-name //cloudresourcemanager.googleapis.com/v1/projects/example-project
     events:
     - api_call:
         expect_request:
@@ -121,7 +121,7 @@ actions:
 - execute_command:
     # Provides full resource path and source id.
     command: |
-      scc findings create organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1 --source 2948230327750090626
+      scc findings create organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1 --source 2948230327750090626 --category 'SomeCategory' --resource-name '//cloudresourcemanager.googleapis.com/v1/projects/example-project'
     events:
     - expect_exit:
         code: 1

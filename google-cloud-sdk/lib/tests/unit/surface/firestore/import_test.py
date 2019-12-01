@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import admin_api
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -26,8 +27,11 @@ from tests.lib.surface.firestore import base
 import six.moves.http_client
 
 
-class ImportTest(base.FirestoreCommandUnitTest):
-  """Tests the firestore import command."""
+class ImportTestGA(base.FirestoreCommandUnitTest):
+  """Tests the GA firestore import command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testImport(self):
     input_uri = 'gs://gcs_bucket/gcs_object'
@@ -35,11 +39,11 @@ class ImportTest(base.FirestoreCommandUnitTest):
         self.DatabaseResourceName(), input_uri)
 
     operation_name = 'import operation name'
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
-    self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ImportDocuments.Expect(
         expected_request, response=mock_response)
 
     actual = self.RunImportTest(input_uri=input_uri)
@@ -63,11 +67,11 @@ class ImportTest(base.FirestoreCommandUnitTest):
         self.DatabaseResourceName(), input_uri, collection_ids=collection_ids)
 
     operation_name = 'import operation name'
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
-    self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ImportDocuments.Expect(
         expected_request, response=mock_response)
 
     actual = self.RunImportTest(
@@ -82,7 +86,7 @@ class ImportTest(base.FirestoreCommandUnitTest):
     exception = http_error.MakeHttpError(
         six.moves.http_client.BAD_REQUEST, 'error_message', url='fake url')
 
-    self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ImportDocuments.Expect(
         request, exception=exception)
 
     with self.assertRaisesRegex(exceptions.HttpException, 'error_message'):
@@ -100,11 +104,11 @@ class ImportTest(base.FirestoreCommandUnitTest):
         self.DatabaseResourceName(), expected_location)
 
     operation_name = 'import operation name'
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
-    self.mock_firestore_v1beta1.projects_databases.ImportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ImportDocuments.Expect(
         expected_request, response=mock_response)
 
     actual = self.RunImportTest(input_uri=input_uri)
@@ -113,6 +117,20 @@ class ImportTest(base.FirestoreCommandUnitTest):
   def AssertInvalidInputUrl(self, input_uri):
     with self.assertRaises(ValueError):
       self.RunImportTest(input_uri=input_uri)
+
+
+class ImportTestBeta(ImportTestGA):
+  """Tests the beta firestore import command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ImportTestAlpha(ImportTestBeta):
+  """Tests the alpha firestore import command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

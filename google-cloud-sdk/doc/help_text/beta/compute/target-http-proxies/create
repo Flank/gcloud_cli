@@ -57,10 +57,10 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --global-url-map
-          If set, the url map is global.
+          If set, the URL map is global.
 
        --url-map-region=URL_MAP_REGION
-          Region of the url map to operate on. Overrides the default
+          Region of the URL map to operate on. Overrides the default
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS

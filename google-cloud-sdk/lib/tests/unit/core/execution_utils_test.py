@@ -55,13 +55,12 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     self.AssertLogNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.exit_mock.assert_called_once_with(1)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testExec_WithArgsWithExit(self):
     # Also tests unicode args are handled correctly. Exec() raises exception
     # if args are not encoded properly.
     execution_utils.Exec(
         [os.path.join(self.scripts_dir, self._SCRIPT),
-         'Ṳᾔḯ¢◎ⅾℯ'.encode('utf7')],
+         'unicode'],
         in_str='fḯsh',
         out_func=sys.stdout.write,
         err_func=sys.stderr.write,
@@ -70,7 +69,7 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     # value. This just make sure that arguments are encoded by default.
     self.assertMultiLineEqual(
         'input: fḯsh\n'
-        'argument: +HnIflB4vAKIlziF+IS8-\n'
+        'argument: unicode\n'
         'test Ṳᾔḯ¢◎ⅾℯ output\n',
         encoding.Decode(self.stdout.getvalue()))
     self.AssertErrEquals('test Ṳᾔḯ¢◎ⅾℯ error\n')

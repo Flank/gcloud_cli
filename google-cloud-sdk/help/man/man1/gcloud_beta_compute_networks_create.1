@@ -112,6 +112,26 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To create a regional auto subnet mode network with the name 'network\-name',
+run:
+
+.RS 2m
+$ gcloud beta compute networks create network\-name
+.RE
+
+To create a global custom subnet mode network with the name 'network\-name',
+run:
+
+.RS 2m
+$ gcloud beta compute networks create network\-name \e
+  \-\-bgp\-routing\-mode=global \e
+  \-\-subnet\-mode=custom
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

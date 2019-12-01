@@ -18,8 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import datetime
 import threading
-
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.cloud_shell import util
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -89,7 +89,8 @@ class SshAlpha(base.Command):
     )
 
     if args.dry_run:
-      log.Print(' '.join(command.Build(connection_info.ssh_env)))
+      elems = command.Build(connection_info.ssh_env)
+      log.Print(' '.join([six.moves.shlex_quote(elem) for elem in elems]))
     else:
       self.done = threading.Event()
       thread = threading.Thread(target=self.Reauthorize, args=())
@@ -100,5 +101,6 @@ class SshAlpha(base.Command):
 
   def Reauthorize(self):
     while not self.done.is_set():
-      self.done.wait(30 * 60)  # Push every 30 minutes
+      self.done.wait(
+          (util.MIN_CREDS_EXPIRY - datetime.timedelta(minutes=2)).seconds)
       util.AuthorizeEnvironment()

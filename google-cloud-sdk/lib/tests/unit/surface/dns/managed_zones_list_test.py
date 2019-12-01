@@ -69,8 +69,7 @@ mz1   zone1.com.  My zone 1!  public
   def testZonesListWithLimit(self):
     self.mocked_dns_v1.managedZones.List.Expect(
         self.messages.DnsManagedZonesListRequest(
-            project=self.Project(),
-            maxResults=1),
+            project=self.Project(), maxResults=100),
         self.messages.ManagedZonesListResponse(
             managedZones=util.GetManagedZones()))
 
@@ -78,6 +77,21 @@ mz1   zone1.com.  My zone 1!  public
     self.AssertOutputContains("""\
 NAME  DNS_NAME   DESCRIPTION VISIBILITY
 mz    zone.com.  My zone!    public
+""", normalize_space=True)
+
+  # b/133821443
+  def testZonesListApplyFlagsInRightOrder(self):
+    self.mocked_dns_v1.managedZones.List.Expect(
+        self.messages.DnsManagedZonesListRequest(
+            project=self.Project(), maxResults=100),
+        self.messages.ManagedZonesListResponse(
+            managedZones=util.GetManagedZonesForFiltering()))
+
+    self.Run('dns managed-zones list --filter="name ~ ^fz" --limit=1')
+
+    self.AssertOutputContains("""\
+NAME  DNS_NAME     DESCRIPTION     VISIBILITY
+fz1   filter.com.  filter zone!    public
 """, normalize_space=True)
 
 

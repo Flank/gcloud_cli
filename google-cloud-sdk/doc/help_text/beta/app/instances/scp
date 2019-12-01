@@ -51,17 +51,17 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To copy one file from a remote instance to the local machine, run:
 
-        $ gcloud beta app instances scp --service s1 --version v1 \
+        $ gcloud beta app instances scp --service=s1 --version=v1 \
           i1:remote_file local_file
 
     To copy several local files to a remote instance, run:
 
-        $ gcloud beta app instances scp --service s1 --version v1 local_1 \
+        $ gcloud beta app instances scp --service=s1 --version=v1 local_1 \
           local_1 i1:remote_dir
 
     To use recursive copy, run:
 
-        $ gcloud beta app instances scp --service s1 --version v1 \
+        $ gcloud beta app instances scp --service=s1 --version=v1 \
           --recurse local_dir i1:remote_dir
 
 NOTES

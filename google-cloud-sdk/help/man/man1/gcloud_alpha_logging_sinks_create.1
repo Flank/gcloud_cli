@@ -11,7 +11,7 @@ gcloud alpha logging sinks create \- creates a sink
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging sinks create\fR \fISINK_NAME\fR \fIDESTINATION\fR [\fB\-\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-include\-children\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-use\-partitioned\-tables\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging sinks create\fR \fISINK_NAME\fR \fIDESTINATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disabled\fR] [\fB\-\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-include\-children\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-use\-partitioned\-tables\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -45,6 +45,14 @@ The destination for the sink.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description of the sink.
+
+.TP 2m
+\fB\-\-disabled\fR
+Sink will be disabled. Disabled sinks do not export logs.
+
 .TP 2m
 \fB\-\-exclusion\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]
 Specify an exclusion filter for a log entry that is not to be exported. This

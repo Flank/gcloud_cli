@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_COMPUTE_BACKEND\-SERVICES_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute backend\-services import \- import a backend service
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute backend\-services import\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Imports a backend service's configuration to a file. This configuration can be
+imported at a later time.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBACKEND_SERVICE_NAME\fR
+Name of the backend service to import.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a YAML file containing backend service configuration export data. The
+YAML file must not contain any output\-only fields. Alternatively, you may omit
+this flag to read from standard input. A schema describing the export/import
+format can be found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/v1/BackendService.yaml.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If set, the backend service is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the backend service to import. Overrides the default
+\fBcompute/region\fR property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+A backend service can be imported by running:
+
+.RS 2m
+$ gcloud compute backend\-services import NAME \e
+    \-\-source=<path\-to\-file> \-\-global
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute backend\-services import
+$ gcloud beta compute backend\-services import
+.RE
+

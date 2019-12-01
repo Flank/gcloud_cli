@@ -4,8 +4,8 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute reservations create $$my-reservation$$ --zone $$zone$$ --vm-count=1
-      --machine-type=n1-standard-1 --min-cpu-platform="Intel Skylake" --accelerator=count=1,type=nvidia-tesla-p4
-      --local-ssd=interface=nvme,size=375 --local-ssd=interface=scsi,size=375
+      --machine-type=n1-standard-1 --min-cpu-platform="Intel Skylake" --local-ssd=interface=nvme,size=375
+      --local-ssd=interface=scsi,size=375
   - stderr: |-
       Created \[https://.*.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$zone$$/reservations/$$my-reservation$$\].
       $
@@ -25,12 +25,6 @@ summary:
       specificReservation.instanceProperties.localSsds[1].diskSizeGb: 375
       specificReservation.instanceProperties.localSsds[1].interface:  SCSI
 - execute:
-  - command: compute reservations describe $$my-reservation$$ --zone $$zone$$ --format="flattened(name,specificReservation.instanceProperties.guestAccelerators[0].acceleratorCount,specificReservation.instanceProperties.guestAccelerators[0].acceleratorType)"
-  - stdout: |
-      name:                                                                         $$my-reservation$$
-      specificReservation.instanceProperties.guestAccelerators[0].acceleratorCount: 1
-      specificReservation.instanceProperties.guestAccelerators[0].acceleratorType:  nvidia-tesla-p4
-- execute:
   - command: compute reservations list --filter="zone:$$zone$$"
   - stdout: .*$$my-reservation$$.*$
 - execute:
@@ -48,9 +42,9 @@ summary:
   - stdout: .*$$my-reservation$$.*$
 - execute:
   - command: compute reservations get-iam-policy $$my-reservation$$ --zone $$zone$$
+      --format [etag]
   - stdout: |
       etag: ACAB
-      version: 1
 - execute:
   - command: compute reservations delete $$my-reservation$$ --zone $$zone$$ --quiet
   - stderr: |
@@ -86,8 +80,8 @@ actions:
 
 - execute_command:
     command: compute reservations create $$my-reservation$$ --zone $$zone$$ --vm-count=1
-      --machine-type=n1-standard-1 --min-cpu-platform="Intel Skylake" --accelerator=count=1,type=nvidia-tesla-p4
-      --local-ssd=interface=nvme,size=375 --local-ssd=interface=scsi,size=375
+      --machine-type=n1-standard-1 --min-cpu-platform="Intel Skylake" --local-ssd=interface=nvme,size=375
+      --local-ssd=interface=scsi,size=375
     validation_only: true
     events:
     - expect_stderr:
@@ -118,17 +112,6 @@ actions:
         specificReservation.instanceProperties.localSsds[0].interface:  NVME
         specificReservation.instanceProperties.localSsds[1].diskSizeGb: 375
         specificReservation.instanceProperties.localSsds[1].interface:  SCSI
-    - expect_exit:
-        code: 0
-
-- execute_command:
-    command: compute reservations describe $$my-reservation$$ --zone $$zone$$ --format="flattened(name,specificReservation.instanceProperties.guestAccelerators[0].acceleratorCount,specificReservation.instanceProperties.guestAccelerators[0].acceleratorType)"
-    validation_only: true
-    events:
-    - expect_stdout: |
-        name:                                                                         $$my-reservation$$
-        specificReservation.instanceProperties.guestAccelerators[0].acceleratorCount: 1
-        specificReservation.instanceProperties.guestAccelerators[0].acceleratorType:  nvidia-tesla-p4
     - expect_exit:
         code: 0
 
@@ -205,9 +188,6 @@ actions:
             specificReservation:
               instanceProperties:
                 machineType: n1-standard-1
-                guestAccelerators:
-                - acceleratorType: nvidia-tesla-p4
-                  acceleratorCount: 1
                 minCpuPlatform: Intel Skylake
                 localSsds:
                 - diskSizeGb: '375'
@@ -228,6 +208,7 @@ actions:
 
 - execute_command:
     command: compute reservations get-iam-policy $$my-reservation$$ --zone $$zone$$
+      --format [etag]
     validation_only: true
     events:
     - api_call:
@@ -242,7 +223,6 @@ actions:
           body: null
     - expect_stdout: |
         etag: ACAB
-        version: 1
     - expect_exit:
         code: 0
 

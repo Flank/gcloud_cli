@@ -79,7 +79,6 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     self.assertNotIn('original', self.stdout)
     self.assertNotIn('original', self.stderr)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testConvertKnownError(self):
     err = http_error.MakeHttpError(400)
     new_err, print_exc = exceptions.ConvertKnownError(err)

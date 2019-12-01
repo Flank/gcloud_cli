@@ -32,13 +32,14 @@ from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.core import properties
 
+from tests.lib import parameterized
 from tests.lib import test_case
 
 import mock
 import six
 
 
-class ConnectionContextTest(test_case.TestCase):
+class ConnectionContextTest(test_case.TestCase, parameterized.TestCase):
 
   def SetUp(self):
     self.get_client_instance = self.StartObjectPatch(apis, 'GetClientInstance')
@@ -64,8 +65,10 @@ class ConnectionContextTest(test_case.TestCase):
             properties.VALUES.api_endpoint_overrides.run.Get(),
             'https://kubernetes.default/')
 
-  def testConnectToRegion(self):
-    with connection_context._RegionalConnectionContext('us-central1'):
+  @parameterized.parameters('v1', 'v1alpha1')
+  def testConnectToRegion(self, version):
+    with connection_context._RegionalConnectionContext(
+        'us-central1', version):
       self.assertEqual(
           properties.VALUES.api_endpoint_overrides.run.Get(),
           'https://us-central1-run.googleapis.com/')

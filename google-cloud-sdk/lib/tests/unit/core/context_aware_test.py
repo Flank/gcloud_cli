@@ -21,13 +21,58 @@ from __future__ import unicode_literals
 import json
 import os
 
+import unittest
+
 from googlecloudsdk.core import context_aware
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
-CERT_KEY_SECTION = """-----BEGIN CERTIFICATE-----
+CERT_SECTION = """-----BEGIN CERTIFICATE-----
+LKJHLSDJKFHLEUIORWUYERWEHJHL
+KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
+-----END CERTIFICATE-----
+"""
+KEY_SECTION = """-----BEGIN ENCRYPTED PRIVATE KEY-----
+LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
+-----END ENCRYPTED PRIVATE KEY-----
+"""
+CERT_KEY_SECTION = CERT_SECTION + KEY_SECTION
+PASSWORD = '##invalid-password##'
+PASSWORD_SECTION = """
+-----BEGIN PASSPHRASE-----
+%s
+-----END PASSPHRASE-----
+""" % PASSWORD
+
+BAD_CERT_KEY_EMBEDDED_SECTION = """-----BEGIN CERTIFICATE-----
+LKJHLSDJKFHLEUIORWUYERWEHJHL
+KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
+-----END ENCRYPTED PRIVATE KEY-----
+-----END CERTIFICATE-----
+"""
+BAD_CERT_KEY_MISSING_END = """-----BEGIN CERTIFICATE-----
+LKJHLSDJKFHLEUIORWUYERWEHJHL
+KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
+-----END CERTIFICATE-----
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
+"""
+BAD_CERT_KEY_MISSING_BEGIN = """-----END CERTIFICATE-----
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
+-----END ENCRYPTED PRIVATE KEY-----
+"""
+BAD_CERT_KEY_MISMATCH = """-----BEGIN CERTIFICATE-----
+LKJHLSDJKFHLEUIORWUYERWEHJHL
+KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
+-----END ENCRYPTED PRIVATE KEY-----
+"""
+CERT_KEY_WITH_COMMENT_AT_BEGIN = """SOMECOMMENTS
+-----BEGIN CERTIFICATE-----
 LKJHLSDJKFHLEUIORWUYERWEHJHL
 KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
 -----END CERTIFICATE-----
@@ -35,12 +80,68 @@ KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
 LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
 -----END ENCRYPTED PRIVATE KEY-----
 """
-PASSWORD = '##invalid-password##'
-PASSWORD_SECTION = """
------BEGIN PASSPHRASE-----
-%s
------END PASSPHRASE-----
-""" % PASSWORD
+CERT_KEY_WITH_COMMENT_AT_END = """-----BEGIN CERTIFICATE-----
+LKJHLSDJKFHLEUIORWUYERWEHJHL
+KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
+-----END CERTIFICATE-----
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
+-----END ENCRYPTED PRIVATE KEY-----
+SOMECOMMENT
+"""
+CERT_KEY_WITH_COMMENT_IN_BETWEEN = """-----BEGIN CERTIFICATE-----
+LKJHLSDJKFHLEUIORWUYERWEHJHL
+KLJHGFDLSJKH(@#*&$)@*#KJHFLKJDSFSD
+-----END CERTIFICATE-----
+SOMECOMMENT
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+LKJWE:RUWEORIU)(#*&$@(#$KJHLKDJHF(I*F@YLFHSLDKJFS
+-----END ENCRYPTED PRIVATE KEY-----
+"""
+
+
+class PemFileParserTest(unittest.TestCase):
+
+  def testPemFileWithCommentAtBegin(self):
+    sections = context_aware._SplitPemIntoSections(
+        CERT_KEY_WITH_COMMENT_AT_BEGIN)
+    self.assertEqual(sections['CERTIFICATE'], CERT_SECTION)
+    self.assertEqual(sections['ENCRYPTED PRIVATE KEY'], KEY_SECTION)
+
+  def testPemFileWithCommentAtEnd(self):
+    sections = context_aware._SplitPemIntoSections(
+        CERT_KEY_WITH_COMMENT_AT_END)
+    self.assertEqual(sections['CERTIFICATE'], CERT_SECTION)
+    self.assertEqual(sections['ENCRYPTED PRIVATE KEY'], KEY_SECTION)
+
+  def testPemFileWithCommentInBetween(self):
+    sections = context_aware._SplitPemIntoSections(
+        CERT_KEY_WITH_COMMENT_IN_BETWEEN)
+    self.assertEqual(sections['CERTIFICATE'], CERT_SECTION)
+    self.assertEqual(sections['ENCRYPTED PRIVATE KEY'], KEY_SECTION)
+
+  def testPemFileWithBadFormatEmbeddedSection(self):
+    sections = context_aware._SplitPemIntoSections(
+        BAD_CERT_KEY_EMBEDDED_SECTION)
+    self.assertIsNone(sections.get('CERTIFICATE'))
+    self.assertEqual(sections.get('ENCRYPTED PRIVATE KEY'), KEY_SECTION)
+
+  def testPemFileWithBadFormatMissingEnd(self):
+    sections = context_aware._SplitPemIntoSections(
+        BAD_CERT_KEY_MISSING_END)
+    self.assertEqual(sections.get('CERTIFICATE'), CERT_SECTION)
+    self.assertIsNone(sections.get('ENCRYPTED PRIVATE KEY'))
+
+  def testPemFileWithBadFormatMissingBegin(self):
+    sections = context_aware._SplitPemIntoSections(
+        BAD_CERT_KEY_MISSING_BEGIN)
+    self.assertIsNone(sections.get('CERTIFICATE'))
+    self.assertEqual(sections.get('ENCRYPTED PRIVATE KEY'), KEY_SECTION)
+
+  def testPemFileWithBadFormatMismatch(self):
+    sections = context_aware._SplitPemIntoSections(BAD_CERT_KEY_MISMATCH)
+    self.assertIsNone(sections.get('CERTIFICATE'))
+    self.assertIsNone(sections.get('ENCRYPTED PRIVATE KEY'))
 
 
 class ContextAwareTest(sdk_test_base.SdkBase):
@@ -86,10 +187,11 @@ class ContextAwareTest(sdk_test_base.SdkBase):
       self.AssertFileEquals(CERT_KEY_SECTION, cfg.client_cert_path)
       self.assertEqual(PASSWORD, cfg.client_cert_password)
 
-  def testAutoDiscoveryWithBadFormat(self):
+  def testAutoDiscoveryWithBadPemFile(self):
     properties.VALUES.context_aware.use_client_certificate.Set(True)
     with file_utils.TemporaryDirectory() as t:
-      self.ConfigureCertProvider(t, '*invalid-contents*')
+      pem = BAD_CERT_KEY_EMBEDDED_SECTION + PASSWORD_SECTION
+      self.ConfigureCertProvider(t, pem)
       with self.assertRaises(context_aware.ConfigException):
         context_aware.Config()
 

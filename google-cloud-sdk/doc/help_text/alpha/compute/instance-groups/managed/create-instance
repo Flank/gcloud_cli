@@ -1,8 +1,7 @@
 NAME
     gcloud alpha compute instance-groups managed create-instance - create a new
         virtual machine instance in a managed instance group with a defined
-        name and optionally its stateful configuration: stateful disk, stateful
-        metadata
+        name and optionally its stateful configuration
 
 SYNOPSIS
     gcloud alpha compute instance-groups managed create-instance NAME
@@ -121,9 +120,22 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To create an instance instance-1 in my-group (in region europe-west4) with
+    metadata my-key: my-value and a disk disk-1 attached to it as the device
+    device-1, run:
+
+        $ gcloud alpha compute instance-groups managed create-instance \
+              my-group --region=europe-west4 \
+              --instance=instance-1 \
+              --stateful-disk='device-name=foo,source=https://compute.googleapis.com/compute/alpha/projects/my-project/zones/europe-west4/disks/disk-1,mode=rw,auto-delete=on-permanent-instance-deletion' \
+              --stateful-metadata='my-key=my-value'
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute instance-groups managed create-instance
 

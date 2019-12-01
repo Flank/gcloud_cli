@@ -47,7 +47,7 @@ EXAMPLES
 
         $ gcloud beta app domain-mappings list
 
-    To create a domain with an automatically managed certiticate, run:
+    To create a domain with an automatically managed certificate, run:
 
         $ gcloud beta app domain-mappings create 'example.com' \
             --certificate-management=AUTOMATIC

@@ -18,27 +18,31 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.firestore import e2e_base
 
 
-class OperationsIntegrationTest(e2e_base.FirestoreE2ETestBase):
-  """Integration test for all operations commands.
+class OperationsIntegrationTestGA(e2e_base.FirestoreE2ETestBase):
+  """Integration test for all GA operations commands.
 
   This test does not mutate project state, and makes no assumptions about the
   contents of the project besides that operations are not commonly deleted.
   """
 
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
   def testOperationsList(self):
-    self.Run('alpha firestore operations list --page-size=10 --limit=20')
+    self.Run('firestore operations list --page-size=10 --limit=20')
 
   def testOperationsDescribe(self):
-    operations = list(self.Run('alpha firestore operations list'))
+    operations = list(self.Run('firestore operations list'))
     if not operations:
       self.skipTest('No operations to describe')
     operation_id = operations[0].name
     operation = self.Run(
-        'alpha firestore operations describe {0}'.format(operation_id))
+        'firestore operations describe {0}'.format(operation_id))
     # TODO(b/36049789): Uncomment after fixing AssertMessagesEqual to handle
     # JsonValue field sorting.
     # self.AssertMessagesEqual(operations[0], operation)

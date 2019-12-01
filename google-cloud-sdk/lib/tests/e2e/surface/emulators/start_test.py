@@ -58,8 +58,6 @@ class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
                          'Executing:',
                          'routes configuration written to file:',
                          'proxy configuration written to file:',
-                         ('INFO: proxying to gcp disabled and local emulator '
-                          'not found, no route for service: datastore'),
                          ('INFO: creating handler for service [pubsub] to '
                           'local port ['),
                          'com.google.cloudsdk.emulators.EmulatorProxy main',

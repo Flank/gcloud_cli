@@ -115,7 +115,8 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
     daisy_utils.AppendArg(
         import_vars, 'scratch_bucket_gcs_path',
-        'gs://{0}/'.format(self.GetScratchBucketName(not from_image)))
+        'gs://{0}/'.format(self.GetScratchBucketName(
+            not from_image or include_storage_location)))
 
     daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
     daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
@@ -288,6 +289,37 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
 
     self.AssertErrContains('Created [https://cloudbuild.googleapis.com/'
                            'v1/projects/my-project/builds/1234]')
+
+  def testDescription(self):
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetNetworkStepForImport(include_zone=False,
+                                     description='custom ubuntu image'))
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             --description="custom ubuntu image"
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
+
+  def testFamily(self):
+    self.PrepareDaisyMocksWithRegionalBucket(
+        self.GetNetworkStepForImport(include_zone=False, family='ubuntu'))
+    self.AddStorageRewriteMock()
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             --family ubuntu
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        [import-image] output
+        """, normalize_space=True)
 
   def testTimeoutFlag(self):
     # Daisy timeout 2% sooner than Argo.
@@ -542,7 +574,6 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     return self.cloudbuild_v1_messages.BuildStep(
         args=import_vars, name=self.builder)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testGcloudBailsWhenFileUploadFails(self):
     self.PrepareDaisyBucketMocksWithoutRegion()
     self.AddStorageUploadMock(error=True)
@@ -685,12 +716,15 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
     properties.VALUES.compute.zone.Set('us-west1-c')
     self.doZoneFlagTest(add_zone_cli_arg=False)
 
-  def doNetworkTestSuccess(self, daisy_step, cmd, from_image=False):
-    if from_image:
-      self.PrepareDaisyMocksWithDefaultBucket(daisy_step)
+  def doNetworkTestSuccess(
+      self, daisy_step, cmd, regionalized=True, from_image=False):
+    if regionalized:
+      self.PrepareDaisyMocksWithRegionalBucket(
+          daisy_step, match_source_file_region=not from_image)
+      if not from_image:
+        self.AddStorageRewriteMock()
     else:
-      self.PrepareDaisyMocksWithRegionalBucket(daisy_step)
-      self.AddStorageRewriteMock()
+      self.PrepareDaisyMocksWithDefaultBucket(daisy_step)
     self.Run(cmd)
     self.AssertOutputContains('[import-image] output', normalize_space=True)
 
@@ -749,7 +783,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
         --network {2}
         """.format(
             self.image_name, self.source_image, self.network),
-        from_image=True)
+        regionalized=False)
 
   def testSubnetFlagFromImage(self):
     self.doNetworkTestSuccess(
@@ -761,7 +795,7 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
         --network {2} --subnet {3} --zone my-region-c
         """.format(
             self.image_name, self.source_image, self.network, self.subnet),
-        from_image=True)
+        regionalized=False)
 
   def testScratchBucketCreatedInSourceRegion(self):
     import_step = self.GetNetworkStepForImport(include_zone=False)
@@ -817,6 +851,28 @@ class ImageImportTest(daisy_test_base.DaisyBaseTest):
                  --source-file gs://bucket --os ubuntu-1604
                  """.format(self.image_name))
 
+  def testStorageLocationFlagFromGCSFile(self):
+    self.doNetworkTestSuccess(
+        self.GetNetworkStepForImport(include_zone=True,
+                                     include_storage_location=True),
+        """
+        compute images import {0} --source-file {1} --os ubuntu-1604
+        --zone my-region-c --storage-location my-region
+        """.format(
+            self.image_name, self.source_disk))
+
+  def testStorageLocationFlagFromImage(self):
+    self.doNetworkTestSuccess(
+        self.GetNetworkStepForImport(
+            network=self.network, include_zone=True, from_image=True,
+            include_storage_location=True),
+        """
+        compute images import {0} --source-image {1} --os ubuntu-1604
+        --network {2} --storage-location my-region --zone my-region-c
+        """.format(
+            self.image_name, self.source_image, self.network),
+        regionalized=True, from_image=True)
+
 
 class ImageImportTestBeta(ImageImportTest):
 
@@ -841,30 +897,6 @@ class ImageImportTestBeta(ImageImportTest):
         [import-image] output
         """, normalize_space=True)
 
-  def testStorageLocation(self):
-    self.doNetworkTestSuccess(
-        self.GetNetworkStepForImport(include_zone=True,
-                                     include_storage_location=True),
-        """
-        compute images import {0} --source-file {1} --os ubuntu-1604
-        --zone my-region-c --storage-location my-region
-        """.format(
-            self.image_name, self.source_disk))
-
-  def GetImportStepForWindowsByolMapping(self, target_workflow,
-                                         translate_workflow):
-    import_vars = []
-    daisy_utils.AppendArg(import_vars, 'source_image', self.source_image)
-    daisy_utils.AppendArg(import_vars, 'os', 'windows-7-byol')
-    daisy_utils.AppendArg(
-        import_vars, 'scratch_bucket_gcs_path',
-        'gs://{0}/'.format(self.GetScratchBucketNameWithoutRegion()))
-    daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
-    daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
-    daisy_utils.AppendArg(import_vars, 'image_name', self.destination_image)
-    return self.cloudbuild_v1_messages.BuildStep(
-        args=import_vars, name=self.builder)
-
   def testDockerImageTag(self):
     self.builder = daisy_utils._IMAGE_IMPORT_BUILDER.format(
         daisy_utils._DEFAULT_BUILDER_VERSION)
@@ -883,36 +915,20 @@ class ImageImportTestBeta(ImageImportTest):
         [import-image] output
         """, normalize_space=True)
 
-  def testDescription(self):
-    self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetNetworkStepForImport(include_zone=False,
-                                     description='custom ubuntu image'))
-    self.AddStorageRewriteMock()
+  def GetImportStepForWindowsByolMapping(
+      self, target_workflow, translate_workflow):
+    import_vars = []
+    daisy_utils.AppendArg(import_vars, 'source_image', self.source_image)
+    daisy_utils.AppendArg(import_vars, 'os', 'windows-7-byol')
+    daisy_utils.AppendArg(
+        import_vars, 'scratch_bucket_gcs_path',
+        'gs://{0}/'.format(self.GetScratchBucketNameWithoutRegion()))
+    daisy_utils.AppendArg(import_vars, 'timeout', _DEFAULT_TIMEOUT)
+    daisy_utils.AppendArg(import_vars, 'client_id', 'gcloud')
+    daisy_utils.AppendArg(import_vars, 'image_name', self.destination_image)
+    return self.cloudbuild_v1_messages.BuildStep(
+        args=import_vars, name=self.builder)
 
-    self.Run("""
-             compute images import {0}
-             --source-file {1} --os ubuntu-1604
-             --description="custom ubuntu image"
-             """.format(self.image_name, self.source_disk))
-
-    self.AssertOutputContains("""\
-        [import-image] output
-        """, normalize_space=True)
-
-  def testFamily(self):
-    self.PrepareDaisyMocksWithRegionalBucket(
-        self.GetNetworkStepForImport(include_zone=False, family='ubuntu'))
-    self.AddStorageRewriteMock()
-
-    self.Run("""
-             compute images import {0}
-             --source-file {1} --os ubuntu-1604
-             --family ubuntu
-             """.format(self.image_name, self.source_disk))
-
-    self.AssertOutputContains("""\
-        [import-image] output
-        """, normalize_space=True)
 
 if __name__ == '__main__':
   test_case.main()

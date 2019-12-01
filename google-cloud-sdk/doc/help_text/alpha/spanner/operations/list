@@ -57,6 +57,16 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list Cloud Spanner operations for an instance, run:
+
+        $ gcloud alpha spanner operations list --instance=my-instance-id
+
+    To list Cloud Spanner operations for a database, run:
+
+        $ gcloud alpha spanner operations list --instance=my-instance-id \
+            --database=my-database-id
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

@@ -2,8 +2,8 @@ NAME
     gcloud alpha dataproc clusters export - export a cluster
 
 SYNOPSIS
-    gcloud alpha dataproc clusters export NAME [--destination=DESTINATION]
-        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha dataproc clusters export (CLUSTER : --region=REGION)
+        [--destination=DESTINATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Exports an existing cluster's configuration to a file. This
@@ -11,8 +11,28 @@ DESCRIPTION
     command.
 
 POSITIONAL ARGUMENTS
-     NAME
-        The name of the cluster to export.
+     Cluster resource - The name of the cluster to export. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument [cluster]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       CLUSTER
+          ID of the cluster or fully qualified identifier for the cluster. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --region=REGION
+          Cloud Dataproc region for the cluster. Each Cloud Dataproc region
+          constitutes an independent resource namespace constrained to
+          deploying instances into Google Compute Engine zones inside the
+          region. The default value of global is a special multi-region
+          namespace which is capable of deploying instances into all Google
+          Compute Engine zones globally, and is disjoint from other Cloud
+          Dataproc regions. Overrides the default dataproc/region property
+          value for this command invocation.
 
 FLAGS
      --destination=DESTINATION
@@ -21,12 +41,6 @@ FLAGS
         Alternatively, you may omit this flag to write to standard output. A
         schema describing the export/import format can be found in:
         $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1/Cluster.yaml.
-
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. Overrides the default
-        dataproc/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

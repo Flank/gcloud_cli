@@ -231,6 +231,68 @@ class SinksUpdateTestAlpha(SinksUpdateTest):
     self.AssertErrContains('Updated')
     self.AssertOutputContains('usePartitionedTables: true')
 
+  def testUpdateSuccessDisabled(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    expected_sink = self.msgs.LogSink(
+        name=test_sink.name,
+        disabled=True)
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com',
+        disabled=True)
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='disabled'),
+        updated_sink)
+    self.RunLogging('sinks update my-sink '
+                    '--disabled '
+                    '--format=default')
+    self.AssertErrContains('Updated')
+    self.AssertOutputContains('disabled: true')
+
+  def testUpdateSuccessDescription(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    expected_sink = self.msgs.LogSink(
+        name=test_sink.name,
+        description='pierogies')
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com',
+        description='pierogies')
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='description'),
+        updated_sink)
+    self.RunLogging('sinks update my-sink '
+                    '--description=pierogies '
+                    '--format=default')
+    self.AssertErrContains('Updated')
+    self.AssertOutputContains('description: pierogies')
+
   def testUpdateSuccessClearExclusions(self):
     test_sink = self.msgs.LogSink(
         name='my-sink',
@@ -315,6 +377,47 @@ class SinksUpdateTestAlpha(SinksUpdateTest):
         new_sink)
 
     self.RunLogging('sinks update my-sink --remove-exclusions ex2,ex4')
+    self.AssertErrContains('Updated')
+
+  def testUpdateAddExclusionsSuccess(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter'),
+        ],
+        writerIdentity='foo@bar.com')
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter'),
+            self.msgs.LogExclusion(name='ex2', filter='filter2'),
+            self.msgs.LogExclusion(name='ex3', filter='filter3'),
+        ])
+    new_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        exclusions=[
+            self.msgs.LogExclusion(name='ex1', filter='filter'),
+            self.msgs.LogExclusion(name='ex2', filter='filter2'),
+            self.msgs.LogExclusion(name='ex3', filter='filter3'),
+        ])
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=updated_sink,
+            uniqueWriterIdentity=True,
+            updateMask='exclusions'),
+        new_sink)
+
+    self.RunLogging('sinks update my-sink '
+                    '--add-exclusions=name=ex2,filter=filter2 '
+                    '--add-exclusions=name=ex3,filter=filter3')
     self.AssertErrContains('Updated')
 
 if __name__ == '__main__':

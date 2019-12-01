@@ -1,0 +1,59 @@
+NAME
+    gcloud alpha labelmanager keys delete - deletes the specified LabelKey
+        resource
+
+SYNOPSIS
+    gcloud alpha labelmanager keys delete
+        [LABEL_KEY_ID : --label-parent=LABEL_PARENT] [--async]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Deletes the LabelKey resource given the LabelKey's display name and
+    parent or the LabelKey's numeric id.
+
+POSITIONAL ARGUMENTS
+     LabelKey.
+
+       LABEL_KEY_ID
+          Display name or numeric id for the LabelKey. The display name must be
+          1-63 characters, beginning and ending with an alphanumeric character
+          ([a-z0-9A-Z]) with dashes (-), underscores (), dots (.), and
+          alphanumerics between. The numeric id should be of the form
+          labelKeys/{numeric_id}. This positional must be specified if any of
+          the other arguments in this group are specified.
+
+       --label-parent=LABEL_PARENT
+          Parent of the LabelKey. This must be the form organizations/{org_id}.
+          This field is required if LABEL_KEY_ID is a display name instead of a
+          numeric id.
+
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To delete a label key with id 123 run:
+
+        $ gcloud alpha labelmanager keys delete labelKeys/123
+
+    To delete a label key with the name env under resource organization/456
+    run:
+
+        $ gcloud alpha labelmanager keys delete env \
+            --label_parent='organizations/456'
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

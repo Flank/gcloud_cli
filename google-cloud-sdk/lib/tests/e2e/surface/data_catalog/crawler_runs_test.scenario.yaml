@@ -1,7 +1,7 @@
-skip:
-  reason: Failing
-  bug: b/132375552
-  always: true
+filters:
+  skipAlways:
+    reason: Failing
+    bug: b/132375552
 title: Start, describe, and list crawler runs.
 release_tracks: [ALPHA]
 summary:

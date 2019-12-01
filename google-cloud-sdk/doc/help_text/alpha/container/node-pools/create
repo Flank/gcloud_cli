@@ -5,12 +5,13 @@ NAME
 SYNOPSIS
     gcloud alpha container node-pools create NAME
         [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
-        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
+        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE]
+        [--enable-autoprovisioning] [--enable-autorepair]
         [--no-enable-autoupgrade] [--image-type=IMAGE_TYPE]
         [--linux-sysctls=KEY=VALUE,[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
-        [--max-surge-upgrade=MAX_SURGE_UPGRADE]
+        [--max-surge-upgrade=MAX_SURGE_UPGRADE; default=1]
         [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
@@ -64,6 +65,13 @@ FLAGS
      --disk-type=DISK_TYPE
         Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
         be one of: pd-standard, pd-ssd.
+
+     --enable-autoprovisioning
+        Enables Cluster Autoscaler to treat the node pool as if it was
+        autoprovisioned.
+
+        Cluster Autoscaler will be able to delete the node pool if it's
+        unneeded.
 
      --enable-autorepair
         Enable node autorepair feature for a node pool.
@@ -138,7 +146,7 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'.
 
-     --max-surge-upgrade=MAX_SURGE_UPGRADE
+     --max-surge-upgrade=MAX_SURGE_UPGRADE; default=1
         Number of extra (surge) nodes to be created on each upgrade of the node
         pool.
 
@@ -147,7 +155,10 @@ FLAGS
         result in creating an extra node each time the node pool is upgraded:
 
             $ gcloud alpha container node-pools create node-pool-1 \
-                --cluster=example-cluster --max-surge-upgrade 1
+                --cluster=example-cluster --max-surge-upgrade=1   \
+                --max-unavailable-upgrade=0
+
+        Must be used in conjunction with '--max-unavailable-upgrade'.
 
      --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE
         Number of nodes that can be unavailable at the same time on each
@@ -160,8 +171,10 @@ FLAGS
         pool is upgraded:
 
             $ gcloud alpha container node-pools create node-pool-1 \
-                --cluster=example-cluster --num-nodes=5 --max-surge-upgrade 1 \
-                --max-unavailable-upgrade=2
+                --cluster=example-cluster --num-nodes=5   \
+                --max-surge-upgrade=1 --max-unavailable-upgrade=2
+
+        Must be used in conjunction with '--max-surge-upgrade'.
 
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Compute Engine metadata to be made available to the guest operating

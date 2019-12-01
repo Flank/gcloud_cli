@@ -658,7 +658,6 @@ class ResourceTransformTest(test_case.Base):
     self.Run(resource, None, resource_transform.TransformDate, [], expected,
              kwargs)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testTransformDateErrors(self):
     resource = [1e12]
     kwargs = {'undefined': 'UNDEFINED'}

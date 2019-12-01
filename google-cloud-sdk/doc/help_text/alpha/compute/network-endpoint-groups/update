@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute network-endpoint-groups update - updates a Google
+    gcloud alpha compute network-endpoint-groups update - update a Google
         Compute Engine network endpoint group
 
 SYNOPSIS
@@ -21,72 +21,103 @@ REQUIRED FLAGS
           The network endpoint to add to the network endpoint group. Keys used
           depend on the endpoint type of the NEG.
 
-          + GCE_VM_IP_PORT
-            - instance - Name of instance in same zone as the network
-              endpoint group.
+          GCE_VM_IP_PORT
 
-                  The VM instance must belong to the network / subnetwork
-                  associated with the network endpoint group. If the VM instance
-                  is deleted, then any network endpoint group that has a reference
-                  to it is updated.
+              *instance* - Name of instance in same zone as the network endpoint
+              group.
 
-            - ip - Optional IP address of the network endpoint. the IP
-              address must belong to a VM in compute engine (either the primary
-              IP or as part of an aliased IP range). If the IP address is not
-              specified, then the primary IP address for the VM instance in the
-              network that the network endpoint group belongs to will be used.
+              The VM instance must belong to the network / subnetwork
+              associated with the network endpoint group. If the VM instance
+              is deleted, then any network endpoint group that has a reference
+              to it is updated.
 
-            - port - Required endpoint port unless NEG default port is set.
+              *ip* - Optional IP address of the network endpoint. the IP address
+              must belong to a VM in compute engine (either the primary IP or
+              as part of an aliased IP range). If the IP address is not
+              specified, then the primary IP address for the VM instance in
+              the network that the network endpoint group belongs to will be
+              used.
 
-          + INTERNET_IP_PORT
-            - ip - Required IP address of the endpoint to attach. Must be
+              *port* - Required endpoint port unless NEG default port is set.
+
+          INTERNET_IP_PORT
+
+              *ip* - Required IP address of the endpoint to attach. Must be
               publicly routable.
 
-            - port - Optional port of the endpoint to attach. If unspecified
-              then NEG default port is set. If no default port is set, the well
-              known port for the backend protocol will be used instead (80 for
-              http, 443 for https).
+              *port* - Optional port of the endpoint to attach. If unspecified
+              then NEG default port is set. If no default port is set, the
+              well known port for the backend protocol will be used instead
+              (80 for http, 443 for https).
 
-          + INTERNET_FQDN_PORT
-            - fqdn - Required fully qualified domain name to use to look up
-              an external endpoint. Must be resolvable to a public IP address
-              via public DNS.
+          INTERNET_FQDN_PORT
 
-            - port - Optional port of the endpoint to attach. If unspecified
-              then NEG default port is set. If no default port is set, the well
-              known port for the backend protocol will be used instead (80 for
-              http, 443 for https or http2).
+              *fqdn* - Required fully qualified domain name to use to look up an
+              external endpoint. Must be resolvable to a public IP address via
+              public DNS.
 
-         --remove-endpoint=[fqdn=FQDN],[instance=INSTANCE],[ip=IP],[port=PORT]
-            The network endpoint to detach from the network endpoint group.
-            Keys used depend on the endpoint type of the NEG.
+              *port* - Optional port of the endpoint to attach. If unspecified
+              then NEG default port is set. If no default port is set, the
+              well known port for the backend protocol will be used instead
+              (80 for http, 443 for https or http2).
 
-                o GCE_VM_IP_PORT
+          NON_GCP_PRIVATE_IP_PORT
 
-                  * instance - Required name of instance whose endpoint(s) to
-                    detach. If IP address is unset then all endpoints for the
-                    instance in the NEG will be detached.
+              *ip* - Required IP address of the network endpoint to attach. The
+              IP address must belong to a VM not in Google Compute Engine and
+              must be routable using a cloud router over VPN or an Interconnect.
 
-                  * ip - Optional IP address of the network endpoint to
-                    detach. If specified port must be provided as well.
+              *port* - Required port of the network endpoint to attach unless
+              NEG default port is set.
 
-                  * port - Optional port of the network endpoint to detach.
+          GCE_VM_PRIMARY_IP
 
-                o INTERNET_IP_PORT
+              *ip* - Required IP address of the network endpoint to attach. The
+              IP address must be the primary IP of a VM's primary network
+              interface.
 
-                  * ip - Required IP address of the network endpoint to
-                    detach.
+       --remove-endpoint=[fqdn=FQDN],[instance=INSTANCE],[ip=IP],[port=PORT]
+          The network endpoint to detach from the network endpoint group. Keys
+          used depend on the endpoint type of the NEG.
 
-                  * port - Optional port of the network endpoint to detach if
-                    the endpoint has a port specified.
+          GCE_VM_IP_PORT
 
-                o INTERNET_FQDN_PORT
+              *instance* - Required name of instance whose endpoint(s) to
+              detach. If IP address is unset then all endpoints for the
+              instance in the NEG will be detached.
 
-                  * fqdn - Required fully qualified domain name of the
-                    endpoint to detach.
+              *ip* - Optional IP address of the network endpoint to detach.
+              If specified port must be provided as well.
 
-                  * port - Optional port of the network endpoint to detach if
-                    the endpoint has a port specified.
+              *port* - Optional port of the network endpoint to detach.
+
+          INTERNET_IP_PORT
+
+              *ip* - Required IP address of the network endpoint to detach.
+
+              *port* - Optional port of the network endpoint to detach if the
+              endpoint has a port specified.
+
+          INTERNET_FQDN_PORT
+
+              *fqdn* - Required fully qualified domain name of the endpoint to
+              detach.
+
+              *port* - Optional port of the network endpoint to detach if the
+              endpoint has a port specified.
+
+          NON_GCP_PRIVATE_IP_PORT
+
+              *ip* - Required IP address of the network endpoint to detach.
+
+              *port* - Required port of the network endpoint to detach unless
+              NEG default port is set.
+
+          GCE_VM_PRIMARY_IP
+
+              *ip* - Required IP address of the network endpoint to attach. The
+              IP address must be the primary IP of a VM's primary network
+              interface.
 
 OPTIONAL FLAGS
      At most one of these may be specified:

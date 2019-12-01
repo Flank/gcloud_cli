@@ -3,7 +3,8 @@ NAME
         annotation stores
 
 SYNOPSIS
-    gcloud alpha healthcare annotation-stores COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha healthcare annotation-stores GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Manage Cloud Healthcare API annotation stores.
@@ -14,6 +15,18 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+GROUPS
+    GROUP is one of the following:
+
+     evaluate
+        (ALPHA) Manage Cloud Healthcare API Annotation store evaluates.
+
+     export
+        (ALPHA) Manage Cloud Healthcare API Annotation store exports.
+
+     import
+        (ALPHA) Manage Cloud Healthcare API Annotation store imports.
 
 COMMANDS
     COMMAND is one of the following:

@@ -1,0 +1,92 @@
+
+.TH "GCLOUD_ACTIVE\-DIRECTORY_OPERATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud active\-directory operations describe \- describe a Managed Microsoft AD operation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud active\-directory operations describe\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describe a Managed Microsoft AD operation given a valid operation name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The operation specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given operation.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Operation resource \- Name of the Managed Microsoft AD operation you want to
+describe. This represents a Cloud resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [operation] on the command line with a fully
+specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of the operation or fully qualified identifier for the operation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmanagedidentities/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/managed\-microsoft\-ad/
+
+
+
+.SH "EXAMPLES"
+
+The following command describes an operation called
+\f5operation\-1484002552235\-425b144f8c3f8\-81aa4b49\-0830d1e9\fR:
+
+.RS 2m
+$ gcloud active\-directory operations describe \e
+    operation\-1484002552235\-425b144f8c3f8\-81aa4b49\-0830d1e9
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha active\-directory operations describe
+$ gcloud beta active\-directory operations describe
+.RE
+

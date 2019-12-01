@@ -48,6 +48,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     explain
+        (ALPHA) Run AI Platform explanation.
+
      predict
         (ALPHA) Run AI Platform online prediction.
 

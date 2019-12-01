@@ -106,6 +106,22 @@ class RunUnitTest(base.DataflowMockingTestBase,
         '--service-account-email=a@b.com --zone=us-foo1-a --max-workers=5')
     self.assertEqual(JOB_1_ID, result.id)
 
+  def testRunWithPrivateIPRuntimeEnvironmentValues(self):
+    self.MockRunJob(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment),
+        gcs_location='gs://foo',
+        service_account_email='a@b.com',
+        zone='us-foo1-a',
+        job_name='myjob',
+        max_workers=5,
+        disable_public_ips=True)
+    result = self.Run(
+        'dataflow jobs run myjob --gcs-location=gs://foo '
+        '--service-account-email=a@b.com --zone=us-foo1-a --max-workers=5 '
+        '--disable-public-ips')
+    self.assertEqual(JOB_1_ID, result.id)
+
   def testRunBetaNoParameters(self):
     self.MockRunJob(
         job=self.SampleJob(

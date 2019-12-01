@@ -19,12 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import operations
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.firestore import base
 
 
-class CancelTest(base.FirestoreCommandUnitTest):
-  """Tests the firestore operations cancel command."""
+class CancelTestGA(base.FirestoreCommandUnitTest):
+  """Tests the GA firestore operations cancel command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCancelRelativeResourcePath(self):
     operation_name_relative = 'doomed'
@@ -57,6 +61,20 @@ class CancelTest(base.FirestoreCommandUnitTest):
     request = messages.FirestoreProjectsDatabasesOperationsCancelRequest()
     request.name = name
     return request
+
+
+class CancelTestBeta(CancelTestGA):
+  """Tests the beta firestore operations cancel command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CancelTestAlpha(CancelTestBeta):
+  """Tests the alpha firestore operations cancel command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

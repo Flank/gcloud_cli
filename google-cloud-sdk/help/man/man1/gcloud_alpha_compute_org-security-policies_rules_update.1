@@ -11,7 +11,7 @@ gcloud alpha compute org\-security\-policies rules update \- update a Google Com
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute org\-security\-policies rules update\fR \fIPRIORITY\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-action\fR=\fIACTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dest\-ip\-ranges\fR=[\fIDEST_IP_RANGE\fR,...]] [\fB\-\-dest\-ports\fR=[\fIDEST_PORTS\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]] [\fB\-\-target\-resources\fR=[\fITARGET_RESOURCES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute org\-security\-policies rules update\fR \fIPRIORITY\fR \fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR [\fB\-\-action\fR=\fIACTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dest\-ip\-ranges\fR=[\fIDEST_IP_RANGE\fR,...]] [\fB\-\-dest\-ports\fR=[\fIDEST_PORTS\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-new\-priority\fR=\fINEW_PRIORITY\fR] [\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]] [\fB\-\-target\-resources\fR=[\fITARGET_RESOURCES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,6 +74,10 @@ incoming traffic. \fIDIRECTION\fR must be one of: \fBINGRESS\fR, \fBEGRESS\fR.
 \fB\-\-enable\-logging\fR
 Use this flag to enable logging of connections that allowed or denied by this
 rule.
+
+.TP 2m
+\fB\-\-new\-priority\fR=\fINEW_PRIORITY\fR
+New priority for the rule to update. Valid in [0, 65535].
 
 .TP 2m
 \fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]

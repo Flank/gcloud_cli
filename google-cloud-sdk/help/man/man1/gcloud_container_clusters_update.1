@@ -11,7 +11,7 @@ gcloud container clusters update \- update cluster settings for an existing cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -63,6 +63,25 @@ $ gcloud container clusters update example\-cluster \e
 
 This causes the cluster to stop serving its old IP, and return to a single IP
 state.
+
+.TP 2m
+\fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR
+Enable Database Encryption.
+
+Enable database encryption that will be used to encrypt Kubernetes Secrets at
+the application layer. The key provided should be the resource ID in the format
+of
+\f5projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]\fR.
+For more information, see
+<https://cloud.google.com/kubernetes\-engine/docs/how\-to/encrypting\-secrets>.
+
+.TP 2m
+\fB\-\-disable\-database\-encryption\fR
+Disable database encryption.
+
+Disable Database Encryption which encrypt Kubernetes Secrets at the application
+layer. For more information, see
+<https://cloud.google.com/kubernetes\-engine/docs/how\-to/encrypting\-secrets>.
 
 .TP 2m
 \fB\-\-enable\-autoscaling\fR
@@ -123,6 +142,10 @@ the master by using \-\-update\-addons=NetworkPolicy=ENABLED flag.
 Enable Stackdriver Kubernetes monitoring and logging.
 
 .TP 2m
+\fB\-\-enable\-vertical\-pod\-autoscaling\fR
+Enable vertical pod autoscaling for a cluster.
+
+.TP 2m
 \fB\-\-generate\-password\fR
 Ask the server to generate a secure password and use that as the basic auth
 password, keeping the existing username.
@@ -137,9 +160,16 @@ $ gcloud container clusters update example\-cluster \e
     \-\-maintenance\-window=12:43
 .RE
 
-The time corresponds to the UTC time zone, and must be in HH:MM format. To
-remove an existing maintenance window from the cluster, use
-\'\-\-maintenance\-window=None'.
+The time corresponds to the UTC time zone, and must be in HH:MM format.
+
+Non\-emergency maintenance will occur in the 4 hour block starting at the
+specified time.
+
+This is mutually exclusive with the recurring maintenance windows and will
+overwrite any existing window. Compatible with maintenance exclusions.
+
+To remove an existing maintenance window from the cluster, use
+\'\-\-clear\-maintenance\-window'.
 
 .TP 2m
 \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
@@ -220,6 +250,110 @@ $ gcloud container clusters update example\-cluster \e
 
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-maintenance\-window\fR
+If set, remove the maintenance window that was set with \-\-maintenance\-window
+family of flags.
+
+.TP 2m
+\fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR
+Name of a maintenance exclusion to remove. If you hadn't specified a name, one
+was auto\-generated. Get it with $ gcloud container clusters describe.
+
+.TP 2m
+
+Sets a period of time in which maintenance should not occur. This is compatible
+with both daily and recurring maintenance windows.
+
+Example:
+
+.RS 2m
+$ gcloud container clusters update example\-cluster   \e
+    \-\-add\-maintenance\-exclusion\-name=holidays\-2000   \e
+    \-\-add\-maintenance\-exclusion\-start=2000\-11\-20T00:00:00   \e
+    \-\-add\-maintenance\-exclusion\-end=2000\-12\-31T23:59:59
+.RE
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR
+End time of the exclusion window. Must take place after the start time. See $
+gcloud topic datetimes for information on time formats. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR
+A descriptor for the exclusion that can be used to remove it. If not specified,
+it will be autogenerated.
+
+.TP 2m
+\fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR
+Start time of the exclusion window (can occur in the past). If not specified,
+the current time will be used. See $ gcloud topic datetimes for information on
+time formats.
+
+.RE
+.sp
+.TP 2m
+
+Set a flexible maintenance window by specifying a window that recurs per an RFC
+5545 RRULE. Non\-emergency maintenance will occur in the recurring windows.
+
+Examples:
+
+For a 9\-5 Mon\-Wed UTC\-4 maintenance window:
+
+.RS 2m
+$ gcloud container clusters update example\-cluster   \e
+    \-\-maintenance\-window\-start=2000\-01\-01T09:00:00\-04:00   \e
+    \-\-maintenance\-window\-end=2000\-01\-01T17:00:00\-04:00   \e
+    \-\-maintenance\-window\-recurrence='FREQ=WEEKLY;BYDAY=MO,TU,WE'
+.RE
+
+For a daily window from 22:00 \- 04:00 UTC:
+
+.RS 2m
+$ gcloud container clusters update example\-cluster   \e
+    \-\-maintenance\-window\-start=2000\-01\-01T22:00:00Z   \e
+    \-\-maintenance\-window\-end=2000\-01\-02T04:00:00Z   \e
+    \-\-maintenance\-window\-recurrence=FREQ=DAILY
+.RE
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR
+End time of the first window (can occur in the past). Must take place after the
+start time. The difference in start and end time specifies the length of each
+recurrence. See $ gcloud topic datetimes for information on time formats. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR
+An RFC 5545 RRULE, specifying how the window will recur. Note that minimum
+requirements for maintenance periods will be enforced. Note that FREQ=SECONDLY,
+MINUTELY, and HOURLY are not supported. This flag must be specified if any of
+the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR
+Start time of the first window (can occur in the past). The start time
+influences when the window will start for recurrences. See $ gcloud topic
+datetimes for information on time formats. This flag must be specified if any of
+the other arguments in this group are specified.
+
+.RE
+.RE
+.sp
+.TP 2m
+
 Exports cluster's usage of cloud resources At most one of these may be
 specified:
 
@@ -268,6 +402,151 @@ $ gcloud container clusters update example\-cluster \e
 
 .RE
 .sp
+.TP 2m
+
+Node autoprovisioning
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-autoprovisioning\fR
+Enables node autoprovisioning for a cluster.
+
+Cluster Autoscaler will be able to create new node pools. Requires maximum CPU
+and memory limits to be specified. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR
+Path of the JSON/YAML file which contains information about the cluster's node
+autoprovisioning configuration. Currently it contains a list of resource limits,
+identity defaults for autoprovisioning and node locations for autoprovisioning.
+
+Resource limits are specified in the field 'resourceLimits'. Each resource
+limits definition contains three fields: resourceType, maximum and minimum.
+Resource type can be "cpu", "memory" or an accelerator (e.g.
+"nvidia\-tesla\-k80" for nVidia Tesla K80). Use gcloud compute
+accelerator\-types list to learn about available accelerator types. Maximum is
+the maximum allowed amount with the unit of the resource. Minimum is the minimum
+allowed amount with the unit of the resource.
+
+Identity default contains at most one of the below fields: serviceAccount: The
+Google Cloud Platform Service Account to be used by node VMs in autoprovisioined
+node pools. If not specified, the project default service account is used.
+scopes: A list of scopes be used by node instances in autoprovisioined node
+pools. Multiple scopes can be specified, separated by commas. For information on
+defaults, look at:
+https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
+
+Autoprovisioning locations is a set of zones where new node pools can be created
+by Autoprovisioning. Autoprovisioning locations are specified in the field
+\'autoprovisioningLocations'. All zones must be in the same region as the
+cluster's master(s).
+
+.TP 2m
+
+Flags to configure autoprovisioned nodes
+
+.RS 2m
+.TP 2m
+\fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
+Set of zones where new node pools can be created by autoprovisioning. All zones
+must be in the same region as the cluster's master(s). Multiple locations can be
+specified, separated by commas.
+
+.TP 2m
+\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR
+Maximum number of cores in the cluster.
+
+Maximum number of cores to which the cluster can scale.
+
+.TP 2m
+\fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR
+Maximum memory in the cluster.
+
+Maximum number of gigabytes of memory to which the cluster can scale.
+
+.TP 2m
+\fB\-\-min\-cpu\fR=\fIMIN_CPU\fR
+Minimum number of cores in the cluster.
+
+Minimum number of cores to which the cluster can scale.
+
+.TP 2m
+\fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR
+Minimum memory in the cluster.
+
+Minimum number of gigabytes of memory to which the cluster can scale.
+
+.TP 2m
+
+Flags to specify identity for autoprovisioned nodes:
+
+.RS 2m
+.TP 2m
+\fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]
+The scopes be used by node instances in autoprovisioined node pools. Multiple
+scopes can be specified, separated by commas. For information on defaults, look
+at:
+https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
+
+.TP 2m
+\fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR
+The Google Cloud Platform Service Account to be used by node VMs in
+autoprovisioined node pools. If not specified, the project default service
+account is used.
+
+.RE
+.sp
+.TP 2m
+
+Arguments to set limits on accelerators:
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]
+Sets maximum limit for a single type of accelerators (e.g. GPUs) in cluster.
+
+.RE
+.RE
+.RE
+.RE
+.sp
+.TP 2m
+\fBtype\fR
+(Required) The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of
+accelerator for which the limit is set. Use \f5gcloud compute accelerator\-types
+list\fR to learn about all available accelerator types.
+
+.TP 2m
+\fBcount\fR
+(Required) The maximum number of accelerators to which the cluster can be
+scaled. This flag must be specified if any of the other arguments in this group
+are specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]
+Sets minimum limit for a single type of accelerators (e.g. GPUs) in cluster.
+Defaults to 0 for all accelerator types if it isn't set.
+
+.RE
+.sp
+.TP 2m
+\fBtype\fR
+(Required) The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of
+accelerator for which the limit is set. Use \f5gcloud compute accelerator\-types
+list\fR to learn about all available accelerator types.
+
+.TP 2m
+\fBcount\fR
+(Required) The minimum number of accelerators to which the cluster can be
+scaled.
+
 .TP 2m
 \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR
 Logging service to use for the cluster. Options are:

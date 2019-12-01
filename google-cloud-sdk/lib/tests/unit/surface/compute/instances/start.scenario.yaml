@@ -10,7 +10,11 @@ summary:
     - status: SUCCESS
   - stderr: |
       Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1].
+      Instance internal IP is 10.128.0.3
+      Instance external IP is 100.107.248.102
       Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2].
+      Instance internal IP is 10.128.0.2
+      Instance external IP is 100.107.248.223
 actions:
 - execute_command:
     command: compute instances start a1 a2 --zone us-east1-b
@@ -198,6 +202,10 @@ actions:
             zone: http://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
     - expect_stderr: |
         Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1].
+        Instance internal IP is 10.128.0.3
+        Instance external IP is 100.107.248.102
         Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2].
+        Instance internal IP is 10.128.0.2
+        Instance external IP is 100.107.248.223
     - expect_exit:
         code: 0

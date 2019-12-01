@@ -18,22 +18,69 @@ FLAGS
         The default port to use if the port number is not specified in the
         network endpoint.
 
-        If this flag isn't specified, then every network endpoint in the
-        network endpoint group must have a port specified.
+        If this flag isn't specified for a NEG with endpoint type
+        GCE_VM_IP_PORT or NON_GCP_PRIVATE_IP_PORT, then every network endpoint
+        in the network endpoint group must have a port specified. For a NEG
+        with endpoint type INTERNET_IP_PORT and INTERNET_FQDN_PORT. If the
+        default port is not specified the well known port for your backend
+        protocol will be used (80 for http, 443 for https).
 
      --network=NETWORK
         Name of the network in which the NEG is created. default project
         network is used if unspecified.
 
+        This is only supported for NEGs with endpoint type GCE_VM_IP_PORT or
+        NON_GCP_PRIVATE_IP_PORT or GCE_VM_PRIMARY_IP.
+
      --network-endpoint-type=NETWORK_ENDPOINT_TYPE; default="gce-vm-ip-port"
-        The network endpoint type. NETWORK_ENDPOINT_TYPE must be one of:
-        gce-vm-ip-port, internet-ip-port, internet-fqdn-port.
+        Determines the spec of endpoints attached to this group.
+
+        * GCE_VM_IP_PORT
+
+              Endpoint IP address must belong to a VM in Google Compute Engine
+              (either the primary IP or as part of an aliased IP range).
+              The `--default-port` must be specified or every network endpoint
+              in the network endpoint group must have a port specified.
+
+        * INTERNET_IP_PORT
+
+              Endpoint IP address must be publicly routable address. The default
+              port will be used if specified. If the default port is not
+              specified, the well known port for your backend protocol will be
+              used as the default port (80 for http,  443 for https).
+
+        * INTERNET_FQDN_PORT
+
+              Endpoint FQDN must be resolvable to a public IP address via public
+              DNS. The default port will be used if specified. If the default
+              port is not specified, the well known port for your backend
+              protocol will be used as the default port (80 for http, 443 for
+              https).
+
+        * NON_GCP_PRIVATE_IP_PORT
+
+              Endpoint IP address must belong to a VM not in Google Compute
+              Engine and must be routable using a cloud router over VPN or an
+              Interconnect. In this case the NEG must be zonal. The
+              `--default-port` must be specified or every network endpoint in
+              the network endpoint group must have a port specified.
+
+        * GCE_VM_PRIMARY_IP
+
+              Endpoint IP address must be the primary IP of a VM's primary
+              network interface in Google Compute Engine.
+
+    NETWORK_ENDPOINT_TYPE must be one of: gce-vm-ip-port, internet-ip-port,
+    internet-fqdn-port, non-gcp-private-ip-port, gce-vm-primary-ip.
 
      --subnet=SUBNET
         Name of the subnet to which all network endpoints belong.
 
         If not specified, network endpoints may belong to any subnetwork in the
         region where the network endpoint group is created.
+
+        This is only supported for NEGs with endpoint type GCE_VM_IP_PORT or
+        GCE_VM_PRIMARY_IP.
 
      At most one of these may be specified:
 

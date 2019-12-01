@@ -44,6 +44,12 @@ class OperationsDescribeUnitTest(unit_base.DataprocUnitTestBase):
     result = self.RunDataproc('operations describe ' + self.OPERATION_ID)
     self.AssertMessagesEqual(expected, result)
 
+  def testOperationUri(self):
+    expected = self.MakeCompletedOperation()
+    self.ExpectGetOperation(expected)
+    result = self.RunDataproc('operations describe ' + self.OperationUri())
+    self.AssertMessagesEqual(expected, result)
+
 
 class OperationsDescribeUnitTestBeta(OperationsDescribeUnitTest,
                                      base.DataprocTestBaseBeta):

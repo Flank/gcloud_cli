@@ -492,6 +492,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         request=managed_service,
         response=self.services_messages.Operation(name='operations/myop')
     )
+    self.MockOperationWait('myop')
 
     # The service configuration resource is created.
     self.mocked_client.services_configs.Create.Expect(
@@ -557,6 +558,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         request=managed_service,
         response=self.services_messages.Operation(name='operations/myop')
     )
+    self.MockOperationWait('myop')
 
     # The service configuration resource is created.
     self.mocked_client.services_configs.Create.Expect(
@@ -1092,6 +1094,8 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         request=managed_service,
         response=self.services_messages.Operation(name='operations/myop')
     )
+    self.MockOperationWait('myop')
+
     # Mock the SubmitSourceConfig API call.
     self.mocked_client.services_configs.Submit.Expect(
         request=(SUBMIT_REQUEST(

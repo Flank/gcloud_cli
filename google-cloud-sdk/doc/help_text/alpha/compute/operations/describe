@@ -43,12 +43,12 @@ EXAMPLES
     To get details about a regional operation, run:
 
         $ gcloud alpha compute operations describe OPERATION \
-            --region us-central1
+            --region=us-central1
 
     To get details about a zonal operation, run:
 
         $ gcloud alpha compute operations describe OPERATION \
-            --zone us-central1-a
+            --zone=us-central1-a
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

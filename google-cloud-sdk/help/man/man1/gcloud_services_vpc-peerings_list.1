@@ -60,14 +60,14 @@ To list connections of a network called \f5my\-network\fR to a service called
 \f5your\-service\fR, run:
 
 .RS 2m
-$ gcloud services vpc\-peerings list \-\-network my\-network \e
-    \-\-service your\-service
+$ gcloud services vpc\-peerings list \-\-network=my\-network \e
+    \-\-service=your\-service
 .RE
 
 To list connections of a network against all services, run:
 
 .RS 2m
-$ gcloud services vpc\-peerings list \-\-network my\-network
+$ gcloud services vpc\-peerings list \-\-network=my\-network
 .RE
 
 

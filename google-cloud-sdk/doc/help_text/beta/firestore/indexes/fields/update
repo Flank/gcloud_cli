@@ -76,8 +76,8 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the firestore/v1beta2 API. The full documentation for
-    this API can be found at: https://cloud.google.com/firestore
+    This command uses the firestore/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/firestore
 
 EXAMPLES
     The following command creates an exemption for the timestamp field in the
@@ -92,20 +92,21 @@ EXAMPLES
     [ASCENDING, DESCENDING]:
 
         $ gcloud beta firestore indexes fields update timestamp \
-            collection-group=Events \
-            --index order=ASCENDING \
-            --index order=DESCENDING
+            --collection-group=Events \
+            --index=order=ASCENDING \
+            --index=order=DESCENDING
 
     The following command clears the exemption on the timestamp field in the
     Events collection group, so that the field will return to inheriting its
     index settings from its ancestors:
 
         $ gcloud beta firestore indexes fields update timestamp \
-            collection-group=Events --clear-exemption
+            --collection-group=Events --clear-exemption
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud firestore indexes fields update
         $ gcloud alpha firestore indexes fields update
 

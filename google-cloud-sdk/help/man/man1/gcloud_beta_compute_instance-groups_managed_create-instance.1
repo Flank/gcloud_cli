@@ -1,0 +1,191 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCE\-GROUPS_MANAGED_CREATE\-INSTANCE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instance\-groups managed create\-instance \- create a new virtual machine instance in a managed instance group with a defined name and optionally its stateful configuration
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instance\-groups managed create\-instance\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute instance\-groups managed create\-instance\fR
+creates a virtual machine instance with a defined name and optionally its
+stateful configuration: stateful disk and stateful metadata key\-values.
+Stateful configuration is stored in the corresponding newly created
+per\-instance config. An instance with a per\-instance config will preserve its
+given name, specified disks, and metadata key\-values during instance
+recreation, auto\-healing, and updates and any other lifecycle transitions of
+the instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to create instance in.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Name of the new instance to create.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]
+Stateful disk for the managed instance group to preserve. Usually, a managed
+instance group deletes disks when deleting instances; however, stateful disks
+are detached from deleted instances and are reattached automatically to the
+instance on recreation, autohealing, updates, and any other lifecycle
+transitions of the instance.
+
+Stateful disks specified here form part of the per\-instance config for the new
+instance.
+
+The same disk can be attached to many instances but only in read\-only mode.
+
+Use this flag multiple times to attach more disks.
+
+.RS 2m
+.TP 2m
+\fBdevice\-name\fR
+(Required) Device name under which disk is or will be attached.
+
+.TP 2m
+\fBsource\fR
+(Required) URI of an existing persistent disk to attach under the specified
+device\-name.
+
+.TP 2m
+\fBmode\fR
+Specifies the attachment mode of the disk. Supported options are 'ro' for
+read\-only and 'rw' for read\-write. If omitted, defaults to 'rw'. \f5mode\fR
+can only be specified if \f5source\fR is given.
+
+.TP 2m
+\fBauto\-delete\fR
+(Optional) Specifies the auto deletion policy of the stateful disk. Supported
+values are 'never' (never delete this disk) and
+\'on\-permanent\-instance\-deletion' (delete the stateful disk when the given
+instance is permanently deleted from the instance group; for example when the
+group is resized down). If omitted, 'never' is used as the default.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+Additional metadata to be made available to the guest operating system on the
+instance along with the metadata defined in the instance template.
+
+Use stateful metadata to define key/value pairs specific to an instance to
+differentiate it from other instances in the managed instance group. The
+stateful metadata forms part of the per\-instance config for the new instance.
+
+Stateful metadata key/value pairs are preserved on instance recreation,
+autohealing, updates, and any other lifecycle transitions of the instance.
+
+Only metadata keys provided in this flag are mutated. Stateful metadata values
+defined for the keys already existing in the instance template override the
+values from the instance template. Other metadata entries from the instance
+template will remain unaffected and available.
+
+Each metadata entry is a key/value pair separated by an equals sign. Metadata
+keys must be unique and less than 128 bytes in length. Multiple entries can be
+passed to this flag, e.g., \f5\fI\-\-stateful\-metadata
+key\-1=value\-1,key\-2=value\-2,key\-3=value\-3\fR\fR.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to create instance in. If not specified,
+you may be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to create instance in. If not specified, you
+may be prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an instance \f5instance\-1\fR in \f5my\-group\fR (in region
+europe\-west4) with metadata \f5my\-key: my\-value\fR and a disk disk\-1
+attached to it as the device \f5device\-1\fR, run:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed create\-instance \e
+      my\-group \-\-region=europe\-west4 \e
+      \-\-instance=instance\-1 \e
+      \-\-stateful\-disk='device\-name=foo,source=https://compute.googleapis.com/compute/alpha/projects/my\-project/zones/europe\-west4/disks/disk\-1,mode=rw,auto\-delete=on\-permanent\-instance\-deletion' \e
+      \-\-stateful\-metadata='my\-key=my\-value'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed create\-instance
+.RE
+

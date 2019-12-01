@@ -19,6 +19,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To describe an iOS locale, run:
+
+        gcloud firebase test ios locales describe es_419
+
+    To describe an iOS locale in JSON format, run:
+
+        gcloud firebase test ios locales describe es_419 --format=json
+
 NOTES
     These variants are also available:
 

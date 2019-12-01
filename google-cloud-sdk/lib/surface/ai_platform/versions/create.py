@@ -18,12 +18,25 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import sys
+
 from googlecloudsdk.api_lib.ml_engine import operations
 from googlecloudsdk.api_lib.ml_engine import versions_api
+from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.ml_engine import flags
 from googlecloudsdk.command_lib.ml_engine import versions_util
 from googlecloudsdk.command_lib.util.args import labels_util
+
+DETAILED_HELP = {
+    'EXAMPLES':
+        """\
+        To create an AI Platform version model with the version ID 'versionId'
+        and with the name 'model-name', run:
+
+          $ {command} versionId --model=model-name
+        """,
+}
 
 
 def _AddCreateArgs(parser):
@@ -95,6 +108,8 @@ class CreateGA(base.CreateCommand):
   https://cloud.google.com/ml-engine/docs/how-tos/managing-models-jobs
   """
 
+  detailed_help = DETAILED_HELP
+
   @staticmethod
   def Args(parser):
     _AddCreateArgs(parser)
@@ -136,6 +151,7 @@ class CreateBeta(CreateGA):
     flags.AddMachineTypeFlagToParser(parser)
     flags.AddUserCodeArgs(parser)
     flags.GetAcceleratorFlag().AddToParser(parser)
+    flags.AddExplainabilityFlags(parser)
 
   def Run(self, args):
     versions_client = versions_api.VersionsClient()
@@ -160,7 +176,10 @@ class CreateBeta(CreateGA):
         service_account=args.service_account,
         prediction_class=args.prediction_class,
         package_uris=args.package_uris,
-        accelerator_config=accelerator)
+        accelerator_config=accelerator,
+        explanation_method=args.explanation_method,
+        num_integral_steps=args.num_integral_steps,
+        num_paths=args.num_paths)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -195,4 +214,7 @@ class CreateAlpha(CreateBeta):
                                 prediction_class=args.prediction_class,
                                 package_uris=args.package_uris,
                                 service_account=args.service_account,
-                                accelerator_config=accelerator)
+                                accelerator_config=accelerator,
+                                explanation_method=args.explanation_method,
+                                num_integral_steps=args.num_integral_steps,
+                                num_paths=args.num_paths)

@@ -1,0 +1,94 @@
+
+.TH "GCLOUD_ACTIVE\-DIRECTORY_DOMAINS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud active\-directory domains describe \- describe a Managed Microsoft AD domain
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud active\-directory domains describe\fR \fIDOMAIN\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Show metadata for a Managed Microsoft AD domain.
+
+Displays all metadata associated with a Active Directory domain given a valid AD
+domain fully\-qualified domain name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The domain specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given domain.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Domain resource \- Name of the Managed Microsoft AD domain you want to describe.
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [domain] on the command line with a fully specified name;
+set the property [core/project]; provide the argument [\-\-project] on the
+command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDOMAIN\fR
+ID of the domain or fully qualified identifier for the domain.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBmanagedidentities/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/managed\-microsoft\-ad/
+
+
+
+.SH "EXAMPLES"
+
+The following command prints metadata for an AD domain with the name
+\f5my\-domain.com\fR.
+
+.RS 2m
+$ gcloud active\-directory domains describe my\-domain.com
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha active\-directory domains describe
+$ gcloud beta active\-directory domains describe
+.RE
+

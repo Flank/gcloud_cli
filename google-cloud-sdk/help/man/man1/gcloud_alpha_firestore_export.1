@@ -74,14 +74,34 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To export all collection groups to \f5mybucket\fR in objects prefixed with
+\f5my/path\fR, run:
+
+.RS 2m
+$ gcloud alpha firestore export gs://mybucket/my/path
+.RE
+
+To export a specific set of collections groups asynchronously, run:
+
+.RS 2m
+$ gcloud alpha firestore export gs://mybucket/my/path \e
+    \-\-collection\-ids='specific collection group1','specific
+ collection group2' \-\-async
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud firestore export
 $ gcloud beta firestore export
 .RE
 

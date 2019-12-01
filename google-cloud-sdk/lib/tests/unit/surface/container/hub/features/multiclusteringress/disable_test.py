@@ -33,11 +33,11 @@ class DisableTest(base.FeaturesTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def _ExpectDeleteCalls(self):
-    operation = self._MakeOperation()
-    self.ExpectDeleteFeature(operation)
-    self.ExpectGetOperation(operation)
-    operation = self._MakeOperation(done=True)
-    self.ExpectGetOperation(operation)
+    operation = self.features_api._MakeOperation()
+    self.features_api.ExpectDelete(operation)
+    self.features_api.ExpectOperation(operation)
+    operation = self.features_api._MakeOperation(done=True)
+    self.features_api.ExpectOperation(operation)
 
   def testRunDisable(self):
     self._ExpectDeleteCalls()

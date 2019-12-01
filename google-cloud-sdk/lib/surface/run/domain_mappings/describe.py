@@ -44,17 +44,6 @@ class Describe(base.Command):
 
   @staticmethod
   def CommonArgs(parser):
-    # Flags specific to managed CR
-    managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddRegionArg(managed_group)
-    # Flags specific to CRoGKE
-    gke_group = flags.GetGkeArgGroup(parser)
-    concept_parsers.ConceptParser([resource_args.CLUSTER_PRESENTATION
-                                  ]).AddToParser(gke_group)
-    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
-    kubernetes_group = flags.GetKubernetesArgGroup(parser)
-    flags.AddKubeconfigFlags(kubernetes_group)
-    # Flags not specific to any platform
     domain_mapping_presentation = presentation_specs.ResourcePresentationSpec(
         '--domain',
         resource_args.GetDomainMappingResourceSpec(),
@@ -63,7 +52,7 @@ class Describe(base.Command):
         prefixes=False)
     concept_parsers.ConceptParser([
         domain_mapping_presentation]).AddToParser(parser)
-    flags.AddPlatformArg(parser)
+
     parser.display_info.AddFormat('yaml')
 
   @staticmethod
@@ -72,7 +61,8 @@ class Describe(base.Command):
 
   def Run(self, args):
     """Describe a domain mapping."""
-    conn_context = connection_context.GetConnectionContext(args)
+    conn_context = connection_context.GetConnectionContext(
+        args, self.ReleaseTrack())
     domain_mapping_ref = args.CONCEPTS.domain.Parse()
     with serverless_operations.Connect(conn_context) as client:
       domain_mapping = client.GetDomainMapping(domain_mapping_ref)

@@ -1258,6 +1258,9 @@ alt="website statistics" /></a></div></noscript>
 
 class ManCommandCollectorTest(calliope_test_base.CalliopeTestBase):
 
+  def SetUp(self):
+    self.SetEncoding('utf-8')
+
   def testManCommandCollectorDecodeOutput(self):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
     check_out_mock.return_value = _MAN_COMMAND_OUTPUT['unicode'].encode('utf8')
@@ -1268,6 +1271,9 @@ class ManCommandCollectorTest(calliope_test_base.CalliopeTestBase):
 
 
 class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
+
+  def SetUp(self):
+    self.SetEncoding('utf-8')
 
   def testManPageCliTreeGeneratorConfigDirNotInitialized(self):
     cli_tree_config_dir = cli_tree.CliTreeConfigDir()

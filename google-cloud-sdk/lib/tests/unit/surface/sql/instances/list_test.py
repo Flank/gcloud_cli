@@ -397,7 +397,7 @@ backupless-instance2 MYSQL_5_5        us-central D1   -               -         
             nextPageToken=None,
         ))
 
-    self.Run('sql instances list --format="table(name,labels.bar)"')
+    self.Run('sql instances list --format="table(name,labels.bar:label=BAR)"')
     self.AssertOutputContains(
         """\
 NAME                  BAR

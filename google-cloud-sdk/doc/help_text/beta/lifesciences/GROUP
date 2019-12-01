@@ -20,11 +20,12 @@ GROUPS
      operations
         (BETA) Manage Cloud Life Sciences operations.
 
-     workflows
-        (BETA) Commands for Life Sciences workflows.
+     pipelines
+        (BETA) Commands for Life Sciences pipelines.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha lifesciences
 

@@ -40,5 +40,11 @@ class CreateTest(unit_test_base.SUUnitTestBase):
     self.AssertErrContains('Service identity created: hello@world.com')
 
 
+class CreateBetaTest(CreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 if __name__ == '__main__':
   test_case.main()

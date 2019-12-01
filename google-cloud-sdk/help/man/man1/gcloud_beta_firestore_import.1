@@ -67,12 +67,31 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To import all collection groups from \f5mybucket/my/path\fR, run:
 
 .RS 2m
+$ gcloud beta firestore import gs://mybucket/my/path
+.RE
+
+To import a specific set of collections groups asynchronously, run:
+
+.RS 2m
+$ gcloud beta firestore import gs://mybucket/my/path \e
+    \-\-collection\-ids='specific collection group1','specific
+ collection group2' \-\-async
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud firestore import
 $ gcloud alpha firestore import
 .RE
 

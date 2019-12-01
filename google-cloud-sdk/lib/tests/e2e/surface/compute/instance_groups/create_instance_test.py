@@ -26,7 +26,7 @@ from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-class ManagedInstanceGroupsCreateInstanceZonalTest(
+class ManagedInstanceGroupsCreateInstanceBetaZonalTest(
     e2e_managers_stateful_test_base.ManagedStatefulTestBase):
 
   def SetUp(self):
@@ -172,8 +172,8 @@ class ManagedInstanceGroupsCreateInstanceZonalTest(
           source=fake_disk_uri))
 
 
-class ManagedInstanceGroupsCreateInstanceRegionalTest(
-    ManagedInstanceGroupsCreateInstanceZonalTest):
+class ManagedInstanceGroupsCreateInstanceBetaRegionalTest(
+    ManagedInstanceGroupsCreateInstanceBetaZonalTest):
 
   def SetUp(self):
     self.prefix = 'mig-instance-configs-regional'

@@ -29,22 +29,26 @@ from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute.backend_services import backend_services_test_base
 
 
-class BackendServiceExportTestBeta(
+class BackendServiceExportTest(
     backend_services_test_base.BackendServicesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.BETA
-    self._api = 'beta'
-    self._backend_services = test_resources.BACKEND_SERVICES_BETA
+    self.track = calliope.base.ReleaseTrack.GA
+    self._api = 'v1'
+    self._backend_services = test_resources.BACKEND_SERVICES_V1
 
   def RunExport(self, command):
     self.Run('compute backend-services export ' + command)
 
   def testExportToStdOut(self):
     backend_service_ref = self.GetBackendServiceRef('my-backend-service')
+
+    backend_service = test_resources.MakeBackendServiceWithOutlierDetection(
+        self.messages, self._api)
+
     self.ExpectGetRequest(
         backend_service_ref=backend_service_ref,
-        backend_service=self._backend_services[0])
+        backend_service=backend_service)
 
     self.RunExport('my-backend-service --global')
 
@@ -55,6 +59,9 @@ class BackendServiceExportTestBeta(
             healthChecks:
             - https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/httpHealthChecks/my-health-check
             name: backend-service-1
+            outlierDetection:
+              interval:
+                seconds: 1500
             portName: http
             protocol: HTTP
             selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/backend-service-1
@@ -80,7 +87,15 @@ class BackendServiceExportTestBeta(
                              exported_backend_service)
 
 
-class BackendServiceExportTestAlpha(BackendServiceExportTestBeta):
+class BackendServiceExportTestBeta(BackendServiceExportTest):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
+    self._backend_services = test_resources.BACKEND_SERVICES_BETA
+
+
+class BackendServiceExportTestAlpha(BackendServiceExportTest):
 
   def PreSetUp(self):
     self.track = calliope.base.ReleaseTrack.ALPHA

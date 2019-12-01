@@ -11,7 +11,7 @@ gcloud beta functions deploy \- create or update a Google Cloud Function
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-allow\-unauthenticated\fR] [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-clear\-max\-instances\fR\ |\ \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-clear\-vpc\-connector\fR\ |\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-allow\-unauthenticated\fR] [\fB\-\-egress\-settings\fR=\fIEGRESS_SETTINGS\fR] [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR] [\fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-clear\-max\-instances\fR\ |\ \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-clear\-vpc\-connector\fR\ |\ \fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -59,6 +59,12 @@ If set, makes this a public function. This will allow all callers, without
 checking authentication.
 
 .TP 2m
+\fB\-\-egress\-settings\fR=\fIEGRESS_SETTINGS\fR
+Egress settings controls what traffic is diverted through the VPC Access
+Connector resource. By default \f5private\-ranges\-only\fR will be used.
+\fIEGRESS_SETTINGS\fR must be one of: \fBprivate\-ranges\-only\fR, \fBall\fR.
+
+.TP 2m
 \fB\-\-entry\-point\fR=\fIENTRY_POINT\fR
 Name of a Google Cloud Function (as defined in source code) that will be
 executed. Defaults to the resource name suffix, if not specified. For backward
@@ -69,6 +75,12 @@ exported by the module specified in \f5source_location\fR.
 .TP 2m
 \fB\-\-ignore\-file\fR=\fIIGNORE_FILE\fR
 Override the .gcloudignore file and use the specified file instead.
+
+.TP 2m
+\fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR
+Ingress settings controls what traffic can reach the function.By default
+\f5all\fR will be used. \fIINGRESS_SETTINGS\fR must be one of: \fBall\fR,
+\fBinternal\-only\fR.
 
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
@@ -101,6 +113,8 @@ Choices:
 \f5python37\fR: Python 3.7
 .IP "\(em" 2m
 \f5go111\fR: Go 1.11
+.IP "\(em" 2m
+\f5go113\fR: Go 1.13
 .IP "\(em" 2m
 \f5nodejs6\fR: Node.js 6 (deprecated)
 .RE

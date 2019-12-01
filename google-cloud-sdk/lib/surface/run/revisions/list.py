@@ -30,7 +30,7 @@ from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class List(commands.List):
   """List available revisions."""
 
@@ -41,22 +41,12 @@ class List(commands.List):
       'EXAMPLES': """\
           To list all revisions for the provided service:
 
-              $ {command} --service foo
+              $ {command} --service=foo
          """,
   }
 
   @classmethod
   def CommonArgs(cls, parser):
-    # Flags specific to managed CR
-    managed_group = flags.GetManagedArgGroup(parser)
-    flags.AddRegionArgWithDefault(managed_group)
-    # Flags specific to CRoGKE
-    gke_group = flags.GetGkeArgGroup(parser)
-    concept_parsers.ConceptParser(
-        [resource_args.CLUSTER_PRESENTATION]).AddToParser(gke_group)
-    # Flags specific to connecting to a Kubernetes cluster (kubeconfig)
-    kubernetes_group = flags.GetKubernetesArgGroup(parser)
-    flags.AddKubeconfigFlags(kubernetes_group)
     # Flags specific to connecting to a cluster
     cluster_group = flags.GetClusterArgGroup(parser)
     namespace_presentation = presentation_specs.ResourcePresentationSpec(
@@ -67,16 +57,18 @@ class List(commands.List):
         prefixes=False)
     concept_parsers.ConceptParser(
         [namespace_presentation]).AddToParser(cluster_group)
+
     # Flags not specific to any platform
     flags.AddServiceFlag(parser)
-    flags.AddPlatformArg(parser)
+
     parser.display_info.AddFormat(
         'table('
         '{ready_column},'
         'name:label=REVISION,'
         'active.yesno(yes="yes", no=""),'
-        'service_name:label=SERVICE,'
-        'creation_timestamp.date("%Y-%m-%d %H:%M:%S %Z"):label=DEPLOYED,'
+        'service_name:label=SERVICE:sort=1,'
+        'creation_timestamp.date("%Y-%m-%d %H:%M:%S %Z"):'
+        'label=DEPLOYED:sort=2:reverse,'
         'author:label="DEPLOYED BY")'.format(
             ready_column=pretty_print.READY_COLUMN))
     parser.display_info.AddUriFunc(cls._GetResourceUri)
@@ -88,7 +80,8 @@ class List(commands.List):
   def Run(self, args):
     """List available revisions."""
     service_name = args.service
-    conn_context = connection_context.GetConnectionContext(args)
+    conn_context = connection_context.GetConnectionContext(
+        args, self.ReleaseTrack())
     namespace_ref = args.CONCEPTS.namespace.Parse()
     with serverless_operations.Connect(conn_context) as client:
       self.SetCompleteApiEndpoint(conn_context.endpoint)
@@ -97,7 +90,9 @@ class List(commands.List):
         log.status.Print('For cluster [{cluster}]{zone}:'.format(
             cluster=conn_context.cluster_name,
             zone=location_msg if conn_context.cluster_location else ''))
-      return client.ListRevisions(namespace_ref, service_name)
+      for rev in client.ListRevisions(namespace_ref, service_name,
+                                      args.limit, args.page_size):
+        yield rev
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)

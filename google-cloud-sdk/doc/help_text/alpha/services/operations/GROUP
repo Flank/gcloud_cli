@@ -20,9 +20,6 @@ COMMANDS
      describe
         (ALPHA) Describes an operation resource for a given operation name.
 
-     list
-        (ALPHA) (DEPRECATED) List operations for a project.
-
      wait
         (ALPHA) Waits for an operation to complete for a given operation name.
 

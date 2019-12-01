@@ -11,7 +11,7 @@ gcloud alpha ml\-engine versions create \- create a new AI Platform version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR;\ default=50] [\fB\-\-num\-paths\fR=\fINUM_PATHS\fR;\ default=50] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -107,6 +107,16 @@ arguments, the command line arguments override the configuration file.
 The description of the version.
 
 .TP 2m
+\fB\-\-explanation\-method\fR=\fIEXPLANATION_METHOD\fR
+Enable explanations and select the explanation method to use.
+
+The valid options are: integrated\-gradients: Use Integrated Gradients.
+sampled\-shapley: Use Sampled Shapley.
+
+\fIEXPLANATION_METHOD\fR must be one of: \fBintegrated\-gradients\fR,
+\fBsampled\-shapley\fR.
+
+.TP 2m
 \fB\-\-framework\fR=\fIFRAMEWORK\fR
 The ML framework used to train this version of the model. If not specified,
 defaults to 'tensorflow'. \fIFRAMEWORK\fR must be one of: \fBscikit\-learn\fR,
@@ -126,6 +136,16 @@ numbers.
 Type of machine on which to serve the model. Currently only applies to online
 prediction. For available machine types, see
 https://cloud.google.com/ml\-engine/docs/tensorflow/online\-predict#machine\-types.
+
+.TP 2m
+\fB\-\-num\-integral\-steps\fR=\fINUM_INTEGRAL_STEPS\fR; default=50
+Number of integral steps for Integrated Gradients. Only valid when
+\f5\-\-explanation\-method=integrated\-gradients\fR is specified.
+
+.TP 2m
+\fB\-\-num\-paths\fR=\fINUM_PATHS\fR; default=50
+Number of paths for Sampled Shapley. Only valid when
+\f5\-\-explanation\-method=sampled\-shapley\fR is specified.
 
 .TP 2m
 \fB\-\-origin\fR=\fIORIGIN\fR
@@ -195,6 +215,17 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an AI Platform version model with the version ID 'versionId' and with
+the name 'model\-name', run:
+
+.RS 2m
+$ gcloud alpha ml\-engine versions create versionId \-\-model=model\-name
+.RE
 
 
 

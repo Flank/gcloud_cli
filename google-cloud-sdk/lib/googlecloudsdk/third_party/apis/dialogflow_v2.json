@@ -448,7 +448,7 @@
           ]
         },
         "priority": {
-          "description": "Optional. The priority of this intent. Higher numbers represent higher\npriorities. If this is zero or unspecified, we use the default\npriority 500000.\n\nNegative numbers mean that the intent is disabled.",
+          "description": "Optional. The priority of this intent. Higher numbers represent higher\npriorities.\n\n- If the supplied value is unspecified or 0, the service\n  translates the value to 500,000, which corresponds to the\n  `Normal` priority in the console.\n- If the supplied value is negative, the intent is ignored\n  in runtime detect intent requests.",
           "type": "integer",
           "format": "int32"
         },
@@ -713,6 +713,18 @@
           "description": "The carousel card response for Actions on Google.",
           "$ref": "GoogleCloudDialogflowV2IntentMessageCarouselSelect"
         },
+        "browseCarouselCard": {
+          "description": "Browse carousel card for Actions on Google.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard"
+        },
+        "tableCard": {
+          "description": "Table card for Actions on Google.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageTableCard"
+        },
+        "mediaContent": {
+          "description": "The media content card for Actions on Google.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageMediaContent"
+        },
         "platform": {
           "description": "Optional. The platform that this message is intended for.",
           "enumDescriptions": [
@@ -975,6 +987,10 @@
           "items": {
             "$ref": "GoogleCloudDialogflowV2IntentMessageListSelectItem"
           }
+        },
+        "subtitle": {
+          "description": "Optional. Subtitle of the list.",
+          "type": "string"
         }
       }
     },
@@ -1053,6 +1069,239 @@
         "image": {
           "description": "Optional. The image to display.",
           "$ref": "GoogleCloudDialogflowV2IntentMessageImage"
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard": {
+      "id": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard",
+      "description": "Browse Carousel Card for Actions on Google.\nhttps:\/\/developers.google.com\/actions\/assistant\/responses#browsing_carousel",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "Required. List of items in the Browse Carousel Card. Minimum of two\nitems, maximum of ten.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem"
+          }
+        },
+        "imageDisplayOptions": {
+          "description": "Optional. Settings for displaying the image. Applies to every image in\nitems.",
+          "enumDescriptions": [
+            "Fill the gaps between the image and the image container with gray\nbars.",
+            "Fill the gaps between the image and the image container with gray\nbars.",
+            "Fill the gaps between the image and the image container with white\nbars.",
+            "Image is scaled such that the image width and height match or exceed\nthe container dimensions. This may crop the top and bottom of the\nimage if the scaled image height is greater than the container\nheight, or crop the left and right of the image if the scaled image\nwidth is greater than the container width. This is similar to \"Zoom\nMode\" on a widescreen TV when playing a 4:3 video.",
+            "Pad the gaps between image and image frame with a blurred copy of the\nsame image."
+          ],
+          "type": "string",
+          "enum": [
+            "IMAGE_DISPLAY_OPTIONS_UNSPECIFIED",
+            "GRAY",
+            "WHITE",
+            "CROPPED",
+            "BLURRED_BACKGROUND"
+          ]
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem": {
+      "id": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem",
+      "description": "Browsing carousel tile",
+      "type": "object",
+      "properties": {
+        "openUriAction": {
+          "description": "Required. Action to present to the user.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction"
+        },
+        "title": {
+          "description": "Required. Title of the carousel item. Maximum of two lines of text.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description of the carousel item. Maximum of four lines of\ntext.",
+          "type": "string"
+        },
+        "image": {
+          "description": "Optional. Hero image for the carousel item.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage"
+        },
+        "footer": {
+          "description": "Optional. Text that appears at the bottom of the Browse Carousel\nCard. Maximum of one line of text.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction": {
+      "id": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction",
+      "description": "Actions on Google action to open a given url.",
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "Required. URL",
+          "type": "string"
+        },
+        "urlTypeHint": {
+          "description": "Optional. Specifies the type of viewer that is used when opening\nthe URL. Defaults to opening via web browser.",
+          "enumDescriptions": [
+            "Unspecified",
+            "Url would be an amp action",
+            "URL that points directly to AMP content, or to a canonical URL\nwhich refers to AMP content via <link rel=\"amphtml\">."
+          ],
+          "type": "string",
+          "enum": [
+            "URL_TYPE_HINT_UNSPECIFIED",
+            "AMP_ACTION",
+            "AMP_CONTENT"
+          ]
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageTableCard": {
+      "id": "GoogleCloudDialogflowV2IntentMessageTableCard",
+      "description": "Table card for Actions on Google.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "Required. Title of the card.",
+          "type": "string"
+        },
+        "subtitle": {
+          "description": "Optional. Subtitle to the title.",
+          "type": "string"
+        },
+        "image": {
+          "description": "Optional. Image which should be displayed on the card.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage"
+        },
+        "columnProperties": {
+          "description": "Optional. Display properties for the columns in this table.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageColumnProperties"
+          }
+        },
+        "rows": {
+          "description": "Optional. Rows in this table of data.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageTableCardRow"
+          }
+        },
+        "buttons": {
+          "description": "Optional. List of buttons for the card.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageBasicCardButton"
+          }
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageColumnProperties": {
+      "id": "GoogleCloudDialogflowV2IntentMessageColumnProperties",
+      "description": "Column properties for TableCard.",
+      "type": "object",
+      "properties": {
+        "header": {
+          "description": "Required. Column heading.",
+          "type": "string"
+        },
+        "horizontalAlignment": {
+          "description": "Optional. Defines text alignment for all cells in this column.",
+          "enumDescriptions": [
+            "Text is aligned to the leading edge of the column.",
+            "Text is aligned to the leading edge of the column.",
+            "Text is centered in the column.",
+            "Text is aligned to the trailing edge of the column."
+          ],
+          "type": "string",
+          "enum": [
+            "HORIZONTAL_ALIGNMENT_UNSPECIFIED",
+            "LEADING",
+            "CENTER",
+            "TRAILING"
+          ]
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageTableCardRow": {
+      "id": "GoogleCloudDialogflowV2IntentMessageTableCardRow",
+      "description": "Row of TableCard.",
+      "type": "object",
+      "properties": {
+        "cells": {
+          "description": "Optional. List of cells that make up this row.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageTableCardCell"
+          }
+        },
+        "dividerAfter": {
+          "description": "Optional. Whether to add a visual divider after this row.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageTableCardCell": {
+      "id": "GoogleCloudDialogflowV2IntentMessageTableCardCell",
+      "description": "Cell of TableCardRow.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "Required. Text in this cell.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageMediaContent": {
+      "id": "GoogleCloudDialogflowV2IntentMessageMediaContent",
+      "description": "The media content card for Actions on Google.",
+      "type": "object",
+      "properties": {
+        "mediaType": {
+          "description": "Optional. What type of media is the content (ie \"audio\").",
+          "enumDescriptions": [
+            "Unspecified.",
+            "Response media type is audio."
+          ],
+          "type": "string",
+          "enum": [
+            "RESPONSE_MEDIA_TYPE_UNSPECIFIED",
+            "AUDIO"
+          ]
+        },
+        "mediaObjects": {
+          "description": "Required. List of media objects.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject"
+          }
+        }
+      }
+    },
+    "GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject": {
+      "id": "GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject",
+      "description": "Response media object for media content card.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Required. Name of media card.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description of media card.",
+          "type": "string"
+        },
+        "largeImage": {
+          "description": "Optional. Image to display above media content.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage"
+        },
+        "icon": {
+          "description": "Optional. Icon to display above media content.",
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage"
+        },
+        "contentUrl": {
+          "description": "Required. Url where the media is stored.",
+          "type": "string"
         }
       }
     },
@@ -1678,7 +1927,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Optional. The name of the voice. If not set, the service will choose a\nvoice based on the other parameters such as language_code and gender.",
+          "description": "Optional. The name of the voice. If not set, the service will choose a\nvoice based on the other parameters such as language_code and\nssml_gender.",
           "type": "string"
         },
         "ssmlGender": {
@@ -1980,189 +2229,6 @@
         }
       }
     },
-    "GoogleCloudDialogflowV2HumanAgentAssistantEvent": {
-      "id": "GoogleCloudDialogflowV2HumanAgentAssistantEvent",
-      "description": "Represents a notification sent to Cloud Pub\/Sub subscribers for\nhuman agent assistant events in a specific conversation.",
-      "type": "object",
-      "properties": {
-        "conversation": {
-          "description": "The conversation this notification refers to.\nFormat: `projects\/<Project ID>\/conversations\/<Conversation ID>`.",
-          "type": "string"
-        },
-        "participant": {
-          "description": "The participant that the suggestion is compiled for. And This field is used\nto call Participants.ListSuggestions API. Format:\n`projects\/<Project ID>\/conversations\/<Conversation\nID>\/participants\/<Participant ID>`.\nIt will not be set in legacy workflow.\nHumanAgentAssistantConfig.name for more\ninformation.",
-          "type": "string"
-        },
-        "suggestionResults": {
-          "description": "The suggestion results payload that this notification refers to.",
-          "type": "array",
-          "items": {
-            "$ref": "GoogleCloudDialogflowV2SuggestionResult"
-          }
-        }
-      }
-    },
-    "GoogleCloudDialogflowV2SuggestionResult": {
-      "id": "GoogleCloudDialogflowV2SuggestionResult",
-      "description": "One response of different type of suggestion response which is used in\nthe response of Participants.AnalyzeContent and\nParticipants.AnalyzeContent, as well as HumanAgentAssistantEvent.",
-      "type": "object",
-      "properties": {
-        "error": {
-          "description": "Error status if the request failed.",
-          "$ref": "GoogleRpcStatus"
-        },
-        "suggestArticlesResponse": {
-          "description": "SuggestArticlesResponse if request is for ARTICLE_SUGGESTION.",
-          "$ref": "GoogleCloudDialogflowV2SuggestArticlesResponse"
-        },
-        "suggestFaqAnswersResponse": {
-          "description": "SuggestFaqAnswersResponse if request is for FAQ_ANSWER.",
-          "$ref": "GoogleCloudDialogflowV2SuggestFaqAnswersResponse"
-        }
-      }
-    },
-    "GoogleCloudDialogflowV2SuggestArticlesResponse": {
-      "id": "GoogleCloudDialogflowV2SuggestArticlesResponse",
-      "description": "The response message for [Participants.SuggestArticles]",
-      "type": "object",
-      "properties": {
-        "articleAnswers": {
-          "description": "Articles ordered by score in descending order.",
-          "type": "array",
-          "items": {
-            "$ref": "GoogleCloudDialogflowV2ArticleAnswer"
-          }
-        },
-        "latestMessage": {
-          "description": "The name of the latest conversation message used to compile\nsuggestion for.\n\nFormat: `projects\/<Project ID>\/conversations\/<Conversation\nID>\/messages\/<Message ID>`.",
-          "type": "string"
-        },
-        "contextSize": {
-          "description": "Number of messages prior to and including\nlast_conversation_message to compile the suggestion. It may be smaller\nthan the CompileSuggestionRequest.context_messages_count field in the\nrequest if there aren't that many messages in the conversation.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "GoogleCloudDialogflowV2ArticleAnswer": {
-      "id": "GoogleCloudDialogflowV2ArticleAnswer",
-      "description": "Represents article answer.",
-      "type": "object",
-      "properties": {
-        "title": {
-          "description": "The article title.",
-          "type": "string"
-        },
-        "uri": {
-          "description": "The article URI.",
-          "type": "string"
-        },
-        "snippets": {
-          "description": "Article snippets.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "confidence": {
-          "description": "Article match confidence.\nThe system's confidence score that this article is a good match for this\nconverstation, as a value from 0.0 (completely uncertain) to 1.0\n(completely certain).",
-          "type": "number",
-          "format": "float"
-        },
-        "metadata": {
-          "description": "A map that contains metadata about the answer and the\ndocument from which it originates.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "answerRecord": {
-          "description": "The name of answer record, in the format of\n\"projects\/<Project ID>\/answerRecords\/<Answer Record ID>\"",
-          "type": "string"
-        }
-      }
-    },
-    "GoogleCloudDialogflowV2SuggestFaqAnswersResponse": {
-      "id": "GoogleCloudDialogflowV2SuggestFaqAnswersResponse",
-      "description": "The request message for [Participants.SuggestFaqAnswers]",
-      "type": "object",
-      "properties": {
-        "faqAnswers": {
-          "description": "Answers extracted from FAQ documents.",
-          "type": "array",
-          "items": {
-            "$ref": "GoogleCloudDialogflowV2FaqAnswer"
-          }
-        },
-        "latestMessage": {
-          "description": "The name of the latest conversation message used to compile\nsuggestion for.\n\nFormat: `projects\/<Project ID>\/conversations\/<Conversation\nID>\/messages\/<Message ID>`.",
-          "type": "string"
-        },
-        "contextSize": {
-          "description": "Number of messages prior to and including\nlast_conversation_message to compile the suggestion. It may be smaller\nthan the CompileSuggestionRequest.context_messages_count field in the\nrequest if there aren't that many messages in the conversation.",
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "GoogleCloudDialogflowV2FaqAnswer": {
-      "id": "GoogleCloudDialogflowV2FaqAnswer",
-      "description": "Represents answer from \"frequently asked questions\".",
-      "type": "object",
-      "properties": {
-        "answer": {
-          "description": "The piece of text from the `source` knowledge base document.",
-          "type": "string"
-        },
-        "confidence": {
-          "description": "The system's confidence score that this Knowledge answer is a good match\nfor this conversational query, range from 0.0 (completely uncertain)\nto 1.0 (completely certain).",
-          "type": "number",
-          "format": "float"
-        },
-        "question": {
-          "description": "The corresponding FAQ question.",
-          "type": "string"
-        },
-        "source": {
-          "description": "Indicates which Knowledge Document this answer was extracted\nfrom.\nFormat: `projects\/<Project ID>\/agent\/knowledgeBases\/<Knowledge Base\nID>\/documents\/<Document ID>`.",
-          "type": "string"
-        },
-        "metadata": {
-          "description": "A map that contains metadata about the answer and the\ndocument from which it originates.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "answerRecord": {
-          "description": "The name of answer record, in the format of\n\"projects\/<Project ID>\/answerRecords\/<Answer Record ID>\"",
-          "type": "string"
-        }
-      }
-    },
-    "GoogleCloudDialogflowV2KnowledgeOperationMetadata": {
-      "id": "GoogleCloudDialogflowV2KnowledgeOperationMetadata",
-      "description": "Metadata in google::longrunning::Operation for Knowledge operations.",
-      "type": "object",
-      "properties": {
-        "state": {
-          "description": "Output only. The current state of this operation.",
-          "enumDescriptions": [
-            "State unspecified.",
-            "The operation has been created.",
-            "The operation is currently running.",
-            "The operation is done, either cancelled or completed."
-          ],
-          "type": "string",
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "PENDING",
-            "RUNNING",
-            "DONE"
-          ]
-        }
-      }
-    },
     "GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesResponse": {
       "id": "GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesResponse",
       "description": "The response message for EntityTypes.BatchUpdateEntityTypes.",
@@ -2291,7 +2357,7 @@
           ]
         },
         "priority": {
-          "description": "Optional. The priority of this intent. Higher numbers represent higher\npriorities. If this is zero or unspecified, we use the default\npriority 500000.\n\nNegative numbers mean that the intent is disabled.",
+          "description": "The priority of this intent. Higher numbers represent higher\npriorities.\n\n- If the supplied value is unspecified or 0, the service\n  translates the value to 500,000, which corresponds to the\n  `Normal` priority in the console.\n- If the supplied value is negative, the intent is ignored\n  in runtime detect intent requests.",
           "type": "integer",
           "format": "int32"
         },
@@ -2890,6 +2956,10 @@
           "items": {
             "$ref": "GoogleCloudDialogflowV2beta1IntentMessageListSelectItem"
           }
+        },
+        "subtitle": {
+          "description": "Optional. Subtitle of the list.",
+          "type": "string"
         }
       }
     },

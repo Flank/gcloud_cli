@@ -38,6 +38,7 @@ class LabelmanagerV1alpha1(base_api.BaseApiClient):
     self.labelKeys = self.LabelKeysService(self)
     self.labelValues_labelBindings = self.LabelValuesLabelBindingsService(self)
     self.labelValues = self.LabelValuesService(self)
+    self.operations = self.OperationsService(self)
 
   class LabelKeysService(base_api.BaseApiService):
     """Service class for the labelKeys resource."""
@@ -50,9 +51,10 @@ class LabelmanagerV1alpha1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new label key. If a another request with the same parameters is.
-sent while the original request is in process the second request
-will receive an error.
+      r"""Creates a new LabelKey. If another request with the same parameters is.
+sent while the original request is in process, the second request
+will receive an error. A maximum of 300 LabelKeys (with any lifecycle
+state) can exist under a parent at any given time.
 
       Args:
         request: (LabelKey) input message
@@ -78,10 +80,10 @@ will receive an error.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Requests deletion of a LabelKey. The Label Key is moved into the.
+      r"""Requests deletion of a LabelKey. The LabelKey is moved into the.
 DELETE_REQUESTED state
-immediately, and is deleted approximately 30 days later. The Label Key
-cannot have any child label values in the
+immediately, and is deleted approximately 30 days later. The LabelKey
+cannot be deleted if it has any child LabelValues in the
 ACTIVE state.
 
       Args:
@@ -109,7 +111,7 @@ ACTIVE state.
     )
 
     def Get(self, request, global_params=None):
-      r"""Retrieves a label key. This method will return PERMISSION_DENIED if the.
+      r"""Retrieves a LabelKey. This method will return PERMISSION_DENIED if the.
 key does not exist or the user does not have permission to view it.
 
       Args:
@@ -166,7 +168,7 @@ set.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists all label keys for a parent resource.
+      r"""Lists all LabelKeys for a parent resource.
 
       Args:
         request: (LabelmanagerLabelKeysListRequest) input message
@@ -282,10 +284,10 @@ may "fail open" without warning.
     )
 
     def Undelete(self, request, global_params=None):
-      r"""Cancels the deletion request for a Label Key. This method may only be.
-called on a Label Key in the
+      r"""Cancels the deletion request for a LabelKey. This method may only be.
+called on a LabelKey in the
 DELETE_REQUESTED state.
-In order to succeed, the Label Key's parent must be in the active state.
+In order to succeed, the LabelKey's parent must be in the active state.
 
       Args:
         request: (LabelmanagerLabelKeysUndeleteRequest) input message
@@ -322,7 +324,7 @@ In order to succeed, the Label Key's parent must be in the active state.
           }
 
     def Create(self, request, global_params=None):
-      r"""Binds a label value to a cloud resource (project, folder, org).
+      r"""Binds a LabelValue to a cloud resource (project, folder, org).
 
       Args:
         request: (LabelmanagerLabelValuesLabelBindingsCreateRequest) input message
@@ -348,7 +350,8 @@ In order to succeed, the Label Key's parent must be in the active state.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists the bindings for the given label value.
+      r"""Lists the bindings for the given LabelValue or.
+cloud resource (project, folder, org).
 
       Args:
         request: (LabelmanagerLabelValuesLabelBindingsListRequest) input message
@@ -384,9 +387,11 @@ In order to succeed, the Label Key's parent must be in the active state.
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a label value as a child of the specified label key. If a another.
+      r"""Creates a LabelValue as a child of the specified LabelKey. If a another.
 request with the same parameters is sent while the original request is in
-process the second request will receive an error.
+process the second request will receive an error. A maximum of 300
+LabelValues (with any lifecycle state) can exist under a LabelKey at any
+given time.
 
       Args:
         request: (LabelValue) input message
@@ -412,9 +417,9 @@ process the second request will receive an error.
     )
 
     def Delete(self, request, global_params=None):
-      r"""Requests deletion of a LabelValue. The Label Value is moved into the.
+      r"""Requests deletion of a LabelValue. The LabelValue is moved into the.
 DELETE_REQUESTED state
-immediately, and is deleted approximately 30 days later. The Label Value
+immediately, and is deleted approximately 30 days later. The LabelValue
 cannot have any bindings when it is deleted.
 
       Args:
@@ -442,7 +447,7 @@ cannot have any bindings when it is deleted.
     )
 
     def DeleteLabelBindings(self, request, global_params=None):
-      r"""Deletes a binding between a label value and a cloud resource.
+      r"""Deletes a binding between a LabelValue and a cloud resource.
 (project, folder, org).
 
       Args:
@@ -469,8 +474,8 @@ cannot have any bindings when it is deleted.
     )
 
     def Get(self, request, global_params=None):
-      r"""Retrieves label value. This method will return PERMISSION_DENIED if the.
-value does not exist or the user does not have permission to view it.
+      r"""Retrieves LabelValue. This method will return PERMISSION_DENIED if the.
+LabelValue does not exist or the user does not have permission to view it.
 
       Args:
         request: (LabelmanagerLabelValuesGetRequest) input message
@@ -497,7 +502,7 @@ value does not exist or the user does not have permission to view it.
     )
 
     def List(self, request, global_params=None):
-      r"""Lists all label values for a specific label key.
+      r"""Lists all LabelValues for a specific LabelKey.
 
       Args:
         request: (LabelmanagerLabelValuesListRequest) input message
@@ -550,10 +555,10 @@ value does not exist or the user does not have permission to view it.
     )
 
     def Undelete(self, request, global_params=None):
-      r"""Cancels the deletion request for a Label Value. This method may only be.
-called on a Label Value in the
+      r"""Cancels the deletion request for a LabelValue. This method may only be.
+called on a LabelValue in the
 DELETE_REQUESTED state.
-In order to succeed, the Label Value's parent must be in the
+In order to succeed, the LabelValue's parent must be in the
 ACTIVE state.
 
       Args:
@@ -576,6 +581,45 @@ ACTIVE state.
         relative_path=u'v1alpha1/{+name}:undelete',
         request_field=u'undeleteLabelValueRequest',
         request_type_name=u'LabelmanagerLabelValuesUndeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+  class OperationsService(base_api.BaseApiService):
+    """Service class for the operations resource."""
+
+    _NAME = u'operations'
+
+    def __init__(self, client):
+      super(LabelmanagerV1alpha1.OperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
+method to poll the operation result at intervals as recommended by the API
+service.
+
+      Args:
+        request: (LabelmanagerOperationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1alpha1/operations/{operationsId}',
+        http_method=u'GET',
+        method_id=u'labelmanager.operations.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1alpha1/{+name}',
+        request_field='',
+        request_type_name=u'LabelmanagerOperationsGetRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )

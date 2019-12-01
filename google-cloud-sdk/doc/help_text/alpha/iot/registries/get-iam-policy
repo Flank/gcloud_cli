@@ -71,7 +71,7 @@ API REFERENCE
 EXAMPLES
     To print the IAM policy for a given device registry, run:
 
-        $ gcloud alpha iot registries get-iam-policy --region us-central1 \
+        $ gcloud alpha iot registries get-iam-policy --region=us-central1 \
             my-registry
 
 NOTES

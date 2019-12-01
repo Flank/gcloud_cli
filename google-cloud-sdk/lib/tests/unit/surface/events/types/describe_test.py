@@ -36,13 +36,20 @@ class TypesDescribeTestAlpha(base.ServerlessSurfaceBase):
         custom_resource_definition.SourceCustomResourceDefinition.New(
             self.mock_crd_client, 'fake-project') for _ in range(num_sources)
     ]
+    self.event_types = []
     for i, crd in enumerate(self.source_crds):
+      crd.spec.names = self.crd_messages.CustomResourceDefinitionNames(
+          kind='SourceKind{}'.format(i))
       event_types = []
       for j in range(num_event_types_per_source):
         event_types.append(
-            self._EventTypeAdditionalProperty(
-                'e{}-{}'.format(i, j), 'desc{}{}'.format(i, j),
-                'google.source.{}.et.{}'.format(i, j)))
+            custom_resource_definition.EventType(
+                crd,
+                type='google.source.{}.et.{}'.format(i, j),
+                schema='https://somewhere.over.the.rainbow.json',
+                description='desc{}{}'.format(i, j)))
+      crd.event_types = event_types
+      self.event_types.extend(event_types)
       spec_properties = [
           self._SpecParameterAdditionalProperty('p{}-{}'.format(i, j), 'string',
                                                 'pdesc{}{}'.format(i, j))
@@ -56,16 +63,9 @@ class TypesDescribeTestAlpha(base.ServerlessSurfaceBase):
       ]
       crd.spec.validation = self.crd_messages.CustomResourceValidation(
           openAPIV3Schema=self._SourceSchemaProperties(
-              'Source{}'.format(i),
-              event_types,
               spec_properties,
               required_properties,
           ))
-    # self.event_types is all event types across all sources ordered by
-    # source then event type (e.g. [s.0.et.0, s.0.et.1, s.1.et.0, etc.])
-    self.event_types = []
-    for crd in self.source_crds:
-      self.event_types.extend(crd.event_types)
     self.operations.ListSourceCustomResourceDefinitions.return_value = (
         self.source_crds)
 
@@ -86,7 +86,7 @@ class TypesDescribeTestAlpha(base.ServerlessSurfaceBase):
     self.Run('events types describe google.source.0.et.0 --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.AssertOutputEquals(
-        """category: Source0
+        """category: SourceKind0
         description: desc00
         schema: https://somewhere.over.the.rainbow.json
         type: google.source.0.et.0

@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
@@ -86,8 +87,8 @@ class DeployTestBase(base.FunctionsTestBase):
       del http, retries, max_retry_wait, redirections, retry_func
       if empty_response:  # Handle empty server response edge case.
         check_response_func(None)
-      self.assertEqual('PUT', request.http_method)
       self.assertEqual('foo', request.url)
+      self.assertEqual('PUT', request.http_method)
       fname_suffix = self.RandomFileName()
       tmp_zip_file = self.Touch(self.temp_path,
                                 'tmp_{}.zip'.format(fname_suffix),
@@ -344,14 +345,10 @@ class PackagingTest(DeployTestBase):
   def SetUp(self):
     self._dirs_size_limit_method = 513 * (2**20)
 
-  @parameterized.parameters([True, False])
-  def testPackageFilesWithIgnoreFile(self, use_node_modules):
-    path = self.PrepareLocalSource(
-        write_extra_files=True, use_node_modules=use_node_modules,
-        ignore_file=True)
+  def _MockBasicFunctionCreate(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.MockGeneratedApiUploadUrl()
-
     location = self.GetLocationResource()
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
@@ -362,9 +359,19 @@ class PackagingTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockUploadToSignedUrl()
     self.MockGetExistingFunction(response=function)
+    return function
+
+  @parameterized.parameters([True, False])
+  def testPackageFilesWithIgnoreFile(self, use_node_modules):
+    path = self.PrepareLocalSource(
+        write_extra_files=True, use_node_modules=use_node_modules,
+        ignore_file=True)
+
+    function = self._MockBasicFunctionCreate()
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet --runtime=nodejs6 '
@@ -388,23 +395,8 @@ class PackagingTest(DeployTestBase):
   def testPackageFilesWithGcloudIgnore(self, use_node_modules):
     path = self.PrepareLocalSource(
         write_extra_files=True, use_node_modules=use_node_modules)
-    self.MockGetExistingFunction(response=None)
-    self.MockGeneratedApiUploadUrl()
 
-    location = self.GetLocationResource()
-    function = self.GetFunctionMessage(
-        _DEFAULT_REGION,
-        _DEFAULT_FUNCTION_NAME,
-        https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo', runtime='nodejs6')
-    create_request = self.GetFunctionsCreateRequest(function, location)
-    operation = self._GenerateActiveOperation('operations/operation')
-    self.mock_client.projects_locations_functions.Create.Expect(
-        create_request, operation)
-
-    self.MockLongRunningOpResult('operations/operation')
-    self.MockUploadToSignedUrl()
-    self.MockGetExistingFunction(response=function)
+    function = self._MockBasicFunctionCreate()
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet --runtime=nodejs6'.format(path))
@@ -415,22 +407,8 @@ class PackagingTest(DeployTestBase):
   def testPackageFilesWithGitignore(self, use_node_modules):
     path = self.PrepareLocalSource(
         write_extra_files=True, use_node_modules=use_node_modules, use_git=True)
-    self.MockGetExistingFunction(response=None)
-    self.MockGeneratedApiUploadUrl()
 
-    location = self.GetLocationResource()
-    function = self.GetFunctionMessage(
-        _DEFAULT_REGION,
-        _DEFAULT_FUNCTION_NAME,
-        https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo', runtime='nodejs6')
-    create_request = self.GetFunctionsCreateRequest(function, location)
-    operation = self._GenerateActiveOperation('operations/operation')
-    self.mock_client.projects_locations_functions.Create.Expect(
-        create_request, operation)
-    self.MockLongRunningOpResult('operations/operation')
-    self.MockUploadToSignedUrl()
-    self.MockGetExistingFunction(response=function)
+    function = self._MockBasicFunctionCreate()
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet --runtime=nodejs6'.format(path))
@@ -455,23 +433,8 @@ class PackagingTest(DeployTestBase):
   def testPackageFilesWithNoIgnorefile(self):  # Happypath use case.
     path = self.PrepareLocalSource(
         write_extra_files=False)
-    self.MockGetExistingFunction(response=None)
-    self.MockGeneratedApiUploadUrl()
 
-    location = self.GetLocationResource()
-    function = self.GetFunctionMessage(
-        _DEFAULT_REGION,
-        _DEFAULT_FUNCTION_NAME,
-        https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo', runtime='nodejs6')
-    create_request = self.GetFunctionsCreateRequest(function, location)
-    operation = self._GenerateActiveOperation('operations/operation')
-    self.mock_client.projects_locations_functions.Create.Expect(
-        create_request, operation)
-
-    self.MockLongRunningOpResult('operations/operation')
-    self.MockUploadToSignedUrl()
-    self.MockGetExistingFunction(response=function)
+    function = self._MockBasicFunctionCreate()
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet --runtime=nodejs6'.format(path))
@@ -505,6 +468,7 @@ class CoreTest(DeployTestBase):
   def testLocalSource(self, staging_bucket_flag):
     path = self.PrepareLocalSource()
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     if staging_bucket_flag:
       self.MockUploadToGCSBucket()
     else:
@@ -523,7 +487,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -536,6 +500,7 @@ class CoreTest(DeployTestBase):
   def testLocalSourceImplied(self):
     path = self.PrepareLocalSource()
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     self.MockGeneratedApiUploadUrl()
     self.MockUploadToSignedUrl()
 
@@ -550,7 +515,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -562,6 +527,7 @@ class CoreTest(DeployTestBase):
 
   def testGcsSource(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     location = self.GetLocationResource()
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
@@ -573,7 +539,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -585,6 +551,7 @@ class CoreTest(DeployTestBase):
 
   def testGcsSourceWithoutExtensionWarns(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     location = self.GetLocationResource()
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
@@ -596,7 +563,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -611,6 +578,7 @@ class CoreTest(DeployTestBase):
 
   def testCodeRepositorySource(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     location = self.GetLocationResource()
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
@@ -624,7 +592,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -647,6 +615,7 @@ class CoreTest(DeployTestBase):
 
   def testWithAllValidOptionalArgs(self):  # Including Retry and Labels
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     location = self.GetLocationResource()
     trigger = self.GetPubSubTrigger(self.Project(), 'topic', True)
     function = self.GetFunctionMessage(
@@ -661,7 +630,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
     result = self.Run(
@@ -673,6 +642,7 @@ class CoreTest(DeployTestBase):
 
   def testValidLabels(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     location = self.GetLocationResource()
     labels = self.GetLabelsMessage([('fizz', 'buzz'), ('foo', 'bar')])
     trigger = self.GetPubSubTrigger(self.Project(), 'topic', False)
@@ -687,7 +657,7 @@ class CoreTest(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
     result = self.Run('functions deploy my-test --trigger-topic topic '
@@ -780,6 +750,7 @@ class TriggerTests(DeployTestBase):
                                          trigger_resource,
                                          trigger):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     location = self.GetLocationResource()
     if trigger == 'pubsub':
       trigger = self.GetPubSubTrigger(self.Project(), 'topic', False,
@@ -799,6 +770,7 @@ class TriggerTests(DeployTestBase):
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
 
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
     result = self.Run(
@@ -812,6 +784,8 @@ class TriggerTests(DeployTestBase):
 
   def testPubSubTriggerWithDefaultBehavior(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
+
     location = self.GetLocationResource()
     trigger = self.GetPubSubTrigger(self.Project(), 'topic', retry=True)
     function = self.GetFunctionMessage(
@@ -824,7 +798,7 @@ class TriggerTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -836,6 +810,7 @@ class TriggerTests(DeployTestBase):
 
   def testGcsTriggerWithDefaultTriggerEvent(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     location = self.GetLocationResource()
     trigger = self.GetGcsTrigger(self.Project(), 'fake_bucket', retry=False)
     function = self.GetFunctionMessage(
@@ -848,7 +823,7 @@ class TriggerTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -860,6 +835,7 @@ class TriggerTests(DeployTestBase):
 
   def testGcsTriggerWithFullyQualifiedBucketUrl(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     location = self.GetLocationResource()
     trigger = self.GetGcsTrigger(self.Project(), 'full-images', retry=False)
     function = self.GetFunctionMessage(
@@ -872,7 +848,7 @@ class TriggerTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -885,6 +861,7 @@ class TriggerTests(DeployTestBase):
 
   def testHttpTrigger(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     location = self.GetLocationResource()
     function = self.GetFunctionMessage(
         _DEFAULT_REGION,
@@ -896,7 +873,7 @@ class TriggerTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
 
@@ -1550,6 +1527,7 @@ class DeployRuntimeTests(DeployTestBase):
 
   def testCreateRuntime(self):
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     location = self.GetLocationResource()
     trigger = self.GetPubSubTrigger(self.Project(), 'topic')
     function = self.GetFunctionMessage(
@@ -1562,7 +1540,7 @@ class DeployRuntimeTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
     result = self.Run(
@@ -1613,6 +1591,7 @@ class EnvVarsTests(DeployTestBase):
       flags: A string containing the flags for setting environment variables.
     """
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     source_archive_url = 'gs://bucket'
     location = self.GetLocationResource()
@@ -1631,7 +1610,7 @@ class EnvVarsTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockUploadToSignedUrl()
     self.MockGetExistingFunction(response=function)
@@ -1707,6 +1686,7 @@ class EnvVarsTests(DeployTestBase):
   def testEnvVarsFileNewFunction(self):
     """Test adding env vars to function with no env vars."""
     self.MockGetExistingFunction(response=None)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
 
     source_archive_url = 'gs://bucket'
     location = self.GetLocationResource()
@@ -1728,7 +1708,7 @@ class EnvVarsTests(DeployTestBase):
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
         create_request, operation)
-
+    self.MockRemoveIamPolicy(_DEFAULT_FUNCTION_NAME)
     self.MockLongRunningOpResult('operations/operation')
     self.MockUploadToSignedUrl()
     self.MockGetExistingFunction(response=function)

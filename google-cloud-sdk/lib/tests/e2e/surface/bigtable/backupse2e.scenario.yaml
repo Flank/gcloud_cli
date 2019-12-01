@@ -31,8 +31,8 @@ summary:
 - execute:
   - command: bigtable operations list --instance=cloud-bigtable-static-instance --limit=1
   - stdout: |-
-      OPERATION_ID.*INSTANCE.*DONE.*START_TIME.*END_TIME
-      .*cloud-bigtable-static-instance.*True.*
+      NAME.*DONE.*START_TIME.*END_TIME
+      .*instances/cloud-bigtable-static-instance.*operations/.*True.*
       $
 - execute:
   - command: bigtable backups describe $$my-backup$$ --instance cloud-bigtable-static-instance
@@ -205,8 +205,8 @@ actions:
     events:
     - expect_stdout:
         matches: |
-          OPERATION_ID.*INSTANCE.*DONE.*START_TIME.*END_TIME
-          .*cloud-bigtable-static-instance.*True.*
+          NAME.*DONE.*START_TIME.*END_TIME
+          .*instances/cloud-bigtable-static-instance.*operations/.*True.*
     - expect_exit:
         code: 0
 

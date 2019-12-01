@@ -58,8 +58,8 @@ FLAGS
         when deployment data is modified.
 
      --preview
-        Preview the requested update without making any changes to
-        theunderlying resources. (default=False)
+        Preview the requested update without making any changes to the
+        underlying resources. (default=False)
 
      --properties=[PROPERTIES,...]
         A comma separated, key:value, map to be used when deploying a template
@@ -148,10 +148,13 @@ EXAMPLES
             --config new_config.yaml --fingerprint deployment-fingerprint
 
     Either the --config, --template, or --composite-type flag is required
-    unless launching an already-previewed update to a deployment.
+    unless launching an already-previewed update to a deployment. If you want
+    to update a deployment's metadata, such as the labels or description, you
+    must run a separate command with --update-labels, --remove-labels, or
+    --description, as applicable.
 
     More information is available at
-    https://cloud.google.com/deployment-manager/docs/configuration/.
+    https://cloud.google.com/deployment-manager/docs/deployments/updating-deployments.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

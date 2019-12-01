@@ -10,6 +10,7 @@ summary:
   - command: data-catalog search $$my-topic$$ --include-project-ids=$$project$$ --limit=1
   - stdout: |
       ---
+      integratedSystem: CLOUD_PUBSUB
       linkedResource: //pubsub.googleapis.com/projects/$$project$$/topics/$$my-topic$$
       relativeResourceName: projects/$$project$$/locations/us-central1/entryGroups/@pubsub/entries/$$my-entry$$
       searchResultSubtype: entry.data_stream.topic
@@ -57,15 +58,16 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '482'
+            content-length: '524'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             results:
             - searchResultType: ENTRY
               searchResultSubtype: entry.data_stream.topic
-              relativeResourceName: projects/$$project$$/locations/us-central1/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL2RhdGFjYXRhbG9nXzIwMTkwNjE5XzAwNTUwNl80ZnJk
+              relativeResourceName: projects/$$project$$/locations/us-central1/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL2RhdGFjYXRhbG9nXzIwMTkxMDIyXzEyNDQ1Nl94M2Fq
               linkedResource: //pubsub.googleapis.com/projects/$$project$$/topics/$$my-topic$$
+              integratedSystem: CLOUD_PUBSUB
         expect_response:
           extract_references:
           - field: results[0].relativeResourceName
@@ -75,12 +77,8 @@ actions:
           body:
             text:
               is_none: false
-    - expect_stdout: |
-        ---
-        linkedResource: //pubsub.googleapis.com/projects/$$project$$/topics/$$my-topic$$
-        relativeResourceName: projects/$$project$$/locations/us-central1/entryGroups/@pubsub/entries/$$my-entry$$
-        searchResultSubtype: entry.data_stream.topic
-        searchResultType: ENTRY
+    - expect_stdout:
+        matches: .*$$my-entry$$.*
     - expect_exit:
         code: 0
 - execute_command:

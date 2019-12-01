@@ -5,9 +5,9 @@ NAME
 SYNOPSIS
     gcloud alpha compute health-checks update http2 NAME
         [--check-interval=CHECK_INTERVAL] [--description=DESCRIPTION]
-        [--healthy-threshold=HEALTHY_THRESHOLD] [--host=HOST]
-        [--proxy-header=PROXY_HEADER] [--request-path=REQUEST_PATH]
-        [--response=RESPONSE] [--timeout=TIMEOUT]
+        [--enable-logging] [--healthy-threshold=HEALTHY_THRESHOLD]
+        [--host=HOST] [--proxy-header=PROXY_HEADER]
+        [--request-path=REQUEST_PATH] [--response=RESPONSE] [--timeout=TIMEOUT]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD]
         [--global | --region=REGION]
         [--port=PORT --port-name=PORT_NAME --use-serving-port]
@@ -31,6 +31,12 @@ FLAGS
      --description=DESCRIPTION
         A textual description for the HTTP2 health check. Pass in an empty
         string to unset.
+
+     --enable-logging
+        Enable logging of health check probe results to Stackdriver. Logging is
+        disabled by default.
+
+            Use --no-enable-logging to disable logging.
 
      --healthy-threshold=HEALTHY_THRESHOLD
         The number of consecutive successful health checks before an unhealthy

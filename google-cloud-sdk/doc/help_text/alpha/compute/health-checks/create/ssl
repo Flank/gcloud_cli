@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute health-checks create ssl NAME
         [--check-interval=CHECK_INTERVAL; default="5s"]
-        [--description=DESCRIPTION]
+        [--description=DESCRIPTION] [--enable-logging]
         [--healthy-threshold=HEALTHY_THRESHOLD; default=2]
         [--proxy-header=PROXY_HEADER; default="NONE"] [--request=REQUEST]
         [--response=RESPONSE] [--timeout=TIMEOUT; default="5s"]
@@ -35,6 +35,12 @@ FLAGS
 
      --description=DESCRIPTION
         An optional string description for the SSL health check.
+
+     --enable-logging
+        Enable logging of health check probe results to Stackdriver. Logging is
+        disabled by default.
+
+            Use --no-enable-logging to disable logging.
 
      --healthy-threshold=HEALTHY_THRESHOLD; default=2
         The number of consecutive successful health checks before an unhealthy

@@ -46,11 +46,14 @@ class GoogleCloudRecommenderV1beta1Impact(_messages.Message):
       COST: Indicates a potential increase or decrease in cost.
       SECURITY: Indicates a potential increase or decrease in security.
       PERFORMANCE: Indicates a potential increase or decrease in performance.
+      MANAGEABILITY: Indicates a potential increase or decrease in
+        manageability.
     """
     CATEGORY_UNSPECIFIED = 0
     COST = 1
     SECURITY = 2
     PERFORMANCE = 3
+    MANAGEABILITY = 4
 
   category = _messages.EnumField('CategoryValueValuesEnum', 1)
   costProjection = _messages.MessageField('GoogleCloudRecommenderV1beta1CostProjection', 2)
@@ -378,9 +381,11 @@ class GoogleCloudRecommenderV1beta1Recommendation(_messages.Message):
       trying to optimize for one category.
     recommenderSubtype: Contains an identifier for a subtype of
       recommendations produced for the same recommender. Subtype is a function
-      of content and impact, meaning a new subtype will be added when either
-      content or primary impact category changes.  Examples:   For recommender
-      = "google.iam.policy.Recommender",   recommender_subtype can be one of
+      of content and impact, meaning a new subtype might be added when
+      significant changes to `content` or `primary_impact.category` are
+      introduced. See the Recommenders section to see a list of subtypes for a
+      given Recommender.  Examples:   For recommender =
+      "google.iam.policy.Recommender",   recommender_subtype can be one of
       "REMOVE_ROLE"/"REPLACE_ROLE"
     stateInfo: Information for state. Contains state and metadata.
   """

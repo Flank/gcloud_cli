@@ -32,18 +32,30 @@ class DescribeTestBeta(base.ServerlessSurfaceBase):
 
   def SetUp(self):
     self.mock_service = service.Service.New(
-        self.mock_serverless_client, 'us-central1.fake-project')
+        self.mock_serverless_client, 'doot')
     self.mock_service.name = 'simon'
     self.mock_service.metadata.creationTimestamp = '2018/01/02 00:00:00'
-    self.mock_service.configuration.env_vars.literals['n1'] = 'v1'
-    self.mock_service.configuration.env_vars.literals['n2'] = 'v2'
+    self.mock_service.template.image = 'gcr.io/foo/bar:latest'
+    self.mock_service.template.env_vars.literals['n1'] = 'v1'
+    self.mock_service.template.env_vars.literals['n2'] = 'v2'
+
+  def testDescribe_Succeed_Yaml(self):
+    """Tests successful describe with default output format."""
+    self.operations.GetService.return_value = self.mock_service
+    self.Run('run services describe simon --format yaml')
+    for s in [
+        'spec', 'kind: Service', 'name: simon', 'name: n1', 'value: v1']:
+      self.AssertOutputMatches(s)
 
   def testDescribe_Succeed_Default(self):
     """Tests successful describe with default output format."""
     self.operations.GetService.return_value = self.mock_service
     self.Run('run services describe simon')
     for s in [
-        'spec', 'kind: Service', 'name: simon', 'name: n1', 'value: v1']:
+        'Service simon in namespace doot',
+        'n1\\s*v1',
+        'Image:\\s*gcr.io/foo/bar:latest',
+    ]:
       self.AssertOutputMatches(s)
 
   def testDescribe_Fail_Missing(self):

@@ -9,6 +9,8 @@ SYNOPSIS
           | --nat-external-ip-pool=IP_ADDRESS,[IP_ADDRESS,...]]
         [--clear-icmp-idle-timeout | --icmp-idle-timeout=ICMP_IDLE_TIMEOUT]
         [--clear-min-ports-per-vm | --min-ports-per-vm=MIN_PORTS_PER_VM]
+        [--clear-nat-external-drain-ip-pool
+          | --nat-external-drain-ip-pool=NAT_EXTERNAL_DRAIN_IP_POOL,[...]]
         [--clear-tcp-established-idle-timeout
           | --tcp-established-idle-timeout=TCP_ESTABLISHED_IDLE_TIMEOUT]
         [--clear-tcp-transitory-idle-timeout
@@ -104,6 +106,16 @@ OPTIONAL FLAGS
 
        --min-ports-per-vm=MIN_PORTS_PER_VM
           Minimum ports to be allocated to a VM
+
+     At most one of these may be specified:
+
+       --clear-nat-external-drain-ip-pool
+          Clear the drained NAT IPs
+
+       --nat-external-drain-ip-pool=NAT_EXTERNAL_DRAIN_IP_POOL,[...]
+          External IP Addresses to be drained
+
+          These IPs must be valid external IPs that have been used as NAT IPs
 
      At most one of these may be specified:
 

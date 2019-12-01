@@ -31,7 +31,7 @@ class GrpcTest(test_case.TestCase):
     metadata = cygrpc.Operation()
     del metadata
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/143144559')
   @test_case.Filters.RunOnlyOnWindows('crcmod extension is only available on '
                                       'windows when using bundled python.')
   def testCrcmodCompiledExtension(self):

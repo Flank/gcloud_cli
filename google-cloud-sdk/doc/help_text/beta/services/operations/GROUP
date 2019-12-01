@@ -20,9 +20,6 @@ COMMANDS
      describe
         (BETA) Describes an operation resource for a given operation name.
 
-     list
-        (BETA) (DEPRECATED) List operations for a project.
-
      wait
         (BETA) Waits for an operation to complete for a given operation name.
 

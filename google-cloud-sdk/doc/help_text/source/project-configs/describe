@@ -19,6 +19,11 @@ API REFERENCE
     This command uses the sourcerepo/v1 API. The full documentation for this
     API can be found at: https://cloud.google.com/source-repositories/docs/apis
 
+EXAMPLES
+    To show the current configuration of the current project run:
+
+        $ gcloud source project-configs describe
+
 NOTES
     These variants are also available:
 

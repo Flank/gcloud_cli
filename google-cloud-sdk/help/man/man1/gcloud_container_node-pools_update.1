@@ -11,7 +11,7 @@ gcloud container node\-pools update \- updates a node pool in a running cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container node\-pools update\fR \fINAME\fR (\fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container node\-pools update\fR \fINAME\fR (\fB\-\-enable\-autoprovisioning\fR\ \fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,7 +38,48 @@ The name of the node pool.
 .RS 2m
 .TP 2m
 
-Node management At least one of these must be specified:
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Cluster autoscaling
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-autoprovisioning\fR
+Enables Cluster Autoscaler to treat the node pool as if it was autoprovisioned.
+
+Cluster Autoscaler will be able to delete the node pool if it's unneeded.
+
+.TP 2m
+\fB\-\-enable\-autoscaling\fR
+Enables autoscaling for a node pool.
+
+Enables autoscaling in the node pool specified by \-\-node\-pool or the default
+node pool if \-\-node\-pool is not provided.
+
+.TP 2m
+\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR
+Maximum number of nodes in the node pool.
+
+Maximum number of nodes to which the node pool specified by \-\-node\-pool (or
+default node pool if unspecified) can scale. Ignored unless
+\-\-enable\-autoscaling is also specified.
+
+.TP 2m
+\fB\-\-min\-nodes\fR=\fIMIN_NODES\fR
+Minimum number of nodes in the node pool.
+
+Minimum number of nodes to which the node pool specified by \-\-node\-pool (or
+default node pool if unspecified) can scale. Ignored unless
+\-\-enable\-autoscaling is also specified.
+
+.RE
+.sp
+.TP 2m
+
+Node management
 
 .RS 2m
 .TP 2m
@@ -66,6 +107,7 @@ See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-upgrades for
 more info.
 
 
+.RE
 .RE
 .RE
 .sp

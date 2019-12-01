@@ -24,47 +24,49 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import utils
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
-
-class CreateTest(test_base.BaseTest):
+class CreateTestBeta(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_beta
 
   def testCreate(self):
-    expected = messages.PacketMirroring(
+    expected = self.messages.PacketMirroring(
         name='my-pm',
         priority=999,
-        network=messages.PacketMirroringNetworkInfo(
-            url=('https://compute.googleapis.com/compute/alpha/'
-                 'projects/my-project/global/networks/default')),
-        collectorIlb=messages.PacketMirroringForwardingRuleInfo(
-            url=('https://compute.googleapis.com/compute/alpha/'
+        network=self.messages.PacketMirroringNetworkInfo(
+            url=('https://compute.googleapis.com/compute/{0}/'
+                 'projects/my-project/global/networks/default'
+                ).format(self.api_version)),
+        collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
+            url=('https://compute.googleapis.com/compute/{0}/'
                  'projects/my-project/regions/us-central1/'
-                 'forwardingRules/fr1')),
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+                 'forwardingRules/fr1').format(self.api_version)),
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1', 't2'],
             instances=[
-                messages.PacketMirroringMirroredResourceInfoInstanceInfo(
-                    url='https://compute.googleapis.com/compute/alpha/'
-                    'projects/my-project/zones/us-central1-a/'
-                    'instances/i1')
+                self.messages.PacketMirroringMirroredResourceInfoInstanceInfo(
+                    url=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/my-project/zones/us-central1-a/'
+                         'instances/i1').format(self.api_version))
             ],
             subnetworks=[
-                messages.PacketMirroringMirroredResourceInfoSubnetInfo(
-                    url='https://compute.googleapis.com/compute/alpha/'
-                    'projects/my-project/regions/us-central1/'
-                    'subnetworks/subnet1'),
-                messages.PacketMirroringMirroredResourceInfoSubnetInfo(
-                    url='https://compute.googleapis.com/compute/alpha/'
-                    'projects/other-project/regions/us-central1/'
-                    'subnetworks/subnet2')
+                self.messages.PacketMirroringMirroredResourceInfoSubnetInfo(
+                    url=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/my-project/regions/us-central1/'
+                         'subnetworks/subnet1').format(self.api_version)),
+                self.messages.PacketMirroringMirroredResourceInfoSubnetInfo(
+                    url=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/other-project/regions/us-central1/'
+                         'subnetworks/subnet2').format(self.api_version))
             ],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter(
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
             cidrRanges=['1.2.3.0/24', '4.5.0.0/16'], IPProtocols=['udp',
                                                                   'tcp']))
 
@@ -80,36 +82,36 @@ class CreateTest(test_base.BaseTest):
         --enable --collector-ilb fr1
         """)
 
-    self.CheckRequests([(self.compute_alpha.packetMirrorings, 'Insert',
-                         messages.ComputePacketMirroringsInsertRequest(
+    self.CheckRequests([(self.compute.packetMirrorings, 'Insert',
+                         self.messages.ComputePacketMirroringsInsertRequest(
                              packetMirroring=expected,
                              project='my-project',
                              region='us-central1',
                          ))])
 
   def testAsync(self):
-    expected = messages.PacketMirroring(
+    expected = self.messages.PacketMirroring(
         name='my-pm',
-        network=messages.PacketMirroringNetworkInfo(
-            url=('https://compute.googleapis.com/compute/alpha/'
-                 'projects/my-project/global/networks/default')),
-        collectorIlb=messages.PacketMirroringForwardingRuleInfo(
-            url=('https://compute.googleapis.com/compute/alpha/'
+        network=self.messages.PacketMirroringNetworkInfo(
+            url=('https://compute.googleapis.com/compute/{0}/'
+                 'projects/my-project/global/networks/default'
+                ).format(self.api_version)),
+        collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
+            url=('https://compute.googleapis.com/compute/{0}/'
                  'projects/my-project/regions/us-central1/'
-                 'forwardingRules/fr1')),
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+                 'forwardingRules/fr1').format(self.api_version)),
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1'],
             instances=[],
             subnetworks=[],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter()
-    )
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter())
     api_mock = utils.ComputeApiMock(
-        'alpha', project=self.Project()).Start()
+        self.api_version, project=self.Project()).Start()
     api_mock.batch_responder.ExpectBatch([
-        ((self.compute_alpha.packetMirrorings, 'Insert',
-          messages.ComputePacketMirroringsInsertRequest(
+        ((self.compute.packetMirrorings, 'Insert',
+          self.messages.ComputePacketMirroringsInsertRequest(
               packetMirroring=expected,
               project='my-project',
               region='us-central1',
@@ -133,6 +135,16 @@ class CreateTest(test_base.BaseTest):
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
     api_mock.Stop()
+
+
+class CreateTestAlpha(CreateTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_alpha
 
 
 if __name__ == '__main__':

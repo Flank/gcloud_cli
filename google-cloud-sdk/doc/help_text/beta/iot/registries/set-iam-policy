@@ -48,7 +48,7 @@ EXAMPLES
     'policy.json' and set it for a device registry with identifier
     'my-registry'
 
-        $ gcloud beta iot registries set-iam-policy --region us-central1 \
+        $ gcloud beta iot registries set-iam-policy --region=us-central1 \
             my-registry policy.json
 
     See https://cloud.google.com/iam/docs/managing-policies for details of the

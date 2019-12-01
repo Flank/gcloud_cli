@@ -314,26 +314,23 @@ def MakeBackendServices(msgs, api):
           selfLink=(prefix + '/projects/my-project'
                     '/global/backendServices/backend-service-1'),
           timeoutSec=30),
-
       msgs.BackendService(
           backends=[
               msgs.Backend(
                   balancingMode=(
                       msgs.Backend.BalancingModeValueValuesEnum.RATE),
                   description='group one',
-                  group=(
-                      'https://compute.googleapis.com/compute/'
-                      '{0}/projects/my-project/zones/zone-1/'
-                      'instanceGroups/group-1'.format(api)),
+                  group=('https://compute.googleapis.com/compute/'
+                         '{0}/projects/my-project/zones/zone-1/'
+                         'instanceGroups/group-1'.format(api)),
                   maxRate=100),
               msgs.Backend(
                   balancingMode=(
                       msgs.Backend.BalancingModeValueValuesEnum.UTILIZATION),
                   description='group two',
-                  group=(
-                      'https://compute.googleapis.com/compute/{0}/'
-                      'projects/my-project/zones/zone-2/'
-                      'instanceGroups/group-2'.format(api)),
+                  group=('https://compute.googleapis.com/compute/{0}/'
+                         'projects/my-project/zones/zone-2/'
+                         'instanceGroups/group-2'.format(api)),
                   maxUtilization=1.0),
           ],
           healthChecks=[
@@ -346,17 +343,15 @@ def MakeBackendServices(msgs, api):
           selfLink=(prefix + '/projects/my-project'
                     '/global/backendServices/backend-service-2'),
           timeoutSec=30),
-
       msgs.BackendService(
           backends=[
               msgs.Backend(
                   balancingMode=(
                       msgs.Backend.BalancingModeValueValuesEnum.RATE),
                   description='instance group one',
-                  group=(
-                      'https://compute.googleapis.com/compute/'
-                      '{0}/projects/my-project/zones/'
-                      'zone-1/instanceGroups/group-1').format(api),
+                  group=('https://compute.googleapis.com/compute/'
+                         '{0}/projects/my-project/zones/'
+                         'zone-1/instanceGroups/group-1').format(api),
                   maxRate=100),
           ],
           healthChecks=[
@@ -369,17 +364,15 @@ def MakeBackendServices(msgs, api):
           selfLink=(prefix + '/projects/my-project'
                     '/global/backendServices/instance-group-service'),
           timeoutSec=30),
-
       msgs.BackendService(
           backends=[
               msgs.Backend(
                   balancingMode=(
                       msgs.Backend.BalancingModeValueValuesEnum.RATE),
                   description='group one',
-                  group=(
-                      'https://compute.googleapis.com/compute/'
-                      '{0}/projects/my-project/regions/region-1/'
-                      'instanceGroups/group-1'.format(api)),
+                  group=('https://compute.googleapis.com/compute/'
+                         '{0}/projects/my-project/regions/region-1/'
+                         'instanceGroups/group-1'.format(api)),
                   maxRate=100),
           ],
           healthChecks=[
@@ -392,26 +385,23 @@ def MakeBackendServices(msgs, api):
           selfLink=(prefix + '/projects/my-project'
                     '/global/backendServices/regional-instance-group-service'),
           timeoutSec=30),
-
       msgs.BackendService(
           backends=[
               msgs.Backend(
                   balancingMode=(
                       msgs.Backend.BalancingModeValueValuesEnum.CONNECTION),
                   description='max connections',
-                  group=(
-                      'https://compute.googleapis.com/compute/'
-                      '{0}/projects/my-project/zones/zone-1/'
-                      'instanceGroups/group-1'.format(api)),
+                  group=('https://compute.googleapis.com/compute/'
+                         '{0}/projects/my-project/zones/zone-1/'
+                         'instanceGroups/group-1'.format(api)),
                   maxConnectionsPerInstance=100),
               msgs.Backend(
                   balancingMode=(
                       msgs.Backend.BalancingModeValueValuesEnum.UTILIZATION),
                   description='utilziation with conneciton',
-                  group=(
-                      'https://compute.googleapis.com/compute/'
-                      '{0}/projects/my-project/zones/zone-2/'
-                      'instanceGroups/group-2'.format(api)),
+                  group=('https://compute.googleapis.com/compute/'
+                         '{0}/projects/my-project/zones/zone-2/'
+                         'instanceGroups/group-2'.format(api)),
                   maxUtilization=1.0,
                   maxConnections=10),
           ],
@@ -424,10 +414,31 @@ def MakeBackendServices(msgs, api):
           protocol=msgs.BackendService.ProtocolValueValuesEnum.TCP,
           selfLink=(prefix + '/projects/my-project'
                     '/global/backendServices/backend-service-tcp'),
-          timeoutSec=30),
+          timeoutSec=30)
   ]
 
   return services
+
+
+def MakeBackendServiceWithOutlierDetection(msgs, api):
+  """Create backend services resource configured with outlier detection."""
+  prefix = _COMPUTE_PATH + '/' + api
+  return msgs.BackendService(
+      backends=[],
+      description='my backend service',
+      healthChecks=[
+          ('https://compute.googleapis.com/compute/{0}/projects/'
+           'my-project/global/httpHealthChecks/my-health-check'.format(api))
+      ],
+      name='backend-service-1',
+      portName='http',
+      protocol=msgs.BackendService.ProtocolValueValuesEnum.HTTP,
+      selfLink=(prefix + '/projects/my-project'
+                '/global/backendServices/backend-service-1'),
+      timeoutSec=30,
+      outlierDetection=msgs.OutlierDetection(
+          interval=msgs.Duration(seconds=1500)))
+
 
 BACKEND_SERVICES_ALPHA = MakeBackendServices(alpha_messages, 'alpha')
 BACKEND_SERVICES_BETA = MakeBackendServices(beta_messages, 'beta')

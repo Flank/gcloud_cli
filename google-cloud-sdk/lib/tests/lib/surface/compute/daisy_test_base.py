@@ -205,12 +205,13 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
           response=self.serviceusage_v1_messages.GoogleApiServiceusageV1Service(
               state=state_type.ENABLED,))
 
-  def PrepareDaisyMocksWithRegionalBucket(self, daisy_step, timeout='7200s',
-                                          log_location=None, permissions=None,
-                                          async_flag=False, is_import=True):
+  def PrepareDaisyMocksWithRegionalBucket(
+      self, daisy_step, timeout='7200s', log_location=None, permissions=None,
+      async_flag=False, is_import=True, match_source_file_region=True):
     self.PrepareDaisyMocks(daisy_step, timeout, log_location, permissions,
                            async_flag, is_import)
-    self.PrepareDaisyBucketMocksWithRegion()
+    self.PrepareDaisyBucketMocksWithRegion(
+        match_source_file_region=match_source_file_region)
 
   def PrepareDaisyMocksWithDefaultBucket(
       self,
@@ -224,15 +225,16 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
                            async_flag, is_import)
     self.PrepareDaisyBucketMocksWithoutRegion()
 
-  def PrepareDaisyBucketMocksWithRegion(self):
-    self.mocked_storage_v1.buckets.Get.Expect(
-        self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
-        response=self.storage_v1_messages.Bucket(
-            name='31dd',
-            storageClass='REGIONAL',
-            location=self.GetScratchBucketRegion()
-        ),
-    )
+  def PrepareDaisyBucketMocksWithRegion(self, match_source_file_region=True):
+    if match_source_file_region:
+      self.mocked_storage_v1.buckets.Get.Expect(
+          self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
+          response=self.storage_v1_messages.Bucket(
+              name='31dd',
+              storageClass='REGIONAL',
+              location=self.GetScratchBucketRegion()
+          ),
+      )
 
     daisy_bucket_name = self.GetScratchBucketNameWithRegion()
     self.mocked_storage_v1.buckets.Get.Expect(
@@ -295,4 +297,4 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
 
   @staticmethod
   def GetScratchBucketRegion():
-    return 'EUROPE-NORTH1'
+    return 'MY-REGION'

@@ -1,7 +1,3 @@
-skip:
-  reason: Failing
-  bug: b/122968518
-  always: true  # Never run this because it takes too long.
 title: Create a disk snapshot from a Windows image.
 release_tracks: [GA]
 

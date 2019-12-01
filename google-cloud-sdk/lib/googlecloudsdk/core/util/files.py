@@ -163,12 +163,13 @@ def _ShouldRetryOperation(func, exc_info):
   Returns:
     True if the error can be retried or false if we should just fail.
   """
-  if not (func == os.remove or func == os.rmdir):
+  # os.unlink is the same as os.remove
+  if not (func == os.remove or func == os.rmdir or func == os.unlink):
     return False
-  if not WindowsError or exc_info[0] != WindowsError:
+  if not WindowsError:
     return False
   e = exc_info[1]
-  return e.winerror in RETRY_ERROR_CODES
+  return getattr(e, 'winerror', None) in RETRY_ERROR_CODES
 
 
 def _RetryOperation(exc_info, func, args,
@@ -217,7 +218,11 @@ def _HandleRemoveError(func, failed_path, exc_info):
 
   # Access denied on Windows. This happens when trying to delete a readonly
   # file. Change the permissions and retry the delete.
-  if exc_info[0] == WindowsError and exc_info[1].winerror == 5:
+  #
+  # In python 3.3+, WindowsError is an alias of OSError and exc_info[0] can be
+  # a subclass of OSError.
+  if (WindowsError and issubclass(exc_info[0], WindowsError) and
+      getattr(exc_info[1], 'winerror', None) == 5):
     os.chmod(failed_path, stat.S_IWUSR)
 
   # Don't remove the trailing comma in the passed arg tuple.  It indicates that
@@ -987,7 +992,7 @@ def WriteFileAtomically(file_name, contents):
 
 
 def GetTreeSizeBytes(path, predicate=None):
-  """Returns sum of sizes of not-ingnored files under given path, in bytes."""
+  """Returns sum of sizes of not-ignored files under given path, in bytes."""
   result = 0
   if predicate is None:
     predicate = lambda x: True
@@ -997,6 +1002,46 @@ def GetTreeSizeBytes(path, predicate=None):
       if predicate(file_path):
         result += os.path.getsize(file_path)
   return result
+
+
+def GetDirectoryTreeListing(path,
+                            include_dirs=False,
+                            file_predicate=None,
+                            dir_sort_func=None,
+                            file_sort_func=None):
+  """Yields a generator that list all the files in a directory tree.
+
+  Walks directory tree from path and yeilds all files that it finds. Will expand
+  paths relative to home dir e.g. those that start with '~'.
+
+  Args:
+    path: string, base of file tree to walk.
+    include_dirs: bool, if true will yield directory names in addition to files.
+    file_predicate: function, boolean function to determine which files should
+      be included in the output. Default is all files.
+    dir_sort_func: function, function that will determine order directories are
+      processed. Default is lexical ordering.
+    file_sort_func:  function, function that will determine order directories
+      are processed. Default is lexical ordering.
+  Yields:
+    Generator: yields all files and directory paths matching supplied criteria.
+  """
+  if not file_sort_func:
+    file_sort_func = sorted
+  if file_predicate is None:
+    file_predicate = lambda x: True
+  if dir_sort_func is None:
+    dir_sort_func = lambda x: x.sort()
+
+  for root, dirs, files in os.walk(ExpandHomeDir(six.text_type(path))):
+    dir_sort_func(dirs)
+    if include_dirs:
+      for dirname in dirs:
+        yield dirname
+    for file_name in file_sort_func(files):
+      file_path = os.path.join(root, file_name)
+      if file_predicate(file_path):
+        yield file_path
 
 
 def ReadFileContents(path):

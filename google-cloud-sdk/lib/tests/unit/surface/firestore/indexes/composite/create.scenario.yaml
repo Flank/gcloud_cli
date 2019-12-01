@@ -1,5 +1,5 @@
 title: cloud firestore create test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -51,7 +51,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/indexes?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/indexes?alt=json
           method: POST
           headers: {}
           body:
@@ -69,7 +69,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/9999",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.IndexOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.IndexOperationMetadata",
                 "startTime": "2018-11-29T01:19:51Z",
                 "index": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgPigl4sK",
                 "state": "PROCESSING",
@@ -91,7 +91,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/9999",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.IndexOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.IndexOperationMetadata",
                 "startTime": "2018-11-29T01:19:51Z",
                 "endTime": "2018-11-29T01:19:52.975169Z",
                 "index": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgPigl4sK",
@@ -100,7 +100,7 @@ actions:
               },
               "done": true,
               "response": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.Index",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.Index",
                 "name": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgPigl4sK",
                 "queryScope": "COLLECTION",
                 "fields": [
@@ -136,7 +136,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/indexes?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/indexes?alt=json
           method: POST
           headers: {}
           body:
@@ -154,7 +154,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/9999",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.IndexOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.IndexOperationMetadata",
                 "startTime": "2018-11-29T01:19:51Z",
                 "index": "projects/fake-project/databases/(default)/collectionGroups/Events/indexes/CICAgPigl4sK",
                 "state": "PROCESSING",

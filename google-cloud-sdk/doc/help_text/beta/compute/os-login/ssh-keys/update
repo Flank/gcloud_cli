@@ -7,9 +7,9 @@ SYNOPSIS
         (--key=KEY | --key-file=KEY_FILE) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute os-login ssh-keys update will take either a
-    string containing an SSH public key or a filename for an SSH public key and
-    will update the key in the user's OS Login profile. Currently, only the
+    (BETA) gcloud beta compute os-login ssh-keys update accepts either a string
+    containing an SSH public key or a filename for an SSH public key, and
+    updates the key in the user's OS Login profile. Currently, only the
     expiration time, --ttl, can be updated.
 
 REQUIRED FLAGS
@@ -36,6 +36,21 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To update the SSH public key found in /home/user/.ssh/id_rsa.pub with an
+    expiration time of one week from now, run:
+
+        $ gcloud beta compute os-login ssh-keys update --ttl=7d \
+            --key-file=/home/user/.ssh/id_rsa.pub
+
+    To update the SSH public key with a fingerprint of
+    'e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47126bc52' and an
+    expiration time of five years from now, run:
+
+        $ gcloud beta compute os-login ssh-keys update --ttl=5y \
+            --key='e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47\
+        126bc52'
 
 NOTES
     This command is currently in BETA and may change without notice. These

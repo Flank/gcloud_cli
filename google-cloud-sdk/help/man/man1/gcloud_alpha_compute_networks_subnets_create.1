@@ -11,7 +11,7 @@ gcloud alpha compute networks subnets create \- define a subnet for a network in
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-enable\-private\-ipv6\-access\fR] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-private\-ipv6\-google\-access\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-enable\-private\-ipv6\-access\fR] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-logging\-aggregation\-interval\fR=\fILOGGING_AGGREGATION_INTERVAL\fR] [\fB\-\-logging\-filter\-expr\fR=\fILOGGING_FILTER_EXPR\fR] [\fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR] [\fB\-\-logging\-metadata\fR=\fILOGGING_METADATA\fR] [\fB\-\-logging\-metadata\-fields\fR=[\fIMETADATA_FIELD\fR,...]] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-private\-ipv6\-google\-access\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -98,6 +98,11 @@ connections. Default is an interval of 5 seconds per connection.
 \fBinterval\-5\-min\fR, \fBinterval\-5\-sec\fR.
 
 .TP 2m
+\fB\-\-logging\-filter\-expr\fR=\fILOGGING_FILTER_EXPR\fR
+Can only be specified if VPC flow logs for this subnetwork is enabled. Export
+filter used to define which VPC flow logs should be logged.
+
+.TP 2m
 \fB\-\-logging\-flow\-sampling\fR=\fILOGGING_FLOW_SAMPLING\fR
 Can only be specified if VPC flow logging for this subnetwork is enabled. The
 value of the field must be in [0, 1]. Set the sampling rate of VPC flow logs
@@ -110,7 +115,13 @@ logs are reported.
 Can only be specified if VPC flow logging for this subnetwork is enabled.
 Configures whether metadata fields should be added to the reported VPC flow
 logs. Default is to include all metadata. \fILOGGING_METADATA\fR must be one of:
-\fBexclude\-all\fR, \fBinclude\-all\fR.
+\fBcustom\fR, \fBexclude\-all\fR, \fBinclude\-all\fR.
+
+.TP 2m
+\fB\-\-logging\-metadata\-fields\fR=[\fIMETADATA_FIELD\fR,...]
+Can only be specified if VPC flow logs for this subnetwork is enabled and
+"metadata" is set to CUSTOM_METADATA. The custom list of metadata fields that
+should be added to reported VPC flow logs.
 
 .TP 2m
 \fB\-\-metadata\fR=\fIMETADATA\fR
@@ -136,6 +147,9 @@ The private IPv6 google access type for the VMs in this subnet.
 The purpose of this subnetwork. \fIPURPOSE\fR must be one of:
 
 .RS 2m
+.TP 2m
+\fBAGGREGATE\fR
+Reserved for Aggregate Ranges used for aggregating private subnetworks.
 .TP 2m
 \fBINTERNAL_HTTPS_LOAD_BALANCER\fR
 Reserved for Internal HTTP(S) Load Balancing.

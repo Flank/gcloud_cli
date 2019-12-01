@@ -12,6 +12,7 @@ SYNOPSIS
           | --target-tcp-proxy=TARGET_TCP_PROXY
           | --target-vpn-gateway=TARGET_VPN_GATEWAY) [--allow-global-access]
         [--description=DESCRIPTION] [--ip-protocol=IP_PROTOCOL]
+        [--is-mirroring-collector]
         [--load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"]
         [--network=NETWORK] [--network-tier=NETWORK_TIER]
         [--service-label=SERVICE_LABEL] [--subnet=SUBNET]
@@ -147,6 +148,11 @@ OPTIONAL FLAGS
         are valid.
 
         IP_PROTOCOL must be one of: AH, ESP, ICMP, SCTP, TCP, UDP.
+
+     --is-mirroring-collector
+        If set, this forwarding rule can be used as a collector for packet
+        mirroring. This can only be specified for forwarding rules with the
+        LOAD_BALANCING_SCHEME set to INTERNAL.
 
      --load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"
         This defines the forwarding rule's load balancing scheme.

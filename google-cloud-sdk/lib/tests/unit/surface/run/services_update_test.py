@@ -28,11 +28,11 @@ from tests.lib.surface.run import base
 import mock
 
 
-class UpdateTestBeta(base.ServerlessSurfaceBase, parameterized.TestCase):
+class UpdateTest(base.ServerlessSurfaceBase, parameterized.TestCase):
   """Tests `services update update` command."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.operations.ReleaseService.return_value = None
@@ -96,6 +96,13 @@ class UpdateTestBeta(base.ServerlessSurfaceBase, parameterized.TestCase):
         'run services update --concurrency default s1')
     self.AssertErrContains('Service [s1] revision [rev.1] is active and '
                            'serving traffic at info.cern.ch')
+
+
+class UpdateTestBeta(UpdateTest):
+  """Tests `services update update` command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class UpdateTestAlpha(UpdateTestBeta):

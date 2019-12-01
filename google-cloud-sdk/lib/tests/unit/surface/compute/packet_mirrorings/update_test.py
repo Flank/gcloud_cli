@@ -23,10 +23,8 @@ from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
-
-class UpdateTest(test_base.BaseTest):
+class UpdateTestBeta(test_base.BaseTest):
   _PM_NAME = 'my-pm'
   _REGION = 'us-central1'
   _ZONE = 'us-central1-a'
@@ -35,17 +33,20 @@ class UpdateTest(test_base.BaseTest):
   _DEFAULT_NETWORK = 'default'
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'beta'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_beta
 
   def testUpdate(self):
     self._SetNextGetResult(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1'],
             instances=[],
             subnetworks=[],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
     )
 
     self.Run("""\
@@ -54,13 +55,13 @@ class UpdateTest(test_base.BaseTest):
         """)
 
     self._CheckGetAndPatchRequests(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1'],
             instances=[],
             subnetworks=[],
         ),
-        filter=messages.PacketMirroringFilter(),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.FALSE,
+        filter=self.messages.PacketMirroringFilter(),
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.FALSE,
         priority=1,
         description='Mirror the packets')
 
@@ -76,18 +77,18 @@ class UpdateTest(test_base.BaseTest):
     """)
 
     self._CheckGetAndPatchRequests(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1', 't2'],
             instances=[self._MakeInstanceInfo('i1')],
             subnetworks=[self._MakeSubnetInfo('sn1')],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter(
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
             cidrRanges=['11.22.0.0/16'], IPProtocols=['tcp', 'udp']))
 
   def testUpdate_RemoveRepeatedFields(self):
     self._SetNextGetResult(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1', 't2'],
             instances=[
                 self._MakeInstanceInfo('i1'),
@@ -98,8 +99,8 @@ class UpdateTest(test_base.BaseTest):
                 self._MakeSubnetInfo('sn2')
             ],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter(
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
             cidrRanges=['11.22.33.0/24', '22.33.0.0/16'],
             IPProtocols=['tcp', 'icmp']))
 
@@ -112,18 +113,18 @@ class UpdateTest(test_base.BaseTest):
     """)
 
     self._CheckGetAndPatchRequests(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t2'],
             instances=[self._MakeInstanceInfo('i2')],
             subnetworks=[self._MakeSubnetInfo('sn2')],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter(
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
             cidrRanges=['22.33.0.0/16'], IPProtocols=['icmp']))
 
   def testUpdate_ClearRepeatedFields(self):
     self._SetNextGetResult(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1', 't2'],
             instances=[
                 self._MakeInstanceInfo('i1'),
@@ -134,8 +135,8 @@ class UpdateTest(test_base.BaseTest):
                 self._MakeSubnetInfo('sn2')
             ],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter(
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
             cidrRanges=['11.22.33.0/24', '22.33.0.0/16'],
             IPProtocols=['tcp', 'icmp']))
 
@@ -146,12 +147,12 @@ class UpdateTest(test_base.BaseTest):
     """)
 
     self._CheckGetAndPatchRequests(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=[],
             instances=[],
             subnetworks=[],
         ),
-        filter=messages.PacketMirroringFilter(),
+        filter=self.messages.PacketMirroringFilter(),
     )
 
   def testUpdate_SetRepeatedFields(self):
@@ -166,25 +167,25 @@ class UpdateTest(test_base.BaseTest):
     """)
 
     self._CheckGetAndPatchRequests(
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['t1', 't2'],
             instances=[self._MakeInstanceInfo('i1')],
             subnetworks=[self._MakeSubnetInfo('sn1')],
         ),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE,
-        filter=messages.PacketMirroringFilter(
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+        filter=self.messages.PacketMirroringFilter(
             cidrRanges=['11.22.0.0/16'], IPProtocols=['tcp', 'udp']))
 
   def _SetNextGetResult(self, **kwargs):
     pm = self._MakeBasicPacketMirroring()
     pm.update(kwargs)
-    self.make_requests.side_effect = iter([[messages.PacketMirroring(**pm)],
-                                           []])
+    self.make_requests.side_effect = iter(
+        [[self.messages.PacketMirroring(**pm)], []])
 
   def _CheckGetAndPatchRequests(self, **kwargs):
     expected_get_request = [
-        (self.compute_alpha.packetMirrorings, 'Get',
-         messages.ComputePacketMirroringsGetRequest(
+        (self.compute.packetMirrorings, 'Get',
+         self.messages.ComputePacketMirroringsGetRequest(
              project=self._PROJECT,
              region=self._REGION,
              packetMirroring=self._PM_NAME))
@@ -193,12 +194,12 @@ class UpdateTest(test_base.BaseTest):
     pm = self._MakeBasicPacketMirroring()
     pm.update(kwargs)
     expected_update_request = [
-        (self.compute_alpha.packetMirrorings, 'Patch',
-         messages.ComputePacketMirroringsPatchRequest(
+        (self.compute.packetMirrorings, 'Patch',
+         self.messages.ComputePacketMirroringsPatchRequest(
              project=self._PROJECT,
              region=self._REGION,
              packetMirroring=self._PM_NAME,
-             packetMirroringResource=messages.PacketMirroring(**pm)))
+             packetMirroringResource=self.messages.PacketMirroring(**pm)))
     ]
     self.CheckRequests(expected_get_request, expected_update_request)
 
@@ -207,39 +208,49 @@ class UpdateTest(test_base.BaseTest):
         'name':
             self._PM_NAME,
         'network':
-            messages.PacketMirroringNetworkInfo(
-                url=('https://compute.googleapis.com/compute/alpha/'
+            self.messages.PacketMirroringNetworkInfo(
+                url=('https://compute.googleapis.com/compute/%s/'
                      'projects/%s/global/networks/%s' %
-                     (self._PROJECT, self._DEFAULT_NETWORK))),
+                     (self.api_version, self._PROJECT, self._DEFAULT_NETWORK))),
         'collectorIlb':
-            messages.PacketMirroringForwardingRuleInfo(
-                url=('https://compute.googleapis.com/compute/alpha/'
+            self.messages.PacketMirroringForwardingRuleInfo(
+                url=('https://compute.googleapis.com/compute/%s/'
                      'projects/%s/regions/%s/forwardingRules/%s' %
-                     (self._PROJECT, self._REGION,
+                     (self.api_version, self._PROJECT, self._REGION,
                       self._DEFAULT_FORWARDING_RULE))),
         'mirroredResources':
-            messages.PacketMirroringMirroredResourceInfo(
+            self.messages.PacketMirroringMirroredResourceInfo(
                 tags=[],
                 instances=[],
                 subnetworks=[],
             ),
         'filter':
-            messages.PacketMirroringFilter(),
+            self.messages.PacketMirroringFilter(),
         'enable':
-            messages.PacketMirroring.EnableValueValuesEnum.TRUE,
+            self.messages.PacketMirroring.EnableValueValuesEnum.TRUE,
     }
 
   def _MakeInstanceInfo(self, instance):
-    return messages.PacketMirroringMirroredResourceInfoInstanceInfo(
-        url='https://compute.googleapis.com/compute/alpha/'
+    return self.messages.PacketMirroringMirroredResourceInfoInstanceInfo(
+        url='https://compute.googleapis.com/compute/%s/'
         'projects/%s/zones/%s/instances/%s' %
-        (self._PROJECT, self._ZONE, instance))
+        (self.api_version, self._PROJECT, self._ZONE, instance))
 
   def _MakeSubnetInfo(self, subnet):
-    return messages.PacketMirroringMirroredResourceInfoSubnetInfo(
-        url='https://compute.googleapis.com/compute/alpha/'
+    return self.messages.PacketMirroringMirroredResourceInfoSubnetInfo(
+        url='https://compute.googleapis.com/compute/%s/'
         'projects/%s/regions/%s/subnetworks/%s' %
-        (self._PROJECT, self._REGION, subnet))
+        (self.api_version, self._PROJECT, self._REGION, subnet))
+
+
+class UpdateTestAlpha(UpdateTestBeta):
+
+  def SetUp(self):
+    self.api_version = 'alpha'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_alpha
 
 
 if __name__ == '__main__':

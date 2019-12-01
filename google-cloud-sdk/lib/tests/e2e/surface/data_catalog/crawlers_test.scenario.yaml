@@ -1,7 +1,7 @@
-skip:
-  reason: Failing
-  always: true
-  bug: b/132375552
+filters:
+  skipAlways:
+    reason: Failing
+    bug: b/132375552
 title: Create, describe, list, update, and delete a crawler.
 release_tracks: [ALPHA]
 summary:

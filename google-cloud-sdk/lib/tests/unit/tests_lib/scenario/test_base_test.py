@@ -27,6 +27,7 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 from tests.lib import e2e_utils
 from tests.lib import parameterized
+from tests.lib import test_case
 from tests.lib.scenario import assertions
 from tests.lib.scenario import schema
 from tests.lib.scenario import session
@@ -212,27 +213,69 @@ actions:
     self.assertEquals('otherproj', properties.VALUES.core.project.Get())
 
 
-class TestBaseSkipTests(test_base.ScenarioTestBase, parameterized.TestCase):
+class TestBaseFilterTests(test_base.ScenarioTestBase, parameterized.TestCase):
 
   def SetUp(self):
     # Test skip behavior can be changed by env vars, so prevent that here.
     self.StartEnvPatch({}, clear=True)
 
-  @parameterized.named_parameters(
-      ('SkippedRemote', True, session.ExecutionMode.REMOTE,
-       {'reason': 'Failing', 'bug': 'b/123456789'}),
-      ('SkippedLocal', True, session.ExecutionMode.LOCAL,
-       {'reason': 'Failing', 'bug': 'b/123456789', 'locally': True}),
-      ('NotSkippedRemote', False, session.ExecutionMode.REMOTE, None),
-      ('NotSkippedLocal', False, session.ExecutionMode.LOCAL,
-       {'reason': 'Failing', 'bug': 'b/123456789'}),
-  )
-  def testSkipper(self, expected_is_skipped, execution_mode, skip_data):
+  def _IsTestFiltered(self, filter_data, execution_mode):
+    """Checks if the given filter data results in a test being filtered."""
     def Test():
       pass
-    skipped_test = test_base.SkipIfSkipped(skip_data, execution_mode)(Test)
-    is_skipped = Test != skipped_test
-    self.assertEqual(expected_is_skipped, is_skipped)
+    filter_decorator = test_base.BuildFilterDecorator(
+        filter_data, execution_mode)
+    filtered_test = filter_decorator(Test)
+    return filtered_test != Test
+
+  @parameterized.named_parameters(
+      ('SkippedRemote', True, session.ExecutionMode.REMOTE,
+       {'skip': {'reason': 'Failing', 'bug': 'b/12345'}}),
+      ('SkippedLocal', True, session.ExecutionMode.LOCAL,
+       {'skip': {'reason': 'Failing', 'bug': 'b/12345', 'locally': True}}),
+      ('NotSkippedRemote', False, session.ExecutionMode.REMOTE, None),
+      ('NotSkippedLocal', False, session.ExecutionMode.LOCAL,
+       {'skip': {'reason': 'Failing', 'bug': 'b/12345'}})
+  )
+  def testSkips(self, expected_is_filtered, execution_mode, filter_data):
+    self.assertEqual(
+        expected_is_filtered, self._IsTestFiltered(filter_data, execution_mode))
+
+  @parameterized.named_parameters(
+      ('RestrictedRemote', True, session.ExecutionMode.REMOTE,
+       {'DoNotRunOnLinux': {'reason': 'Because'}}),
+      ('RestrictedLocal', True, session.ExecutionMode.LOCAL,
+       {'DoNotRunOnLinux': {'reason': 'Because'}}),
+      ('NotRestrictedRemote', False, session.ExecutionMode.REMOTE,
+       {'RunOnlyOnLinux': {'reason': 'Because'}})
+  )
+  def testRestrictions(self, expected_is_filtered, execution_mode, filter_data):
+    # Pretend we're running on Linux so that the restriction is relevant.
+    self.StartObjectPatch(test_case.Filters, '_IS_ON_LINUX', True)
+    self.assertEqual(
+        expected_is_filtered, self._IsTestFiltered(filter_data, execution_mode))
+
+  @parameterized.parameters(
+      (True, True, True),
+      (True, True, False),
+      (True, False, True),
+      (False, False, False)
+  )
+  def testMultipleFilters(self, expected_is_filtered, is_linux, is_kokoro):
+    self.StartObjectPatch(test_case.Filters, '_IS_ON_LINUX', is_linux)
+    self.StartObjectPatch(test_case.Filters, '_IS_IN_KOKORO', is_kokoro)
+    filter_data = {
+        'DoNotRunOnLinux': {
+            'reason': 'Because'
+        },
+        'DoNotRunInKokoro': {
+            'reason': 'Because'
+        }
+    }
+
+    self.assertEqual(
+        expected_is_filtered,
+        self._IsTestFiltered(filter_data, session.ExecutionMode.REMOTE))
 
 
 class TestBaseFileUpdateTests(test_base.ScenarioTestBase):

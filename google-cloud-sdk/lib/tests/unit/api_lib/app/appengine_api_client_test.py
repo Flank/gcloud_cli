@@ -163,7 +163,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     fake_build.build_op = 'fake_build_op'
     self.beta_client.DeployService('fake-service', fake_version, fake_service,
                                    None, fake_build)
-    cloud_client_mock.Stream.assert_called_once_with(build_res)
+    cloud_client_mock.Stream.assert_called_once_with(build_res, out=log.status)
 
   def testDeployServiceFromBuildOptions(self):
     """Test service deployment using server-side builds."""
@@ -247,7 +247,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
 
     self.beta_client.DeployService('fake-service', fake_version, fake_service,
                                    manifest, fake_build)
-    cloud_client_mock.Stream.assert_called_once_with(build_res)
+    cloud_client_mock.Stream.assert_called_once_with(build_res, out=log.status)
     warning_mock.assert_has_calls(
         [mock.call('oh-no!\n'),
          mock.call('it\'s getting worse!\n')],

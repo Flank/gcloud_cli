@@ -1,5 +1,5 @@
 title: cloud firestore single-field update test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -150,7 +150,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
           method: PATCH
           headers: {}
           body:
@@ -168,7 +168,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/AyAxZTM4YmZjM2FiYjYtOTJlYS00ZGE0LWFjNjMtNGMzYzcxODUkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.FieldOperationMetadata",
                 "startTime": "2018-12-11T23:59:35.092Z",
                 "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
                 "state": "INITIALIZING"
@@ -181,7 +181,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
           method: GET
           headers: {}
           body: null
@@ -231,7 +231,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
           method: PATCH
           headers: {}
           body:
@@ -249,7 +249,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/AyA1MDNiZjA1NGFhN2ItMzk3OC1lMjk0LTU1OTktNjllYmY3YmQkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.FieldOperationMetadata",
                 "startTime": "2018-12-12T17:11:49.966Z",
                 "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
                 "state": "INITIALIZING"
@@ -262,7 +262,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
           method: GET
           headers: {}
           body: null
@@ -311,7 +311,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
           method: PATCH
           headers: {}
           body:
@@ -332,7 +332,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/AyA2ODMxM2JkNTZiMzYtZTAyOS03NTU0LTlhZWQtYjFhMjYyOWEkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.FieldOperationMetadata",
                 "startTime": "2018-12-12T17:22:29.699Z",
                 "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
                 "state": "INITIALIZING"
@@ -345,7 +345,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
           method: GET
           headers: {}
           body: null
@@ -441,7 +441,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
           method: PATCH
           headers: {}
           body:
@@ -455,7 +455,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/AyA1N2MxNTc3NTc3YjMtYzU5Yi0yZGQ0LTkzNDUtMWRkM2M1ZDQkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.FieldOperationMetadata",
                 "startTime": "2018-12-12T17:44:31.376Z",
                 "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
                 "state": "INITIALIZING"
@@ -468,7 +468,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
           method: GET
           headers: {}
           body: null
@@ -498,7 +498,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json&updateMask=indexConfig
           method: PATCH
           headers: {}
           body:
@@ -511,7 +511,7 @@ actions:
             {
               "name": "projects/fake-project/databases/(default)/operations/AyA5YmM5ZTNkMmIzZTItMjllYi0zMjI0LTE5YjgtMGIwOWQ0NTAkGnRsdWFmZWQHEjF0c2Flc3UtcmV4ZWRuaS1uaW1kYRUKSBI",
               "metadata": {
-                "@type": "type.googleapis.com/google.firestore.admin.v1beta2.FieldOperationMetadata",
+                "@type": "type.googleapis.com/google.firestore.admin.v1.FieldOperationMetadata",
                 "startTime": "2018-12-12T17:47:39.206Z",
                 "field": "projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp",
                 "state": "INITIALIZING"
@@ -524,7 +524,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
           method: GET
           headers: {}
           body: null

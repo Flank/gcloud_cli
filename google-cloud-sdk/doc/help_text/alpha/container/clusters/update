@@ -15,9 +15,9 @@ SYNOPSIS
           | --enable-shielded-nodes | --enable-stackdriver-kubernetes
           | --enable-vertical-pod-autoscaling | --generate-password
           | --identity-namespace=IDENTITY_NAMESPACE
-          | --maintenance-window=START_TIME | --remove-labels=[KEY,...]
-          | --security-profile=SECURITY_PROFILE | --set-password
-          | --start-credential-rotation | --start-ip-rotation
+          | --maintenance-window=START_TIME | --release-channel=CHANNEL
+          | --remove-labels=[KEY,...] | --security-profile=SECURITY_PROFILE
+          | --set-password | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
           | --node-locations=ZONE,[ZONE,...] | --clear-maintenance-window
@@ -36,6 +36,8 @@ SYNOPSIS
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
           | --autoprovisioning-locations=ZONE,[ZONE,...] --max-cpu=MAX_CPU
           --max-memory=MAX_MEMORY --min-cpu=MIN_CPU --min-memory=MIN_MEMORY
+          --autoprovisioning-scopes=[SCOPE,...]
+          --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
           [--max-accelerator=[type=TYPE,count=COUNT,...]
           : --min-accelerator=[type=TYPE,count=COUNT,...]]]
           | --logging-service=LOGGING_SERVICE
@@ -188,7 +190,7 @@ REQUIRED FLAGS
           Enable Stackdriver Kubernetes monitoring and logging.
 
        --enable-vertical-pod-autoscaling
-          Enables vertical pod autoscaling for a cluster.
+          Enable vertical pod autoscaling for a cluster.
 
        --generate-password
           Ask the server to generate a secure password and use that as the
@@ -216,8 +218,7 @@ REQUIRED FLAGS
                   --maintenance-window=12:43
 
           The time corresponds to the UTC time zone, and must be in HH:MM
-          format. To remove an existing maintenance window from the cluster,
-          use '--maintenance-window=None'.
+          format.
 
           Non-emergency maintenance will occur in the 4 hour block starting at
           the specified time.
@@ -225,6 +226,47 @@ REQUIRED FLAGS
           This is mutually exclusive with the recurring maintenance windows and
           will overwrite any existing window. Compatible with maintenance
           exclusions.
+
+          To remove an existing maintenance window from the cluster, use
+          '--clear-maintenance-window'.
+
+       --release-channel=CHANNEL
+          Subscribe or unsubscribe this cluster to a release channel.
+
+          When a cluster is subscribed to a release channel, Google maintains
+          both the master version and the node version. Node auto-upgrade
+          defaults to true and cannot be disabled. Updates to version related
+          fields (e.g. --cluster-version) return an error.
+
+          CHANNEL must be one of:
+
+           None
+              Use '--release-channel=None' to take a cluster off of a release
+              channel. Clusters on 'rapid' cannot be taken off of the release
+              channel.
+
+           rapid
+              WARNING: 'rapid' is recommended for testing, and not for
+              production workloads. Clusters on 'rapid' are not covered by GKE
+              SLA.
+
+              Clusters subscribed to 'rapid' receive the latest qualified
+              components, before any other channel. 'rapid' is intended for
+              early testers and developers who require new features. New
+              upgrades will occur roughly weekly.
+
+           regular
+              Clusters subscribed to 'regular' receive versions that are
+              considered GA quality. 'regular' is intended for production users
+              who want to take advantage of new features. New upgrades will
+              occur roughly every few weeks.
+
+           stable
+              Clusters subscribed to 'stable' receive versions that are known
+              to be stable and reliable in production. 'stable' is intended for
+              production users who need stability above all else, or for whom
+              frequent upgrades are too risky. New upgrades will occur roughly
+              every few months.
 
        --remove-labels=[KEY,...]
           Labels to remove from the Google Cloud resources in use by the
@@ -272,7 +314,8 @@ REQUIRED FLAGS
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
           KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-          NetworkPolicy=ENABLED|DISABLED CloudRun=ENABLED|DISABLED
+          ApplicationManager=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
+          CloudRun=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -520,6 +563,19 @@ REQUIRED FLAGS
 
                 Minimum number of gigabytes of memory to which the cluster can
                 scale.
+
+             Flags to specify identity for autoprovisioned nodes:
+
+               --autoprovisioning-scopes=[SCOPE,...]
+                  The scopes be used by node instances in autoprovisioined node
+                  pools. Multiple scopes can be specified, separated by commas.
+                  For information on defaults, look at:
+                  https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+               --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
+                  The Google Cloud Platform Service Account to be used by node
+                  VMs in autoprovisioined node pools. If not specified, the
+                  project default service account is used.
 
              Arguments to set limits on accelerators:
 

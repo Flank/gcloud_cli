@@ -993,6 +993,83 @@ class HealthChecksUpdateHttp2AlphaTest(HealthChecksUpdateHttp2BetaTest):
     self.SelectApi('alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+  def Run(self, command):
+    return super(HealthChecksUpdateHttp2AlphaTest,
+                 self).Run(command + ' --global')
+
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                http2HealthCheck=self.messages.HTTP2HealthCheck(
+                    host='www.example.com', port=80))
+        ],
+        [],
+    ])
+
+    self.Run("""
+        compute health-checks update http2 my-health-check {0}""".format(
+            enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                  http2HealthCheck=self.messages.HTTP2HealthCheck(
+                      host='www.example.com', port=80),
+                  logConfig=expected_log_config),
+              project='my-project'))],
+    )
+
+  def testEnableToDisableLogConfig(self):
+    log_config = self.messages.HealthCheckLogConfig(enable=True)
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                http2HealthCheck=self.messages.HTTP2HealthCheck(
+                    host='www.example.com', port=80),
+                logConfig=log_config)
+        ],
+        [],
+    ])
+
+    self.Run(
+        """compute health-checks update http2 my-health-check --no-enable-logging"""
+    )
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=False)
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Get',
+          self.messages.ComputeHealthChecksGetRequest(
+              healthCheck='my-health-check', project='my-project'))],
+        [(self.compute.healthChecks, 'Update',
+          self.messages.ComputeHealthChecksUpdateRequest(
+              healthCheck='my-health-check',
+              healthCheckResource=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTP2,
+                  http2HealthCheck=self.messages.HTTP2HealthCheck(
+                      host='www.example.com', port=80),
+                  logConfig=expected_log_config),
+              project='my-project'))],
+    )
+
 
 class RegionHealthChecksUpdateHttp2BetaTest(test_base.BaseTest,
                                             test_case.WithOutputCapture):

@@ -4,12 +4,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha container hub features multiclusteringress enable
-        --config-membership=CONFIG_MEMBERSHIP [GCLOUD_WIDE_FLAG ...]
+        [--config-membership=CONFIG_MEMBERSHIP] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command enables MultiClusterIngress Feature in Hub.
 
-REQUIRED FLAGS
+FLAGS
      --config-membership=CONFIG_MEMBERSHIP
         Membership resource representing the Kubernetes cluster which hosts the
         MultiClusterIngress and MultiClusterService CustomResourceDefinitions.

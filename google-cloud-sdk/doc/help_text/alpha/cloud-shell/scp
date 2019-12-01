@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha cloud-shell scp (cloudshell|localhost):SRC
         [(cloudshell|localhost):SRC ...] (cloudshell|localhost):DEST
-        [--dry-run] [--force-key-file-overwrite] [--recurse]
+        [--boosted] [--dry-run] [--force-key-file-overwrite] [--recurse]
         [--scp-flag=SCP_FLAG] [--ssh-key-file] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -39,6 +39,11 @@ POSITIONAL ARGUMENTS
         Specifies a destination for the source files.
 
 FLAGS
+     --boosted
+        If provided, starts Cloud Shell in boost mode. If there is alread a
+        running Cloud Shell session that is not boosted, this will restart the
+        session.
+
      --dry-run
         If provided, prints the command that would be run to standard out
         instead of executing it.

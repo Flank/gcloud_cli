@@ -3,7 +3,7 @@ NAME
         session with Cloud Shell
 
 SYNOPSIS
-    gcloud alpha cloud-shell ssh [--command=COMMAND] [--dry-run]
+    gcloud alpha cloud-shell ssh [--boosted] [--command=COMMAND] [--dry-run]
         [--force-key-file-overwrite] [--ssh-flag=SSH_FLAG] [--ssh-key-file]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -13,6 +13,11 @@ DESCRIPTION
     be started before establishing the SSH session.
 
 FLAGS
+     --boosted
+        If provided, starts Cloud Shell in boost mode. If there is alread a
+        running Cloud Shell session that is not boosted, this will restart the
+        session.
+
      --command=COMMAND
         A command to run in Cloud Shell.
 

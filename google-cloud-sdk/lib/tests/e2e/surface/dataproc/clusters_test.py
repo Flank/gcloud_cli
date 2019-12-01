@@ -63,9 +63,6 @@ class ClustersIntegrationTest(e2e_base.DataprocIntegrationTestBase):
   def DoTestGetSetIAMPolicy(self):
     pass
 
-  def testClustersList(self):
-    self.RunDataproc('clusters list --page-size=10 --limit=20')
-
 
 class ClustersIntegrationTestBeta(ClustersIntegrationTest,
                                   base.DataprocTestBaseBeta):
@@ -82,6 +79,23 @@ class ClustersIntegrationTestBeta(ClustersIntegrationTest,
 
   def DoTestGetSetIAMPolicy(self):
     self.GetSetIAMPolicy('clusters', self.cluster_name)
+
+  def testImportCluster(self):
+    cluster_yaml = """
+    config:
+      gceClusterConfig:
+        zoneUri: {zone}
+      softwareConfig:
+        properties:
+          dataproc:fake.property: "fake-value"
+    """.format(zone=self.zone)
+    self.WriteInput(cluster_yaml)
+
+    result = self.RunDataproc('clusters import {0}'.format(self.cluster_name))
+    self.assertEqual(self.cluster_name, result.clusterName)
+
+  def testClustersList(self):
+    self.RunDataproc('clusters list --page-size=10 --limit=20')
 
 
 if __name__ == '__main__':

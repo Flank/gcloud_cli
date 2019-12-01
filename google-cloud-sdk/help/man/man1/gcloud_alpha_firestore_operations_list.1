@@ -77,14 +77,31 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To retrieve information about recent operations, run:
+
+.RS 2m
+$ gcloud alpha firestore operations list
+.RE
+
+To only list operations that are done, run:
+
+.RS 2m
+$ gcloud alpha firestore operations list \-\-filter="done:true"
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist. This variant is also available:
+whitelist. These variants are also available:
 
 .RS 2m
+$ gcloud firestore operations list
 $ gcloud beta firestore operations list
 .RE
 

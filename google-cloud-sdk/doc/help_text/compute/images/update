@@ -6,22 +6,7 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud compute images update updates labels for a Google Compute image. For
-    example:
-
-        $ gcloud compute images update example-image \
-          --update-labels=k0=value1,k1=value2 --remove-labels=k3
-
-    will add/update labels k0 and k1 and remove labels with key k3.
-
-    Labels can be used to identify the image and to filter them as in
-
-        $ gcloud compute images list --filter='labels.k1:value2'
-
-    To list existing labels
-
-        $ gcloud compute images describe example-image \
-            --format='default(labels)'
+    gcloud compute images update updates labels for a Google Compute image.
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
@@ -62,6 +47,23 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To update labels k0 and k1 and remove labels with key k3, run:
+
+        $ gcloud compute images update example-image \
+            --update-labels=k0=value1,k1=value2 --remove-labels=k3
+
+        k0 and k1 will be added as new labels if not already present.
+
+    Labels can be used to identify the image and to filter them like:
+
+        $ gcloud compute images list --filter='labels.k1:value2'
+
+    To list only the labels when describing a resource, use --format:
+
+        $ gcloud compute images describe example-image \
+            --format='default(labels)'
 
 NOTES
     These variants are also available:

@@ -90,6 +90,8 @@ PUBLIC_KEY = ('ssh-rsa '
               'loNEhBnvoQFQl5aCwcS8UQnzzwMDflQ+JgsynYN08dLIRGcwkJe9')
 
 PUBLIC_KEY_RESPONSE = ({'status': '200'}, '{0} \n'.format(PUBLIC_KEY))
+ENCODED_KEY_RESPONSE = ({'status': '200'},
+                        '{0} \n'.format(PUBLIC_KEY).encode('utf-8'))
 BAD_KEY_RESPONSE = ({'status': '404'}, '')
 
 
@@ -608,6 +610,54 @@ class SerialPortTest(test_base.BaseSSHTest):
         mock_matchers.TypeMatcher(ssh.SSHCommand),
         ssh.Remote(self.gateway,
                    user='my-project.zone-1.instance-4.user_google_com.port=1'),
+        identity_file=self.private_key_file,
+        options=self.options,
+        port='9600')
+
+    self.ssh_run.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        self.env, force_connect=True)
+
+    # Known Hosts
+    self.known_hosts_add.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.KnownHosts),
+        '[ssh-serialport.googleapis.com]:9600', PUBLIC_KEY, overwrite=True)
+    self.known_hosts_write.assert_called_once()
+    self.make_requests.assert_not_called()
+
+  def testWithEncodedHttpResponse(self):
+    self.mock_http_request.request.return_value = ENCODED_KEY_RESPONSE
+    self.make_requests.side_effect = iter([
+        [INSTANCE_WITH_EXTERNAL_ADDRESS],
+        [self.project_resource],
+    ])
+
+    self.Run("""
+        compute connect-to-serial-port instance-1 --zone zone-1
+        """)
+    self.CheckRequests(
+        [(self.GetCompute().instances,
+          'Get',
+          self.GetMessages().ComputeInstancesGetRequest(
+              instance='instance-1',
+              project='my-project',
+              zone='zone-1'))],
+        [(self.GetCompute().projects,
+          'Get',
+          self.GetMessages().ComputeProjectsGetRequest(
+              project='my-project'))])
+
+    # Require SSH keys
+    self.ensure_keys.assert_called_once_with(
+        self.keys, None, allow_passphrase=True)
+
+    # No polling
+    self.poller_poll.assert_not_called()
+
+    # SSH Command
+    self.ssh_init.assert_called_once_with(
+        mock_matchers.TypeMatcher(ssh.SSHCommand),
+        ssh.Remote(self.gateway, user='my-project.zone-1.instance-1.me.port=1'),
         identity_file=self.private_key_file,
         options=self.options,
         port='9600')

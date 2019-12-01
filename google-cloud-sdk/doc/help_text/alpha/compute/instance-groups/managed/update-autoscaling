@@ -35,11 +35,11 @@ FLAGS
      --mode=MODE
         Set the mode of an autoscaler for a managed instance group.
 
-        You can turn off or restrict MIG activities without changing MIG
-        configuration and then having to restore it later. MIG configuration
-        persists while the activities are turned off or restricted, and the
-        activities pick it up when they are turned on again or when the
-        restrictions are lifted.
+        You can turn off or restrict MIG autoscaler activities (scaling up,
+        scaling down) without changing autoscaler configuration and then having
+        to restore it later. Autoscaler configuration persists while the
+        activities are turned off or restricted, and the activities pick it up
+        when they are turned on again or when the restrictions are lifted.
 
         MODE must be one of:
 
@@ -48,8 +48,6 @@ FLAGS
          on
             to permit autoscaling to scale up and down (default for new
             autoscalers).
-         only-down
-            to permit autoscaling to scale only down and not up.
          only-up
             to permit autoscaling to scale only up and not down.
 
@@ -108,9 +106,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To update an existing instance group:
+
+        $ gcloud alpha compute instance-groups managed update-autoscaling \
+          --mode=only-up
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute instance-groups managed update-autoscaling
 

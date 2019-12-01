@@ -180,7 +180,7 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     tz = times.TzOffset(60, expected)
     dt = times.GetDateTimeFromTimeStamp(ts)
     actual = times.FormatDateTime(dt, '%Z', tz)
-    self.assertRegexpMatches(actual, r'ascii|\+01:00')
+    self.assertRegexpMatches(actual, r'ascii')
 
   def testFormatTzNameAscii(self):
     encoding = 'ascii'
@@ -190,7 +190,7 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     tz = times.TzOffset(60, expected)
     dt = times.GetDateTimeFromTimeStamp(ts, tz)
     actual = times.FormatDateTime(dt, '%Z')
-    self.assertRegexpMatches(actual, r'ascii|\+01:00')
+    self.assertRegexpMatches(actual, r'ascii')
 
   def testFormatTzNameIso8859_1Unaware(self):
     encoding = 'iso8859-1'
@@ -200,7 +200,8 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts)
     actual = times.FormatDateTime(dt, '%Z', tz)
-    self.assertEqual(expected, actual)
+    # Python 2 falls back to +-HH:MM; Python 3 returns ÜñîçòÐé
+    self.assertRegexpMatches(actual, r'ÜñîçòÐé|\+01:00')
 
   def testFormatTzNameIso8859_1(self):
     encoding = 'iso8859-1'
@@ -210,9 +211,9 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts, tz)
     actual = times.FormatDateTime(dt, '%Z')
-    self.assertEqual(expected, actual)
+    # Python 2 falls back to +-HH:MM; Python 3 returns ÜñîçòÐé
+    self.assertRegexpMatches(actual, r'ÜñîçòÐé|\+01:00')
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   @test_case.Filters.SkipOnMacAndPy3('failing', 'b/139006909')
   def testFormatTzNameUtf8Unaware(self):
     encoding = 'utf-8'
@@ -222,9 +223,9 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts)
     actual = times.FormatDateTime(dt, '%Z', tz)
-    self.assertEqual(expected, actual)
+    # Python 2 falls back to +-HH:MM; Python 3 returns ÜñîçòÐé
+    self.assertRegexpMatches(actual, r'Ṳᾔḯ¢◎ⅾℯ|\+01:00')
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   @test_case.Filters.SkipOnMacAndPy3('failing', 'b/139006909')
   def testFormatTzNameUtf8(self):
     encoding = 'utf-8'
@@ -234,7 +235,8 @@ class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
     tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts, tz)
     actual = times.FormatDateTime(dt, '%Z')
-    self.assertEqual(expected, actual)
+    # Python 2 falls back to +-HH:MM; Python 3 returns ÜñîçòÐé
+    self.assertRegexpMatches(actual, r'Ṳᾔḯ¢◎ⅾℯ|\+01:00')
 
 
 class ParseDateTimeTest(subtests.Base):

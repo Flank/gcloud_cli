@@ -17,7 +17,7 @@ POSITIONAL ARGUMENTS
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: provide the
-     argument [TEMPLATE] on the command line with a fully specified name;
+     argument [template] on the command line with a fully specified name;
      provide the argument [--project] on the command line; set the property
      [core/project]. This must be specified.
 
@@ -42,7 +42,7 @@ FLAGS
         data. The YAML file must not contain any output-only fields.
         Alternatively, you may omit this flag to read from standard input. A
         schema describing the export/import format can be found in:
-        $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1/WorkflowTemplate.yaml.
+        $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1beta2/WorkflowTemplate.yaml.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

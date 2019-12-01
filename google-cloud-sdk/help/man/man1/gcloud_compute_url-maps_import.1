@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_COMPUTE_URL\-MAPS_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute url\-maps import \- import a URL map
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute url\-maps import\fR \fIURL_MAP\fR [\fB\-\-source\fR=\fISOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Imports a URL map's configuration to a file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIURL_MAP\fR
+Name of the URL map to import.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a YAML file containing url map configuration export data. The YAML file
+must not contain any output\-only fields. Alternatively, you may omit this flag
+to read from standard input. A schema describing the export/import format can be
+found in: $CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/v1/UrlMap.yaml.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+A URL map can be imported by running:
+
+.RS 2m
+$ gcloud compute url\-maps import NAME \-\-source=<path\-to\-file>
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute url\-maps import
+$ gcloud beta compute url\-maps import
+.RE
+

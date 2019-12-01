@@ -669,7 +669,15 @@ class CsvOptions(_messages.Message):
     skipLeadingRows: [Optional] The number of rows at the top of a CSV file
       that BigQuery will skip when reading the data. The default value is 0.
       This property is useful if you have header rows in the file that should
-      be skipped.
+      be skipped. When autodetect is on, the behavior is the following: *
+      skipLeadingRows unspecified - Autodetect tries to detect headers in the
+      first row. If they are not detected, the row is read as data. Otherwise
+      data is read starting from the second row. * skipLeadingRows is 0 -
+      Instructs autodetect that there are no headers and data should be read
+      starting from the first row. * skipLeadingRows = N > 0 - Autodetect
+      skips N-1 rows and tries to detect headers in row N. If headers are not
+      detected, row N is just skipped. Otherwise row N is used to extract
+      column names for the detected schema.
   """
 
   allowJaggedRows = _messages.BooleanField(1)
@@ -1113,14 +1121,8 @@ class ExternalDataConfiguration(_messages.Message):
     csvOptions: Additional properties to set if sourceFormat is set to CSV.
     googleSheetsOptions: [Optional] Additional options if sourceFormat is set
       to GOOGLE_SHEETS.
-    hivePartitioningMode: [Optional, Trusted Tester] If hive partitioning is
-      enabled, which mode to use. Two modes are supported: - AUTO:
-      automatically infer partition key name(s) and type(s). - STRINGS:
-      automatic infer partition key name(s). All types are strings. Not all
-      storage formats support hive partitioning -- requesting hive
-      partitioning on an unsupported format will lead to an error. Note: this
-      setting is in the process of being deprecated in favor of
-      hivePartitioningOptions.
+    hivePartitioningMode: [Optional, Trusted Tester] Deprecated, do not use.
+      Please set hivePartitioningOptions instead.
     hivePartitioningOptions: [Optional, Trusted Tester] Options to configure
       hive partitioning support.
     ignoreUnknownValues: [Optional] Indicates if BigQuery should allow extra
@@ -1474,12 +1476,8 @@ class JobConfigurationLoad(_messages.Message):
       first byte of the encoded string to split the data in its raw, binary
       state. BigQuery also supports the escape sequence "\t" to specify a tab
       separator. The default value is a comma (',').
-    hivePartitioningMode: [Optional, Trusted Tester] If hive partitioning is
-      enabled, which mode to use. Two modes are supported: - AUTO:
-      automatically infer partition key name(s) and type(s). - STRINGS:
-      automatic infer partition key name(s). All types are strings. Not all
-      storage formats support hive partitioning -- requesting hive
-      partitioning on an unsupported format will lead to an error.
+    hivePartitioningMode: [Optional, Trusted Tester] Deprecated, do not use.
+      Please set hivePartitioningOptions instead.
     hivePartitioningOptions: [Optional, Trusted Tester] Options to configure
       hive partitioning support.
     ignoreUnknownValues: [Optional] Indicates if BigQuery should allow extra
@@ -1967,14 +1965,14 @@ class JobStatistics2(_messages.Message):
       manipulation-language. "MERGE": MERGE query; see
       https://cloud.google.com/bigquery/docs/reference/standard-sql/data-
       manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW":
-      ALTER VIEW query. "CREATE_FUNCTION": CREATE FUNCTION query.
-      "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... .
-      "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR
-      REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR
-      REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE]
-      VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query.
-      "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query.
-      "DROP_VIEW": DROP VIEW query.
+      ALTER VIEW query. "ASSERT": ASSERT condition AS 'description'.
+      "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR
+      REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE
+      query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT.
+      "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... .
+      "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... .
+      "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE
+      query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
     timeline: [Output-only] [Beta] Describes a timeline of job execution.
     totalBytesBilled: [Output-only] Total bytes billed for the job.
     totalBytesProcessed: [Output-only] Total bytes processed for the job.
@@ -2119,13 +2117,21 @@ class MaterializedViewDefinition(_messages.Message):
   r"""A MaterializedViewDefinition object.
 
   Fields:
+    enableRefresh: [Optional] [TrustedTester] Enable automatic refresh of the
+      materialized view when the base table is updated. The default value is
+      "true".
     lastRefreshTime: [Output-only] [TrustedTester] The time when this
       materialized view was last modified, in milliseconds since the epoch.
     query: [Required] A query whose result is persisted.
+    refreshIntervalMs: [Optional] [TrustedTester] The maximum frequency at
+      which this materialized view will be refreshed. The default value is
+      "1800000" (30 minutes).
   """
 
-  lastRefreshTime = _messages.IntegerField(1)
-  query = _messages.StringField(2)
+  enableRefresh = _messages.BooleanField(1)
+  lastRefreshTime = _messages.IntegerField(2)
+  query = _messages.StringField(3)
+  refreshIntervalMs = _messages.IntegerField(4)
 
 
 class ModelDefinition(_messages.Message):
@@ -2661,9 +2667,9 @@ class Table(_messages.Message):
     rangePartitioning: [TrustedTester] Range partitioning specification for
       this table. Only one of timePartitioning and rangePartitioning should be
       specified.
-    requirePartitionFilter: [Beta] [Optional] If set to true, queries over
-      this table require a partition filter that can be used for partition
-      elimination to be specified.
+    requirePartitionFilter: [Optional] If set to true, queries over this table
+      require a partition filter that can be used for partition elimination to
+      be specified.
     schema: [Optional] Describes the schema of this table.
     selfLink: [Output-only] A URL that can be used to access this resource
       again.
@@ -2848,6 +2854,7 @@ class TableFieldSchema(_messages.Message):
   Messages:
     CategoriesValue: [Optional] The categories attached to this field, used
       for field-level access control.
+    PolicyTagsValue: A PolicyTagsValue object.
 
   Fields:
     categories: [Optional] The categories attached to this field, used for
@@ -2861,6 +2868,7 @@ class TableFieldSchema(_messages.Message):
     name: [Required] The field name. The name must contain only letters (a-z,
       A-Z), numbers (0-9), or underscores (_), and must start with a letter or
       underscore. The maximum length is 128 characters.
+    policyTags: A PolicyTagsValue attribute.
     type: [Required] The field data type. Possible values include STRING,
       BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT),
       BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD
@@ -2880,12 +2888,24 @@ class TableFieldSchema(_messages.Message):
 
     names = _messages.StringField(1, repeated=True)
 
+  class PolicyTagsValue(_messages.Message):
+    r"""A PolicyTagsValue object.
+
+    Fields:
+      names: A list of category resource names. For example,
+        "projects/1/location/eu/taxonomies/2/policyTags/3". At most 1 policy
+        tag is allowed.
+    """
+
+    names = _messages.StringField(1, repeated=True)
+
   categories = _messages.MessageField('CategoriesValue', 1)
   description = _messages.StringField(2)
   fields = _messages.MessageField('TableFieldSchema', 3, repeated=True)
   mode = _messages.StringField(4)
   name = _messages.StringField(5)
-  type = _messages.StringField(6)
+  policyTags = _messages.MessageField('PolicyTagsValue', 6)
+  type = _messages.StringField(7)
 
 
 class TableList(_messages.Message):
@@ -2924,6 +2944,8 @@ class TableList(_messages.Message):
       kind: The resource type.
       labels: The labels associated with this table. You can use these to
         organize and group your tables.
+      rangePartitioning: The range partitioning specification for this table,
+        if configured.
       tableReference: A reference uniquely identifying the table.
       timePartitioning: The time-based partitioning specification for this
         table, if configured.
@@ -2973,10 +2995,11 @@ class TableList(_messages.Message):
     id = _messages.StringField(5)
     kind = _messages.StringField(6, default=u'bigquery#table')
     labels = _messages.MessageField('LabelsValue', 7)
-    tableReference = _messages.MessageField('TableReference', 8)
-    timePartitioning = _messages.MessageField('TimePartitioning', 9)
-    type = _messages.StringField(10)
-    view = _messages.MessageField('ViewValue', 11)
+    rangePartitioning = _messages.MessageField('RangePartitioning', 8)
+    tableReference = _messages.MessageField('TableReference', 9)
+    timePartitioning = _messages.MessageField('TimePartitioning', 10)
+    type = _messages.StringField(11)
+    view = _messages.MessageField('ViewValue', 12)
 
   etag = _messages.StringField(1)
   kind = _messages.StringField(2, default=u'bigquery#tableList')

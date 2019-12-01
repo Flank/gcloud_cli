@@ -4,9 +4,9 @@ NAME
 SYNOPSIS
     gcloud alpha compute health-checks update ssl NAME
         [--check-interval=CHECK_INTERVAL] [--description=DESCRIPTION]
-        [--healthy-threshold=HEALTHY_THRESHOLD] [--proxy-header=PROXY_HEADER]
-        [--request=REQUEST] [--response=RESPONSE] [--timeout=TIMEOUT]
-        [--unhealthy-threshold=UNHEALTHY_THRESHOLD]
+        [--enable-logging] [--healthy-threshold=HEALTHY_THRESHOLD]
+        [--proxy-header=PROXY_HEADER] [--request=REQUEST] [--response=RESPONSE]
+        [--timeout=TIMEOUT] [--unhealthy-threshold=UNHEALTHY_THRESHOLD]
         [--global | --region=REGION]
         [--port=PORT --port-name=PORT_NAME --use-serving-port]
         [GCLOUD_WIDE_FLAG ...]
@@ -29,6 +29,12 @@ FLAGS
      --description=DESCRIPTION
         A textual description for the SSL health check. Pass in an empty string
         to unset.
+
+     --enable-logging
+        Enable logging of health check probe results to Stackdriver. Logging is
+        disabled by default.
+
+            Use --no-enable-logging to disable logging.
 
      --healthy-threshold=HEALTHY_THRESHOLD
         The number of consecutive successful health checks before an unhealthy

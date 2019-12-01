@@ -1135,14 +1135,17 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
     )
 
 
-class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
+class InstanceGroupManagersSetAutoscalingBetaTest(test_base.BaseTest):
 
   INSTANCE_GROUP_MANAGERS = (
-      test_resources.MakeInstanceGroupManagers('alpha'))
-  AUTOSCALERS = test_resources.MakeAutoscalers('alpha')
+      test_resources.MakeInstanceGroupManagers('beta'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('beta')
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi(self.track.prefix)
     self.make_requests.side_effect = iter([
         [self.INSTANCE_GROUP_MANAGERS[0]],  # Get IGM.
         self.AUTOSCALERS[1:],
@@ -1176,7 +1179,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
     )
 
   def testInsertMinimalAutoscaler(self):
-    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1')
     request = self.messages.ComputeAutoscalersInsertRequest(
         autoscaler=self.messages.Autoscaler(
@@ -1197,7 +1200,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
     )
 
   def testInsertAutoscaler_Mode(self):
-    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 --mode only-up')
     mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
     request = self.messages.ComputeAutoscalersInsertRequest(
@@ -1226,7 +1229,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
         []
     ])
 
-    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 --mode only-up')
 
     custom_metric_utilization = (
@@ -1259,7 +1262,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
     )
 
   def testUpdateAutoscaler_PreservesMode(self):
-    autoscalers = test_resources.MakeAutoscalers('alpha')
+    autoscalers = test_resources.MakeAutoscalers(self.track.prefix)
     autoscalers[0].autoscalingPolicy.mode = (
         autoscalers[0].autoscalingPolicy.ModeValueValuesEnum.ONLY_UP)
     self.make_requests.side_effect = iter([
@@ -1268,7 +1271,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
         []
     ])
 
-    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1')
 
     custom_metric_utilization = (
@@ -1299,8 +1302,19 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
         [(self.compute.autoscalers, 'Update', request)],
     )
 
+
+class InstanceGroupManagersSetAutoscalingAlphaTest(
+    InstanceGroupManagersSetAutoscalingBetaTest):
+
+  INSTANCE_GROUP_MANAGERS = (
+      test_resources.MakeInstanceGroupManagers('alpha'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('alpha')
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
   def testInsertAutoscaler_ScaleDown(self):
-    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 '
              '--scale-down-control max-scaled-down-replicas=5,time-window=30')
     scale_down = self.messages.AutoscalingPolicyScaleDownControl(
@@ -1342,7 +1356,7 @@ class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
         timeWindowSec=30
     )
 
-    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+    self.Run('compute instance-groups managed set-autoscaling group-1 '
              '--max-num-replicas 10 --zone zone-1 '
              '--scale-down-control max-scaled-down-replicas=5,time-window=30')
 

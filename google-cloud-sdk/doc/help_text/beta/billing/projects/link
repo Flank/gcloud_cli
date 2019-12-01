@@ -33,7 +33,7 @@ EXAMPLES
     run:
 
         $ gcloud beta billing projects link my-project \
-            --billing-account 0X0X0X-0X0X0X-0X0X0X
+            --billing-account=0X0X0X-0X0X0X-0X0X0X
 
 NOTES
     This command is currently in BETA and may change without notice. This

@@ -3,9 +3,10 @@ NAME
 
 SYNOPSIS
     gcloud alpha run services delete (SERVICE : --namespace=NAMESPACE)
-        [--platform=PLATFORM] [--region=REGION]
-        [--cluster=CLUSTER --cluster-location=CLUSTER_LOCATION]
-        [--context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
+        [--platform=PLATFORM]
+        [--region=REGION
+          | --cluster=CLUSTER --cluster-location=CLUSTER_LOCATION
+          | --context=CONTEXT --kubeconfig=KUBECONFIG] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Delete a service.
@@ -20,7 +21,8 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --namespace=NAMESPACE
-          Specific to Cloud Run on GKE: Kubernetes namespace for the service.
+          Specific to Cloud Run for Anthos: Kubernetes namespace for the
+          service.
 
 FLAGS
      --platform=PLATFORM
@@ -32,8 +34,8 @@ FLAGS
             Fully managed version of Cloud Run. Use with the --region flag or
             set the [run/region] property to specify a Cloud Run region.
          gke
-            Cloud Run for Anthos on Google Kubernetes Engine. Use with the
-            --cluster and --cluster-location flags or set the [run/cluster] and
+            Cloud Run for Anthos on Google Cloud. Use with the --cluster and
+            --cluster-location flags or set the [run/cluster] and
             [run/cluster_location] properties to specify a cluster in a given
             zone.
          kubernetes
@@ -41,45 +43,48 @@ FLAGS
             --kubeconfig and --context flags to specify a kubeconfig file and
             the context for connecting.
 
-     Only applicable if connecting to Cloud Run (fully managed). Specify
-     '--platform=managed' to use:
+     Arguments to locate resources, depending on the platform used. At most one
+     of these may be specified:
 
-       --region=REGION
-          Region in which the resource can be found. Alternatively, set the
-          property [run/region].
+       Only applicable if connecting to Cloud Run (fully managed). Specify
+       --platform=managed to use:
 
-     Only applicable if connecting to Cloud Run for Anthos deployed on GKE.
-     Specify '--platform=gke' to use:
+         --region=REGION
+            Region in which the resource can be found. Alternatively, set the
+            property [run/region].
 
-       Cluster resource - Kubernetes Engine cluster to connect to. The
-       arguments in this group can be used to specify the attributes of this
-       resource. (NOTE) Some attributes are not given arguments in this group
-       but can be set in other ways. To set the [project] attribute: provide
-       the argument [--cluster] on the command line with a fully specified
-       name; set the property [run/cluster] with a fully specified name;
-       specify the cluster from a list of available clusters with a fully
-       specified name; provide the argument [--project] on the command line;
-       set the property [core/project].
+       Only applicable if connecting to Cloud Run for Anthos deployed on Google
+       Cloud. Specify --platform=gke to use:
 
-         --cluster=CLUSTER
-            ID of the cluster or fully qualified identifier for the cluster.
+         Cluster resource - Kubernetes Engine cluster to connect to. The
+         arguments in this group can be used to specify the attributes of this
+         resource. (NOTE) Some attributes are not given arguments in this group
+         but can be set in other ways. To set the [project] attribute: provide
+         the argument [--cluster] on the command line with a fully specified
+         name; set the property [run/cluster] with a fully specified name;
+         specify the cluster from a list of available clusters with a fully
+         specified name; provide the argument [--project] on the command line;
+         set the property [core/project].
 
-         --cluster-location=CLUSTER_LOCATION
-            Zone in which the cluster is located. Alternatively, set the
-            property [run/cluster_location].
+           --cluster=CLUSTER
+              ID of the cluster or fully qualified identifier for the cluster.
 
-     Only applicable if connecting to Cloud Run for Anthos deployed on VMware.
-     Specify '--platform=kubernetes' to use:
+           --cluster-location=CLUSTER_LOCATION
+              Zone in which the cluster is located. Alternatively, set the
+              property [run/cluster_location].
 
-       --context=CONTEXT
-          The name of the context in your kubectl config file to use for
-          connecting.
+       Only applicable if connecting to Cloud Run for Anthos deployed on
+       VMware. Specify --platform=kubernetes to use:
 
-       --kubeconfig=KUBECONFIG
-          The absolute path to your kubectl config file. If not specified, the
-          colon- or semicolon-delimited list of paths specified by $KUBECONFIG
-          will be used. If $KUBECONFIG is unset, this defaults to
-          ~/.kube/config.
+         --context=CONTEXT
+            The name of the context in your kubectl config file to use for
+            connecting.
+
+         --kubeconfig=KUBECONFIG
+            The absolute path to your kubectl config file. If not specified,
+            the colon- or semicolon-delimited list of paths specified by
+            $KUBECONFIG will be used. If $KUBECONFIG is unset, this defaults to
+            ~/.kube/config.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -97,7 +102,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud run services delete
         $ gcloud beta run services delete
 

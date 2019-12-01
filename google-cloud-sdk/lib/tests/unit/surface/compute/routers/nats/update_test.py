@@ -366,17 +366,6 @@ class UpdateTest(router_test_base.RouterTestBase):
         --region us-central1 --no-enable-logging
         """)
 
-
-class BetaUpdateTest(UpdateTest):
-
-  def SetUp(self):
-    self.version = 'beta'
-    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
-
-    self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='beta')
-    self.orig.nats = [self.messages.RouterNat(name='my-nat')]
-
   def testDrainIps(self):
     expected_router = copy.deepcopy(self.orig)
     expected_router.nats = [
@@ -410,7 +399,7 @@ class BetaUpdateTest(UpdateTest):
     self.Run("""
         compute routers nats update my-nat --router my-router
         --region us-central1 --nat-external-ip-pool=address-1,address-2
-        --drain-nat-ips=address-3
+        --nat-external-drain-ip-pool=address-3
         --nat-all-subnet-ip-ranges
         """)
 
@@ -474,7 +463,7 @@ class BetaUpdateTest(UpdateTest):
     self.Run("""
         compute routers nats update my-nat --router my-router
         --region us-central1
-        --drain-nat-ips=address-1
+        --nat-external-drain-ip-pool=address-1
         --nat-all-subnet-ip-ranges
         """)
 
@@ -508,9 +497,20 @@ class BetaUpdateTest(UpdateTest):
     self.Run("""
         compute routers nats update my-nat --router my-router
         --region us-central1 --nat-external-ip-pool=address-1,address-2
-        --clear-drain-nat-ips
+        --clear-nat-external-drain-ip-pool
         --nat-all-subnet-ip-ranges
         """)
+
+
+class BetaUpdateTest(UpdateTest):
+
+  def SetUp(self):
+    self.version = 'beta'
+    self.SelectApi(calliope_base.ReleaseTrack.BETA, 'beta')
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='beta')
+    self.orig.nats = [self.messages.RouterNat(name='my-nat')]
 
 
 class AlphaUpdateTest(BetaUpdateTest):

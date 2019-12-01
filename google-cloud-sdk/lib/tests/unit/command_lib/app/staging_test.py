@@ -318,21 +318,21 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
           staging._BundledCommand('failure.sh', 'failure.cmd')
   }, default=staging.NoopCommand())
 
-  _SUCCESS_OUTPUT_PATTERN = (r'-+ STDOUT -+\r?\n'
-                             r'out\r?\n'
-                             r'-+ STDERR -+\r?\n'
-                             r'service-yaml path: app.yaml\r?\n'
-                             r'app-dir path: .\r?\n'
+  _SUCCESS_OUTPUT_PATTERN = (r'-+ STDOUT -+\n'
+                             r'out\n'
+                             r'-+ STDERR -+\n'
+                             r'service-yaml path: app.yaml\n'
+                             r'app-dir path: .\n'
                              r'-+')
 
   _FAILURE_PATTERN = (r'Staging command '
                       r'\[\S+failure.(?:sh|cmd) app.yaml . \S+\] '
-                      r'failed with return code \[1\].\r?\n\r?\n'
-                      r'-+ STDOUT -+\r?\n'
-                      r'out\r?\n'
-                      r'-+ STDERR -+\r?\n'
-                      r'service.yaml path: app.yaml\r?\n'
-                      r'app-dir path: .\r?\n'
+                      r'failed with return code \[1\].\n\n'
+                      r'-+ STDOUT -+\n'
+                      r'out\n'
+                      r'-+ STDERR -+\n'
+                      r'service.yaml path: app.yaml\n'
+                      r'app-dir path: .\n'
                       r'-+')
 
   def SetUp(self):
@@ -344,7 +344,6 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
     self.staging_area = tempfile.mkdtemp()
     self.stager = staging.Stager(self._REGISTRY, self.staging_area)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testStage_Success(self):
     app_dir = self.stager.Stage('app.yaml', '.', 'success',
                                 env.FLEX)

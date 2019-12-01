@@ -35,11 +35,13 @@ class ListTest(test_base.OsConfigBaseTest):
         self.messages.PatchJob(
             name='projects/my-project/patchJobs/my-patch-job-1',
             filter='name=instance-1',
+            displayName='patch-job-1',
             description='Patch instance-1',
             state=self.messages.PatchJob.StateValueValuesEnum.SUCCEEDED),
         self.messages.PatchJob(
             name='projects/my-project/patchJobs/my-patch-job-2',
             filter='id=*',
+            displayName='patch-job-2',
             description='Patch all',
             state=self.messages.PatchJob.StateValueValuesEnum
             .COMPLETED_WITH_ERRORS)
@@ -55,9 +57,9 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           DESCRIPTION      CREATE_TIME STATE                 NUM_INSTANCES
-            my-patch-job-1 Patch instance-1             SUCCEEDED
-            my-patch-job-2 Patch all                    COMPLETED_WITH_ERRORS
+            ID             DISPLAY_NAME DESCRIPTION       CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
+            my-patch-job-1 patch-job-1   Patch instance-1                         SUCCEEDED
+            my-patch-job-2 patch-job-2   Patch all                                COMPLETED_WITH_ERRORS
             """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -79,7 +81,7 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           DESCRIPTION CREATE_TIME STATE NUM_INSTANCES
+            ID             DISPLAY_NAME DESCRIPTION CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
             my-patch-job-0
             my-patch-job-1
             my-patch-job-2
@@ -104,8 +106,8 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           DESCRIPTION      CREATE_TIME STATE     NUM_INSTANCES
-            my-patch-job-1 Patch instance-1             SUCCEEDED
+            ID             DISPLAY_NAME DESCRIPTION       CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
+            my-patch-job-1 patch-job-1   Patch instance-1                         SUCCEEDED
             """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -120,10 +122,11 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           DESCRIPTION      CREATE_TIME STATE     NUM_INSTANCES
-            my-patch-job-1 Patch instance-1             SUCCEEDED
-            NAME           DESCRIPTION CREATE_TIME STATE                 NUM_INSTANCES
-            my-patch-job-2 Patch all               COMPLETED_WITH_ERRORS
+            ID             DISPLAY_NAME DESCRIPTION       CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
+            my-patch-job-1 patch-job-1   Patch instance-1                         SUCCEEDED
+
+            ID             DISPLAY_NAME DESCRIPTION       CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
+            my-patch-job-2 patch-job-2   Patch all                                COMPLETED_WITH_ERRORS
             """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -140,9 +143,9 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           DESCRIPTION      CREATE_TIME STATE                 NUM_INSTANCES
-            my-patch-job-2 Patch all                    COMPLETED_WITH_ERRORS
-            my-patch-job-1 Patch instance-1             SUCCEEDED
+            ID             DISPLAY_NAME DESCRIPTION       CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
+            my-patch-job-2 patch-job-2   Patch all                                COMPLETED_WITH_ERRORS
+            my-patch-job-1 patch-job-1   Patch instance-1                         SUCCEEDED
             """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -159,8 +162,8 @@ class ListTest(test_base.OsConfigBaseTest):
 
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME           DESCRIPTION      CREATE_TIME STATE     NUM_INSTANCES
-            my-patch-job-1 Patch instance-1             SUCCEEDED
+            ID             DISPLAY_NAME DESCRIPTION       CREATE_TIME UPDATE_TIME STATE TARGETED_INSTANCES
+            my-patch-job-1 patch-job-1   Patch instance-1                         SUCCEEDED
             """),
         normalize_space=True)
     self.AssertErrEquals('')

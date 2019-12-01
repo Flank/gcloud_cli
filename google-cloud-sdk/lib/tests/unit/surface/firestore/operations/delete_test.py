@@ -19,12 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import operations
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.firestore import base
 
 
-class DeleteTest(base.FirestoreCommandUnitTest):
-  """Tests the firestore operations delete command."""
+class DeleteTestGA(base.FirestoreCommandUnitTest):
+  """Tests the GA firestore operations delete command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDeleteRelativePath(self):
     operation_name_relative = 'doomed'
@@ -55,6 +59,20 @@ class DeleteTest(base.FirestoreCommandUnitTest):
     request = messages.FirestoreProjectsDatabasesOperationsDeleteRequest()
     request.name = name
     return request
+
+
+class DeleteTestBeta(DeleteTestGA):
+  """Tests the beta firestore operations delete command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+  """Tests the alpha firestore operations delete command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

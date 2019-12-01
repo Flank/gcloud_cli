@@ -204,7 +204,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
                                       'maxSize': 60})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--autoscaling-policy mode=on,min-size=10,max-size=60 '
+             '--mode=on --min-size=10 --max-size=60 '
              '--zone ' + self.zone)
     self.AssertErrContains(
         'Setting autoscaling policy on [my-node-group] to '
@@ -215,7 +215,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
     self._ExpectSetAutoscalingPolicy({'mode': mode})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--autoscaling-policy mode=on '
+             '--mode=on '
              '--zone ' + self.zone)
     self.AssertErrContains(
         'Setting autoscaling policy on [my-node-group] to '
@@ -223,17 +223,16 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
 
   def testUpdate_SetAutoscalingPolicyNoMode(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --autoscaling-policy: Key [mode] required in dict arg but '
-        'not provided'):
+        'argument --max-size --min-size: --mode must be specified.'):
       self.Run('compute sole-tenancy node-groups update my-node-group '
-               '--autoscaling-policy min-size=10,max-size=60 '
+               '--min-size=10 --max-size=60 '
                '--zone ' + self.zone)
 
   def testUpdate_SetAutoscalingPolicyWrongMode(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --autoscaling-policy: [mode] must be one of [off,on]'):
+        'argument --mode: [mode] must be one of [off,on]'):
       self.Run('compute sole-tenancy node-groups update my-node-group '
-               '--autoscaling-policy mode=foo '
+               '--mode=foo '
                '--zone ' + self.zone)
 
   def testUpdate_SetAutoscalingPolicyModeMin(self):
@@ -242,7 +241,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
                                       'minSize': 10})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--autoscaling-policy mode=on,min-size=10 '
+             '--mode=on --min-size=10 '
              '--zone ' + self.zone)
     self.AssertErrContains(
         'Setting autoscaling policy on [my-node-group] to '
@@ -254,7 +253,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
                                       'maxSize': 60})
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--autoscaling-policy mode=on,max-size=60 '
+             '--mode=on --max-size=60 '
              '--zone ' + self.zone)
     self.AssertErrContains(
         'Setting autoscaling policy on [my-node-group] to '

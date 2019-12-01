@@ -42,128 +42,6 @@ class GoogleIamAssistV1alpha2AccessTuple(_messages.Message):
   principal = _messages.StringField(4)
 
 
-class GoogleIamAssistV1alpha2BindingExplanation(_messages.Message):
-  r"""Binding Explanation.
-
-  Enums:
-    AccessValueValuesEnum: REQUIRED: Access decision for this binding.
-    RolePermissionValueValuesEnum: Whether the role of this binding contains
-      the checked permission
-
-  Messages:
-    MembershipsValue: For each member in the binding, provides information
-      whether or not the principal from the request is included in the member
-      by which the CheckResult is keyed. May indicate that the caller has no
-      access to this information.
-
-  Fields:
-    access: REQUIRED: Access decision for this binding.
-    condition: The condition which needs to be satisfied in order for this
-      binding to grant the role to the principal.
-    conditionExplanation: Condition evaluation state for this binding.
-    memberships: For each member in the binding, provides information whether
-      or not the principal from the request is included in the member by which
-      the CheckResult is keyed. May indicate that the caller has no access to
-      this information.
-    role: The role that this binding grants in the policy.
-    rolePermission: Whether the role of this binding contains the checked
-      permission
-  """
-
-  class AccessValueValuesEnum(_messages.Enum):
-    r"""REQUIRED: Access decision for this binding.
-
-    Values:
-      ACCESS_STATE_UNSPECIFIED: Reserved
-      GRANTED: The access is granted due to one or multiple bindings found.
-      NOT_GRANTED: The access is not granted by the policy.
-      UNKNOWN_CONDITIONAL: At least one binding was found but it is
-        conditional. undecided, undetermined ,uncertain, open, tentative,
-        contingent
-      UNKNOWN_INFO_DENIED: Indicating that lack of access to the underlying
-        information causes the result to be undetermined. This can be due to
-        1) The caller has no access to the policy. In this case
-        ExplainedPolicy    will have not policy set.  2) The caller has no
-        access to some of the items referenced in the policy.    In this case
-        the policy in ExplainedPolicy will be set but the    explanations
-        field will contain at least one inconclusive element.
-    """
-    ACCESS_STATE_UNSPECIFIED = 0
-    GRANTED = 1
-    NOT_GRANTED = 2
-    UNKNOWN_CONDITIONAL = 3
-    UNKNOWN_INFO_DENIED = 4
-
-  class RolePermissionValueValuesEnum(_messages.Enum):
-    r"""Whether the role of this binding contains the checked permission
-
-    Values:
-      ROLE_PERMISSION_UNSPECIFIED: Reserved
-      ROLE_PERMISSION_INCLUDED: Permission is included in the role.
-      ROLE_PERMISSION_NOT_INCLUDED: Permission is included in the role.
-      ROLE_PERMISSION_UNKNOWN_INFO_DENIED: Calling principal has no access to
-        the role permission relation.
-    """
-    ROLE_PERMISSION_UNSPECIFIED = 0
-    ROLE_PERMISSION_INCLUDED = 1
-    ROLE_PERMISSION_NOT_INCLUDED = 2
-    ROLE_PERMISSION_UNKNOWN_INFO_DENIED = 3
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class MembershipsValue(_messages.Message):
-    r"""For each member in the binding, provides information whether or not
-    the principal from the request is included in the member by which the
-    CheckResult is keyed. May indicate that the caller has no access to this
-    information.
-
-    Messages:
-      AdditionalProperty: An additional property for a MembershipsValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type MembershipsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a MembershipsValue object.
-
-      Enums:
-        ValueValueValuesEnum:
-
-      Fields:
-        key: Name of the additional property.
-        value: A ValueValueValuesEnum attribute.
-      """
-
-      class ValueValueValuesEnum(_messages.Enum):
-        r"""ValueValueValuesEnum enum type.
-
-        Values:
-          MEMBERSHIP_UNSPECIFIED: <no description>
-          MEMBERSHIP_INCLUDED: <no description>
-          MEMBERSHIP_NOT_INCLUDED: <no description>
-          MEMBERSHIP_UNKNOWN_INFO_DENIED: <no description>
-          MEMBERSHIP_UNKNOWN_UNSUPPORTED: <no description>
-        """
-        MEMBERSHIP_UNSPECIFIED = 0
-        MEMBERSHIP_INCLUDED = 1
-        MEMBERSHIP_NOT_INCLUDED = 2
-        MEMBERSHIP_UNKNOWN_INFO_DENIED = 3
-        MEMBERSHIP_UNKNOWN_UNSUPPORTED = 4
-
-      key = _messages.StringField(1)
-      value = _messages.EnumField('ValueValueValuesEnum', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  access = _messages.EnumField('AccessValueValuesEnum', 1)
-  condition = _messages.MessageField('GoogleTypeExpr', 2)
-  conditionExplanation = _messages.MessageField('GoogleIamAssistV1alpha2ConditionExplanation', 3)
-  memberships = _messages.MessageField('MembershipsValue', 4)
-  role = _messages.StringField(5)
-  rolePermission = _messages.EnumField('RolePermissionValueValuesEnum', 6)
-
-
 class GoogleIamAssistV1alpha2CheckAccessRequest(_messages.Message):
   r"""CheckAccessRequest is the request for CheckAccess
 
@@ -246,183 +124,6 @@ class GoogleIamAssistV1alpha2CheckAccessResponse(_messages.Message):
   access = _messages.EnumField('AccessValueValuesEnum', 1)
 
 
-class GoogleIamAssistV1alpha2ConditionExplanation(_messages.Message):
-  r"""Condition Explanation
-
-  Fields:
-    evaluationStates: List of evaluated states of non boolean expression in
-      the condition
-    value: Value of the condition
-  """
-
-  evaluationStates = _messages.MessageField('GoogleIamAssistV1alpha2ConditionExplanationEvaluationState', 1, repeated=True)
-  value = _messages.MessageField('GoogleIamAssistV1alpha2ConditionExplanationValue', 2)
-
-
-class GoogleIamAssistV1alpha2ConditionExplanationEvaluationState(_messages.Message):
-  r"""Evaluated state of an expression
-
-  Fields:
-    end: End position of an expression in the original condition, by
-      character, end included, for example: the end position of the first part
-      of "a==b || c==d" would be 4
-    start: Start position of an expression in the original condition, by
-      character
-    value: Value of this expression
-  """
-
-  end = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  start = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  value = _messages.MessageField('GoogleIamAssistV1alpha2ConditionExplanationValue', 3)
-
-
-class GoogleIamAssistV1alpha2ConditionExplanationValue(_messages.Message):
-  r"""Represents a condition expression value.
-
-  Enums:
-    NullValueValueValuesEnum: Null value.
-
-  Fields:
-    boolValue: Boolean value.
-    nullValue: Null value.
-  """
-
-  class NullValueValueValuesEnum(_messages.Enum):
-    r"""Null value.
-
-    Values:
-      NULL_VALUE: Null value.
-    """
-    NULL_VALUE = 0
-
-  boolValue = _messages.BooleanField(1)
-  nullValue = _messages.EnumField('NullValueValueValuesEnum', 2)
-
-
-class GoogleIamAssistV1alpha2ExplainAccessRequest(_messages.Message):
-  r"""ExplainAccessRequest is used in ExplainAccess
-
-  Fields:
-    conditionContext: OPTIONAL: The Cloud IAM condition context under which
-      defines the kind of access being explained. ExplainAccess would explain
-      if and why the principal has the queried permission on the resource
-      specified in full_resource_name under this context
-    fullResourceName: REQUIRED: A full resource name according to http://go
-      /resource-names. This is the full resource name of the resource that
-      access is checked against.
-    permission: REQUIRED: The Cloud IAM permission under which defines the
-      kind of access being explained. Example: "resourcemanager.projects.get"
-      would explain if and why the principal has the
-      resourcemanager.projects.get permission on the resource specified in
-      full_resource_name declared in this structure. See
-      https://cloud.google.com/iam/docs/testing-permissions
-    principal: REQUIRED: The principal on behalf of who the access is
-      explained for. The format is the one of the principal's email addresses
-      associated with its gaia account. It must be an account that can appear
-      as an actor. For example groups are not supported. Currently, service
-      accounts are partially supported.
-  """
-
-  conditionContext = _messages.MessageField('GoogleRpcContextAttributeContext', 1)
-  fullResourceName = _messages.StringField(2)
-  permission = _messages.StringField(3)
-  principal = _messages.StringField(4)
-
-
-class GoogleIamAssistV1alpha2ExplainAccessResponse(_messages.Message):
-  r"""ExplainAccessResponse is used in ExplainAccess.
-
-  Enums:
-    AccessValueValuesEnum: Reflects whether the probed access was granted,
-      denied or ultimately could not be decided from the caller's point of
-      view.
-
-  Fields:
-    access: Reflects whether the probed access was granted, denied or
-      ultimately could not be decided from the caller's point of view.
-    explainedPolicies: List of explained policies. Each explanation
-      corresponds to one policy along the ancestry path.
-  """
-
-  class AccessValueValuesEnum(_messages.Enum):
-    r"""Reflects whether the probed access was granted, denied or ultimately
-    could not be decided from the caller's point of view.
-
-    Values:
-      ACCESS_STATE_UNSPECIFIED: Reserved
-      GRANTED: The access is granted due to one or multiple bindings found.
-      NOT_GRANTED: The access is not granted by the policy.
-      UNKNOWN_CONDITIONAL: At least one binding was found but it is
-        conditional. undecided, undetermined ,uncertain, open, tentative,
-        contingent
-      UNKNOWN_INFO_DENIED: Indicating that lack of access to the underlying
-        information causes the result to be undetermined. This can be due to
-        1) The caller has no access to the policy. In this case
-        ExplainedPolicy    will have not policy set.  2) The caller has no
-        access to some of the items referenced in the policy.    In this case
-        the policy in ExplainedPolicy will be set but the    explanations
-        field will contain at least one inconclusive element.
-    """
-    ACCESS_STATE_UNSPECIFIED = 0
-    GRANTED = 1
-    NOT_GRANTED = 2
-    UNKNOWN_CONDITIONAL = 3
-    UNKNOWN_INFO_DENIED = 4
-
-  access = _messages.EnumField('AccessValueValuesEnum', 1)
-  explainedPolicies = _messages.MessageField('GoogleIamAssistV1alpha2ExplainedPolicy', 2, repeated=True)
-
-
-class GoogleIamAssistV1alpha2ExplainedPolicy(_messages.Message):
-  r"""An explained IAM policy combines the raw policy in the context of the
-  resource which it is attached to along with detailed evaluation on the
-  evaluation parameters provided through the request.
-
-  Enums:
-    AccessValueValuesEnum: Access decision for this section of the resource's
-      effective policy.
-
-  Fields:
-    access: Access decision for this section of the resource's effective
-      policy.
-    bindingExplanations: Detailed binding evaluation explanations provide
-      information about how each binding contributes to the principal's access
-      or the lack thereof.
-    fullResourceName: Resource that this section of the effective policy
-      attaches to.
-    policy: The IAM policy attached to the resource.
-  """
-
-  class AccessValueValuesEnum(_messages.Enum):
-    r"""Access decision for this section of the resource's effective policy.
-
-    Values:
-      ACCESS_STATE_UNSPECIFIED: Reserved
-      GRANTED: The access is granted due to one or multiple bindings found.
-      NOT_GRANTED: The access is not granted by the policy.
-      UNKNOWN_CONDITIONAL: At least one binding was found but it is
-        conditional. undecided, undetermined ,uncertain, open, tentative,
-        contingent
-      UNKNOWN_INFO_DENIED: Indicating that lack of access to the underlying
-        information causes the result to be undetermined. This can be due to
-        1) The caller has no access to the policy. In this case
-        ExplainedPolicy    will have not policy set.  2) The caller has no
-        access to some of the items referenced in the policy.    In this case
-        the policy in ExplainedPolicy will be set but the    explanations
-        field will contain at least one inconclusive element.
-    """
-    ACCESS_STATE_UNSPECIFIED = 0
-    GRANTED = 1
-    NOT_GRANTED = 2
-    UNKNOWN_CONDITIONAL = 3
-    UNKNOWN_INFO_DENIED = 4
-
-  access = _messages.EnumField('AccessValueValuesEnum', 1)
-  bindingExplanations = _messages.MessageField('GoogleIamAssistV1alpha2BindingExplanation', 2, repeated=True)
-  fullResourceName = _messages.StringField(3)
-  policy = _messages.MessageField('GoogleIamV1Policy', 4)
-
-
 class GoogleIamAssistV1alpha2LogsMetadata(_messages.Message):
   r"""Metatdata about the logs used for replay.
 
@@ -431,13 +132,15 @@ class GoogleIamAssistV1alpha2LogsMetadata(_messages.Message):
       baseline and simulated policies.
     newestTime: Timestamp of newest log entry queried.
     oldestTime: Timestamp of oldest log entry queried.
+    replayErrorCount: Number of logs with error during replay.
     uniqueLogCount: Number of unique log entries analyzed.
   """
 
   differenceCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   newestTime = _messages.StringField(2)
   oldestTime = _messages.StringField(3)
-  uniqueLogCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  replayErrorCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  uniqueLogCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
 class GoogleIamAssistV1alpha2ReplayDiff(_messages.Message):
@@ -447,14 +150,16 @@ class GoogleIamAssistV1alpha2ReplayDiff(_messages.Message):
   Fields:
     accessDiff: The difference in AccessState between replays.
     accessTuple: The access tuple with a difference between replays.
+    lastAccessTime: Newest Timestamp at which access_tuple was seen.
   """
 
   accessDiff = _messages.MessageField('GoogleIamAssistV1alpha2ReplayDiffAccessStateDiff', 1)
   accessTuple = _messages.MessageField('GoogleIamAssistV1alpha2AccessTuple', 2)
+  lastAccessTime = _messages.StringField(3)
 
 
 class GoogleIamAssistV1alpha2ReplayDiffAccessStateDiff(_messages.Message):
-  r"""A GoogleIamAssistV1alpha2ReplayDiffAccessStateDiff object.
+  r"""Container for AccessState of baseline and simulated policies.
 
   Enums:
     BaselineValueValuesEnum: The access state when replayed against the
@@ -519,6 +224,45 @@ class GoogleIamAssistV1alpha2ReplayDiffAccessStateDiff(_messages.Message):
   simulated = _messages.EnumField('SimulatedValueValuesEnum', 2)
 
 
+class GoogleIamAssistV1alpha2ReplayError(_messages.Message):
+  r"""A GoogleIamAssistV1alpha2ReplayError object.
+
+  Enums:
+    CodeValueValuesEnum: Specific error code indicating what went wrong.
+
+  Fields:
+    accessTuple: The access tuple with a error during replay.
+    code: Specific error code indicating what went wrong.
+    newestTime: Newest Timestamp at which access_tuple was seen.
+  """
+
+  class CodeValueValuesEnum(_messages.Enum):
+    r"""Specific error code indicating what went wrong.
+
+    Values:
+      ERROR_CODE_UNSPECIFIED: Reserved
+      INVALID_ACCESS_TUPLE: An invalid AccessTuple was provided. This can be
+        caused by  1) An invalidly formatted principal, resource, or
+        permission.  2) Providing a permission that is not relevant to the
+        provided resource type, e.g. permission buckets.list on a VM instance.
+      PERMISSION_DENIED: Caller does not have permission to retrieve this
+        resource's IAM policy.
+      UNKNOWN_CONDITIONAL: Both the baseline and the simulated Access State
+        were UNKNOWN_CONDITIONAL.
+      UNKNOWN_INFO_DENIED: Both the baseline and the simulated Access State
+        were UNKNOWN_INFO_DENIED.
+    """
+    ERROR_CODE_UNSPECIFIED = 0
+    INVALID_ACCESS_TUPLE = 1
+    PERMISSION_DENIED = 2
+    UNKNOWN_CONDITIONAL = 3
+    UNKNOWN_INFO_DENIED = 4
+
+  accessTuple = _messages.MessageField('GoogleIamAssistV1alpha2AccessTuple', 1)
+  code = _messages.EnumField('CodeValueValuesEnum', 2)
+  newestTime = _messages.StringField(3)
+
+
 class GoogleIamAssistV1alpha2ReplayOperationMetadata(_messages.Message):
   r"""Metadata about a ReplayAccessLogs operation.
 
@@ -574,11 +318,13 @@ class GoogleIamAssistV1alpha2ReplayRecentAccessesResponse(_messages.Message):
 
   Fields:
     diffs: List of differences found during replay.
+    errors: List of errors encountered during replay.
     logsMetadata: Metadata about the replayed logs.
   """
 
   diffs = _messages.MessageField('GoogleIamAssistV1alpha2ReplayDiff', 1, repeated=True)
-  logsMetadata = _messages.MessageField('GoogleIamAssistV1alpha2LogsMetadata', 2)
+  errors = _messages.MessageField('GoogleIamAssistV1alpha2ReplayError', 2, repeated=True)
+  logsMetadata = _messages.MessageField('GoogleIamAssistV1alpha2LogsMetadata', 3)
 
 
 class GoogleIamV1AuditConfig(_messages.Message):
@@ -667,9 +413,26 @@ class GoogleIamV1Binding(_messages.Message):
       `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
       that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
-      that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: The G Suite domain (primary) that represents all
-      the    users of that domain. For example, `google.com` or `example.com`.
+      that represents a Google group.    For example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus    unique identifier) representing a service account that has been
+      recently    deleted. For example,    `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`.    If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique    identifier) representing a Google group
+      that has been recently    deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If    the group is
+      recovered, this value reverts to `group:{emailid}` and the    recovered
+      group retains the role in the binding.   * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the    users of that domain.
+      For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """

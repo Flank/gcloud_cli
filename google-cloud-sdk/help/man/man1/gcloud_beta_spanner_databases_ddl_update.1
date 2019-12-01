@@ -83,6 +83,18 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To add a column to a table in the given Cloud Spanner database, run:
+
+.RS 2m
+$ gcloud beta spanner databases ddl update my\-database\-id \e
+    \-\-instance=my\-instance\-id
+    \-\-ddl='ALTER TABLE test_table ADD COLUMN a INT64'
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

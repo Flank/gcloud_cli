@@ -78,9 +78,8 @@ GLOBAL FLAGS
         Disable all interactive prompts when running gcloud commands. If input
         is required, defaults will be used, or an error will be raised.
         Overrides the default core/disable_prompts property value for this
-        command invocation. Must be used at the beginning of commands. This is
-        equivalent to setting the environment variable
-        CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
+        command invocation. This is equivalent to setting the environment
+        variable CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
 
      --verbosity=VERBOSITY; default="warning"
         Override the default verbosity for this command. Overrides the default
@@ -126,6 +125,9 @@ GROUPS
 
      access-context-manager
         Manage Access Context Manager resources.
+
+     active-directory
+        Manage Managed Microsoft AD resources.
 
      ai-platform
         Manage AI Platform jobs and models.
@@ -196,6 +198,9 @@ GROUPS
      firebase
         Work with Google Firebase.
 
+     firestore
+        Manage your Cloud Firestore resources.
+
      functions
         Manage Google Cloud Functions.
 
@@ -231,6 +236,9 @@ GROUPS
 
      resource-manager
         Manage Cloud Resources.
+
+     run
+        Manage your Cloud Run applications.
 
      scheduler
         Manage Cloud Scheduler jobs and schedules.

@@ -181,23 +181,27 @@ The default Kubernetes version is available using the following command.
   return parser.add_argument('--cluster-version', help=help, hidden=suppressed)
 
 
-def AddReleaseChannelFlag(parser):
+def AddReleaseChannelFlag(parser, is_update=False):
   """Adds a --release-channel flag to the given parser."""
-  help_text = """\
+  short_text = """\
 Release channel a cluster is subscribed to.
 
+"""
+  if is_update:
+    short_text = """\
+Subscribe or unsubscribe this cluster to a release channel.
+
+"""
+  help_text = short_text + """\
 When a cluster is subscribed to a release channel, Google maintains both the
 master version and the node version. Node auto-upgrade defaults to true and
 cannot be disabled. Updates to version related fields (e.g. --cluster-version)
 return an error.
 """
 
-  return parser.add_argument(
-      '--release-channel',
-      metavar='CHANNEL',
-      choices={
-          'rapid':
-              """\
+  choices = {
+      'rapid':
+          """\
 WARNING: 'rapid' is recommended for testing, and not for production workloads.
 Clusters on 'rapid' are not covered by GKE SLA.
 
@@ -206,21 +210,33 @@ components, before any other channel. 'rapid' is intended for early testers
 and developers who require new features. New upgrades will occur roughly
 weekly.
 """,
-          'regular':
-              """\
+      'regular':
+          """\
 Clusters subscribed to 'regular' receive versions that are considered GA
 quality. 'regular' is intended for production users who want to take
 advantage of new features. New upgrades will occur roughly every few
 weeks.
 """,
-          'stable':
-              """\
+      'stable':
+          """\
 Clusters subscribed to 'stable' receive versions that are known to be
 stable and reliable in production. 'stable' is intended for production
 users who need stability above all else, or for whom frequent upgrades
 are too risky. New upgrades will occur roughly every few months.
 """,
-      },
+  }
+
+  if is_update:
+    none_text = """\
+Use '--release-channel=None' to take a cluster off of a release channel.
+Clusters on 'rapid' cannot be taken off of the release channel.
+"""
+    choices['None'] = none_text
+
+  return parser.add_argument(
+      '--release-channel',
+      metavar='CHANNEL',
+      choices=choices,
       help=help_text,
       hidden=False)
 
@@ -499,11 +515,11 @@ accelerator-types list``` to learn about all available accelerator types.
 to which the cluster can be scaled.
 """)
   identity_group = from_flags_group.add_argument_group(
-      'Flags to specify identity for autoprovisioned nodes:', mutex=True)
+      'Flags to specify identity for autoprovisioned nodes:')
   identity_group.add_argument(
       '--autoprovisioning-service-account',
       type=str,
-      hidden=True,
+      hidden=hidden,
       help="""\
 The Google Cloud Platform Service Account to be used by node VMs in
 autoprovisioined node pools. If not specified, the project default
@@ -513,7 +529,7 @@ service account is used.
       '--autoprovisioning-scopes',
       type=arg_parsers.ArgList(),
       metavar='SCOPE',
-      hidden=True,
+      hidden=hidden,
       help="""\
 The scopes be used by node instances in autoprovisioined node pools.
 Multiple scopes can be specified, separated by commas. For information
@@ -574,6 +590,19 @@ Alpha clusters are not covered by the Kubernetes Engine SLA and should not be
 used for production workloads."""
   parser.add_argument(
       '--enable-kubernetes-alpha', action='store_true', help=help_text)
+
+
+def AddEnableCloudRunAlphaFlag(parser):
+  """Adds a --enable-cloud-run-alpha flag to parser."""
+  help_text = """\
+Enable Cloud Run alpha features on this cluster. Selecting this
+option will result in the cluster having all Cloud Run alpha API groups and
+features turned on.
+
+Cloud Run alpha clusters are not covered by the Cloud Run SLA and should not be
+used for production workloads."""
+  parser.add_argument(
+      '--enable-cloud-run-alpha', action='store_true', help=help_text)
 
 
 def AddEnableStackdriverKubernetesFlag(parser):
@@ -804,12 +833,6 @@ info."""
       hidden=suppressed)
 
 
-# Warn GA customers about the future node auto-upgrade default value change.
-# At the same time we will release the actual change to Alpha/Beta in parallel.
-def WarnGAForFutureAutoUpgradeChange():
-  log.warning(util.WARN_GA_FUTURE_AUTOUPGRADE_CHANGE)
-
-
 def AddTagsFlag(parser, help_text):
   """Adds a --tags to the given parser."""
   parser.add_argument(
@@ -1030,26 +1053,20 @@ invalidate old credentials."""
 
 
 def AddMaintenanceWindowGroup(parser,
-                              hidden=False,
-                              emw_hidden=False,
-                              add_emw_flags=True):
+                              hidden=False):
   """Adds a mutex for --maintenance-window and --maintenance-window-*."""
   maintenance_group = parser.add_group(hidden=hidden, mutex=True)
-  AddDailyMaintenanceWindowFlag(maintenance_group, add_emw_text=not emw_hidden)
-  help_text = """\
+  maintenance_group.help = """\
 One of either maintenance-window or the group of maintenance-window flags can
 be set.
 """
-  if add_emw_flags:
-    if not emw_hidden:
-      maintenance_group.help = help_text
-    AddRecurringMaintenanceWindowFlags(maintenance_group, hidden=emw_hidden)
+  AddDailyMaintenanceWindowFlag(maintenance_group)
+  AddRecurringMaintenanceWindowFlags(maintenance_group, hidden=hidden)
 
 
 def AddDailyMaintenanceWindowFlag(parser,
                                   hidden=False,
-                                  add_unset_text=False,
-                                  add_emw_text=False):
+                                  add_unset_text=False):
   """Adds a --maintenance-window flag to parser."""
   help_text = """\
 Set a time of day when you prefer maintenance to start on this cluster. \
@@ -1058,12 +1075,7 @@ For example:
   $ {command} example-cluster --maintenance-window=12:43
 
 The time corresponds to the UTC time zone, and must be in HH:MM format.
-"""
-  unset_text = """\
-To remove an existing maintenance window from the cluster, use
-'--maintenance-window=None'.
-"""
-  emw_text = """
+
 Non-emergency maintenance will occur in the 4 hour block starting at the
 specified time.
 
@@ -1071,14 +1083,16 @@ This is mutually exclusive with the recurring maintenance windows
 and will overwrite any existing window. Compatible with maintenance
 exclusions.
 """
+  unset_text = """
+To remove an existing maintenance window from the cluster, use
+'--clear-maintenance-window'.
+"""
   description = 'Maintenance windows must be passed in using HH:MM format.'
   unset_description = ' They can also be removed by using the word \"None\".'
 
   if add_unset_text:
     help_text += unset_text
     description += unset_description
-  if add_emw_text:
-    help_text += emw_text
 
   type_ = arg_parsers.RegexpValidator(
       r'^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$|^None$', description)
@@ -1686,7 +1700,7 @@ def AddAddonsFlagsWithOptions(parser, addon_options):
       # TODO(b/65264376): Replace the doc link when a better doc is ready.
       help="""\
 Addons
-(https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+(https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster.AddonsConfig)
 are additional Kubernetes cluster components. Addons specified by this flag will
 be enabled. The others will be disabled. Default addons: {0}.
 """.format(', '.join(api_adapter.DEFAULT_ADDONS)))
@@ -2192,7 +2206,7 @@ def AddVerticalPodAutoscalingFlag(parser, hidden=False):
   parser.add_argument(
       '--enable-vertical-pod-autoscaling',
       default=None,
-      help='Enables vertical pod autoscaling for a cluster.',
+      help='Enable vertical pod autoscaling for a cluster.',
       hidden=hidden,
       action='store_true')
 
@@ -2429,14 +2443,22 @@ more secure Node credential bootstrapping implementation.
       hidden=False)
 
 
-def AddSurgeUpgradeFlag(parser, hidden=False, for_node_pool=False):
-  """Adds surge upgrade related flag to the parser.
+# pylint: disable=protected-access
+def ValidateSurgeUpgradeSettings(args):
+  """Raise exception if upgrade settings are not all-or-nothing."""
+  if ('max_surge_upgrade' in args._specified_args and
+      'max_unavailable_upgrade' not in args._specified_args):
+    raise exceptions.InvalidArgumentException(
+        '--max-surge-upgrade', util.INVALIID_SURGE_UPGRADE_SETTINGS)
+  if ('max_surge_upgrade' not in args._specified_args and
+      'max_unavailable_upgrade' in args._specified_args):
+    raise exceptions.InvalidArgumentException(
+        '--max-unavailable-upgrade', util.INVALIID_SURGE_UPGRADE_SETTINGS)
+# pylint: enable=protected-access
 
-  Args:
-    parser: A given parser.
-    hidden: Whether or not to hide the help text.
-    for_node_pool: Whether this flag is for a node pool.
-  """
+
+def AddSurgeUpgradeFlag(parser, for_node_pool=False, default=None):
+  """Adds --max-surge-upgrade flag to the parser."""
 
   if for_node_pool:
     max_surge_help = """\
@@ -2446,7 +2468,10 @@ Specifies the number of extra (surge) nodes to be created during this node
 pool's upgrades. For example, running the following command will result in
 creating an extra node each time the node pool is upgraded:
 
-  $ {command} node-pool-1 --cluster=example-cluster --max-surge-upgrade 1
+  $ {command} node-pool-1 --cluster=example-cluster --max-surge-upgrade=1 \
+  --max-unavailable-upgrade=0
+
+Must be used in conjunction with '--max-unavailable-upgrade'.
 """
   else:
     max_surge_help = """\
@@ -2456,36 +2481,54 @@ Specifies the number of extra (surge) nodes to be created during this node
 pool's upgrades. For example, running the following command will result in
 creating an extra node each time the node pool is upgraded:
 
-  $ {command} example-cluster --max-surge-upgrade 1
+  $ {command} example-cluster --max-surge-upgrade=1 --max-unavailable-upgrade=0
+
+Must be used in conjunction with '--max-unavailable-upgrade'.
 """
   parser.add_argument(
       '--max-surge-upgrade',
       type=int,
-      default=None,
+      default=default,
       help=max_surge_help,
-      hidden=hidden)
+      hidden=False)
 
 
-def AddMaxUnavailableUpgradeFlag(parser, hidden=False, for_node_pool=False):
-  """Adds --max-unavailable-upgrade flag to the parser.
-
-  Args:
-    parser: A given parser.
-    hidden: Whether or not to hide the help text.
-    for_node_pool: Whether this flag is for a node pool.
-  """
+def AddMaxUnavailableUpgradeFlag(parser, for_node_pool=False, is_create=False):
+  """Adds --max-unavailable-upgrade flag to the parser."""
 
   if for_node_pool:
-    max_unavailable_upgrade_help = """\
-Number of nodes that can be unavailable at the same time on each upgrade of the node pool.
+    if is_create:
+      max_unavailable_upgrade_help = """\
+Number of nodes that can be unavailable at the same time on each upgrade of the
+node pool.
 
-Specifies the number of nodes that can be unavailable at the same time during this node
-pool's upgrades. For example, running the following command will result in
-having 3 nodes being upgraded in parallel (1 + 2), but keeping always at least 3 (5 - 2)
-available each time the node pool is upgraded:
+Specifies the number of nodes that can be unavailable at the same time during
+this node pool's upgrades. For example, running the following command will
+result in having 3 nodes being upgraded in parallel (1 + 2), but keeping always
+at least 3 (5 - 2) available each time the node pool is upgraded:
 
-  $ {command} node-pool-1 --cluster=example-cluster --num-nodes=5 --max-surge-upgrade 1 --max-unavailable-upgrade=2
+  $ {command} node-pool-1 --cluster=example-cluster --num-nodes=5 \
+  --max-surge-upgrade=1 --max-unavailable-upgrade=2
+
+Must be used in conjunction with '--max-surge-upgrade'.
 """
+    else:
+      max_unavailable_upgrade_help = """\
+Number of nodes that can be unavailable at the same time on each upgrade of the
+node pool.
+
+Specifies the number of nodes that can be unavailable at the same time during
+this node pool's upgrades. For example, assume the node pool has 5 nodes,
+running the following command will result in having 3 nodes being upgraded in
+parallel (1 + 2), but keeping always at least 3 (5 - 2) available each time the
+node pool is upgraded:
+
+  $ {command} node-pool-1 --cluster=example-cluster --max-surge-upgrade=1 \
+  --max-unavailable-upgrade=2
+
+Must be used in conjunction with '--max-surge-upgrade'.
+"""
+
   else:
     max_unavailable_upgrade_help = """\
 Number of nodes that can be unavailable at the same time on each upgrade of a
@@ -2496,15 +2539,17 @@ this node pool is being upgraded. For example, running the following command
 will result in having 3 nodes being upgraded in parallel (1 + 2), but keeping
 always at least 3 (5 - 2) available each time the node pool is upgraded:
 
-   $ {command} example-cluster --num-nodes=5 --max-surge-upgrade 1 \
+   $ {command} example-cluster --num-nodes=5 --max-surge-upgrade=1 \
      --max-unavailable-upgrade=2
+
+Must be used in conjunction with '--max-surge-upgrade'.
 """
   parser.add_argument(
       '--max-unavailable-upgrade',
       type=int,
       default=None,
       help=max_unavailable_upgrade_help,
-      hidden=hidden)
+      hidden=False)
 
 
 def AddLinuxSysctlFlags(parser, for_node_pool=False):
@@ -2604,7 +2649,10 @@ def AddShieldedInstanceFlags(parser):
       The instance will boot with secure boot enabled.
       """
   parser.add_argument(
-      '--shielded-secure-boot', action='store_true', help=secure_boot_help)
+      '--shielded-secure-boot',
+      default=None,
+      action='store_true',
+      help=secure_boot_help)
 
   integrity_monitoring_help = """\
       Enables monitoring and attestation of the boot integrity of the
@@ -2614,6 +2662,7 @@ def AddShieldedInstanceFlags(parser):
       """
   parser.add_argument(
       '--shielded-integrity-monitoring',
+      default=None,
       action='store_true',
       help=integrity_monitoring_help)
 
@@ -2623,7 +2672,7 @@ def AddDatabaseEncryptionFlag(parser):
   parser.add_argument(
       '--database-encryption-key',
       default=None,
-      help="""
+      help="""\
 Enable Database Encryption.
 
 Enable database encryption that will be used to encrypt Kubernetes Secrets at
@@ -2644,7 +2693,7 @@ def AddDisableDatabaseEncryptionFlag(parser):
       '--disable-database-encryption',
       default=False,
       action='store_true',
-      help="""
+      help="""\
 Disable database encryption.
 
 Disable Database Encryption which encrypt Kubernetes Secrets at

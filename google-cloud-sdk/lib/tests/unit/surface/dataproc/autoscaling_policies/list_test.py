@@ -34,21 +34,22 @@ class AutoscalingPoliciesListUnitTest(unit_base.DataprocUnitTestBase):
   def testListAutoscalingPolicies(self):
     policy_1 = self.messages.AutoscalingPolicy(
         id='policy-1',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
     )
     policy_2 = self.messages.AutoscalingPolicy(
         id='policy-2',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-2'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-2'
     )
     policy_3 = self.messages.AutoscalingPolicy(
         id='policy-3',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-3'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-3'
     )
     mocked_response = self.messages.ListAutoscalingPoliciesResponse(
         policies=[policy_1, policy_2, policy_3])
     self.mock_client.projects_regions_autoscalingPolicies.List.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesListRequest(
-            pageSize=100, parent='projects/fake-project/regions/global'),
+            pageSize=100,
+            parent='projects/fake-project/regions/antarctica-north42'),
         response=mocked_response)
 
     self.RunDataproc('autoscaling-policies list', output_format='')
@@ -93,25 +94,26 @@ policy-3
   def testListAutoscalingPolicies_pagination(self):
     policy_1 = self.messages.AutoscalingPolicy(
         id='policy-1',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
     )
     policy_2 = self.messages.AutoscalingPolicy(
         id='policy-2',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-2'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-2'
     )
     policy_3 = self.messages.AutoscalingPolicy(
         id='policy-3',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-3'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-3'
     )
     self.mock_client.projects_regions_autoscalingPolicies.List.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesListRequest(
-            pageSize=2, parent='projects/fake-project/regions/global'),
+            pageSize=2,
+            parent='projects/fake-project/regions/antarctica-north42'),
         response=self.messages.ListAutoscalingPoliciesResponse(
             policies=[policy_1, policy_2], nextPageToken='cool-token'))
     self.mock_client.projects_regions_autoscalingPolicies.List.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesListRequest(
             pageSize=2,
-            parent='projects/fake-project/regions/global',
+            parent='projects/fake-project/regions/antarctica-north42',
             pageToken='cool-token'),
         response=self.messages.ListAutoscalingPoliciesResponse(
             policies=[policy_3]))
@@ -123,6 +125,7 @@ policy-3
 ID
 policy-1
 policy-2
+
 ID
 policy-3
 """))
@@ -130,30 +133,31 @@ policy-3
   def testListAutoscalingPolicies_uriListing(self):
     policy_1 = self.messages.AutoscalingPolicy(
         id='policy-1',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
     )
     policy_2 = self.messages.AutoscalingPolicy(
         id='policy-2',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-2'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-2'
     )
     policy_3 = self.messages.AutoscalingPolicy(
         id='policy-3',
-        name='projects/fake-project/regions/global/autoscalingPolicies/policy-3'
+        name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-3'
     )
     mocked_response = self.messages.ListAutoscalingPoliciesResponse(
         policies=[policy_1, policy_2, policy_3])
     self.mock_client.projects_regions_autoscalingPolicies.List.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesListRequest(
-            pageSize=100, parent='projects/fake-project/regions/global'),
+            pageSize=100,
+            parent='projects/fake-project/regions/antarctica-north42'),
         response=mocked_response)
 
     self.RunDataproc('autoscaling-policies list --uri', output_format='')
     # Note that there's no header
     self.AssertOutputEquals(
         textwrap.dedent("""\
-projects/fake-project/regions/global/autoscalingPolicies/policy-1
-projects/fake-project/regions/global/autoscalingPolicies/policy-2
-projects/fake-project/regions/global/autoscalingPolicies/policy-3
+projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1
+projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-2
+projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-3
 """))
 
 

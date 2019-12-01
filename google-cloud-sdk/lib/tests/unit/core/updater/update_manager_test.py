@@ -1150,7 +1150,6 @@ project = cloudsdktest
     with self.assertRaises(installers.ComponentDownloadFailedError):
       manager.Update(['a'])
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testPermissionsWhenRemoving(self):
     # initial install
     component_tuples = [('a', 1, [])]

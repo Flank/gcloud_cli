@@ -144,12 +144,12 @@ class _GetAndUpdateCommand(interfaces.OrgPolicyGetAndUpdateCommand):
     new_policy = copy.deepcopy(policy)
 
     if args.condition is None:
-      new_policy.rules = []
-      new_policy.inheritFromParent = False
-      new_policy.reset = False
+      new_policy.spec.rules = []
+      new_policy.spec.inheritFromParent = False
+      new_policy.spec.reset = False
       return new_policy
 
-    if new_policy.rules:
+    if new_policy.spec.rules:
       return new_policy
 
     _, new_policy = org_policy_utils.CreateRuleOnPolicy(new_policy,

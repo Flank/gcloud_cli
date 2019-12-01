@@ -136,7 +136,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The name of this cluster. The name must be unique within this project\nand zone, and can be up to 40 characters with the following restrictions:\n\n* Lowercase letters, numbers, and hyphens only.\n* Must start with a letter.\n* Must end with a number or a letter.",
+          "description": "The name of this cluster. The name must be unique within this project\nand location (e.g. zone or region), and can be up to 40 characters with\nthe following restrictions:\n\n* Lowercase letters, numbers, and hyphens only.\n* Must start with a letter.\n* Must end with a number or a letter.",
           "type": "string"
         },
         "description": {
@@ -676,6 +676,10 @@
         "cloudRunConfig": {
           "description": "Configuration for the Cloud Run addon. The `IstioConfig` addon must be\nenabled in order to enable Cloud Run addon. This option can only be enabled\nat cluster creation time.",
           "$ref": "CloudRunConfig"
+        },
+        "kalmConfig": {
+          "description": "Configuration for the KALM addon, which manages the lifecycle of k8s\napplications.",
+          "$ref": "KalmConfig"
         }
       }
     },
@@ -753,6 +757,17 @@
       "properties": {
         "disabled": {
           "description": "Whether Cloud Run addon is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
+    "KalmConfig": {
+      "id": "KalmConfig",
+      "description": "Configuration options for the KALM addon.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether KALM is enabled for this cluster.",
           "type": "boolean"
         }
       }
@@ -846,6 +861,10 @@
           "description": "[Output only] The pod CIDR block size per node in this node pool.",
           "type": "integer",
           "format": "int32"
+        },
+        "upgradeSettings": {
+          "description": "Upgrade settings control disruption and speed of the upgrade.",
+          "$ref": "UpgradeSettings"
         }
       }
     },
@@ -948,6 +967,23 @@
         "message": {
           "description": "Human-friendly representation of the condition",
           "type": "string"
+        }
+      }
+    },
+    "UpgradeSettings": {
+      "id": "UpgradeSettings",
+      "description": "These upgrade settings control the level of parallelism and the level of\ndisruption caused by an upgrade.\n\nmaxUnavailable controls the number of nodes that can be simultaneously\nunavailable.\n\nmaxSurge controls the number of additional nodes that can be added to the\nnode pool temporarily for the time of the upgrade to increase the number of\navailable nodes.\n\n(maxUnavailable + maxSurge) determines the level of parallelism (how many\nnodes are being upgraded at the same time).\n\nNote: upgrades inevitably introduce some disruption since workloads need to\nbe moved from old nodes to new, upgraded ones. Even if maxUnavailable=0,\nthis holds true. (Disruption stays within the limits of\nPodDisruptionBudget, if it is configured.)\n\nConsider a hypothetical node pool with 5 nodes having maxSurge=2,\nmaxUnavailable=1. This means the upgrade process upgrades 3 nodes\nsimultaneously. It creates 2 additional (upgraded) nodes, then it brings\ndown 3 old (not yet upgraded) nodes at the same time. This ensures that\nthere are always at least 4 nodes available.",
+      "type": "object",
+      "properties": {
+        "maxSurge": {
+          "description": "The maximum number of nodes that can be created beyond the current size\nof the node pool during the upgrade process.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "maxUnavailable": {
+          "description": "The maximum number of nodes that can be simultaneously unavailable during\nthe upgrade process. A node is considered available if its status is\nReady.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -1248,6 +1284,14 @@
         "serviceAccount": {
           "description": "The Google Cloud Platform Service Account to be used by the node VMs. If\nservice_account is specified, scopes should be empty.",
           "type": "string"
+        },
+        "upgradeSettings": {
+          "description": "Specifies the upgrade settings for NAP created node pools",
+          "$ref": "UpgradeSettings"
+        },
+        "management": {
+          "description": "Specifies the node management options for NAP created node-pools.",
+          "$ref": "NodeManagement"
         }
       }
     },
@@ -1774,6 +1818,10 @@
           "description": "The desired config of Intra-node visibility.",
           "$ref": "IntraNodeVisibilityConfig"
         },
+        "desiredReleaseChannel": {
+          "description": "The desired release channel configuration.",
+          "$ref": "ReleaseChannel"
+        },
         "desiredMasterVersion": {
           "description": "The Kubernetes version to change the master to. The only valid value is the\nlatest supported version.\n\nUsers may specify either explicit versions offered by\nKubernetes Engine or version aliases, which have the following behavior:\n\n- \"latest\": picks the highest valid Kubernetes version\n- \"1.X\": picks the highest valid patch+gke.N patch in the 1.X version\n- \"1.X.Y\": picks the highest valid gke.N patch in the 1.X.Y version\n- \"1.X.Y-gke.N\": picks an explicit Kubernetes version\n- \"-\": picks the default Kubernetes version",
           "type": "string"
@@ -1862,6 +1910,10 @@
         "name": {
           "description": "The name (project, location, cluster, node pool) of the node pool to\nupdate. Specified in the format\n'projects\/*\/locations\/*\/clusters\/*\/nodePools\/*'.",
           "type": "string"
+        },
+        "upgradeSettings": {
+          "description": "Upgrade settings control disruption and speed of the upgrade.",
+          "$ref": "UpgradeSettings"
         }
       }
     },
@@ -2297,6 +2349,28 @@
         },
         "defaultVersion": {
           "description": "The default version for newly created clusters on the channel.",
+          "type": "string"
+        },
+        "availableVersions": {
+          "description": "List of available versions for the release channel.",
+          "type": "array",
+          "items": {
+            "$ref": "AvailableVersion"
+          }
+        }
+      }
+    },
+    "AvailableVersion": {
+      "id": "AvailableVersion",
+      "description": "AvailableVersion is an additional Kubernetes versions offered\nto users who subscribed to the release channel.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "Kubernetes version.",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Reason for availability.",
           "type": "string"
         }
       }

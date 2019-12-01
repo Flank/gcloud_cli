@@ -1,0 +1,157 @@
+# Copyright 2019 Google LLC. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+title: cloud identity groups create test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      identity groups create eng-discuss@foo.com --organization 433637338589
+      --with-initial-owner WITH_INITIAL_OWNER
+      --display-name "Engineer Discuss" --description "Group for engineering discussions"
+      --labels "system/groups/discussion_forum="
+  - stderr: |
+      Created.
+- execute:
+  - command: |
+      identity groups create eng-discuss@foo.com --organization 433637338589
+      --display-name "Engineer Discuss" --description "Group for engineering discussions"
+      --dynamic-user-query="user.organizations.exists(org,org.title=='SWE')"
+      --labels "system/groups/discussion_forum="
+  - stderr: |
+      Created.
+actions:
+- execute_command:  # Create a group.
+    command: |
+      identity groups create eng-discuss@foo.com --organization 433637338589
+      --with-initial-owner WITH_INITIAL_OWNER
+      --display-name "Engineer Discuss" --description "Group for engineering discussions"
+      --labels "system/groups/discussion_forum="
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/organizations/433637338589?alt=json
+          method: GET
+          headers: {}
+          body: |-
+            {}
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "displayName": "google.com",
+              "owner": {
+                "directoryCustomerId": "C02h8e9nw"
+              },
+              "creationTime": "2015-09-09T19:34:18.591Z",
+              "lifecycleState": "ACTIVE",
+              "name": "organizations/433637338589"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups?alt=json&initialGroupConfig=WITH_INITIAL_OWNER
+          method: POST
+          headers: {}
+          body: |-
+            {
+              resource: {
+                group_key: {
+                  id: "eng-discuss@foo.com"
+                },
+                parent: "customerId/C02h8e9nw",
+                display_name: "eng-discuss",
+                labels: {
+                  key: "system/groups/discussion_forum",
+                  value: ""
+                }
+              },
+              initial_group_config: WITH_INITIAL_OWNER
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0
+- execute_command:  # Create a dynamic group.
+    command: |
+      identity groups create eng-discuss@foo.com --organization 433637338589
+      --display-name "Engineer Discuss" --description "Group for engineering discussions"
+      --dynamic-user-query="user.organizations.exists(org,org.title=='SWE')"
+      --labels "system/groups/discussion_forum="
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/organizations/433637338589?alt=json
+          method: GET
+          headers: {}
+          body: |-
+            {}
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "displayName": "google.com",
+              "owner": {
+                "directoryCustomerId": "C02h8e9nw"
+              },
+              "creationTime": "2015-09-09T19:34:18.591Z",
+              "lifecycleState": "ACTIVE",
+              "name": "organizations/433637338589"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups?alt=json
+          method: POST
+          headers: {}
+          body: |-
+            {
+              resource: {
+                group_key: {
+                  id: "eng-discuss@foo.com"
+                },
+                parent: "customerId/13573226",
+                display_name: "eng-discuss",
+                labels: {
+                  key: "system/groups/discussion_forum",
+                  value: ""
+                },
+                dynamicGroupMetadata: {
+                  queries: [
+                    {
+                      resourceType: USER,
+                      query: "user.organizations.exists(org,org.title=='SWE')"
+                    }
+                  ]
+                }
+              }
+            }
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - expect_stderr: |
+        Created.
+    - expect_exit:
+        code: 0

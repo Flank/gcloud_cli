@@ -80,6 +80,23 @@ can be found at: https://cloud.google.com/spanner/
 
 
 
+.SH "EXAMPLES"
+
+To update the display name of a Cloud Spanner instance, run:
+
+.RS 2m
+$ gcloud alpha spanner instances update my\-instance\-id \e
+    \-\-description=my\-new\-display\-name
+.RE
+
+To update the node count of a Cloud Spanner instance, run:
+
+.RS 2m
+$ gcloud alpha spanner instances update my\-instance\-id \-\-nodes=1
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this

@@ -1166,6 +1166,18 @@ actions:
             serviceAccount: 462803083913@cloudservices.gserviceaccount.com
     - api_call:
         expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$/listPerInstanceConfigs?alt=json&maxResults=500
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body: null
+    - api_call:
+        expect_request:
           uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json
           method: PATCH
           headers: {}
@@ -1351,6 +1363,18 @@ actions:
                 calculated: 1
               minReadySec: 0
             serviceAccount: 462803083913@cloudservices.gserviceaccount.com
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$/listPerInstanceConfigs?alt=json&maxResults=500
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body: null
     - api_call:
         expect_request:
           uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroupManagers/$$manager$$?alt=json

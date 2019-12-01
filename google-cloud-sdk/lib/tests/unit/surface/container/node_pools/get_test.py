@@ -91,6 +91,8 @@ class GetTestBeta(base.BetaTestBase, GetTestGA):
             '1.6.8',
         'management':
             self.messages.NodeManagement(autoRepair=True, autoUpgrade=True),
+        'upgradeSettings':
+            self.messages.UpgradeSettings(maxSurge=1),
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool, zone=location)
@@ -108,14 +110,13 @@ class GetTestBeta(base.BetaTestBase, GetTestGA):
         ('config:\n'
          'oauthScopes:\n'
          '{scopes}'
-         'shieldedInstanceConfig:\n'
-         'enableIntegrityMonitoring: false\n'
-         'enableSecureBoot: false\n'
          'initialNodeCount: {initialNodeCount}\n'
          'management:\n'
          'autoRepair: true\n'
          'autoUpgrade: true\n'
          'name: {name}\n'
+         'upgradeSettings:\n'
+         'maxSurge: 1\n'
          'version: {version}\n').format(
              initialNodeCount=self.NUM_NODES,
              name=pool.name,
@@ -148,6 +149,8 @@ class GetTestAlpha(base.AlphaTestBase, GetTestBeta):
                 cpuManagerPolicy='static',
                 cpuCfsQuota=True,
                 cpuCfsQuotaPeriod='10ms'),
+        'upgradeSettings':
+            self.messages.UpgradeSettings(maxSurge=1),
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool, zone=location)
@@ -173,14 +176,13 @@ class GetTestAlpha(base.AlphaTestBase, GetTestBeta):
          '      net.ipv4.tcp_rmem: 4096 87380 6291456\n'
          'oauthScopes:\n'
          '{scopes}'
-         'shieldedInstanceConfig:\n'
-         'enableIntegrityMonitoring: false\n'
-         'enableSecureBoot: false\n'
          'initialNodeCount: {initialNodeCount}\n'
          'management:\n'
          'autoRepair: true\n'
          'autoUpgrade: true\n'
          'name: {name}\n'
+         'upgradeSettings:\n'
+         'maxSurge: 1\n'
          'version: {version}\n').format(
              initialNodeCount=self.NUM_NODES,
              name=pool.name,

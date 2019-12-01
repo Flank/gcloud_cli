@@ -48,8 +48,8 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
   CLUSTER_NAMES = ['test-cluster-0', 'test-cluster-1', 'test-cluster-2']
   GCS_BUCKET = 'test-bucket'
   OPERATION_ID = '564f9cac-e514-43e5-98de-e74442010cd3'
-  REGION = 'global'
-  ZONE = 'us-central1-a'
+  REGION = 'antarctica-north42'
+  ZONE = 'antarctica-north42-a'
   REQUEST_ID = 'dbf5f287-f332-470b-80b2-c94b49358c45'
   WORKFLOW_TEMPLATE = 'test-workflow-template'
   WORKFLOW_TEMPLATE_IDS = [
@@ -82,19 +82,22 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
       return self._messages
     return self._beta_messages
 
-  def OperationName(self, op_id=None):
+  def OperationName(self, op_id=None, region=None):
     return ('projects/{project}/regions/{region}/operations/{id}'.format(
         project=self.Project(),
-        region=self.REGION,
+        region=region or self.REGION,
         id=op_id or self.OPERATION_ID))
 
-  def ClusterUri(self):
-    return ('https://dataproc.googleapis.com/{version}/projects/{project}/'
-            'regions/global/clusters/test-cluster'.format(
-                version=self.api_version, project=self.Project()))
+  def OperationUri(self, *args):
+    return 'https://dataproc.googleapis.com/{version}/{name}'.format(
+        version=self.api_version, name=self.OperationName(*args))
 
-  def ZoneUri(self):
-    return 'us-central1-a'
+  def ClusterUri(self, region=None):
+    return ('https://dataproc.googleapis.com/{version}/projects/{project}/'
+            'regions/{region}/clusters/test-cluster'.format(
+                version=self.api_version,
+                project=self.Project(),
+                region=region or self.REGION))
 
   def SetupForReleaseTrack(self, release_track):
     self.track = release_track
@@ -151,14 +154,19 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     status_dict.update(kwargs)
     return encoding.DictToMessage(status_dict, self.messages.Status)
 
-  def MakeOperation(self, name=None, done=False, error=None, response=None,
-                    metadata=None):
+  def MakeOperation(self,
+                    name=None,
+                    done=False,
+                    error=None,
+                    response=None,
+                    metadata=None,
+                    region=None):
     metadata = metadata or {}
     new_metadata = collections.OrderedDict()
     for key, value in metadata.items():
       new_metadata[key] = self._MakeJsonValue(value)
     return self.messages.Operation(
-        name=name or self.OperationName(),
+        name=name or self.OperationName(region=region),
         done=done,
         error=error,
         response=response,
@@ -248,7 +256,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                         serviceAccount=kwargs.get('serviceAccount', None),
                         serviceAccountScopes=kwargs.get('serviceAccountScopes',
                                                         []),
-                        zoneUri=kwargs.get('zoneUri', self.ZoneUri()))),
+                        zoneUri=kwargs.get('zoneUri', self.ZONE))),
                 masterConfig=kwargs.get(
                     'masterConfig',
                     self.messages.InstanceGroupConfig(
@@ -368,9 +376,9 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         response=response,
         exception=exception)
 
-  def ExpectGetOperation(self, operation=None, exception=None):
+  def ExpectGetOperation(self, operation=None, exception=None, region=None):
     if not operation:
-      operation = self.MakeOperation()
+      operation = self.MakeOperation(region=region)
     response = None
     if not exception:
       response = operation
@@ -410,13 +418,14 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
 
   def MakeWorkflowTemplate(self,
                            name=None,
+                           region=None,
                            version=None,
                            create_time=None,
                            template_id=None,
                            labels=None,
                            update_time=None,
                            jobs=None):
-    template_name = name if name else self.WorkflowTemplateName()
+    template_name = name if name else self.WorkflowTemplateName(region=region)
     template_id = template_id if template_id else self.WORKFLOW_TEMPLATE
     if not jobs:
       jobs = []
@@ -442,10 +451,11 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
   def ExpectGetWorkflowTemplate(self,
                                 name=None,
                                 version=None,
+                                region=None,
                                 response=None,
                                 exception=None):
     if not name:
-      name = self.WorkflowTemplateName()
+      name = self.WorkflowTemplateName(region=region)
     self.mock_client.projects_regions_workflowTemplates.Get.Expect(
         self.messages.DataprocProjectsRegionsWorkflowTemplatesGetRequest(
             name=name, version=version),
@@ -538,7 +548,7 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
     return policy
 
   def RelativeName(self, collection):
-    fmt = 'projects/{project}/regions/global/'
+    fmt = 'projects/{project}/regions/{region}/'
     if collection == self.CLUSTER:
       fmt += 'clusters/test-{collection}'
     elif collection == self.JOB:
@@ -552,7 +562,8 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
     else:
       raise ValueError('Invalid collection')
 
-    return fmt.format(project=self.Project(), collection=collection)
+    return fmt.format(
+        project=self.Project(), region=self.REGION, collection=collection)
 
   def MockedService(self, collection):
     if collection == self.CLUSTER:

@@ -168,7 +168,6 @@ class TransformManifestsTest(test_case.TestCase):
     # There should be no microseconds
     self.assertEqual(dt.microsecond, 0)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   @test_case.Filters.DoNotRunInDebPackage('overflow does not occur here')
   @test_case.Filters.DoNotRunInRpmPackage('overflow does not occur here')
   def testTimeStampTransformation_ConversionErrorReturnsNone(self):

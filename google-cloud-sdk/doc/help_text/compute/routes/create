@@ -4,10 +4,11 @@ NAME
 SYNOPSIS
     gcloud compute routes create NAME --destination-range=DESTINATION_RANGE
         (--next-hop-address=NEXT_HOP_ADDRESS
-          | --next-hop-gateway=NEXT_HOP_GATEWAY
+          | --next-hop-gateway=NEXT_HOP_GATEWAY | --next-hop-ilb=NEXT_HOP_ILB
           | --next-hop-instance=NEXT_HOP_INSTANCE
           | --next-hop-vpn-tunnel=NEXT_HOP_VPN_TUNNEL)
         [--description=DESCRIPTION] [--network=NETWORK; default="default"]
+        [--next-hop-ilb-region=NEXT_HOP_ILB_REGION]
         [--next-hop-instance-zone=NEXT_HOP_INSTANCE_ZONE]
         [--next-hop-vpn-tunnel-region=NEXT_HOP_VPN_TUNNEL_REGION]
         [--priority=PRIORITY; default=1000] [--tags=TAG,[TAG,...]]
@@ -57,6 +58,12 @@ REQUIRED FLAGS
           the only acceptable value is default-internet-gateway which is a
           gateway operated by Google Compute Engine.
 
+       --next-hop-ilb=NEXT_HOP_ILB
+          The target forwarding rule that will receive forwarded traffic. This
+          can only be used when the destination_range is a public (non-RFC
+          1918) IP CIDR range. Requires --load-balancing-scheme=INTERNAL on the
+          corresponding forwarding rule.
+
        --next-hop-instance=NEXT_HOP_INSTANCE
           Specifies the name of an instance that should handle traffic matching
           this route. When this flag is specified, the zone of the instance
@@ -71,6 +78,26 @@ OPTIONAL FLAGS
 
      --network=NETWORK; default="default"
         Specifies the network to which the route will be applied.
+
+     --next-hop-ilb-region=NEXT_HOP_ILB_REGION
+        The region of the next hop forwarding rule. If not specified, you may
+        be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
 
      --next-hop-instance-zone=NEXT_HOP_INSTANCE_ZONE
         The zone of the next hop instance. If not specified, the user may be
@@ -130,6 +157,14 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To create a route with the name 'route-name' with destination range
+    '0.0.0.0/0' and with next hop gateway 'default-internet-gateway', run:
+
+        $ gcloud compute routes create route-name \
+          --destination-range=0.0.0.0/0 \
+          --next-hop-gateway=default-internet-gateway
 
 NOTES
     These variants are also available:

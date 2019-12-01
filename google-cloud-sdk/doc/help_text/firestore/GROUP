@@ -1,0 +1,40 @@
+NAME
+    gcloud firestore - manage your Cloud Firestore resources
+
+SYNOPSIS
+    gcloud firestore GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage your Cloud Firestore resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     indexes
+        Manage indexes for Cloud Firestore.
+
+     operations
+        Manage Long Running Operations for Cloud Firestore.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     export
+        export Cloud Firestore documents to Google Cloud Storage.
+
+     import
+        import Cloud Firestore documents from Google Cloud Storage.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha firestore
+        $ gcloud beta firestore
+

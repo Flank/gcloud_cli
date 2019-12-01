@@ -170,9 +170,26 @@ class Binding(_messages.Message):
       `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
       that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
-      that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: The G Suite domain (primary) that represents all
-      the    users of that domain. For example, `google.com` or `example.com`.
+      that represents a Google group.    For example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus    unique identifier) representing a service account that has been
+      recently    deleted. For example,    `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`.    If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique    identifier) representing a Google group
+      that has been recently    deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If    the group is
+      recovered, this value reverts to `group:{emailid}` and the    recovered
+      group retains the role in the binding.   * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the    users of that domain.
+      For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -193,10 +210,10 @@ class CloudassetBatchGetAssetsHistoryRequest(_messages.Message):
       e.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1
       `. See [Resource Names](https://cloud.google.com/apis/design/resource_na
       mes#full_resource_name) and [Resource Name
-      Format](https://cloud.google.com/resource-manager/docs/cloud-asset-
-      inventory/resource-name-format) for more info.  The request becomes a
-      no-op if the asset name list is empty, and the max size of the asset
-      name list is 100 in one request.
+      Format](https://cloud.google.com/asset-inventory/docs/resource-name-
+      format) for more info.  The request becomes a no-op if the asset name
+      list is empty, and the max size of the asset name list is 100 in one
+      request.
     contentType: Optional. The content type.
     parent: Required. The relative name of the root asset. It can only be an
       organization number (such as "organizations/123"), a project ID (such as
@@ -267,8 +284,8 @@ class ExportAssetsRequest(_messages.Message):
     assetTypes: A list of asset types of which to take a snapshot for. For
       example: "compute.googleapis.com/Disk". If specified, only matching
       assets will be returned. See [Introduction to Cloud Asset
-      Inventory](https://cloud.google.com/resource-manager/docs/cloud-asset-
-      inventory/overview) for all supported asset types.
+      Inventory](https://cloud.google.com/asset-inventory/docs/overview) for
+      all supported asset types.
     contentType: Asset content type. If not specified, no content but the
       asset name will be returned.
     outputConfig: Required. Output configuration indicating where the results
@@ -770,8 +787,8 @@ class GoogleIdentityAccesscontextmanagerV1OsConstraint(_messages.Message):
     osType: Required. The allowed OS type.
     requireVerifiedChromeOs: Only allows requests from devices with a verified
       Chrome OS. Verifications includes requirements that the device is
-      enterprise-managed, conformant to Dasher domain policies, and the caller
-      has permission to call the API targeted by the request.
+      enterprise-managed, conformant to domain policies, and the caller has
+      permission to call the API targeted by the request.
   """
 
   class OsTypeValueValuesEnum(_messages.Enum):

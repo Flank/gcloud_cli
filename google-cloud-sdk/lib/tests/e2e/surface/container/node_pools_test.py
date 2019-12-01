@@ -19,63 +19,105 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import contextlib
+
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from tests.lib import e2e_utils
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.container import base as testbase
 
 
-class NodePoolsTestGA(testbase.IntegrationTestBase):
+@test_case.Filters.skipAlways('Failing', 'b/143631184')
+class NodePoolsTestGA(testbase.IntegrationTestBase, parameterized.TestCase):
 
   def SetUp(self):
     self.releasetrack = calliope_base.ReleaseTrack.GA
-
-  # We need to write a kubeconfig entry that has the executable path to gcloud,
-  # so we run this test only in bundle.
-  def NodePoolsUpdate(self, location_flag, prefix, track):
     self.cluster_name = next(
-        e2e_utils.GetResourceNameGenerator(prefix=prefix))
+        e2e_utils.GetResourceNameGenerator(prefix='update-test'))
 
-    # Cluster deleted in "TeadDown" method of calliope_base class.
-    log.status.Print('Creating cluster %s', self.cluster_name)
-    self.Run('container clusters create {0} {1} --num-nodes=1'
-             .format(self.cluster_name, location_flag),
-             track=track)
-    self.AssertErrContains('Created')
-    self.AssertOutputContains(self.cluster_name)
-    self.AssertOutputContains('RUNNING')
-    log.status.Print('Enabling auto-upgrade for cluster %s', self.cluster_name)
-    self.Run('container node-pools update default-pool --cluster={0} {1} '
-             '--enable-autoupgrade'
-             .format(self.cluster_name, location_flag),
-             track=track)
-    self.AssertErrContains('Updated')
-    node_pool = self.Run('container node-pools describe default-pool '
-                         '--cluster={0} {1}'
-                         .format(self.cluster_name, location_flag))
-    self.assertTrue(node_pool.management.autoUpgrade)
+  def _FormatNameAndLocation(self, location):
+    """Helper function.
 
-  @test_case.Filters.skipAlways('Failing', 'b/135201894')
-  def testNodePoolsUpdateZone(self):
-    self.NodePoolsUpdate('--zone=' + self.ZONE, 'test-pool',
-                         self.releasetrack)
+    Args:
+      location: pre-formatted '--zone|region=<zone|region name>' string
 
-  @test_case.Filters.skipAlways('Failing', 'b/135201894')
-  def testNodePoolsUpdateRegion(self):
-    self.NodePoolsUpdate('--region=' + self.REGION,
-                         'test-pool-region', self.releasetrack)
+    Returns:
+      str: a string formatted with the provided values.
+    """
+    return '{name} {location}'.format(name=self.cluster_name, location=location)
 
-  # This test will cleanup the leaked clusters.
-  # Delete clusters that are older than 1h.
-  # TODO(b/141495754) Clean these leaked clusters using our cleanup script
+  @contextlib.contextmanager
+  def _CreateCluster(self, location, track):
+    try:
+      log.status.Print('Creating cluster {}'.format(self.cluster_name))
+      result = self.Run(
+          'container clusters create {0} '
+          '--create-subnetwork range=/28 '
+          '--enable-ip-alias '
+          '--network do-not-delete-node-pools-test '
+          '--no-enable-autoupgrade '  # explicit since the default will soon
+          # become --enable-autoupgrade
+          '--num-nodes=1'.format(
+              self._FormatNameAndLocation(location)
+          ), track=track
+      )
+      yield result
+
+    finally:
+      try:
+        log.status.Print('Cleaning up {}'.format(self.cluster_name))
+        # Make cluster deletion asynchronous until gcloud allows a timeout
+        # longer than 20 minutes.
+        self.Run(
+            'container clusters delete {name_and_location} --async -q'.format(
+                name_and_location=self._FormatNameAndLocation(location)
+            )
+        )
+      except core_exceptions.Error as error:
+        log.warning(
+            'Failed to delete cluster {}:\n{}'.format(self.cluster_name, error)
+        )
+
+  @parameterized.named_parameters(
+      ('Zone', 'zone'),
+      ('Region', 'region')
+  )
   @sdk_test_base.Filters.RunOnlyInBundle
-  def testCleanup(self):
-    self.CleanupLeakedClusters(self.ZONE, self.releasetrack)
-    self.CleanupLeakedClusters(self.REGION, self.releasetrack)
+  def testNodePoolsUpdate(self, location):
+    if location == 'zone':
+      location = '--zone={}'.format(self.ZONE)
+    else:
+      location = '--region={}'.format(self.REGION)
+
+    track = self.releasetrack
+    with self._CreateCluster(location, track):
+      self.AssertErrContains('Created')
+      self.AssertOutputContains(self.cluster_name)
+      self.AssertOutputContains('RUNNING')
+      log.status.Print('Enabling auto-upgrade for cluster %s',
+                       self.cluster_name)
+      self.Run(
+          'container node-pools update default-pool '
+          '--cluster {name_and_location} --enable-autoupgrade'.format(
+              name_and_location=self._FormatNameAndLocation(location)
+          ),
+          track=track
+      )
+      self.AssertErrContains('Updated')
+      node_pool = self.Run(
+          'container node-pools describe default-pool '
+          '--cluster {name_and_location}'.format(
+              name_and_location=self._FormatNameAndLocation(location)
+          )
+      )
+      self.assertTrue(node_pool.management.autoUpgrade)
 
 
+@test_case.Filters.skipAlways('Failing', 'b/143631184')
 class NodePoolsTestBeta(NodePoolsTestGA):
 
   def SetUp(self):

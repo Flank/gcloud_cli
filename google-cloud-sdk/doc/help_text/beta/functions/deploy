@@ -3,8 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud beta functions deploy (NAME : --region=REGION)
-        [--allow-unauthenticated] [--entry-point=ENTRY_POINT]
-        [--ignore-file=IGNORE_FILE] [--memory=MEMORY] [--retry]
+        [--allow-unauthenticated] [--egress-settings=EGRESS_SETTINGS]
+        [--entry-point=ENTRY_POINT] [--ignore-file=IGNORE_FILE]
+        [--ingress-settings=INGRESS_SETTINGS] [--memory=MEMORY] [--retry]
         [--runtime=RUNTIME] [--service-account=SERVICE_ACCOUNT]
         [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
         [--update-labels=[KEY=VALUE,...]]
@@ -45,6 +46,11 @@ FLAGS
         If set, makes this a public function. This will allow all callers,
         without checking authentication.
 
+     --egress-settings=EGRESS_SETTINGS
+        Egress settings controls what traffic is diverted through the VPC
+        Access Connector resource. By default private-ranges-only will be used.
+        EGRESS_SETTINGS must be one of: private-ranges-only, all.
+
      --entry-point=ENTRY_POINT
         Name of a Google Cloud Function (as defined in source code) that will
         be executed. Defaults to the resource name suffix, if not specified.
@@ -55,6 +61,11 @@ FLAGS
 
      --ignore-file=IGNORE_FILE
         Override the .gcloudignore file and use the specified file instead.
+
+     --ingress-settings=INGRESS_SETTINGS
+        Ingress settings controls what traffic can reach the function.By
+        default all will be used. INGRESS_SETTINGS must be one of: all,
+        internal-only.
 
      --memory=MEMORY
         Limit on the amount of memory the function can use.
@@ -79,6 +90,7 @@ FLAGS
         * nodejs10: Node.js 10
         * python37: Python 3.7
         * go111: Go 1.11
+        * go113: Go 1.13
         * nodejs6: Node.js 6 (deprecated)
 
      --service-account=SERVICE_ACCOUNT

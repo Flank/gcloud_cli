@@ -1,5 +1,5 @@
 title: surface unit tests for asset feed update
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -20,10 +20,6 @@ summary:
       name: projects/846710131186/feeds/gcloud_feed
 
 actions:
-- define_reference:
-    reference: track
-    track_values:
-      ALPHA: alpha
 - execute_command:
     command: |-
       asset feeds create gcloud_feed --project=cai-playground --asset-names="id1","id2"

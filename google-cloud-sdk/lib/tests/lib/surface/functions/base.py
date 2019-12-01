@@ -56,6 +56,14 @@ class FunctionsTestBase(sdk_test_base.WithFakeAuth,
     self.track = calliope_base.ReleaseTrack.GA
     self._region = 'us-central1'
     self.StartPatch('time.sleep')
+    self.mock_resource_manager_client = apitools_mock.Client(
+        core_apis.GetClientClass('cloudresourcemanager', 'v1'),
+        real_client=core_apis.GetClientInstance(
+            'cloudresourcemanager', 'v1', no_http=True))
+    self.mock_resource_manager_client.Mock()
+    self.addCleanup(self.mock_resource_manager_client.Unmock)
+    self.resource_manager_messages = core_apis.GetMessagesModule(
+        'cloudresourcemanager', 'v1')
 
   def ReturnUnderMaxSize(self, *unused_args, **unused_kwargs):
     return 50 * 2**20 + 1
@@ -103,3 +111,54 @@ class FunctionsTestBase(sdk_test_base.WithFakeAuth,
     operation.name = name
     operation.done = True
     return operation
+
+  def MockRemoveIamPolicy(self, function_name, region=None):
+    initial_policy = self.messages.Policy(
+        bindings=[
+            self.messages.Binding(
+                role='roles/cloudfunctions.invoker',
+                members=['user:existinguser@google.com', 'allUsers'])
+        ],
+        etag=b'someUniqueEtag',
+        version=1)
+    updated_policy = self.messages.Policy(
+        bindings=[
+            self.messages.Binding(
+                role='roles/cloudfunctions.invoker',
+                members=['user:existinguser@google.com'])
+        ],
+        etag=b'someUniqueEtag',
+        version=1)
+    function_path = 'projects/{}/locations/{}/functions/{}'.format(
+        self.Project(), region or self.GetRegion(), function_name)
+    self.mock_client.projects_locations_functions.GetIamPolicy.Expect(
+        self.messages.
+        CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
+            resource=function_path),
+        response=initial_policy)
+    set_request = \
+      self.messages.CloudfunctionsProjectsLocationsFunctionsSetIamPolicyRequest(
+          resource=function_path,
+          setIamPolicyRequest=self.messages.SetIamPolicyRequest(
+              policy=updated_policy))
+    self.mock_client.projects_locations_functions.SetIamPolicy.Expect(
+        set_request,
+        response=updated_policy)
+
+  def ExpectResourceManagerTestIamPolicyBinding(self, can_set, project=None):
+    my_project = self.Project() if project is None else project
+    needed_permissions = [
+        'resourcemanager.projects.getIamPolicy',
+        'resourcemanager.projects.setIamPolicy']
+
+    messages = self.resource_manager_messages
+    request = messages.CloudresourcemanagerProjectsTestIamPermissionsRequest(
+        resource=my_project,
+        testIamPermissionsRequest=messages.TestIamPermissionsRequest(
+            permissions=needed_permissions))
+
+    permissions = needed_permissions if can_set else []
+    response = messages.TestIamPermissionsResponse(permissions=permissions)
+
+    self.mock_resource_manager_client.projects.TestIamPermissions.Expect(
+        request, response=response)

@@ -186,7 +186,8 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
 
     self.assertEqual(project_attr.name, 'project')
     self.assertEqual(project_attr.help_text,
-                     'The Cloud project for the {resource}.')
+                     'Project ID of the Google Cloud Platform project '
+                     'for the {resource}.')
     self.assertEqual(
         project_attr.fallthroughs,
         concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG.fallthroughs)

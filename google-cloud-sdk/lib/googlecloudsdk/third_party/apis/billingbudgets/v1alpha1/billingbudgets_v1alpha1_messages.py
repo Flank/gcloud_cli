@@ -17,7 +17,7 @@ class BillingbudgetsBillingAccountsBudgetsCreateRequest(_messages.Message):
     googleCloudBillingBudgetsV1alpha1CreateBudgetRequest: A
       GoogleCloudBillingBudgetsV1alpha1CreateBudgetRequest resource to be
       passed as the request body.
-    parent: Required. the name of the billing account to create the budget in.
+    parent: Required. The name of the billing account to create the budget in.
       Values are of the form `billingAccounts/{billingAccountId}`.
   """
 
@@ -87,13 +87,16 @@ class GoogleCloudBillingBudgetsV1alpha1AllUpdatesRule(_messages.Message):
   threshold rules.
 
   Fields:
-    pubsubTopic: Required. The name of Cloud Pub/Sub topic that budget related
-      messages are published to. Updates are sent at regular intervals to the
-      topic. This value of the form `projects/{project_id}/topics/{topic_id}`
-      can be used as IAM resource name and to call services defined in
-      google/pubsub/v1/pubsub.proto. On creation of a budget, the topic must
-      be owned by the user, and Google must be granted publishing permissions
-      on it.
+    pubsubTopic: Required. The name of the Cloud Pub/Sub topic where budget
+      related messages will be published, in the form
+      `projects/{project_id}/topics/{topic_id}`. Updates are sent at regular
+      intervals to the topic. The topic needs to be created before the budget
+      is created; see https://cloud.google.com/billing/docs/how-to/budgets
+      #manage-notifications for more details. Caller is expected to have
+      `pubsub.topics.setIamPolicy` permission on the topic when it's set for a
+      budget, otherwise, the API call will fail with PERMISSION_DENIED. See
+      https://cloud.google.com/pubsub/docs/access-control for more details on
+      Pub/Sub roles and permissions.
     schemaVersion: Required. The schema version of the notification. Only
       "1.0" is accepted. It represents the JSON schema as defined in
       https://cloud.google.com/billing/docs/how-to/budgets#notification_format
@@ -104,11 +107,11 @@ class GoogleCloudBillingBudgetsV1alpha1AllUpdatesRule(_messages.Message):
 
 
 class GoogleCloudBillingBudgetsV1alpha1Budget(_messages.Message):
-  r"""A budget is a plan that describes what the user expects to spend on
-  Cloud projects, plus rules to execute as spend is tracked against that plan,
-  e.g. alert at 90% of $100 target. Currently all plans are monthly budgets so
-  the usage period(s) tracked are implied (calendar months of usage back-to-
-  back).
+  r"""A budget is a plan that describes what you expect to spend on Cloud
+  projects, plus the rules to execute as spend is tracked against that plan,
+  (for example, send an alert when 90% of the target spend is met). Currently
+  all plans are monthly budgets so the usage period(s) tracked are implied
+  (calendar months of usage back-to-back).
 
   Fields:
     allUpdatesRule: Optional. Rules to apply to all updates to the actual
@@ -204,9 +207,10 @@ class GoogleCloudBillingBudgetsV1alpha1Filter(_messages.Message):
 
 
 class GoogleCloudBillingBudgetsV1alpha1LastPeriodAmount(_messages.Message):
-  r"""Describes a plan to target last period's spend. There are no options
-  yet. The amount is automatically 100% of last period's spend. Future
-  configuration will go here (e.g. configuring the percentage).
+  r"""Describes a budget amount targeted to last period's spend. At this time,
+  the amount is automatically 100% of last period's spend; that is, there are
+  no other options yet. Future configuration will be described here (for
+  example, configuring a percentage of last period's spend).
   """
 
 

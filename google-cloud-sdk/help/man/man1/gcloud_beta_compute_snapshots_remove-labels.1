@@ -18,28 +18,7 @@ gcloud beta compute snapshots remove\-labels \- remove labels from Google Comput
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute snapshots remove\-labels\fR removes labels
-from a Google Compute Engine snapshot. For example, running:
-
-.RS 2m
-$ gcloud beta compute snapshots remove\-labels example\-snapshot \e
-    \-\-labels=k0,k1
-.RE
-
-will remove existing labels with key \f5\fIk0\fR\fR and \f5\fIk1\fR\fR from
-\'example\-snapshot'.
-
-Labels can be used to identify the snapshot and to filter them as in
-
-.RS 2m
-$ gcloud beta compute snapshots list \-\-filter='labels.k1:value2'
-.RE
-
-To list existing labels
-
-.RS 2m
-$ gcloud beta compute snapshots describe example\-snapshot \e
-    \-\-format='default(labels)'
-.RE
+from a Google Compute Engine snapshot.
 
 
 
@@ -82,6 +61,32 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove existing labels with key \f5\fIk0\fR\fR and \f5\fIk1\fR\fR from
+\'example\-snapshot'
+
+.RS 2m
+$ gcloud beta compute snapshots remove\-labels example\-snapshot \e
+    \-\-labels=k0,k1
+.RE
+
+Labels can be used to identify the snapshot and to filter them. To find a
+snapshot labeled with key\-value pair \f5\fIk1\fR\fR, \f5\fIv2\fR\fR
+
+.RS 2m
+$ gcloud beta compute snapshots list \-\-filter='labels.k1:v2'
+.RE
+
+To list only the labels when describing a resource, use \-\-format
+
+.RS 2m
+$ gcloud beta compute snapshots describe example\-snapshot \e
+    \-\-format='default(labels)'
+.RE
 
 
 

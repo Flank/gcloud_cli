@@ -29,13 +29,13 @@ from tests.lib.surface.compute import forwarding_rules_test_base
 from tests.lib.surface.compute import test_resources
 
 
-class ForwardingRulesExportTestBeta(
+class ForwardingRulesExportTest(
     forwarding_rules_test_base.ForwardingRulesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.BETA
-    self._api = 'beta'
-    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_BETA
+    self.track = calliope.base.ReleaseTrack.GA
+    self._api = 'v1'
+    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_V1
 
   def RunExport(self, command):
     self.Run('compute forwarding-rules export ' + command)
@@ -76,7 +76,15 @@ class ForwardingRulesExportTestBeta(
                              exported_forwarding_rule)
 
 
-class ForwardingRulesExportTestAlpha(ForwardingRulesExportTestBeta):
+class ForwardingRulesExportTestBeta(ForwardingRulesExportTest):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
+    self._forwarding_rules = test_resources.GLOBAL_FORWARDING_RULES_BETA
+
+
+class ForwardingRulesExportTestAlpha(ForwardingRulesExportTest):
 
   def PreSetUp(self):
     self.track = calliope.base.ReleaseTrack.ALPHA

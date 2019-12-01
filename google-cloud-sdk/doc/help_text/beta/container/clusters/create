@@ -13,11 +13,12 @@ SYNOPSIS
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
         [--no-enable-autoupgrade] [--enable-binauthz] [--enable-cloud-logging]
-        [--enable-cloud-monitoring] [--enable-intra-node-visibility]
-        [--enable-ip-alias] [--enable-kubernetes-alpha]
-        [--enable-legacy-authorization] [--enable-network-policy]
-        [--enable-pod-security-policy] [--enable-shielded-nodes]
-        [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
+        [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
+        [--enable-intra-node-visibility] [--enable-ip-alias]
+        [--enable-kubernetes-alpha] [--enable-legacy-authorization]
+        [--enable-network-policy] [--enable-pod-security-policy]
+        [--enable-shielded-nodes] [--enable-stackdriver-kubernetes]
+        [--enable-vertical-pod-autoscaling]
         [--identity-namespace=IDENTITY_NAMESPACE] [--image-type=IMAGE_TYPE]
         [--issue-client-certificate]
         [--istio-config=[auth=MTLS_PERMISSIVE,...]] [--labels=[KEY=VALUE,...]]
@@ -25,6 +26,8 @@ SYNOPSIS
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
+        [--max-surge-upgrade=MAX_SURGE_UPGRADE; default=1]
+        [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
@@ -40,7 +43,8 @@ SYNOPSIS
           : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
           | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY
           : --autoprovisioning-locations=ZONE,[ZONE,...] --min-cpu=MIN_CPU
-          --min-memory=MIN_MEMORY
+          --min-memory=MIN_MEMORY --autoprovisioning-scopes=[SCOPE,...]
+          --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
           [--max-accelerator=[type=TYPE,count=COUNT,...]
           : --min-accelerator=[type=TYPE,count=COUNT,...]]]]]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
@@ -91,12 +95,12 @@ FLAGS
 
      --addons=[ADDON,...]
         Addons
-        (https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+        (https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster.AddonsConfig)
         are additional Kubernetes cluster components. Addons specified by this
         flag will be enabled. The others will be disabled. Default addons:
         HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
         HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        NetworkPolicy, Istio, CloudRun.
+        NetworkPolicy, CloudRun, Istio, ApplicationManager.
 
      --allow-route-overlap
         Allows the provided cluster CIDRs to overlap with existing routes that
@@ -241,6 +245,14 @@ FLAGS
         Kubernetes Engine monitoring and logging. For more details, please
         read: https://cloud.google.com/monitoring/kubernetes-engine/migration.
 
+     --enable-cloud-run-alpha
+        Enable Cloud Run alpha features on this cluster. Selecting this option
+        will result in the cluster having all Cloud Run alpha API groups and
+        features turned on.
+
+        Cloud Run alpha clusters are not covered by the Cloud Run SLA and
+        should not be used for production workloads.
+
      --enable-intra-node-visibility
         Enable Intra-node visibility for this cluster.
 
@@ -296,7 +308,7 @@ FLAGS
         Enable Stackdriver Kubernetes monitoring and logging.
 
      --enable-vertical-pod-autoscaling
-        Enables vertical pod autoscaling for a cluster.
+        Enable vertical pod autoscaling for a cluster.
 
      --identity-namespace=IDENTITY_NAMESPACE
         Enable Workload Identity on the cluster.
@@ -391,6 +403,35 @@ FLAGS
         --default-max-pods-per-node flag set at the cluster level.
 
         Must be used in conjunction with '--enable-ip-alias'.
+
+     --max-surge-upgrade=MAX_SURGE_UPGRADE; default=1
+        Number of extra (surge) nodes to be created on each upgrade of a node
+        pool.
+
+        Specifies the number of extra (surge) nodes to be created during this
+        node pool's upgrades. For example, running the following command will
+        result in creating an extra node each time the node pool is upgraded:
+
+            $ gcloud beta container clusters create example-cluster \
+                --max-surge-upgrade=1 --max-unavailable-upgrade=0
+
+        Must be used in conjunction with '--max-unavailable-upgrade'.
+
+     --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE
+        Number of nodes that can be unavailable at the same time on each
+        upgrade of a node pool.
+
+        Specifies the number of nodes that can be unavailable at the same time
+        while this node pool is being upgraded. For example, running the
+        following command will result in having 3 nodes being upgraded in
+        parallel (1 + 2), but keeping always at least 3 (5 - 2) available each
+        time the node pool is upgraded:
+
+            $ gcloud beta container clusters create example-cluster \
+               --num-nodes=5 --max-surge-upgrade=1      \
+               --max-unavailable-upgrade=2
+
+        Must be used in conjunction with '--max-surge-upgrade'.
 
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Compute Engine metadata to be made available to the guest operating
@@ -693,6 +734,19 @@ FLAGS
 
               Minimum number of gigabytes of memory to which the cluster can
               scale.
+
+           Flags to specify identity for autoprovisioned nodes:
+
+             --autoprovisioning-scopes=[SCOPE,...]
+                The scopes be used by node instances in autoprovisioined node
+                pools. Multiple scopes can be specified, separated by commas.
+                For information on defaults, look at:
+                https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+             --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
+                The Google Cloud Platform Service Account to be used by node
+                VMs in autoprovisioined node pools. If not specified, the
+                project default service account is used.
 
            Arguments to set limits on accelerators:
 

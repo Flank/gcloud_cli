@@ -71,6 +71,19 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To create a regional auto subnet mode network with the name 'network-name',
+    run:
+
+        $ gcloud beta compute networks create network-name
+
+    To create a global custom subnet mode network with the name 'network-name',
+    run:
+
+        $ gcloud beta compute networks create network-name \
+          --bgp-routing-mode=global \
+          --subnet-mode=custom
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

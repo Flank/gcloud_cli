@@ -58,6 +58,11 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list the Cloud Spanner databases in an instance, run:
+
+        $ gcloud spanner databases list --instance=my-instance-id
+
 NOTES
     These variants are also available:
 

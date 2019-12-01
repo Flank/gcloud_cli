@@ -25,7 +25,7 @@ DESCRIPTION
     may need to explicitly enable ssh access by adding a firewall-rule:
 
         $ gcloud compute firewall-rules create --network=NETWORK           \
-              default-allow-ssh --allow tcp:22
+              default-allow-ssh --allow=tcp:22
 
     gcloud alpha compute ssh ensures that the user's public SSH key is present
     in the project's metadata. If the user does not have a public SSH key, one
@@ -48,7 +48,7 @@ POSITIONAL ARGUMENTS
         The '--' argument must be specified between gcloud specific args on the
         left and SSH_ARGS on the right. Example:
 
-            $ gcloud alpha compute ssh example-instance --zone us-central1-a \
+            $ gcloud alpha compute ssh example-instance --zone=us-central1-a \
             -- -vvv -L 80:%INSTANCE%:80
 
 FLAGS
@@ -87,7 +87,7 @@ FLAGS
         replace occurences of %USER% and %INSTANCE% with their dereferenced
         values. Example:
 
-            $ gcloud alpha compute ssh example-instance --zone us-central1-a \
+            $ gcloud alpha compute ssh example-instance --zone=us-central1-a \
                 --ssh-flag="-vvv" --ssh-flag="-L 80:%INSTANCE%:80"
 
         is equivalent to passing the flags --vvv and -L 80:162.222.181.197:80
@@ -169,30 +169,30 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To SSH into 'example-instance' in zone us-central1-a, run:
 
-        $ gcloud alpha compute ssh example-instance --zone us-central1-a
+        $ gcloud alpha compute ssh example-instance --zone=us-central1-a
 
     You can also run a command on the virtual machine. For example, to get a
     snapshot of the guest's process tree, run:
 
-        $ gcloud alpha compute ssh example-instance --zone us-central1-a \
-            --command "ps -ejH"
+        $ gcloud alpha compute ssh example-instance --zone=us-central1-a \
+            --command="ps -ejH"
 
     If you are using the Google Container-Optimized virtual machine image, you
     can SSH into one of your containers with:
 
-        $ gcloud alpha compute ssh example-instance --zone us-central1-a \
-            --container CONTAINER
+        $ gcloud alpha compute ssh example-instance --zone=us-central1-a \
+            --container=CONTAINER
 
     You can limit the allowed time to ssh. For example, to allow a key to be
     used through 2019:
 
-        $ gcloud alpha compute ssh example-instance --zone us-central1-a \
-            --ssh-key-expiration "2020-01-01T00:00:00:00Z"
+        $ gcloud alpha compute ssh example-instance --zone=us-central1-a \
+            --ssh-key-expiration="2020-01-01T00:00:00:00Z"
 
     Or alternatively, allow access for the next two minutes:
 
-        $ gcloud alpha compute ssh example-instance --zone us-central1-a \
-            --ssh-key-expire-after 2m
+        $ gcloud alpha compute ssh example-instance --zone=us-central1-a \
+            --ssh-key-expire-after=2m
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

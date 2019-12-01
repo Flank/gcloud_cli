@@ -46,7 +46,7 @@ EXAMPLES
 
         $ gcloud beta recommender recommendations describe abcd-1234 \
             --project=project-name --location=global \
-            --recommender=google.iam.policy.RoleRecommender
+            --recommender=google.iam.policy.Recommender
 
 NOTES
     This command is currently in BETA and may change without notice. This

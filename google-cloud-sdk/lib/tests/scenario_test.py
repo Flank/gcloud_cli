@@ -112,7 +112,9 @@ class _GlobalDataHolder(object):
     for config in configs:
       for track in config.tracks:
         test_name = '_' + config.name + '/' + track.id.title()
-        tests.append((test_name, config.resource_path, track, config.skip_data))
+        tests.append(
+            (test_name, config.resource_path, track, config.filter_data)
+        )
     return tests
 
 
@@ -120,7 +122,7 @@ DATA = _GlobalDataHolder()
 
 
 def AddScenarioTestMethodToTestClass(
-    test_class, testname, scenario_path, track, skip_data):
+    test_class, testname, scenario_path, track, filter_data):
   """Adds a test method for running the specified scenario test to a test class.
 
   Args:
@@ -128,9 +130,9 @@ def AddScenarioTestMethodToTestClass(
     testname: The name of the method to add.
     scenario_path: The path to the scenario to test.
     track: The gcloud release track to run the scenario on.
-    skip_data: If test is skipped, an object with a reason and bug for skip.
+    filter_data: The filters (skips and restrictions) to apply to the test.
   """
-  @test_base.SkipIfSkipped(skip_data, EXECUTION_MODE)
+  @test_base.BuildFilterDecorator(filter_data, EXECUTION_MODE)
   def Test(self):
     self.RunScenario(
         scenario_path, track, self.EXECUTION_MODE, UPDATE_MODES, DEBUG)

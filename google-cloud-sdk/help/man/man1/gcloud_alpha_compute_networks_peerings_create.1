@@ -17,7 +17,10 @@ gcloud alpha compute networks peerings create \- create a Google Compute Engine 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Create a Google Compute Engine network peering.
+\fB(ALPHA)\fR \fBgcloud alpha compute networks peerings create\fR is used to
+create peerings between virtual networks. Each side of a peering association is
+set up independently. Peering will be active only when the configuration from
+both sides matches.
 
 
 
@@ -102,6 +105,24 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a network peering with the name 'peering\-name' between the network
+\'local\-network' and the network 'peer\-network' which exports and imports
+custom routes and subnet routes with public IPs, run:
+
+.RS 2m
+$ gcloud alpha compute networks peerings create peering\-name \e
+  \-\-network=local\-network \e
+  \-\-peer\-network=peer\-network \e
+  \-\-export\-custom\-routes \e
+  \-\-import\-custom\-routes \e
+  \-\-export\-subnet\-routes\-with\-public\-ip \e
+  \-\-import\-subnet\-routes\-with\-public\-ip
+.RE
 
 
 

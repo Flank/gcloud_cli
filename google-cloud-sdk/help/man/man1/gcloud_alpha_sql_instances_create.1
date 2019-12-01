@@ -246,10 +246,9 @@ First Generation tiers, we recommend using Second Generation instead.
 .TP 2m
 
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
-used to protect the instance. Please ensure that you have the
-\f5resourcemanager.projects.setIamPolicy\fR permission for the project
-associated with the key. The arguments in this group can be used to specify the
-attributes of this resource.
+used to protect the instance. The 'Compute Engine Service Agent' service account
+must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'. The arguments in
+this group can be used to specify the attributes of this resource.
 
 .RS 2m
 .TP 2m

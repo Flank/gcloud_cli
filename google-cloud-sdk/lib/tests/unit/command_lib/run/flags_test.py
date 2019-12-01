@@ -100,7 +100,6 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     self.service = service.Service.New(
         self.mock_serverless_client, self.namespace.namespacesId)
     self.service.name = 'myservice'
-    self.config = self.service.configuration
     self.metadata = self.service.metadata
     self.StartObjectPatch(
         name_generator,
@@ -115,37 +114,36 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testCpu(self):
     self.args.cpu = '1m'
     self._GetAndApplyChanges()
-    self.assertEquals(len(self.changes), 1)
-    self.assertEquals('1m', self.config.resource_limits['cpu'])
-
-  def testConcurrencyEnum(self):
-    self.args.concurrency = 'Single'
-    self._GetAndApplyChanges()
-    self.AssertErrContains('deprecated')
-    self.assertEquals(len(self.changes), 1)
-    self.assertEquals('Single', self.config.deprecated_string_concurrency)
-    self.assertIsNone(self.config.concurrency)
+    self.assertEqual(len(self.changes), 1)
+    self.assertEqual('1m', self.service.template.resource_limits['cpu'])
 
   def testConcurrencyDefault(self):
     self.args.concurrency = 'default'
     self._GetAndApplyChanges()
-    self.assertEquals(len(self.changes), 1)
-    self.assertIsNone(self.config.deprecated_string_concurrency)
-    self.assertIsNone(self.config.concurrency)
+    self.assertEqual(len(self.changes), 1)
+    self.assertIsNone(self.service.template.concurrency)
 
   def testServiceAccount(self):
     self.args.service_account = 'test@project.iam.gserviceaccount.com'
     self._GetAndApplyChanges()
     self.assertEqual(len(self.changes), 1)
-    self.assertEqual(self.config.service_account, self.args.service_account)
+    self.assertEqual(self.service.template.service_account,
+                     self.args.service_account)
 
   @parameterized.parameters(['0', '1', '3'])
   def testConcurrencyNumeric(self, concurrency):
     self.args.concurrency = concurrency
     self._GetAndApplyChanges()
-    self.assertEquals(len(self.changes), 1)
-    self.assertEquals(self.config.concurrency, int(concurrency))
-    self.assertIsNone(self.config.deprecated_string_concurrency)
+    self.assertEqual(len(self.changes), 1)
+    self.assertEqual(self.service.template.concurrency, int(concurrency))
+
+  @parameterized.parameters('1', '123', '7', '65535', 'default')
+  def testConcurrencyValidValues(self, concurrency):
+    self.assertTrue(flags._ConcurrencyValue(concurrency))
+
+  @parameterized.parameters('0', '-1', 'bob', '', 'defaults')
+  def testConcurrencyInvalidValues(self, concurrency):
+    self.assertFalse(flags._ConcurrencyValue(concurrency))
 
   def testUpdateLabels(self):
     self.args.update_labels = {'asdf': 'tyte'}
@@ -170,16 +168,17 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testValidTimeoutDuration(self, timeout):
     self.args.timeout = timeout
     self._GetAndApplyChanges()
-    self.assertEquals(len(self.changes), 1)
-    self.assertEquals(self.config.timeout,
-                      int(times.ParseDuration(timeout).total_seconds))
+    self.assertEqual(len(self.changes), 1)
+    self.assertEqual(
+        self.service.template.timeout,
+        int(times.ParseDuration(timeout).total_seconds))
 
   @parameterized.parameters(['2', '5'])
   def testValidTimeoutNumber(self, timeout):
     self.args.timeout = timeout
     self._GetAndApplyChanges()
-    self.assertEquals(len(self.changes), 1)
-    self.assertEquals(self.config.timeout, int(timeout))
+    self.assertEqual(len(self.changes), 1)
+    self.assertEqual(self.service.template.timeout, int(timeout))
 
   @parameterized.parameters(['2.0', '@^$%4', 'abcd'])
   def testInvalidTimeoutDurationSyntaxError(self, timeout):
@@ -206,8 +205,16 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
   def testRevisionSuffix(self, suffix):
     self.args.revision_suffix = suffix
     self._GetAndApplyChanges()
+    self.assertEqual(self.service.template.name, 'myservice-{}'.format(
+        suffix))
     self.assertEqual(len(self.changes), 1)
-    self.assertEqual(self.config.template.name, 'myservice-{}'.format(
+
+  @parameterized.parameters(['suffix', 'revision-1'])
+  def testRevisionSuffixWithPreviousName(self, suffix):
+    self.args.revision_suffix = suffix
+    self.service.template.name = 'myservice-oldname'
+    self._GetAndApplyChanges()
+    self.assertEqual(self.service.template.name, 'myservice-{}'.format(
         suffix))
     self.assertEqual(len(self.changes), 1)
 
@@ -289,50 +296,58 @@ class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
     enable_mock.assert_called_once_with('fake-project', 'api_token')
 
   def testContainerCommand(self):
-    self.args.command = 'some/command'
+    self.args.command = ['some/command']
     self._GetAndApplyChanges()
-    self.assertEqual(self.config.template.container.command, ['some/command'])
+    self.assertEqual(self.service.template.container.command, ['some/command'])
 
   def testArgsCommand(self):
-    self.args.args = '--flag value'
+    self.args.args = ['--flag', 'value']
     self._GetAndApplyChanges()
-    self.assertEqual(self.config.template.container.args, ['--flag', 'value'])
+    self.assertEqual(self.service.template.container.args, ['--flag', 'value'])
 
   def testSecrets(self):
     self.args.set_secrets = {'/my/path': 'mysecret', 'VAR': 'mysecret:key'}
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
     self._GetAndApplyChanges()
     self.assertDictEqual({'/my/path': 'mysecret-genr8d'},
-                         dict(self.config.template.volume_mounts.secrets))
+                         dict(self.service.template.volume_mounts.secrets))
     self.assertDictEqual({
         'mysecret-genr8d':
             self.serverless_messages.SecretVolumeSource(
                 secretName='mysecret')
-    }, dict(self.config.template.volumes.secrets))
+    }, dict(self.service.template.volumes.secrets))
     self.assertDictEqual({
         'VAR':
             self.serverless_messages.EnvVarSource(
                 secretKeyRef=self.serverless_messages.SecretKeySelector(
                     name='mysecret', key='key'))
-    }, dict(self.config.template.env_vars.secrets))
+    }, dict(self.service.template.env_vars.secrets))
 
   def testConfigMaps(self):
     self.args.set_config_maps = {'/my/path': 'myconfig', 'VAR': 'myconfig:key'}
     self.StartObjectPatch(self.args, 'IsSpecified', return_value=True)
     self._GetAndApplyChanges()
     self.assertDictEqual({'/my/path': 'myconfig-genr8d'},
-                         dict(self.config.template.volume_mounts.config_maps))
+                         dict(self.service.template.volume_mounts.config_maps))
     self.assertDictEqual({
         'myconfig-genr8d':
             self.serverless_messages.ConfigMapVolumeSource(
                 name='myconfig')
-    }, dict(self.config.template.volumes.config_maps))
+    }, dict(self.service.template.volumes.config_maps))
     self.assertDictEqual({
         'VAR':
             self.serverless_messages.EnvVarSource(
                 configMapKeyRef=self.serverless_messages.ConfigMapKeySelector(
                     name='myconfig', key='key'))
-    }, dict(self.config.template.env_vars.config_maps))
+    }, dict(self.service.template.env_vars.config_maps))
+
+  @parameterized.parameters('1', '123', '7', '65535', 'default')
+  def testContainerPortValidValues(self, port_str):
+    self.assertTrue(flags._PortValue(port_str))
+
+  @parameterized.parameters('0', '-1', 'bob', '65536', '', 'defaults')
+  def testContainerPortInvalidValues(self, port_str):
+    self.assertFalse(flags._PortValue(port_str))
 
 
 class GetRegionTest(base.ServerlessBase,
@@ -341,7 +356,6 @@ class GetRegionTest(base.ServerlessBase,
 
   def SetUp(self):
     properties.VALUES.run.region.Set('serverless-config-region')
-    properties.VALUES.compute.region.Set('compute-config-region')
     self.args = parser_extensions.Namespace()
 
   def testGetFromFlag(self):
@@ -352,11 +366,6 @@ class GetRegionTest(base.ServerlessBase,
     self.assertEqual(
         'serverless-config-region', flags.GetRegion(self.args))
 
-  def testGetFromComputeConfig(self):
-    properties.VALUES.run.region.Set(None)
-    self.assertEqual('compute-config-region',
-                     flags.GetRegion(self.args, prompt=True))
-
   def testGetFromPrompt(self):
     with mock.patch(
         'googlecloudsdk.api_lib.run.global_methods.GetServerlessClientInstance',
@@ -365,7 +374,6 @@ class GetRegionTest(base.ServerlessBase,
           'googlecloudsdk.api_lib.run.global_methods.ListRegions',
           return_value=[base.DEFAULT_REGION]):
         properties.VALUES.run.region.Set(None)
-        properties.VALUES.compute.region.Set(None)
 
         fake_idx = 0
         self.WriteInput('{}\n'.format(fake_idx + 1))
@@ -445,12 +453,6 @@ class ValidationsTest(test_case.TestCase):
       args.region = 'us-central1'
       flags.VerifyGKEFlags(args)
 
-  def testVerifyGKEFlagsRevisionSuffix(self):
-    with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
-      args.revision_suffix = 'revision-1'
-      flags.VerifyGKEFlags(args)
-
   def testVerifyGKEFlagsKubeconfig(self):
     with self.assertRaises(exceptions.ConfigurationError):
       args = mock.Mock()
@@ -515,12 +517,6 @@ class ValidationsTest(test_case.TestCase):
     with self.assertRaises(exceptions.ConfigurationError):
       args = mock.Mock()
       args.region = 'us-central1'
-      flags.VerifyKubernetesFlags(args)
-
-  def testVerifyKuberetesFlagsRevisionSuffix(self):
-    with self.assertRaises(exceptions.ConfigurationError):
-      args = mock.Mock()
-      args.revision_suffix = 'revision-1'
       flags.VerifyKubernetesFlags(args)
 
   def testVerifyKuberetesFlagsCluster(self):

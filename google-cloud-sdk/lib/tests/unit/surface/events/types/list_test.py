@@ -35,21 +35,22 @@ class TypesListTestAlpha(base.ServerlessSurfaceBase):
         custom_resource_definition.SourceCustomResourceDefinition.New(
             self.mock_crd_client, 'fake-project')
         for _ in range(num_sources)]
+    self.event_types = []
     for i, crd in enumerate(self.source_crds):
+      crd.spec.names = self.crd_messages.CustomResourceDefinitionNames(
+          kind='SourceKind{}'.format(i))
       event_types = []
       for j in range(num_event_types_per_source):
         event_types.append(
-            self._EventTypeAdditionalProperty(
-                'et{}-{}'.format(i, j), 'desc{}{}'.format(i, j),
-                'google.source.{}.et.{}'.format(i, j)))
-      crd.spec.validation = self.crd_messages.CustomResourceValidation(
-          openAPIV3Schema=self._SourceSchemaProperties('Source{}'.format(i),
-                                                       event_types))
-    self.event_types = []
-    for crd in self.source_crds:
-      self.event_types.extend(crd.event_types)
-    (self.operations.ListSourceCustomResourceDefinitions
-     .return_value) = self.source_crds
+            custom_resource_definition.EventType(
+                crd,
+                type='google.source.{}.et.{}'.format(i, j),
+                description='desc{}{}'.format(i, j)))
+      crd.event_types = event_types
+      self.event_types.extend(event_types)
+
+    self.operations.ListSourceCustomResourceDefinitions.return_value = (
+        self.source_crds)
 
   def testListFailsNonGKE(self):
     """Event Types are not yet supported on managed Cloud Run."""
@@ -68,26 +69,26 @@ class TypesListTestAlpha(base.ServerlessSurfaceBase):
     self.assertEqual(out, self.event_types)
     self.AssertOutputEquals(
         """TYPE CATEGORY DESCRIPTION
-           google.source.0.et.0 Source0 desc00
-           google.source.0.et.1 Source0 desc01
-           google.source.0.et.2 Source0 desc02
-           google.source.1.et.0 Source1 desc10
-           google.source.1.et.1 Source1 desc11
-           google.source.1.et.2 Source1 desc12
+           google.source.0.et.0 SourceKind0 desc00
+           google.source.0.et.1 SourceKind0 desc01
+           google.source.0.et.2 SourceKind0 desc02
+           google.source.1.et.0 SourceKind1 desc10
+           google.source.1.et.1 SourceKind1 desc11
+           google.source.1.et.2 SourceKind1 desc12
         """,
         normalize_space=True)
 
   def testListWithCategory(self):
     """Two event types are listable."""
     self._MakeEventTypes(num_sources=3, num_event_types_per_source=3)
-    self.Run('events types list --category=Source0 --platform=gke '
+    self.Run('events types list --category=SourceKind0 --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
 
     self.operations.ListSourceCustomResourceDefinitions.assert_called_once()
     self.AssertOutputEquals(
         """TYPE CATEGORY DESCRIPTION
-           google.source.0.et.0 Source0 desc00
-           google.source.0.et.1 Source0 desc01
-           google.source.0.et.2 Source0 desc02
+           google.source.0.et.0 SourceKind0 desc00
+           google.source.0.et.1 SourceKind0 desc01
+           google.source.0.et.2 SourceKind0 desc02
         """,
         normalize_space=True)

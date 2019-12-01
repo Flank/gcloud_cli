@@ -38,7 +38,9 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        Name of the instance to set metadata on.
+        Name of the instance to set metadata on. For details on valid instance
+        names, refer to the criteria documented under the field 'name' at:
+        https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 FLAGS
      --metadata=KEY=VALUE,[KEY=VALUE,...]

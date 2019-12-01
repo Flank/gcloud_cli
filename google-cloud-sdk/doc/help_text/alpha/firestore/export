@@ -42,11 +42,24 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To export all collection groups to mybucket in objects prefixed with
+    my/path, run:
+
+        $ gcloud alpha firestore export gs://mybucket/my/path
+
+    To export a specific set of collections groups asynchronously, run:
+
+        $ gcloud alpha firestore export gs://mybucket/my/path \
+            --collection-ids='specific collection group1','specific
+         collection group2' --async
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud firestore export
         $ gcloud beta firestore export
 

@@ -142,7 +142,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
     result = self.Run(
         'compute sole-tenancy node-groups create my-node-group '
         '--node-template my-template --target-size 3 '
-        '--autoscaling-policy mode=on,min-size=10,max-size=60 '
+        '--mode=on --min-size=10 --max-size=60 '
         '--description "Frontend Group" --zone ' + self.zone)
 
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
@@ -150,21 +150,20 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
 
   def testCreate_AutoscalingPolicyNoMode(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --autoscaling-policy: Key [mode] required in dict arg but '
-        'not provided'):
+        'argument --max-size --min-size: --mode must be specified.'):
       self.Run(
           'compute sole-tenancy node-groups create my-node-group '
           '--node-template my-template --target-size 3 '
-          '--autoscaling-policy min-size=10,max-size=60 '
+          '--min-size=10 --max-size=60 '
           '--description "Frontend Group" --zone ' + self.zone)
 
   def testCreate_AutoscalingPolicyWrongMode(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --autoscaling-policy: [mode] must be one of [off,on]'):
+        'argument --mode: [mode] must be one of [off,on]'):
       self.Run(
           'compute sole-tenancy node-groups create my-node-group '
           '--node-template my-template --target-size 3 '
-          '--autoscaling-policy mode=foo '
+          '--mode=foo '
           '--description "Frontend Group" --zone ' + self.zone)
 
   def testCreate_AutoscalingPolicyModeMin(self):
@@ -179,7 +178,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
     result = self.Run(
         'compute sole-tenancy node-groups create my-node-group '
         '--node-template my-template --target-size 3 '
-        '--autoscaling-policy mode=on,min-size=10 '
+        '--mode=on --min-size=10 '
         '--description "Frontend Group" --zone ' + self.zone)
 
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])
@@ -197,7 +196,7 @@ class NodeGroupsCreateTestAlpha(NodeGroupsCreateTestBeta):
     result = self.Run(
         'compute sole-tenancy node-groups create my-node-group '
         '--node-template my-template --target-size 3 '
-        '--autoscaling-policy mode=on,max-size=60 '
+        '--mode=on --max-size=60 '
         '--description "Frontend Group" --zone ' + self.zone)
 
     self.CheckRequests([(self.compute.nodeGroups, 'Insert', request)])

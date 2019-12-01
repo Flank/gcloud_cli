@@ -43,7 +43,7 @@ def _DetailedHelp():
 
 
 def _AddArgs(parser, include_alpha_logging, include_l7_internal_load_balancing,
-             include_private_ipv6_access):
+             include_private_ipv6_access, include_aggregate_purpose):
   """Add subnetwork create arguments to parser."""
   parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
 
@@ -103,12 +103,11 @@ def _AddArgs(parser, include_alpha_logging, include_l7_internal_load_balancing,
       logs are reported and 0.0 means no logs are reported. Default is 0.5
       which means half of all collected logs are reported.
       """)
-  flags.AddLoggingMetadata(parser, messages)
 
   if include_alpha_logging:
     messages = apis.GetMessagesModule('compute',
                                       compute_api.COMPUTE_ALPHA_API_VERSION)
-    flags.AddLoggingAggregationIntervalAlpha(parser, messages)
+    flags.AddLoggingAggregationIntervalDeprecated(parser, messages)
     parser.add_argument(
         '--flow-sampling',
         type=arg_parsers.BoundedFloat(lower_bound=0.0, upper_bound=1.0),
@@ -119,20 +118,52 @@ def _AddArgs(parser, include_alpha_logging, include_l7_internal_load_balancing,
         logs are reported and 0.0 means no logs are reported. Default is 0.5
         which means half of all collected logs are reported.
         """)
-    flags.AddLoggingMetadataAlpha(parser, messages)
+    flags.AddLoggingMetadataDeprecated(parser, messages)
 
+    parser.add_argument(
+        '--logging-filter-expr',
+        help="""\
+        Can only be specified if VPC flow logs for this subnetwork is enabled.
+        Export filter used to define which VPC flow logs should be logged.
+        """)
+    flags.AddLoggingMetadataAlpha(parser, messages)
+    parser.add_argument(
+        '--logging-metadata-fields',
+        type=arg_parsers.ArgList(),
+        metavar='METADATA_FIELD',
+        default=None,
+        help="""\
+        Can only be specified if VPC flow logs for this subnetwork is enabled
+        and "metadata" is set to CUSTOM_METADATA. The custom list of metadata
+        fields that should be added to reported VPC flow logs.
+        """)
+  else:
+    flags.AddLoggingMetadata(parser, messages)
+
+  purpose_choices = {
+      'PRIVATE':
+          'Regular user created or automatically created subnet.',
+      'INTERNAL_HTTPS_LOAD_BALANCER':
+          'Reserved for Internal HTTP(S) Load Balancing.',
+  }
+
+  if include_aggregate_purpose:
+    purpose_choices['AGGREGATE'] = (
+        'Reserved for Aggregate Ranges used for aggregating '
+        'private subnetworks.')
+
+  # Subnetwork purpose is introduced with L7ILB feature. Aggregate purpose
+  # will have to be enabled for a given release track only after L7ILB feature
+  # is enabled for that release track. Hence if include_aggregate_purpose
+  # true, this code assumes that L7ILB purpose is enabled.
   if include_l7_internal_load_balancing:
     parser.add_argument(
         '--purpose',
-        choices={
-            'PRIVATE':
-                'Regular user created or automatically created subnet.',
-            'INTERNAL_HTTPS_LOAD_BALANCER':
-                'Reserved for Internal HTTP(S) Load Balancing.'
-        },
-        type=lambda x: x.replace('-', '_').upper(),
+        choices=purpose_choices,
+        type=arg_utils.ChoiceToEnumName,
         help='The purpose of this subnetwork.')
 
+  if include_l7_internal_load_balancing:
     parser.add_argument(
         '--role',
         choices={
@@ -191,7 +222,7 @@ def GetPrivateIpv6GoogleAccessTypeFlagMapper(messages):
 
 def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
                       include_alpha_logging, include_l7_internal_load_balancing,
-                      include_private_ipv6_access):
+                      include_private_ipv6_access, include_aggregate_purpose):
   """Create the subnet resource."""
   subnetwork = messages.Subnetwork(
       name=subnet_ref.Name(),
@@ -203,7 +234,9 @@ def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
   if (args.enable_flow_logs is not None or
       args.logging_aggregation_interval is not None or
       args.logging_flow_sampling is not None or
-      args.logging_metadata is not None):
+      args.logging_metadata is not None or
+      (include_alpha_logging and args.logging_filter_expr is not None) or
+      (include_alpha_logging and args.logging_metadata_fields is not None)):
     log_config = messages.SubnetworkLogConfig(enable=args.enable_flow_logs)
     if args.logging_aggregation_interval:
       log_config.aggregationInterval = flags.GetLoggingAggregationIntervalArg(
@@ -211,8 +244,16 @@ def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
     if args.logging_flow_sampling is not None:
       log_config.flowSampling = args.logging_flow_sampling
     if args.logging_metadata:
-      log_config.metadata = flags.GetLoggingMetadataArg(
-          messages).GetEnumForChoice(args.logging_metadata)
+      if include_alpha_logging:
+        log_config.metadata = flags.GetLoggingMetadataArgAlpha(
+            messages).GetEnumForChoice(args.logging_metadata)
+      else:
+        log_config.metadata = flags.GetLoggingMetadataArg(
+            messages).GetEnumForChoice(args.logging_metadata)
+    if include_alpha_logging and args.logging_filter_expr is not None:
+      log_config.filterExpr = args.logging_filter_expr
+    if include_alpha_logging and args.logging_metadata_fields is not None:
+      log_config.metadataFields = args.logging_metadata_fields
     subnetwork.logConfig = log_config
 
   if include_alpha_logging:
@@ -224,13 +265,17 @@ def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
           messages.SubnetworkLogConfig(enable=args.enable_flow_logs))
       if args.aggregation_interval:
         log_config.aggregationInterval = (
-            flags.GetLoggingAggregationIntervalArgAlpha(
+            flags.GetLoggingAggregationIntervalArgDeprecated(
                 messages).GetEnumForChoice(args.aggregation_interval))
       if args.flow_sampling is not None:
         log_config.flowSampling = args.flow_sampling
       if args.metadata:
-        log_config.metadata = flags.GetLoggingMetadataArgAlpha(
+        log_config.metadata = flags.GetLoggingMetadataArgDeprecated(
             messages).GetEnumForChoice(args.metadata)
+      if args.logging_filter_expr is not None:
+        log_config.filterExpr = args.logging_filter_expr
+      if args.logging_metadata_fields is not None:
+        log_config.metadataFields = args.logging_metadata_fields
       subnetwork.logConfig = log_config
 
   if include_l7_internal_load_balancing:
@@ -245,6 +290,20 @@ def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
       subnetwork.logConfig = None
     if getattr(args, 'role', None):
       subnetwork.role = messages.Subnetwork.RoleValueValuesEnum(args.role)
+
+  # At present aggregate purpose is available only in alpha whereas
+  # https_load_balancer is available in Beta. Given Aggregate Purpose Enum
+  # is not available in Beta, the code duplication below is necessary.
+  if include_aggregate_purpose:
+    if args.purpose:
+      subnetwork.purpose = messages.Subnetwork.PurposeValueValuesEnum(
+          args.purpose)
+      if (subnetwork.purpose ==
+          messages.Subnetwork.PurposeValueValuesEnum.AGGREGATE):
+        # Clear unsupported fields in the subnet resource
+        subnetwork.privateIpGoogleAccess = None
+        subnetwork.enableFlowLogs = None
+        subnetwork.logConfig = None
 
   if include_private_ipv6_access:
     if args.enable_private_ipv6_access is not None:
@@ -261,7 +320,8 @@ def _CreateSubnetwork(messages, subnet_ref, network_ref, args,
 
 
 def _Run(args, holder, include_alpha_logging,
-         include_l7_internal_load_balancing, include_private_ipv6_access):
+         include_l7_internal_load_balancing, include_private_ipv6_access,
+         include_aggregate_purpose):
   """Issues a list of requests necessary for adding a subnetwork."""
   client = holder.client
 
@@ -276,7 +336,8 @@ def _Run(args, holder, include_alpha_logging,
   subnetwork = _CreateSubnetwork(client.messages, subnet_ref, network_ref, args,
                                  include_alpha_logging,
                                  include_l7_internal_load_balancing,
-                                 include_private_ipv6_access)
+                                 include_private_ipv6_access,
+                                 include_aggregate_purpose)
   request = client.messages.ComputeSubnetworksInsertRequest(
       subnetwork=subnetwork,
       region=subnet_ref.region,
@@ -302,6 +363,7 @@ class Create(base.CreateCommand):
   _include_alpha_logging = False
   _include_l7_internal_load_balancing = False
   _include_private_ipv6_access = False
+  _include_aggregate_purpose = False
 
   detailed_help = _DetailedHelp()
 
@@ -309,14 +371,15 @@ class Create(base.CreateCommand):
   def Args(cls, parser):
     _AddArgs(parser, cls._include_alpha_logging,
              cls._include_l7_internal_load_balancing,
-             cls._include_private_ipv6_access)
+             cls._include_private_ipv6_access, cls._include_aggregate_purpose)
 
   def Run(self, args):
     """Issues a list of requests necessary for adding a subnetwork."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     return _Run(args, holder, self._include_alpha_logging,
                 self._include_l7_internal_load_balancing,
-                self._include_private_ipv6_access)
+                self._include_private_ipv6_access,
+                self._include_aggregate_purpose)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -330,3 +393,4 @@ class CreateAlpha(CreateBeta):
 
   _include_alpha_logging = True
   _include_private_ipv6_access = True
+  _include_aggregate_purpose = True

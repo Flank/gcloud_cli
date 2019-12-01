@@ -36,6 +36,7 @@ from tests.lib.surface.compute import test_resources
 
 import mock
 
+# TODO(b/143895166) Clean up this test file.
 
 _DEFAULT_IMAGE = (
     '{compute_uri}/projects/debian-cloud/global/images/family/debian-9')
@@ -74,6 +75,8 @@ def SetUp(test, api):
   test._default_access_config = test.messages.AccessConfig(
       name='external-nat', type=test._one_to_one_nat)
 
+  test._MakeInstanceTemplate = MakeInstanceTemplate(test)
+
   random.seed(1)
   system_random_patcher = mock.patch(
       'random.SystemRandom', new=lambda: random)
@@ -96,6 +99,51 @@ def SetUp(test, api):
       test.messages.ComputeImagesGetFromFamilyRequest(
           family='debian-9',
           project='debian-cloud'))]
+
+
+def MakeInstanceTemplate(test):
+  """Returns a function that creates default templates given custom values.
+
+  Args:
+    test: Test class to create custom templates for.
+  """
+
+  def _make_template(**kwargs):
+    """Creates templates based on default test class properties."""
+    default_disk = test.messages.AttachedDisk(
+        autoDelete=True,
+        boot=True,
+        initializeParams=test.messages.AttachedDiskInitializeParams(
+            sourceImage=test._default_image,),
+        mode=test.messages.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+        type=test.messages.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    default_metadata = test.messages.Metadata()
+    default_network_interface = test.messages.NetworkInterface(
+        accessConfigs=[test._default_access_config],
+        network=test._default_network)
+    default_service_account = test.messages.ServiceAccount(
+        email='default', scopes=_DEFAULT_SCOPES)
+    default_scheduling = test.messages.Scheduling(automaticRestart=True)
+
+    template = test.messages.InstanceTemplate(
+        name='template-1',
+        description=kwargs.get('description', None),
+        properties=test.messages.InstanceProperties(
+            canIpForward=kwargs.get('canIpForward', False),
+            disks=kwargs.get('disks', [default_disk]),
+            machineType=kwargs.get('machineType', _DEFAULT_MACHINE_TYPE),
+            metadata=kwargs.get('metadata', default_metadata),
+            networkInterfaces=kwargs.get('networkInterfaces',
+                                         [default_network_interface]),
+            serviceAccounts=kwargs.get('serviceAccounts',
+                                       [default_service_account]),
+            scheduling=kwargs.get('scheduling', default_scheduling),
+            guestAccelerators=kwargs.get('guestAccelerators', []),
+            minCpuPlatform=kwargs.get('minCpuPlatform', None)))
+
+    return template
+
+  return _make_template
 
 
 class InstanceTemplatesCreateTest(test_base.BaseTest):
@@ -163,38 +211,20 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --disk name=disk-1,boot=yes
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=True,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    source=('disk-1'),
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    source=('disk-2'),
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=True,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            source=('disk-1'),
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            source=('disk-2'),
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+    ])
 
     self.CheckRequests(
         [(self.compute.instanceTemplates,
@@ -224,58 +254,33 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --local-ssd interface=NVME
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=True,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    source=('disk-1'),
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    source=('disk-2'),
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=True,
-                    initializeParams=(
-                        m.AttachedDiskInitializeParams(
-                            diskType='local-ssd')),
-                    mode=(m.AttachedDisk
-                          .ModeValueValuesEnum.READ_WRITE),
-                    type=(m.AttachedDisk
-                          .TypeValueValuesEnum.SCRATCH)),
-                m.AttachedDisk(
-                    autoDelete=True,
-                    initializeParams=(
-                        m.AttachedDiskInitializeParams(
-                            diskType='local-ssd')),
-                    interface=(m.AttachedDisk
-                               .InterfaceValueValuesEnum.NVME),
-                    mode=(m.AttachedDisk
-                          .ModeValueValuesEnum.READ_WRITE),
-                    type=(m.AttachedDisk
-                          .TypeValueValuesEnum.SCRATCH)),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=True,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            source=('disk-1'),
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            source=('disk-2'),
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=True,
+            initializeParams=(m.AttachedDiskInitializeParams(
+                diskType='local-ssd')),
+            mode=(m.AttachedDisk.ModeValueValuesEnum.READ_WRITE),
+            type=(m.AttachedDisk.TypeValueValuesEnum.SCRATCH)),
+        m.AttachedDisk(
+            autoDelete=True,
+            initializeParams=(m.AttachedDiskInitializeParams(
+                diskType='local-ssd')),
+            interface=(m.AttachedDisk.InterfaceValueValuesEnum.NVME),
+            mode=(m.AttachedDisk.ModeValueValuesEnum.READ_WRITE),
+            type=(m.AttachedDisk.TypeValueValuesEnum.SCRATCH)),
+    ])
 
     self.CheckRequests(
         [(self.compute.instanceTemplates,
@@ -348,33 +353,17 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --boot-disk-size 199GB
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    diskSizeGb=199,
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                diskSizeGb=199,
+                sourceImage=self._default_image,
+            ),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -397,32 +386,7 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --can-ip-forward
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=True,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(canIpForward=True)
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -441,33 +405,7 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --description "Hakuna Matata"
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        description=('Hakuna Matata'),
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(description='Hakuna Matata')
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -486,33 +424,13 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --scopes compute-rw
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=[
-                        'https://www.googleapis.com/auth/compute',
-                    ]),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(serviceAccounts=[
+        m.ServiceAccount(
+            email='default',
+            scopes=[
+                'https://www.googleapis.com/auth/compute',
+            ]),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -533,31 +451,9 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
 
     expected_scopes = sorted(_DEFAULT_SCOPES +
                              ['https://www.googleapis.com/auth/compute'])
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=expected_scopes),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(serviceAccounts=[
+        m.ServiceAccount(email='default', scopes=expected_scopes),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -576,28 +472,7 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --no-scopes
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[],
-            scheduling=m.Scheduling(automaticRestart=True)
-        )
-    )
+    template = self._MakeInstanceTemplate(serviceAccounts=[])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -616,35 +491,14 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --scopes compute-rw,https://www.googleapis.com/auth/devstorage.full_control
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=[
-                        'https://www.googleapis.com/auth/compute',
-                        ('https://www.googleapis.com/auth/devstorage'
-                         '.full_control'),
-                    ]),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True)
-        )
-    )
+    template = self._MakeInstanceTemplate(serviceAccounts=[
+        m.ServiceAccount(
+            email='default',
+            scopes=[
+                'https://www.googleapis.com/auth/compute',
+                'https://www.googleapis.com/auth/devstorage.full_control',
+            ]),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -664,35 +518,15 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --service-account 1234@project.gserviceaccount.com
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='1234@project.gserviceaccount.com',
-                    scopes=[
-                        'https://www.googleapis.com/auth/compute',
-                        ('https://www.googleapis.com/auth/devstorage'
-                         '.full_control'),
-                    ]),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True)
-        )
-    )
+    template = self._MakeInstanceTemplate(serviceAccounts=[
+        m.ServiceAccount(
+            email='1234@project.gserviceaccount.com',
+            scopes=[
+                'https://www.googleapis.com/auth/compute',
+                ('https://www.googleapis.com/auth/devstorage'
+                 '.full_control'),
+            ]),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -723,32 +557,9 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --no-address
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(accessConfigs=[], network=self._default_network)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -772,32 +583,10 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
         type=self._one_to_one_nat,
         natIP='74.125.28.139')
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[access_config], network=self._default_network)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -839,35 +628,17 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --image my-image
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=(
-                        '{compute}/projects/'
-                        'my-project/global/images/my-image'.format(
-                            compute=self.compute_uri)),
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=('{compute}/projects/'
+                             'my-project/global/images/my-image'.format(
+                                 compute=self.compute_uri)),),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         [(self.compute.images,
@@ -902,34 +673,17 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --image-project some-other-project
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=(
-                        '{compute}/projects/some-other-project/global/images'
-                        '/other-image'.format(compute=self.compute_uri)),
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=(
+                    '{compute}/projects/some-other-project/global/images'
+                    '/other-image'.format(compute=self.compute_uri)),),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         [(self.compute.images,
@@ -965,34 +719,17 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --image-project {compute}/projects/some-other-project
           """.format(compute=self.compute_uri))
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=(
-                        '{compute}/projects/some-other-project/global/images'
-                        '/other-image'.format(compute=self.compute_uri)),
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=(
+                    '{compute}/projects/some-other-project/global/images'
+                    '/other-image'.format(compute=self.compute_uri)),),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         [(self.compute.images,
@@ -1075,38 +812,13 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --metadata x=y,z=1,a=b,c=d
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(
-                items=[
-                    m.Metadata.ItemsValueListEntry(key='a', value='b'),
-                    m.Metadata.ItemsValueListEntry(key='c', value='d'),
-                    m.Metadata.ItemsValueListEntry(key='x', value='y'),
-                    m.Metadata.ItemsValueListEntry(key='z', value='1'),
-                ]),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(
+        metadata=m.Metadata(items=[
+            m.Metadata.ItemsValueListEntry(key='a', value='b'),
+            m.Metadata.ItemsValueListEntry(key='c', value='d'),
+            m.Metadata.ItemsValueListEntry(key='x', value='y'),
+            m.Metadata.ItemsValueListEntry(key='z', value='1'),
+        ]))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1131,38 +843,12 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --metadata-from-file x={},y={}
         """.format(metadata_file1, metadata_file2))
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(
-                items=[
-                    m.Metadata.ItemsValueListEntry(
-                        key='x', value='hello'),
-                    m.Metadata.ItemsValueListEntry(
-                        key='y', value='hello\nand\ngoodbye'),
-                ]),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(
+        metadata=m.Metadata(items=[
+            m.Metadata.ItemsValueListEntry(key='x', value='hello'),
+            m.Metadata.ItemsValueListEntry(
+                key='y', value='hello\nand\ngoodbye'),
+        ]))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1188,44 +874,15 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --metadata-from-file x={},y={}
         """.format(metadata_file1, metadata_file2))
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(
-                items=[
-                    m.Metadata.ItemsValueListEntry(
-                        key='a', value='x'),
-                    m.Metadata.ItemsValueListEntry(
-                        key='b', value='y'),
-                    m.Metadata.ItemsValueListEntry(
-                        key='x', value='hello'),
-                    m.Metadata.ItemsValueListEntry(
-                        key='y', value='hello\nand\ngoodbye'),
-                    m.Metadata.ItemsValueListEntry(
-                        key='z', value='d'),
-                ]),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(
+        metadata=m.Metadata(items=[
+            m.Metadata.ItemsValueListEntry(key='a', value='x'),
+            m.Metadata.ItemsValueListEntry(key='b', value='y'),
+            m.Metadata.ItemsValueListEntry(key='x', value='hello'),
+            m.Metadata.ItemsValueListEntry(
+                key='y', value='hello\nand\ngoodbye'),
+            m.Metadata.ItemsValueListEntry(key='z', value='d'),
+        ]))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1268,34 +925,58 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --network some-other-network
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=(
-                    '{compute}/projects/my-project/global/networks/'
-                    'some-other-network'.format(compute=self.compute_uri)))],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[self._default_access_config],
+            network=('{compute}/projects/my-project/global/networks/'
+                     'some-other-network'.format(compute=self.compute_uri)))
+    ])
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
     )
+
+  def testWithPrivateIP(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+          --private-network-ip=1.1.1.1
+          """)
+
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[self._default_access_config],
+            network=self._default_network,
+            networkIP='1.1.1.1')
+    ])
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
+  def testWithPrivateNetworkInterfaceIP(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+          --network-interface=private-network-ip=1.1.1.1
+          """)
+
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[],
+            network=self._default_network,
+            networkIP='1.1.1.1')
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1314,32 +995,8 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --no-restart-on-failure
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=False),
-        )
-    )
+    template = self._MakeInstanceTemplate(
+        scheduling=m.Scheduling(automaticRestart=False))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1367,36 +1024,11 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
     m = self.messages
     self.Run(cmd)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(
-                automaticRestart=True,
-                onHostMaintenance=(
-                    m.Scheduling.OnHostMaintenanceValueValuesEnum
-                    .TERMINATE)),
-        )
-    )
+    template = self._MakeInstanceTemplate(
+        scheduling=m.Scheduling(
+            automaticRestart=True,
+            onHostMaintenance=(
+                m.Scheduling.OnHostMaintenanceValueValuesEnum.TERMINATE)))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1613,40 +1245,21 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --disk name=disk-1
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,
-                    ),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-1'),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-1'),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1665,41 +1278,22 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --disk name=disk-1,mode=rw,device-name=x,boot=no
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,
-                    ),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    deviceName='x',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-1'),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ),
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            deviceName='x',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-1'),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1720,55 +1314,36 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --disk boot=no,device-name=z,name=disk-3,mode=rw
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,
-                    ),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    deviceName='x',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-1'),
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=False,
-                    deviceName='y',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-2'),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    deviceName='z',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-3'),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            deviceName='x',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-1'),
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=False,
+            deviceName='y',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-2'),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            deviceName='z',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-3'),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -1864,59 +1439,40 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --image image-1
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=True,
-                    deviceName='boot-disk',
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=(
-                            '{compute}/projects/my-project/global/images'
-                            '/image-1'.format(compute=self.compute_uri)),
-                        diskSizeGb=100,
-                        diskType='pd-ssd'),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    deviceName='x',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-1'),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    deviceName='y',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-2'),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    deviceName='z',
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source='disk-3'),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=True,
+            deviceName='boot-disk',
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=('{compute}/projects/my-project/global/images'
+                             '/image-1'.format(compute=self.compute_uri)),
+                diskSizeGb=100,
+                diskType='pd-ssd'),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            deviceName='x',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-1'),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            deviceName='y',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-2'),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            deviceName='z',
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+            source='disk-3'),
+    ])
 
     self.CheckRequests(
         [(self.compute.images,
@@ -1953,54 +1509,39 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --image {compute}/projects/my-project/global/images/my-image
         """.format(compute=self.compute_uri))
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=(
-                            '{compute}/'
-                            'projects/my-project/global/images/'
-                            'my-image'.format(compute=self.compute_uri)),
-                        diskType=(
-                            '{compute}/'
-                            'projects/my-project/zones/central1-a/diskTypes/'
-                            'pd-ssd'.format(compute=self.compute_uri)),
-                    ),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                    source=(
-                        '{compute}/'
+    template = self._MakeInstanceTemplate(
+        disks=[
+            m.AttachedDisk(
+                autoDelete=True,
+                boot=True,
+                initializeParams=m.AttachedDiskInitializeParams(
+                    sourceImage=('{compute}/'
+                                 'projects/my-project/global/images/'
+                                 'my-image'.format(compute=self.compute_uri)),
+                    diskType=('{compute}/'
+                              'projects/my-project/zones/central1-a/diskTypes/'
+                              'pd-ssd'.format(compute=self.compute_uri)),
+                ),
+                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+            m.AttachedDisk(
+                autoDelete=False,
+                boot=False,
+                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+                source=('{compute}/'
                         'projects/my-project/zones/central1-a/disks/'
                         'disk-1'.format(compute=self.compute_uri))),
-            ],
-            machineType=('{compute}/projects/'
-                         'my-project/zones/central1-a/machineTypes/'
-                         'n2-standard-1'.format(compute=self.compute_uri)),
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
+        ],
+        machineType=('{compute}/projects/'
+                     'my-project/zones/central1-a/machineTypes/'
+                     'n2-standard-1'.format(compute=self.compute_uri)),
+        networkInterfaces=[
+            m.NetworkInterface(
                 accessConfigs=[self._default_access_config],
                 network=('{compute}/projects/my-project/global/networks/'
-                         'some-other-network'.format(
-                             compute=self.compute_uri)))],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-
-        )
+                         'some-other-network'.format(compute=self.compute_uri)))
+        ],
     )
 
     self.CheckRequests(
@@ -2024,34 +1565,8 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
         compute instance-templates create template-1 --preemptible
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(
-                automaticRestart=False,
-                preemptible=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(
+        scheduling=m.Scheduling(automaticRestart=False, preemptible=True),)
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2069,36 +1584,10 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
             --accelerator type=nvidia-tesla-k80
           """)
     m = self.messages
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            guestAccelerators=[
-                m.AcceleratorConfig(
-                    acceleratorType='nvidia-tesla-k80',
-                    acceleratorCount=1)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(guestAccelerators=[
+        m.AcceleratorConfig(
+            acceleratorType='nvidia-tesla-k80', acceleratorCount=1)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2116,36 +1605,10 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
             --accelerator type=nvidia-tesla-k80,count=4
           """)
     m = self.messages
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            guestAccelerators=[
-                m.AcceleratorConfig(
-                    acceleratorType='nvidia-tesla-k80',
-                    acceleratorCount=4)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(guestAccelerators=[
+        m.AcceleratorConfig(
+            acceleratorType='nvidia-tesla-k80', acceleratorCount=4)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2248,36 +1711,15 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
           --region my-region
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[],
-                    network=('{compute}/projects/my-project/global/'
-                             'networks/my-network'.format(
-                                 compute=self.compute_uri)),
-                    subnetwork=(
-                        '{compute}/projects/my-project/regions/my-region/'
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[],
+            network=('{compute}/projects/my-project/global/'
+                     'networks/my-network'.format(compute=self.compute_uri)),
+            subnetwork=('{compute}/projects/my-project/regions/my-region/'
                         'subnetworks/my-subnetwork'.format(
                             compute=self.compute_uri)))
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),))
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2378,31 +1820,7 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
         --min-cpu-platform cpu-platform
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            minCpuPlatform='cpu-platform',
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[self._default_access_config],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),))
+    template = self._MakeInstanceTemplate(minCpuPlatform='cpu-platform')
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2421,37 +1839,17 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
         --network-tier PREMIUM
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[
+                m.AccessConfig(
+                    name='external-nat',
+                    networkTier=(self.messages.AccessConfig
+                                 .NetworkTierValueValuesEnum.PREMIUM),
+                    type=self._one_to_one_nat)
             ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[
-                        m.AccessConfig(
-                            name='external-nat',
-                            networkTier=(self.messages.AccessConfig.
-                                         NetworkTierValueValuesEnum.PREMIUM),
-                            type=self._one_to_one_nat)
-                    ],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ))
+            network=self._default_network)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2469,37 +1867,17 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
         --network-tier standard
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[
+                m.AccessConfig(
+                    name='external-nat',
+                    networkTier=(self.messages.AccessConfig
+                                 .NetworkTierValueValuesEnum.STANDARD),
+                    type=self._one_to_one_nat)
             ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[
-                        m.AccessConfig(
-                            name='external-nat',
-                            networkTier=(self.messages.AccessConfig.
-                                         NetworkTierValueValuesEnum.STANDARD),
-                            type=self._one_to_one_nat)
-                    ],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ))
+            network=self._default_network)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2572,38 +1950,13 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
     m = self.messages
 
     self.Run("""
-        compute instance-templates create template-custom-mt
+        compute instance-templates create template-1
           --custom-vm-type n2
           --custom-cpu 4
           --custom-memory 4096MiB
         """)
 
-    template = m.InstanceTemplate(
-        name='template-custom-mt',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType='n2-custom-4-4096',
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(machineType='n2-custom-4-4096')
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2619,38 +1972,13 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
     m = self.messages
 
     self.Run("""
-        compute instance-templates create template-custom-mt
+        compute instance-templates create template-1
           --custom-cpu 4
           --custom-memory 4096MiB
           --custom-extensions
         """)
 
-    template = m.InstanceTemplate(
-        name='template-custom-mt',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType='custom-4-4096-ext',
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(machineType='custom-4-4096-ext')
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2671,39 +1999,15 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --region my-region
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=(
-                    '{compute}/projects/my-project/global/'
-                    'networks/my-network'.format(
-                        compute=self.compute_uri)),
-                subnetwork=(
-                    '{compute}/projects/my-project/regions/my-region/'
-                    'subnetworks/my-subnetwork'.format(
-                        compute=self.compute_uri)))],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[self._default_access_config],
+            network=('{compute}/projects/my-project/global/'
+                     'networks/my-network'.format(compute=self.compute_uri)),
+            subnetwork=('{compute}/projects/my-project/regions/my-region/'
+                        'subnetworks/my-subnetwork'.format(
+                            compute=self.compute_uri)))
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2723,35 +2027,13 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --region my-region
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                subnetwork=(
-                    '{compute}/projects/my-project/regions/my-region/'
-                    'subnetworks/my-subnetwork'.format(
-                        compute=self.compute_uri)))],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[self._default_access_config],
+            subnetwork=('{compute}/projects/my-project/regions/my-region/'
+                        'subnetworks/my-subnetwork'.format(
+                            compute=self.compute_uri)))
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2781,35 +2063,19 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --image-family my-family
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
+    template = self._MakeInstanceTemplate(
+        disks=[
+            m.AttachedDisk(
                 autoDelete=True,
                 boot=True,
                 initializeParams=m.AttachedDiskInitializeParams(
                     sourceImage=(
                         '{compute}/projects/'
                         'my-project/global/images/family/my-family'.format(
-                            compute=self.compute_uri)),
-                ),
+                            compute=self.compute_uri)),),
                 mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+        ],)
 
     self.CheckRequests(
         [(self.compute.images,
@@ -2845,35 +2111,17 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --image-project some-other-project
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=(
-                        '{compute}/projects/some-other-project/global/images'
-                        '/family/other-family'
-                        .format(compute=self.compute_uri)),
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=(
+                    '{compute}/projects/some-other-project/global/images'
+                    '/family/other-family'.format(compute=self.compute_uri)),),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         [(self.compute.images,
@@ -2909,35 +2157,17 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --image-project {compute}/projects/some-other-project
           """.format(compute=self.compute_uri))
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=(
-                        '{compute}/projects/some-other-project/global/images'
-                        '/family/other-family'
-                        .format(compute=self.compute_uri)),
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=(
+                    '{compute}/projects/some-other-project/global/images'
+                    '/family/other-family'.format(compute=self.compute_uri)),),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         [(self.compute.images,
@@ -2958,48 +2188,32 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
     m = self.messages
 
     self.Run(
-        'compute instance-templates create template-create-disk '
+        'compute instance-templates create template-1 '
         '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
         'image-project=debian-cloud,description=testDescription')
 
-    template = m.InstanceTemplate(
-        name='template-create-disk',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        diskName='disk-1',
-                        description='testDescription',
-                        diskSizeGb=10,
-                        sourceImage=(self.compute_uri +
-                                     '/projects/debian-cloud/global/images'
-                                     '/debian-8'),
-                        diskType='SSD'),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[self._default_access_config],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ))
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            initializeParams=m.AttachedDiskInitializeParams(
+                diskName='disk-1',
+                description='testDescription',
+                diskSizeGb=10,
+                sourceImage=(self.compute_uri +
+                             '/projects/debian-cloud/global/images'
+                             '/debian-8'),
+                diskType='SSD'),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -3014,51 +2228,34 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
   def testWithMultipleCreateDisks(self):
     m = self.messages
 
-    self.Run('compute instance-templates create template-create-disk '
+    self.Run('compute instance-templates create template-1 '
              '  --create-disk type=SSD'
              '  --create-disk image=debian-8,image-project=debian-cloud')
 
-    template = m.InstanceTemplate(
-        name='template-create-disk',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        diskType='SSD'),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=(self.compute_uri +
-                                     '/projects/debian-cloud/global/images'
-                                     '/debian-8')),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[self._default_access_config],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ))
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            initializeParams=m.AttachedDiskInitializeParams(diskType='SSD'),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=False,
+            boot=False,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=(self.compute_uri +
+                             '/projects/debian-cloud/global/images'
+                             '/debian-8')),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -3071,10 +2268,10 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
     )
 
   def testMultipleNetworkInterfaceCards(self):
-    msg = self.messages
+    m = self.messages
 
     self.Run("""
-        compute instance-templates create hamlet
+        compute instance-templates create template-1
           --network-interface network=default,address=1.2.3.4
           --network-interface network=default,address=,network-tier=premium
           --network-interface network=some-net,address=8.8.8.8,network-tier=SELECT
@@ -3082,74 +2279,46 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --region central1
         """)
 
-    self.CheckRequests(
-        self.get_default_image_requests,
-        [(self.compute.instanceTemplates, 'Insert',
-          msg.ComputeInstanceTemplatesInsertRequest(
-              instanceTemplate=msg.InstanceTemplate(
-                  name='hamlet',
-                  properties=msg.InstanceProperties(
-                      canIpForward=False,
-                      disks=[
-                          msg.AttachedDisk(
-                              autoDelete=True,
-                              boot=True,
-                              initializeParams=msg.AttachedDiskInitializeParams(
-                                  sourceImage=(
-                                      self.compute_uri +
-                                      '/projects/debian-cloud/global/images/'
-                                      'family/debian-9'),),
-                              mode=msg.AttachedDisk.ModeValueValuesEnum.
-                              READ_WRITE,
-                              type=msg.AttachedDisk.TypeValueValuesEnum.
-                              PERSISTENT,)
-                      ],
-                      machineType=_DEFAULT_MACHINE_TYPE,
-                      metadata=msg.Metadata(),
-                      networkInterfaces=[
-                          msg.NetworkInterface(
-                              accessConfigs=[
-                                  msg.AccessConfig(
-                                      name='external-nat',
-                                      natIP='1.2.3.4',
-                                      type=self._one_to_one_nat)
-                              ],
-                              network=self._default_network),
-                          msg.NetworkInterface(
-                              accessConfigs=[
-                                  msg.AccessConfig(
-                                      name='external-nat',
-                                      networkTier=(
-                                          self.messages.AccessConfig.
-                                          NetworkTierValueValuesEnum.PREMIUM),
-                                      type=self._one_to_one_nat)
-                              ],
-                              network=self._default_network),
-                          msg.NetworkInterface(
-                              accessConfigs=[
-                                  msg.AccessConfig(
-                                      name='external-nat',
-                                      networkTier=(
-                                          self.messages.AccessConfig.
-                                          NetworkTierValueValuesEnum.SELECT),
-                                      natIP='8.8.8.8',
-                                      type=self._one_to_one_nat)
-                              ],
-                              network=(
-                                  'https://compute.googleapis.com/compute/alpha/'
-                                  'projects/my-project/global/networks/'
-                                  'some-net')),
-                          msg.NetworkInterface(subnetwork=(
-                              'https://compute.googleapis.com/compute/alpha/'
-                              'projects/my-project/regions/central1/'
-                              'subnetworks/some-subnet')),
-                      ],
-                      scheduling=msg.Scheduling(automaticRestart=True),
-                      serviceAccounts=[
-                          msg.ServiceAccount(
-                              email='default', scopes=_DEFAULT_SCOPES),
-                      ],),),
-              project='my-project',))],)
+    template = self._MakeInstanceTemplate(networkInterfaces=[
+        m.NetworkInterface(
+            accessConfigs=[
+                m.AccessConfig(
+                    name='external-nat',
+                    natIP='1.2.3.4',
+                    type=self._one_to_one_nat)
+            ],
+            network=self._default_network),
+        m.NetworkInterface(
+            accessConfigs=[
+                m.AccessConfig(
+                    name='external-nat',
+                    networkTier=(self.messages.AccessConfig
+                                 .NetworkTierValueValuesEnum.PREMIUM),
+                    type=self._one_to_one_nat)
+            ],
+            network=self._default_network),
+        m.NetworkInterface(
+            accessConfigs=[
+                m.AccessConfig(
+                    name='external-nat',
+                    networkTier=(self.messages.AccessConfig
+                                 .NetworkTierValueValuesEnum.SELECT),
+                    natIP='8.8.8.8',
+                    type=self._one_to_one_nat)
+            ],
+            network=('https://compute.googleapis.com/compute/alpha/'
+                     'projects/my-project/global/networks/'
+                     'some-net')),
+        m.NetworkInterface(
+            subnetwork=('https://compute.googleapis.com/compute/alpha/'
+                        'projects/my-project/regions/central1/'
+                        'subnetworks/some-subnet')),
+    ])
+
+    self.CheckRequests(self.get_default_image_requests,
+                       [(self.compute.instanceTemplates, 'Insert',
+                         m.ComputeInstanceTemplatesInsertRequest(
+                             instanceTemplate=template, project='my-project'))])
 
   def testNetworkInterfaceWithSubnetAndNetwork(self):
     m = self.messages
@@ -3159,21 +2328,8 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --region my-region
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
+    template = self._MakeInstanceTemplate(
+        networkInterfaces=[m.NetworkInterface(
                 accessConfigs=[],
                 network=(
                     '{compute}/projects/my-project/global/'
@@ -3182,15 +2338,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                 subnetwork=(
                     '{compute}/projects/my-project/regions/my-region/'
                     'subnetworks/my-subnetwork'.format(
-                        compute=self.compute_uri)))],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
+                        compute=self.compute_uri)))]
     )
 
     self.CheckRequests(
@@ -3222,24 +2370,8 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           --service-account 1234@project.gserviceaccount.com
         """)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[m.AttachedDisk(
-                autoDelete=True,
-                boot=True,
-                initializeParams=m.AttachedDiskInitializeParams(
-                    sourceImage=self._default_image,
-                ),
-                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
+    template = self._MakeInstanceTemplate(
+        serviceAccounts=[
                 m.ServiceAccount(
                     email='1234@project.gserviceaccount.com',
                     scopes=[
@@ -3251,9 +2383,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                         'https://www.googleapis.com/auth/taskqueue',
                         'https://www.googleapis.com/auth/userinfo.email',
                     ]),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True)
-        )
+            ]
     )
 
     self.CheckRequests(
@@ -3273,38 +2403,22 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
         """)
 
     m = self.messages
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=True,
-                    initializeParams=(m.AttachedDiskInitializeParams(
-                        diskType='aep-nvdimm')),
-                    interface=m.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[self._default_access_config],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ))
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=True,
+            initializeParams=(m.AttachedDiskInitializeParams(
+                diskType='aep-nvdimm')),
+            interface=m.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -3323,39 +2437,23 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
         """)
 
     m = self.messages
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
-                m.AttachedDisk(
-                    autoDelete=True,
-                    boot=True,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,),
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=True,
-                    diskSizeGb=3072,
-                    initializeParams=(m.AttachedDiskInitializeParams(
-                        diskType='aep-nvdimm')),
-                    interface=m.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[
-                m.NetworkInterface(
-                    accessConfigs=[self._default_access_config],
-                    network=self._default_network)
-            ],
-            serviceAccounts=[
-                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        ))
+    template = self._MakeInstanceTemplate(disks=[
+        m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,),
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+        m.AttachedDisk(
+            autoDelete=True,
+            diskSizeGb=3072,
+            initializeParams=(m.AttachedDiskInitializeParams(
+                diskType='aep-nvdimm')),
+            interface=m.AttachedDisk.InterfaceValueValuesEnum.NVDIMM,
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.SCRATCH),
+    ])
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -3375,11 +2473,8 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
         """)
 
     m = self.messages
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=m.InstanceProperties(
-            canIpForward=False,
-            disks=[
+    template = self._MakeInstanceTemplate(
+        disks=[
                 m.AttachedDisk(
                     autoDelete=True,
                     boot=True,
@@ -3409,20 +2504,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                           .ModeValueValuesEnum.READ_WRITE),
                     type=(m.AttachedDisk
                           .TypeValueValuesEnum.SCRATCH)),
-            ],
-            machineType=_DEFAULT_MACHINE_TYPE,
-            metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
-            serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
-            ],
-            scheduling=m.Scheduling(automaticRestart=True),
-        )
+            ]
     )
 
     self.CheckRequests(
@@ -4096,8 +3178,7 @@ class InstanceTemplatesCreateTestBeta(InstanceTemplatesCreateTest,
       ('Beta', 'beta', calliope_base.ReleaseTrack.BETA),
       ('Ga', 'v1', calliope_base.ReleaseTrack.GA),
   )
-  def testCreateWithConfigureDiskBadCustomImageArg(
-      self, api_version, track):
+  def testCreateWithConfigureDiskBadCustomImageArg(self, api_version, track):
     SetUp(self, api_version)
     self.track = track
     with self.AssertRaisesExceptionMatches(
@@ -4446,24 +3527,24 @@ class InstanceTemplatesCreateShieldedInstanceConfigGATest(
 
     prop = m.InstanceProperties(
         canIpForward=False,
-        disks=[m.AttachedDisk(
-            autoDelete=True,
-            boot=True,
-            initializeParams=m.AttachedDiskInitializeParams(
-                sourceImage=self._default_image,
-            ),
-            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+        disks=[
+            m.AttachedDisk(
+                autoDelete=True,
+                boot=True,
+                initializeParams=m.AttachedDiskInitializeParams(
+                    sourceImage=self._default_image,),
+                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+        ],
         machineType=_DEFAULT_MACHINE_TYPE,
         metadata=m.Metadata(),
-        networkInterfaces=[m.NetworkInterface(
-            accessConfigs=[self._default_access_config],
-            network=self._default_network)],
+        networkInterfaces=[
+            m.NetworkInterface(
+                accessConfigs=[self._default_access_config],
+                network=self._default_network)
+        ],
         serviceAccounts=[
-            m.ServiceAccount(
-                email='default',
-                scopes=_DEFAULT_SCOPES
-            ),
+            m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
         ],
         scheduling=m.Scheduling(automaticRestart=True),
     )
@@ -4474,15 +3555,11 @@ class InstanceTemplatesCreateShieldedInstanceConfigGATest(
         enableVtpm=enable_vtpm,
         enableIntegrityMonitoring=enable_integrity_monitoring)
 
-    template = m.InstanceTemplate(
-        name='template-1',
-        properties=prop
-    )
+    template = m.InstanceTemplate(name='template-1', properties=prop)
 
     self.CheckRequests(
         self.get_default_image_requests,
-        [(self.compute.instanceTemplates,
-          'Insert',
+        [(self.compute.instanceTemplates, 'Insert',
           m.ComputeInstanceTemplatesInsertRequest(
               instanceTemplate=template,
               project='my-project',
@@ -4506,6 +3583,60 @@ class InstanceTemplatesCreateShieldedInstanceConfigAlphaTest(
   def SetUp(self):
     SetUp(self, 'alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceTemplatesCreateConfidentialInstanceConfigAlphaTest(
+    InstanceTemplatesCreateTest, parameterized.TestCase):
+  """Test creation of VM instances with Confidential Instance Config."""
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  @parameterized.named_parameters(
+      ('EnableConfidentialCompute', '--confidential-compute', True),
+      ('DisableConfidentialCompute', '--no-confidential-compute', False))
+  def testCreateVMWithConfidentialCompute(self, cmd_flag,
+                                          enable_confidential_compute):
+    m = self.messages
+    self.Run('compute instance-templates create template-1 '
+             '{}'.format(cmd_flag))
+
+    prop = m.InstanceProperties(
+        canIpForward=False,
+        disks=[
+            m.AttachedDisk(
+                autoDelete=True,
+                boot=True,
+                initializeParams=m.AttachedDiskInitializeParams(
+                    sourceImage=self._default_image,),
+                mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+        ],
+        machineType=_DEFAULT_MACHINE_TYPE,
+        metadata=m.Metadata(),
+        networkInterfaces=[
+            m.NetworkInterface(
+                accessConfigs=[self._default_access_config],
+                network=self._default_network)
+        ],
+        serviceAccounts=[
+            m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+        ],
+        scheduling=m.Scheduling(automaticRestart=True),
+        confidentialInstanceConfig=m.ConfidentialInstanceConfig(
+            enableConfidentialCompute=enable_confidential_compute))
+
+    template = m.InstanceTemplate(name='template-1', properties=prop)
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
 
 
 class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,

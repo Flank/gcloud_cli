@@ -18,8 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import random
 
 from googlecloudsdk.api_lib.events import custom_resource_definition
+from googlecloudsdk.api_lib.events import source
+from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.command_lib.events import exceptions
 from googlecloudsdk.command_lib.events import util
 from tests.lib.surface.run import base
@@ -27,48 +30,105 @@ from tests.lib.surface.run import base
 
 class UtilTest(base.ServerlessBase):
 
-  def _MakeSourceCrds(self, num_sources, num_events_per_source):
+  def _MakeSourceCrds(self, num_sources, num_event_types_per_source):
     """Creates source CRDs with event types."""
     self.source_crds = [
         custom_resource_definition.SourceCustomResourceDefinition.New(
             self.mock_crd_client, 'fake-project')
         for _ in range(num_sources)]
-    for i, crd in enumerate(self.source_crds):
-      event_types = []
-      for j in range(num_events_per_source):
-        event_types.append(
-            self._EventTypeAdditionalProperty(
-                'e{}-{}'.format(i, j), 'desc{}{}'.format(i, j),
-                'google.source.{}.event.type.{}'.format(i, j)))
-      crd.spec.validation = self.crd_messages.CustomResourceValidation(
-          openAPIV3Schema=self._SourceSchemaProperties('Source{}'.format(i),
-                                                       event_types))
-    # self.event_types is all event types across all sources ordered by
-    # source then event type (e.g. [s.0.et.0, s.0.et.1, s.1.et.0, etc.])
     self.event_types = []
-    for crd in self.source_crds:
-      self.event_types.extend(crd.event_types)
+    for i, crd in enumerate(self.source_crds):
+      crd.spec.group = 'events.api.group.{}'.format(i)
+      crd.spec.names = (
+          self.crd_messages.CustomResourceDefinitionNames(
+              kind='PubSub', plural='pubsubs'))
+      event_types = []
+      for j in range(num_event_types_per_source):
+        event_types.append(
+            custom_resource_definition.EventType(
+                crd,
+                type='google.source.{}.event.type.{}'.format(i, j),
+                description='desc{}{}'.format(i, j)))
+      crd.event_types = event_types
+      self.event_types.extend(event_types)
 
-  def testEventTypeFromPattern(self):
-    self._MakeSourceCrds(num_sources=2, num_events_per_source=2)
+  def _MakeSource(self, source_crd):
+    """Creates a source object of the type specified by source_crd."""
+    self.source = source.Source.New(self.mock_serverless_client,
+                                    'default',
+                                    source_crd.source_kind,
+                                    source_crd.source_api_category)
+    self.source.name = 'source-for-my-trigger'
+
+  def _MakeTrigger(self, source_obj, event_type):
+    """Creates a trigger object with the given source dependency and event type."""
+    self.trigger = trigger.Trigger.New(self.mock_serverless_client, 'default')
+    self.trigger.name = 'my-trigger'
+    self.trigger.dependency = source_obj
+    # TODO(b/141617597): Set to str(random.random()) without prepended string
+    self.trigger.filter_attributes[trigger.SOURCE_TRIGGER_LINK_FIELD] = (
+        'link{}'.format(random.random()))
+    self.trigger.filter_attributes[trigger.EVENT_TYPE_FIELD] = event_type.type
+
+  def testEventTypeFromTypeString(self):
+    self._MakeSourceCrds(num_sources=2, num_event_types_per_source=2)
     self.assertEqual(
         self.event_types[2],
-        util.EventTypeFromPattern(self.source_crds,
-                                  'google.source.1.event.type.0'))
+        util.EventTypeFromTypeString(self.source_crds,
+                                     'google.source.1.event.type.0'))
 
-  def testEventTypeFromPatternNotFound(self):
-    self._MakeSourceCrds(num_sources=2, num_events_per_source=2)
+  def testEventTypeFromTypeStringNotFound(self):
+    self._MakeSourceCrds(num_sources=2, num_event_types_per_source=2)
     with self.assertRaises(exceptions.EventTypeNotFound):
-      util.EventTypeFromPattern(self.source_crds, 'nonexistent.event.type')
+      util.EventTypeFromTypeString(self.source_crds, 'nonexistent.event.type')
 
-  def testEventTypeFromPatternNoEventTypes(self):
-    self._MakeSourceCrds(num_sources=2, num_events_per_source=0)
+  def testEventTypeFromTypeStringNoEventTypes(self):
+    self._MakeSourceCrds(num_sources=2, num_event_types_per_source=0)
     with self.assertRaises(exceptions.EventTypeNotFound):
-      util.EventTypeFromPattern(self.source_crds,
-                                'google.source.0.event.type.0')
+      util.EventTypeFromTypeString(self.source_crds,
+                                   'google.source.0.event.type.0')
 
-  def testEventTypeFromPatternNoSources(self):
-    self._MakeSourceCrds(num_sources=0, num_events_per_source=0)
+  def testEventTypeFromTypeStringNoSources(self):
+    self._MakeSourceCrds(num_sources=0, num_event_types_per_source=0)
     with self.assertRaises(exceptions.EventTypeNotFound):
-      util.EventTypeFromPattern(self.source_crds,
-                                'google.source.0.event.type.0')
+      util.EventTypeFromTypeString(self.source_crds,
+                                   'google.source.0.event.type.0')
+
+  def testValidateTriggerSucceeds(self):
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
+    self._MakeSource(self.source_crds[0])
+    self._MakeTrigger(self.source, self.event_types[0])
+    util.ValidateTrigger(self.trigger, self.source, self.event_types[0])
+
+  def testValidateTriggerNoDependency(self):
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
+    self._MakeSource(self.source_crds[0])
+    self._MakeTrigger(self.source, self.event_types[0])
+    del self.trigger.annotations[trigger.DEPENDENCY_ANNOTATION_FIELD]
+    with self.assertRaises(AssertionError):
+      util.ValidateTrigger(self.trigger, self.source, self.event_types[0])
+
+  def testValidateTriggerBadDependency(self):
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
+    self._MakeSource(self.source_crds[0])
+    self._MakeTrigger(self.source, self.event_types[0])
+    self.trigger.annotations[trigger.DEPENDENCY_ANNOTATION_FIELD] = (
+        '{"name": "something else"}')
+    with self.assertRaises(AssertionError):
+      util.ValidateTrigger(self.trigger, self.source, self.event_types[0])
+
+  def testValidateTriggerNoEventTypeField(self):
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
+    self._MakeSource(self.source_crds[0])
+    self._MakeTrigger(self.source, self.event_types[0])
+    del self.trigger.filter_attributes[trigger.EVENT_TYPE_FIELD]
+    with self.assertRaises(AssertionError):
+      util.ValidateTrigger(self.trigger, self.source, self.event_types[0])
+
+  def testValidateTriggerBadEventTypeField(self):
+    self._MakeSourceCrds(num_sources=1, num_event_types_per_source=1)
+    self._MakeSource(self.source_crds[0])
+    self._MakeTrigger(self.source, self.event_types[0])
+    self.trigger.filter_attributes[trigger.EVENT_TYPE_FIELD] = 'bla'
+    with self.assertRaises(AssertionError):
+      util.ValidateTrigger(self.trigger, self.source, self.event_types[0])

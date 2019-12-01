@@ -1,9 +1,5 @@
 title: Create an instance and move it to a new zone.
 release_tracks: [GA]
-skip:
-  reason: Timeouts
-  always: true
-  bug: b/135526536
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

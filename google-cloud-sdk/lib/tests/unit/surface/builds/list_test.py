@@ -321,6 +321,7 @@ ID           CREATE_TIME                DURATION  SOURCE  IMAGES  STATUS
     self.AssertOutputContains("""\
 ID           CREATE_TIME                DURATION  SOURCE  IMAGES  STATUS
 123-456-789  2016-05-26T00:00:00+00:00  -         -       -       QUEUED
+
 ID           CREATE_TIME                DURATION  SOURCE  IMAGES  STATUS
 987-654-321  2016-05-26T00:00:00+00:00  -         -       -       QUEUED
 """, normalize_space=True)

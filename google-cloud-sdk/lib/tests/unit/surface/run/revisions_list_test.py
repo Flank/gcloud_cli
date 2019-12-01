@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import itertools
+
 from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.run import base
@@ -51,33 +53,86 @@ class RevisionsListTestBeta(base.ServerlessSurfaceBase):
               status='Unknown' if i%2 else 'True')
       ]
 
-    self.operations.ListRevisions.return_value = self.revisions
+    self.operations.ListRevisions.return_value = (r for r in self.revisions)
     self._MockConnectionContext()
+
+  def testPaging(self):
+    """Two pages of revisions are listable using the Serverless API format."""
+    self.operations.ListRevisions.return_value = itertools.chain(
+        (r for r in self.revisions),
+        (r for r in self.revisions))
+    self.Run('run revisions list --limit 4 --page-size 2')
+    self.AssertOutputEquals(
+        """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+
+        REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+        """, normalize_space=True)
+
+  def testPagingCouldBeMore(self):
+    """Two of three pages are listable using the Serverless API format."""
+    self.operations.ListRevisions.return_value = itertools.chain(
+        (r for r in self.revisions),
+        (r for r in self.revisions),
+        (r for r in self.revisions))
+    self.Run('run revisions list --limit 4 --page-size 2')
+    self.AssertOutputEquals(
+        """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+
+        REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+        """, normalize_space=True)
+
+  def testPagingWithThreePages(self):
+    """Three of four pages are listable."""
+    self.operations.ListRevisions.return_value = itertools.chain(
+        (r for r in self.revisions),
+        (r for r in self.revisions),
+        (r for r in self.revisions),
+        (r for r in self.revisions))
+    self.Run('run revisions list --limit 6 --page-size 2')
+    self.AssertOutputEquals(
+        """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+
+        REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+
+        REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
+        . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
+        """, normalize_space=True)
 
   def testNoArg(self):
     """Two revisions are listable using the Serverless API format."""
-    out = self.Run('run revisions list')
+    self.Run('run revisions list')
 
     self.operations.ListRevisions.assert_called_once_with(self.namespace,
-                                                          None)
-    self.assertEqual(out, self.revisions)
+                                                          None, None, None)
     self.AssertOutputEquals(
         """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
-        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
         . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
         """, normalize_space=True)
 
   def testServiceArg(self):
     """Two revisions are listable using the Serverless API format."""
-    out = self.Run('run revisions list --service foo')
+    self.Run('run revisions list --service foo')
 
     self.operations.ListRevisions.assert_called_once_with(self.namespace,
-                                                          'foo')
-    self.assertEqual(out, self.revisions)
+                                                          'foo', None, None)
     self.AssertOutputEquals(
         """REVISION ACTIVE SERVICE DEPLOYED DEPLOYED BY
-        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
         . revision1 foo 2018-01-01 00:10:00 UTC some1@google.com
+        + revision0 yes foo 2018-01-01 00:00:00 UTC some0@google.com
         """, normalize_space=True)
 
   def testNoArgUri(self):
@@ -85,7 +140,7 @@ class RevisionsListTestBeta(base.ServerlessSurfaceBase):
     self.Run('run revisions list --uri')
 
     self.operations.ListRevisions.assert_called_once_with(self.namespace,
-                                                          None)
+                                                          None, None, None)
     self.AssertOutputEquals(
         """https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/revision0
         https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/revision1

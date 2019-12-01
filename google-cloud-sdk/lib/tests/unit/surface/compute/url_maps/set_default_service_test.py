@@ -74,8 +74,11 @@ class UrlMapsSetDefaultServiceTest(test_base.BaseTest):
                                                  project='my-project'))],
         )
 
+    warning_msg = ('WARNING: The url-maps set-default-service command will '
+                   'soon require either a --global or --region flag.\n'
+                  ) if self.api == 'v1' else ''
     self.AssertErrEquals(
-        'No change requested; skipping update for [url-map-1].\n',
+        warning_msg + 'No change requested; skipping update for [url-map-1].\n',
         normalize_space=True)
 
   def testSimpleBackendBucketCase(self):

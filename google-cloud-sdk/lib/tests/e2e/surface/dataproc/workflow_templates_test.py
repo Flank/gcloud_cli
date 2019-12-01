@@ -20,7 +20,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import contextlib
+import os
 
+from googlecloudsdk.core.util import files
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -47,6 +49,34 @@ class WorkflowTemplatesE2ETest(e2e_base.DataprocIntegrationTestBase,
       yield resource
     finally:
       self.RunDataproc('workflow-templates delete {0}'.format(name))
+
+  def testInstantiateWorkflowFromFile(self):
+    template_yaml = """
+      jobs:
+      - stepId: teragen
+        hadoopJob:
+          mainJarFileUri: file:///usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar
+          args:
+          - teragen
+          - "10"
+          - hdfs:///tmp/terasort-input
+      placement:
+        managedCluster:
+          config:
+            gceClusterConfig:
+              zoneUri: {zone}
+            softwareConfig:
+              properties:
+                dataproc:fake.property: "fake-value"
+    """.format(zone=self.zone)
+
+    file_name = os.path.join(self.temp_path, 'template.yaml')
+    with files.FileWriter(file_name) as stream:
+      stream.write(template_yaml)
+
+    self.RunDataproc(
+        'workflow-templates instantiate-from-file --file {file_name}'.format(
+            file_name=file_name))
 
 
 if __name__ == '__main__':

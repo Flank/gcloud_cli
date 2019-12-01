@@ -11,7 +11,7 @@ gcloud alpha cloud\-shell ssh \- allows you to establish an interactive SSH sess
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha cloud\-shell ssh\fR [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha cloud\-shell ssh\fR [\fB\-\-boosted\fR] [\fB\-\-command\fR=\fICOMMAND\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-ssh\-flag\fR=\fISSH_FLAG\fR] [\fB\-\-ssh\-key\-file\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,6 +26,11 @@ be started before establishing the SSH session.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-boosted\fR
+If provided, starts Cloud Shell in boost mode. If there is alread a running
+Cloud Shell session that is not boosted, this will restart the session.
+
 .TP 2m
 \fB\-\-command\fR=\fICOMMAND\fR
 A command to run in Cloud Shell.

@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_COMPUTE_URL\-MAPS_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute url\-maps export \- export a URL map
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute url\-maps export\fR \fIURL_MAP\fR [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Exports a URL map's configuration to a file. This configuration can be imported
+at a later time.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIURL_MAP\fR
+Name of the URL map to export.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Path to a YAML file where the url map configuration will be exported. The
+exported data will not contain any output\-only fields. Alternatively, you may
+omit this flag to write to standard output. A schema describing the
+export/import format can be found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/compute/v1/UrlMap.yaml.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+A URL map can be exported by running:
+
+.RS 2m
+$ gcloud compute url\-maps export NAME \-\-destination=<path\-to\-file>
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute url\-maps export
+$ gcloud beta compute url\-maps export
+.RE
+

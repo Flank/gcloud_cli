@@ -53,13 +53,15 @@ class WorkflowTemplateSetManagedClusterUnitTest(
   def ExpectCallSetManagedCluster(self,
                                   workflow_template=None,
                                   managed_cluster=None,
+                                  region=None,
                                   response=None,
                                   exception=None):
     if not workflow_template:
-      workflow_template = self.MakeWorkflowTemplate()
+      workflow_template = self.MakeWorkflowTemplate(region=region)
     self.ExpectGetWorkflowTemplate(
         name=workflow_template.name,
         version=workflow_template.version,
+        region=region,
         response=workflow_template)
     if not managed_cluster:
       cluster_name = 'test-cluster'
@@ -215,9 +217,9 @@ class WorkflowTemplateSetManagedClusterUnitTest(
   def testSetManagedClusterOmitZone_globalRegion(self):
     self.MockCompute()
     self.ExpectListZones()
-    self.WriteInput('3\n')  # us-central1-a
+    self.WriteInput('3\n')  # antarctica-north42-a
 
-    template_name = self.WorkflowTemplateName()
+    template_name = self.WorkflowTemplateName(region='global')
     cluster_name = 'test-cluster'
     workflow_template = self.MakeWorkflowTemplate(name=template_name)
     managed_cluster = self.MakeManagedCluster(
@@ -227,13 +229,17 @@ class WorkflowTemplateSetManagedClusterUnitTest(
     result = self.RunDataproc(
         'workflow-templates set-managed-cluster {template} '
         '--cluster-name {cluster_name} '
+        '--region {region} '
         '--zone=""'.format(
-            template=workflow_template.id, cluster_name=cluster_name))
+            template=workflow_template.id,
+            cluster_name=cluster_name,
+            region='global'),
+        set_region=False)
     self.AssertMessagesEqual(workflow_template, result)
     self.AssertErrContains('PROMPT_CHOICE')
     self.AssertErrContains(
-        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
-        '"us-central1-a (DEPRECATED)", "us-central1-b"]')
+        '"choices": ["antarctica-north42-a (DEPRECATED)", '
+        '"antarctica-north42-b", "europe-west1-a", "europe-west1-b (DELETED)"]')
 
 
 class WorkflowTemplateSetManagedClusterUnitTestBeta(

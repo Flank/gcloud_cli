@@ -11,7 +11,7 @@ gcloud beta compute instance\-groups managed set\-autoscaling \- set autoscaling
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -86,6 +86,32 @@ Maximum number of replicas Autoscaler will set.
 .TP 2m
 \fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR
 Minimum number of replicas Autoscaler will set.
+
+.TP 2m
+\fB\-\-mode\fR=\fIMODE\fR
+Set the mode of an autoscaler for a managed instance group.
+
+You can turn off or restrict MIG autoscaler activities (scaling up, scaling
+down) without changing autoscaler configuration and then having to restore it
+later. Autoscaler configuration persists while the activities are turned off or
+restricted, and the activities pick it up when they are turned on again or when
+the restrictions are lifted.
+
+\fIMODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+to turn off autoscaling, while keeping the new configuration.
+.TP 2m
+\fBon\fR
+to permit autoscaling to scale up and down (default for new autoscalers).
+.TP 2m
+\fBonly\-up\fR
+to permit autoscaling to scale only up and not down.
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR

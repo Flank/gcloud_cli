@@ -28,6 +28,7 @@ from googlecloudsdk.command_lib.container import constants
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import times
+from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -950,13 +951,10 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
 
   def _MP(self, resource_version=None, window=None, exclusions=None):
     """Creates a maintenance policy for ease of tests."""
-    mp = self.msgs.MaintenancePolicy(window=self.msgs.MaintenanceWindow())
+    mp = self.msgs.MaintenancePolicy(
+        window=self.msgs.MaintenanceWindow(), resourceVersion=resource_version)
 
-    if hasattr(mp, 'resourceVersion'):
-      mp.resourceVersion = resource_version
-
-    if hasattr(self.msgs, 'RecurringTimeWindow') and isinstance(
-        window, self.msgs.RecurringTimeWindow):
+    if isinstance(window, self.msgs.RecurringTimeWindow):
       mp.window.recurringWindow = window
     elif isinstance(window, self.msgs.DailyMaintenanceWindow):
       mp.window.dailyMaintenanceWindow = window
@@ -1015,6 +1013,368 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
         self.clusters_command_base.format(self.ZONE) +
         ' update {0} {1}'.format(name, '--maintenance-window=None'))
     self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetMaintenancePolicyWhenNoExistingPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'emptyRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY')))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
+            '--maintenance-window-end=2000-01-01T17:00:00Z '
+            '--maintenance-window-recurrence=FREQ=DAILY'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetRecurringMaintenancePolicyWhenExistingDailyPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP('1143RV', window=self._DailyWindow('11:43')))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            '1143RV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY')))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
+            '--maintenance-window-end=2000-01-01T17:00:00Z '
+            '--maintenance-window-recurrence=FREQ=DAILY'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetDailyMaintenancePolicyWhenExistingRecurringPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY')))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP('someRV', window=self._DailyWindow('11:43')))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--maintenance-window=11:43'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetDailyMaintenancePolicyWithExistingExclusions(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
+            '--maintenance-window-end=2000-01-01T17:00:00Z '
+            '--maintenance-window-recurrence=FREQ=DAILY'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetRecurringMaintenancePolicyWithExistingExclusions(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            '1143RV',
+            window=self._DailyWindow('11:43'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            '1143RV',
+            window=self._DailyWindow('11:43'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--maintenance-window=11:43'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testSetMaintenancePolicyBadTimes(self):
+    with self.AssertRaisesArgumentErrorMatches('Failed to parse date/time'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(
+              'emwCluster', '--maintenance-window-start=2000-00-01T09:00:00Z '
+              '--maintenance-window-end=2000-13-01T17:00:00Z '
+              '--maintenance-window-recurrence=FREQ=DAILY'))
+
+  @parameterized.parameters(
+      ('--maintenance-window-start=2000-01-01T09:00:00Z '
+       '--maintenance-window-recurrence=FREQ=DAILY',
+       '--maintenance-window-end'),
+      ('--maintenance-window-end=2000-01-01T17:00:00Z '
+       '--maintenance-window-recurrence=FREQ=DAILY',
+       '--maintenance-window-start'),
+      ('--maintenance-window-start=2000-01-01T09:00:00Z '
+       '--maintenance-window-end=2000-01-01T17:00:00Z',
+       '--maintenance-window-recurrence'),
+  )
+  def testSetMaintenancePolicyMissingFields(self, flags, error_flag):
+    name = 'emwCluster'
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument {0}: Must be specified.'.format(error_flag)):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name, flags))
+
+  def testRemoveMaintenanceWindow(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'someRV',
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(name, '--clear-maintenance-window'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveMaintenanceWindowWhenNoWindow(self):
+    name = 'emwCluster'
+    self.ExpectGetCluster(
+        self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                exclusions=[
+                    self._Exclusion('2000-01-01T00:00:00+00:00',
+                                    '2000-01-07T00:00:00+00:00', 'first-week')
+                ])))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error, api_adapter.NOTHING_TO_UPDATE_ERROR_MSG):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name, '--clear-maintenance-window'))
+
+  def testAddMaintenanceExclusionWhenNoExistingPolicy(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'emptyRV',
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-start=2000-01-01T00:00:00Z '
+            '--add-maintenance-exclusion-end=2000-01-07T00:00:00Z '
+            '--add-maintenance-exclusion-name=first-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testAddMaintenanceExclusionWhenExistingPolicy(self):
+    name = 'emwCluster'
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                             '2000-01-01T17:00:00+00:00',
+                                             'FREQ=DAILY'))),
+        policy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-start=2000-01-01T00:00:00Z '
+            '--add-maintenance-exclusion-end=2000-01-07T00:00:00Z '
+            '--add-maintenance-exclusion-name=first-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testAddMaintenanceExclusionWhenExistingExclusions(self):
+    name = 'emwCluster'
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                             '2000-01-01T17:00:00+00:00',
+                                             'FREQ=DAILY'),
+                exclusions=[
+                    self._Exclusion('2000-01-01T00:00:00+00:00',
+                                    '2000-01-07T00:00:00+00:00', 'first-week'),
+                ])),
+        policy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+                self._Exclusion('2000-01-07T00:00:00+00:00',
+                                '2000-01-14T00:00:00+00:00', 'second-week'),
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-start=2000-01-07T00:00:00Z '
+            '--add-maintenance-exclusion-end=2000-01-14T00:00:00Z '
+            '--add-maintenance-exclusion-name=second-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testAddMaintenanceExclusionWithMinimalInfo(self):
+    self.StartObjectPatch(
+        times,
+        'Now',
+        return_value=times.ParseDateTime('2000-01-01T09:00:00-04:00'))
+
+    name = 'emwCluster'
+    cluster = self._RunningCluster(name=name)
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'emptyRV',
+            exclusions=[
+                self._Exclusion(
+                    '2000-01-01T09:00:00-04:00', '2000-01-10T12:00:00-04:00',
+                    'generated-exclusion-2000-01-01T09:00:00-04:00')
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--add-maintenance-exclusion-end=2000-01-10T12:00:00-04:00'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveMaintenanceExclusion(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+                self._Exclusion('2000-01-07T00:00:00+00:00',
+                                '2000-01-14T00:00:00+00:00', 'second-week'),
+                self._Exclusion('2000-01-14T00:00:00+00:00',
+                                '2000-01-21T00:00:00+00:00', 'third-week'),
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster,
+        policy=self._MP(
+            'someRV',
+            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
+                                         '2000-01-01T17:00:00+00:00',
+                                         'FREQ=DAILY'),
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+                self._Exclusion('2000-01-14T00:00:00+00:00',
+                                '2000-01-21T00:00:00+00:00', 'third-week'),
+            ]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--remove-maintenance-exclusion=second-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveOnlyMaintenanceExclusion(self):
+    name = 'emwCluster'
+    cluster = self._RunningCluster(
+        name=name,
+        maintenancePolicy=self._MP(
+            'someRV',
+            exclusions=[
+                self._Exclusion('2000-01-01T00:00:00+00:00',
+                                '2000-01-07T00:00:00+00:00', 'first-week'),
+            ]))
+    self._TestExpectedMaintenancePolicyRequests(
+        cluster=cluster, policy=self._MP('someRV', exclusions=[]))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, '--remove-maintenance-exclusion=first-week'))
+    self.AssertErrContains('Updating {0}'.format(name))
+
+  def testRemoveMaintenanceExclusionNonExisting(self):
+    name = 'emwCluster'
+    self.ExpectGetCluster(
+        self._RunningCluster(
+            name=name,
+            maintenancePolicy=self._MP(
+                'someRV',
+                exclusions=[
+                    self._Exclusion('2000-01-01T00:00:00+00:00',
+                                    '2000-01-07T00:00:00+00:00', 'first-week'),
+                    self._Exclusion('2000-01-14T00:00:00+00:00',
+                                    '2000-01-21T00:00:00+00:00', 'third-week'),
+                ])))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error,
+        'No maintenance exclusion with name second-week exists. Existing '
+        'exclusions: first-week, third-week'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(
+              name, '--remove-maintenance-exclusion=second-week'))
+
+  def testRemoveMaintenanceExclusionNoPolicy(self):
+    name = 'emwCluster'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.AssertRaisesExceptionMatches(
+        c_util.Error, 'No maintenance exclusion with name first-week exists.'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update {0} {1}'.format(name,
+                                   '--remove-maintenance-exclusion=first-week'))
 
   def testUpdateLabels(self):
     self._TestUpdateLabels(self.ZONE)
@@ -1135,70 +1495,21 @@ class UpdateTestGA(parameterized.TestCase, base.GATestBase,
     self._TestUpdate(
         update=update, flags='--clear-resource-usage-bigquery-dataset')
 
-
-# TODO(b/64575339): switch to use parameterized testing.
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def testUpdateAdditionalZonesRemove(self):
-    self._TestUpdateAdditionalZonesRemove()
-
-  def testUpdateAdditionalZonesAdd(self):
-    self._TestUpdateAdditionalZonesAdd()
-
-  def testRegionalUpdateLabels(self):
-    self._TestUpdateLabels(self.REGION)
-
-  def testUpdateAddons(self):
+  def testEnableDatabaseEncryption(self):
+    update = self.msgs.ClusterUpdate(
+        desiredDatabaseEncryption=self.msgs.DatabaseEncryption(
+            keyName='projects/p/locations/l/keyRings/kr/cryptoKeys/k',
+            state=self.msgs.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED))
     self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                    disabled=False))),
-        flags='--update-addons NetworkPolicy=ENABLED')
+        update=update,
+        flags='--database-encryption-key=projects/p/locations/l/keyRings/kr/cryptoKeys/k '
+    )
 
-    self._TestUpdate(
-        self.msgs.ClusterUpdate(
-            desiredAddonsConfig=self.msgs.AddonsConfig(
-                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
-                    disabled=True))),
-        flags='--update-addons NetworkPolicy=DISABLED')
-
-  def testUpdateLocations(self):
-    self._TestUpdate(
-        update=self.msgs.ClusterUpdate(
-            desiredLocations=sorted(['us-central1-a', 'moon-north3-z'])),
-        flags='--node-locations=us-central1-a,moon-north3-z')
-
-  def testUpdateEnablePodSecurityPolicy(self):
-    self._TestUpdate(
-        update=self.msgs.ClusterUpdate(
-            desiredPodSecurityPolicyConfig=self.msgs.PodSecurityPolicyConfig(
-                enabled=True)),
-        flags='--enable-pod-security-policy')
-
-  def testEnableBinaryAuthorization(self):
-    self._TestEnableBinaryAuthorization(enabled=True, flags='--enable-binauthz')
-
-  def _TestEnableBinaryAuthorization(self, enabled, flags):
-    binauthz = self.msgs.BinaryAuthorization(enabled=enabled)
-    update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
-    self._TestUpdate(update=update, flags=flags)
-
-  def testUpdateMonitoringAndLogging(self):
-    self._TestUpdate(
-        update=self.msgs.ClusterUpdate(
-            desiredMonitoringService='some.monitoring.service',
-            desiredLoggingService='some.logging.service'),
-        flags='--monitoring-service=some.monitoring.service '
-        '--logging-service=some.logging.service')
-
-  def testUpdateMonitoring(self):
-    self._TestUpdate(
-        update=self.msgs.ClusterUpdate(
-            desiredMonitoringService='some.monitoring.service'),
-        flags='--monitoring-service=some.monitoring.service ')
+  def testDisableDatabaseEncryption(self):
+    update = self.msgs.ClusterUpdate(
+        desiredDatabaseEncryption=self.msgs.DatabaseEncryption(
+            state=self.msgs.DatabaseEncryption.StateValueValuesEnum.DECRYPTED))
+    self._TestUpdate(update=update, flags='--disable-database-encryption ')
 
   def testEnableAutoprovisioning(self):
     self._TestUpdateAutoprovisioning(
@@ -1295,6 +1606,23 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
         flags='--enable-autoprovisioning --max-memory 128 '
         '--max-cpu 100 --min-cpu 8 '
         '--autoprovisioning-scopes=scope1,scope2')
+
+  def testEnableAutoprovisioningWithScopesAndServiceAccount(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            serviceAccount='sa',
+            oauthScopes=['scope1', 'scope2'],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        autoprovisioning_locations=[],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-scopes=scope1,scope2 '
+        '--autoprovisioning-service-account=sa')
 
   def testEnableAutoprovisioningWithScopesFromFile(self):
     autoprovisioning_config_file = self.Touch(
@@ -1456,6 +1784,71 @@ resourceLimits:
         '--autoprovisioning-config-file {}'.format(
             autoprovisioning_config_file))
 
+
+# TODO(b/64575339): switch to use parameterized testing.
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
+  """gcloud Beta track using container v1beta1 API."""
+
+  def testUpdateAdditionalZonesRemove(self):
+    self._TestUpdateAdditionalZonesRemove()
+
+  def testUpdateAdditionalZonesAdd(self):
+    self._TestUpdateAdditionalZonesAdd()
+
+  def testRegionalUpdateLabels(self):
+    self._TestUpdateLabels(self.REGION)
+
+  def testUpdateAddons(self):
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=False))),
+        flags='--update-addons NetworkPolicy=ENABLED')
+
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True))),
+        flags='--update-addons NetworkPolicy=DISABLED')
+
+  def testUpdateLocations(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredLocations=sorted(['us-central1-a', 'moon-north3-z'])),
+        flags='--node-locations=us-central1-a,moon-north3-z')
+
+  def testUpdateEnablePodSecurityPolicy(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredPodSecurityPolicyConfig=self.msgs.PodSecurityPolicyConfig(
+                enabled=True)),
+        flags='--enable-pod-security-policy')
+
+  def testEnableBinaryAuthorization(self):
+    self._TestEnableBinaryAuthorization(enabled=True, flags='--enable-binauthz')
+
+  def _TestEnableBinaryAuthorization(self, enabled, flags):
+    binauthz = self.msgs.BinaryAuthorization(enabled=enabled)
+    update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
+    self._TestUpdate(update=update, flags=flags)
+
+  def testUpdateMonitoringAndLogging(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredMonitoringService='some.monitoring.service',
+            desiredLoggingService='some.logging.service'),
+        flags='--monitoring-service=some.monitoring.service '
+        '--logging-service=some.logging.service')
+
+  def testUpdateMonitoring(self):
+    self._TestUpdate(
+        update=self.msgs.ClusterUpdate(
+            desiredMonitoringService='some.monitoring.service'),
+        flags='--monitoring-service=some.monitoring.service ')
+
   def testEnableVerticalPodAutoscaling(self):
     update = self.msgs.ClusterUpdate(
         desiredVerticalPodAutoscaling=self.msgs.VerticalPodAutoscaling(
@@ -1583,268 +1976,19 @@ resourceLimits:
             state=self.msgs.DatabaseEncryption.StateValueValuesEnum.DECRYPTED))
     self._TestUpdate(update=update, flags='--disable-database-encryption ')
 
-  def testSetMaintenancePolicyWhenNoExistingPolicy(self):
-    name = 'emwCluster'
-    cluster = self._RunningCluster(name=name)
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster,
-        policy=self._MP(
-            'emptyRV',
-            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                         '2000-01-01T17:00:00+00:00',
-                                         'FREQ=DAILY')))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
-            '--maintenance-window-end=2000-01-01T17:00:00Z '
-            '--maintenance-window-recurrence=FREQ=DAILY'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testSetMaintenancePolicyWhenExistingPolicy(self):
-    name = 'emwCluster'
-    cluster = self._RunningCluster(
-        name=name,
-        maintenancePolicy=self._MP('1143RV', window=self._DailyWindow('11:43')))
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster,
-        policy=self._MP(
-            '1143RV',
-            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                         '2000-01-01T17:00:00+00:00',
-                                         'FREQ=DAILY')))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--maintenance-window-start=2000-01-01T09:00:00Z '
-            '--maintenance-window-end=2000-01-01T17:00:00Z '
-            '--maintenance-window-recurrence=FREQ=DAILY'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testSetMaintenancePolicyBadTimes(self):
-    with self.AssertRaisesArgumentErrorMatches('Failed to parse date/time'):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update {0} {1}'.format(
-              'emwCluster', '--maintenance-window-start=2000-00-01T09:00:00Z '
-              '--maintenance-window-end=2000-13-01T17:00:00Z '
-              '--maintenance-window-recurrence=FREQ=DAILY'))
-
-  @parameterized.parameters(
-      ('--maintenance-window-start=2000-01-01T09:00:00Z '
-       '--maintenance-window-recurrence=FREQ=DAILY',
-       '--maintenance-window-end'),
-      ('--maintenance-window-end=2000-01-01T17:00:00Z '
-       '--maintenance-window-recurrence=FREQ=DAILY',
-       '--maintenance-window-start'),
-      ('--maintenance-window-start=2000-01-01T09:00:00Z '
-       '--maintenance-window-end=2000-01-01T17:00:00Z',
-       '--maintenance-window-recurrence'),
-  )
-  def testSetMaintenancePolicyMissingFields(self, flags, error_flag):
-    name = 'emwCluster'
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument {0}: Must be specified.'.format(error_flag)):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update {0} {1}'.format(name, flags))
-
-  def testRemoveMaintenanceWindow(self):
-    name = 'emwCluster'
-    cluster = self._RunningCluster(
-        name=name,
-        maintenancePolicy=self._MP(
-            'someRV',
-            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                         '2000-01-01T17:00:00+00:00',
-                                         'FREQ=DAILY'),
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week')
-            ]))
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster,
-        policy=self._MP(
-            'someRV',
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week')
-            ]))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' update {0} {1}'.format(name, '--clear-maintenance-window'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testRemoveMaintenanceWindowWhenNoWindow(self):
-    name = 'emwCluster'
-    self.ExpectGetCluster(
-        self._RunningCluster(
-            name=name,
-            maintenancePolicy=self._MP(
-                'someRV',
-                exclusions=[
-                    self._Exclusion('2000-01-01T00:00:00+00:00',
-                                    '2000-01-07T00:00:00+00:00', 'first-week')
-                ])))
-    with self.AssertRaisesExceptionMatches(
-        c_util.Error, api_adapter.NOTHING_TO_UPDATE_ERROR_MSG):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update {0} {1}'.format(name, '--clear-maintenance-window'))
-
-  def testAddMaintenanceExclusionWhenNoExistingPolicy(self):
-    name = 'emwCluster'
-    cluster = self._RunningCluster(name=name)
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster,
-        policy=self._MP(
-            'emptyRV',
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week')
-            ]))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--add-maintenance-exclusion-start=2000-01-01T00:00:00Z '
-            '--add-maintenance-exclusion-end=2000-01-07T00:00:00Z '
-            '--add-maintenance-exclusion-name=first-week'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testAddMaintenanceExclusionWhenExistingPolicy(self):
-    name = 'emwCluster'
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=self._RunningCluster(
-            name=name,
-            maintenancePolicy=self._MP(
-                'someRV',
-                window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                             '2000-01-01T17:00:00+00:00',
-                                             'FREQ=DAILY'),
-                exclusions=[
-                    self._Exclusion('2000-01-01T00:00:00+00:00',
-                                    '2000-01-07T00:00:00+00:00', 'first-week'),
-                ])),
-        policy=self._MP(
-            'someRV',
-            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                         '2000-01-01T17:00:00+00:00',
-                                         'FREQ=DAILY'),
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week'),
-                self._Exclusion('2000-01-07T00:00:00+00:00',
-                                '2000-01-14T00:00:00+00:00', 'second-week'),
-            ]))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--add-maintenance-exclusion-start=2000-01-07T00:00:00Z '
-            '--add-maintenance-exclusion-end=2000-01-14T00:00:00Z '
-            '--add-maintenance-exclusion-name=second-week'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testAddMaintenanceExclusionWithMinimalInfo(self):
-    self.StartObjectPatch(
-        times,
-        'Now',
-        return_value=times.ParseDateTime('2000-01-01T09:00:00-04:00'))
-
-    name = 'emwCluster'
-    cluster = self._RunningCluster(name=name)
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster,
-        policy=self._MP(
-            'emptyRV',
-            exclusions=[
-                self._Exclusion(
-                    '2000-01-01T09:00:00-04:00', '2000-01-10T12:00:00-04:00',
-                    'generated-exclusion-2000-01-01T09:00:00-04:00')
-            ]))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--add-maintenance-exclusion-end=2000-01-10T12:00:00-04:00'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testRemoveMaintenanceExclusion(self):
-    name = 'emwCluster'
-    cluster = self._RunningCluster(
-        name=name,
-        maintenancePolicy=self._MP(
-            'someRV',
-            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                         '2000-01-01T17:00:00+00:00',
-                                         'FREQ=DAILY'),
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week'),
-                self._Exclusion('2000-01-07T00:00:00+00:00',
-                                '2000-01-14T00:00:00+00:00', 'second-week'),
-                self._Exclusion('2000-01-14T00:00:00+00:00',
-                                '2000-01-21T00:00:00+00:00', 'third-week'),
-            ]))
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster,
-        policy=self._MP(
-            'someRV',
-            window=self._RecurringWindow('2000-01-01T09:00:00+00:00',
-                                         '2000-01-01T17:00:00+00:00',
-                                         'FREQ=DAILY'),
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week'),
-                self._Exclusion('2000-01-14T00:00:00+00:00',
-                                '2000-01-21T00:00:00+00:00', 'third-week'),
-            ]))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--remove-maintenance-exclusion=second-week'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testRemoveOnlyMaintenanceExclusion(self):
-    name = 'emwCluster'
-    cluster = self._RunningCluster(
-        name=name,
-        maintenancePolicy=self._MP(
-            'someRV',
-            exclusions=[
-                self._Exclusion('2000-01-01T00:00:00+00:00',
-                                '2000-01-07T00:00:00+00:00', 'first-week'),
-            ]))
-    self._TestExpectedMaintenancePolicyRequests(
-        cluster=cluster, policy=self._MP('someRV', exclusions=[]))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
-            name, '--remove-maintenance-exclusion=first-week'))
-    self.AssertErrContains('Updating {0}'.format(name))
-
-  def testRemoveMaintenanceExclusionNonExisting(self):
-    name = 'emwCluster'
-    self.ExpectGetCluster(
-        self._RunningCluster(
-            name=name,
-            maintenancePolicy=self._MP(
-                'someRV',
-                exclusions=[
-                    self._Exclusion('2000-01-01T00:00:00+00:00',
-                                    '2000-01-07T00:00:00+00:00', 'first-week'),
-                    self._Exclusion('2000-01-14T00:00:00+00:00',
-                                    '2000-01-21T00:00:00+00:00', 'third-week'),
-                ])))
-    with self.AssertRaisesExceptionMatches(
-        c_util.Error,
-        'No maintenance exclusion with name second-week exists. Existing '
-        'exclusions: first-week, third-week'):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update {0} {1}'.format(
-              name, '--remove-maintenance-exclusion=second-week'))
-
-  def testRemoveMaintenanceExclusionNoPolicy(self):
-    name = 'emwCluster'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.AssertRaisesExceptionMatches(
-        c_util.Error, 'No maintenance exclusion with name first-week exists.'):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) +
-          ' update {0} {1}'.format(name,
-                                   '--remove-maintenance-exclusion=first-week'))
+  def testUpdateAddonsApplicationManager(self):
+    # test disabling ApplicationManager
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                kalmConfig=self.msgs.KalmConfig(enabled=False))),
+        flags='--update-addons ApplicationManager=DISABLED')
+    # test enabling ApplicationManager
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                kalmConfig=self.msgs.KalmConfig(enabled=True))),
+        flags='--update-addons ApplicationManager=ENABLED')
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -1944,6 +2088,43 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
         desiredCostManagementConfig=self.msgs.CostManagementConfig(
             enabled=enabled))
     self._TestUpdate(update=update, flags=flags)
+
+  def testUpdateAddonsApplicationManager(self):
+    # test disabling ApplicationManager
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                kalmConfig=self.msgs.KalmConfig(enabled=False))),
+        flags='--update-addons ApplicationManager=DISABLED')
+    # test enabling ApplicationManager
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredAddonsConfig=self.msgs.AddonsConfig(
+                kalmConfig=self.msgs.KalmConfig(enabled=True))),
+        flags='--update-addons ApplicationManager=ENABLED')
+
+  @parameterized.parameters('rapid', 'regular', 'stable', 'None')
+  def testUpdateReleaseChannel(self, channel):
+    channels = {
+        'rapid': self.messages.ReleaseChannel.ChannelValueValuesEnum.RAPID,
+        'regular': self.messages.ReleaseChannel.ChannelValueValuesEnum.REGULAR,
+        'stable': self.messages.ReleaseChannel.ChannelValueValuesEnum.STABLE,
+        'None': self.messages.ReleaseChannel.ChannelValueValuesEnum.UNSPECIFIED,
+    }
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(
+            desiredReleaseChannel=self.messages.ReleaseChannel(
+                channel=channels[channel])),
+        flags='--release-channel={rc}'.format(rc=channel))
+
+  @parameterized.parameters('invalid', 'Rapid', 'RAPID', 'Regular', 'REGULAR',
+                            'Stable', 'STABLE', 'none', 'NONE')
+  def testUpdateReleaseChannelInvalidChannelError(self, channel_name):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                'Invalid choice'):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' update test-cluster --release-channel={0}'.format(channel_name))
 
 
 if __name__ == '__main__':

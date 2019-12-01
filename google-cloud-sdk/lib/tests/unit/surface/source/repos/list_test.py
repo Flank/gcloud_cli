@@ -38,6 +38,7 @@ this/repo/name/has/slashes           myproject     https://
 SAMPLE_OUTPUT_PAGE_SIZE_ONE = """\
 REPO_NAME           PROJECT_ID URL
 size_zero  myproject      https://
+
 REPO_NAME           PROJECT_ID URL
 test-repo           myproject     https://
 """

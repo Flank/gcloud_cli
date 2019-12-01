@@ -285,7 +285,7 @@ class StartIapTunnelStdinTestGA(test_base.BaseTest):
         iap_tunnel_websocket, 'IapTunnelWebSocket', autospec=True,
         side_effect=WebSocketInitGenerator())
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
+  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/143145077')
   def testSimpleCase(self):
     self.make_requests.side_effect = [
         [INSTANCE_WITH_EXTERNAL_ADDRESS],

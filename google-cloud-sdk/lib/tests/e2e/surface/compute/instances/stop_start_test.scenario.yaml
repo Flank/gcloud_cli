@@ -538,6 +538,8 @@ actions:
     - expect_stderr:
         matches: |
           Updated \[https://.*/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+          Instance internal IP is .*
+          Instance external IP is .*
     - expect_exit:
         code: 0
 - execute_command:

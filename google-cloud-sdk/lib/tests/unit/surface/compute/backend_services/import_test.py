@@ -31,12 +31,12 @@ from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute.backend_services import backend_services_test_base
 
 
-class BackendServiceImportTestBeta(
+class BackendServiceImportTest(
     backend_services_test_base.BackendServicesTestBase):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.BETA
-    self._backend_services = test_resources.BACKEND_SERVICES_BETA
+    self.track = calliope.base.ReleaseTrack.GA
+    self._backend_services = test_resources.BACKEND_SERVICES_V1
 
   def RunImport(self, command):
     self.Run('compute backend-services import ' + command)
@@ -99,7 +99,14 @@ class BackendServiceImportTestBeta(
                      '--source {0}'.format(file_name))
 
 
-class BackendServiceImportTestAlpha(BackendServiceImportTestBeta):
+class BackendServiceImportTestBeta(BackendServiceImportTest):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._backend_services = test_resources.BACKEND_SERVICES_BETA
+
+
+class BackendServiceImportTestAlpha(BackendServiceImportTest):
 
   def PreSetUp(self):
     self.track = calliope.base.ReleaseTrack.ALPHA

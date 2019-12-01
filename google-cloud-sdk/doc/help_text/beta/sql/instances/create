@@ -24,6 +24,10 @@ SYNOPSIS
         [--storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT]
         [--storage-size=STORAGE_SIZE] [--storage-type=STORAGE_TYPE]
         [--tier=TIER, -t TIER]
+        [--disk-encryption-key=DISK_ENCRYPTION_KEY
+          : --disk-encryption-key-keyring=DISK_ENCRYPTION_KEY_KEYRING
+          --disk-encryption-key-location=DISK_ENCRYPTION_KEY_LOCATION
+          --disk-encryption-key-project=DISK_ENCRYPTION_KEY_PROJECT]
         [--master-dump-file-path=MASTER_DUMP_FILE_PATH
           --master-username=MASTER_USERNAME
           : [--master-ca-certificate-path=MASTER_CA_CERTIFICATE_PATH
@@ -216,6 +220,26 @@ FLAGS
         IMPORTANT: First Generation instances are deprecated. If you're
         considering any First Generation tiers, we recommend using Second
         Generation instead.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the instance. The 'Compute Engine Service Agent'
+     service account must hold permission 'Cloud KMS CryptoKey
+     Encrypter/Decrypter'. The arguments in this group can be used to specify
+     the attributes of this resource.
+
+       --disk-encryption-key=DISK_ENCRYPTION_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --disk-encryption-key-keyring=DISK_ENCRYPTION_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --disk-encryption-key-location=DISK_ENCRYPTION_KEY_LOCATION
+          The Cloud location for the key.
+
+       --disk-encryption-key-project=DISK_ENCRYPTION_KEY_PROJECT
+          The Cloud project for the key.
 
      Options for creating an internal replica of an external data source.
 

@@ -35,14 +35,14 @@ class _InstanceGroupManagerCreateInstanceTestBase(sdk_test_base.WithFakeAuth,
                                                   cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'beta')
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE
-    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
+    self.endpoint_uri = 'https://compute.googleapis.com/compute/beta/'
     self.project_uri = '{endpoint_uri}projects/fake-project'.format(
         endpoint_uri=self.endpoint_uri)
 
@@ -79,7 +79,7 @@ class _InstanceGroupManagerCreateInstanceTestBase(sdk_test_base.WithFakeAuth,
         key=key, value=value)
 
 
-class InstanceGroupManagerCreateInstanceZonalTest(
+class InstanceGroupManagerCreateInstanceBetaZonalTest(
     _InstanceGroupManagerCreateInstanceTestBase):
 
   def _ExpectListPerInstanceConfigs(self,
@@ -233,7 +233,7 @@ class InstanceGroupManagerCreateInstanceZonalTest(
           """.format(project_uri=self.project_uri))
 
 
-class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
+class InstanceGroupManagerCreateInstanceBetaRegionalTest(
     _InstanceGroupManagerCreateInstanceTestBase):
 
   def _ExpectListManagedInstances(self):
@@ -395,6 +395,38 @@ class InstanceGroupManagerInstanceConfigsCreateRegionalTest(
           --region us-central2
           --instance foo
         """)
+
+
+class InstanceGroupManagerCreateInstanceAlphaZonalTest(
+    InstanceGroupManagerCreateInstanceBetaZonalTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
+    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
+        endpoint_uri=self.endpoint_uri)
+
+
+class InstanceGroupManagerCreateInstanceAlphaRegionalTest(
+    InstanceGroupManagerCreateInstanceBetaRegionalTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+    self.endpoint_uri = 'https://compute.googleapis.com/compute/alpha/'
+    self.project_uri = '{endpoint_uri}projects/fake-project'.format(
+        endpoint_uri=self.endpoint_uri)
 
 
 if __name__ == '__main__':

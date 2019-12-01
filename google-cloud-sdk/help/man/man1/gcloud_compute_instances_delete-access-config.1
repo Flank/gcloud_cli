@@ -29,7 +29,9 @@ virtual machine.
 .RS 2m
 .TP 2m
 \fIINSTANCE_NAME\fR
-Name of the instance to operate on.
+Name of the instance to operate on. For details on valid instance names, refer
+to the criteria documented under the field 'name' at:
+https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 
 .RE
@@ -99,7 +101,7 @@ To remove the externally accessible IP from a virtual machine named
 
 .RS 2m
 $ gcloud compute instances delete\-access\-config example\-instance \e
-    \-\-zone us\-central1\-a
+    \-\-zone=us\-central1\-a
 .RE
 
 

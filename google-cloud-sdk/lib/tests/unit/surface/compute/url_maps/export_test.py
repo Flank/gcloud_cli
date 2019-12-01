@@ -28,12 +28,12 @@ from tests.lib import test_case
 from tests.lib.surface.compute import url_maps_test_base
 
 
-class UrlMapsExportTestBeta(url_maps_test_base.UrlMapsTestBase):
+class UrlMapsExportTest(url_maps_test_base.UrlMapsTestBase):
 
   def PreSetUp(self):
     # TODO(b/135125441): Use SelectApi() instead.
-    self.track = calliope.base.ReleaseTrack.BETA
-    self._api = 'beta'
+    self.track = calliope.base.ReleaseTrack.GA
+    self._api = 'v1'
 
   def RunExport(self, command):
     self.Run('compute url-maps export ' + command)
@@ -41,20 +41,37 @@ class UrlMapsExportTestBeta(url_maps_test_base.UrlMapsTestBase):
   def testExportToStdOut(self):
     url_map_ref = self.GetUrlMapRef('url-map-1')
     url_map = self.MakeTestUrlMap(self.messages, self._api)
+    url_map.defaultRouteAction = self.messages.HttpRouteAction(
+        timeout=self.messages.Duration(seconds=1000))
 
     self.ExpectGetRequest(url_map_ref=url_map_ref, url_map=url_map)
 
-    self.RunExport('url-map-1 --global')
+    global_flag = '--global'
+    if self._api == 'v1':
+      # --global is only applicable for alpha and beta
+      global_flag = ''
+    self.RunExport('url-map-1 {0}'.format(global_flag))
 
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
+            defaultRouteAction:
+              timeout:
+                seconds: 1000
             defaultService: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/backendServices/default-service
             name: url-map-1
             selfLink: https://compute.googleapis.com/compute/%(api)s/projects/my-project/global/urlMaps/url-map-1
             """ % {'api': self._api}))
 
+
+class UrlMapsExportTestBeta(UrlMapsExportTest):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
+
   def testExportToFile(self):
+    # Regional urlmaps are only applicable for alpha and beta
     url_map_ref = self.GetUrlMapRef('url-map-1', region='alaska')
     url_map = self.MakeTestUrlMap(self.messages, self._api)
 

@@ -8,7 +8,10 @@ SYNOPSIS
         [--peer-project=PEER_PROJECT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Create a Google Compute Engine network peering.
+    gcloud compute networks peerings create is used to create peerings between
+    virtual networks. Each side of a peering association is set up
+    independently. Peering will be active only when the configuration from both
+    sides matches.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -41,6 +44,14 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To create a network peering with the name 'peering-name' between the
+    network 'local-network' and the network 'peer-network', run:
+
+        $ gcloud compute networks peerings create peering-name \
+          --network=local-network \
+          --peer-network=peer-network
 
 NOTES
     These variants are also available:

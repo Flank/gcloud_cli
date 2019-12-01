@@ -31,15 +31,6 @@ import six.moves.urllib.parse
 import six.moves.urllib.request
 
 
-def IsGCDComponentInstalled():
-  try:
-    util.EnsureComponentIsInstalled('gcd-emulator',
-                                    datastore_util.DATASTORE_TITLE)
-  except:  # pylint:disable=bare-except
-    return False
-  return True
-
-
 def IsCloudDatastoreEmulatorComponentInstalled():
   try:
     util.EnsureComponentIsInstalled('cloud-datastore-emulator',
@@ -59,36 +50,14 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
   def Project(self):
     return 'fake-project'
 
-  @test_case.Filters.SkipOnWindows('Failing on Windows', 'b/36216325')
-  @test_case.Filters.RunOnlyIf(IsGCDComponentInstalled(),
-                               'Need GCD')
-  def testStartLegacyEmulatorAndPrintEnv(self):
-    self.doTestStartEmulatorAndPrintEnv(True)
-
   @test_case.Filters.RunOnlyIf(IsCloudDatastoreEmulatorComponentInstalled(),
                                'Need Cloud Datastore Emulator')
-  def testStartDefaultEmulatorAndPrintEnv(self):
-    self.doTestStartEmulatorAndPrintEnv(None)
-
-  @test_case.Filters.RunOnlyIf(IsCloudDatastoreEmulatorComponentInstalled(),
-                               'Need Cloud Datastore Emulator')
-  def testLegacyEmulatorAndPrintEnv(self):
-    self.doTestStartEmulatorAndPrintEnv(False)
-
-  def doTestStartEmulatorAndPrintEnv(self, legacy):
+  def testStartEmulatorAndPrintEnv(self):
     port = self.GetPort()
     args = ['beta', 'emulators', 'datastore', 'start',
             '--host-port=localhost:' + port,]
-    if legacy:
-      args.append('--legacy')
-    elif legacy is not None:
-      args.append('--no-legacy')
 
-    # The default should have the same characteristics as no-legacy.
-    if legacy:
-      match_text = '[datastore] INFO: Dev App Server is now running'
-    else:
-      match_text = 'Dev App Server is now running.'
+    match_text = 'Dev App Server is now running.'
 
     with self.ExecuteScriptAsync(
         'gcloud',
@@ -99,12 +68,8 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
       data = encoding.Decode(
           six.moves.urllib.request.urlopen('http://localhost:' + port).read(),
           'utf-8')
-      if legacy:
-        self.assertTrue('Cloud Datastore service' in data,
-                        'Datastore was not started')
-      else:
-        self.assertTrue('Ok' in data,
-                        'Datastore was not started')
+      self.assertTrue('Ok' in data,
+                      'Datastore was not started')
 
     self.Run('beta emulators datastore env-init')
     self.AssertOutputContains('DATASTORE_HOST=http://localhost:' + port)

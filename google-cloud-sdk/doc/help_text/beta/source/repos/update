@@ -9,9 +9,6 @@ SYNOPSIS
           --service-account=SERVICE_ACCOUNT --topic-project=TOPIC_PROJECT)
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) Update the configuration of a Cloud Source Repository.
-
 POSITIONAL ARGUMENTS
      Repo resource - Name of the Cloud Source repository to update. This
      represents a Cloud resource. (NOTE) Some attributes are not given
@@ -83,6 +80,14 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To associate a Cloud Pub/Sub topic to receive repository update
+    notifications, run:
+
+        $ gcloud beta source repos update --add-topic=TOPIC_NAME \
+            --service-account=SERVICE_ACCOUNT_EMAIL \
+            --message-format=json
 
 NOTES
     This command is currently in BETA and may change without notice. These

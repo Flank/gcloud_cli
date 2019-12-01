@@ -94,6 +94,16 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         'k3': 'v3',
     }, dict(self.template.env_vars.literals))
 
+  def testEnvLiteralUpdateEmptyString(self):
+    # Because the `value` field is omitempty, when an empty string is passed
+    # as the value the field is left unset. Assigning the value to None here
+    # replicates that unset behavior.
+    self.template.env_vars.literals.update({'k1': None})
+    env_change = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update={'k1': 'v1'})
+    self.resource = env_change.Adjust(self.resource)
+    self.assertDictEqual({'k1': 'v1'}, dict(self.template.env_vars.literals))
+
   def testEnvLiteralRemove(self):
     self.template.env_vars.literals.update({'k1': 'v1', 'k2': 'v2'})
     env_change = config_changes.EnvVarLiteralChanges(env_vars_to_remove=['k1'])
@@ -523,7 +533,7 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
         latestRevision=True, percent=100)
     self.resource.traffic[traffic.LATEST_REVISION_KEY] = latest100
     self.resource = config_changes.TrafficChanges(
-        {'r1': 90}, 10).Adjust(self.resource)
+        {'r1': 90, 'LATEST': 10}).Adjust(self.resource)
     latest10 = self.serverless_messages.TrafficTarget(
         latestRevision=True, percent=10)
     r190 = self.serverless_messages.TrafficTarget(
@@ -531,22 +541,86 @@ class ConfigChangesTest(base.ServerlessApiBase, test_case.TestCase,
     expect = {'r1': r190, traffic.LATEST_REVISION_KEY: latest10}
     self.assertEqual(expect, self.resource.traffic)
 
-  @parameterized.parameters(
-      ('somecmd', ['somecmd']),
-      ('some/cmd   and\nmore', ['some/cmd', 'and', 'more']),
-      ('some "quoted command"', ['some', 'quoted command']))
-  def testContainerCommandChange(self, input_str, expected_list):
-    self.template.container.command = []
-    self.resource = config_changes.ContainerCommandChange(input_str).Adjust(
+  def testContainerPortChangeNumberNewPort(self):
+    self.reource = config_changes.ContainerPortChange(port='123').Adjust(
         self.resource)
-    self.assertEqual(expected_list, self.template.container.command)
+    self.assertEqual(1, len(self.resource.template.container.ports))
+    self.assertIsNone(self.resource.template.container.ports[0].name)
+    self.assertEqual(
+        123, self.resource.template.container.ports[0].containerPort)
 
-  @parameterized.parameters(
-      ('--flag value', ['--flag', 'value']),
-      ('$(VAR)   --flag     value', ['$(VAR)', '--flag', 'value']),
-      ('--flag="multi word  value"', ['--flag=multi word  value']))
-  def testContainerArgsChange(self, input_str, expected_list):
-    self.template.container.args = []
-    self.resource = config_changes.ContainerArgsChange(input_str).Adjust(
+  def testContainerPortChangeNameNewPort(self):
+    self.reource = config_changes.ContainerPortChange(use_http2=True).Adjust(
         self.resource)
-    self.assertEqual(expected_list, self.template.container.args)
+    self.assertEqual(1, len(self.resource.template.container.ports))
+    self.assertEqual(
+        'h2c', self.resource.template.container.ports[0].name)
+    self.assertEqual(
+        8080, self.resource.template.container.ports[0].containerPort)
+
+  def testContainerPortChangeUnnameNewPort(self):
+    self.reource = config_changes.ContainerPortChange(use_http2=False).Adjust(
+        self.resource)
+    self.assertEqual(0, len(self.resource.template.container.ports))
+
+  def testContainerPortChangeNumberExistingPort(self):
+    self.resource.template.container.ports = [
+        self.serverless_messages.ContainerPort(containerPort=456)
+    ]
+    self.reource = config_changes.ContainerPortChange(port='123').Adjust(
+        self.resource)
+    self.assertEqual(1, len(self.resource.template.container.ports))
+    self.assertIsNone(self.resource.template.container.ports[0].name)
+    self.assertEqual(
+        123, self.resource.template.container.ports[0].containerPort)
+
+  def testContainerPortChangeNameExistingPort(self):
+    self.resource.template.container.ports = [
+        self.serverless_messages.ContainerPort(containerPort=456)
+    ]
+    self.reource = config_changes.ContainerPortChange(use_http2=True).Adjust(
+        self.resource)
+    self.assertEqual(1, len(self.resource.template.container.ports))
+    self.assertEqual(
+        'h2c', self.resource.template.container.ports[0].name)
+    self.assertEqual(
+        456, self.resource.template.container.ports[0].containerPort)
+
+  def testContainerPortChangeUnnameExistingPort(self):
+    self.resource.template.container.ports = [
+        self.serverless_messages.ContainerPort(name='h2c', containerPort=456)
+    ]
+    self.reource = config_changes.ContainerPortChange(use_http2=False).Adjust(
+        self.resource)
+    self.assertEqual(1, len(self.resource.template.container.ports))
+    self.assertIsNone(self.resource.template.container.ports[0].name)
+    self.assertEqual(
+        456, self.resource.template.container.ports[0].containerPort)
+
+  def testContainerPortChangeNumberDefault(self):
+    self.resource.template.container.ports = [
+        self.serverless_messages.ContainerPort(containerPort=456)
+    ]
+    self.reource = config_changes.ContainerPortChange(port='default').Adjust(
+        self.resource)
+    self.assertEqual(0, len(self.resource.template.container.ports))
+
+  def testContainerPortChangeNumberDefaultExistingName(self):
+    self.resource.template.container.ports = [
+        self.serverless_messages.ContainerPort(name='h2c', containerPort=456)
+    ]
+    self.reource = config_changes.ContainerPortChange(port='default').Adjust(
+        self.resource)
+    self.assertEqual(1, len(self.resource.template.container.ports))
+    self.assertEqual(
+        'h2c', self.resource.template.container.ports[0].name)
+    self.assertEqual(
+        8080, self.resource.template.container.ports[0].containerPort)
+
+  def testContainerPortChangeNumberDefaultAndUnname(self):
+    self.resource.template.container.ports = [
+        self.serverless_messages.ContainerPort(name='h2c', containerPort=456)
+    ]
+    self.reource = config_changes.ContainerPortChange(
+        port='default', use_http2=False).Adjust(self.resource)
+    self.assertEqual(0, len(self.resource.template.container.ports))

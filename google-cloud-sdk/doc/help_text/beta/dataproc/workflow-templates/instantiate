@@ -15,7 +15,7 @@ POSITIONAL ARGUMENTS
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: provide the
-     argument [TEMPLATE] on the command line with a fully specified name;
+     argument [template] on the command line with a fully specified name;
      provide the argument [--project] on the command line; set the property
      [core/project]. This must be specified.
 

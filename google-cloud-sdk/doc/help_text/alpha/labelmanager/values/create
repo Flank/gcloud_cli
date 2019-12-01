@@ -1,0 +1,71 @@
+NAME
+    gcloud alpha labelmanager values create - creates a LabelValue resource
+
+SYNOPSIS
+    gcloud alpha labelmanager values create
+        [DISPLAY_NAME --label-key=LABEL_KEY : --label-parent=LABEL_PARENT]
+        [--async] [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates a LabelValue resource given the display name and
+    description as well as details on the parent of the LabelValue. The
+    LabelValaue is always a LabelKey and the LabelKey's details can be passed
+    as a numeric id or the display name along with the label-parent.
+
+POSITIONAL ARGUMENTS
+     LabelValue.
+
+       DISPLAY_NAME
+          Display name for the LabelKey. The display name must be 1-63
+          characters, beginning and ending with an alphanumeric character
+          ([a-z0-9A-Z]) with dashes (-), underscores (), dots (.), and
+          alphanumerics between. This positional must be specified if any of
+          the other arguments in this group are specified.
+
+       --label-key=LABEL_KEY
+          Display name or numeric id of the parent LabelKey. Numeric ids should
+          be of the form labelKeys/{numeric_id} This flag must be specified if
+          any of the other arguments in this group are specified.
+
+       --label-parent=LABEL_PARENT
+          Parent of the LabelKey. This must be the form organizations/{org_id}.
+          --label-parent is required when using display name instead of numeric
+          id for the --label-key flag.
+
+FLAGS
+     --async
+        Return immediately, without waiting for the operation in progress to
+        complete.
+
+     --description=DESCRIPTION
+        Optional user-assigned description of the label. Must not exceed 256
+        characters.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To create a label value with the display name 'test' under a label key with
+    display name env and under organization 123 run:
+
+        $ gcloud alpha labelmanager values create test --label-key='env'
+            --label-parent='organizations/123' --description='description'
+
+    To create a label value with the display name 'test' under label key with
+    id 456 run:
+
+        $ gcloud alpha labelmanager values create test \
+            --label-key='labelKeys/456'
+            --description='description'
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

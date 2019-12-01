@@ -17,6 +17,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     create
+        (ALPHA) Creates a bucket.
+
      describe
         (ALPHA) Displays information about a bucket.
 

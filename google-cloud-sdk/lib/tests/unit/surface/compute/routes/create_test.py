@@ -187,7 +187,7 @@ class RoutesCreateTest(test_base.BaseTest):
   def testWithNoNextHop(self):
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of (--next-hop-address | --next-hop-gateway | '
-        '--next-hop-instance | --next-hop-vpn-tunnel) '
+        '--next-hop-ilb | --next-hop-instance | --next-hop-vpn-tunnel) '
         'must be specified.'):
       self.Run("""
           compute routes create my-route
@@ -199,7 +199,8 @@ class RoutesCreateTest(test_base.BaseTest):
   def testWithManyNextHops(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --next-hop-gateway: Exactly one of (--next-hop-address | '
-        '--next-hop-gateway | --next-hop-instance | --next-hop-vpn-tunnel) '
+        '--next-hop-gateway | --next-hop-ilb | --next-hop-instance | '
+        '--next-hop-vpn-tunnel) '
         'must be specified.'):
       self.Run("""
           compute routes create my-route
@@ -433,13 +434,6 @@ class RoutesCreateTest(test_base.BaseTest):
             --next-hop-vpn-tunnel-region us-central1-a
           """)
 
-
-class RoutesCreateAlphaTest(RoutesCreateTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
   def testWithNextHopIlb(self):
     messages = self.messages
     self.Run("""
@@ -459,7 +453,8 @@ class RoutesCreateAlphaTest(RoutesCreateTest):
                           '/projects/my-project/global/networks/default'),
                  nextHopIlb=(
                      self.compute_uri + '/projects/my-project'
-                     '/regions/us-central1/forwardingRules/my-forwarding-rule'),
+                                        '/regions/us-central1/f'
+                                        'orwardingRules/my-forwarding-rule'),
                  priority=1000,
              ),
              project='my-project'))
@@ -496,7 +491,8 @@ class RoutesCreateAlphaTest(RoutesCreateTest):
                            '/projects/my-project/global/networks/default'),
                   nextHopIlb=(
                       self.compute_uri + '/projects/my-project'
-                      '/regions/region-1/forwardingRules/my-forwarding-rule'),
+                                         '/regions/region-1/forwardingRules/'
+                                         'my-forwarding-rule'),
                   priority=1000,
               ),
               project='my-project'))],
@@ -513,41 +509,19 @@ class RoutesCreateAlphaTest(RoutesCreateTest):
             --next-hop-ilb-region us-central1-a
           """)
 
-  def testWithNoNextHop(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Exactly one of (--next-hop-address | --next-hop-gateway | '
-        '--next-hop-ilb | --next-hop-instance | --next-hop-vpn-tunnel) '
-        'must be specified.'):
-      self.Run("""
-          compute routes create my-route
-            --destination-range 10.0.0.0/8
-          """)
 
-    self.CheckRequests()
-
-  def testWithManyNextHops(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --next-hop-gateway: Exactly one of (--next-hop-address | '
-        '--next-hop-gateway | --next-hop-ilb | --next-hop-instance | '
-        '--next-hop-vpn-tunnel) '
-        'must be specified.'):
-      self.Run("""
-          compute routes create my-route
-            --destination-range 10.0.0.0/8
-            --next-hop-instance my-instance
-            --next-hop-instance-zone us-central1-a
-            --next-hop-gateway default-internet-gateway
-          """)
-
-    self.CheckRequests()
-
-
-class RoutesCreateBetaTest(RoutesCreateAlphaTest):
+class RoutesCreateBetaTest(RoutesCreateTest):
 
   def SetUp(self):
     self.SelectApi('beta')
     self.track = calliope_base.ReleaseTrack.BETA
 
+
+class RoutesCreateAlphaTest(RoutesCreateBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

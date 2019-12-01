@@ -9,17 +9,18 @@ SYNOPSIS
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
         [--create-subnetwork=[KEY=VALUE,...]]
+        [--database-encryption-key=DATABASE_ENCRYPTION_KEY]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--enable-autoupgrade] [--enable-binauthz] [--enable-cloud-logging]
-        [--enable-cloud-monitoring] [--enable-intra-node-visibility]
-        [--enable-ip-alias] [--enable-kubernetes-alpha]
-        [--enable-legacy-authorization] [--enable-network-policy]
-        [--enable-stackdriver-kubernetes] [--image-type=IMAGE_TYPE]
+        [--no-enable-autoupgrade] [--enable-binauthz] [--enable-cloud-logging]
+        [--enable-cloud-monitoring] [--enable-cloud-run-alpha]
+        [--enable-intra-node-visibility] [--enable-ip-alias]
+        [--enable-kubernetes-alpha] [--enable-legacy-authorization]
+        [--enable-network-policy] [--enable-stackdriver-kubernetes]
+        [--enable-vertical-pod-autoscaling] [--image-type=IMAGE_TYPE]
         [--issue-client-certificate] [--labels=[KEY=VALUE,...]]
         [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
-        [--maintenance-window=START_TIME]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -29,7 +30,16 @@ SYNOPSIS
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
         [--num-nodes=NUM_NODES; default=3] [--preemptible]
         [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
+        [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
+        [[--enable-autoprovisioning
+          : --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
+          | [--max-cpu=MAX_CPU --max-memory=MAX_MEMORY
+          : --autoprovisioning-locations=ZONE,[ZONE,...] --min-cpu=MIN_CPU
+          --min-memory=MIN_MEMORY --autoprovisioning-scopes=[SCOPE,...]
+          --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
+          [--max-accelerator=[type=TYPE,count=COUNT,...]
+          : --min-accelerator=[type=TYPE,count=COUNT,...]]]]]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--enable-master-authorized-networks
           --master-authorized-networks=NETWORK,[NETWORK,...]]
@@ -39,6 +49,9 @@ SYNOPSIS
         [--enable-private-endpoint
           --enable-private-nodes --master-ipv4-cidr=MASTER_IPV4_CIDR]
         [--enable-tpu --tpu-ipv4-cidr=CIDR]
+        [--maintenance-window=START_TIME | --maintenance-window-end=TIME_STAMP
+          --maintenance-window-recurrence=RRULE
+          --maintenance-window-start=TIME_STAMP]
         [--password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
@@ -92,12 +105,12 @@ FLAGS
 
      --addons=[ADDON,...]
         Addons
-        (https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+        (https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster.AddonsConfig)
         are additional Kubernetes cluster components. Addons specified by this
         flag will be enabled. The others will be disabled. Default addons:
         HttpLoadBalancing, HorizontalPodAutoscaling. ADDON must be one of:
         HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        NetworkPolicy.
+        NetworkPolicy, CloudRun.
 
      --async
         Return immediately, without waiting for the operation in progress to
@@ -162,6 +175,16 @@ FLAGS
         Can not be specified unless '--enable-ip-alias' is also specified. Can
         not be used in conjunction with the '--subnetwork' option.
 
+     --database-encryption-key=DATABASE_ENCRYPTION_KEY
+        Enable Database Encryption.
+
+        Enable database encryption that will be used to encrypt Kubernetes
+        Secrets at the application layer. The key provided should be the
+        resource ID in the format of
+        projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+        For more information, see
+        <https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets>.
+
      --default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE
         The default max number of pods per node for node pools in the cluster.
 
@@ -200,6 +223,8 @@ FLAGS
         See https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
         for more info.
 
+        Enabled by default, use --no-enable-autoupgrade to disable.
+
      --enable-binauthz
         Enable Binary Authorization for this cluster.
 
@@ -225,6 +250,14 @@ FLAGS
         --enable-stackdriver-kubernetes instead, to migrate to new Stackdriver
         Kubernetes Engine monitoring and logging. For more details, please
         read: https://cloud.google.com/monitoring/kubernetes-engine/migration.
+
+     --enable-cloud-run-alpha
+        Enable Cloud Run alpha features on this cluster. Selecting this option
+        will result in the cluster having all Cloud Run alpha API groups and
+        features turned on.
+
+        Cloud Run alpha clusters are not covered by the Cloud Run SLA and
+        should not be used for production workloads.
 
      --enable-intra-node-visibility
         Enable Intra-node visibility for this cluster.
@@ -268,6 +301,9 @@ FLAGS
 
      --enable-stackdriver-kubernetes
         Enable Stackdriver Kubernetes monitoring and logging.
+
+     --enable-vertical-pod-autoscaling
+        Enable vertical pod autoscaling for a cluster.
 
      --image-type=IMAGE_TYPE
         The image type to use for the cluster. Defaults to server-specified.
@@ -322,15 +358,6 @@ FLAGS
 
             $ gcloud container clusters create high-mem-pool \
                 --machine-type=custom-2-12288
-
-     --maintenance-window=START_TIME
-        Set a time of day when you prefer maintenance to start on this cluster.
-        For example:
-
-            $ gcloud container clusters create example-cluster \
-                --maintenance-window=12:43
-
-        The time corresponds to the UTC time zone, and must be in HH:MM format.
 
      --max-nodes-per-pool=MAX_NODES_PER_POOL
         The maximum number of nodes to allocate per default initial node pool.
@@ -496,6 +523,15 @@ FLAGS
         Must be used in conjunction with '--enable-ip-alias'. Cannot be used
         with --create-subnetwork.
 
+     --shielded-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created.
+
+     --shielded-secure-boot
+        The instance will boot with secure boot enabled.
+
      --subnetwork=SUBNETWORK
         The Google Compute Engine subnetwork
         (https://cloud.google.com/compute/docs/subnetworks) to which the
@@ -515,6 +551,124 @@ FLAGS
         firewall rules. See
         https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
         for examples.
+
+     Node autoprovisioning
+
+       --enable-autoprovisioning
+          Enables node autoprovisioning for a cluster.
+
+          Cluster Autoscaler will be able to create new node pools. Requires
+          maximum CPU and memory limits to be specified. This flag must be
+          specified if any of the other arguments in this group are specified.
+
+       At most one of these may be specified:
+
+         --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
+            Path of the JSON/YAML file which contains information about the
+            cluster's node autoprovisioning configuration. Currently it
+            contains a list of resource limits, identity defaults for
+            autoprovisioning and node locations for autoprovisioning.
+
+            Resource limits are specified in the field 'resourceLimits'. Each
+            resource limits definition contains three fields: resourceType,
+            maximum and minimum. Resource type can be "cpu", "memory" or an
+            accelerator (e.g. "nvidia-tesla-k80" for nVidia Tesla K80). Use
+            gcloud compute accelerator-types list to learn about available
+            accelerator types. Maximum is the maximum allowed amount with the
+            unit of the resource. Minimum is the minimum allowed amount with
+            the unit of the resource.
+
+            Identity default contains at most one of the below fields:
+            serviceAccount: The Google Cloud Platform Service Account to be
+            used by node VMs in autoprovisioined node pools. If not specified,
+            the project default service account is used. scopes: A list of
+            scopes be used by node instances in autoprovisioined node pools.
+            Multiple scopes can be specified, separated by commas. For
+            information on defaults, look at:
+            https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+            Autoprovisioning locations is a set of zones where new node pools
+            can be created by Autoprovisioning. Autoprovisioning locations are
+            specified in the field 'autoprovisioningLocations'. All zones must
+            be in the same region as the cluster's master(s).
+
+         Flags to configure autoprovisioned nodes
+
+           --max-cpu=MAX_CPU
+              Maximum number of cores in the cluster.
+
+              Maximum number of cores to which the cluster can scale. This flag
+              must be specified if any of the other arguments in this group are
+              specified.
+
+           --max-memory=MAX_MEMORY
+              Maximum memory in the cluster.
+
+              Maximum number of gigabytes of memory to which the cluster can
+              scale. This flag must be specified if any of the other arguments
+              in this group are specified.
+
+           --autoprovisioning-locations=ZONE,[ZONE,...]
+              Set of zones where new node pools can be created by
+              autoprovisioning. All zones must be in the same region as the
+              cluster's master(s). Multiple locations can be specified,
+              separated by commas.
+
+           --min-cpu=MIN_CPU
+              Minimum number of cores in the cluster.
+
+              Minimum number of cores to which the cluster can scale.
+
+           --min-memory=MIN_MEMORY
+              Minimum memory in the cluster.
+
+              Minimum number of gigabytes of memory to which the cluster can
+              scale.
+
+           Flags to specify identity for autoprovisioned nodes:
+
+             --autoprovisioning-scopes=[SCOPE,...]
+                The scopes be used by node instances in autoprovisioined node
+                pools. Multiple scopes can be specified, separated by commas.
+                For information on defaults, look at:
+                https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+             --autoprovisioning-service-account=AUTOPROVISIONING_SERVICE_ACCOUNT
+                The Google Cloud Platform Service Account to be used by node
+                VMs in autoprovisioined node pools. If not specified, the
+                project default service account is used.
+
+           Arguments to set limits on accelerators:
+
+             --max-accelerator=[type=TYPE,count=COUNT,...]
+                Sets maximum limit for a single type of accelerators (e.g.
+                GPUs) in cluster.
+
+       type
+          (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
+          K80) of accelerator for which the limit is set. Use gcloud compute
+          accelerator-types list to learn about all available accelerator
+          types.
+
+       count
+          (Required) The maximum number of accelerators to which the cluster
+          can be scaled. This flag must be specified if any of the other
+          arguments in this group are specified.
+
+                   --min-accelerator=[type=TYPE,count=COUNT,...]
+                      Sets minimum limit for a single type of accelerators
+                      (e.g. GPUs) in cluster. Defaults to 0 for all accelerator
+                      types if it isn't set.
+
+       type
+          (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla
+          K80) of accelerator for which the limit is set. Use gcloud compute
+          accelerator-types list to learn about all available accelerator
+          types.
+
+       count
+          (Required) The minimum number of accelerators to which the cluster
+          can be scaled.
 
      Cluster autoscaling
 
@@ -629,6 +783,68 @@ FLAGS
 
           Can not be specified unless '--enable-tpu' and '--enable-ip-alias'
           are also specified.
+
+     One of either maintenance-window or the group of maintenance-window flags
+     can be set. At most one of these may be specified:
+
+       --maintenance-window=START_TIME
+          Set a time of day when you prefer maintenance to start on this
+          cluster. For example:
+
+              $ gcloud container clusters create example-cluster \
+                  --maintenance-window=12:43
+
+          The time corresponds to the UTC time zone, and must be in HH:MM
+          format.
+
+          Non-emergency maintenance will occur in the 4 hour block starting at
+          the specified time.
+
+          This is mutually exclusive with the recurring maintenance windows and
+          will overwrite any existing window. Compatible with maintenance
+          exclusions.
+
+       Set a flexible maintenance window by specifying a window that recurs per
+       an RFC 5545 RRULE. Non-emergency maintenance will occur in the recurring
+       windows.
+
+       Examples:
+
+       For a 9-5 Mon-Wed UTC-4 maintenance window:
+
+           $ gcloud container clusters create example-cluster   \
+               --maintenance-window-start=2000-01-01T09:00:00-04:00   \
+               --maintenance-window-end=2000-01-01T17:00:00-04:00   \
+               --maintenance-window-recurrence='FREQ=WEEKLY;BYDAY=MO,TU,WE'
+
+       For a daily window from 22:00 - 04:00 UTC:
+
+           $ gcloud container clusters create example-cluster   \
+               --maintenance-window-start=2000-01-01T22:00:00Z   \
+               --maintenance-window-end=2000-01-02T04:00:00Z   \
+               --maintenance-window-recurrence=FREQ=DAILY
+
+         --maintenance-window-end=TIME_STAMP
+            End time of the first window (can occur in the past). Must take
+            place after the start time. The difference in start and end time
+            specifies the length of each recurrence. See $ gcloud topic
+            datetimes for information on time formats. This flag must be
+            specified if any of the other arguments in this group are
+            specified.
+
+         --maintenance-window-recurrence=RRULE
+            An RFC 5545 RRULE, specifying how the window will recur. Note that
+            minimum requirements for maintenance periods will be enforced. Note
+            that FREQ=SECONDLY, MINUTELY, and HOURLY are not supported. This
+            flag must be specified if any of the other arguments in this group
+            are specified.
+
+         --maintenance-window-start=TIME_STAMP
+            Start time of the first window (can occur in the past). The start
+            time influences when the window will start for recurrences. See $
+            gcloud topic datetimes for information on time formats. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
 
      Basic auth
 

@@ -55,8 +55,8 @@ EXAMPLES
     To update a type provider, run:
 
         $ gcloud alpha deployment-manager type-providers update \
-            my-type-provider --api-options=my-options.yaml \
-            --descriptor-url <descriptor URL> --description "My type."
+            my-type-provider --api-options-file=my-options.yaml \
+            --descriptor-url=<descriptor URL> --description="My type."
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

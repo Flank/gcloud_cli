@@ -14,15 +14,6 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-COMMANDS
-    COMMAND is one of the following:
-
-     register-cluster
-        (BETA) Registers a cluster with Google Cloud Platform.
-
-     unregister-cluster
-        (BETA) Unregisters a cluster from Google Cloud Platform.
-
 EXAMPLES
     Register a cluster referenced from the default kubeconfig file, installing
     the Connect agent:

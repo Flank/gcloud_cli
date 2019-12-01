@@ -1,0 +1,104 @@
+NAME
+    gcloud alpha asset analyze-iam-policy - analyzes accessible IAM policies
+        that match a request
+
+SYNOPSIS
+    gcloud alpha asset analyze-iam-policy --organization=ORGANIZATION_ID
+        [--full-resource-name=FULL_RESOURCE_NAME] [--identity=IDENTITY]
+        [--expand-groups --expand-resources --expand-roles --output-group-edges
+          --output-partial-result-before-timeout --output-resource-edges]
+        [--permissions=[PERMISSIONS,...] --roles=[ROLES,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Analyzes accessible IAM policies that match a request.
+
+REQUIRED FLAGS
+     --organization=ORGANIZATION_ID
+        The organization ID to perform the analysis.
+
+OPTIONAL FLAGS
+     Specifies a resource for analysis. Leaving it empty means ANY.
+
+       --full-resource-name=FULL_RESOURCE_NAME
+          The full resource name.
+
+     Specifies an identity for analysis. Leaving it empty means ANY.
+
+       --identity=IDENTITY
+          The identity appearing in the form of members in the IAM policy
+          binding.
+
+     The analysis options.
+
+       --expand-groups
+          If true, the identities section of the result will expand any Google
+          groups appearing in an IAM policy binding. Default is false.
+
+       --expand-resources
+          If true, the resource section of the result will expand any resource
+          attached to an IAM policy to include resources lower in the resource
+          hierarchy. Default is false.
+
+       --expand-roles
+          If true, the access section of result will expand any roles appearing
+          in IAM policy bindings to include their permissions. Default is
+          false.
+
+       --output-group-edges
+          If true, the result will output group identity edges, starting from
+          the binding's group members, to any expanded identities. Default is
+          false.
+
+       --output-partial-result-before-timeout
+          If true, you will get a response with a partial result instead of a
+          DEADLINE_EXCEEDED error when your request processing takes longer
+          than the deadline. Default is false.
+
+       --output-resource-edges
+          If true, the result will output resource edges, starting from the
+          policy attached resource, to any expanded resources. Default is
+          false.
+
+     Specifies roles or permissions for analysis. Leaving it empty means ANY.
+
+       --permissions=[PERMISSIONS,...]
+          The permissions to appear in the result.
+
+       --roles=[ROLES,...]
+          The roles to appear in the result.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To find out who has iam.serviceAccounts.actAs permission permission on a
+    specified service account, run:
+
+    $ gcloud alpha asset analyze-iam-policy --organization=YOUR_ORG_ID
+    --full-resource-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT'
+    --permissions='iam.serviceAccounts.actAs'
+    --output-partial-result-before-timeout
+
+    To find out which resources a specified user can access, run:
+
+    $ gcloud alpha asset analyze-iam-policy --organization=YOUR_ORG_ID
+    --identity='user:u1@foo.com' --output-partial-result-before-timeout
+
+    To find out which accesses (roles or permissions) a specified user has on a
+    specified project, run:
+
+    $ gcloud alpha asset analyze-iam-policy --organization=YOUR_ORG_ID
+    --full-resource-name='//cloudresourcemanager.googleapis.com/projects/YOUR_PROJ_ID'
+    --identity='user:u1@foo.com' --output-partial-result-before-timeout
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you may be trying to access an API with an invitation-only early
+    access whitelist.
+

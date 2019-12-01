@@ -4,11 +4,13 @@ NAME
 SYNOPSIS
     gcloud beta ai-platform versions create VERSION --model=MODEL
         [--accelerator=[count=COUNT],[type=TYPE]] [--async] [--config=CONFIG]
-        [--description=DESCRIPTION] [--framework=FRAMEWORK]
-        [--labels=[KEY=VALUE,...]] [--machine-type=MACHINE_TYPE]
-        [--origin=ORIGIN] [--python-version=PYTHON_VERSION]
-        [--runtime-version=RUNTIME_VERSION] [--service-account=SERVICE_ACCOUNT]
-        [--staging-bucket=STAGING_BUCKET]
+        [--description=DESCRIPTION] [--explanation-method=EXPLANATION_METHOD]
+        [--framework=FRAMEWORK] [--labels=[KEY=VALUE,...]]
+        [--machine-type=MACHINE_TYPE]
+        [--num-integral-steps=NUM_INTEGRAL_STEPS; default=50]
+        [--num-paths=NUM_PATHS; default=50] [--origin=ORIGIN]
+        [--python-version=PYTHON_VERSION] [--runtime-version=RUNTIME_VERSION]
+        [--service-account=SERVICE_ACCOUNT] [--staging-bucket=STAGING_BUCKET]
         [--package-uris=[PACKAGE_URI,...] --prediction-class=PREDICTION_CLASS]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -77,6 +79,15 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         The description of the version.
 
+     --explanation-method=EXPLANATION_METHOD
+        Enable explanations and select the explanation method to use.
+
+        The valid options are: integrated-gradients: Use Integrated Gradients.
+        sampled-shapley: Use Sampled Shapley.
+
+        EXPLANATION_METHOD must be one of: integrated-gradients,
+        sampled-shapley.
+
      --framework=FRAMEWORK
         The ML framework used to train this version of the model. If not
         specified, defaults to 'tensorflow'. FRAMEWORK must be one of:
@@ -94,6 +105,14 @@ OPTIONAL FLAGS
         Type of machine on which to serve the model. Currently only applies to
         online prediction. For available machine types, see
         https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#machine-types.
+
+     --num-integral-steps=NUM_INTEGRAL_STEPS; default=50
+        Number of integral steps for Integrated Gradients. Only valid when
+        --explanation-method=integrated-gradients is specified.
+
+     --num-paths=NUM_PATHS; default=50
+        Number of paths for Sampled Shapley. Only valid when
+        --explanation-method=sampled-shapley is specified.
 
      --origin=ORIGIN
         Location of model/ "directory" (as output by
@@ -147,6 +166,13 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To create an AI Platform version model with the version ID 'versionId' and
+    with the name 'model-name', run:
+
+        $ gcloud beta ai-platform versions create versionId \
+            --model=model-name
 
 NOTES
     This command is currently in BETA and may change without notice. These

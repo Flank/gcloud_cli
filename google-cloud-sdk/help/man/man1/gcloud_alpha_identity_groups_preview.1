@@ -1,0 +1,107 @@
+
+.TH "GCLOUD_ALPHA_IDENTITY_GROUPS_PREVIEW" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha identity groups preview \- retrieve a list of users in a customer account using CEL query
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha identity groups preview\fR \fB\-\-customer\fR=\fICUSTOMER\fR [\fB\-\-custom\-field\-mask\fR=[\fIcustom\-mask\fR,...]] [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR;\ default=100] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-projection\fR=\fIPROJECTION\fR;\ default="basic"] [\fB\-\-query\fR=\fIQUERY\fR] [\fB\-\-view\-type\fR=\fIVIEW_TYPE\fR;\ default="admin\-view"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Retrieve a list of users in a customer account using CEL query.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-customer\fR=\fICUSTOMER\fR
+The customer ID for the customer's G Suite account.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-custom\-field\-mask\fR=[\fIcustom\-mask\fR,...]
+A comma\-separated list of schema names. All fields from these schemas are
+fetched. This should only be set when \-\-projection=custom.
+
+.TP 2m
+\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR; default=100
+Maximum number of results to return. Acceptable values are 1 to 500, inclusive.
+
+.TP 2m
+\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR
+Token to specify next page in the list.
+
+.TP 2m
+\fB\-\-projection\fR=\fIPROJECTION\fR; default="basic"
+Subsets of fields to fetch for this user. \fIPROJECTION\fR must be one of:
+\fBbasic\fR, \fBfull\fR, \fBcustom\fR.
+
+.TP 2m
+\fB\-\-query\fR=\fIQUERY\fR
+Query string using CEL and supported user attributes
+
+.TP 2m
+\fB\-\-view\-type\fR=\fIVIEW_TYPE\fR; default="admin\-view"
+Whether to fetch the administrator\-only or domain\-wide public view of the
+user. \fIVIEW_TYPE\fR must be one of: \fBadmin\-view\fR, \fBdomain\-public\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To retrieve a list of user in a customer and filter it with a query, run:
+
+.RS 2m
+$ gcloud alpha identity groups preview \e
+    \-\-query="user.locations.exists(loc, loc.desk_code == 'abc')" \e
+    \-\-customer=A1234abcd
+.RE
+
+To retrieve a list of users with only fullName and primaryEMail fields, run:
+
+.RS 2m
+$ gcloud alpha identity groups preview \e
+    \-\-query="user.locations.exists(loc, loc.desk_code == 'abc')" \e
+    \-\-customer=A1234abcd \e
+    \-\-format="flattened(nextPageToken, users[].primaryEmail,\e
+ users[].name.fullName)"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

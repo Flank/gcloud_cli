@@ -20,16 +20,20 @@ from __future__ import unicode_literals
 
 
 import re
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.firestore import e2e_base
 
 
-class ExportIntegrationTest(e2e_base.FirestoreE2ETestBase):
-  """Tests for Export command.
+class ExportIntegrationTestGA(e2e_base.FirestoreE2ETestBase):
+  """Tests for GA Export command.
 
   These tests don't test that exports actually complete because this can take
   a long time.
   """
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _verifyType(self, operation):
     self.assertRegexpMatches(
@@ -41,12 +45,12 @@ class ExportIntegrationTest(e2e_base.FirestoreE2ETestBase):
         msg='Incorrect type')
 
   def testExport(self):
-    operation = self.Run('alpha firestore export --async {}'.format(
+    operation = self.Run('firestore export --async {}'.format(
         self.GetGcsBucket()))
     self._verifyType(operation)
 
   def testExportWithCollectionIds(self):
-    operation = self.Run('alpha firestore export --async '
+    operation = self.Run('firestore export --async '
                          '--collection-ids=foo,\'id with space\' '
                          '{}'.format(self.GetGcsBucket()))
     self._verifyType(operation)

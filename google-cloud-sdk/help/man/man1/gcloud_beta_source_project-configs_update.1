@@ -15,13 +15,6 @@ gcloud beta source project\-configs update \- update the Cloud Source Repositori
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Update the Cloud Source Repositories configuration of the current
-project.
-
-
-
 .SH "REQUIRED FLAGS"
 
 .RS 2m
@@ -128,6 +121,25 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enable PushBlock for all repositories under current project, run:
+
+.RS 2m
+$ gcloud beta source project\-configs update \-\-enable\-pushblock
+.RE
+
+To associate a Cloud Pub/Sub topic to receive repository update notifications,
+run:
+
+.RS 2m
+$ gcloud beta source project\-configs update \-\-add\-topic=TOPIC_NAME \e
+    \-\-service\-account=SERVICE_ACCOUNT_EMAIL \e
+    \-\-message\-format=json
+.RE
 
 
 

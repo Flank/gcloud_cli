@@ -102,7 +102,7 @@ class UtilsTest(test_base.OrgPolicyUnitTestBase, parameterized.TestCase):
 
     rules = utils.GetMatchingRulesFromPolicy(policy, None)
 
-    self.assertEqual(rules, filtered_policy.rules)
+    self.assertEqual(rules, filtered_policy.spec.rules)
 
   def testGetMatchingRulesFromPolicy_ConditionSpecified_ReturnsMatchingRules(
       self):
@@ -126,7 +126,7 @@ class UtilsTest(test_base.OrgPolicyUnitTestBase, parameterized.TestCase):
     rules = utils.GetMatchingRulesFromPolicy(policy,
                                              self.CONDITION_EXPRESSION_A)
 
-    self.assertEqual(rules, filtered_policy.rules)
+    self.assertEqual(rules, filtered_policy.spec.rules)
 
   def testGetNonMatchingRulesFromPolicy_NoConditionSpecified_ReturnsNonMatchingRules(
       self):
@@ -143,7 +143,7 @@ class UtilsTest(test_base.OrgPolicyUnitTestBase, parameterized.TestCase):
 
     rules = utils.GetNonMatchingRulesFromPolicy(policy, None)
 
-    self.assertEqual(rules, filtered_policy.rules)
+    self.assertEqual(rules, filtered_policy.spec.rules)
 
   def testGetNonMatchingRulesFromPolicy_ConditionSpecified_ReturnsNonMatchingRules(
       self):
@@ -161,7 +161,7 @@ class UtilsTest(test_base.OrgPolicyUnitTestBase, parameterized.TestCase):
     rules = utils.GetNonMatchingRulesFromPolicy(policy,
                                                 self.CONDITION_EXPRESSION_A)
 
-    self.assertEqual(rules, filtered_policy.rules)
+    self.assertEqual(rules, filtered_policy.spec.rules)
 
   def testCreateRuleOnPolicy_NoConditionSpecified_CreatesRule(self):
     policy = self.Policy(rule_data=[{'condition': self.CONDITION_EXPRESSION_A}])

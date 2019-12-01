@@ -295,6 +295,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
+    self.should_list_per_instance_configs = True
 
 
 class InstanceGroupManagersUpdateInstancesBetaRegionalTest(
@@ -303,6 +304,7 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
+    self.should_list_per_instance_configs = True
 
 
 class InstanceGroupManagersUpdateInstancesAlphaZonalTest(

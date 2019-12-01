@@ -67,7 +67,7 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To print the IAM policy for a given device registry, run:
 
-        $ gcloud beta iot registries get-iam-policy --region us-central1 \
+        $ gcloud beta iot registries get-iam-policy --region=us-central1 \
             my-registry
 
 NOTES

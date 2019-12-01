@@ -160,6 +160,65 @@ def GetManagedZones(api_version="v1"):
   ]
 
 
+# For testing of b/133821443
+def GetManagedZonesForFiltering(api_version="v1"):
+  m = GetMessages(api_version)
+  return [
+      m.ManagedZone(
+          creationTime="2014-10-20T20:06:50.077Z",
+          description="My zone!",
+          dnsName="zone.com.",
+          id=67371891,
+          kind="dns#managedZone",
+          name="mz",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
+          nameServers=[
+              "ns-cloud-e1.googledomains.com.",
+              "ns-cloud-e2.googledomains.com.",
+              "ns-cloud-e3.googledomains.com.", "ns-cloud-e4.googledomains.com."
+          ]),
+      m.ManagedZone(
+          creationTime="2014-10-21T20:06:50.077Z",
+          description="My zone 1!",
+          dnsName="zone1.com.",
+          id=67671341,
+          kind="dns#managedZone",
+          name="mz1",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
+          nameServers=[
+              "ns-cloud-e2.googledomains.com.",
+              "ns-cloud-e1.googledomains.com.",
+              "ns-cloud-e3.googledomains.com.", "ns-cloud-e4.googledomains.com."
+          ]),
+      m.ManagedZone(
+          creationTime="2014-10-20T20:06:50.077Z",
+          description="filter zone!",
+          dnsName="filter.com.",
+          id=67371892,
+          kind="dns#managedZone",
+          name="fz1",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
+          nameServers=[
+              "ns-cloud-e1.googledomains.com.",
+              "ns-cloud-e2.googledomains.com.",
+              "ns-cloud-e3.googledomains.com.", "ns-cloud-e4.googledomains.com."
+          ]),
+      m.ManagedZone(
+          creationTime="2014-10-21T20:06:50.077Z",
+          description="Filter zone 2!",
+          dnsName="filter2.com.",
+          id=67671342,
+          kind="dns#managedZone",
+          name="fz2",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
+          nameServers=[
+              "ns-cloud-e2.googledomains.com.",
+              "ns-cloud-e1.googledomains.com.",
+              "ns-cloud-e3.googledomains.com.", "ns-cloud-e4.googledomains.com."
+          ]),
+  ]
+
+
 def GetManagedZoneBeforeCreation(messages,
                                  dns_sec_config=False,
                                  visibility_dict=None,

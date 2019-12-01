@@ -11,7 +11,7 @@ gcloud compute images import \- import an image into Compute Engine
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute images import\fR \fIIMAGE_NAME\fR (\fB\-\-data\-disk\fR\ |\ \fB\-\-os\fR=\fIOS\fR) (\fB\-\-source\-file\fR=\fISOURCE_FILE\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR) [\fB\-\-async\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute images import\fR \fIIMAGE_NAME\fR (\fB\-\-data\-disk\fR\ |\ \fB\-\-os\fR=\fIOS\fR) (\fB\-\-source\-file\fR=\fISOURCE_FILE\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-no\-guest\-environment\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-storage\-location\fR=\fISTORAGE_LOCATION\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -111,6 +111,14 @@ An existing Compute Engine image from which to import.
 Return immediately, without waiting for the operation in progress to complete.
 
 .TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description to set for the imported image.
+
+.TP 2m
+\fB\-\-family\fR=\fIFAMILY\fR
+Family to set for the imported image.
+
+.TP 2m
 \fB\-\-guest\-environment\fR
 Installs the guest environment on the image. See
 https://cloud.google.com/compute/docs/images/guest\-environment. Enabled by
@@ -126,6 +134,12 @@ num>.cloudbuild\-logs.googleusercontent.com/\fR is created and used.
 Name of the network in your project to use for the image import. The network
 must have access to Cloud Storage. If not specified, the network named
 \f5default\fR is used.
+
+.TP 2m
+\fB\-\-storage\-location\fR=\fISTORAGE_LOCATION\fR
+Specifies a Cloud Storage location, either regional or multi\-regional, where
+image content is to be stored. If not specified, the multi\-region location
+closest to the source is chosen automatically.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR

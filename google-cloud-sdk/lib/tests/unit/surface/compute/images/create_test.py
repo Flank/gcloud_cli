@@ -869,6 +869,26 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               --csek-key-file -
           """)
 
+  def testStorageLocation(self):
+    self.Run("""
+        compute images create my-image
+          --source-uri gs://31dd/source-image
+          --storage-location us-central1
+        """)
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source=_STORAGE_IMAGE_URL),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
+                  storageLocations=['us-central1']),
+              project='my-project'))],
+    )
+
 
 class ImagesCreateBetaTest(ImagesCreateTest):
   """Tests for features only available in beta."""
@@ -1003,26 +1023,6 @@ class ImagesCreateBetaTest(ImagesCreateTest):
     )
     self.AssertLogContains(
         'Flag force-create is deprecated. Use --force instead.')
-
-  def testStorageLocation(self):
-    self.Run("""
-        compute images create my-image
-          --source-uri gs://31dd/source-image
-          --storage-location us-central1
-        """)
-
-    self.CheckRequests(
-        [(self.compute.images,
-          'Insert',
-          self.messages.ComputeImagesInsertRequest(
-              image=self.messages.Image(
-                  name='my-image',
-                  rawDisk=self.messages.Image.RawDiskValue(
-                      source=_STORAGE_IMAGE_URL),
-                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
-                  storageLocations=['us-central1']),
-              project='my-project'))],
-    )
 
 
 class ImagesCreateAlphaTest(ImagesCreateBetaTest):

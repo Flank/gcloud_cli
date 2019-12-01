@@ -11,7 +11,7 @@ gcloud alpha dataproc clusters update \- update labels and/or the number of work
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dataproc clusters update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-graceful\-decommission\-timeout\fR=\fIGRACEFUL_DECOMMISSION_TIMEOUT\fR] [\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR\ :\ \fB\-\-disable\-autoscaling\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR\ |\ \fB\-\-no\-max\-age\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR\ |\ \fB\-\-no\-max\-idle\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dataproc clusters update\fR (\fICLUSTER\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-async\fR] [\fB\-\-graceful\-decommission\-timeout\fR=\fIGRACEFUL_DECOMMISSION_TIMEOUT\fR] [\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR\ :\ \fB\-\-disable\-autoscaling\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR\ |\ \fB\-\-no\-max\-age\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR\ |\ \fB\-\-no\-max\-idle\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,10 +25,32 @@ gcloud alpha dataproc clusters update \- update labels and/or the number of work
 
 .RS 2m
 .TP 2m
-\fINAME\fR
-The name of the cluster to update.
+
+Cluster resource \- The name of the cluster to update. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [cluster] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICLUSTER\fR
+ID of the cluster or fully qualified identifier for the cluster. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region for the cluster. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Google
+Compute Engine zones inside the region. The default value of \f5global\fR is a
+special multi\-region namespace which is capable of deploying instances into all
+Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
+regions. Overrides the default \f5dataproc/region\fR property value for this
+command invocation.
 
 
+.RE
 .RE
 .sp
 
@@ -58,13 +80,6 @@ The new number of preemptible worker nodes in the cluster.
 The new number of worker nodes in the cluster.
 
 .TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. Overrides the default \fBdataproc/region\fR
-property value for this command invocation.
-
-.TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
@@ -89,7 +104,7 @@ provide the argument [\-\-project] on the command line; set the property
 [core/project]. To set the [region] attribute: provide the argument
 [\-\-autoscaling\-policy] on the command line with a fully specified name;
 provide the argument [\-\-region] on the command line; set the property
-[dataproc/region].
+[dataproc/region]; N/A.
 
 .RS 2m
 .TP 2m

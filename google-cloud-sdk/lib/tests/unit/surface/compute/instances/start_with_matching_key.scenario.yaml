@@ -10,6 +10,8 @@ summary:
     - status: SUCCESS
   - stderr: |
       Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2].
+      Instance internal IP is 10.240.0.7
+      Instance external IP is 74.125.64.163
 actions:
 - write_file:
     path: key.json
@@ -191,5 +193,7 @@ actions:
             zone: https://compute.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
     - expect_stderr: |
         Updated [https://compute.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/z2].
+        Instance internal IP is 10.240.0.7
+        Instance external IP is 74.125.64.163
     - expect_exit:
         code: 0

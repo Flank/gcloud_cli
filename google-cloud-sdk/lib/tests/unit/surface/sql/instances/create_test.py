@@ -930,15 +930,6 @@ create-instance1  MYSQL_5_7         us-central  D1    -               -         
       self.Run('sql instances create some-instance '
                '--database-version=SQLSERVER_2017_STANDARD')
 
-
-class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
-                              base.SqlMockTestBeta):
-  pass
-
-
-class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
-                               base.SqlMockTestAlpha):
-
   def testCreateWithEncryptionKey(self):
     prompt_mock = self.StartObjectPatch(
         console_io, 'PromptContinue', return_value=True)
@@ -971,6 +962,17 @@ class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
     with self.assertRaises(exceptions.InvalidArgumentException):
       self.Run('sql instances create custom-instance1 --region=us-central1 '
                '--disk-encryption-key=projects/whatever')
+
+
+class InstancesCreateBetaTest(_BaseInstancesCreateBetaTest,
+                              base.SqlMockTestBeta):
+  pass
+
+
+class InstancesCreateAlphaTest(_BaseInstancesCreateBetaTest,
+                               base.SqlMockTestAlpha):
+  pass
+
 
 if __name__ == '__main__':
   test_case.main()

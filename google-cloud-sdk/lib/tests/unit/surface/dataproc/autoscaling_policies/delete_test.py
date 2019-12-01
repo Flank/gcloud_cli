@@ -33,7 +33,7 @@ class AutoscalingPoliciesDeleteUnitTest(unit_base.DataprocUnitTestBase):
   def testDeleteAutoscalingPolicies(self):
     self.mock_client.projects_regions_autoscalingPolicies.Delete.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesDeleteRequest(
-            name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+            name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
         ),
         response=self.messages.Empty())
     self.WriteInput('Y\n')
@@ -60,7 +60,8 @@ class AutoscalingPoliciesDeleteUnitTest(unit_base.DataprocUnitTestBase):
         response=self.messages.Empty())
     self.WriteInput('Y\n')
     result = self.RunDataproc(
-        'autoscaling-policies delete policy-1 --region cool-region')
+        'autoscaling-policies delete policy-1 --region cool-region',
+        set_region=False)
     self.AssertErrContains(
         "The autoscaling policy '[policy-1]' will be deleted.")
     self.AssertErrContains('PROMPT_CONTINUE')
@@ -75,8 +76,8 @@ class AutoscalingPoliciesDeleteUnitTest(unit_base.DataprocUnitTestBase):
     self.WriteInput('Y\n')
     # Overriding default project and region
     result = self.RunDataproc(
-        'autoscaling-policies delete projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1'
-    )
+        'autoscaling-policies delete projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1',
+        set_region=False)
     self.AssertErrContains(
         "The autoscaling policy '[policy-1]' will be deleted.")
     self.AssertErrContains('PROMPT_CONTINUE')

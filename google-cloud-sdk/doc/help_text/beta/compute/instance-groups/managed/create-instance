@@ -1,0 +1,139 @@
+NAME
+    gcloud beta compute instance-groups managed create-instance - create a new
+        virtual machine instance in a managed instance group with a defined
+        name and optionally its stateful configuration
+
+SYNOPSIS
+    gcloud beta compute instance-groups managed create-instance NAME
+        --instance=INSTANCE
+        [--stateful-disk=[auto-delete=AUTO-DELETE],
+          [device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]]
+        [--stateful-metadata=KEY=VALUE,[KEY=VALUE,...]]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instance-groups managed create-instance creates
+    a virtual machine instance with a defined name and optionally its stateful
+    configuration: stateful disk and stateful metadata key-values. Stateful
+    configuration is stored in the corresponding newly created per-instance
+    config. An instance with a per-instance config will preserve its given
+    name, specified disks, and metadata key-values during instance recreation,
+    auto-healing, and updates and any other lifecycle transitions of the
+    instance.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the managed instance group to create instance in.
+
+REQUIRED FLAGS
+     --instance=INSTANCE
+        Name of the new instance to create.
+
+OPTIONAL FLAGS
+     --stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]
+        Stateful disk for the managed instance group to preserve. Usually, a
+        managed instance group deletes disks when deleting instances; however,
+        stateful disks are detached from deleted instances and are reattached
+        automatically to the instance on recreation, autohealing, updates, and
+        any other lifecycle transitions of the instance.
+
+        Stateful disks specified here form part of the per-instance config for
+        the new instance.
+
+        The same disk can be attached to many instances but only in read-only
+        mode.
+
+        Use this flag multiple times to attach more disks.
+
+         device-name
+            (Required) Device name under which disk is or will be attached.
+
+         source
+            (Required) URI of an existing persistent disk to attach under the
+            specified device-name.
+
+         mode
+            Specifies the attachment mode of the disk. Supported options are
+            'ro' for read-only and 'rw' for read-write. If omitted, defaults to
+            'rw'. mode can only be specified if source is given.
+
+         auto-delete
+            (Optional) Specifies the auto deletion policy of the stateful disk.
+            Supported values are 'never' (never delete this disk) and
+            'on-permanent-instance-deletion' (delete the stateful disk when the
+            given instance is permanently deleted from the instance group; for
+            example when the group is resized down). If omitted, 'never' is
+            used as the default.
+
+     --stateful-metadata=KEY=VALUE,[KEY=VALUE,...]
+        Additional metadata to be made available to the guest operating system
+        on the instance along with the metadata defined in the instance
+        template.
+
+        Use stateful metadata to define key/value pairs specific to an instance
+        to differentiate it from other instances in the managed instance group.
+        The stateful metadata forms part of the per-instance config for the new
+        instance.
+
+        Stateful metadata key/value pairs are preserved on instance recreation,
+        autohealing, updates, and any other lifecycle transitions of the
+        instance.
+
+        Only metadata keys provided in this flag are mutated. Stateful metadata
+        values defined for the keys already existing in the instance template
+        override the values from the instance template. Other metadata entries
+        from the instance template will remain unaffected and available.
+
+        Each metadata entry is a key/value pair separated by an equals sign.
+        Metadata keys must be unique and less than 128 bytes in length.
+        Multiple entries can be passed to this flag, e.g., --stateful-metadata
+        key-1=value-1,key-2=value-2,key-3=value-3.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          Region of the managed instance group to create instance in. If not
+          specified, you may be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          Zone of the managed instance group to create instance in. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To create an instance instance-1 in my-group (in region europe-west4) with
+    metadata my-key: my-value and a disk disk-1 attached to it as the device
+    device-1, run:
+
+        $ gcloud beta compute instance-groups managed create-instance \
+              my-group --region=europe-west4 \
+              --instance=instance-1 \
+              --stateful-disk='device-name=foo,source=https://compute.googleapis.com/compute/alpha/projects/my-project/zones/europe-west4/disks/disk-1,mode=rw,auto-delete=on-permanent-instance-deletion' \
+              --stateful-metadata='my-key=my-value'
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute instance-groups managed create-instance
+

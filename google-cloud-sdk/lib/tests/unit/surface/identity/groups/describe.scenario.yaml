@@ -1,0 +1,109 @@
+title: cloud identity groups describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      identity groups describe eng-discuss@foo.com
+  - stdout: |
+      createTime: '2019-10-02T17:42:04.747863Z'
+      description: This is a group for engineering discussion.
+      displayName: eng discuss group
+      groupKey:
+        id: eng-discuss@foo.com
+      labels:
+        system/groups/discussion_forum: ''
+      name: groups/11zu0gzc3tkdgn2
+      parent: customers/C046psxkn
+      updateTime: '2019-10-02T17:42:04.747863Z'
+- execute:
+  - command: |
+      identity groups describe invalid-group@foo.com
+  - error: '1: Invalid value for [email]: There is no such a group associated with
+      the specified argument:invalid-group@foo.com'
+actions:
+- execute_command:  # Describe a group for a specified email.
+    command: |
+      identity groups describe eng-discuss@foo.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=eng-discuss%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2"
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups/11zu0gzc3tkdgn2?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "groups/11zu0gzc3tkdgn2",
+              "groupKey": {
+                "id": "eng-discuss@foo.com"
+              },
+              "parent": "customers/C046psxkn",
+              "displayName": "eng discuss group",
+              "description": "This is a group for engineering discussion.",
+              "createTime": "2019-10-02T17:42:04.747863Z",
+              "updateTime": "2019-10-02T17:42:04.747863Z",
+              "labels": {
+                "system/groups/discussion_forum": ""
+              }
+            }
+    - expect_stdout: |
+        createTime: '2019-10-02T17:42:04.747863Z'
+        description: This is a group for engineering discussion.
+        displayName: eng discuss group
+        groupKey:
+          id: eng-discuss@foo.com
+        labels:
+          system/groups/discussion_forum: ''
+        name: groups/11zu0gzc3tkdgn2
+        parent: customers/C046psxkn
+        updateTime: '2019-10-02T17:42:04.747863Z'
+    - expect_exit:
+        code: 0
+- execute_command:  # Describe a group with an invalid (not existed group's) email.
+    command: |
+      identity groups describe invalid-group@foo.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudidentity.googleapis.com/v1alpha1/groups:lookup?groupKey.id=invalid-group%40foo.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '404'
+          body: |
+            {
+              "error": {
+                "code": 404,
+                "message": "Requested entity was not found.",
+                "status": "NOT_FOUND",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::not_found: Requested resource is not found.\nDetails: com.google.net.rpc3.client.RpcClientException: \u003ceye3 title='/RostersService.LookupRoster, NOT_FOUND'/\u003e APPLICATION_ERROR;groups_rosters/RostersService.LookupRoster;Error in resolving roster key: entity_namespace_key {\n  entity_id: \"invalid-group@foo.com\"\n}\n\ncom.google.apps.framework.request.StatusException: \u003ceye3 title='NOT_FOUND'/\u003e generic::NOT_FOUND: Error in resolving roster key: entity_namespace_key {\n  entity_id: \"invalid-group@foo.com\"\n}\n;AppErrorCode=5;StartTimeMs=1570048196016;In process;Deadline(sec)=59.985;ResFormat=AUTOMATIC;Originator=traffic-prod;Tag=\u0002cloud_project_number\u000332555940559\u0002IncomingMethod\u0003/GroupsRostersGroupsServiceV1Alpha1.LookupGroupName\u0002cidc\u00032;ServerTimeSec=0.05242112;LogBytes=256;Non-FailFast;EndUserCredsRequested;EffSecLevel=none;DelegatedRole=groups-rosters-groups-service;ReqFormat=AUTOMATIC;ReqID=defac5ea44a0fed5;GlobalID=d6a80cefea24c159;Server=IN_PROCESS\ncom.google.net.rpc3.client.RpcClientException: \u003ceye3 title='/RostersService.LookupRoster, NOT_FOUND'/\u003e APPLICATION_ERROR;groups_rosters/RostersService.LookupRoster;Error in resolving roster key: entity_namespace_key {\n  entity_id: \"invalid-group@foo.com\"\n}\n\ncom.google.apps.framework.request.StatusException: \u003ceye3 title='NOT_FOUND'/\u003e generic::NOT_FOUND: Error in resolving roster key: entity_namespace_key {\n  entity_id: \"invalid-group@foo.com\"\n}\n;AppErrorCode=5;StartTimeMs=1570048196016;In process;Deadline(sec)=59.985;ResFormat=AUTOMATIC;Originator=traffic-prod;Tag=\u0002cloud_project_number\u000332555940559\u0002IncomingMethod\u0003/GroupsRostersGroupsServiceV1Alpha1.LookupGroupName\u0002cidc\u00032;ServerTimeSec=0.05242112;LogBytes=256;Non-FailFast;EndUserCredsRequested;EffSecLevel=none;DelegatedRole=groups-rosters-groups-service;ReqFormat=AUTOMATIC;ReqID=defac5ea44a0fed5;GlobalID=d6a80cefea24c159;Server=IN_PROCESS"
+                  }
+                ]
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: 'Invalid value for [email]: There is no such a group associated with
+          the specified argument:invalid-group@foo.com'

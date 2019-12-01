@@ -11,7 +11,7 @@ gcloud compute routes create \- create a new route
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute routes create\fR \fINAME\fR \fB\-\-destination\-range\fR=\fIDESTINATION_RANGE\fR (\fB\-\-next\-hop\-address\fR=\fINEXT_HOP_ADDRESS\fR\ |\ \fB\-\-next\-hop\-gateway\fR=\fINEXT_HOP_GATEWAY\fR\ |\ \fB\-\-next\-hop\-instance\fR=\fINEXT_HOP_INSTANCE\fR\ |\ \fB\-\-next\-hop\-vpn\-tunnel\fR=\fINEXT_HOP_VPN_TUNNEL\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-next\-hop\-instance\-zone\fR=\fINEXT_HOP_INSTANCE_ZONE\fR] [\fB\-\-next\-hop\-vpn\-tunnel\-region\fR=\fINEXT_HOP_VPN_TUNNEL_REGION\fR] [\fB\-\-priority\fR=\fIPRIORITY\fR;\ default=1000] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute routes create\fR \fINAME\fR \fB\-\-destination\-range\fR=\fIDESTINATION_RANGE\fR (\fB\-\-next\-hop\-address\fR=\fINEXT_HOP_ADDRESS\fR\ |\ \fB\-\-next\-hop\-gateway\fR=\fINEXT_HOP_GATEWAY\fR\ |\ \fB\-\-next\-hop\-ilb\fR=\fINEXT_HOP_ILB\fR\ |\ \fB\-\-next\-hop\-instance\fR=\fINEXT_HOP_INSTANCE\fR\ |\ \fB\-\-next\-hop\-vpn\-tunnel\fR=\fINEXT_HOP_VPN_TUNNEL\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-next\-hop\-ilb\-region\fR=\fINEXT_HOP_ILB_REGION\fR] [\fB\-\-next\-hop\-instance\-zone\fR=\fINEXT_HOP_INSTANCE_ZONE\fR] [\fB\-\-next\-hop\-vpn\-tunnel\-region\fR=\fINEXT_HOP_VPN_TUNNEL_REGION\fR] [\fB\-\-priority\fR=\fIPRIORITY\fR;\ default=1000] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -78,6 +78,13 @@ acceptable value is \f5default\-internet\-gateway\fR which is a gateway operated
 by Google Compute Engine.
 
 .TP 2m
+\fB\-\-next\-hop\-ilb\fR=\fINEXT_HOP_ILB\fR
+The target forwarding rule that will receive forwarded traffic. This can only be
+used when the destination_range is a public (non\-RFC 1918) IP CIDR range.
+Requires \-\-load\-balancing\-scheme=INTERNAL on the corresponding forwarding
+rule.
+
+.TP 2m
 \fB\-\-next\-hop\-instance\fR=\fINEXT_HOP_INSTANCE\fR
 Specifies the name of an instance that should handle traffic matching this
 route. When this flag is specified, the zone of the instance must be specified
@@ -102,6 +109,33 @@ An optional, textual description for the route.
 .TP 2m
 \fB\-\-network\fR=\fINETWORK\fR; default="default"
 Specifies the network to which the route will be applied.
+
+.TP 2m
+\fB\-\-next\-hop\-ilb\-region\fR=\fINEXT_HOP_ILB_REGION\fR
+The region of the next hop forwarding rule. If not specified, you may be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
 \fB\-\-next\-hop\-instance\-zone\fR=\fINEXT_HOP_INSTANCE_ZONE\fR
@@ -180,6 +214,19 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a route with the name 'route\-name' with destination range '0.0.0.0/0'
+and with next hop gateway 'default\-internet\-gateway', run:
+
+.RS 2m
+$ gcloud compute routes create route\-name \e
+  \-\-destination\-range=0.0.0.0/0 \e
+  \-\-next\-hop\-gateway=default\-internet\-gateway
+.RE
 
 
 

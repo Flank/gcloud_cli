@@ -69,17 +69,17 @@ service called \f5your\-service\fR with IP CIDR ranges
 \f5google\-range\-1,google\-range\-2\fR for the service to use, run:
 
 .RS 2m
-$ gcloud services vpc\-peerings connect \-\-network my\-network \e
-    \-\-service your\-service \e
-    \-\-ranges google\-range\-1,google\-range\-2
+$ gcloud services vpc\-peerings connect \-\-network=my\-network \e
+    \-\-service=your\-service \e
+    \-\-ranges=google\-range\-1,google\-range\-2
 .RE
 
 To run the same command asynchronously (non\-blocking), run:
 
 .RS 2m
-$ gcloud services vpc\-peerings connect \-\-network my\-network \e
-    \-\-service your\-service \e
-    \-\-ranges google\-range\-1,google\-range\-2 \-\-async
+$ gcloud services vpc\-peerings connect \-\-network=my\-network \e
+    \-\-service=your\-service \e
+    \-\-ranges=google\-range\-1,google\-range\-2 \-\-async
 .RE
 
 

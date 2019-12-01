@@ -32,7 +32,7 @@ actions:
     - api_call:
         expect_request:
           uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com:detach?alt=json
-          method: PATCH
+          method: POST
           headers: {}
           body: null
         return_response:
@@ -103,7 +103,7 @@ actions:
     - api_call:
         expect_request:
           uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com:detach?alt=json
-          method: PATCH
+          method: POST
           headers: {}
           body: null
         return_response:

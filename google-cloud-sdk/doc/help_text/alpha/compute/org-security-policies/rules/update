@@ -7,7 +7,8 @@ SYNOPSIS
         --security-policy=SECURITY_POLICY [--action=ACTION]
         [--description=DESCRIPTION] [--dest-ip-ranges=[DEST_IP_RANGE,...]]
         [--dest-ports=[DEST_PORTS,...]] [--direction=DIRECTION]
-        [--enable-logging] [--src-ip-ranges=[SRC_IP_RANGE,...]]
+        [--enable-logging] [--new-priority=NEW_PRIORITY]
+        [--src-ip-ranges=[SRC_IP_RANGE,...]]
         [--target-resources=[TARGET_RESOURCES,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -46,6 +47,9 @@ OPTIONAL FLAGS
      --enable-logging
         Use this flag to enable logging of connections that allowed or denied
         by this rule.
+
+     --new-priority=NEW_PRIORITY
+        New priority for the rule to update. Valid in [0, 65535].
 
      --src-ip-ranges=[SRC_IP_RANGE,...]
         Source IP ranges to match for this rule. Can only be specified if

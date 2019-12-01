@@ -128,7 +128,6 @@ class TarfileTest(cli_test_base.CliTestBase,
         tmp, util.FileIterator(tmp, self.re), self.object_ref,
         gen_files=gen_files)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testFailure(self):
     """Test HttpError raises to user."""
     tmp = self.CreateTempDir()

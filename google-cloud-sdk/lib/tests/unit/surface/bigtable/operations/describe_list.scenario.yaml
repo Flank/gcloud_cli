@@ -32,8 +32,8 @@ summary:
   - command: |
       bigtable operations list --limit=1
   - stdout: |
-      OPERATION_ID         INSTANCE       DONE  START_TIME           END_TIME
-      3015903788314914209  fake-instance  True  2019-09-10T20:23:45  2019-09-10T20:23:46
+      NAME                                                                     DONE  START_TIME           END_TIME
+      instances/fake-instance/locations/us-central1-b/operations/my-operation  True  2019-09-10T20:23:45  2019-09-10T20:23:46
 actions:
 - execute_command:
     command: |
@@ -41,7 +41,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://bigtableadmin.googleapis.com/v2/operations/my-operation?alt=json
+          uri: https://bigtableadmin.googleapis.com/v2/operations/projects/fake-project/my-operation?alt=json
           method: GET
           headers: {}
           body: null
@@ -50,7 +50,7 @@ actions:
             status: '200'
           body: |
             {
-              "name": "operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/my-operation",
+              "name": "operations/projects/fake-project/my-operation",
               "metadata": {
                 "@type": "type.googleapis.com/google.bigtable.admin.v2.FakeRequest",
                 "originalRequest": {
@@ -96,7 +96,7 @@ actions:
             instanceId: fake-instance
             parent: projects/fake-project
           requestTime: '2019-09-10T20:23:45.236771379Z'
-        name: operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/my-operation
+        name: operations/projects/fake-project/my-operation
         response:
           '@type': type.googleapis.com/google.bigtable.admin.v2.FakeRequest
           displayName: fake-display-name
@@ -122,7 +122,7 @@ actions:
             {
               "operations": [
                 {
-                  "name": "operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/3015903788314914209",
+                  "name": "operations/projects/fake-project/instances/fake-instance/locations/us-central1-b/operations/my-operation",
                   "metadata": {
                     "@type": "type.googleapis.com/google.bigtable.admin.v2.FakeRequest",
                     "originalRequest": {
@@ -154,7 +154,7 @@ actions:
               ]
             }
     - expect_stdout: |
-        OPERATION_ID         INSTANCE       DONE  START_TIME           END_TIME
-        3015903788314914209  fake-instance  True  2019-09-10T20:23:45  2019-09-10T20:23:46
+        NAME                                                                     DONE  START_TIME           END_TIME
+        instances/fake-instance/locations/us-central1-b/operations/my-operation  True  2019-09-10T20:23:45  2019-09-10T20:23:46
     - expect_exit:
         code: 0

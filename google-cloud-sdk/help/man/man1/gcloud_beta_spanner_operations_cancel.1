@@ -65,6 +65,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To cancel an instance operation with ID \fIauto_12345, run:
+
+.RS 2m
+$ gcloud beta spanner operations cancel _auto_12345 \e
+    \-\-instance=my\-instance\-id
+.RE
+
+To cancel a database operation with ID \fRauto_12345, run:
+
+.RS 2m
+$ gcloud beta spanner operations cancel  _auto_12345 \e
+    \-\-instance=my\-instance\-id
+    \-\-database=my\-database\-id
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

@@ -225,6 +225,11 @@ AVAILABLE PROPERTIES
             If True, use client certificate to authorize user device using
             context aware access.
 
+     dataflow
+         disable_public_ips
+            Specifies that Cloud Dataflow workers must not use public IP
+            addresses.
+
      datafusion
          location
             Datafusion location to use. Each Datafusion location constitutes an

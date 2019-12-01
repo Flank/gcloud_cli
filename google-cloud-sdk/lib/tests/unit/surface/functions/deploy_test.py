@@ -32,10 +32,8 @@ import functools
 import os
 import zipfile
 
-from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.functions.exceptions import FunctionsError
 from googlecloudsdk.api_lib.storage import storage_api
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.exceptions import RequiredArgumentException
 from googlecloudsdk.command_lib.functions import flags
@@ -61,16 +59,6 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
   # Otherwise the function will be deployed from the CWD, which may result in
   # huge zip files being created (plus potential test timeouts and out of space
   # on /tmp).
-
-  def SetUp(self):
-    self.mock_resource_manager_client = apitools_mock.Client(
-        core_apis.GetClientClass('cloudresourcemanager', 'v1'),
-        real_client=core_apis.GetClientInstance(
-            'cloudresourcemanager', 'v1', no_http=True))
-    self.mock_resource_manager_client.Mock()
-    self.addCleanup(self.mock_resource_manager_client.Unmock)
-    self.resource_manager_messages = core_apis.GetMessagesModule(
-        'cloudresourcemanager', 'v1')
 
   def FakeMakeZipFromDir(self, dest_zip_file, src_dir, predicate=None):
     self.assertEqual(src_dir, '.')
@@ -98,7 +86,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     )
 
   def _MaybeExpectRemoveIamPolicyBinding(self, test_name):
-    pass
+    self._ExpectRemoveIamPolicyBinding(test_name, True, False)
 
   def _GenerateFunctionWithPubsub(
       self, name, url, topic, entry_point=None, memory=None, timeout=None,
@@ -209,26 +197,6 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
     if timeout:
       result.timeout = timeout
     return result
-
-  def _ExpectResourceManagerTestIamPolicyBinding(self, can_set, project=None):
-    my_project = self.Project() if project is None else project
-    if self.track in [
-        calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA]:
-      needed_permissions = [
-          'resourcemanager.projects.getIamPolicy',
-          'resourcemanager.projects.setIamPolicy']
-
-      messages = self.resource_manager_messages
-      request = messages.CloudresourcemanagerProjectsTestIamPermissionsRequest(
-          resource=my_project,
-          testIamPermissionsRequest=messages.TestIamPermissionsRequest(
-              permissions=needed_permissions))
-
-      permissions = needed_permissions if can_set else []
-      response = messages.TestIamPermissionsResponse(permissions=permissions)
-
-      self.mock_resource_manager_client.projects.TestIamPermissions.Expect(
-          request, response=response)
 
   def _ExpectGetOperationAndGetFunction(self, test_name):
     self.mock_client.operations.Get.Expect(
@@ -464,6 +432,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
       self._ExpectAddIamPolicyBinding(test_name, fail_policy_bind)
     elif no_allow_unauthenticated:
       self._ExpectRemoveIamPolicyBinding(test_name, fail_policy_bind, False)
+    else:
+      assert False, 'should I allow unauth'
 
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
@@ -479,9 +449,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             cloudFunction=self._GenerateFunctionWithPubsub(
                 test_name, gcs_dest_url, 'projects/fake-project/topics/topic')),
         self._GenerateActiveOperation('operations/operation'))
-    if self.track in [
-        calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA]:
-      self._ExpectRemoveIamPolicyBinding(test_name, True, False)
+    self._ExpectRemoveIamPolicyBinding(test_name, True, False)
     self.mock_client.operations.Get.Expect(
         self.messages.CloudfunctionsOperationsGetRequest(
             name='operations/operation'),
@@ -542,9 +510,8 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             ),
             location=test_location,),
         self._GenerateActiveOperation('operations/operation'),)
-    if self.track in [
-        calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA]:
-      self._ExpectRemoveIamPolicyBinding(test_name, True, False)
+
+    self._ExpectRemoveIamPolicyBinding(test_name, True, False)
     self._ExpectGetOperationAndGetFunction(test_name)
     return 0
 
@@ -591,7 +558,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run('functions deploy my-test --trigger-topic topic '
              '--stage-bucket buck '
              '--entry-point foo_bar --runtime=nodejs6')
@@ -607,7 +574,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --trigger-bucket path --stage-bucket buck '
         '--runtime=nodejs6')
@@ -623,7 +590,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --service-account service-account@google.com '
         '--trigger-bucket path --stage-bucket buck --runtime=nodejs6')
@@ -639,7 +606,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --timeout 30s --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
@@ -652,13 +619,12 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.Project(), self.GetRegion())
     self._ExpectCopyFileToGCS(functools.partial(
         self._ExpectFunctionCreateWithHttp,
-        no_allow_unauthenticated=self.track in [
-            calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA]))
+        no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run('functions deploy my-test --trigger-http --stage-bucket buck '
              '--runtime=nodejs6')
 
@@ -673,7 +639,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     with self.assertRaisesRegex(Exception, base.OP_FAILED_REGEXP):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck '
@@ -716,7 +682,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False, project='another')
+    self.ExpectResourceManagerTestIamPolicyBinding(False, project='another')
     self.Run('functions deploy my-test --trigger-topic topic '
              '--stage-bucket buck --project another --runtime=nodejs6')
 
@@ -741,7 +707,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --trigger-topic topic --stage-bucket buck '
         '--region {} --runtime=nodejs6'.format(self.GetRegion()))
@@ -757,7 +723,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --max-instances 8 --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
@@ -774,7 +740,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --clear-max-instances --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
@@ -791,7 +757,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --vpc-connector avpc --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
@@ -807,7 +773,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --clear-vpc-connector --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
@@ -823,7 +789,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test --vpc-connector "" --trigger-bucket path '
         '--stage-bucket buck --runtime=nodejs6')
@@ -881,11 +847,14 @@ class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectCopyFileToGCS(self._ExpectFunctionCreateWithHttp)
+    self._ExpectCopyFileToGCS(functools.partial(
+        self._ExpectFunctionCreateWithHttp,
+        no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run('functions deploy my-test '
              '--trigger-http --stage-bucket buck --runtime=nodejs6')
     self.AssertErrContains('deprecated')
@@ -899,7 +868,7 @@ class FunctionsDeployTriggerTest(FunctionsDeployTestBase):
     self._ExpectCreateFunctionWith(
         event_type='providers/cloud.pubsub/eventTypes/topic.publish',
         resource='projects/fake-project/topics/topic')
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test '
         '--trigger-event providers/cloud.pubsub/eventTypes/topic.publish '
@@ -911,7 +880,7 @@ class FunctionsDeployTriggerTest(FunctionsDeployTestBase):
     self._ExpectCreateFunctionWith(
         event_type='providers/cloud.storage/eventTypes/object.change',
         resource='projects/_/buckets/bucket')
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test '
         '--trigger-event providers/cloud.storage/eventTypes/object.change '
@@ -923,7 +892,7 @@ class FunctionsDeployTriggerTest(FunctionsDeployTestBase):
     self._ExpectCreateFunctionWith(
         event_type='providers/cloud.storage/eventTypes/object.change',
         resource='projects/_/buckets/bucket')
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
     self.Run(
         'functions deploy my-test '
         '--trigger-event providers/cloud.storage/eventTypes/object.change '
@@ -947,9 +916,6 @@ class FunctionsBetaTests(FunctionsDeployTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-
-  def _MaybeExpectRemoveIamPolicyBinding(self, test_name):
-    self._ExpectRemoveIamPolicyBinding(test_name, True, False)
 
   def testCreateWithHttpAllowUnauth(self):
     self.MockUnpackedSourcesDirSize()
@@ -993,7 +959,7 @@ class FunctionsBetaTests(FunctionsDeployTest):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectResourceManagerTestIamPolicyBinding(True)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     self._ExpectCopyFileToGCS(functools.partial(
         self._ExpectFunctionCreateWithHttp, allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
@@ -1010,7 +976,7 @@ class FunctionsBetaTests(FunctionsDeployTest):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectResourceManagerTestIamPolicyBinding(True)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     self._ExpectCopyFileToGCS(functools.partial(
         self._ExpectFunctionCreateWithHttp, no_allow_unauthenticated=True))
     self.mock_client.projects_locations_functions.Get.Expect(
@@ -1039,48 +1005,6 @@ class FunctionsBetaTests(FunctionsDeployTest):
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
     self.Run('functions deploy my-test --trigger-http --stage-bucket buck '
              '--runtime=nodejs6 --no-allow-unauthenticated')
-
-
-class FunctionsAlphaTests(FunctionsBetaTests):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  # Get test coverage of repeated polling to remove IAM policy bindings by doing
-  # it for all the alpha tests.
-  def _MaybeExpectRemoveIamPolicyBinding(self, test_name):
-    self._ExpectRemoveIamPolicyBinding(test_name, True, True)
-
-  def testInvalidTriggerResourceProjectResource(self):
-    self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegex(properties.InvalidProjectError, '@'):
-      self.Run(
-          'functions deploy my-test '
-          '--trigger-event providers/firebase.auth/eventTypes/user.create '
-          '--trigger-resource @ --stage-bucket buck --runtime=nodejs6')
-
-  def testUserCreateExplicitProject(self):
-    self.MockUnpackedSourcesDirSize()
-    self.MockChooserAndMakeZipFromFileList()
-    self._ExpectCreateFunctionWith(
-        event_type='providers/firebase.auth/eventTypes/user.create',
-        resource='projects/asdf')
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test '
-        '--trigger-event providers/firebase.auth/eventTypes/user.create '
-        '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
-
-  def testUserCreateExplicitProjectWithNodeModules(self):
-    self.MockUnpackedSourcesDirSize()
-    self._ExpectCreateFunctionWithModules(
-        event_type='providers/firebase.auth/eventTypes/user.create',
-        resource='projects/asdf')
-    self._ExpectResourceManagerTestIamPolicyBinding(False)
-    self.Run(
-        'functions deploy my-test '
-        '--trigger-event providers/firebase.auth/eventTypes/user.create '
-        '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
 
   def _ExpectFunctionCreateWithIngressEgressSettings(
       self,
@@ -1138,7 +1062,7 @@ class FunctionsAlphaTests(FunctionsBetaTests):
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
     test_name = 'projects/{}/locations/{}/functions/my-test'.format(
         self.Project(), self.GetRegion())
-    self._ExpectResourceManagerTestIamPolicyBinding(True)
+    self.ExpectResourceManagerTestIamPolicyBinding(True)
     self._ExpectCopyFileToGCS(self
                               ._ExpectFunctionCreateWithIngressEgressSettings(
                                   ingress_settings='all',
@@ -1169,6 +1093,48 @@ class FunctionsAlphaTests(FunctionsBetaTests):
       self.Run('functions deploy my-test --vpc-connector my-vpc '
                '--trigger-bucket path --stage-bucket buck --runtime=nodejs6 '
                '--egress-settings=private')
+
+
+class FunctionsAlphaTests(FunctionsBetaTests):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  # Get test coverage of repeated polling to remove IAM policy bindings by doing
+  # it for all the alpha tests.
+  def _MaybeExpectRemoveIamPolicyBinding(self, test_name):
+    self._ExpectRemoveIamPolicyBinding(test_name, True, True)
+
+  def testInvalidTriggerResourceProjectResource(self):
+    self.MockUnpackedSourcesDirSize()
+    with self.assertRaisesRegex(properties.InvalidProjectError, '@'):
+      self.Run(
+          'functions deploy my-test '
+          '--trigger-event providers/firebase.auth/eventTypes/user.create '
+          '--trigger-resource @ --stage-bucket buck --runtime=nodejs6')
+
+  def testUserCreateExplicitProject(self):
+    self.MockUnpackedSourcesDirSize()
+    self.MockChooserAndMakeZipFromFileList()
+    self._ExpectCreateFunctionWith(
+        event_type='providers/firebase.auth/eventTypes/user.create',
+        resource='projects/asdf')
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
+    self.Run(
+        'functions deploy my-test '
+        '--trigger-event providers/firebase.auth/eventTypes/user.create '
+        '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
+
+  def testUserCreateExplicitProjectWithNodeModules(self):
+    self.MockUnpackedSourcesDirSize()
+    self._ExpectCreateFunctionWithModules(
+        event_type='providers/firebase.auth/eventTypes/user.create',
+        resource='projects/asdf')
+    self.ExpectResourceManagerTestIamPolicyBinding(False)
+    self.Run(
+        'functions deploy my-test '
+        '--trigger-event providers/firebase.auth/eventTypes/user.create '
+        '--trigger-resource asdf --stage-bucket buck --runtime=nodejs6')
 
   def testRaisesVpcConnectorRequiredIfEgressSettingsSpecified(self):
     self.MockUnpackedSourcesDirSize()

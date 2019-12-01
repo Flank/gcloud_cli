@@ -10,10 +10,6 @@ SYNOPSIS
           | --remove-topic=REMOVE_TOPIC | --update-topic=UPDATE_TOPIC)
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) Update the Cloud Source Repositories configuration of the current
-    project.
-
 REQUIRED FLAGS
      Exactly one of these must be specified:
 
@@ -86,6 +82,18 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To enable PushBlock for all repositories under current project, run:
+
+        $ gcloud beta source project-configs update --enable-pushblock
+
+    To associate a Cloud Pub/Sub topic to receive repository update
+    notifications, run:
+
+        $ gcloud beta source project-configs update --add-topic=TOPIC_NAME \
+            --service-account=SERVICE_ACCOUNT_EMAIL \
+            --message-format=json
 
 NOTES
     This command is currently in BETA and may change without notice. These

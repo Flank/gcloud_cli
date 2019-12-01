@@ -31,8 +31,9 @@ COMMANDS
         (BETA) List composite indexes.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud firestore indexes composite
         $ gcloud alpha firestore indexes composite
 

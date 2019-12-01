@@ -3,8 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud dataflow jobs run JOB_NAME --gcs-location=GCS_LOCATION
-        [--max-workers=MAX_WORKERS] [--parameters=[PARAMETERS,...]]
-        [--region=REGION_ID] [--service-account-email=SERVICE_ACCOUNT_EMAIL]
+        [--disable-public-ips] [--max-workers=MAX_WORKERS]
+        [--parameters=[PARAMETERS,...]] [--region=REGION_ID]
+        [--service-account-email=SERVICE_ACCOUNT_EMAIL]
         [--staging-location=STAGING_LOCATION] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -21,6 +22,11 @@ REQUIRED FLAGS
         a URL beginning with 'gs://'.)
 
 OPTIONAL FLAGS
+     --disable-public-ips
+        The Cloud Dataflow workers must not use public IP addresses. Overrides
+        the default dataflow/disable_public_ips property value for this command
+        invocation.
+
      --max-workers=MAX_WORKERS
         The maximum number of workers to run.
 

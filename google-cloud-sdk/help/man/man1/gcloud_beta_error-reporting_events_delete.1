@@ -19,7 +19,9 @@ gcloud beta error\-reporting events delete \- deletes all error events of the pr
 
 \fB(BETA)\fR Deletes all error events of the project. All error events which are
 stored for the given project are deleted and the error counters are reset to
-zero.
+zero. If you're subscribed to error notifications for the project, then you
+receive notifications of the reoccurrence of errors that were previously
+resolved.
 
 
 
@@ -30,6 +32,16 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete all errors, run:
+
+.RS 2m
+$ gcloud beta error\-reporting events delete
+.RE
 
 
 

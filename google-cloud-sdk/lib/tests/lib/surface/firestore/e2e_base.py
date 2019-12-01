@@ -83,4 +83,4 @@ class FirestoreE2ETestBase(e2e_base.WithServiceAuth):
 
   def RunFirestoreTest(self, command):
     """Helper to run command with appropriate flags set."""
-    return self.Run('alpha firestore %s --format=disable' % command)
+    return self.Run('firestore %s --format=disable' % command)

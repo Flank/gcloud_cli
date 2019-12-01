@@ -11,7 +11,7 @@ gcloud beta container clusters update \- update cluster settings for an existing
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-disable\-workload\-identity\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-enable\-shielded\-nodes\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-identity\-namespace\fR=\fIIDENTITY_NAMESPACE\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-database\-encryption\-key\fR=\fIDATABASE_ENCRYPTION_KEY\fR\ |\ \fB\-\-disable\-database\-encryption\fR\ |\ \fB\-\-disable\-workload\-identity\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-enable\-shielded\-nodes\fR\ |\ \fB\-\-enable\-stackdriver\-kubernetes\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-identity\-namespace\fR=\fIIDENTITY_NAMESPACE\fR\ |\ \fB\-\-maintenance\-window\fR=\fISTART_TIME\fR\ |\ \fB\-\-release\-channel\fR=\fICHANNEL\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-maintenance\-window\fR\ |\ \fB\-\-remove\-maintenance\-exclusion\fR=\fINAME\fR\ |\ [\fB\-\-add\-maintenance\-exclusion\-end\fR=\fITIME_STAMP\fR\ :\ \fB\-\-add\-maintenance\-exclusion\-name\fR=\fINAME\fR\ \fB\-\-add\-maintenance\-exclusion\-start\fR=\fITIME_STAMP\fR]\ |\ \fB\-\-maintenance\-window\-end\fR=\fITIME_STAMP\fR\ \fB\-\-maintenance\-window\-recurrence\fR=\fIRRULE\fR\ \fB\-\-maintenance\-window\-start\fR=\fITIME_STAMP\fR\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-enable\-resource\-consumption\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ \fB\-\-autoprovisioning\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ \fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ \fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]\ \fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -166,7 +166,7 @@ Enable Stackdriver Kubernetes monitoring and logging.
 
 .TP 2m
 \fB\-\-enable\-vertical\-pod\-autoscaling\fR
-Enables vertical pod autoscaling for a cluster.
+Enable vertical pod autoscaling for a cluster.
 
 .TP 2m
 \fB\-\-generate\-password\fR
@@ -199,15 +199,59 @@ $ gcloud beta container clusters update example\-cluster \e
     \-\-maintenance\-window=12:43
 .RE
 
-The time corresponds to the UTC time zone, and must be in HH:MM format. To
-remove an existing maintenance window from the cluster, use
-\'\-\-maintenance\-window=None'.
+The time corresponds to the UTC time zone, and must be in HH:MM format.
 
 Non\-emergency maintenance will occur in the 4 hour block starting at the
 specified time.
 
 This is mutually exclusive with the recurring maintenance windows and will
 overwrite any existing window. Compatible with maintenance exclusions.
+
+To remove an existing maintenance window from the cluster, use
+\'\-\-clear\-maintenance\-window'.
+
+.TP 2m
+\fB\-\-release\-channel\fR=\fICHANNEL\fR
+Subscribe or unsubscribe this cluster to a release channel.
+
+When a cluster is subscribed to a release channel, Google maintains both the
+master version and the node version. Node auto\-upgrade defaults to true and
+cannot be disabled. Updates to version related fields (e.g.
+\-\-cluster\-version) return an error.
+
+\fICHANNEL\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBNone\fR
+Use '\-\-release\-channel=None' to take a cluster off of a release channel.
+Clusters on 'rapid' cannot be taken off of the release channel.
+
+.TP 2m
+\fBrapid\fR
+WARNING: 'rapid' is recommended for testing, and not for production workloads.
+Clusters on 'rapid' are not covered by GKE SLA.
+
+Clusters subscribed to 'rapid' receive the latest qualified components, before
+any other channel. 'rapid' is intended for early testers and developers who
+require new features. New upgrades will occur roughly weekly.
+
+.TP 2m
+\fBregular\fR
+Clusters subscribed to 'regular' receive versions that are considered GA
+quality. 'regular' is intended for production users who want to take advantage
+of new features. New upgrades will occur roughly every few weeks.
+
+.TP 2m
+\fBstable\fR
+Clusters subscribed to 'stable' receive versions that are known to be stable and
+reliable in production. 'stable' is intended for production users who need
+stability above all else, or for whom frequent upgrades are too risky. New
+upgrades will occur roughly every few months.
+
+.RE
+.sp
+
 
 .TP 2m
 \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
@@ -253,7 +297,8 @@ point to the new IP.
 Cluster addons to enable or disable. Options are
 HorizontalPodAutoscaling=ENABLED|DISABLED HttpLoadBalancing=ENABLED|DISABLED
 KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-NetworkPolicy=ENABLED|DISABLED CloudRun=ENABLED|DISABLED
+ApplicationManager=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
+CloudRun=ENABLED|DISABLED
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -557,6 +602,26 @@ Minimum memory in the cluster.
 
 Minimum number of gigabytes of memory to which the cluster can scale.
 
+.TP 2m
+
+Flags to specify identity for autoprovisioned nodes:
+
+.RS 2m
+.TP 2m
+\fB\-\-autoprovisioning\-scopes\fR=[\fISCOPE\fR,...]
+The scopes be used by node instances in autoprovisioined node pools. Multiple
+scopes can be specified, separated by commas. For information on defaults, look
+at:
+https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
+
+.TP 2m
+\fB\-\-autoprovisioning\-service\-account\fR=\fIAUTOPROVISIONING_SERVICE_ACCOUNT\fR
+The Google Cloud Platform Service Account to be used by node VMs in
+autoprovisioined node pools. If not specified, the project default service
+account is used.
+
+.RE
+.sp
 .TP 2m
 
 Arguments to set limits on accelerators:

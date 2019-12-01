@@ -48,6 +48,7 @@ class Update(base.UpdateCommand):
     flags.AddEnableLogging(parser)
     flags.AddTargetResources(parser)
     flags.AddDescription(parser)
+    flags.AddNewPriority(parser, operation='update')
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -55,41 +56,51 @@ class Update(base.UpdateCommand):
         args, holder.resources, with_project=False)
     security_policy_rule_client = client.OrgSecurityPolicyRule(
         ref=ref, compute_client=holder.client)
+    priority = rule_utils.ConvertPriorityToInt(ref.Name())
     src_ip_ranges = []
     dest_ip_ranges = []
-    dest_ports = []
+    dest_port_list = []
     target_resources = []
     enable_logging = False
+    should_setup_match = False
+    traffic_direct = None
+    matcher = None
     if args.IsSpecified('src_ip_ranges'):
       src_ip_ranges = args.src_ip_ranges
+      should_setup_match = True
     if args.IsSpecified('dest_ip_ranges'):
       dest_ip_ranges = args.dest_ip_ranges
+      should_setup_match = True
     if args.IsSpecified('dest_ports'):
-      dest_ports = args.dest_ports
+      dest_port_list = rule_utils.ParseDestPorts(args.dest_ports,
+                                                 holder.client.messages)
+      should_setup_match = True
     if args.IsSpecified('target_resources'):
       target_resources = args.target_resources
     if args.IsSpecified('enable_logging'):
       enable_logging = True
+    if args.IsSpecified('new_priority'):
+      new_priority = rule_utils.ConvertPriorityToInt(args.new_priority)
+    else:
+      new_priority = priority
 
-    dest_port_list = rule_utils.ParseDestPorts(dest_ports,
-                                               holder.client.messages)
-
-    matcher = holder.client.messages.SecurityPolicyRuleMatcher(
-        versionedExpr=holder.client.messages.SecurityPolicyRuleMatcher
-        .VersionedExprValueValuesEnum.FIREWALL,
-        config=holder.client.messages.SecurityPolicyRuleMatcherConfig(
-            srcIpRanges=src_ip_ranges,
-            destIpRanges=dest_ip_ranges,
-            destPorts=dest_port_list))
-    traffic_direct = holder.client.messages.SecurityPolicyRule.DirectionValueValuesEnum.INGRESS
+    # If need to construct a new matcher.
+    if should_setup_match:
+      matcher = holder.client.messages.SecurityPolicyRuleMatcher(
+          versionedExpr=holder.client.messages.SecurityPolicyRuleMatcher
+          .VersionedExprValueValuesEnum.FIREWALL,
+          config=holder.client.messages.SecurityPolicyRuleMatcherConfig(
+              srcIpRanges=src_ip_ranges,
+              destIpRanges=dest_ip_ranges,
+              destPorts=dest_port_list))
     if args.IsSpecified('direction'):
       if args.direction == 'INGRESS':
         traffic_direct = holder.client.messages.SecurityPolicyRule.DirectionValueValuesEnum.INGRESS
       else:
         traffic_direct = holder.client.messages.SecurityPolicyRule.DirectionValueValuesEnum.EGRESS
-    priority = rule_utils.ConvertPriorityToInt(ref.Name())
+
     security_policy_rule = holder.client.messages.SecurityPolicyRule(
-        priority=priority,
+        priority=new_priority,
         action=args.action,
         match=matcher,
         direction=traffic_direct,

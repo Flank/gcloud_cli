@@ -21,7 +21,8 @@ POSITIONAL ARGUMENTS
           group are specified.
 
        --namespace=NAMESPACE
-          Specific to Cloud Run on GKE: Kubernetes namespace for the Trigger.
+          Specific to Cloud Run for Anthos: Kubernetes namespace for the
+          Trigger.
 
 FLAGS
      --platform=PLATFORM
@@ -33,8 +34,8 @@ FLAGS
             Fully managed version of Cloud Run. Use with the --region flag or
             set the [run/region] property to specify a Cloud Run region.
          gke
-            Cloud Run for Anthos on Google Kubernetes Engine. Use with the
-            --cluster and --cluster-location flags or set the [run/cluster] and
+            Cloud Run for Anthos on Google Cloud. Use with the --cluster and
+            --cluster-location flags or set the [run/cluster] and
             [run/cluster_location] properties to specify a cluster in a given
             zone.
          kubernetes
@@ -43,14 +44,14 @@ FLAGS
             the context for connecting.
 
      Only applicable if connecting to Cloud Run (fully managed). Specify
-     '--platform=managed' to use:
+     --platform=managed to use:
 
        --region=REGION
           Region in which the resource can be found. Alternatively, set the
           property [run/region].
 
-     Only applicable if connecting to Cloud Run for Anthos deployed on GKE.
-     Specify '--platform=gke' to use:
+     Only applicable if connecting to Cloud Run for Anthos deployed on Google
+     Cloud. Specify --platform=gke to use:
 
        Cluster resource - Kubernetes Engine cluster to connect to. The
        arguments in this group can be used to specify the attributes of this
@@ -70,7 +71,7 @@ FLAGS
             property [run/cluster_location].
 
      Only applicable if connecting to Cloud Run for Anthos deployed on VMware.
-     Specify '--platform=kubernetes' to use:
+     Specify --platform=kubernetes to use:
 
        --context=CONTEXT
           The name of the context in your kubectl config file to use for

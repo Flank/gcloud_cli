@@ -72,11 +72,6 @@ NODEPOOLS_FORMAT = """
 HTTP_ERROR_FORMAT = (
     'ResponseError: code={status_code}, message={status_message}')
 
-WARN_GA_FUTURE_AUTOUPGRADE_CHANGE = ('In October 2019, node auto-upgrade will '
-                                     'be enabled by default for newly created '
-                                     'clusters and node pools. To disable it, '
-                                     'use the `--no-enable-autoupgrade` flag.')
-
 WARN_AUTOUPGRADE_ENABLED_BY_DEFAULT = (
     'Newly created clusters and node-pools will have node auto-upgrade enabled '
     'by default. This can be disabled using the `--no-enable-autoupgrade` '
@@ -86,6 +81,10 @@ WARN_NODE_VERSION_WITH_AUTOUPGRADE_ENABLED = (
     'Node version is specified while node auto-upgrade is enabled. '
     'Node-pools created at the specified version will be auto-upgraded '
     'whenever auto-upgrade preconditions are met.')
+
+INVALIID_SURGE_UPGRADE_SETTINGS = (
+    '\'--max-surge-upgrade\' and \'--max-unavailable-upgrade\' must be used in '
+    'conjunction.')
 
 GKE_DEFAULT_POD_RANGE = 14
 GKE_DEFAULT_POD_RANGE_PER_NODE = 24

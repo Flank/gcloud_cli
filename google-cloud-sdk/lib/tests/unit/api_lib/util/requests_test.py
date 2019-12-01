@@ -65,17 +65,14 @@ class RequestsTest(test_case.TestCase):
 
   def testExtractErrorMessageUrlAndDetailsUnicode(self):
     error = {'code': 8,
-             'message': 'error ⛴',
-             'url': 'http://example.com/⛴',
-             'details': {'data': '⛴'}}
+             'message': 'error Ṳᾔḯ¢◎ⅾℯ',
+             'url': 'http://example.com/Ṳᾔḯ¢◎ⅾℯ',
+             'details': {'data': 'Ṳᾔḯ¢◎ⅾℯ'}}
     message = requests.ExtractErrorMessage(error)
-    # TODO(b/73727780): Include actual unicode output in json dumps.
-    # When we do that, the 'data' in the output won't have the escaped unicode
-    # character.
     self.assertEqual(
-        ('Error Response: [8] error ⛴\n'
-         'http://example.com/⛴\n\n'
-         'Details: [\n  {\n    "data": "\\u26f4"\n  }\n]\n'), message)
+        ('Error Response: [8] error Ṳᾔḯ¢◎ⅾℯ\n'
+         'http://example.com/Ṳᾔḯ¢◎ⅾℯ\n\n'
+         'Details: [\n  {\n    "data": "Ṳᾔḯ¢◎ⅾℯ"\n  }\n]\n'), message)
 
 
 if __name__ == '__main__':

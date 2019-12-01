@@ -19,21 +19,14 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import copy
-import datetime
-import json
 import os
 
-from apitools.base.py import encoding
 from apitools.base.py.testing import mock
-from dateutil import parser
-from dateutil import tz
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import kubeconfig as kconfig
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import config as core_config
-from googlecloudsdk.core import exceptions as core_exceptions
-from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import files as file_utils
@@ -310,6 +303,7 @@ class TestBase(cli_test_base.CliTestBase):
         defaultMaxPodsConstraint=kwargs.get('defaultMaxPodsConstraint'),
         enableTpu=kwargs.get('enableTpu'),
         verticalPodAutoscaling=kwargs.get('verticalPodAutoscaling'),
+        autoscaling=kwargs.get('clusterAutoscaling'),
     )
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
@@ -330,6 +324,22 @@ class TestBase(cli_test_base.CliTestBase):
         c.masterAuth.clientCertificateConfig = (
             self.messages.ClientCertificateConfig(
                 issueClientCertificate=kwargs.get('issueClientCertificate')))
+
+    # Initialize maintenance policy resource version if told to. We can't do
+    # this all the time because it's something the server sets. So normally all
+    # get requests will have it, but we shouldn't be setting ourselves for
+    # create requests.
+    resource_version = kwargs.get('maintenancePolicyResourceVersion')
+    if resource_version:
+      if c.maintenancePolicy is None:
+        c.maintenancePolicy = self.messages.MaintenancePolicy()
+      if not c.maintenancePolicy.resourceVersion:
+        c.maintenancePolicy.resourceVersion = resource_version
+
+    if kwargs.get('databaseEncryptionKey'):
+      c.databaseEncryption = self.messages.DatabaseEncryption(
+          keyName=kwargs.get('databaseEncryptionKey'),
+          state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
     return c
 
   def _MakeClusterWithAutoscaling(self, **kwargs):
@@ -363,6 +373,7 @@ class TestBase(cli_test_base.CliTestBase):
             minCpuPlatform=kwargs.get('minCpuPlatform'),
             taints=kwargs.get('nodeTaints', []),
             metadata=kwargs.get('metadata'),
+            shieldedInstanceConfig=kwargs.get('shieldedInstanceConfig'),
         ),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
         autoscaling=kwargs.get('autoscaling'),
@@ -373,13 +384,15 @@ class TestBase(cli_test_base.CliTestBase):
 
   # Creates a default node management adaptive to release tracks.
   # Autorepair default value is True for default image config.
-  # Autoupgrade default value is None for GA, True for alpha and beta.
-  # TODO(b/128547638) remove the release checking hack once we promote the new
-  # autoupgrade default value to GA
+  # Autoupgrade default value is True.
   def _MakeDefaultNodeManagement(self, auto_repair=True):
-    auto_upgrade = None if self.API_VERSION == 'v1' else True
     return self.messages.NodeManagement(
-        autoRepair=auto_repair, autoUpgrade=auto_upgrade)
+        autoRepair=auto_repair, autoUpgrade=True)
+
+  def _MakeDefaultUpgradeSettings(self):
+    if self.API_VERSION == 'v1':
+      return None
+    return self.messages.UpgradeSettings(maxSurge=1)
 
   def _MakeIPAllocationPolicy(self, **kwargs):
     policy = self.messages.IPAllocationPolicy()
@@ -1032,25 +1045,12 @@ class BetaTestBase(GATestBase):
 
   def _MakeCluster(self, **kwargs):
     cluster = GATestBase._MakeCluster(self, **kwargs)
-    cluster.autoscaling = kwargs.get('clusterAutoscaling')
     cluster.verticalPodAutoscaling = kwargs.get('verticalPodAutoscaling')
     cluster.shieldedNodes = kwargs.get('shieldedNodes')
     if kwargs.get('databaseEncryptionKey'):
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
           keyName=kwargs.get('databaseEncryptionKey'),
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
-
-    # Initialize maintenance policy resource version if told to. We can't do
-    # this all the time because it's something the server sets. So normally all
-    # get requests will have it, but we shouldn't be setting ourselves for
-    # create requests.
-    resource_version = kwargs.get('maintenancePolicyResourceVersion')
-    if resource_version:
-      if cluster.maintenancePolicy is None:
-        cluster.maintenancePolicy = self.messages.MaintenancePolicy()
-      if not cluster.maintenancePolicy.resourceVersion:
-        cluster.maintenancePolicy.resourceVersion = resource_version
-
     cluster.releaseChannel = kwargs.get('releaseChannel')
 
     return cluster
@@ -1061,13 +1061,12 @@ class BetaTestBase(GATestBase):
         'workloadMetadataConfig')
     node_pool.config.metadata = kwargs.get('metadata')
     node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
-    node_pool.config.shieldedInstanceConfig = kwargs.get(
-        'shieldedInstanceConfig',
-        self.messages.ShieldedInstanceConfig(
-            enableSecureBoot=False, enableIntegrityMonitoring=False),
-    )
     if kwargs.get('nodePoolLocations'):
       node_pool.locations = kwargs.get('nodePoolLocations')
+    if 'upgradeSettings' in kwargs:
+      node_pool.upgradeSettings = kwargs.get('upgradeSettings')
+    else:
+      node_pool.upgradeSettings = self._MakeDefaultUpgradeSettings()
     return node_pool
 
   def _MakeIPAllocationPolicy(self, **kwargs):
@@ -1117,36 +1116,6 @@ class BetaTestBase(GATestBase):
     self.mocked_client.projects_aggregated_usableSubnetworks.List.Expect(
         req, response=response, exception=exception)
 
-
-class AlphaTestBase(BetaTestBase):
-  """Mixin class for testing v1alpha1."""
-  API_VERSION = 'v1alpha1'
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def _MakeCluster(self, **kwargs):
-    cluster = super(AlphaTestBase, self)._MakeCluster(**kwargs)
-    if kwargs.get('databaseEncryptionKey'):
-      cluster.databaseEncryption = self.messages.DatabaseEncryption(
-          keyName=kwargs.get('databaseEncryptionKey'),
-          state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
-
-    return cluster
-
-  def _MakeNodePool(self, **kwargs):
-    node_pool = BetaTestBase._MakeNodePool(self, **kwargs)
-    if kwargs.get('localSsdVolumeConfigs') is not None:
-      node_pool.config.localSsdVolumeConfigs = kwargs.get(
-          'localSsdVolumeConfigs')
-    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
-    node_pool.config.nodeGroup = kwargs.get('nodeGroup')
-    node_pool.upgradeSettings = kwargs.get('upgradeSettings')
-    node_pool.config.linuxNodeConfig = kwargs.get('linuxNodeConfig')
-    node_pool.config.kubeletConfig = kwargs.get('kubeletConfig')
-
-    return node_pool
-
   def ExpectUpdateNodePool(self,
                            node_pool_name,
                            workload_metadata_config=None,
@@ -1170,67 +1139,36 @@ class AlphaTestBase(BetaTestBase):
         msg, response=response, exception=exception)
 
 
+class AlphaTestBase(BetaTestBase):
+  """Mixin class for testing v1alpha1."""
+  API_VERSION = 'v1alpha1'
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def _MakeCluster(self, **kwargs):
+    cluster = super(AlphaTestBase, self)._MakeCluster(**kwargs)
+    return cluster
+
+  def _MakeNodePool(self, **kwargs):
+    node_pool = BetaTestBase._MakeNodePool(self, **kwargs)
+    if kwargs.get('localSsdVolumeConfigs') is not None:
+      node_pool.config.localSsdVolumeConfigs = kwargs.get(
+          'localSsdVolumeConfigs')
+    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
+    node_pool.config.nodeGroup = kwargs.get('nodeGroup')
+    node_pool.config.linuxNodeConfig = kwargs.get('linuxNodeConfig')
+    node_pool.config.kubeletConfig = kwargs.get('kubeletConfig')
+
+    return node_pool
+
+
 class IntegrationTestBase(e2e_base.WithServiceAuth,
                           sdk_test_base.WithOutputCapture):
   """Base class for container integration tests."""
 
   REGION = 'us-central1'
   ZONE = 'us-central1-f'
-
-  def TearDown(self):
-    if not hasattr(self, 'cluster_name'):
-      return
-    try:
-      log.status.Print('Attempting to cleaning up %s', self.cluster_name)
-      # Make cluster deletion asynchronized until gcloud can allow a timeout
-      # longer than 20 minutes.
-      self.Run('container clusters delete {0} --zone={1} --async -q'.format(
-          self.cluster_name, self.ZONE))
-    except core_exceptions.Error as error:
-      log.status.Print('Failed to delete %s:\n%s', self.cluster_name, error)
-    try:
-      log.status.Print('Attempting to cleaning up %s', self.cluster_name)
-      # Make cluster deletion asynchronized until gcloud can allow a timeout
-      # longer than 20 minutes.
-      self.Run('container clusters delete {0} --region={1} --async -q'.format(
-          self.cluster_name, self.REGION))
-    except core_exceptions.Error as error:
-      log.status.Print('Failed to delete %s:\n%s', self.cluster_name, error)
-
-  def _GetLocationFlag(self, location):
-    """Produce location flag for a given location."""
-    if location == self.ZONE:
-      return '--zone={0}'.format(self.ZONE)
-    elif location == self.REGION:
-      return '--region={0}'.format(self.REGION)
-    raise ValueError('Broken test - location unknown to the test util.')
-
-  def CleanupLeakedClusters(self, location, track):
-    """Cleanup leaked clusters that are older than 3 hours."""
-    # TODO(b/109872728): improve how we handle leaked clusters.
-    # Creating a cluster may timeout in the test, but the creation may
-    # eventually succeed. This causes the cluster leaked. Too many leaked
-    # clusters will prevent future cluster creation due to lack of quota.
-    # When there are no leaked clusters, that cleanup operations are just NOOP.
-    # We cleanup leaked clusters that are older than 3 hours.
-    leaked_cluster_min_age = datetime.timedelta(hours=3)
-    output = self.Run(
-        'container clusters list {0}'.format(self._GetLocationFlag(location)),
-        track=track)
-    jsonoutput = encoding.MessageToJson(output)
-    clusters = json.loads(jsonoutput)
-    for cluster in clusters:
-      if cluster['status'] != 'PROVISIONING':
-        createtime = cluster['createTime']
-        createtime = parser.parse(createtime)
-        max_cluster_life_time = createtime + leaked_cluster_min_age
-        now = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())  # pylint: disable=g-tzinfo-replace
-        if max_cluster_life_time < now:
-          self.Run(
-              'container clusters delete {0} {1} -q --async'.format(
-                  cluster['name'], self._GetLocationFlag(location)),
-              track=track)
-          log.status.Print('Deleting a leaked cluster: %s', cluster['name'])
 
 
 class ClustersTestBase(UnitTestBase):

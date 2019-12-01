@@ -153,15 +153,15 @@ To reserve three IP addresses in the 'us\-central1' region, run:
 
 .RS 2m
 $ gcloud beta compute addresses create ADDRESS\-1 ADDRESS\-2 \e
-    ADDRESS\-3 \-\-region us\-central1
+    ADDRESS\-3 \-\-region=us\-central1
 .RE
 
-To reserve ephemeral IP addresses 162.222.181.198 and 23.251.146.189 which are
-being used by virtual machine instances in the 'us\-central1' region, run:
+To reserve ephemeral IP addresses '162.222.181.198' and '23.251.146.189' which
+are being used by virtual machine instances in the 'us\-central1' region, run:
 
 .RS 2m
 $ gcloud beta compute addresses create \e
-    \-\-addresses 162.222.181.198,23.251.146.189 \-\-region us\-central1
+    \-\-addresses=162.222.181.198,23.251.146.189 \-\-region=us\-central1
 .RE
 
 In the above invocation, the two addresses will be assigned random names.
@@ -171,7 +171,7 @@ run:
 
 .RS 2m
 $ gcloud beta compute addresses create SUBNET\-ADDRESS\-1 \e
-    \-\-region us\-central1 \-\-subnet default
+    \-\-region=us\-central1 \-\-subnet=default
 .RE
 
 To reserve an IP address that can be used by multiple internal load balancers
@@ -179,25 +179,26 @@ from the subnet 'default' in the 'us\-central1' region, run:
 
 .RS 2m
 $ gcloud beta compute addresses create SHARED\-ADDRESS\-1 \e
-    \-\-region us\-central1 \-\-subnet default \e
-    \-\-purpose SHARED_LOADBALANCER_VIP
+    \-\-region=us\-central1 \-\-subnet=default \e
+  \-\-purpose=SHARED_LOADBALANCER_VIP
 .RE
 
-To reserve an IP range 10.110.0.0/16 from the network 'default' for VPC_PEERING,
-run:
+To reserve an IP range '10.110.0.0/16' from the network 'default' for
+\'VPC_PEERING', run:
 
 .RS 2m
 $ gcloud beta compute addresses create IP\-RANGE\-1 \-\-global \e
-    \-\-addresses 10.110.0.0 \-\-prefix\-length 16 \e
-    \-\-purpose VPC_PEERING \-\-network default
+    \-\-addresses=10.110.0.0 \-\-prefix\-length=16 \e
+  \-\-purpose=VPC_PEERING \-\-network=default
 .RE
 
-To reserve any IP range with prefix length 16 from the network 'default' for
-VPC_PEERING, run:
+To reserve any IP range with prefix length '16' from the network 'default' for
+\'VPC_PEERING', run:
 
 .RS 2m
 $ gcloud beta compute addresses create IP\-RANGE\-1 \-\-global \e
-    \-\-prefix\-length 16 \-\-purpose VPC_PEERING \-\-network default
+    \-\-prefix\-length=16 \-\-purpose=VPC_PEERING \e
+  \-\-network=default
 .RE
 
 

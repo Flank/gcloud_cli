@@ -29,12 +29,12 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.compute import url_maps_test_base
 
 
-class UrlMapsImportTestBeta(url_maps_test_base.UrlMapsTestBase):
+class UrlMapsImportTest(url_maps_test_base.UrlMapsTestBase):
 
   def PreSetUp(self):
     # TODO(b/135125441): Use SelectApi() instead.
-    self.track = calliope.base.ReleaseTrack.BETA
-    self._api = 'beta'
+    self.track = calliope.base.ReleaseTrack.GA
+    self._api = 'v1'
 
   def RunImport(self, command):
     self.Run('compute url-maps import ' + command)
@@ -51,9 +51,41 @@ class UrlMapsImportTestBeta(url_maps_test_base.UrlMapsTestBase):
 
     self.WriteInput(export_util.Export(url_map))
 
-    self.RunImport('url-map-1 --global')
+    global_flag = '--global'
+    if self._api == 'v1':
+      global_flag = ''
+    self.RunImport('url-map-1 {0}'.format(global_flag))
+
+  def testImportUrlMapInvalidSchema(self):
+    # This test ensures that the schema files do not contain invalid fields.
+    url_map = self.MakeTestUrlMap(self.messages, self._api)
+
+    # id and fingerprint fields should be removed from schema files manually.
+    url_map.id = 12345
+
+    # Write the modified url_map to a file.
+    file_name = os.path.join(self.temp_path, 'temp-urlmap.yaml')
+    with files.FileWriter(file_name) as stream:
+      export_util.Export(message=url_map, stream=stream)
+
+    with self.AssertRaisesExceptionMatches(
+        exceptions.Error, 'Additional properties are not allowed '
+        "('id' was unexpected)"):
+      global_flag = ' --global'
+      if self._api == 'v1':
+        global_flag = ''
+      self.RunImport('url-map-1 --source {0} {1}'.format(
+          file_name, global_flag))
+
+
+class UrlMapsImportTestBeta(UrlMapsImportTest):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+    self._api = 'beta'
 
   def testImportUrlMapsFromFile(self):
+    # Regional urlmaps are only applicable for alpha and beta
     url_map_ref = self.GetUrlMapRef('url-map-1', region='alaska')
     url_map = self.MakeTestUrlMap(self.messages, self._api)
 
@@ -76,7 +108,7 @@ class UrlMapsImportTestBeta(url_maps_test_base.UrlMapsTestBase):
     ]
 
     # Write the modified url_map to a file.
-    file_name = os.path.join(self.temp_path, 'temp-bs.yaml')
+    file_name = os.path.join(self.temp_path, 'temp-urlmap.yaml')
     with files.FileWriter(file_name) as stream:
       export_util.Export(message=url_map, stream=stream)
 
@@ -89,29 +121,12 @@ class UrlMapsImportTestBeta(url_maps_test_base.UrlMapsTestBase):
 
     self.RunImport('url-map-1 --source {0} --region alaska'.format(file_name))
 
-  def testImportBackendServiceInvalidSchema(self):
-    # This test ensures that the schema files do not contain invalid fields.
-    url_map = self.MakeTestUrlMap(self.messages, self._api)
-
-    # id and fingerprint fields should be removed from schema files manually.
-    url_map.id = 12345
-
-    # Write the modified url_map to a file.
-    file_name = os.path.join(self.temp_path, 'temp-bs.yaml')
-    with files.FileWriter(file_name) as stream:
-      export_util.Export(message=url_map, stream=stream)
-
-    with self.AssertRaisesExceptionMatches(
-        exceptions.Error, "Additional properties are not allowed "
-        "('id' was unexpected)"):
-      self.RunImport('url-map-1 --source {0} --global'.format(file_name))
-
 
 class UrlMapsImportTestAlpha(UrlMapsImportTestBeta):
 
   def PreSetUp(self):
-    self.track = calliope.base.ReleaseTrack.BETA
-    self._api = 'beta'
+    self.track = calliope.base.ReleaseTrack.ALPHA
+    self._api = 'alpha'
 
 
 if __name__ == '__main__':

@@ -17,10 +17,10 @@ gcloud beta compute os\-login ssh\-keys update \- update an SSH public key in an
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute os\-login ssh\-keys update\fR will take
-either a string containing an SSH public key or a filename for an SSH public key
-and will update the key in the user's OS Login profile. Currently, only the
-expiration time, \f5\fI\-\-ttl\fR\fR, can be updated.
+\fB(BETA)\fR \fBgcloud beta compute os\-login ssh\-keys update\fR accepts either
+a string containing an SSH public key or a filename for an SSH public key, and
+updates the key in the user's OS Login profile. Currently, only the expiration
+time, \f5\fI\-\-ttl\fR\fR, can be updated.
 
 
 
@@ -61,6 +61,28 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the SSH public key found in \f5/home/user/.ssh/id_rsa.pub\fR with an
+expiration time of one week from now, run:
+
+.RS 2m
+$ gcloud beta compute os\-login ssh\-keys update \-\-ttl=7d \e
+    \-\-key\-file=/home/user/.ssh/id_rsa.pub
+.RE
+
+To update the SSH public key with a fingerprint of
+\'e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47126bc52' and an
+expiration time of five years from now, run:
+
+.RS 2m
+$ gcloud beta compute os\-login ssh\-keys update \-\-ttl=5y \e
+    \-\-key='e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47\e
+126bc52'
+.RE
 
 
 

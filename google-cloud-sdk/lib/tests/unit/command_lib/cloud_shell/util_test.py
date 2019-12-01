@@ -124,6 +124,25 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
     self.expectGetEnvironment()
     util.PrepareEnvironment(self.makeArgs())
 
+  def testKeyNotRunningNeedsBoost(self):
+    # Given an environment that has a key but isn't running
+    self.expectGetEnvironment(
+        response=self.makeEnvironment(
+            has_key=True,
+            running=False,
+        ))
+    self.expectUpdateEnvironment()
+
+    # Expect that we start the environment, but don't create a key
+    self.expectStartEnvironment(
+        response=self.messages.Operation(name='some-op'))
+    self.expectGetOperation(name='some-op')
+    self.expectGetEnvironment()
+
+    args = self.makeArgs()
+    args.boosted = True
+    util.PrepareEnvironment(args)
+
   def testNoKeyRunning(self):
     # Given an environment without a key that is running
     self.expectGetEnvironment(
@@ -168,6 +187,13 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
     self.expectGetEnvironment()
     util.PrepareEnvironment(self.makeArgs())
 
+  def testKeyFormat(self):
+    with self.assertRaisesRegex(
+        ssh.InvalidKeyError,
+        'SSH_ED25519 format of the key is not supported yet.'):
+      util.ValidateKeyType('SSH_ED25519',
+                           apis.GetMessagesModule('cloudshell', 'v1alpha1'))
+
   def expectGetEnvironment(self, response=None):
     if response is None:
       response = self.messages.Environment()
@@ -176,14 +202,27 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
             name='users/me/environments/default'),
         response=response)
 
+  def expectUpdateEnvironment(self, response=None):
+    if response is None:
+      response = self.messages.Environment()
+    boosted_environment = self.messages.Environment(
+        size=self.messages.Environment.SizeValueValuesEnum.BOOSTED)
+
+    self.client.UsersEnvironmentsService.Patch.Expect(
+        self.messages.CloudshellUsersEnvironmentsPatchRequest(
+            name='users/me/environments/default',
+            updateMask='size',
+            environment=boosted_environment),
+        response=response)
+
   def expectCreatePublicKey(self):
     self.client.UsersEnvironmentsPublicKeysService.Create.Expect(
         self.messages.CloudshellUsersEnvironmentsPublicKeysCreateRequest(
             parent='users/me/environments/default',
             createPublicKeyRequest=self.messages.CreatePublicKeyRequest(
                 key=self.messages.PublicKey(
-                    format=self.messages.PublicKey.FormatValueValuesEnum.
-                    SSH_RSA,
+                    format=self.messages.PublicKey.FormatValueValuesEnum
+                    .SSH_RSA,
                     key=base64.b64decode(KEY_CONTENT)))),
         response=self.messages.PublicKey())
 
@@ -211,14 +250,15 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
       def __init__(self, **entries):
         self.__dict__.update(entries)
 
-    return Struct(ssh_key_file=None, force_key_file_overwrite=False)
+    return Struct(
+        ssh_key_file=None, force_key_file_overwrite=False, boosted=False)
 
   def makeOperation(self, name='some-op', done=True):
     return self.operations_messages.Operation(
         name=name,
         done=done,
-        metadata=self.operations_messages.Operation.
-        MetadataValue(additionalProperties=[
+        metadata=self.operations_messages.Operation
+        .MetadataValue(additionalProperties=[
             self.operations_messages.Operation.MetadataValue.AdditionalProperty(
                 key='state',
                 value=extra_types.JsonValue(string_value='XXX'),
@@ -241,6 +281,7 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
               format=self.messages.PublicKey.FormatValueValuesEnum.SSH_RSA,
               key=base64.b64decode(KEY_CONTENT)))
     return self.messages.Environment(
+        size=self.messages.Environment.SizeValueValuesEnum.DEFAULT,
         state=state,
         publicKeys=public_keys,
         sshUsername=user,

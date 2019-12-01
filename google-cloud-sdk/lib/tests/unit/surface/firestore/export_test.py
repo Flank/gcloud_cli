@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import admin_api
 from googlecloudsdk.api_lib.firestore import operations
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -28,18 +29,21 @@ from tests.lib.surface.firestore import base
 import six.moves.http_client
 
 
-class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
-  """Tests the firestore export command."""
+class ExportTestGA(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
+  """Tests the GA firestore export command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testExport(self):
     output_uri_prefix = 'gs://gcs_bucket'
     expected_request = admin_api.GetExportDocumentsRequest(
         self.DatabaseResourceName(), output_uri_prefix)
     operation_name = 'export operation name'
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
-    self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ExportDocuments.Expect(
         expected_request, response=mock_response)
 
     resp = self.RunExportTest(output_uri_prefix=output_uri_prefix)
@@ -51,7 +55,7 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
         self.DatabaseResourceName(), output_uri_prefix)
     operation_name = ('projects/{}/databases/(default)/'
                       'operations/exportoperationname').format(self.Project())
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_export_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
     mock_get_response = operations.GetMessages().GoogleLongrunningOperation(
@@ -63,7 +67,7 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
 
     # Expect several calls while done=False, then we get a response from the
     # command once the export is complete.
-    self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ExportDocuments.Expect(
         expected_request, response=mock_export_response)
     self.mock_firestore_v1.projects_databases_operations.Get.Expect(
         expected_operation_get, response=mock_get_response)
@@ -91,11 +95,11 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
         collection_ids=collection_ids)
 
     operation_name = 'export operation name'
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
-    self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ExportDocuments.Expect(
         request, response=mock_response)
 
     actual = self.RunExportTest(
@@ -110,7 +114,7 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
     exception = http_error.MakeHttpError(
         six.moves.http_client.BAD_REQUEST, 'error_message', url='Fake url')
 
-    self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ExportDocuments.Expect(
         request, exception=exception)
 
     with self.assertRaisesRegex(exceptions.HttpException, 'error_message'):
@@ -142,11 +146,11 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
     expected_request = admin_api.GetExportDocumentsRequest(
         self.DatabaseResourceName(), expected)
     operation_name = 'export operation name'
-    messages = self.mock_firestore_v1beta1.MESSAGES_MODULE
+    messages = self.mock_firestore_v1.MESSAGES_MODULE
     mock_response = messages.GoogleLongrunningOperation(
         done=False, name=operation_name)
 
-    self.mock_firestore_v1beta1.projects_databases.ExportDocuments.Expect(
+    self.mock_firestore_v1.projects_databases.ExportDocuments.Expect(
         expected_request, response=mock_response)
 
     resp = self.RunExportTest(output_uri_prefix=output_uri_prefix)
@@ -155,6 +159,20 @@ class ExportTest(base.FirestoreCommandUnitTest, sdk_test_base.WithLogCapture):
   def AssertInvalidOutputUrlPrefix(self, output_uri_prefix):
     with self.assertRaises(ValueError):
       self.RunExportTest(output_uri_prefix=output_uri_prefix)
+
+
+class ExportTestBeta(ExportTestGA):
+  """Tests the beta firestore export command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ExportTestAlpha(ExportTestBeta):
+  """Tests the alpha firestore export command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

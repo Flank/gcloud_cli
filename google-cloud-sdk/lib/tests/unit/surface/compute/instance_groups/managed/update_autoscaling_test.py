@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import itertools
 import random
 
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
@@ -32,18 +31,13 @@ from tests.lib.surface.compute import test_resources
 
 
 # TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(list(itertools.product(
-    [calliope_base.ReleaseTrack.ALPHA],
-    [scope_util.ScopeEnum.REGION, scope_util.ScopeEnum.ZONE])))
-class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
-                                                   parameterized.TestCase):
+@parameterized.parameters(scope_util.ScopeEnum.REGION,
+                          scope_util.ScopeEnum.ZONE)
+class InstanceGroupManagersSetAutoscalingZonalTestBeta(test_base.BaseTest,
+                                                       parameterized.TestCase):
 
-  def _SetUpForTrack(self, track):
-    self.track = track
-    if track is calliope_base.ReleaseTrack.ALPHA:
-      self.SelectApi('alpha')
-    else:
-      raise ValueError('Unrecognized API version.')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _SetUpForScope(self, scope):
     self.scope = scope
@@ -134,13 +128,13 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
     self._ExpectRequest(request, [])
 
   def SetUp(self):
+    self.SelectApi(self.track.prefix)
     self.expected_requests = []
     self.expected_responses = []
 
     self.StartObjectPatch(random, 'choice').return_value = 'a'
 
-  def testNoInstanceGroupFound(self, track, scope):
-    self._SetUpForTrack(track)
+  def testNoInstanceGroupFound(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     def MakeRequests(*_, **kwargs):
@@ -156,8 +150,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testNoMatchingAutoscaler(self, track, scope):
-    self._SetUpForTrack(track)
+  def testNoMatchingAutoscaler(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers(group_name='group-2')
@@ -170,8 +163,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testNoOp(self, track, scope):
-    self._SetUpForTrack(track)
+  def testNoOp(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -186,8 +178,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testUpdateMode(self, track, scope):
-    self._SetUpForTrack(track)
+  def testUpdateMode(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -205,8 +196,16 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testUpdateScaleDownNumbers(self, track, scope):
-    self._SetUpForTrack(track)
+
+@parameterized.parameters(scope_util.ScopeEnum.REGION,
+                          scope_util.ScopeEnum.ZONE)
+class InstanceGroupManagersSetAutoscalingZonalTestAlpha(
+    InstanceGroupManagersSetAutoscalingZonalTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdateScaleDownNumbers(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -229,8 +228,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testUpdateScaleDownPercents(self, track, scope):
-    self._SetUpForTrack(track)
+  def testUpdateScaleDownPercents(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -253,8 +251,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
 
     self.CheckRequests(*self.expected_requests)
 
-  def testScaleDownErrorBothSpecified(self, track, scope):
-    self._SetUpForTrack(track)
+  def testScaleDownErrorBothSpecified(self, scope):
     self._SetUpForScope(scope)
     self._ExpectGetManagedInstanceGroup()
     self._ExpectListAutoscalers()
@@ -278,6 +275,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest,
                '--scale-down-control max-scaled-down-replicas-percent=5,'
                'max-scaled-down-replicas=5,'
                'time-window=30 {} {}'.format(self.location_flag, self.location))
+
 
 if __name__ == '__main__':
   test_case.main()

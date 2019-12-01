@@ -77,6 +77,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To create an empty Cloud Spanner database, run:
+
+.RS 2m
+$ gcloud beta spanner databases create testdb \e
+    \-\-instance=my\-instance\-id
+.RE
+
+To create a Cloud Spanner database with populated schema, run:
+
+.RS 2m
+$ gcloud beta spanner databases create testdb \e
+    \-\-instance=my\-instance\-id
+    \-\-ddl='CREATE TABLE mytable (a INT64, b INT64) PRIMARY KEY(a)'
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

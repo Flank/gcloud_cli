@@ -11,7 +11,7 @@ gcloud alpha emulators datastore env\-unset \- print the commands required to un
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha emulators datastore env\-unset\fR [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fB\-\-legacy\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha emulators datastore env\-unset\fR [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -34,14 +34,6 @@ USER_CONFIG_DIR can be found by running:
 .RS 2m
 $ gcloud info \-\-format='get(config.paths.global_config_dir)'
 .RE
-
-.TP 2m
-\fB\-\-legacy\fR
-(DEPRECATED) Set to use the legacy emulator which supports Cloud Datastore API
-v1beta2.
-
-This flag is deprecated due to the legacy Datastore emulator no longer being
-supported. It will be removed in early October 2019.
 
 
 .RE

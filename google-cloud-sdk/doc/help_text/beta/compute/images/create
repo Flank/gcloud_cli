@@ -171,9 +171,9 @@ OPTIONAL FLAGS
         --source-image or --source-image-family when using this flag.
 
      --storage-location=LOCATION
-        Google Cloud Storage location, either regional or multi-regional, where
-        image content is to be stored. If absent, the multi-region location
-        closest to the source is chosen automatically.
+        Specifies a Cloud Storage location, either regional or multi-regional,
+        where image content is to be stored. If not specified, the multi-region
+        location closest to the source is chosen automatically.
 
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the image. The arguments in this group can be used to
@@ -199,6 +199,33 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To create an image 'my-image' from a disk 'my-disk' in zone 'us-east1-a',
+    run:
+
+        $ gcloud beta compute images create my-image --source-disk=my-disk \
+          --source-disk-zone=us-east1-a
+
+    To create an image 'my-image' from another image 'source-image' with source
+    image project 'source-image-project', run:
+
+        $ gcloud beta compute images create my-image \
+          --source-image=source-image \
+          --source-image-project=source-image-project
+
+    To create an image 'my-image' from the latest non-deprecated image in the
+    family 'source-image-family' with source image project
+    'source-image-project', run:
+
+        $ gcloud beta compute images create my-image \
+          --source-image-family=source-image-family \
+          --source-image-project=source-image-project
+
+    To create an image 'my-image' from a snapshot 'source-snapshot', run:
+
+        $ gcloud beta compute images create my-image \
+          --source-snapshot=source-snapshot
 
 NOTES
     This command is currently in BETA and may change without notice. These

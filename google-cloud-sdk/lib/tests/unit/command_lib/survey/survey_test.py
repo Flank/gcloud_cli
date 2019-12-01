@@ -90,12 +90,6 @@ class SurveyTest(cli_test_base.CliTestBase):
                                                   expected_questions):
       self.assertEqual(survey_question, expected_question)
 
-  def testSurveyNotDefinedException(self):
-    with self.AssertRaisesExceptionRegexp(
-        survey.SurveyContentNotDefinedError,
-        'Cannot find survey SurveyNotExisting.yaml .*'):
-      _ = survey.Survey('SurveyNotExisting')
-
   def testPrintSurveyInstruction(self):
     self.survey.PrintInstruction()
     self.AssertErrEquals(

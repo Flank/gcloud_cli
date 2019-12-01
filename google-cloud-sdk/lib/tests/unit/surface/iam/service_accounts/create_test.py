@@ -73,12 +73,6 @@ class CreateTestGA(unit_test_base.BaseTest):
         'email: test-account@test-project.iam.gserviceaccount.com')
     self.AssertErrEquals('Created service account [test-account].\n')
 
-
-class CreateTestBeta(CreateTestGA):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testCreateServiceAccountWithDescription(self):
     self.client.projects_serviceAccounts.Create.Expect(
         request=self.msgs.IamProjectsServiceAccountsCreateRequest(
@@ -134,6 +128,12 @@ class CreateTestBeta(CreateTestGA):
     self.AssertOutputContains(
         'email: test-account@test-project.iam.gserviceaccount.com')
     self.AssertErrEquals('Created service account [test-account].\n')
+
+
+class CreateTestBeta(CreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class CreateTestAlpha(CreateTestBeta):

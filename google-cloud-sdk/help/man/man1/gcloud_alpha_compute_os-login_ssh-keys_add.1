@@ -17,9 +17,9 @@ gcloud alpha compute os\-login ssh\-keys add \- add an SSH public key to an OS L
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute os\-login ssh\-keys add\fR will take
-either a string containing an SSH public key or a filename for an SSH public key
-and will add that key to the user's OS Login profile.
+\fB(ALPHA)\fR \fBgcloud alpha compute os\-login ssh\-keys add\fR accepts either
+a string containing an SSH public key or a filename for an SSH public key and
+adds that key to the user's OS Login profile.
 
 
 
@@ -65,6 +65,33 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add the key in \f5/home/user/.ssh/id_rsa.pub\fR to your OS Login profile,
+run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys add \e
+    \-\-key\-file=/home/user/.ssh/id_rsa.pub
+.RE
+
+To add the same key, but with a one year expiration time, run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys add \e
+    \-\-key\-file=/home/user/.ssh/id_rsa.pub \-\-ttl=1y
+.RE
+
+To add a key not stored in a file, run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys add \e
+    \-\-key='ssh\-rsa AAAAB3NzaC1yc2EAAA...MTg+InRG47+/O4/uWEOy6gIQEF
+ user@example.com'
+.RE
 
 
 

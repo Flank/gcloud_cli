@@ -11,7 +11,7 @@ gcloud compute images create \- create Google Compute Engine images
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute images create\fR \fIIMAGE_NAME\fR (\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR\ |\ \fB\-\-source\-image\-family\fR=\fISOURCE_IMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-uri\fR=\fISOURCE_URI\fR) [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-force\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSES\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-source\-image\-project\fR=\fISOURCE_IMAGE_PROJECT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute images create\fR \fIIMAGE_NAME\fR (\fB\-\-source\-disk\fR=\fISOURCE_DISK\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR\ |\ \fB\-\-source\-image\-family\fR=\fISOURCE_IMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR\ |\ \fB\-\-source\-uri\fR=\fISOURCE_URI\fR) [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-family\fR=\fIFAMILY\fR] [\fB\-\-force\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSES\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-source\-disk\-zone\fR=\fISOURCE_DISK_ZONE\fR] [\fB\-\-source\-image\-project\fR=\fISOURCE_IMAGE_PROJECT\fR] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -213,6 +213,12 @@ The project name of the source image. Must also specify either
 using this flag.
 
 .TP 2m
+\fB\-\-storage\-location\fR=\fILOCATION\fR
+Specifies a Cloud Storage location, either regional or multi\-regional, where
+image content is to be stored. If not specified, the multi\-region location
+closest to the source is chosen automatically.
+
+.TP 2m
 
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
 used to protect the image. The arguments in this group can be used to specify
@@ -248,6 +254,44 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an image 'my\-image' from a disk 'my\-disk' in zone 'us\-east1\-a',
+run:
+
+.RS 2m
+$ gcloud compute images create my\-image \-\-source\-disk=my\-disk \e
+  \-\-source\-disk\-zone=us\-east1\-a
+.RE
+
+To create an image 'my\-image' from another image 'source\-image' with source
+image project 'source\-image\-project', run:
+
+.RS 2m
+$ gcloud compute images create my\-image \e
+  \-\-source\-image=source\-image \e
+  \-\-source\-image\-project=source\-image\-project
+.RE
+
+To create an image 'my\-image' from the latest non\-deprecated image in the
+family 'source\-image\-family' with source image project
+\'source\-image\-project', run:
+
+.RS 2m
+$ gcloud compute images create my\-image \e
+  \-\-source\-image\-family=source\-image\-family \e
+  \-\-source\-image\-project=source\-image\-project
+.RE
+
+To create an image 'my\-image' from a snapshot 'source\-snapshot', run:
+
+.RS 2m
+$ gcloud compute images create my\-image \e
+  \-\-source\-snapshot=source\-snapshot
+.RE
 
 
 

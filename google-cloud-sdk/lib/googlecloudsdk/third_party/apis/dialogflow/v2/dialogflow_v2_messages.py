@@ -855,59 +855,6 @@ class GoogleCloudDialogflowV2Agent(_messages.Message):
   timeZone = _messages.StringField(12)
 
 
-class GoogleCloudDialogflowV2ArticleAnswer(_messages.Message):
-  r"""Represents article answer.
-
-  Messages:
-    MetadataValue: A map that contains metadata about the answer and the
-      document from which it originates.
-
-  Fields:
-    answerRecord: The name of answer record, in the format of
-      "projects/<Project ID>/answerRecords/<Answer Record ID>"
-    confidence: Article match confidence. The system's confidence score that
-      this article is a good match for this converstation, as a value from 0.0
-      (completely uncertain) to 1.0 (completely certain).
-    metadata: A map that contains metadata about the answer and the document
-      from which it originates.
-    snippets: Article snippets.
-    title: The article title.
-    uri: The article URI.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class MetadataValue(_messages.Message):
-    r"""A map that contains metadata about the answer and the document from
-    which it originates.
-
-    Messages:
-      AdditionalProperty: An additional property for a MetadataValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type MetadataValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a MetadataValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  answerRecord = _messages.StringField(1)
-  confidence = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
-  metadata = _messages.MessageField('MetadataValue', 3)
-  snippets = _messages.StringField(4, repeated=True)
-  title = _messages.StringField(5)
-  uri = _messages.StringField(6)
-
-
 class GoogleCloudDialogflowV2BatchCreateEntitiesRequest(_messages.Message):
   r"""The request message for EntityTypes.BatchCreateEntities.
 
@@ -1344,82 +1291,6 @@ class GoogleCloudDialogflowV2ExportAgentResponse(_messages.Message):
   agentUri = _messages.StringField(2)
 
 
-class GoogleCloudDialogflowV2FaqAnswer(_messages.Message):
-  r"""Represents answer from "frequently asked questions".
-
-  Messages:
-    MetadataValue: A map that contains metadata about the answer and the
-      document from which it originates.
-
-  Fields:
-    answer: The piece of text from the `source` knowledge base document.
-    answerRecord: The name of answer record, in the format of
-      "projects/<Project ID>/answerRecords/<Answer Record ID>"
-    confidence: The system's confidence score that this Knowledge answer is a
-      good match for this conversational query, range from 0.0 (completely
-      uncertain) to 1.0 (completely certain).
-    metadata: A map that contains metadata about the answer and the document
-      from which it originates.
-    question: The corresponding FAQ question.
-    source: Indicates which Knowledge Document this answer was extracted from.
-      Format: `projects/<Project ID>/agent/knowledgeBases/<Knowledge Base
-      ID>/documents/<Document ID>`.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class MetadataValue(_messages.Message):
-    r"""A map that contains metadata about the answer and the document from
-    which it originates.
-
-    Messages:
-      AdditionalProperty: An additional property for a MetadataValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type MetadataValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a MetadataValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  answer = _messages.StringField(1)
-  answerRecord = _messages.StringField(2)
-  confidence = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
-  metadata = _messages.MessageField('MetadataValue', 4)
-  question = _messages.StringField(5)
-  source = _messages.StringField(6)
-
-
-class GoogleCloudDialogflowV2HumanAgentAssistantEvent(_messages.Message):
-  r"""Represents a notification sent to Cloud Pub/Sub subscribers for human
-  agent assistant events in a specific conversation.
-
-  Fields:
-    conversation: The conversation this notification refers to. Format:
-      `projects/<Project ID>/conversations/<Conversation ID>`.
-    participant: The participant that the suggestion is compiled for. And This
-      field is used to call Participants.ListSuggestions API. Format:
-      `projects/<Project ID>/conversations/<Conversation
-      ID>/participants/<Participant ID>`. It will not be set in legacy
-      workflow. HumanAgentAssistantConfig.name for more information.
-    suggestionResults: The suggestion results payload that this notification
-      refers to.
-  """
-
-  conversation = _messages.StringField(1)
-  participant = _messages.StringField(2)
-  suggestionResults = _messages.MessageField('GoogleCloudDialogflowV2SuggestionResult', 3, repeated=True)
-
-
 class GoogleCloudDialogflowV2ImportAgentRequest(_messages.Message):
   r"""The request message for Agents.ImportAgent.
 
@@ -1603,8 +1474,10 @@ class GoogleCloudDialogflowV2Intent(_messages.Message):
       identifies the parent followup intent. Format: `projects/<Project
       ID>/agent/intents/<Intent ID>`.
     priority: Optional. The priority of this intent. Higher numbers represent
-      higher priorities. If this is zero or unspecified, we use the default
-      priority 500000.  Negative numbers mean that the intent is disabled.
+      higher priorities.  - If the supplied value is unspecified or 0, the
+      service   translates the value to 500,000, which corresponds to the
+      `Normal` priority in the console. - If the supplied value is negative,
+      the intent is ignored   in runtime detect intent requests.
     resetContexts: Optional. Indicates whether to delete all contexts in the
       current session when this intent is matched.
     rootFollowupIntentName: Read-only. The unique identifier of the root
@@ -1717,11 +1590,13 @@ class GoogleCloudDialogflowV2IntentMessage(_messages.Message):
 
   Fields:
     basicCard: The basic card response for Actions on Google.
+    browseCarouselCard: Browse carousel card for Actions on Google.
     card: The card response.
     carouselSelect: The carousel card response for Actions on Google.
     image: The image response.
     linkOutSuggestion: The link out suggestion chip for Actions on Google.
     listSelect: The list card response for Actions on Google.
+    mediaContent: The media content card for Actions on Google.
     payload: Returns a response containing a custom, platform-specific
       payload. See the Intent.Message.Platform type for a description of the
       structure that may be required for your platform.
@@ -1729,6 +1604,7 @@ class GoogleCloudDialogflowV2IntentMessage(_messages.Message):
     quickReplies: The quick replies response.
     simpleResponses: The voice and text-only responses for Actions on Google.
     suggestions: The suggestion chips for Actions on Google.
+    tableCard: Table card for Actions on Google.
     text: The text response.
   """
 
@@ -1808,17 +1684,20 @@ class GoogleCloudDialogflowV2IntentMessage(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   basicCard = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageBasicCard', 1)
-  card = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageCard', 2)
-  carouselSelect = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageCarouselSelect', 3)
-  image = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 4)
-  linkOutSuggestion = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageLinkOutSuggestion', 5)
-  listSelect = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageListSelect', 6)
-  payload = _messages.MessageField('PayloadValue', 7)
-  platform = _messages.EnumField('PlatformValueValuesEnum', 8)
-  quickReplies = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageQuickReplies', 9)
-  simpleResponses = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageSimpleResponses', 10)
-  suggestions = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageSuggestions', 11)
-  text = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageText', 12)
+  browseCarouselCard = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard', 2)
+  card = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageCard', 3)
+  carouselSelect = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageCarouselSelect', 4)
+  image = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 5)
+  linkOutSuggestion = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageLinkOutSuggestion', 6)
+  listSelect = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageListSelect', 7)
+  mediaContent = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageMediaContent', 8)
+  payload = _messages.MessageField('PayloadValue', 9)
+  platform = _messages.EnumField('PlatformValueValuesEnum', 10)
+  quickReplies = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageQuickReplies', 11)
+  simpleResponses = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageSimpleResponses', 12)
+  suggestions = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageSuggestions', 13)
+  tableCard = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageTableCard', 14)
+  text = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageText', 15)
 
 
 class GoogleCloudDialogflowV2IntentMessageBasicCard(_messages.Message):
@@ -1860,6 +1739,102 @@ class GoogleCloudDialogflowV2IntentMessageBasicCardButtonOpenUriAction(_messages
   """
 
   uri = _messages.StringField(1)
+
+
+class GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard(_messages.Message):
+  r"""Browse Carousel Card for Actions on Google.
+  https://developers.google.com/actions/assistant/responses#browsing_carousel
+
+  Enums:
+    ImageDisplayOptionsValueValuesEnum: Optional. Settings for displaying the
+      image. Applies to every image in items.
+
+  Fields:
+    imageDisplayOptions: Optional. Settings for displaying the image. Applies
+      to every image in items.
+    items: Required. List of items in the Browse Carousel Card. Minimum of two
+      items, maximum of ten.
+  """
+
+  class ImageDisplayOptionsValueValuesEnum(_messages.Enum):
+    r"""Optional. Settings for displaying the image. Applies to every image in
+    items.
+
+    Values:
+      IMAGE_DISPLAY_OPTIONS_UNSPECIFIED: Fill the gaps between the image and
+        the image container with gray bars.
+      GRAY: Fill the gaps between the image and the image container with gray
+        bars.
+      WHITE: Fill the gaps between the image and the image container with
+        white bars.
+      CROPPED: Image is scaled such that the image width and height match or
+        exceed the container dimensions. This may crop the top and bottom of
+        the image if the scaled image height is greater than the container
+        height, or crop the left and right of the image if the scaled image
+        width is greater than the container width. This is similar to "Zoom
+        Mode" on a widescreen TV when playing a 4:3 video.
+      BLURRED_BACKGROUND: Pad the gaps between image and image frame with a
+        blurred copy of the same image.
+    """
+    IMAGE_DISPLAY_OPTIONS_UNSPECIFIED = 0
+    GRAY = 1
+    WHITE = 2
+    CROPPED = 3
+    BLURRED_BACKGROUND = 4
+
+  imageDisplayOptions = _messages.EnumField('ImageDisplayOptionsValueValuesEnum', 1)
+  items = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem', 2, repeated=True)
+
+
+class GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem(_messages.Message):
+  r"""Browsing carousel tile
+
+  Fields:
+    description: Optional. Description of the carousel item. Maximum of four
+      lines of text.
+    footer: Optional. Text that appears at the bottom of the Browse Carousel
+      Card. Maximum of one line of text.
+    image: Optional. Hero image for the carousel item.
+    openUriAction: Required. Action to present to the user.
+    title: Required. Title of the carousel item. Maximum of two lines of text.
+  """
+
+  description = _messages.StringField(1)
+  footer = _messages.StringField(2)
+  image = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 3)
+  openUriAction = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction', 4)
+  title = _messages.StringField(5)
+
+
+class GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction(_messages.Message):
+  r"""Actions on Google action to open a given url.
+
+  Enums:
+    UrlTypeHintValueValuesEnum: Optional. Specifies the type of viewer that is
+      used when opening the URL. Defaults to opening via web browser.
+
+  Fields:
+    url: Required. URL
+    urlTypeHint: Optional. Specifies the type of viewer that is used when
+      opening the URL. Defaults to opening via web browser.
+  """
+
+  class UrlTypeHintValueValuesEnum(_messages.Enum):
+    r"""Optional. Specifies the type of viewer that is used when opening the
+    URL. Defaults to opening via web browser.
+
+    Values:
+      URL_TYPE_HINT_UNSPECIFIED: Unspecified
+      AMP_ACTION: Url would be an amp action
+      AMP_CONTENT: URL that points directly to AMP content, or to a canonical
+        URL which refers to AMP content via <link rel="amphtml">.
+    """
+    URL_TYPE_HINT_UNSPECIFIED = 0
+    AMP_ACTION = 1
+    AMP_CONTENT = 2
+
+  url = _messages.StringField(1)
+  urlTypeHint = _messages.EnumField('UrlTypeHintValueValuesEnum', 2)
 
 
 class GoogleCloudDialogflowV2IntentMessageCard(_messages.Message):
@@ -1917,6 +1892,38 @@ class GoogleCloudDialogflowV2IntentMessageCarouselSelectItem(_messages.Message):
   title = _messages.StringField(4)
 
 
+class GoogleCloudDialogflowV2IntentMessageColumnProperties(_messages.Message):
+  r"""Column properties for TableCard.
+
+  Enums:
+    HorizontalAlignmentValueValuesEnum: Optional. Defines text alignment for
+      all cells in this column.
+
+  Fields:
+    header: Required. Column heading.
+    horizontalAlignment: Optional. Defines text alignment for all cells in
+      this column.
+  """
+
+  class HorizontalAlignmentValueValuesEnum(_messages.Enum):
+    r"""Optional. Defines text alignment for all cells in this column.
+
+    Values:
+      HORIZONTAL_ALIGNMENT_UNSPECIFIED: Text is aligned to the leading edge of
+        the column.
+      LEADING: Text is aligned to the leading edge of the column.
+      CENTER: Text is centered in the column.
+      TRAILING: Text is aligned to the trailing edge of the column.
+    """
+    HORIZONTAL_ALIGNMENT_UNSPECIFIED = 0
+    LEADING = 1
+    CENTER = 2
+    TRAILING = 3
+
+  header = _messages.StringField(1)
+  horizontalAlignment = _messages.EnumField('HorizontalAlignmentValueValuesEnum', 2)
+
+
 class GoogleCloudDialogflowV2IntentMessageImage(_messages.Message):
   r"""The image response message.
 
@@ -1950,11 +1957,13 @@ class GoogleCloudDialogflowV2IntentMessageListSelect(_messages.Message):
 
   Fields:
     items: Required. List items.
+    subtitle: Optional. Subtitle of the list.
     title: Optional. The overall title of the list.
   """
 
   items = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageListSelectItem', 1, repeated=True)
-  title = _messages.StringField(2)
+  subtitle = _messages.StringField(2)
+  title = _messages.StringField(3)
 
 
 class GoogleCloudDialogflowV2IntentMessageListSelectItem(_messages.Message):
@@ -1971,6 +1980,50 @@ class GoogleCloudDialogflowV2IntentMessageListSelectItem(_messages.Message):
   image = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 2)
   info = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageSelectItemInfo', 3)
   title = _messages.StringField(4)
+
+
+class GoogleCloudDialogflowV2IntentMessageMediaContent(_messages.Message):
+  r"""The media content card for Actions on Google.
+
+  Enums:
+    MediaTypeValueValuesEnum: Optional. What type of media is the content (ie
+      "audio").
+
+  Fields:
+    mediaObjects: Required. List of media objects.
+    mediaType: Optional. What type of media is the content (ie "audio").
+  """
+
+  class MediaTypeValueValuesEnum(_messages.Enum):
+    r"""Optional. What type of media is the content (ie "audio").
+
+    Values:
+      RESPONSE_MEDIA_TYPE_UNSPECIFIED: Unspecified.
+      AUDIO: Response media type is audio.
+    """
+    RESPONSE_MEDIA_TYPE_UNSPECIFIED = 0
+    AUDIO = 1
+
+  mediaObjects = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject', 1, repeated=True)
+  mediaType = _messages.EnumField('MediaTypeValueValuesEnum', 2)
+
+
+class GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject(_messages.Message):
+  r"""Response media object for media content card.
+
+  Fields:
+    contentUrl: Required. Url where the media is stored.
+    description: Optional. Description of media card.
+    icon: Optional. Icon to display above media content.
+    largeImage: Optional. Image to display above media content.
+    name: Required. Name of media card.
+  """
+
+  contentUrl = _messages.StringField(1)
+  description = _messages.StringField(2)
+  icon = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 3)
+  largeImage = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 4)
+  name = _messages.StringField(5)
 
 
 class GoogleCloudDialogflowV2IntentMessageQuickReplies(_messages.Message):
@@ -2049,6 +2102,49 @@ class GoogleCloudDialogflowV2IntentMessageSuggestions(_messages.Message):
   """
 
   suggestions = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageSuggestion', 1, repeated=True)
+
+
+class GoogleCloudDialogflowV2IntentMessageTableCard(_messages.Message):
+  r"""Table card for Actions on Google.
+
+  Fields:
+    buttons: Optional. List of buttons for the card.
+    columnProperties: Optional. Display properties for the columns in this
+      table.
+    image: Optional. Image which should be displayed on the card.
+    rows: Optional. Rows in this table of data.
+    subtitle: Optional. Subtitle to the title.
+    title: Required. Title of the card.
+  """
+
+  buttons = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageBasicCardButton', 1, repeated=True)
+  columnProperties = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageColumnProperties', 2, repeated=True)
+  image = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageImage', 3)
+  rows = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageTableCardRow', 4, repeated=True)
+  subtitle = _messages.StringField(5)
+  title = _messages.StringField(6)
+
+
+class GoogleCloudDialogflowV2IntentMessageTableCardCell(_messages.Message):
+  r"""Cell of TableCardRow.
+
+  Fields:
+    text: Required. Text in this cell.
+  """
+
+  text = _messages.StringField(1)
+
+
+class GoogleCloudDialogflowV2IntentMessageTableCardRow(_messages.Message):
+  r"""Row of TableCard.
+
+  Fields:
+    cells: Optional. List of cells that make up this row.
+    dividerAfter: Optional. Whether to add a visual divider after this row.
+  """
+
+  cells = _messages.MessageField('GoogleCloudDialogflowV2IntentMessageTableCardCell', 1, repeated=True)
+  dividerAfter = _messages.BooleanField(2)
 
 
 class GoogleCloudDialogflowV2IntentMessageText(_messages.Message):
@@ -2167,33 +2263,6 @@ class GoogleCloudDialogflowV2IntentTrainingPhrasePart(_messages.Message):
   entityType = _messages.StringField(2)
   text = _messages.StringField(3)
   userDefined = _messages.BooleanField(4)
-
-
-class GoogleCloudDialogflowV2KnowledgeOperationMetadata(_messages.Message):
-  r"""Metadata in google::longrunning::Operation for Knowledge operations.
-
-  Enums:
-    StateValueValuesEnum: Output only. The current state of this operation.
-
-  Fields:
-    state: Output only. The current state of this operation.
-  """
-
-  class StateValueValuesEnum(_messages.Enum):
-    r"""Output only. The current state of this operation.
-
-    Values:
-      STATE_UNSPECIFIED: State unspecified.
-      PENDING: The operation has been created.
-      RUNNING: The operation is currently running.
-      DONE: The operation is done, either cancelled or completed.
-    """
-    STATE_UNSPECIFIED = 0
-    PENDING = 1
-    RUNNING = 2
-    DONE = 3
-
-  state = _messages.EnumField('StateValueValuesEnum', 1)
 
 
 class GoogleCloudDialogflowV2ListContextsResponse(_messages.Message):
@@ -2728,62 +2797,6 @@ class GoogleCloudDialogflowV2SessionEntityType(_messages.Message):
   name = _messages.StringField(3)
 
 
-class GoogleCloudDialogflowV2SuggestArticlesResponse(_messages.Message):
-  r"""The response message for [Participants.SuggestArticles]
-
-  Fields:
-    articleAnswers: Articles ordered by score in descending order.
-    contextSize: Number of messages prior to and including
-      last_conversation_message to compile the suggestion. It may be smaller
-      than the CompileSuggestionRequest.context_messages_count field in the
-      request if there aren't that many messages in the conversation.
-    latestMessage: The name of the latest conversation message used to compile
-      suggestion for.  Format: `projects/<Project
-      ID>/conversations/<Conversation ID>/messages/<Message ID>`.
-  """
-
-  articleAnswers = _messages.MessageField('GoogleCloudDialogflowV2ArticleAnswer', 1, repeated=True)
-  contextSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  latestMessage = _messages.StringField(3)
-
-
-class GoogleCloudDialogflowV2SuggestFaqAnswersResponse(_messages.Message):
-  r"""The request message for [Participants.SuggestFaqAnswers]
-
-  Fields:
-    contextSize: Number of messages prior to and including
-      last_conversation_message to compile the suggestion. It may be smaller
-      than the CompileSuggestionRequest.context_messages_count field in the
-      request if there aren't that many messages in the conversation.
-    faqAnswers: Answers extracted from FAQ documents.
-    latestMessage: The name of the latest conversation message used to compile
-      suggestion for.  Format: `projects/<Project
-      ID>/conversations/<Conversation ID>/messages/<Message ID>`.
-  """
-
-  contextSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  faqAnswers = _messages.MessageField('GoogleCloudDialogflowV2FaqAnswer', 2, repeated=True)
-  latestMessage = _messages.StringField(3)
-
-
-class GoogleCloudDialogflowV2SuggestionResult(_messages.Message):
-  r"""One response of different type of suggestion response which is used in
-  the response of Participants.AnalyzeContent and Participants.AnalyzeContent,
-  as well as HumanAgentAssistantEvent.
-
-  Fields:
-    error: Error status if the request failed.
-    suggestArticlesResponse: SuggestArticlesResponse if request is for
-      ARTICLE_SUGGESTION.
-    suggestFaqAnswersResponse: SuggestFaqAnswersResponse if request is for
-      FAQ_ANSWER.
-  """
-
-  error = _messages.MessageField('GoogleRpcStatus', 1)
-  suggestArticlesResponse = _messages.MessageField('GoogleCloudDialogflowV2SuggestArticlesResponse', 2)
-  suggestFaqAnswersResponse = _messages.MessageField('GoogleCloudDialogflowV2SuggestFaqAnswersResponse', 3)
-
-
 class GoogleCloudDialogflowV2SynthesizeSpeechConfig(_messages.Message):
   r"""Configuration of how speech should be synthesized.
 
@@ -2852,7 +2865,8 @@ class GoogleCloudDialogflowV2VoiceSelectionParams(_messages.Message):
 
   Fields:
     name: Optional. The name of the voice. If not set, the service will choose
-      a voice based on the other parameters such as language_code and gender.
+      a voice based on the other parameters such as language_code and
+      ssml_gender.
     ssmlGender: Optional. The preferred gender of the voice. If not set, the
       service will choose a voice based on the other parameters such as
       language_code and name. Note that this is only a preference, not
@@ -3326,9 +3340,11 @@ class GoogleCloudDialogflowV2beta1Intent(_messages.Message):
       BatchUpdateIntents, in order to make this intent a followup intent.  It
       identifies the parent followup intent. Format: `projects/<Project
       ID>/agent/intents/<Intent ID>`.
-    priority: Optional. The priority of this intent. Higher numbers represent
-      higher priorities. If this is zero or unspecified, we use the default
-      priority 500000.  Negative numbers mean that the intent is disabled.
+    priority: The priority of this intent. Higher numbers represent higher
+      priorities.  - If the supplied value is unspecified or 0, the service
+      translates the value to 500,000, which corresponds to the   `Normal`
+      priority in the console. - If the supplied value is negative, the intent
+      is ignored   in runtime detect intent requests.
     resetContexts: Optional. Indicates whether to delete all contexts in the
       current session when this intent is matched.
     rootFollowupIntentName: Read-only. The unique identifier of the root
@@ -3823,11 +3839,13 @@ class GoogleCloudDialogflowV2beta1IntentMessageListSelect(_messages.Message):
 
   Fields:
     items: Required. List items.
+    subtitle: Optional. Subtitle of the list.
     title: Optional. The overall title of the list.
   """
 
   items = _messages.MessageField('GoogleCloudDialogflowV2beta1IntentMessageListSelectItem', 1, repeated=True)
-  title = _messages.StringField(2)
+  subtitle = _messages.StringField(2)
+  title = _messages.StringField(3)
 
 
 class GoogleCloudDialogflowV2beta1IntentMessageListSelectItem(_messages.Message):

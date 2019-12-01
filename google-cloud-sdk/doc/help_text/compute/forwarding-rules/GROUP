@@ -27,6 +27,12 @@ COMMANDS
      describe
         Display detailed information about a forwarding rule.
 
+     export
+        Export a forwarding rule.
+
+     import
+        Import a forwarding rule.
+
      list
         List Google Compute Engine forwarding rules.
 

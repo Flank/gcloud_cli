@@ -1,0 +1,296 @@
+title: cloud identity groups preview test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      identity groups preview --customer C1212rwrws
+  - stdout: |
+      users:
+      - id: '1111'
+        primaryEmail: user1@example.com
+      - id: '2222'
+        primaryEmail: user2@example.com
+      - id: '3333'
+        primaryEmail: user3@example.com
+- execute:
+  - command: |
+      identity groups preview --customer C1212rwrws --query "user.organizations.exists(org, org.title == 'swe')"
+  - stdout: |
+      users:
+      - id: '1111'
+        primaryEmail: user1@example.com
+- execute:
+  - command: |
+      identity groups preview --customer C1212rwrws --view-type=domain-public
+  - stdout: |
+      users:
+      - id: '1111'
+        primaryEmail: user1@example.com
+- execute:
+  - command: |
+      identity groups preview --customer C1212rwrws --max-results 1
+  - stdout: |
+      nextPageToken: page_token_1
+      users:
+      - id: '1111'
+        primaryEmail: user1@example.com
+- execute:
+  - command: |
+      identity groups preview --customer C1212rwrws --max-results 1 --page-token page_token_1
+  - stdout: |
+      nextPageToken: page_token_2
+      users:
+      - id: '2222'
+        primaryEmail: user2@example.com
+- execute:
+  - command: |
+      identity groups preview --customer C1212rwrws --max-results 1
+  - stdout: |
+      nextPageToken: page_token_1
+      users:
+      - id: '3333'
+        primaryEmail: user3@example.com
+- execute:
+  - command: |
+      identity groups preview --customer C03fht40b --max-results 2 --format="flattened(nextPageToken, users[].primaryEmail, users[].name.fullName)"
+  - stdout: |
+      nextPageToken:          page_token_1
+      users[0].name.fullName: user1 FullName
+      users[0].primaryEmail:  user1@example.com
+      users[1].name.fullName: user2 FullName
+      users[1].primaryEmail:  user2@example.com
+actions:
+- execute_command:
+    command: |
+      identity groups preview --customer C1212rwrws
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C1212rwrws&maxResults=100&projection=basic&viewType=admin_view
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "users": [
+                {
+                  "id": "1111",
+                  "primaryEmail": "user1@example.com"
+                },
+                {
+                  "id": "2222",
+                  "primaryEmail": "user2@example.com"
+                },
+                {
+                  "id": "3333",
+                  "primaryEmail": "user3@example.com"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        users:
+        - id: '1111'
+          primaryEmail: user1@example.com
+        - id: '2222'
+          primaryEmail: user2@example.com
+        - id: '3333'
+          primaryEmail: user3@example.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      identity groups preview --customer C1212rwrws --query "user.organizations.exists(org, org.title == 'swe')"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C1212rwrws&maxResults=100&projection=basic&query=user.organizations.exists%28org%2C+org.title+%3D%3D+%27swe%27%29&viewType=admin_view
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "users": [
+                {
+                  "id": "1111",
+                  "primaryEmail": "user1@example.com"
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        users:
+        - id: '1111'
+          primaryEmail: user1@example.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      identity groups preview --customer C1212rwrws --view-type=domain-public
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C1212rwrws&maxResults=100&projection=basic&viewType=domain_public
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "users": [
+                {
+                  "id": "1111",
+                  "primaryEmail": "user1@example.com"
+                }
+              ]
+            }
+    - expect_stdout: |
+        users:
+        - id: '1111'
+          primaryEmail: user1@example.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      identity groups preview --customer C1212rwrws --max-results 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C1212rwrws&maxResults=1&projection=basic&viewType=admin_view
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "nextPageToken": "page_token_1",
+              "users": [
+                {
+                  "id": "1111",
+                  "primaryEmail": "user1@example.com"
+                }
+              ]
+            }
+    - expect_stdout: |
+        nextPageToken: page_token_1
+        users:
+        - id: '1111'
+          primaryEmail: user1@example.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      identity groups preview --customer C1212rwrws --max-results 1 --page-token page_token_1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C1212rwrws&maxResults=1&pageToken=page_token_1&projection=basic&viewType=admin_view
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "nextPageToken": "page_token_2",
+              "users": [
+                {
+                  "id": "2222",
+                  "primaryEmail": "user2@example.com"
+                }
+              ]
+            }
+    - expect_stdout: |
+        nextPageToken: page_token_2
+        users:
+        - id: '2222'
+          primaryEmail: user2@example.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      identity groups preview --customer C1212rwrws --max-results 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C1212rwrws&maxResults=1&projection=basic&viewType=admin_view
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "nextPageToken": "page_token_1",
+              "users": [
+                {
+                  "id": "3333",
+                  "primaryEmail": "user3@example.com"
+                }
+              ]
+            }
+    - expect_stdout: |
+        nextPageToken: page_token_1
+        users:
+        - id: '3333'
+          primaryEmail: user3@example.com
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      identity groups preview --customer C03fht40b --max-results 2 --format="flattened(nextPageToken, users[].primaryEmail, users[].name.fullName)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/admin/directory/v1/users?alt=json&customer=C03fht40b&maxResults=2&projection=basic&viewType=admin_view
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "nextPageToken": "page_token_1",
+              "users": [
+                {
+                  "id": "1111",
+                  "primaryEmail": "user1@example.com",
+                  "name": {
+                      "givenName": "user1 GivenName",
+                      "familyName": "user1 FamilyName",
+                      "fullName": "user1 FullName"
+                   }
+                },
+                {
+                  "id": "2222",
+                  "primaryEmail": "user2@example.com",
+                  "name": {
+                      "givenName": "user2 GivenName",
+                      "familyName": "user2 FamilyName",
+                      "fullName": "user2 FullName"
+                   }
+                }
+              ]
+            }
+    - expect_stdout: |
+        nextPageToken:          page_token_1
+        users[0].name.fullName: user1 FullName
+        users[0].primaryEmail:  user1@example.com
+        users[1].name.fullName: user2 FullName
+        users[1].primaryEmail:  user2@example.com
+    - expect_exit:
+        code: 0

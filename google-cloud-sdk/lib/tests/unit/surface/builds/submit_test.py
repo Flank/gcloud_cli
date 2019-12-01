@@ -1140,7 +1140,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
 
     with self.assertRaisesRegex(
         c_exceptions.RequiredArgumentException,
-        'Specify a bucket using --gcs_source_staging_dir'):
+        'Specify a bucket using --gcs-source-staging-dir'):
       self._Run([
           'builds', 'submit', 'gs://bucket/object.zip',
           '--tag=gcr.io/my-project/image', '--async'

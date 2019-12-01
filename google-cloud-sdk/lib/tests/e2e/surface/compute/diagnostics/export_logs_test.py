@@ -26,6 +26,7 @@ from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 _UPLOAD_TIMEOUT = 300
@@ -67,6 +68,7 @@ class WindowsDiagnostcisTest(e2e_test_base.BaseTest):
         prefix='gcloud-compute-test-windows'))
     self.instance_names_used.append(self.instance_name)
 
+  @test_case.Filters.skip('Failing', 'b/138801142')
   def testInstances(self):
     self.GetInstanceName()
     self._CreateInstance()

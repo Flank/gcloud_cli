@@ -25,6 +25,7 @@ import re
 
 from googlecloudsdk.api_lib.container import kubeconfig
 from googlecloudsdk.api_lib.run import global_methods
+from googlecloudsdk.api_lib.run import traffic
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
@@ -54,7 +55,7 @@ _PLATFORMS = collections.OrderedDict([
     ('managed', 'Fully managed version of Cloud Run. Use with the `--region` '
                 'flag or set the [run/region] property to specify a Cloud Run '
                 'region.'),
-    ('gke', 'Cloud Run for Anthos on Google Kubernetes Engine. Use with the '
+    ('gke', 'Cloud Run for Anthos on Google Cloud. Use with the '
             '`--cluster` and `--cluster-location` flags or set the '
             '[run/cluster] and [run/cluster_location] properties to specify a '
             'cluster in a given zone.'),
@@ -65,7 +66,7 @@ _PLATFORMS = collections.OrderedDict([
 
 _PLATFORM_SHORT_DESCRIPTIONS = {
     'managed': 'Cloud Run (fully managed)',
-    'gke': 'Cloud Run for Anthos deployed on GKE',
+    'gke': 'Cloud Run for Anthos deployed on Google Cloud',
     'kubernetes': 'Cloud Run for Anthos deployed on VMware',
 }
 
@@ -106,7 +107,7 @@ def GetManagedArgGroup(parser):
   return _GetOrAddArgGroup(
       parser,
       _ARG_GROUP_HELP_TEXT.format(
-          platform='\'--platform=managed\'',
+          platform='`--platform=managed`',
           platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
 
 
@@ -115,7 +116,7 @@ def GetGkeArgGroup(parser):
   return _GetOrAddArgGroup(
       parser,
       _ARG_GROUP_HELP_TEXT.format(
-          platform='\'--platform=gke\'',
+          platform='`--platform=gke`',
           platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
 
 
@@ -124,7 +125,7 @@ def GetKubernetesArgGroup(parser):
   return _GetOrAddArgGroup(
       parser,
       _ARG_GROUP_HELP_TEXT.format(
-          platform='\'--platform=kubernetes\'',
+          platform='`--platform=kubernetes`',
           platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
 
 
@@ -133,7 +134,7 @@ def GetClusterArgGroup(parser):
   return _GetOrAddArgGroup(
       parser,
       _ARG_GROUP_HELP_TEXT.format(
-          platform='\'--platform=gke\' or \'--platform=kubernetes\'',
+          platform='`--platform=gke` or `--platform=kubernetes`',
           platform_desc='{} or {}'.format(
               _PLATFORM_SHORT_DESCRIPTIONS['gke'],
               _PLATFORM_SHORT_DESCRIPTIONS['kubernetes'])))
@@ -177,21 +178,6 @@ def AddRegionArg(parser):
       '--region',
       help='Region in which the resource can be found. '
       'Alternatively, set the property [run/region].')
-
-
-# TODO(b/118339293): When global list endpoint ready, stop hardcoding regions.
-def AddRegionArgWithDefault(parser):
-  """Add a region arg which defaults to us-central1.
-
-  This is used by commands which list global resources.
-
-  Args:
-    parser: ArgumentParser, The calliope argparse parser.
-  """
-  parser.add_argument(
-      '--region',
-      default='us-central1',
-      help='Region in which to list the resources.')
 
 
 def AddFunctionArg(parser):
@@ -269,7 +255,9 @@ def AddUpdateTrafficFlags(parser):
       '40 percent of traffic and revision-2 is serving 60 percent. If '
       'revision-1 is assigned 45 percent of traffic and no assignment is '
       'made for revision-2, the service is updated with revsion-1 assigned '
-      '45 percent of traffic and revision-2 scaled down to 55 percent.')
+      '45 percent of traffic and revision-2 scaled down to 55 percent. '
+      'You can use "LATEST" as a special revision name to always put the given '
+      'percentage of traffic on the latest ready revision.')
 
   group.add_argument(
       '--to-latest',
@@ -278,7 +266,8 @@ def AddUpdateTrafficFlags(parser):
       help='True to assign 100 percent of traffic to the \'latest\' '
       'revision of this service. Note that when a new revision is '
       'created, it will become the \'latest\' and traffic will be '
-      'directed to it. Defaults to False.')
+      'directed to it. Defaults to False. Synonymous with '
+      '\'--to-revisions=LATEST=100\'.')
 
 
 def AddCloudSQLFlags(parser):
@@ -356,9 +345,20 @@ def AddCpuFlag(parser):
       'Ex: .5, 500m, 2.')
 
 
+def _ConcurrencyValue(value):
+  """Returns True if value is an int > 0 or 'default'."""
+  try:
+    return value == 'default' or int(value) > 0
+  except ValueError:
+    return False
+
+
 def AddConcurrencyFlag(parser):
   parser.add_argument(
       '--concurrency',
+      type=arg_parsers.CustomFunctionValidator(
+          _ConcurrencyValue,
+          'must be an integer greater than 0 or "default".'),
       help='Set the number of concurrent requests allowed per '
       'container instance. A concurrency of 0 or unspecified indicates '
       'any number of concurrent requests are allowed. To unset '
@@ -526,6 +526,8 @@ def AddCommandFlag(parser):
   """Add flags for specifying container's startup command."""
   parser.add_argument(
       '--command',
+      metavar='COMMAND',
+      type=arg_parsers.ArgList(),
       help='Entrypoint for the container image. If not specified, the '
       'container image\'s default Entrypoint is run. '
       'To reset this field to its default, pass an empty string.')
@@ -535,11 +537,41 @@ def AddArgsFlag(parser):
   """Add flags for specifying container's startup args."""
   parser.add_argument(
       '--args',
-      help='Arguments passed to the command run by the container '
-      'image. If not specified and no \'--command\' is provided, the container '
-      'image\'s default Cmd is used. Otherwise, if not specified, no arguments '
-      'are passed. '
+      metavar='ARG',
+      type=arg_parsers.ArgList(),
+      help='Comma-separated arguments passed to the command run by the '
+      'container image. If not specified and no \'--command\' is provided, the '
+      'container image\'s default Cmd is used. Otherwise, if not specified, no '
+      'arguments are passed. '
       'To reset this field to its default, pass an empty string.')
+
+
+def _PortValue(value):
+  """Returns True if port value is an int within range or 'default'."""
+  try:
+    return value == 'default' or (int(value) >= 1 and int(value) <= 65535)
+  except ValueError:
+    return False
+
+
+def AddPortFlag(parser):
+  """Add port flag to override $PORT."""
+  parser.add_argument(
+      '--port',
+      type=arg_parsers.CustomFunctionValidator(
+          _PortValue,
+          'must be an integer between 1 and 65535, inclusive, or "default".'),
+      help='Container port to receive requests at. Also sets the $PORT '
+      'environment variable. Must be a number between 1 and 65535, inclusive. '
+      'To unset this field, pass the special value "default".')
+
+
+def AddHttp2Flag(parser):
+  """Add http/2 flag to set the port name."""
+  parser.add_argument(
+      '--use-http2',
+      action=arg_parsers.StoreTrueFalseAction,
+      help='Whether to use HTTP/2 for connections to the service.')
 
 
 def _HasChanges(args, flags):
@@ -743,9 +775,11 @@ def _CheckCloudSQLApiEnablement():
 
 def _GetTrafficChanges(args):
   """Returns a changes for traffic assignment based on the flags."""
+  if args.to_latest:
+    # Mutually exlcusive flag with to-revisions
+    return config_changes.TrafficChanges({traffic.LATEST_REVISION_KEY: 100})
   new_percentages = args.to_revisions if args.to_revisions else {}
-  new_latest_percentage = 100 if args.to_latest else None
-  return config_changes.TrafficChanges(new_percentages, new_latest_percentage)
+  return config_changes.TrafficChanges(new_percentages)
 
 
 def GetConfigurationChanges(args):
@@ -780,14 +814,8 @@ def GetConfigurationChanges(args):
   if 'memory' in args and args.memory:
     changes.append(config_changes.ResourceChanges(memory=args.memory))
   if 'concurrency' in args and args.concurrency:
-    try:
-      c = int(args.concurrency)
-    except ValueError:
-      c = args.concurrency
-      if c != 'default':
-        log.warning('Specifying concurrency as Single or Multi is deprecated; '
-                    'an integer is preferred.')
-    changes.append(config_changes.ConcurrencyChanges(concurrency=c))
+    changes.append(config_changes.ConcurrencyChanges(
+        concurrency=args.concurrency))
   if 'timeout' in args and args.timeout:
     try:
       # A bare number is interpreted as seconds.
@@ -830,7 +858,10 @@ def GetConfigurationChanges(args):
   if 'args' in args and args.args is not None:
     # Allow passing an empty string here to reset the field
     changes.append(config_changes.ContainerArgsChange(args.args))
-
+  if (_FlagIsExplicitlySet(args, 'port') or
+      _FlagIsExplicitlySet(args, 'use_http2')):
+    changes.append(
+        config_changes.ContainerPortChange(args.port, args.use_http2))
   return changes
 
 
@@ -886,7 +917,6 @@ def GetRegion(args, prompt=False):
   Region is decided in the following order:
   - region argument;
   - run/region gcloud config;
-  - compute/region gcloud config;
   - prompt user.
 
   Args:
@@ -900,8 +930,6 @@ def GetRegion(args, prompt=False):
     return args.region
   if properties.VALUES.run.region.IsExplicitlySet():
     return properties.VALUES.run.region.Get()
-  if properties.VALUES.compute.region.IsExplicitlySet():
-    return properties.VALUES.compute.region.Get()
   if prompt:
     region = PromptForRegion()
     if region:
@@ -1056,6 +1084,13 @@ def VerifyOnePlatformFlags(args):
             platform='gke',
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
 
+  if _FlagIsExplicitlySet(args, 'use_http2'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--[no-]-use-http2',
+            platform='gke',
+            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['gke']))
+
   if _FlagIsExplicitlySet(args, 'kubeconfig'):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
@@ -1067,27 +1102,6 @@ def VerifyOnePlatformFlags(args):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
             flag='--context',
-            platform='kubernetes',
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
-
-  if _FlagIsExplicitlySet(args, 'no_traffic'):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--no-traffic',
-            platform='kubernetes',
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
-
-  if _FlagIsExplicitlySet(args, 'to_revisions'):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--to-revisions',
-            platform='kubernetes',
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
-
-  if _FlagIsExplicitlySet(args, 'to_latest'):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--to-latest',
             platform='kubernetes',
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['kubernetes']))
 
@@ -1116,13 +1130,6 @@ def VerifyGKEFlags(args):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
             flag='--region',
-            platform='managed',
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
-
-  if _FlagIsExplicitlySet(args, 'revision_suffix'):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--revision-suffix',
             platform='managed',
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
 
@@ -1183,13 +1190,6 @@ def VerifyKubernetesFlags(args):
             platform='managed',
             platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
 
-  if _FlagIsExplicitlySet(args, 'revision_suffix'):
-    raise serverless_exceptions.ConfigurationError(
-        error_msg.format(
-            flag='--revision-suffix',
-            platform='managed',
-            platform_desc=_PLATFORM_SHORT_DESCRIPTIONS['managed']))
-
   if _FlagIsExplicitlySet(args, 'vpc_connector'):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
@@ -1224,7 +1224,7 @@ def GetPlatformFallback():
   return properties.VALUES.run.platform.Get()
 
 
-def GetPlatform(args):
+def GetPlatform(args, validate=True):
   """Returns the platform to run on."""
   platform = properties.VALUES.run.platform.Get()
   if platform is None:
@@ -1249,13 +1249,14 @@ def GetPlatform(args):
               '\n'.join(
                   ['- {}: {}'.format(k, v) for k, v in _PLATFORMS.items()])))
 
-  if platform == 'managed':
-    VerifyOnePlatformFlags(args)
-  elif platform == 'gke':
-    VerifyGKEFlags(args)
-  elif platform == 'kubernetes':
-    VerifyKubernetesFlags(args)
-  else:
+  if validate:
+    if platform == 'managed':
+      VerifyOnePlatformFlags(args)
+    elif platform == 'gke':
+      VerifyGKEFlags(args)
+    elif platform == 'kubernetes':
+      VerifyKubernetesFlags(args)
+  if platform not in _PLATFORMS:
     raise ArgumentError(
         'Invalid target platform specified: [{}].\n'
         'Available platforms:\n{}'.format(
@@ -1292,10 +1293,28 @@ def IsManaged(args):
   return GetPlatform(args) == 'managed'
 
 
-def ValidatePlatformIsManaged(platform):
+def ValidatePlatformIsManaged(unused_ref, args, req):
+  """Validate the specified platform is managed.
+
+  This method is referenced by the declaritive iam commands which only work
+  against the managed platform.
+
+  Args:
+    unused_ref: ref to the service.
+    args: Namespace, The args namespace.
+    req: The request to be made.
+
+  Returns:
+    Unmodified request
+  """
+  # We don't want to validate any platforms other than managed, because only
+  # the managed platform can be used here. If a non-managed platform is
+  # specified, the error raised should reflect the bad platform, not other args.
+  platform = GetPlatform(args, validate=False)
   if platform != 'managed':
     raise calliope_exceptions.BadArgumentException(
         '--platform', 'The platform [{}] is not supported by this operation. '
         'Specify `--platform managed` or run '
         '`gcloud config set run/platform managed`.'.format(platform))
-  return platform
+  VerifyOnePlatformFlags(args)
+  return req

@@ -111,13 +111,13 @@ class Scenario(object):
     return cls(
         title=data.get('title'),
         description=data.get('description'),
-        skip=data.get('skip'),
+        filters=data.get('filters'),
         data=data)
 
-  def __init__(self, title, description, skip, data):
+  def __init__(self, title, description, filters, data):
     self.title = title
     self.description = description
-    self.skip = skip
+    self.filters = filters
     self._data = data
 
   def LoadActions(self):

@@ -20,11 +20,101 @@ from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock as apimock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
 import six
+
+
+MODULE_NAME = 'gkehub'
+
+
+class MockMembershipsAPI(object):
+  """Mock for Memberships API."""
+
+  API_VERSION = 'v1beta1'
+
+  def __init__(self, project):
+    self.messages = core_apis.GetMessagesModule(MODULE_NAME,
+                                                self.API_VERSION)
+    self.mocked_client = apimock.Client(
+        client_class=core_apis.GetClientClass(MODULE_NAME,
+                                              self.API_VERSION))
+
+    self.parent = 'projects/{0}/locations/global'.format(project)
+
+  def _MakeMembership(self,
+                      name,
+                      description):
+
+    membership = self.messages.Membership(
+        name=name,
+        description=description)
+    return membership
+
+  def ExpectList(self, responses):
+    self.mocked_client.projects_locations_memberships.List.Expect(
+        (self.messages.GkehubProjectsLocationsMembershipsListRequest(
+            parent=self.parent)),
+        response=self.messages.ListMembershipsResponse(resources=responses))
+
+
+class MockFeaturesAPI(object):
+  """Mock for Features API."""
+
+  API_VERSION = 'v1alpha1'
+
+  def __init__(self, project, feature_id):
+    self.messages = core_apis.GetMessagesModule(MODULE_NAME,
+                                                self.API_VERSION)
+    self.mocked_client = apimock.Client(
+        client_class=core_apis.GetClientClass(MODULE_NAME,
+                                              self.API_VERSION))
+    self.feature_id = feature_id
+    self.parent = 'projects/{0}/locations/global'.format(project)
+    self.resource_name = '{0}/features/{1}'.format(self.parent, self.feature_id)
+
+    self.wait_operation_relative_name = (
+        'projects/{0}/locations/global/operations/operation-x'.format(
+            project))
+
+  def _MakeFeature(self, **kwargs):
+    return self.messages.Feature(**kwargs)
+
+  def ExpectDelete(self, response):
+    self.mocked_client.projects_locations_global_features.Delete.Expect(
+        request=(
+            self.messages.GkehubProjectsLocationsGlobalFeaturesDeleteRequest(
+                name=self.resource_name)),
+        response=response)
+
+  def ExpectGet(self, feature):
+    self.mocked_client.projects_locations_global_features.Get.Expect(
+        request=(self.messages.GkehubProjectsLocationsGlobalFeaturesGetRequest(
+            name=self.resource_name)),
+        response=feature)
+
+  def ExpectCreate(self, feature, response):
+    self.mocked_client.projects_locations_global_features.Create.Expect(
+        request=(
+            self.messages.GkehubProjectsLocationsGlobalFeaturesCreateRequest(
+                parent=self.parent,
+                featureId=self.feature_id,
+                feature=feature)),
+        response=response)
+
+  def _MakeOperation(self, name=None, done=False, error=None, response=None):
+    operation = self.messages.Operation(
+        name=name or self.wait_operation_relative_name, done=done, error=error)
+    if done:
+      operation.response = response
+    return operation
+
+  def ExpectOperation(self, operation, exception=None):
+    req = self.messages.GkehubProjectsLocationsOperationsGetRequest(
+        name=self.wait_operation_relative_name)
+    self.mocked_client.projects_locations_operations.Get.Expect(
+        req, response=operation, exception=exception)
 
 
 class FeaturesTestBase(cli_test_base.CliTestBase,
@@ -35,68 +125,16 @@ class FeaturesTestBase(cli_test_base.CliTestBase,
   API_VERSION = 'v1alpha1'
 
   def SetUp(self):
-    self.messages = core_apis.GetMessagesModule(self.MODULE_NAME,
-                                                self.API_VERSION)
-    self.mocked_client = apimock.Client(
-        client_class=core_apis.GetClientClass(self.MODULE_NAME,
-                                              self.API_VERSION))
-    self.mocked_client.Mock()
-    self.addCleanup(self.mocked_client.Unmock)
+    self.memberships_api = MockMembershipsAPI(self.Project())
+    self.memberships_api.mocked_client.Mock()
+    self.addCleanup(self.memberships_api.mocked_client.Unmock)
 
-    self.wait_operation_ref = resources.REGISTRY.Parse(
-        'operation-x',
-        collection='gkehub.projects.locations.operations',
-        params={
-            'locationsId': 'global',
-            'projectsId': self.Project(),
-        },
-        api_version=self.API_VERSION)
-    self.wait_operation_relative_name = self.wait_operation_ref.RelativeName()
-
-    self.parent = 'projects/{0}/locations/global'.format(self.Project())
-    self.feature = '{0}/features/{1}'.format(self.parent,
-                                             self.FEATURE_NAME)
+    self.features_api = MockFeaturesAPI(self.Project(), self.FEATURE_NAME)
+    self.features_api.mocked_client.Mock()
+    self.addCleanup(self.features_api.mocked_client.Unmock)
 
   def RunCommand(self, params):
     prefix = ['container', 'hub', 'features', self.FEATURE_NAME]
     if isinstance(params, six.string_types):
       return self.Run(prefix + [params])
     return self.Run(prefix + params)
-
-  def _MakeFeature(self, **kwargs):
-    return self.messages.Feature(**kwargs)
-
-  def _MakeOperation(self, name=None, done=False, error=None, response=None):
-    operation = self.messages.Operation(
-        name=name or self.wait_operation_relative_name, done=done, error=error)
-    if done:
-      operation.response = response
-    return operation
-
-  def ExpectDeleteFeature(self, response):
-    self.mocked_client.projects_locations_global_features.Delete.Expect(
-        request=(
-            self.messages.GkehubProjectsLocationsGlobalFeaturesDeleteRequest(
-                name=self.feature)),
-        response=response)
-
-  def ExpectGetFeature(self, feature):
-    self.mocked_client.projects_locations_global_features.Get.Expect(
-        request=(self.messages.GkehubProjectsLocationsGlobalFeaturesGetRequest(
-            name=self.feature)),
-        response=feature)
-
-  def ExpectCreateFeature(self, feature, response):
-    self.mocked_client.projects_locations_global_features.Create.Expect(
-        request=(
-            self.messages.GkehubProjectsLocationsGlobalFeaturesCreateRequest(
-                parent=self.parent,
-                featureId=self.FEATURE_NAME,
-                feature=feature)),
-        response=response)
-
-  def ExpectGetOperation(self, operation, exception=None):
-    req = self.messages.GkehubProjectsLocationsOperationsGetRequest(
-        name=self.wait_operation_relative_name)
-    self.mocked_client.projects_locations_operations.Get.Expect(
-        req, response=operation, exception=exception)

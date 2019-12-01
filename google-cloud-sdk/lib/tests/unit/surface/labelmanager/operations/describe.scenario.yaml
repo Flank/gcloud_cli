@@ -1,0 +1,59 @@
+title: LabelManager - Operations - Describe test
+release_tracks: [ALPHA]
+
+actions:
+- execute_command:
+    command: labelmanager operations describe operations/clk.12345
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/operations/clk.12345?alt=json
+          method: GET
+          body:
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "operations/clk.12345",
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey",
+                "displayName": "env",
+                "name": "labelKeys/123",
+                "state": "ACTIVE",
+                "parent": "organizations/456"
+              }
+            }
+    - expect_stdout: |
+        done: true
+        name: operations/clk.12345
+        response:
+          '@type': type.googleapis.com/google.cloud.labelmanager.v1alpha1.LabelKey
+          displayName: env
+          name: labelKeys/123
+          parent: organizations/456
+          state: ACTIVE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: labelmanager operations describe operations/clv.789
+    events:
+    - api_call:
+        expect_request:
+          uri: https://labelmanager.googleapis.com/v1alpha1/operations/clv.789?alt=json
+          method: GET
+          body:
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": false,
+              "name": "operations/clv.789"
+            }
+    - expect_stdout: |
+        done: false
+        name: operations/clv.789
+    - expect_exit:
+        code: 0

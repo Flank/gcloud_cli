@@ -93,6 +93,7 @@ def _MakeTest(base_dir, apis_dir, api_name, api_version, api_config):
 
 
 def MakeTestsFrom(base_dir, config_file, test_class):
+  """Generates tests to validate the generated clients."""
   config = yaml.load_path(config_file)
 
   apis_dir = config['root_dir']
@@ -102,6 +103,9 @@ def MakeTestsFrom(base_dir, config_file, test_class):
   # register a separate test for each case.
   for api_name, api_version_config in six.iteritems(config['apis']):
     for api_version, api_config in six.iteritems(api_version_config):
+      # TODO(b/142448542) Roll back the hacky
+      if api_name == 'admin' and api_version == 'v1':
+        continue
       test_func = _MakeTest(base_dir, apis_dir,
                             api_name, api_version, api_config)
       setattr(test_class, test_func.__name__, test_func)

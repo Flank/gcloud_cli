@@ -49,6 +49,9 @@ unset _ARGCOMPLETE COMP_LINE COMP_POINT
 """
 
 
+@test_case.Filters.RunOnlyWithEnv('TAB_COMPLETION_TIMES_FILE',
+                                  ('Only run in cloudsdk/[periodic|presubmit]/'
+                                   'ubuntu_performance.sh'))
 class PerformanceTest(sdk_test_base.BundledBase, parameterized.TestCase):
 
   @parameterized.parameters([

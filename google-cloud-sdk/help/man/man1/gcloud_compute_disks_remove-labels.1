@@ -18,27 +18,7 @@ gcloud compute disks remove\-labels \- remove labels from Google Compute Engine 
 .SH "DESCRIPTION"
 
 \fBgcloud compute disks remove\-labels\fR removes labels from a Google Compute
-Engine persistent disk. For example, running:
-
-.RS 2m
-$ gcloud compute disks remove\-labels example\-disk \-\-labels=k0,k1
-.RE
-
-will remove existing labels with key \f5\fIk0\fR\fR and \f5\fIk1\fR\fR from
-\'example\-disk'.
-
-Labels can be used to identify the disk and to filter them as in
-
-.RS 2m
-$ gcloud compute disks list \-\-filter='labels.k1:value2'
-.RE
-
-To list existing labels
-
-.RS 2m
-$ gcloud compute disks describe example\-disk \e
-    \-\-format='default(labels)'
-.RE
+Engine persistent disk.
 
 
 
@@ -149,6 +129,31 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove existing labels with key \f5\fIk0\fR\fR and \f5\fIk1\fR\fR from
+\'example\-disk'
+
+.RS 2m
+$ gcloud compute disks remove\-labels example\-disk \-\-labels=k0,k1
+.RE
+
+Labels can be used to identify the disk and to filter them. To find a disk
+labeled with key\-value pair \f5\fIk1\fR\fR, \f5\fIv2\fR\fR
+
+.RS 2m
+$ gcloud compute disks list \-\-filter='labels.k1:v2'
+.RE
+
+To list only the labels when describing a resource, use \-\-format
+
+.RS 2m
+$ gcloud compute disks describe example\-disk \e
+    \-\-format='default(labels)'
+.RE
 
 
 

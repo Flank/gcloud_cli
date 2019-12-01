@@ -1188,6 +1188,10 @@
       "description": "Request to search for potentially sensitive info in an image and redact it\nby covering it with a colored rectangle.",
       "type": "object",
       "properties": {
+        "location": {
+          "description": "The geographic location to process the request. Reserved for future\nextensions.",
+          "type": "string"
+        },
         "inspectConfig": {
           "description": "Configuration for the inspector.",
           "$ref": "GooglePrivacyDlpV2InspectConfig"
@@ -1412,7 +1416,7 @@
       "type": "object",
       "properties": {
         "maskingCharacter": {
-          "description": "Character to mask the sensitive values&mdash;for example, \"*\" for an\nalphabetic string such as name, or \"0\" for a numeric string such as ZIP\ncode or credit card number. String must have length 1. If not supplied, we\nwill default to \"*\" for strings, 0 for digits.",
+          "description": "Character to use to mask the sensitive values&mdash;for example, `*` for an\nalphabetic string such as a name, or `0` for a numeric string such as ZIP\ncode or credit card number. This string must have a length of 1. If not\nsupplied, this value defaults to `*` for strings, and `0` for digits.",
           "type": "string"
         },
         "numberToMask": {
@@ -1421,11 +1425,11 @@
           "format": "int32"
         },
         "reverseOrder": {
-          "description": "Mask characters in reverse order. For example, if `masking_character` is\n'0', number_to_mask is 14, and `reverse_order` is false, then\n1234-5678-9012-3456 -> 00000000000000-3456\nIf `masking_character` is '*', `number_to_mask` is 3, and `reverse_order`\nis true, then 12345 -> 12***",
+          "description": "Mask characters in reverse order. For example, if `masking_character` is\n`0`, `number_to_mask` is `14`, and `reverse_order` is `false`, then the\ninput string `1234-5678-9012-3456` is masked as `00000000000000-3456`.\nIf `masking_character` is `*`, `number_to_mask` is `3`, and `reverse_order`\nis `true`, then the string `12345` is masked as `12***`.",
           "type": "boolean"
         },
         "charactersToIgnore": {
-          "description": "When masking a string, items in this list will be skipped when replacing.\nFor example, if your string is 555-555-5555 and you ask us to skip `-` and\nmask 5 chars with * we would produce ***-*55-5555.",
+          "description": "When masking a string, items in this list will be skipped when replacing\ncharacters. For example, if the input string is `555-555-5555` and you\ninstruct Cloud DLP to skip `-` and mask 5 characters with `*`, Cloud DLP\nreturns `***-**5-5555`.",
           "type": "array",
           "items": {
             "$ref": "GooglePrivacyDlpV2CharsToIgnore"
@@ -1493,11 +1497,11 @@
           ]
         },
         "customAlphabet": {
-          "description": "This is supported by mapping these to the alphanumeric characters\nthat the FFX mode natively supports. This happens before\/after\nencryption\/decryption.\nEach character listed must appear only once.\nNumber of characters must be in the range [2, 62].\nThis must be encoded as ASCII.\nThe order of characters does not matter.",
+          "description": "This is supported by mapping these to the alphanumeric characters\nthat the FFX mode natively supports. This happens before\/after\nencryption\/decryption.\nEach character listed must appear only once.\nNumber of characters must be in the range [2, 95].\nThis must be encoded as ASCII.\nThe order of characters does not matter.",
           "type": "string"
         },
         "radix": {
-          "description": "The native way to select the alphabet. Must be in the range [2, 62].",
+          "description": "The native way to select the alphabet. Must be in the range [2, 95].",
           "type": "integer",
           "format": "int32"
         },
@@ -1634,7 +1638,7 @@
             "[1-12]",
             "[1-31]",
             "[1-7]",
-            "[1-52]",
+            "[1-53]",
             "[0-23]"
           ],
           "type": "string",
@@ -2570,6 +2574,10 @@
         "jobNotificationEmails": {
           "description": "Enable email notification to project owners and editors on job's\ncompletion\/failure.",
           "$ref": "GooglePrivacyDlpV2JobNotificationEmails"
+        },
+        "publishToStackdriver": {
+          "description": "Enable Stackdriver metric dlp.googleapis.com\/finding_count",
+          "$ref": "GooglePrivacyDlpV2PublishToStackdriver"
         }
       }
     },
@@ -2642,6 +2650,13 @@
     "GooglePrivacyDlpV2JobNotificationEmails": {
       "id": "GooglePrivacyDlpV2JobNotificationEmails",
       "description": "Enable email notification to project owners and editors on jobs's\ncompletion\/failure.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "GooglePrivacyDlpV2PublishToStackdriver": {
+      "id": "GooglePrivacyDlpV2PublishToStackdriver",
+      "description": "Enable Stackdriver metric dlp.googleapis.com\/finding_count. This\nwill publish a metric to stack driver on each infotype requested and\nhow many findings were found for it. CustomDetectors will be bucketed\nas 'Custom' under the Stackdriver label 'info_type'.",
       "type": "object",
       "properties": {
       }
@@ -3893,7 +3908,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name.",
+                  "description": "Required. The parent resource name.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -3997,7 +4012,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "parent": {
-                      "description": "The parent resource name.",
+                      "description": "Required. The parent resource name.",
                       "location": "path",
                       "required": true,
                       "pattern": "^projects\/[^\/]+$",
@@ -4024,6 +4039,45 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Re-identifies content that has been de-identified.\nSee\nhttps:\/\/cloud.google.com\/dlp\/docs\/pseudonymization#re-identification_in_free_text_code_example\nto learn more."
+                }
+              }
+            },
+            "image": {
+              "methods": {
+                "redact": {
+                  "id": "dlp.projects.locations.image.redact",
+                  "path": "v2/{+parent}/locations/{location}/image:redact",
+                  "flatPath": "v2/projects/{projectsId}/locations/{location}/image:redact",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "The parent resource name, for example projects\/my-project-id.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "location": {
+                      "description": "The geographic location to process the request. Reserved for future\nextensions.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent",
+                    "location"
+                  ],
+                  "request": {
+                    "$ref": "GooglePrivacyDlpV2RedactImageRequest"
+                  },
+                  "response": {
+                    "$ref": "GooglePrivacyDlpV2RedactImageResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Redacts potentially sensitive info from an image.\nThis method has limits on input size, processing time, and output size.\nSee https:\/\/cloud.google.com\/dlp\/docs\/redacting-sensitive-data-images to\nlearn more.\n\nWhen no InfoTypes or CustomInfoTypes are specified in this request, the\nsystem will automatically choose what detectors to run. By default this may\nbe all types, but may change over time as detectors are updated."
                 }
               }
             }
@@ -4070,7 +4124,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4098,7 +4152,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of organization and inspectTemplate to be updated, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
+                  "description": "Required. Resource name of organization and inspectTemplate to be updated, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/inspectTemplates\/[^\/]+$",
@@ -4126,7 +4180,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and inspectTemplate to be read, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and inspectTemplate to be read, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/inspectTemplates\/[^\/]+$",
@@ -4151,7 +4205,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4192,7 +4246,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and inspectTemplate to be deleted, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and inspectTemplate to be deleted, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/inspectTemplates\/[^\/]+$",
@@ -4221,7 +4275,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4249,7 +4303,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of organization and deidentify template to be updated, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
+                  "description": "Required. Resource name of organization and deidentify template to be updated, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/deidentifyTemplates\/[^\/]+$",
@@ -4277,7 +4331,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and deidentify template to be read, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and deidentify template to be read, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/deidentifyTemplates\/[^\/]+$",
@@ -4302,7 +4356,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4343,7 +4397,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and deidentify template to be deleted,\nfor example `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and deidentify template to be deleted,\nfor example `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/deidentifyTemplates\/[^\/]+$",
@@ -4372,7 +4426,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4400,7 +4454,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the project and the triggeredJob, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
+                  "description": "Required. Resource name of the project and the triggeredJob, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/jobTriggers\/[^\/]+$",
@@ -4428,7 +4482,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the project and the triggeredJob, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
+                  "description": "Required. Resource name of the project and the triggeredJob, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/jobTriggers\/[^\/]+$",
@@ -4453,7 +4507,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example `projects\/my-project-id`.",
+                  "description": "Required. The parent resource name, for example `projects\/my-project-id`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4499,7 +4553,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the project and the triggeredJob, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
+                  "description": "Required. Resource name of the project and the triggeredJob, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/jobTriggers\/[^\/]+$",
@@ -4524,7 +4578,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the trigger to activate, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
+                  "description": "Required. Resource name of the trigger to activate, for example\n`projects\/dlp-test-project\/jobTriggers\/53234423`.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/jobTriggers\/[^\/]+$",
@@ -4556,7 +4610,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4584,7 +4638,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4640,7 +4694,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "The name of the DlpJob resource.",
+                  "description": "Required. The name of the DlpJob resource.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/dlpJobs\/[^\/]+$",
@@ -4665,7 +4719,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "The name of the DlpJob resource to be deleted.",
+                  "description": "Required. The name of the DlpJob resource to be deleted.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/dlpJobs\/[^\/]+$",
@@ -4690,7 +4744,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "name": {
-                  "description": "The name of the DlpJob resource to be cancelled.",
+                  "description": "Required. The name of the DlpJob resource to be cancelled.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/dlpJobs\/[^\/]+$",
@@ -4722,7 +4776,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4750,7 +4804,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of organization and storedInfoType to be updated, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
+                  "description": "Required. Resource name of organization and storedInfoType to be updated, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/storedInfoTypes\/[^\/]+$",
@@ -4778,7 +4832,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and storedInfoType to be read, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
+                  "description": "Required. Resource name of the organization and storedInfoType to be read, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/storedInfoTypes\/[^\/]+$",
@@ -4803,7 +4857,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -4844,7 +4898,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and storedInfoType to be deleted, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
+                  "description": "Required. Resource name of the organization and storedInfoType to be deleted, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+\/storedInfoTypes\/[^\/]+$",
@@ -4955,7 +5009,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+$",
@@ -4983,7 +5037,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of organization and inspectTemplate to be updated, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
+                  "description": "Required. Resource name of organization and inspectTemplate to be updated, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/inspectTemplates\/[^\/]+$",
@@ -5011,7 +5065,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and inspectTemplate to be read, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and inspectTemplate to be read, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/inspectTemplates\/[^\/]+$",
@@ -5036,7 +5090,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+$",
@@ -5077,7 +5131,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and inspectTemplate to be deleted, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and inspectTemplate to be deleted, for\nexample `organizations\/433245324\/inspectTemplates\/432452342` or\nprojects\/project-id\/inspectTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/inspectTemplates\/[^\/]+$",
@@ -5106,7 +5160,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+$",
@@ -5134,7 +5188,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of organization and deidentify template to be updated, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
+                  "description": "Required. Resource name of organization and deidentify template to be updated, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/deidentifyTemplates\/[^\/]+$",
@@ -5162,7 +5216,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and deidentify template to be read, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and deidentify template to be read, for\nexample `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/deidentifyTemplates\/[^\/]+$",
@@ -5187,7 +5241,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+$",
@@ -5228,7 +5282,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and deidentify template to be deleted,\nfor example `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
+                  "description": "Required. Resource name of the organization and deidentify template to be deleted,\nfor example `organizations\/433245324\/deidentifyTemplates\/432452342` or\nprojects\/project-id\/deidentifyTemplates\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/deidentifyTemplates\/[^\/]+$",
@@ -5257,7 +5311,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+$",
@@ -5285,7 +5339,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "Resource name of organization and storedInfoType to be updated, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
+                  "description": "Required. Resource name of organization and storedInfoType to be updated, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/storedInfoTypes\/[^\/]+$",
@@ -5313,7 +5367,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and storedInfoType to be read, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
+                  "description": "Required. Resource name of the organization and storedInfoType to be read, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/storedInfoTypes\/[^\/]+$",
@@ -5338,7 +5392,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
+                  "description": "Required. The parent resource name, for example projects\/my-project-id or\norganizations\/my-org-id.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+$",
@@ -5379,7 +5433,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Resource name of the organization and storedInfoType to be deleted, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
+                  "description": "Required. Resource name of the organization and storedInfoType to be deleted, for\nexample `organizations\/433245324\/storedInfoTypes\/432452342` or\nprojects\/project-id\/storedInfoTypes\/432452342.",
                   "location": "path",
                   "required": true,
                   "pattern": "^organizations\/[^\/]+\/storedInfoTypes\/[^\/]+$",

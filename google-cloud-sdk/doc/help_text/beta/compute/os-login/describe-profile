@@ -17,6 +17,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To show all of the information about your OS Login profile, including POSIX
+    account information and stored SSH public keys, run:
+
+        $ gcloud beta compute os-login describe-profile
+
+    To show all of the information in a different format, such as JSON, use the
+    --format flag:
+
+        $ gcloud beta compute os-login describe-profile --format=json
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

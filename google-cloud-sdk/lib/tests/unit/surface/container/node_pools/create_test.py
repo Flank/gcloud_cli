@@ -83,21 +83,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
                 version=pool.version),
         normalize_space=True)
 
-  def _TestAutoUpgradeDefault(self, expect_default):
-    pool_kwargs = {
-        'management': self.messages.NodeManagement(
-            autoRepair=True, autoUpgrade=expect_default)
-    }
-    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
-        pool_kwargs)
-    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetNodePool(return_pool.name, response=return_pool)
-    self.Run('{base} create {name} --quiet --cluster {clusterName}'.format(
-        base=self.node_pools_command_base.format(self.ZONE),
-        name=self.NODE_POOL_NAME,
-        clusterName=self.CLUSTER_NAME))
-
   def testCreateDefaults(self):
     self._TestCreateDefaults(self.ZONE)
 
@@ -159,7 +144,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ],
         'autoscaling':
             self.msgs.NodePoolAutoscaling(
-                enabled=True, minNodeCount=1, maxNodeCount=5),
+                enabled=True, minNodeCount=1, maxNodeCount=5,
+                autoprovisioned=True),
         'imageType':
             'custom',
         'nodeImageConfig':
@@ -221,6 +207,7 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --tags=http-server,https-server'
         ' --node-labels=env=prod'
         ' --node-taints=key1=val1:NoSchedule'
+        ' --enable-autoprovisioning'
         ' --enable-autoscaling'
         ' --min-nodes=1'
         ' --max-nodes=5'
@@ -591,16 +578,24 @@ Created \
         'auto-upgrade, auto-repair, and auto-scaling. To preserve '
         'modifications across node recreation, use a DaemonSet.')
 
+  def testAutoUpgradeDefault(self):
+    pool_kwargs = {
+        'management': self.messages.NodeManagement(
+            autoRepair=True, autoUpgrade=True)
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} --quiet --cluster {clusterName}'.format(
+        base=self.node_pools_command_base.format(self.ZONE),
+        name=self.NODE_POOL_NAME,
+        clusterName=self.CLUSTER_NAME))
+
 
 class CreateTestGAOnly(CreateTestGA):
   """gcloud GA track only using container v1 API (not beta/alpha)."""
-
-  def testWarnFutureAutoUpgradeChange(self):
-    self._TestCreateDefaults(self.ZONE)
-    self.AssertErrContains(c_util.WARN_GA_FUTURE_AUTOUPGRADE_CHANGE)
-
-  def testAutoUpgradeDefault(self):
-    self._TestAutoUpgradeDefault(expect_default=None)
 
 
 # TODO(b/64575339): switch to use parameterized testing.
@@ -746,10 +741,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         '--node-locations=us-central1-a,us-central1-b',
         locations=['us-central1-a', 'us-central1-b'])
 
-  def testAutoUpgradeDefault(self):
-    self._TestAutoUpgradeDefault(expect_default=True)
-    self.AssertErrContains(c_util.WARN_AUTOUPGRADE_ENABLED_BY_DEFAULT)
-
   def testWarnNodeVersionWithAutoUpgradeEnabled(self):
     pool_kwargs = {
         'nodeVersion': self.VERSION,
@@ -786,6 +777,54 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
                                                        self.CLUSTER_NAME))
     self.AssertErrContains('argument --sandbox')
 
+  @parameterized.parameters('--max-surge-upgrade=2',
+                            '--max-unavailable-upgrade=1')
+  def testInvalidSurgeUpgrade(self, upgrade_flag):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name': 'my-custom-pool',
+        'clusterId': self.CLUSTER_NAME,
+        'upgradeFlag': upgrade_flag,
+    }
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {name} --cluster={clusterId} {upgradeFlag}'
+          .format(**pool_kwargs))
+    self.AssertErrContains(c_util.INVALIID_SURGE_UPGRADE_SETTINGS)
+
+  def testEnableSurgeUpgrade(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name': 'my-custom-pool',
+        'clusterId': self.CLUSTER_NAME,
+        'upgradeSettings': self._MakeUpgradeSettings(maxSurge=3,
+                                                     maxUnavailable=2),
+    }
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) +
+        ' create {name} --cluster={clusterId}'
+        ' --max-surge-upgrade=3 --max-unavailable-upgrade=2'
+        .format(**pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
@@ -810,9 +849,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
             m.LocalSsdVolumeConfig(
                 count=1, type='scsi', format=format_enum.BLOCK),
         ],
-        'autoscaling':
-            m.NodePoolAutoscaling(
-                enabled=True, maxNodeCount=6, autoprovisioned=True),
         'nodeGroup':
             'test-node-group',
     }
@@ -834,7 +870,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         ' --cluster={clusterId}'
         ' --local-ssd-volumes count=2,type=nvme,format=fs'
         ' --local-ssd-volumes count=1,type=scsi,format=block'
-        ' --enable-autoscaling --enable-autoprovisioning --max-nodes 6'
         ' --workload-metadata-from-node=secure'
         ' --node-group {nodeGroup}'.format(**pool_kwargs))
     self.AssertOutputEquals(
@@ -906,71 +941,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         ' --cluster={clusterId}'
         ' --linux-sysctls="net.core.somaxconn=4096,'
         'net.ipv4.tcp_rmem=4096 87380 6291456"'.format(**pool_kwargs))
-    self.AssertOutputEquals(
-        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {version}\n').format(name=pool.name, version=pool.version),
-        normalize_space=True)
-
-  def testEnableSurgeUpgrade(self):
-    self.assertIsNone(
-        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                  self.PROJECT_ID))
-    pool_kwargs = {
-        'name':
-            'my-custom-pool',
-        'clusterId':
-            self.CLUSTER_NAME,
-        'upgradeSettings':
-            self._MakeUpgradeSettings(maxSurge=1),
-    }
-    self.ExpectCreateNodePool(
-        self._MakeNodePool(**pool_kwargs),
-        self._MakeNodePoolOperation(**pool_kwargs))
-    self.ExpectGetOperation(
-        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
-
-    pool_version_kwargs = pool_kwargs.copy()
-    pool_version_kwargs.update({'nodeVersion': self.VERSION})
-    pool = self._MakeNodePool(**pool_version_kwargs)
-    self.ExpectGetNodePool(pool.name, response=pool)
-    self.Run(
-        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
-        ' --cluster={clusterId}'
-        ' --max-surge-upgrade=1'
-        .format(**pool_kwargs))
-    self.AssertOutputEquals(
-        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {version}\n').format(name=pool.name, version=pool.version),
-        normalize_space=True)
-
-  def testEnableSurgeUpgradeWithMaxUnavailable(self):
-    self.assertIsNone(
-        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                  self.PROJECT_ID))
-    pool_kwargs = {
-        'name':
-            'my-custom-pool',
-        'clusterId':
-            self.CLUSTER_NAME,
-        'upgradeSettings':
-            self._MakeUpgradeSettings(maxSurge=3, maxUnavailable=2),
-    }
-    self.ExpectCreateNodePool(
-        self._MakeNodePool(**pool_kwargs),
-        self._MakeNodePoolOperation(**pool_kwargs))
-    self.ExpectGetOperation(
-        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
-
-    pool_version_kwargs = pool_kwargs.copy()
-    pool_version_kwargs.update({'nodeVersion': self.VERSION})
-    pool = self._MakeNodePool(**pool_version_kwargs)
-    self.ExpectGetNodePool(pool.name, response=pool)
-    self.Run(
-        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
-        ' --cluster={clusterId}'
-        ' --max-surge-upgrade=3'
-        ' --max-unavailable-upgrade=2'
-        .format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),

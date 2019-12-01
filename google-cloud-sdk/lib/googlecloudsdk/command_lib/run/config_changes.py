@@ -21,9 +21,7 @@ from __future__ import unicode_literals
 
 import abc
 import copy
-import shlex
 
-from googlecloudsdk.api_lib.run import configuration
 from googlecloudsdk.api_lib.run import k8s_object
 from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import service
@@ -62,7 +60,7 @@ class LabelChanges(ConfigChanger):
     # Currently assumes all "system"-owned labels are applied by the control
     # plane and it's ok for us to clear them on the client.
     update_result = self._diff.Apply(
-        resource.MessagesModule().ObjectMeta.LabelsValue,
+        k8s_object.Meta(resource.MessagesModule()).LabelsValue,
         resource.metadata.labels)
     maybe_new_labels = update_result.GetOrNone()
     if maybe_new_labels:
@@ -95,6 +93,12 @@ class ReplaceServiceChange(ConfigChanger):
     """
     if resource.metadata.resourceVersion:
       self._service.metadata.resourceVersion = resource.metadata.resourceVersion
+      # Knative will complain if you try to edit (incl remove) serving annots.
+      # So replicate them here.
+      if not resource.is_managed:
+        for k, v in resource.annotations.items():
+          if k.startswith(k8s_object.SERVING_GROUP):
+            self._service.annotations[k] = v
     return self._service
 
 
@@ -179,9 +183,9 @@ class ImageChange(ConfigChanger):
     self.image = image
 
   def Adjust(self, resource):
-    annotations = k8s_object.AnnotationsFromMetadata(
-        resource.MessagesModule(), resource.metadata)
-    annotations[configuration.USER_IMAGE_ANNOTATION] = (
+    resource.annotations[revision.USER_IMAGE_ANNOTATION] = (
+        self.image)
+    resource.template.annotations[revision.USER_IMAGE_ANNOTATION] = (
         self.image)
     resource.template.image = self.image
     return resource
@@ -359,8 +363,6 @@ class ResourceChanges(ConfigChanger):
       resource.template.resource_limits['cpu'] = self._cpu
     return resource
 
-_CLOUDSQL_ANNOTATION = 'run.googleapis.com/cloudsql-instances'
-
 
 class CloudSQLChanges(ConfigChanger):
   """Represents the intent to update the Cloug SQL instances."""
@@ -404,7 +406,8 @@ class CloudSQLChanges(ConfigChanger):
 
   def Adjust(self, resource):
     def GetCurrentInstances():
-      annotation_val = resource.template.annotations.get(_CLOUDSQL_ANNOTATION)
+      annotation_val = resource.template.annotations.get(
+          revision.CLOUDSQL_ANNOTATION)
       if annotation_val:
         return annotation_val.split(',')
       return []
@@ -412,7 +415,8 @@ class CloudSQLChanges(ConfigChanger):
     instances = repeated.ParsePrimitiveArgs(
         self, 'cloudsql-instances', GetCurrentInstances)
     if instances is not None:
-      resource.template.annotations[_CLOUDSQL_ANNOTATION] = ','.join(instances)
+      resource.template.annotations[
+          revision.CLOUDSQL_ANNOTATION] = ','.join(instances)
     return resource
 
   def _Augment(self, instance_str):
@@ -440,19 +444,11 @@ class ConcurrencyChanges(ConfigChanger):
   """Represents the user intent to update concurrency preference."""
 
   def __init__(self, concurrency):
-    self._concurrency = None if concurrency == 'default' else concurrency
+    self._concurrency = None if concurrency == 'default' else int(concurrency)
 
   def Adjust(self, resource):
     """Mutates the given config's resource limits to match what's desired."""
-    if self._concurrency is None:
-      resource.template.deprecated_string_concurrency = None
-      resource.template.concurrency = None
-    elif isinstance(self._concurrency, int):
-      resource.template.concurrency = self._concurrency
-      resource.template.deprecated_string_concurrency = None
-    else:
-      resource.template.deprecated_string_concurrency = self._concurrency
-      resource.template.concurrency = None
+    resource.template.concurrency = self._concurrency
     return resource
 
 
@@ -646,22 +642,20 @@ class NoTrafficChange(ConfigChanger):
 class TrafficChanges(ConfigChanger):
   """Represents the user intent to change a services traffic assignments."""
 
-  def __init__(self, new_percentages, new_latest_percentage):
+  def __init__(self, new_percentages):
     self._new_percentages = new_percentages
-    self._new_latest_percentage = new_latest_percentage
 
   def Adjust(self, resource):
     """Mutates the given services traffic assignments."""
-    resource.traffic.UpdateTraffic(
-        self._new_percentages, self._new_latest_percentage)
+    resource.traffic.UpdateTraffic(self._new_percentages)
     return resource
 
 
 class ContainerCommandChange(ConfigChanger):
   """Represents the user intent to change the 'command' for the container."""
 
-  def __init__(self, command_str):
-    self._commands = shlex.split(command_str)
+  def __init__(self, command):
+    self._commands = command
 
   def Adjust(self, resource):
     resource.template.container.command = self._commands
@@ -671,9 +665,56 @@ class ContainerCommandChange(ConfigChanger):
 class ContainerArgsChange(ConfigChanger):
   """Represents the user intent to change the 'args' for the container."""
 
-  def __init__(self, args_str):
-    self._args = shlex.split(args_str)
+  def __init__(self, args):
+    self._args = args
 
   def Adjust(self, resource):
     resource.template.container.args = self._args
+    return resource
+
+
+_HTTP2_NAME = 'h2c'
+_DEFAULT_PORT = 8080
+
+
+class ContainerPortChange(ConfigChanger):
+  """Represents the user intent to change the port name and/or number."""
+
+  def __init__(self, port=None, use_http2=None):
+    """Initialize a ContainerPortChange.
+
+    Args:
+      port: str, the port number to set the port to, "default" to unset the
+        containerPort field, or None to not modify the port number.
+      use_http2: bool, True to set the port name for http/2, False to unset it,
+        or None to not modify the port name.
+    """
+    self._port = port
+    self._http2 = use_http2
+
+  def Adjust(self, resource):
+    """Modify an existing ContainerPort or create a new one."""
+    port_msg = (
+        resource.template.container.ports[0]
+        if resource.template.container.ports else
+        resource.MessagesModule().ContainerPort())
+    # Set port to given value or clear field
+    if self._port == 'default':
+      port_msg.reset('containerPort')
+    elif self._port is not None:
+      port_msg.containerPort = int(self._port)
+    # Set name for http/2 or clear field
+    if self._http2:
+      port_msg.name = _HTTP2_NAME
+    elif self._http2 is not None:
+      port_msg.reset('name')
+    # A port number must be specified
+    if port_msg.name and not port_msg.containerPort:
+      port_msg.containerPort = _DEFAULT_PORT
+
+    # Use the ContainerPort iff it's not empty
+    if port_msg.containerPort:
+      resource.template.container.ports = [port_msg]
+    else:
+      resource.template.container.reset('ports')
     return resource

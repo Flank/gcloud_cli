@@ -35,8 +35,8 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the firestore/v1beta2 API. The full documentation for
-    this API can be found at: https://cloud.google.com/firestore
+    This command uses the firestore/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/firestore
 
 EXAMPLES
     The following command describes the composite index with ID 3421ef:
@@ -44,8 +44,9 @@ EXAMPLES
         $ gcloud beta firestore indexes composite describe 3421ef
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud firestore indexes composite describe
         $ gcloud alpha firestore indexes composite describe
 

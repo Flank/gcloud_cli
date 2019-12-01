@@ -63,17 +63,18 @@ class AdjustTraffic(base.Command):
           run:
 
               $ {command} myservice --to-latest
+
+          You can also refer to the current or future LATEST revision in
+          --to-revisions by the string "LATEST". For example, to set 10% of
+          traffic to always float to the latest revision:
+
+              $ {command} myservice --to-revisions=LATEST=10
+
          """,
   }
 
   @staticmethod
   def Args(parser):
-    # Flags specific to CRoGKE
-    gke_group = flags.GetGkeArgGroup(parser)
-    concept_parsers.ConceptParser([resource_args.CLUSTER_PRESENTATION
-                                  ]).AddToParser(gke_group)
-
-    # Flags not specific to any platform
     service_presentation = presentation_specs.ResourcePresentationSpec(
         'SERVICE',
         resource_args.GetServiceResourceSpec(prompt=True),
@@ -83,7 +84,6 @@ class AdjustTraffic(base.Command):
     flags.AddAsyncFlag(parser)
     flags.AddUpdateTrafficFlags(parser)
     concept_parsers.ConceptParser([service_presentation]).AddToParser(parser)
-    flags.AddPlatformArg(parser)
 
   def _SetFormat(self, args):
     """Set display format for output.
@@ -107,13 +107,9 @@ class AdjustTraffic(base.Command):
     Returns:
       List of traffic.TrafficTargetStatus instances reflecting the change.
     """
-    conn_context = connection_context.GetConnectionContext(args)
+    conn_context = connection_context.GetConnectionContext(
+        args, self.ReleaseTrack())
     service_ref = flags.GetService(args)
-
-    if conn_context.supports_one_platform:
-      flags.VerifyOnePlatformFlags(args)
-    else:
-      flags.VerifyGKEFlags(args)
 
     changes = flags.GetConfigurationChanges(args)
     if not changes:

@@ -80,9 +80,8 @@ GCLOUD WIDE FLAGS
     details.
 
 API REFERENCE
-    This command uses the managedidentities/v1beta1 API. The full documentation
-    for this API can be found at:
-    https://cloud.google.com/managed-microsoft-ad/
+    This command uses the managedidentities/v1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/managed-microsoft-ad/
 
 EXAMPLES
     The following command creates an external, bidirectional AD trust between
@@ -94,8 +93,9 @@ EXAMPLES
         --selective-authentication=false --async
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud active-directory domains trusts create
         $ gcloud alpha active-directory domains trusts create
 

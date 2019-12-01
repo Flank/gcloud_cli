@@ -465,6 +465,10 @@
         "evaluationMetrics": {
           "description": "The evaluation metrics over training\/eval data that were computed at the\nend of training.",
           "$ref": "EvaluationMetrics"
+        },
+        "dataSplitResult": {
+          "description": "Data split result of the training run. Only set when the input data is\nactually split.",
+          "$ref": "DataSplitResult"
         }
       }
     },
@@ -624,13 +628,15 @@
           "enumDescriptions": [
             "",
             "Initializes the centroids randomly.",
-            "Initializes the centroids using data specified in\nkmeans_initialization_column."
+            "Initializes the centroids using data specified in\nkmeans_initialization_column.",
+            "Initializes with kmeans++."
           ],
           "type": "string",
           "enum": [
             "KMEANS_INITIALIZATION_METHOD_UNSPECIFIED",
             "RANDOM",
-            "CUSTOM"
+            "CUSTOM",
+            "KMEANS_PLUS_PLUS"
           ]
         },
         "kmeansInitializationColumn": {
@@ -675,6 +681,9 @@
           "items": {
             "$ref": "ClusterInfo"
           }
+        },
+        "arimaResult": {
+          "$ref": "ArimaResult"
         }
       }
     },
@@ -697,6 +706,136 @@
           "description": "Cluster size, the total number of points assigned to the cluster.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "ArimaResult": {
+      "id": "ArimaResult",
+      "description": "(Auto-)arima fitting result. Wrap everything in ArimaResult for easier\nrefactoring if we want to use model-specific iteration results.",
+      "type": "object",
+      "properties": {
+        "arimaModelInfo": {
+          "description": "This message is repeated because there are multiple arima models\nfitted in auto-arima. For non-auto-arima model, its size is one.",
+          "type": "array",
+          "items": {
+            "$ref": "ArimaModelInfo"
+          }
+        },
+        "seasonalPeriods": {
+          "description": "Seasonal periods. Repeated because multiple periods are supported for\none time series.",
+          "enumDescriptions": [
+            "",
+            "No seasonality",
+            "Daily period, 24 hours.",
+            "Weekly period, 7 days.",
+            "Monthly period, can be as 30 days or irregular.",
+            "Quarterly period, can be as 90 days or irregular.",
+            "Yearly period, can be as 365 days or irregular."
+          ],
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SEASONAL_PERIOD_TYPE_UNSPECIFIED",
+              "NO_SEASONALITY",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "QUARTERLY",
+              "YEARLY"
+            ]
+          }
+        }
+      }
+    },
+    "ArimaModelInfo": {
+      "id": "ArimaModelInfo",
+      "description": "Arima model information.",
+      "type": "object",
+      "properties": {
+        "nonSeasonalOrder": {
+          "description": "Non-seasonal order.",
+          "$ref": "ArimaOrder"
+        },
+        "arimaCoefficients": {
+          "description": "Arima coefficients.",
+          "$ref": "ArimaCoefficients"
+        },
+        "arimaFittingMetrics": {
+          "description": "Arima fitting metrics.",
+          "$ref": "ArimaFittingMetrics"
+        }
+      }
+    },
+    "ArimaOrder": {
+      "id": "ArimaOrder",
+      "description": "Arima order, can be used for both non-seasonal and seasonal parts.",
+      "type": "object",
+      "properties": {
+        "p": {
+          "description": "Order of the autoregressive part.",
+          "type": "string",
+          "format": "int64"
+        },
+        "d": {
+          "description": "Order of the differencing part.",
+          "type": "string",
+          "format": "int64"
+        },
+        "q": {
+          "description": "Order of the moving-average part.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ArimaCoefficients": {
+      "id": "ArimaCoefficients",
+      "description": "Arima coefficients.",
+      "type": "object",
+      "properties": {
+        "autoRegressiveCoefficients": {
+          "description": "Auto-regressive coefficients, an array of double.",
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "movingAverageCoefficients": {
+          "description": "Moving-average coefficients, an array of double.",
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "interceptCoefficient": {
+          "description": "Intercept coefficient, just a double not an array.",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ArimaFittingMetrics": {
+      "id": "ArimaFittingMetrics",
+      "description": "ARIMA model fitting metrics.",
+      "type": "object",
+      "properties": {
+        "logLikelihood": {
+          "description": "log-likelihood",
+          "type": "number",
+          "format": "double"
+        },
+        "aic": {
+          "description": "AIC",
+          "type": "number",
+          "format": "double"
+        },
+        "variance": {
+          "description": "variance.",
+          "type": "number",
+          "format": "double"
         }
       }
     },
@@ -1041,6 +1180,21 @@
           "description": "The count of training samples matching the category within the\ncluster.",
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "DataSplitResult": {
+      "id": "DataSplitResult",
+      "description": "Data split result. This contains references to the training and evaluation\ndata tables that were used to train the model.",
+      "type": "object",
+      "properties": {
+        "trainingTable": {
+          "description": "Table reference of the training data after split.",
+          "$ref": "TableReference"
+        },
+        "evaluationTable": {
+          "description": "Table reference of the evaluation data after split.",
+          "$ref": "TableReference"
         }
       }
     },
@@ -1401,6 +1555,10 @@
         "hivePartitioningOptions": {
           "description": "[Optional, Trusted Tester] When set, configures hive partitioning support.\nNot all storage formats support hive partitioning -- requesting hive\npartitioning on an unsupported format will lead to an error, as will\nproviding an invalid specification.",
           "$ref": "HivePartitioningOptions"
+        },
+        "connectionId": {
+          "description": "Optional This field is in testing and should not yet be\nused.",
+          "type": "string"
         }
       }
     },
@@ -1445,6 +1603,23 @@
         "description": {
           "description": "Optional. The field description. The maximum length is 1,024 characters.",
           "type": "string"
+        },
+        "policyTags": {
+          "description": "Optional. The policy tags attached to this field, used for field-level access\ncontrol. If not set, defaults to empty policy_tags.",
+          "$ref": "PolicyTagList"
+        }
+      }
+    },
+    "PolicyTagList": {
+      "id": "PolicyTagList",
+      "type": "object",
+      "properties": {
+        "names": {
+          "description": "A list of policy tag resource names. For example,\n\"projects\/1\/locations\/eu\/taxonomies\/2\/policyTags\/3\". At most 1 policy tag\nis currently allowed.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1457,7 +1632,7 @@
           "type": "string"
         },
         "skipLeadingRows": {
-          "description": "[Optional] The number of rows at the top of a CSV file that BigQuery will\nskip when reading the data. The default value is 0. This property is\nuseful if you have header rows in the file that should be skipped.",
+          "description": "[Optional] The number of rows at the top of a CSV file that BigQuery will\nskip when reading the data. The default value is 0. This property is\nuseful if you have header rows in the file that should be skipped.\nWhen autodetect is on, the behavior is the following:\n\n* skipLeadingRows unspecified - Autodetect tries to detect headers in the\n  first row. If they are not detected, the row is read as data. Otherwise\n  data is read starting from the second row.\n* skipLeadingRows is 0 - Instructs autodetect that there are no headers and\n  data should be read starting from the first row.\n* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect\n  headers in row N. If headers are not detected, row N is just skipped.\n  Otherwise row N is used to extract column names for the detected schema.",
           "type": "string",
           "format": "int64"
         },
@@ -1565,7 +1740,7 @@
       "type": "object",
       "properties": {
         "skipLeadingRows": {
-          "description": "[Optional] The number of rows at the top of a sheet that BigQuery will skip\nwhen reading the data. The default value is 0. This property is useful if\nyou have header rows that should be skipped. When autodetect is on,\nbehavior is the following:\n* skipLeadingRows unspecified - Autodetect tries to detect headers in the\n  first row. If they are not detected, the row is read as data. Otherwise\n  data is read starting from the second row.\n* skipLeadingRows is 0 - Instructs autodetect that there are no headers and\n  data should be read starting from the first row.\n* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect\n  headers in row N. If headers are not detected, row N is just skipped.\n  Otherwise row N is used to extract column names for the detected schema.",
+          "description": "[Optional] The number of rows at the top of a sheet that BigQuery will skip\nwhen reading the data. The default value is 0. This property is useful if\nyou have header rows that should be skipped. When autodetect is on,\nthe behavior is the following:\n* skipLeadingRows unspecified - Autodetect tries to detect headers in the\n  first row. If they are not detected, the row is read as data. Otherwise\n  data is read starting from the second row.\n* skipLeadingRows is 0 - Instructs autodetect that there are no headers and\n  data should be read starting from the first row.\n* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect\n  headers in row N. If headers are not detected, row N is just skipped.\n  Otherwise row N is used to extract column names for the detected schema.",
           "type": "string",
           "format": "int64"
         },
@@ -1791,7 +1966,7 @@
           "type": "string"
         },
         "skipLeadingRows": {
-          "description": "[Optional] The number of rows at the top of a CSV file that BigQuery will\nskip when loading the data. The default value is 0. This property is useful\nif you have header rows in the file that should be skipped.",
+          "description": "[Optional] The number of rows at the top of a CSV file that BigQuery will\nskip when loading the data. The default value is 0. This property is useful\nif you have header rows in the file that should be skipped. When autodetect\nis on, the behavior is the following:\n\n* skipLeadingRows unspecified - Autodetect tries to detect headers in the\n  first row. If they are not detected, the row is read as data. Otherwise\n  data is read starting from the second row.\n* skipLeadingRows is 0 - Instructs autodetect that there are no headers and\n  data should be read starting from the first row.\n* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect\n  headers in row N. If headers are not detected, row N is just skipped.\n  Otherwise row N is used to extract column names for the detected schema.",
           "type": "integer",
           "format": "int32"
         },
@@ -2201,7 +2376,7 @@
           }
         },
         "statementType": {
-          "description": "Output only. The type of query statement, if valid.\nPossible values (new values might be added in the future):\n\"SELECT\": SELECT query.\n\"INSERT\": INSERT query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"UPDATE\": UPDATE query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"DELETE\": DELETE query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"MERGE\": MERGE query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"ALTER_TABLE\": ALTER TABLE query.\n\"ALTER_VIEW\": ALTER VIEW query.\n\"CREATE_FUNCTION\": CREATE FUNCTION query.\n\"CREATE_MODEL\": CREATE [OR REPLACE] MODEL ... AS SELECT ... .\n\"CREATE_PROCEDURE\": CREATE PROCEDURE query.\n\"CREATE_TABLE\": CREATE [OR REPLACE] TABLE without AS SELECT.\n\"CREATE_TABLE_AS_SELECT\": CREATE [OR REPLACE] TABLE ... AS SELECT ... .\n\"CREATE_VIEW\": CREATE [OR REPLACE] VIEW ... AS SELECT ... .\n\"DROP_FUNCTION\" : DROP FUNCTION query.\n\"DROP_PROCEDURE\": DROP PROCEDURE query.\n\"DROP_TABLE\": DROP TABLE query.\n\"DROP_VIEW\": DROP VIEW query.",
+          "description": "Output only. The type of query statement, if valid.\nPossible values (new values might be added in the future):\n\"SELECT\": SELECT query.\n\"INSERT\": INSERT query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"UPDATE\": UPDATE query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"DELETE\": DELETE query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"MERGE\": MERGE query; see\nhttps:\/\/cloud.google.com\/bigquery\/docs\/reference\/standard-sql\/data-manipulation-language.\n\"ALTER_TABLE\": ALTER TABLE query.\n\"ALTER_VIEW\": ALTER VIEW query.\n\"ASSERT\": ASSERT condition AS 'description'.\n\"CREATE_FUNCTION\": CREATE FUNCTION query.\n\"CREATE_MODEL\": CREATE [OR REPLACE] MODEL ... AS SELECT ... .\n\"CREATE_PROCEDURE\": CREATE PROCEDURE query.\n\"CREATE_TABLE\": CREATE [OR REPLACE] TABLE without AS SELECT.\n\"CREATE_TABLE_AS_SELECT\": CREATE [OR REPLACE] TABLE ... AS SELECT ... .\n\"CREATE_VIEW\": CREATE [OR REPLACE] VIEW ... AS SELECT ... .\n\"DROP_FUNCTION\" : DROP FUNCTION query.\n\"DROP_PROCEDURE\": DROP PROCEDURE query.\n\"DROP_TABLE\": DROP TABLE query.\n\"DROP_VIEW\": DROP VIEW query.",
           "type": "string"
         },
         "ddlOperationPerformed": {
@@ -3058,7 +3233,7 @@
       "type": "object",
       "properties": {
         "routines": {
-          "description": "Routines in the requested dataset. Only the following fields are populated:\netag, project_id, dataset_id, routine_id, routine_type, creation_time,\nlast_modified_time, language.",
+          "description": "Routines in the requested dataset. Unless read_mask is set in the request,\nonly the following fields are populated:\netag, project_id, dataset_id, routine_id, routine_type, creation_time,\nlast_modified_time, and language.",
           "type": "array",
           "items": {
             "$ref": "Routine"
@@ -3126,7 +3301,7 @@
           "$ref": "Clustering"
         },
         "requirePartitionFilter": {
-          "description": "Beta If set to true, queries over this table require\na partition filter that can be used for partition elimination to be\nspecified.",
+          "description": "[Optional] If set to true, queries over this table require\na partition filter that can be used for partition elimination to be\nspecified.",
           "default": "false",
           "type": "boolean"
         },
@@ -3228,6 +3403,15 @@
           "description": "Output only. The time when this materialized view was last refreshed, in\nmilliseconds since the epoch.",
           "type": "string",
           "format": "int64"
+        },
+        "enableRefresh": {
+          "description": "Optional. Enable automatic refresh of the materialized view when the base table is\nupdated. The default value is \"true\".",
+          "type": "boolean"
+        },
+        "refreshIntervalMs": {
+          "description": "Optional. The maximum frequency at which this materialized view will be refreshed.\nThe default value is \"1800000\" (30 minutes).",
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -3297,6 +3481,10 @@
               "timePartitioning": {
                 "description": "The time-based partitioning for this table.",
                 "$ref": "TimePartitioning"
+              },
+              "rangePartitioning": {
+                "description": "The range partitioning for this table.",
+                "$ref": "RangePartitioning"
               },
               "clustering": {
                 "description": "[TrustedTester] Clustering specification for this table, if configured.",
@@ -3448,7 +3636,7 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"role\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and\/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time <\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles\/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles\/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
       "type": "object",
       "properties": {
         "version": {
@@ -3487,7 +3675,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example,`alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -3921,7 +4109,7 @@
             "https://www.googleapis.com/auth/bigquery",
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
+          "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"
         },
         "getIamPolicy": {
           "id": "bigquery.datasets.getIamPolicy",
@@ -4441,12 +4629,6 @@
               "required": true,
               "pattern": "^[^\/]+$",
               "type": "string"
-            },
-            "fieldMask": {
-              "description": "If set, only the Routine fields in the field mask are returned in the\nresponse. If unset, all Routine fields are returned.",
-              "location": "query",
-              "type": "string",
-              "format": "google-fieldmask"
             }
           },
           "parameterOrder": [
@@ -4926,7 +5108,7 @@
             "https://www.googleapis.com/auth/bigquery",
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
+          "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"
         },
         "getIamPolicy": {
           "id": "bigquery.tables.getIamPolicy",

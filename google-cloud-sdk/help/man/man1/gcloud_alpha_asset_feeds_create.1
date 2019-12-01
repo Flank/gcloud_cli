@@ -126,10 +126,11 @@ help\fR for details.
 To create a new feed 'feed1' in project 'p1' which alerts on compute disks and
 network resources types, run:
 
+.RS 2m
 $ gcloud alpha asset feeds create feed1 \-\-project=p1
 \-\-asset\-types=compute.googleapis.com/Network,compute.googleapis.com/Disk
-\-\-content\-type=resource
-\-\-pubsub\-topic=projects/project1/topics/feed\-topic
+\-\-content\-type=resource \-\-pubsub\-topic=projects/project1/topics/feed\-topic
+.RE
 
 
 
@@ -138,5 +139,9 @@ $ gcloud alpha asset feeds create feed1 \-\-project=p1
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta asset feeds create
+.RE
 

@@ -53,6 +53,11 @@ API REFERENCE
     This command uses the redis/v1 API. The full documentation for this API can
     be found at: https://cloud.google.com/memorystore/docs/redis/
 
+EXAMPLES
+    To list all the zones where Redis instances can be created, run:
+
+        $ gcloud beta redis zones list
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

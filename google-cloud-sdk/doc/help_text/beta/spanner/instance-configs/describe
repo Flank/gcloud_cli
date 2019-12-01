@@ -20,6 +20,15 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To describe an instance config named regional-us-central1, run:
+
+        $ gcloud beta spanner instance-configs describe regional-us-central1
+
+    To describe an instance config named nam-eur-asia1, run:
+
+        $ gcloud beta spanner instance-configs describe nam-eur-asia1
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

@@ -63,7 +63,7 @@ EXAMPLES
 
     List images with names prefixed with 'test-project':
 
-        $ gcloud beta container images list --filter "name:test-project"
+        $ gcloud beta container images list --filter="name:test-project"
 
 NOTES
     This command is currently in BETA and may change without notice. These

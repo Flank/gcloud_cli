@@ -8,7 +8,7 @@ SYNOPSIS
         [--dockerfile=DOCKERFILE; default="Dockerfile"]
         [--image-name=IMAGE_NAME]
         [--kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"]
-        [--service-name=SERVICE_NAME]
+        [--service-account=SERVICE_ACCOUNT] [--service-name=SERVICE_NAME]
         [--skaffold-file=SKAFFOLD_FILE; default="skaffold.yaml"]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -28,6 +28,10 @@ FLAGS
 
      --kubernetes-file=KUBERNETES_FILE; default="pods_and_services.yaml"
         File containing yaml specifications for kubernetes resources.
+
+     --service-account=SERVICE_ACCOUNT
+        When connecting to Google Cloud Platform services, use a service
+        account key.
 
      --service-name=SERVICE_NAME
         Name of the service.

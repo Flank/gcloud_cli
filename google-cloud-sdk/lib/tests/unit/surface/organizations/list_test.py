@@ -99,6 +99,7 @@ class OrganizationsListTest(testbase.OrganizationsUnitTestBase):
     self.AssertOutputContains("""\
       DISPLAY_NAME                   ID  DIRECTORY_CUSTOMER_ID
       Test Organization For Testing  298357488294     C0123n456
+
       DISPLAY_NAME                   ID  DIRECTORY_CUSTOMER_ID
       A Secondary Organization       309468599305     C9876n543
       """,

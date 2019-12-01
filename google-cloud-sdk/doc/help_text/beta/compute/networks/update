@@ -45,6 +45,18 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To update regional network with the name 'network-name' to global, run:
+
+        $ gcloud beta compute networks update network-name \
+          --bgp-routing-mode=global
+
+    To update an auto subnet mode network with the name 'network-name' to
+    custom subnet mode, run:
+
+        $ gcloud beta compute networks update network-name \
+          --switch-to-custom-subnet-mode
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

@@ -8,25 +8,13 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute instances remove-labels removes labels from a
-    Google Compute Engine virtual machine instance. For example, running:
-
-        $ gcloud beta compute instances remove-labels example-instance \
-            --labels=k0,k1
-
-    will remove existing labels with key k0 and k1 from 'example-instance'.
-
-    Labels can be used to identify the instance and to filter them as in
-
-        $ gcloud beta compute instances list --filter='labels.k1:value2'
-
-    To list existing labels
-
-        $ gcloud beta compute instances describe example-instance \
-            --format='default(labels)'
+    Google Compute Engine virtual machine instance.
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        Name of the instance to operate on.
+        Name of the instance to operate on. For details on valid instance
+        names, refer to the criteria documented under the field 'name' at:
+        https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
@@ -67,6 +55,22 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To remove existing labels with key k0 and k1 from 'example-instance'
+
+        $ gcloud beta compute instances remove-labels example-instance \
+            --labels=k0,k1
+
+    Labels can be used to identify the instance and to filter them. To find a
+    instance labeled with key-value pair k1, v2
+
+        $ gcloud beta compute instances list --filter='labels.k1:v2'
+
+    To list only the labels when describing a resource, use --format
+
+        $ gcloud beta compute instances describe example-instance \
+            --format='default(labels)'
 
 NOTES
     This command is currently in BETA and may change without notice. These

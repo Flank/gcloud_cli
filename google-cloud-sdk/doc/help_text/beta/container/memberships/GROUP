@@ -30,6 +30,12 @@ COMMANDS
      list
         (BETA) List memberships.
 
+     register
+        (BETA) Registers a cluster with Google Cloud Platform.
+
+     unregister
+        (BETA) Unregisters a cluster from Google Cloud Platform.
+
      update
         (BETA) Update a membership.
 

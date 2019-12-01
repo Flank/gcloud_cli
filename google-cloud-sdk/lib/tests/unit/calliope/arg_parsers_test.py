@@ -29,6 +29,7 @@ import re
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import display_info
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -1767,6 +1768,111 @@ class StoreFilePathAndContentsTest(sdk_test_base.SdkBase, test_case.WithInput):
         help='Auxilio aliis.')
     with self.assertRaises(arg_parsers.ArgumentTypeError):
       self.parser.parse_args(['--other-file-arg={}'.format(filename)])
+
+
+class YAMLFileContentsTest(sdk_test_base.SdkBase, test_case.WithInput,
+                           parameterized.TestCase):
+
+  def YamlFileTest(self, data, ext='yaml', validator=None):
+    filename = self.Touch(self.temp_path,
+                          'test.{}'.format(ext), contents=data, makedirs=True)
+    fun = arg_parsers.YAMLFileContents(validator=validator)
+    expected_data = yaml.load(data)
+    self.assertEqual(expected_data, fun(filename))
+
+  def StdinTest(self, lines, validator=None):
+    self.WriteInput(*lines)
+    fun = arg_parsers.YAMLFileContents(validator=validator)
+    expected_data = yaml.load('\n'.join(lines))
+    self.assertEqual(expected_data, fun('-'))
+
+  def testReadFile(self):
+    yaml_data = """
+    version: 1
+    dataItem: Foo
+    arrayItem:
+    - val1
+    - val2
+    objectItem:
+     prop1: bar
+     prop2: baz
+    """
+    self.YamlFileTest(yaml_data)
+
+    json_data = ("{'version': 1, "
+                 "'dataItem': 'Foo', 'arrayItem': ['val1', 'val2'], "
+                 "'objectItem': {'prop1': 'bar', 'prop2': 'baz'}}")
+    self.YamlFileTest(json_data, ext='json')
+
+  def testReadFileWithValidation(self):
+    data = """
+    version: 1
+    dataItem: Foo
+    arrayItem:
+    - val1
+    - val2
+    objectItem:
+     prop1: bar
+     prop2: baz
+    """
+    is_valid = lambda x: x['dataItem'] == 'Foo'
+    self.YamlFileTest(data, validator=is_valid)
+
+  def testReadFileWithFailedValidation(self):
+    data = """
+    version: 1
+    dataItem: Foo
+    arrayItem:
+    - val1
+    - val2
+    objectItem:
+     prop1: bar
+     prop2: baz
+    """
+    is_valid = lambda x: len(['arrayItem']) == 3
+    with self.assertRaises(ValueError):
+      self.YamlFileTest(data, validator=is_valid)
+
+  def testReadNonYamlFile(self):
+    data = 'ABCDefgHIJ123'
+    with self.assertRaises(arg_parsers.ArgumentTypeError):
+      self.YamlFileTest(data)
+
+  @parameterized.parameters(([
+      'version: 1', 'dataItem: Foo', 'arrayItem:', '- val1', '- val1',
+      'objectItem:', ' prop1: bar', ' prop2: baz'
+  ],), ([("{'version': 1, 'dataItem': 'Foo', 'arrayItem': ['val1', 'val2'], "
+          "'objectItem': {'prop1': 'bar', 'prop2': 'baz'}}")],))
+  def testReadStdin(self, lines):
+    self.StdinTest(lines)
+
+  def testReadStdinWithValidation(self):
+    lines = [
+        'version: 1', 'dataItem: Foo', 'arrayItem:', '- val1', '- val1',
+        'objectItem:', ' prop1: bar', ' prop2: baz'
+    ]
+    is_valid = lambda x: x['dataItem'] == 'Foo'
+    self.StdinTest(lines, validator=is_valid)
+
+  def testReadStdinFailedValidation(self):
+    lines = [
+        'version: 1', 'dataItem: Foo', 'arrayItem:', '- val1', '- val1',
+        'objectItem:', ' prop1: bar', ' prop2: baz'
+    ]
+    is_valid = lambda x: len(['arrayItem']) == 3
+    with self.assertRaises(ValueError):
+      self.StdinTest(lines, validator=is_valid)
+
+  def testReadNonYamlStdin(self):
+    lines = ['ABCDefgHIJ123']
+    with self.assertRaises(arg_parsers.ArgumentTypeError):
+      self.StdinTest(lines)
+
+  def testFileMissing(self):
+    filename = os.path.join(self.temp_path, 'FileMissing.json')
+    fun = arg_parsers.YAMLFileContents()
+    with self.assertRaises(arg_parsers.ArgumentTypeError):
+      fun(filename)
 
 
 class ArgBooleanTest(subtests.Base, parameterized.TestCase):

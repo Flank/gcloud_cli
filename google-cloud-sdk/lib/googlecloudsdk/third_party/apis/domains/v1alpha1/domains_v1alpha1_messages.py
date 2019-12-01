@@ -143,9 +143,26 @@ class Binding(_messages.Message):
       `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
       that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
-      that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: The G Suite domain (primary) that represents all
-      the    users of that domain. For example, `google.com` or `example.com`.
+      that represents a Google group.    For example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus    unique identifier) representing a service account that has been
+      recently    deleted. For example,    `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`.    If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique    identifier) representing a Google group
+      that has been recently    deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If    the group is
+      recovered, this value reverts to `group:{emailid}` and the    recovered
+      group retains the role in the binding.   * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the    users of that domain.
+      For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -317,10 +334,8 @@ class CounterOptions(_messages.Message):
   representation of IAMContext.principal even if a      token or authority
   selector is present; or    - "" (empty string), resulting in a counter with
   no fields.  Examples:   counter { metric: "/debug_access_count"  field:
-  "iam_principal" }   ==> increment counter
-  /iam/policy/backend_debug_access_count
-  {iam_principal=[value of IAMContext.principal]}  At this time we do not
-  support multiple field names (though this may be supported in the future).
+  "iam_principal" }   ==> increment counter /iam/policy/debug_access_count
+  {iam_principal=[value of IAMContext.principal]}
 
   Fields:
     customFields: Custom fields.
@@ -394,12 +409,10 @@ class DnsConfig(_messages.Message):
   r"""Defines DNS configuration of the Registration.
 
   Fields:
-    glueRecords: A list of glue records this registration has.
     nameServers: Name servers that store the configuration of the domain.
   """
 
-  glueRecords = _messages.MessageField('GlueRecord', 1, repeated=True)
-  nameServers = _messages.StringField(2, repeated=True)
+  nameServers = _messages.StringField(1, repeated=True)
 
 
 class DomainAvailability(_messages.Message):
@@ -483,15 +496,18 @@ class DomainsProjectsLocationsListRequest(_messages.Message):
 
   Fields:
     filter: The standard list filter.
+    includeUnrevealedLocations: If true, the returned list will include
+      locations which are not yet revealed.
     name: The resource that owns the locations collection, if applicable.
     pageSize: The standard list page size.
     pageToken: The standard list page token.
   """
 
   filter = _messages.StringField(1)
-  name = _messages.StringField(2, required=True)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
+  includeUnrevealedLocations = _messages.BooleanField(2)
+  name = _messages.StringField(3, required=True)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
 
 
 class DomainsProjectsLocationsOperationsGetRequest(_messages.Message):
@@ -739,29 +755,6 @@ class Expr(_messages.Message):
   expression = _messages.StringField(2)
   location = _messages.StringField(3)
   title = _messages.StringField(4)
-
-
-class GlueRecord(_messages.Message):
-  r"""Defines a GlueRecord. Glue Records or "Registered Hosts" are a way of
-  making the IP address of the name server known when it is a subdomain of the
-  domain for which it serves. For example, If your domain is example.com and
-  your name servers are ns1.example.com, ns2.example.com, ns3.example.com, and
-  ns4.example.com, you would create four registered host records linking each
-  name server to its IP address. Use glue records when your name servers are
-  subdomains of your domain.
-
-  Fields:
-    hostName: Required. Fully qualified host name, from least to most
-      significant order, e.g. "subdomain.domain.com".
-    ipv4Addresses: List of IPv4 addresses corresponding to this host. At least
-      one of ipv4_address and ipv6_address must be set.
-    ipv6Addresses: List of IPv6 addresses corresponding to this host. At least
-      one of ipv4_address and ipv6_address must be set.
-  """
-
-  hostName = _messages.StringField(1)
-  ipv4Addresses = _messages.StringField(2, repeated=True)
-  ipv6Addresses = _messages.StringField(3, repeated=True)
 
 
 class ListLocationsResponse(_messages.Message):

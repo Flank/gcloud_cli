@@ -34,6 +34,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
 
   def SetUp(self):
     self._printer = resource_printer.Printer('json')
+    self.SetEncoding('utf-8')
 
   def testEmpty(self):
     self._printer.Finish()
@@ -50,7 +51,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
           "labels": {
             "empty": "",
             "full": "value",
-            "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+            "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
           },
           "metadata": {
             "items": [
@@ -90,7 +91,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             }
           ],
           "size": 0,
-          "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+          "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
         }
         """))
 
@@ -112,7 +113,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -152,7 +153,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 0,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/az-1",
@@ -160,7 +161,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -200,7 +201,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 11,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }
         ]
         {
@@ -209,7 +210,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
           "labels": {
             "empty": "",
             "full": "value",
-            "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+            "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
           },
           "metadata": {
             "items": [
@@ -249,7 +250,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             }
           ],
           "size": 2,
-          "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+          "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
         }
         [
           {
@@ -258,7 +259,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -298,7 +299,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 33,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/azzzz-4",
@@ -306,7 +307,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -346,7 +347,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 4,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }
         ]
         """))
@@ -364,7 +365,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -404,7 +405,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 0,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }
         ]
         """))
@@ -422,7 +423,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -462,7 +463,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 0,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }"""))
 
     self._printer.AddRecord(resource[1])
@@ -475,7 +476,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -515,7 +516,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 0,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/az-1",
@@ -523,7 +524,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -563,7 +564,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 11,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }"""))
 
     self._printer.AddRecord(resource[2])
@@ -576,7 +577,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -616,7 +617,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 0,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/az-1",
@@ -624,7 +625,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -664,7 +665,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 11,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/azz-2",
@@ -672,7 +673,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -712,7 +713,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 2,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }"""))
 
     self._printer.Finish()
@@ -725,7 +726,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -765,7 +766,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 0,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/az-1",
@@ -773,7 +774,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -813,7 +814,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 11,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           },
           {
             "SelfLink": "http://g/selfie/azz-2",
@@ -821,7 +822,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             "labels": {
               "empty": "",
               "full": "value",
-              "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+              "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
             },
             "metadata": {
               "items": [
@@ -861,7 +862,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
               }
             ],
             "size": 2,
-            "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+            "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
           }
         ]
         """))
@@ -878,7 +879,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
           "labels": {
             "empty": "",
             "full": "value",
-            "\\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f": "\\u00ae\\u01d6\\u026c\\u0258\\u03c2"
+            "Ṳᾔḯ¢◎ⅾℯ": "®ǖɬɘς"
           },
           "metadata": {
             "items": [
@@ -918,7 +919,7 @@ class JsonPrinterTest(resource_printer_test_base.Base):
             }
           ],
           "size": 0,
-          "unicode": "python 2 \\u1e72\\u1f94\\u1e2f\\u00a2\\u25ce\\u217e\\u212f \\u1e67\\u028a\\u00a2\\u043a\\u1e67"
+          "unicode": "python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ"
         }
         """),
         out=log.out)

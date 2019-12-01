@@ -4,9 +4,10 @@ NAME
 SYNOPSIS
     gcloud compute images import IMAGE_NAME (--data-disk | --os=OS)
         (--source-file=SOURCE_FILE | --source-image=SOURCE_IMAGE) [--async]
-        [--no-guest-environment] [--log-location=LOG_LOCATION]
-        [--network=NETWORK] [--subnet=SUBNET] [--timeout=TIMEOUT; default="2h"]
-        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--family=FAMILY] [--no-guest-environment]
+        [--log-location=LOG_LOCATION] [--network=NETWORK]
+        [--storage-location=STORAGE_LOCATION] [--subnet=SUBNET]
+        [--timeout=TIMEOUT; default="2h"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute images import imports Virtual Disk images, such as VMWare
@@ -65,6 +66,12 @@ OPTIONAL FLAGS
         Return immediately, without waiting for the operation in progress to
         complete.
 
+     --description=DESCRIPTION
+        Description to set for the imported image.
+
+     --family=FAMILY
+        Family to set for the imported image.
+
      --guest-environment
         Installs the guest environment on the image. See
         https://cloud.google.com/compute/docs/images/guest-environment. Enabled
@@ -79,6 +86,11 @@ OPTIONAL FLAGS
         Name of the network in your project to use for the image import. The
         network must have access to Cloud Storage. If not specified, the
         network named default is used.
+
+     --storage-location=STORAGE_LOCATION
+        Specifies a Cloud Storage location, either regional or multi-regional,
+        where image content is to be stored. If not specified, the multi-region
+        location closest to the source is chosen automatically.
 
      --subnet=SUBNET
         Name of the subnetwork in your project to use for the image import. If

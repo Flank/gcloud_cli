@@ -222,30 +222,29 @@ To invoke an XCTest lasting up to five minutes against the default device
 environment, run:
 
 .RS 2m
-$ gcloud firebase test ios run \-\-test XCTEST_ZIP \-\-timeout 5m
+$ gcloud firebase test ios run \-\-test=XCTEST_ZIP \-\-timeout=5m
 .RE
 
 To invoke an XCTest against an iPad 5 running iOS 11.2, run:
 
 .RS 2m
-$ gcloud firebase test ios run \-\-test XCTEST_ZIP \e
-    \-\-device model=ipad5,version=11.2
+$ gcloud firebase test ios run \-\-test=XCTEST_ZIP \e
+    \-\-device=model=ipad5,version=11.2
 .RE
 
 To run your tests against multiple iOS devices simultaneously, specify the
 \fB\-\-device\fR flag more than once:
 
 .RS 2m
-$ gcloud firebase test ios run \-\-test XCTEST_ZIP               \e
-    \-\-device model=iphone7               \e
-    \-\-device model=ipadmini4,version=11.2               \e
-    \-\-device model=iphonese
+$ gcloud firebase test ios run \-\-test=XCTEST_ZIP \e
+    \-\-device=model=iphone7
+\-\-device=model=ipadmini4,version=11.2 \-\-device=model=iphonese
 .RE
 
 To run your XCTest using a specific version of Xcode, say 9.4.1, run:
 
 .RS 2m
-$ gcloud firebase test ios run \-\-test XCTEST_ZIP \e
+$ gcloud firebase test ios run \-\-test=XCTEST_ZIP \e
     \-\-xcode\-version=9.4.1
 .RE
 

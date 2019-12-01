@@ -67,6 +67,22 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To list all iOS versions available for testing, run:
+
+.RS 2m
+gcloud alpha firebase test ios versions list
+.RE
+
+To filter major versions available for testing, run:
+
+.RS 2m
+gcloud alpha firebase test ios versions list \-\-filter=majorVersion:12
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this

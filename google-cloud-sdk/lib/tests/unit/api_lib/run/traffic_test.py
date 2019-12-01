@@ -27,16 +27,12 @@ from tests.lib import test_case
 MESSAGES = core_apis.GetMessagesModule('run', 'v1alpha1')
 
 
-def NewTrafficTargets(percentages, latest_percentage=None):
+def NewTrafficTargets(percentages):
   targets = []
   for revision_name in percentages:
     targets.append(
         traffic.NewTrafficTarget(
             MESSAGES, revision_name, percentages[revision_name]))
-
-  if latest_percentage is not None:
-    targets.append(traffic.NewTrafficTarget(
-        MESSAGES, traffic.LATEST_REVISION_KEY, latest_percentage))
 
   sorted(targets, key=traffic.SortKeyFromTarget)
   return traffic.TrafficTargets(MESSAGES, targets)
@@ -64,7 +60,7 @@ class TrafficTest(test_case.TestCase):
     self.assertEqual(str(targets), '[]')
 
   def test_access_not_empty_traffic_targets(self):
-    targets = NewTrafficTargets({'r0': 10, 'r1': 20}, 70)
+    targets = NewTrafficTargets({'r0': 10, 'r1': 20, 'LATEST': 70})
     r0 = traffic.NewTrafficTarget(
         MESSAGES, 'r0', 10)
     r1 = traffic.NewTrafficTarget(
@@ -90,7 +86,7 @@ class TrafficTest(test_case.TestCase):
     self.assertIn('LATEST:', str(targets))
 
   def test_modify_traffic_targets(self):
-    targets = NewTrafficTargets({'r0': 10}, 70)
+    targets = NewTrafficTargets({'r0': 10, 'LATEST': 70})
     r0 = traffic.NewTrafficTarget(
         MESSAGES, 'r0', 10)
     r1 = traffic.NewTrafficTarget(
@@ -138,125 +134,125 @@ class TrafficTest(test_case.TestCase):
         self.GetTargetsKeys(targets), [u'r0', traffic.LATEST_REVISION_KEY])
 
   def test_validate_current_traffic_99_fails(self):
-    targets = NewTrafficTargets({'r0': 10, 'r1': 20}, 69)
+    targets = NewTrafficTargets({'r0': 10, 'r1': 20, 'LATEST': 69})
     with self.assertRaises(ValueError):
-      targets.UpdateTraffic({}, 100)
+      targets.UpdateTraffic({'LATEST': 100})
 
   def test_validate_current_traffic_negative_target_fails(self):
-    targets = NewTrafficTargets({'r0': -1, 'r1': 101}, None)
+    targets = NewTrafficTargets({'r0': -1, 'r1': 101})
     with self.assertRaises(ValueError):
-      targets.UpdateTraffic({}, 100)
-    targets = NewTrafficTargets({'r0': 100}, -1)
+      targets.UpdateTraffic({'LATEST': 100})
+    targets = NewTrafficTargets({'r0': 100, 'LATEST': -1})
     with self.assertRaises(ValueError):
-      targets.UpdateTraffic({}, 100)
+      targets.UpdateTraffic({'LATEST': 100})
 
   def test_validate_new_percentages_101_fails(self):
-    targets = NewTrafficTargets({'r0': 10, 'r1': 20}, 70)
+    targets = NewTrafficTargets({'r0': 10, 'r1': 20, 'LATEST': 70})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({}, 101)
+      targets.UpdateTraffic({'LATEST': 101})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({'r1': 101}, None)
+      targets.UpdateTraffic({'r1': 101})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({'r1': 10, 'r2': 91}, None)
+      targets.UpdateTraffic({'r1': 10, 'r2': 91})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({'r1': 2}, 99)
+      targets.UpdateTraffic({'r1': 2, 'LATEST': 99})
 
   def test_validate_new_percentages_101_negative_target_fails(self):
-    targets = NewTrafficTargets({'r0': 10, 'r1': 20}, 70)
+    targets = NewTrafficTargets({'r0': 10, 'r1': 20, 'LATEST': 70})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({'r1': 10, 'r2': 91, 'r3': -1}, None)
+      targets.UpdateTraffic({'r1': 10, 'r2': 91, 'r3': -1})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({'r1': 10, 'r2': 91}, -1)
+      targets.UpdateTraffic({'r1': 10, 'r2': 91, 'LATEST': -1})
 
   def test_validate_new_percentages_99_no_unspecified_fails(self):
-    targets = NewTrafficTargets({'r0': 10, 'r1': 20}, 70)
+    targets = NewTrafficTargets({'r0': 10, 'r1': 20, 'LATEST': 70})
     with self.assertRaises(traffic.InvalidTrafficSpecificationError):
-      targets.UpdateTraffic({'r0': 10, 'r1': 20}, 69)
+      targets.UpdateTraffic({'r0': 10, 'r1': 20, 'LATEST': 69})
 
   def test_round_none(self):
-    targets = NewTrafficTargets({}, 100)
+    targets = NewTrafficTargets({'LATEST': 100})
     self.assertEqual(
         targets._IntPercentages({'r0': 25.0, 'r1': 75.0}),
         {'r0': 25, 'r1': 75})
 
   def test_round_extra_biggest_loss(self):
-    targets = NewTrafficTargets({}, 100)
+    targets = NewTrafficTargets({'LATEST': 100})
     self.assertEqual(
         targets._IntPercentages({'r0': 24.9, 'r1': 75.0}),
         {'r0': 25, 'r1': 75})
 
   def test_round_extra_2biggest_loss(self):
-    targets = NewTrafficTargets({}, 100)
+    targets = NewTrafficTargets({'LATEST': 100})
     self.assertEqual(
         targets._IntPercentages({'r0': 20.2, 'r1': 38.9, 'r2': 40.9}),
         {'r0': 20, 'r1': 39, 'r2': 41})
 
   def test_round_extra_2smallest_percent(self):
-    targets = NewTrafficTargets({}, 100)
+    targets = NewTrafficTargets({'LATEST': 100})
     self.assertEqual(
         targets._IntPercentages({'r0': 40.66, 'r1': 30.66, 'r2': 28.66}),
         {'r0': 40, 'r1': 31, 'r2': 29})
 
   def test_round_extra_smallest_key(self):
-    targets = NewTrafficTargets({}, 100)
+    targets = NewTrafficTargets({'LATEST': 100})
     self.assertEqual(
         targets._IntPercentages({'r0': 33.33, 'r1': 33.33, 'r2': 33.33}),
         {'r0': 34, 'r1': 33, 'r2': 33})
 
   def test_round_assign_40_percent(self):
-    targets = NewTrafficTargets({}, 100)
+    targets = NewTrafficTargets({'LATEST': 100})
     self.assertEqual(
         targets._IntPercentages({'r0': 30.1, 'r1': 9.9}),
         {'r0': 30, 'r1': 10})
 
   def test_all_active_revisions_changed(self):
-    targets = NewTrafficTargets({'r0': 60, 'r1': 40}, None)
-    targets.UpdateTraffic({'r0': 40, 'r1': 60}, None)
+    targets = NewTrafficTargets({'r0': 60, 'r1': 40})
+    targets.UpdateTraffic({'r0': 40, 'r1': 60})
     self.assertEqual(
-        targets, NewTrafficTargets({'r0': 40, 'r1': 60}, None))
+        targets, NewTrafficTargets({'r0': 40, 'r1': 60}))
 
   def test_active_one_active_revision_unchanged_no_drain(self):
     targets = NewTrafficTargets(
-        {'r0': 25, 'r1': 25, 'r2': 50}, None)
-    targets.UpdateTraffic({'r0': 20, 'r1': 30, 'r2': 50}, None)
+        {'r0': 25, 'r1': 25, 'r2': 50})
+    targets.UpdateTraffic({'r0': 20, 'r1': 30, 'r2': 50})
     self.assertEqual(
-        targets, NewTrafficTargets({'r0': 20, 'r1': 30, 'r2': 50}, None))
+        targets, NewTrafficTargets({'r0': 20, 'r1': 30, 'r2': 50}))
 
   def test_active_one_active_revision_unchanged_drain(self):
     targets = NewTrafficTargets(
-        {'r0': 25, 'r1': 25, 'r2': 50}, None)
-    targets.UpdateTraffic({'r0': 35, 'r1': 30}, None)
+        {'r0': 25, 'r1': 25, 'r2': 50})
+    targets.UpdateTraffic({'r0': 35, 'r1': 30})
     self.assertEqual(
-        targets, NewTrafficTargets({'r0': 35, 'r1': 30, 'r2': 35}, None))
+        targets, NewTrafficTargets({'r0': 35, 'r1': 30, 'r2': 35}))
 
   def test_active_one_active_revision_unassigned_one_unchanged_drain(self):
     targets = NewTrafficTargets(
-        {'r0': 25, 'r1': 25, 'r2': 50}, None)
-    targets.UpdateTraffic({'r0': 25, 'r1': 30}, None)
+        {'r0': 25, 'r1': 25, 'r2': 50})
+    targets.UpdateTraffic({'r0': 25, 'r1': 30})
     self.assertEqual(
-        targets, NewTrafficTargets({'r0': 25, 'r1': 30, 'r2': 45}, None))
+        targets, NewTrafficTargets({'r0': 25, 'r1': 30, 'r2': 45}))
 
   def test_active_one_active_revision_unchanged_undrain(self):
     targets = NewTrafficTargets(
-        {'r0': 25, 'r1': 25, 'r2': 50}, None)
-    targets.UpdateTraffic({'r0': 20, 'r1': 15}, None)
+        {'r0': 25, 'r1': 25, 'r2': 50})
+    targets.UpdateTraffic({'r0': 20, 'r1': 15})
     self.assertEqual(
         targets,
-        NewTrafficTargets({'r0': 20, 'r1': 15, 'r2': 65}, None))
+        NewTrafficTargets({'r0': 20, 'r1': 15, 'r2': 65}))
 
   def test_active_three_active_revisions_unchanged_no_drain(self):
     targets = NewTrafficTargets(
-        {'r0': 5, 'r1': 10, 'r2': 15, 'r3': 30, 'r4': 40}, None)
-    targets.UpdateTraffic({'r0': 8, 'r1': 7}, None)
+        {'r0': 5, 'r1': 10, 'r2': 15, 'r3': 30, 'r4': 40})
+    targets.UpdateTraffic({'r0': 8, 'r1': 7})
     self.assertEqual(
         targets,
         NewTrafficTargets(
-            {'r0': 8, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 40}, None))
+            {'r0': 8, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 40}))
 
   def test_active_three_active_revisions_unchanged_drain(self):
     targets = NewTrafficTargets(
-        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45}, None)
-    targets.UpdateTraffic({'r0': 3 + 6, 'r1': 7}, None)
+        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45})
+    targets.UpdateTraffic({'r0': 3 + 6, 'r1': 7})
     self.assertEqual(
         targets,
         NewTrafficTargets(
@@ -264,13 +260,12 @@ class TrafficTest(test_case.TestCase):
              'r1': 7,
              'r2': 15 - 1,
              'r3': 30 - 2,
-             'r4': 45 - 3},
-            None))
+             'r4': 45 - 3}))
 
   def test_active_three_active_revisions_unchanged_undrain(self):
     targets = NewTrafficTargets(
-        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45}, None)
-    targets.UpdateTraffic({'r0': 3, 'r1': 7 - 6}, None)
+        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45})
+    targets.UpdateTraffic({'r0': 3, 'r1': 7 - 6})
     self.assertEqual(
         targets,
         NewTrafficTargets(
@@ -278,13 +273,12 @@ class TrafficTest(test_case.TestCase):
              'r1': 7 - 6,
              'r2': 15 + 1,
              'r3': 30 + 2,
-             'r4': 45 + 3},
-            None))
+             'r4': 45 + 3}))
 
   def test_three_active_revisions_unchanged_drain_round(self):
     targets = NewTrafficTargets(
-        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45}, None)
-    targets.UpdateTraffic({'r0': 3 + 5, 'r1': 7}, None)
+        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45})
+    targets.UpdateTraffic({'r0': 3 + 5, 'r1': 7})
     self.assertEqual(
         targets,
         NewTrafficTargets(
@@ -292,13 +286,12 @@ class TrafficTest(test_case.TestCase):
              'r1': 7,
              'r2': 15 - 1,
              'r3': 30 - 2,
-             'r4': 45 - 2},
-            None))
+             'r4': 45 - 2}))
 
   def test_three_active_revisions_unchanged_undrain_round(self):
     targets = NewTrafficTargets(
-        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45}, None)
-    targets.UpdateTraffic({'r0': 3, 'r1': 7 - 5}, None)
+        {'r0': 3, 'r1': 7, 'r2': 15, 'r3': 30, 'r4': 45})
+    targets.UpdateTraffic({'r0': 3, 'r1': 7 - 5})
     self.assertEqual(
         targets,
         NewTrafficTargets(
@@ -306,43 +299,44 @@ class TrafficTest(test_case.TestCase):
              'r1': 7 - 5,
              'r2': 15 + 1,
              'r3': 30 + 2,
-             'r4': 45 + 2},
-            None))
+             'r4': 45 + 2}))
 
   def test_latest_drain(self):
-    targets = NewTrafficTargets({'r0': 20}, 80)
-    targets.UpdateTraffic({'r0': 30}, None)
-    self.assertEqual(targets, NewTrafficTargets({'r0': 30}, 70))
+    targets = NewTrafficTargets({'r0': 20, 'LATEST': 80})
+    targets.UpdateTraffic({'r0': 30})
+    self.assertEqual(targets, NewTrafficTargets({'r0': 30, 'LATEST': 70}))
 
   def test_latest_undrain(self):
-    targets = NewTrafficTargets({'r0': 20}, 80)
-    targets.UpdateTraffic({'r0': 10}, None)
-    self.assertEqual(targets, NewTrafficTargets({'r0': 10}, 90))
+    targets = NewTrafficTargets({'r0': 20, 'LATEST': 80})
+    targets.UpdateTraffic({'r0': 10})
+    self.assertEqual(targets, NewTrafficTargets({'r0': 10, 'LATEST': 90}))
 
   def test_add_revision(self):
-    targets = NewTrafficTargets({'r0': 20}, 80)
-    targets.UpdateTraffic({'r1': 30}, None)
-    self.assertEqual(targets, NewTrafficTargets({'r0': 14, 'r1': 30}, 56))
+    targets = NewTrafficTargets({'r0': 20, 'LATEST': 80})
+    targets.UpdateTraffic({'r1': 30})
+    self.assertEqual(targets, NewTrafficTargets(
+        {'r0': 14, 'r1': 30, 'LATEST': 56}))
 
   def test_add_latest(self):
-    targets = NewTrafficTargets({'r0': 100}, None)
-    targets.UpdateTraffic({}, 20)
-    self.assertEqual(targets, NewTrafficTargets({'r0': 80}, 20))
+    targets = NewTrafficTargets({'r0': 100})
+    targets.UpdateTraffic({'LATEST': 20})
+    self.assertEqual(targets, NewTrafficTargets({'r0': 80, 'LATEST': 20}))
 
   def test_zero_revision(self):
-    targets = NewTrafficTargets({'r0': 20}, 80)
-    targets.UpdateTraffic({'r0': 0}, None)
-    self.assertEqual(targets, NewTrafficTargets({}, 100))
+    targets = NewTrafficTargets({'r0': 20, 'LATEST': 80})
+    targets.UpdateTraffic({'r0': 0})
+    self.assertEqual(targets, NewTrafficTargets({'LATEST': 100}))
 
   def test_zero_one_keep_onerevision(self):
-    targets = NewTrafficTargets({'r0': 1, 'r1': 1}, 98)
-    targets.UpdateTraffic({}, 99)
-    self.assertEqual(targets, NewTrafficTargets({'r0': 1, 'r1': 0}, 99))
+    targets = NewTrafficTargets({'r0': 1, 'r1': 1, 'LATEST': 98})
+    targets.UpdateTraffic({'LATEST': 99})
+    self.assertEqual(targets, NewTrafficTargets(
+        {'r0': 1, 'r1': 0, 'LATEST': 99}))
 
   def test_zero_latest(self):
-    targets = NewTrafficTargets({'r0': 20}, 80)
-    targets.UpdateTraffic({'r0': 100}, None)
-    self.assertEqual(targets, NewTrafficTargets({'r0': 100}, None))
+    targets = NewTrafficTargets({'r0': 20, 'LATEST': 80})
+    targets.UpdateTraffic({'r0': 100})
+    self.assertEqual(targets, NewTrafficTargets({'r0': 100}))
 
 
 def NewTrafficTargetPair(
@@ -588,7 +582,7 @@ class GetTrafficPairsTest(test_case.TestCase):
 
   def testSpecOnlyExplicitLatest(self):
     traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90}, latest_percentage=10),
+        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
         status_traffic=NewTrafficTargets({}),
         is_platform_managed=False,
         latest_ready_revision_name='s1-r1')
@@ -615,8 +609,8 @@ class GetTrafficPairsTest(test_case.TestCase):
 
   def testBothExplicitLatest(self):
     traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90}, latest_percentage=10),
-        status_traffic=NewTrafficTargets({'s1-r1': 90}, latest_percentage=10),
+        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
+        status_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
         is_platform_managed=False,
         latest_ready_revision_name='s1-r1')
     self.assertEqual(len(traffic_pairs), 2)
@@ -642,7 +636,7 @@ class GetTrafficPairsTest(test_case.TestCase):
 
   def testBothImplicitLatestMissingStatusGke(self):
     traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90}, latest_percentage=10),
+        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
         status_traffic=NewTrafficTargets({'s1-r1': 100}),
         is_platform_managed=False,
         latest_ready_revision_name='s1-r1')
@@ -669,7 +663,7 @@ class GetTrafficPairsTest(test_case.TestCase):
 
   def testBothImplicitManaged(self):
     traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 90}, latest_percentage=10),
+        spec_traffic=NewTrafficTargets({'s1-r1': 90, 'LATEST': 10}),
         status_traffic=NewTrafficTargets({'s1-r1': 100}),
         is_platform_managed=True,
         latest_ready_revision_name='s1-r1')
@@ -696,7 +690,7 @@ class GetTrafficPairsTest(test_case.TestCase):
 
   def testLatestImplicitManaged(self):
     traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({}, latest_percentage=100),
+        spec_traffic=NewTrafficTargets({'LATEST': 100}),
         status_traffic=NewTrafficTargets({'s1-r1': 100}),
         is_platform_managed=True,
         latest_ready_revision_name='s1-r1')
@@ -714,7 +708,7 @@ class GetTrafficPairsTest(test_case.TestCase):
 
   def testLatestByNameOnlyManaged(self):
     traffic_pairs = GetTrafficTargetPairs(
-        spec_traffic=NewTrafficTargets({'s1-r1': 100}, latest_percentage=None),
+        spec_traffic=NewTrafficTargets({'s1-r1': 100}),
         status_traffic=NewTrafficTargets({'s1-r1': 100}),
         is_platform_managed=True,
         latest_ready_revision_name='s1-r1')

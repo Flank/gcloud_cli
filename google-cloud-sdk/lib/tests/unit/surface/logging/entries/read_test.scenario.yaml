@@ -1,0 +1,109 @@
+title: logging read test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: --project is specified before logging
+  - command: |
+      --project logging-project logging read --limit 1
+- execute:
+  - label: --project is specified after logging
+  - command: |
+      logging --project logging-project read --limit 1
+- execute:
+  - label: --project is specified after read
+  - command: |
+      logging read --project logging-project --limit 1
+- execute:
+  - label: --project is not specified
+  - command: |
+      logging read --limit 1
+actions:
+- execute_command:
+    label: --project is specified before logging
+    command: |
+      --project logging-project logging read --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://logging.googleapis.com/v2/entries:list?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              orderBy: timestamp desc
+              pageSize: 1
+              resourceNames:
+              - projects/logging-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: --project is specified after logging
+    command: |
+      logging --project logging-project read --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://logging.googleapis.com/v2/entries:list?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              orderBy: timestamp desc
+              pageSize: 1
+              resourceNames:
+              - projects/logging-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: --project is specified after read
+    command: |
+      logging read --project logging-project --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://logging.googleapis.com/v2/entries:list?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              orderBy: timestamp desc
+              pageSize: 1
+              resourceNames:
+              - projects/logging-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: --project is not specified
+    command: |
+      logging read --limit 1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://logging.googleapis.com/v2/entries:list?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              orderBy: timestamp desc
+              pageSize: 1
+              resourceNames:
+              - projects/fake-project
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_exit:
+        code: 0

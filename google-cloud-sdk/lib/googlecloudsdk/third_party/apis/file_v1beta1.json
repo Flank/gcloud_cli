@@ -552,6 +552,10 @@
         "consumerDefinedName": {
           "description": "consumer_defined_name is the name that is set by the consumer. On the other\nhand Name field represents system-assigned id of an instance so consumers\nare not necessarily aware of it.\nconsumer_defined_name is used for notification\/UI purposes for consumer to\nrecognize their instances.",
           "type": "string"
+        },
+        "slmInstanceTemplate": {
+          "description": "Link to the SLM instance template. Only populated when updating SLM\ninstances via SSA's Actuation service adaptor.\nService producers with custom control plane (e.g. Cloud SQL) doesn't\nneed to populate this field. Instead they should use software_versions.",
+          "type": "string"
         }
       }
     },
@@ -624,7 +628,7 @@
           "type": "string"
         },
         "exclusions": {
-          "description": "List of SLO exclusion windows. When multiple entries in the list match\n(matching the exclusion time-window against current time point)\nthe exclusion reason used in the first matching entry will be published.\n\nIt is not needed to include expired exclusion in this list, as only the\ncurrently applicable exclusions are taken into account by the eligibility\nexporting subsystem (the historical state of exclusions will be reflected\nin the historically produced timeseries regardless of the current state).\n\nThis field can be used to mark the instance as temporary ineligible\nfor the purpose of SLO calculation. For permanent instance SLO exclusion,\na dedicated tier name can be used that does not have targets specified\nin the service SLO configuration.",
+          "description": "List of SLO exclusion windows. When multiple entries in the list match\n(matching the exclusion time-window against current time point)\nthe exclusion reason used in the first matching entry will be published.\n\nIt is not needed to include expired exclusion in this list, as only the\ncurrently applicable exclusions are taken into account by the eligibility\nexporting subsystem (the historical state of exclusions will be reflected\nin the historically produced timeseries regardless of the current state).\n\nThis field can be used to mark the instance as temporary ineligible\nfor the purpose of SLO calculation. For permanent instance SLO exclusion,\nuse of custom instance eligibility is recommended. See 'eligibility' field\nbelow.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion"
@@ -636,24 +640,28 @@
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata"
           }
+        },
+        "eligibility": {
+          "description": "Optional: user-defined instance eligibility.",
+          "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility"
         }
       }
     },
     "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion": {
       "id": "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion",
-      "description": "SloExclusion represents an excusion in SLI calculation applies to all SLOs.",
+      "description": "SloExclusion represents an exclusion in SLI calculation applies to all SLOs.",
       "type": "object",
       "properties": {
         "sliName": {
           "description": "Name of an SLI that this exclusion applies to. Can be left empty,\nsignaling that the instance should be excluded from all SLIs defined\nin the service SLO configuration.",
           "type": "string"
         },
-        "exclusionStartTime": {
+        "startTime": {
           "description": "Start time of the exclusion. No alignment (e.g. to a full minute) needed.",
           "type": "string",
           "format": "google-datetime"
         },
-        "exclusionDuration": {
+        "duration": {
           "description": "Exclusion duration. No restrictions on the possible values.\n\nWhen an ongoing operation is taking longer than initially expected,\nan existing entry in the exclusion list can be updated by extending the\nduration. This is supported by the subsystem exporting eligibility data\nas long as such extension is committed at least 10 minutes before the\noriginal exclusion expiration - otherwise it is possible that there will\nbe \"gaps\" in the exclusion application in the exported timeseries.",
           "type": "string",
           "format": "google-duration"
@@ -683,6 +691,21 @@
           "items": {
             "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion"
           }
+        }
+      }
+    },
+    "GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility": {
+      "id": "GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility",
+      "description": "SloEligibility is a tuple containing eligibility value: true if an instance\nis eligible for SLO calculation or false if it should be excluded from all\nSLO-related calculations along with a user-defined reason.",
+      "type": "object",
+      "properties": {
+        "eligible": {
+          "description": "Whether an instance is eligible or ineligible.",
+          "type": "boolean"
+        },
+        "reason": {
+          "description": "User-defined reason for the current value of instance eligibility. Usually,\nthis can be directly mapped to the internal state. An empty reason is\nallowed.",
+          "type": "string"
         }
       }
     },
@@ -734,6 +757,11 @@
                   "description": "The standard list filter.",
                   "location": "query",
                   "type": "string"
+                },
+                "includeUnrevealedLocations": {
+                  "description": "If true, the returned list will include locations which are not yet\nrevealed.",
+                  "location": "query",
+                  "type": "boolean"
                 },
                 "pageSize": {
                   "description": "The standard list page size.",
@@ -1029,7 +1057,7 @@
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Mask of fields to update.  At least one path must be supplied in this\nfield.  The elements of the repeated paths field may only include these\nfields:\n\"description\"\n\"file_shares\"\n\"labels\"",
+                      "description": "Mask of fields to update.  At least one path must be supplied in this\nfield.  The elements of the repeated paths field may only include these\nfields:\n\n* \"description\"\n* \"file_shares\"\n* \"labels\"",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"

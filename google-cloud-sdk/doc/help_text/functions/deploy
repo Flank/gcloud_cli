@@ -2,7 +2,7 @@ NAME
     gcloud functions deploy - create or update a Google Cloud Function
 
 SYNOPSIS
-    gcloud functions deploy (NAME : --region=REGION)
+    gcloud functions deploy (NAME : --region=REGION) [--allow-unauthenticated]
         [--entry-point=ENTRY_POINT] [--ignore-file=IGNORE_FILE]
         [--memory=MEMORY] [--retry] [--runtime=RUNTIME]
         [--service-account=SERVICE_ACCOUNT] [--source=SOURCE]
@@ -41,6 +41,10 @@ POSITIONAL ARGUMENTS
           functions/region property value for this command invocation.
 
 FLAGS
+     --allow-unauthenticated
+        If set, makes this a public function. This will allow all callers,
+        without checking authentication.
+
      --entry-point=ENTRY_POINT
         Name of a Google Cloud Function (as defined in source code) that will
         be executed. Defaults to the resource name suffix, if not specified.
@@ -75,6 +79,7 @@ FLAGS
         * nodejs10: Node.js 10
         * python37: Python 3.7
         * go111: Go 1.11
+        * go113: Go 1.13
         * nodejs6: Node.js 6 (deprecated)
 
      --service-account=SERVICE_ACCOUNT

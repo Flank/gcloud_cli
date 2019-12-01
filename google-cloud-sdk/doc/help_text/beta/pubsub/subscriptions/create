@@ -42,7 +42,7 @@ REQUIRED FLAGS
           are specified.
 
        --topic-project=TOPIC_PROJECT
-          The Cloud project for the topic.
+          Project ID of the Google Cloud Platform project for the topic.
 
 OPTIONAL FLAGS
      --ack-deadline=ACK_DEADLINE
@@ -90,7 +90,8 @@ OPTIONAL FLAGS
      --retain-acked-messages
         Whether or not to retain acknowledged messages. If true, messages are
         not expunged from the subscription's backlog until they fall out of the
-        --message-retention-duration window.
+        --message-retention-duration window. Acknowledged messages are not
+        retained by default.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

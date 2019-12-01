@@ -34,7 +34,7 @@ COMMANDS
         (ALPHA) List network endpoints in a network endpoint group.
 
      update
-        (ALPHA) Updates a Google Compute Engine network endpoint group.
+        (ALPHA) Update a Google Compute Engine network endpoint group.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

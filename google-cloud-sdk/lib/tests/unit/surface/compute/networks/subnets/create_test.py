@@ -34,8 +34,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.compute.subnetworks,
-          'Insert',
+        [(self.compute.subnetworks, 'Insert',
           self.messages.ComputeSubnetworksInsertRequest(
               subnetwork=self.messages.Subnetwork(
                   name='my-subnet',
@@ -44,8 +43,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False),
               region='us-central1',
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testDescription(self):
     self.Run("""
@@ -54,8 +52,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.compute.subnetworks,
-          'Insert',
+        [(self.compute.subnetworks, 'Insert',
           self.messages.ComputeSubnetworksInsertRequest(
               subnetwork=self.messages.Subnetwork(
                   name='my-subnet',
@@ -65,12 +62,11 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False),
               region='us-central1',
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testRegionalPrompting(self):
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.WriteInput('2\n')
     self.make_requests.side_effect = iter([
         test_resources.REGIONS,
@@ -83,9 +79,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
 
     self.CheckRequests(
         self.regions_list_request,
-
-        [(self.compute.subnetworks,
-          'Insert',
+        [(self.compute.subnetworks, 'Insert',
           self.messages.ComputeSubnetworksInsertRequest(
               subnetwork=self.messages.Subnetwork(
                   name='my-subnet',
@@ -110,8 +104,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.compute.subnetworks,
-          'Insert',
+        [(self.compute.subnetworks, 'Insert',
           self.messages.ComputeSubnetworksInsertRequest(
               subnetwork=self.messages.Subnetwork(
                   name='my-subnet',
@@ -120,8 +113,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=True),
               region='us-central1',
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testCreateWithGoogleAccessDisabled(self):
     """Test creating a subnet with privateIpGoogleAccess disabled."""
@@ -132,8 +124,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
         """)
 
     self.CheckRequests(
-        [(self.compute.subnetworks,
-          'Insert',
+        [(self.compute.subnetworks, 'Insert',
           self.messages.ComputeSubnetworksInsertRequest(
               subnetwork=self.messages.Subnetwork(
                   name='my-subnet',
@@ -142,8 +133,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False),
               region='us-central1',
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testCreateWithoutGoogleAccess(self):
     """Test creating a subnet with no value given for privateIpGoogleAccess."""
@@ -155,8 +145,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
     # The subnet create request should use the default value of False for
     # privateIpGoogleAccess.
     self.CheckRequests(
-        [(self.compute.subnetworks,
-          'Insert',
+        [(self.compute.subnetworks, 'Insert',
           self.messages.ComputeSubnetworksInsertRequest(
               subnetwork=self.messages.Subnetwork(
                   name='my-subnet',
@@ -165,8 +154,7 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False),
               region='us-central1',
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testSecondaryRanges(self):
     self.Run("""
@@ -296,6 +284,54 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
              region='us-central1',
              project='my-project'))
     ],)
+
+  def testCreateWithFlowLogsFilterExpr(self):
+    """Test creating a subnet with a filter expr for flow logs."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
+        --logging-filter-expr 'src_location.asn != 36647'
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  logConfig=self.messages.SubnetworkLogConfig(
+                      enable=True, filterExpr='src_location.asn != 36647')),
+              region='us-central1',
+              project='my-project'))],)
+
+  def testCreateWithFlowLogsCustomMetadata(self):
+    """Test creating a subnet with custom metadata fields for flow logs."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
+        --logging-metadata custom --logging-metadata-fields
+         'src_instance,dest_instance'
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  logConfig=self.messages.SubnetworkLogConfig(
+                      enable=True,
+                      metadata=(self.messages.SubnetworkLogConfig
+                                .MetadataValueValuesEnum.CUSTOM_METADATA),
+                      metadataFields=['src_instance', 'dest_instance'])),
+              region='us-central1',
+              project='my-project'))],)
 
   def testCreateWithPrivateV6AccessEnabled(self):
     """Test creating a subnet with --enable-private-v6-access."""
@@ -458,6 +494,33 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
               project='my-project'))],)
 
 
+class SubnetsCreateAggregateRangesAlphaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+
+  def testCreateWithPurposeAggregate(self):
+    """Test to create an aggregate subnetwork."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --purpose aggregate
+        """)
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum
+                  .AGGREGATE),
+              region='us-central1',
+              project='my-project'))],)
+
+
 class SubnetsCreateInternalHttpsLoadBalancerBetaTest(test_base.BaseTest):
 
   def SetUp(self):
@@ -480,8 +543,8 @@ class SubnetsCreateInternalHttpsLoadBalancerBetaTest(test_base.BaseTest):
                   network=self.compute_uri +
                   '/projects/my-project/global/networks/my-network',
                   ipCidrRange='10.240.0.0/16',
-                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum.
-                  INTERNAL_HTTPS_LOAD_BALANCER,
+                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum
+                  .INTERNAL_HTTPS_LOAD_BALANCER,
                   role=self.messages.Subnetwork.RoleValueValuesEnum.ACTIVE),
               region='us-central1',
               project='my-project'))],)
@@ -502,8 +565,8 @@ class SubnetsCreateInternalHttpsLoadBalancerBetaTest(test_base.BaseTest):
                   '/projects/my-project/global/networks/my-network',
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False,
-                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum.
-                  PRIVATE),
+                  purpose=self.messages.Subnetwork.PurposeValueValuesEnum
+                  .PRIVATE),
               region='us-central1',
               project='my-project'))],)
 

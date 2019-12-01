@@ -46,7 +46,7 @@ REQUIRED FLAGS
           group are specified.
 
        --attestor-project=ATTESTOR_PROJECT
-          The Cloud project for the attestor.
+          Project ID of the Google Cloud Platform project for the attestor.
 
 OPTIONAL FLAGS
      --payload-file=PAYLOAD_FILE

@@ -11,6 +11,7 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [--licenses=[LICENSES,...]]
         [--no-require-csek-key-create] [--source-disk-zone=SOURCE_DISK_ZONE]
         [--source-image-project=SOURCE_IMAGE_PROJECT]
+        [--storage-location=LOCATION]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [GCLOUD_WIDE_FLAG ...]
@@ -161,6 +162,11 @@ OPTIONAL FLAGS
         The project name of the source image. Must also specify either
         --source-image or --source-image-family when using this flag.
 
+     --storage-location=LOCATION
+        Specifies a Cloud Storage location, either regional or multi-regional,
+        where image content is to be stored. If not specified, the multi-region
+        location closest to the source is chosen automatically.
+
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the image. The arguments in this group can be used to
      specify the attributes of this resource.
@@ -185,6 +191,33 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To create an image 'my-image' from a disk 'my-disk' in zone 'us-east1-a',
+    run:
+
+        $ gcloud compute images create my-image --source-disk=my-disk \
+          --source-disk-zone=us-east1-a
+
+    To create an image 'my-image' from another image 'source-image' with source
+    image project 'source-image-project', run:
+
+        $ gcloud compute images create my-image \
+          --source-image=source-image \
+          --source-image-project=source-image-project
+
+    To create an image 'my-image' from the latest non-deprecated image in the
+    family 'source-image-family' with source image project
+    'source-image-project', run:
+
+        $ gcloud compute images create my-image \
+          --source-image-family=source-image-family \
+          --source-image-project=source-image-project
+
+    To create an image 'my-image' from a snapshot 'source-snapshot', run:
+
+        $ gcloud compute images create my-image \
+          --source-snapshot=source-snapshot
 
 NOTES
     These variants are also available:

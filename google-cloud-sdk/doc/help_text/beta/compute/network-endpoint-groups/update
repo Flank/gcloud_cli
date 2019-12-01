@@ -1,5 +1,5 @@
 NAME
-    gcloud beta compute network-endpoint-groups update - updates a Google
+    gcloud beta compute network-endpoint-groups update - update a Google
         Compute Engine network endpoint group
 
 SYNOPSIS

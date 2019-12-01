@@ -1,5 +1,5 @@
 title: VPC Access locations tests
-release_tracks: [BETA, ALPHA]
+release_tracks: [GA, BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -38,14 +38,14 @@ actions:
             operations:
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/ded11fc7-50e5-451a-bc18-e0ae8a3fc36e
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-09-18T02:09:21.280770Z'
                 endTime: '2019-09-18T02:11:10.391Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/do-not-delete
               done: true
               response:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.Connector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.Connector
                 name: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/do-not-delete
                 id: do-not-delete
                 network: do-not-delete-redis-test
@@ -53,16 +53,16 @@ actions:
                 status: READY
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/0b935279-58bd-46c9-b61b-c1cf7285eed2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-09-18T02:00:29.977660Z'
                 endTime: '2019-09-18T02:00:51.056Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190918-020008-7u5v
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/0dd244f4-e5eb-469c-aa8b-a5bb29fdac23
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-09-18T02:00:09.556580Z'
                 endTime: '2019-09-18T02:00:25.866Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190918-020008-7u5v
@@ -72,16 +72,16 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/154b0308-a6ab-4552-9791-020c3f50043c
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-09-18T01:59:40.341129Z'
                 endTime: '2019-09-18T02:00:06.395Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190918-015910-pm32
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/0b875694-61c7-410b-bdb8-facfa745e57b
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-09-18T01:59:17.936880Z'
                 endTime: '2019-09-18T01:59:33.861Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190918-015910-pm32
@@ -91,24 +91,24 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/2db35f60-f913-49a3-858f-299bde6c36ab
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:26:57.746079Z'
                 endTime: '2019-08-29T01:27:40.205Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012634-uw3b
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/4e331b5c-37c5-410c-af82-14514e5ed8d2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:26:57.078672Z'
                 endTime: '2019-08-29T01:27:28.631Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012634-lqvt
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/7c2ef883-a81e-4c0b-919a-fbfd6a0dd3cb
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:26:37.105514Z'
                 endTime: '2019-08-29T01:26:53.156Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012634-uw3b
@@ -119,8 +119,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/cc5b30c7-2ef1-4408-96f6-acc31df62dde
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:26:37.061541Z'
                 endTime: '2019-08-29T01:26:53.102Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012634-lqvt
@@ -131,24 +131,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/3611d185-0589-4618-88e0-941537bff230
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:25:29.005978Z'
                 endTime: '2019-08-29T01:26:11.328Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012459-f6p6
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/13edf8b5-064d-497b-b1b4-a306d459eb4f
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:25:28.408485Z'
                 endTime: '2019-08-29T01:26:05.950Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012459-fh9x
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/6d2171a2-cdf1-427f-86cb-f8cd57b7db34
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:24:59.857215Z'
                 endTime: '2019-08-29T01:25:26.593Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012459-fh9x
@@ -158,8 +158,8 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/98dae321-932f-4e81-8abe-4f59fec3cbf8
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:24:59.848090Z'
                 endTime: '2019-08-29T01:25:26.557Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012459-f6p6
@@ -170,24 +170,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/c8849df4-69a0-4fe1-920c-4d0685a4bf3b
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:23:54.455490Z'
                 endTime: '2019-08-29T01:24:20.849Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012326-h5py
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/b8b455e8-f59c-484f-ae29-e9e057e89a4e
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:23:39.459457Z'
                 endTime: '2019-08-29T01:24:05.801Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012326-d26d
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/9f63f351-43e2-4d35-9ff9-5200e7a41001
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:23:26.549713Z'
                 endTime: '2019-08-29T01:23:37.455Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012326-d26d
@@ -198,8 +198,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/750fabe5-259b-4f9b-90b8-1340c54e47c4
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:23:26.549712Z'
                 endTime: '2019-08-29T01:23:48.420Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-012326-h5py
@@ -210,24 +210,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/30a4da3b-bdc3-4d02-8308-2346e4ec8220
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:11:56.936374Z'
                 endTime: '2019-08-29T01:12:23.048Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011118-toib
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/9ccad8fd-7a30-43d6-a2c9-7bffe338b9e2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:11:50.647080Z'
                 endTime: '2019-08-29T01:12:17.059Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011111-pl6v
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/c9745efe-38e9-4821-a816-a22e9eb61e88
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:11:18.841367Z'
                 endTime: '2019-08-29T01:11:45.405Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011118-toib
@@ -237,8 +237,8 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/30f3fabd-957b-4027-9e94-30bcfb5aa680
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:11:12.287721Z'
                 endTime: '2019-08-29T01:11:38.987Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011111-pl6v
@@ -249,24 +249,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/790b3abc-6f5a-4752-811b-196149ce0180
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:10:51.358699Z'
                 endTime: '2019-08-29T01:11:12.434Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011023-cftc
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/8a4e8bd1-3e6b-4ec7-9e88-ac1e0b938575
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:10:44.081645Z'
                 endTime: '2019-08-29T01:11:10.324Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011025-ba5a
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/91da78b7-c97f-4423-936e-653e7c9a7f93
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:10:25.600169Z'
                 endTime: '2019-08-29T01:10:41.671Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011025-ba5a
@@ -277,8 +277,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/da17611b-5690-4137-844c-4e97a32e555a
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:10:24.116317Z'
                 endTime: '2019-08-29T01:10:50.616Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-011023-cftc
@@ -289,16 +289,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/70433e6b-ffcf-4aa9-a5b3-6d011c781125
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:08:52.245334Z'
                 endTime: '2019-08-29T01:09:29.050Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010830-lj7b
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/b73e0042-88b5-46de-834c-65e2ec37fa57
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:08:31.323301Z'
                 endTime: '2019-08-29T01:08:47.429Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010830-lj7b
@@ -309,16 +309,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/1c6d7404-765d-4c4a-93ab-121fcc86e817
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:08:01.469582Z'
                 endTime: '2019-08-29T01:08:22.675Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010740-9t8k
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/ba630f6e-b28e-481d-b2c7-22c846e569ea
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:07:40.846589Z'
                 endTime: '2019-08-29T01:07:57.111Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010740-9t8k
@@ -329,16 +329,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/8d6dd746-9190-46e8-aa9c-1be70baee66d
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:06:56.465576Z'
                 endTime: '2019-08-29T01:07:23.587Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010626-tkgq
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/7c13238e-bf15-4339-b5ea-13e651dd5d54
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:06:27.266481Z'
                 endTime: '2019-08-29T01:06:53.730Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010626-tkgq
@@ -348,16 +348,16 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/36c468bb-4121-4386-9346-54537b680c81
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:05:56.984913Z'
                 endTime: '2019-08-29T01:06:18.551Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010526-5vsy
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/999ef3ce-f516-4cbb-b056-51bd6a48bd94
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:05:26.884183Z'
                 endTime: '2019-08-29T01:05:53.406Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010526-5vsy
@@ -368,16 +368,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/92ad4c66-2c51-40fc-b2bf-c0e5fb0736b5
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T01:01:21.105691Z'
                 endTime: '2019-08-29T01:01:42.642Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010059-ykcv
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/62edde95-dc39-4274-8f5a-4377f01629e8
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T01:00:59.942984Z'
                 endTime: '2019-08-29T01:01:15.941Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-010059-ykcv
@@ -388,16 +388,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/5c3a2b3a-e38e-4edb-b977-0751acbfa936
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T01:00:29.688136Z'
                 endTime: '2019-08-29T01:00:50.811Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005959-bm6u
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/f927fbf7-f448-4d97-92f2-12cb14f38225
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T01:00:00.201214Z'
                 endTime: '2019-08-29T01:00:27.236Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005959-bm6u
@@ -407,24 +407,24 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/e6c519b2-6d78-477a-863f-63ac80754598
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:54:34.197354Z'
                 endTime: '2019-08-29T00:55:21.479Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005406-m1b3
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/69150eee-3c11-4f77-b6d0-12491e339156
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:54:17.882234Z'
                 endTime: '2019-08-29T00:54:54.403Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005358-pfem
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/2b37d7d7-7208-4f03-9bf8-cea02cb21d6f
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:54:06.249008Z'
                 endTime: '2019-08-29T00:54:27.386Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005406-m1b3
@@ -435,8 +435,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/cb787c63-f055-4f8a-8b51-e27bacc5a832
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:53:59.094105Z'
                 endTime: '2019-08-29T00:54:14.991Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005358-pfem
@@ -447,24 +447,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/bc65ef23-4a63-4836-b8b5-6ff4abbf34c6
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:53:31.553589Z'
                 endTime: '2019-08-29T00:53:52.751Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005304-irk4
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/04e89364-a266-4700-a55f-88b3aa0785e1
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:53:28.266616Z'
                 endTime: '2019-08-29T00:54:00.255Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005309-bbdr
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/1d2a97ee-26ec-445d-9522-072a44385c89
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:53:09.512500Z'
                 endTime: '2019-08-29T00:53:25.567Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005309-bbdr
@@ -474,8 +474,8 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/3cd2e81d-4d14-45c5-a198-a40525f64edb
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:53:04.415058Z'
                 endTime: '2019-08-29T00:53:31.133Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-005304-irk4
@@ -485,16 +485,16 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/147b92cc-51be-4ed5-99bf-39c7b548028e
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:47:56.221951Z'
                 endTime: '2019-08-29T00:48:38.440Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004726-t01z
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/c5ab8f17-10dc-441a-87a5-0d38cbf5a670
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:47:27.052793Z'
                 endTime: '2019-08-29T00:47:48.338Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004726-t01z
@@ -505,16 +505,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/e91b30d7-230f-42cb-b412-45ec4ce7397c
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:46:28.781854Z'
                 endTime: '2019-08-29T00:47:16.304Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004605-tb1b
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/905ce08a-18fd-49d5-a20a-3f6b9d7bc9ab
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:46:06.437205Z'
                 endTime: '2019-08-29T00:46:22.454Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004605-tb1b
@@ -525,24 +525,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/546b867f-d2cb-4680-9693-fc7eb2e81670
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:45:09.434167Z'
                 endTime: '2019-08-29T00:45:35.893Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004441-6f9w
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/8747f9b0-0002-4273-a5b2-617eaea0cd5f
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:45:03.770044Z'
                 endTime: '2019-08-29T00:45:25.130Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004443-4v8d
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/2c6d243d-5a7e-450d-a897-34affbf28b94
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:44:43.624564Z'
                 endTime: '2019-08-29T00:44:59.966Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004443-4v8d
@@ -553,8 +553,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/9f0cdb5b-64b1-40df-9d21-fe51d1ec33a1
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:44:42.171738Z'
                 endTime: '2019-08-29T00:45:03.490Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004441-6f9w
@@ -565,24 +565,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/b1845078-d713-424c-b266-2f347568a000
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:44:15.529102Z'
                 endTime: '2019-08-29T00:44:36.506Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004347-gufc
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/69a69d74-b244-48c3-8203-1dcf69deb833
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:44:01.831514Z'
                 endTime: '2019-08-29T00:44:38.866Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004343-akd5
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/45fa3722-3e9c-4d6a-9ad2-ff07b4b2cd3b
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:43:48.219576Z'
                 endTime: '2019-08-29T00:44:14.947Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004347-gufc
@@ -592,8 +592,8 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/abfbe721-9764-4471-b587-aec05bd45c13
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:43:43.581913Z'
                 endTime: '2019-08-29T00:43:59.588Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004343-akd5
@@ -604,16 +604,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/eb2ff610-59f0-4b7e-a553-9686c4e31698
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:41:52.575190Z'
                 endTime: '2019-08-29T00:42:19.294Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004137-j1uq
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/b3299ea6-3bb6-46cb-bd3e-391d252046c3
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:41:38.427217Z'
                 endTime: '2019-08-29T00:41:49.277Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004137-j1uq
@@ -624,16 +624,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/33e22812-c112-447a-8da7-237da46f2349
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:40:56.993224Z'
                 endTime: '2019-08-29T00:41:33.804Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004027-ui72
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/e06b4095-e71a-4f40-b9a3-8b2b2632d429
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:40:28.208002Z'
                 endTime: '2019-08-29T00:40:54.919Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-004027-ui72
@@ -644,24 +644,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/446aa95d-0152-44a4-8b94-028e7afb781f
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:35:52.493758Z'
                 endTime: '2019-08-29T00:36:19.146Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003533-eagi
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/4416c746-1e26-4d20-a1f8-5f03ea0144f6
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:35:45.646295Z'
                 endTime: '2019-08-29T00:36:33.142Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003518-00mt
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/e2fb5edb-2f9f-41ee-aff3-3cff907e7c74
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:35:33.847985Z'
                 endTime: '2019-08-29T00:35:50.373Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003533-eagi
@@ -672,8 +672,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/f3fc9781-79de-4531-8565-c46155edc070
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:35:19.192096Z'
                 endTime: '2019-08-29T00:35:40.416Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003518-00mt
@@ -684,24 +684,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/c32d0ee2-a9e2-45e2-9d66-7f7f62e8df02
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:34:54.904699Z'
                 endTime: '2019-08-29T00:35:26.411Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003427-k6dl
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/f179e004-b41c-4f1b-b830-14fbdaed71d5
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:34:40.873395Z'
                 endTime: '2019-08-29T00:35:07.102Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003422-01tg
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/5d979d3e-f244-4645-ace7-e5609b88d7be
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:34:28.182046Z'
                 endTime: '2019-08-29T00:34:49.520Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003427-k6dl
@@ -712,8 +712,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/6498932a-7253-4d17-a58d-7b34146cc7de
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:34:22.416340Z'
                 endTime: '2019-08-29T00:34:38.386Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-003422-01tg
@@ -724,16 +724,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/088ab011-618a-4a4d-97c5-3f0cc4a4014b
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-29T00:22:23.722152Z'
                 endTime: '2019-08-29T00:23:00.896Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-002153-r6c2
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/14761999-d36c-49c2-952b-24d8aae72f9c
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-29T00:21:54.077607Z'
                 endTime: '2019-08-29T00:22:20.770Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-002153-r6c2
@@ -744,16 +744,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/212a5ddd-0bd6-4738-9035-c5c6823a43d2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-29T00:21:11.008414Z'
                 endTime: '2019-08-29T00:21:47.603Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-002040-xrq7
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/65110b4a-abcd-40b1-ac0a-781fe0c6c6d7
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-29T00:20:40.749136Z'
                 endTime: '2019-08-29T00:21:02.049Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/t7t-20190829-002040-xrq7
@@ -764,16 +764,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/d11a516e-cc64-43f1-a3c1-d9bb56dacbac
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T15:08:50.571415Z'
                 endTime: '2019-08-28T15:09:22.275Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/wfaris-connector
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/af137d0c-3b80-4c73-b8e5-478dc6d0197e
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T14:44:09.161871Z'
                 endTime: '2019-08-28T14:44:25.347Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/wfaris-connector
@@ -784,16 +784,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/8b981282-4de0-4576-88ef-438746584075
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T14:28:17.327858Z'
                 endTime: '2019-08-28T14:28:43.588Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142755-730q
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/fe6a37f3-683e-4a6f-85a5-78efbf4f1d8a
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T14:27:56.301171Z'
                 endTime: '2019-08-28T14:28:12.304Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142755-730q
@@ -804,16 +804,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/a38ba12a-4258-43bd-9859-5f9546ded4a2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-28T14:26:59.791289Z'
                 endTime: '2019-08-28T14:27:47.638Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142630-kf6u
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/b69796fc-715a-47bb-b496-0da765b4c81a
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-28T14:26:30.777852Z'
                 endTime: '2019-08-28T14:26:57.787Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142630-kf6u
@@ -824,16 +824,16 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/0965ac8b-37a3-408a-b4f1-c5459651d076
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T14:25:18.839583Z'
                 endTime: '2019-08-28T14:25:45.454Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142456-nvpb
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/99632e96-2f2e-48a4-bd6e-841548737b8b
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T14:24:56.735368Z'
                 endTime: '2019-08-28T14:25:13.852Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142456-nvpb
@@ -843,16 +843,16 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/69dd67be-ae52-4478-b1b4-c9ec0d65355c
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-28T14:24:26.289887Z'
                 endTime: '2019-08-28T14:24:47.548Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142404-rcb7
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/5399867c-ed6e-45fe-a9b1-3c45b09faeb8
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-28T14:24:05.341232Z'
                 endTime: '2019-08-28T14:24:21.330Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-142404-rcb7
@@ -862,24 +862,24 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/5b5b137a-514b-4355-8631-221bc308202c
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-28T14:07:22.684053Z'
                 endTime: '2019-08-28T14:07:59.507Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140642-asnz
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/57c53e45-a368-4b60-bada-c41e9108d8db
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T14:07:10.713851Z'
                 endTime: '2019-08-28T14:07:37.134Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140642-mp8j
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/5e3a716f-2262-4eb0-9d52-60fc87683fe2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T14:06:45.107366Z'
                 endTime: '2019-08-28T14:07:06.355Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140642-mp8j
@@ -890,8 +890,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/22741bd7-863f-4cc0-a6af-4125812cb9bf
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-28T14:06:45.097609Z'
                 endTime: '2019-08-28T14:07:11.460Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140642-asnz
@@ -901,24 +901,24 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/005dba77-4f18-420d-96cc-5f0acfb69874
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-28T14:06:20.132741Z'
                 endTime: '2019-08-28T14:06:41.037Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140550-rxnq
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/9747e638-71fe-40ef-b309-b2abe4040e02
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T14:06:11.227641Z'
                 endTime: '2019-08-28T14:06:37.486Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140550-p8tq
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/800909e4-573e-4f7e-a076-2ac03a56f651
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T14:05:51.244491Z'
                 endTime: '2019-08-28T14:06:07.236Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140550-p8tq
@@ -929,8 +929,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/8f380097-a7f6-4686-bdf5-73db0bfc66e2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-28T14:05:51.204222Z'
                 endTime: '2019-08-28T14:06:17.643Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140550-rxnq
@@ -940,24 +940,24 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/db97d6fb-1e80-4d0e-89ff-90369213ba1a
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T14:03:35.155476Z'
                 endTime: '2019-08-28T14:03:56.509Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140308-b114
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/5c859bfe-a1d8-4d35-aa1d-b9e9041a47c2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-28T14:03:26.353550Z'
                 endTime: '2019-08-28T14:03:58.092Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140308-dulg
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/2ffc9ff5-5d8e-4d60-93cc-28ba6def2b47
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.CreateConnector
                 insertTime: '2019-08-28T14:03:08.189654Z'
                 endTime: '2019-08-28T14:03:24.094Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140308-dulg
@@ -968,8 +968,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/56f6c942-76ec-41ff-86f6-48fa8e6cca0f
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T14:03:08.185879Z'
                 endTime: '2019-08-28T14:03:34.755Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-140308-b114
@@ -980,24 +980,24 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/9060c356-5a71-4432-8333-badf7e1f29ba
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T13:54:37.947289Z'
                 endTime: '2019-08-28T13:55:04.137Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-135409-3xzk
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/3eeab39b-8f0d-4971-b1de-0b1d2b69fd8f
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.DeleteConnector
                 createTime: '2019-08-28T13:54:20.056779Z'
                 endTime: '2019-08-28T13:54:56.671Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-135401-yvzn
               done: true
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/1e50b633-e74d-454f-9733-903ae74d94be
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T13:54:09.959064Z'
                 endTime: '2019-08-28T13:54:36.644Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-135409-3xzk
@@ -1008,8 +1008,8 @@ actions:
                   connector. Please delete the connector manually.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/9ed4276a-60ea-4167-a06e-e9ea029653d2
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$.OperationMetadataV1Beta1
-                method: google.cloud.vpcaccess.$$api-version$$.VpcAccessService.CreateConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$beta1.OperationMetadataV1Beta1
+                method: google.cloud.vpcaccess.$$api-version$$beta1.VpcAccessService.CreateConnector
                 createTime: '2019-08-28T13:54:01.436871Z'
                 endTime: '2019-08-28T13:54:17.649Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-135401-yvzn
@@ -1019,8 +1019,8 @@ actions:
                 message: 'Operation failed: Legacy Networks are not supported.'
             - name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/471d144f-b677-48bf-a684-2b32c604f467
               metadata:
-                '@type': type.googleapis.com/google.cloud.vpcaccess.v1alpha1.OperationMetadataV1Alpha1
-                method: google.cloud.vpcaccess.v1alpha1.VpcAccessService.DeleteConnector
+                '@type': type.googleapis.com/google.cloud.vpcaccess.$$api-version$$alpha1.OperationMetadataV1Alpha1
+                method: google.cloud.vpcaccess.$$api-version$$alpha1.VpcAccessService.DeleteConnector
                 insertTime: '2019-08-28T13:53:32.690095Z'
                 endTime: '2019-08-28T13:53:58.864Z'
                 target: projects/cloud-sdk-integration-testing/locations/us-central1/connectors/c-20190828-135254-iw7n

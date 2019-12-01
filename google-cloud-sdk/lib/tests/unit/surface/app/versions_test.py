@@ -156,12 +156,12 @@ class VersionsListTest(VersionsApiTestBase):
     self.Run('app versions list')
     self.AssertOutputContains(
         """\
-        SERVICE   VERSION  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
-        service1  v1       0.00           -             SERVING
-        service1  v2       0.67           -             SERVING
-        service1  v3       0.33           -             SERVING
-        service2  v1       1.00           -             SERVING
-        service2  v2       0.00           -             SERVING""",
+        SERVICE   VERSION.ID  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
+        service1  v1          0.00           -             SERVING
+        service1  v2          0.67           -             SERVING
+        service1  v3          0.33           -             SERVING
+        service2  v1          1.00           -             SERVING
+        service2  v2          0.00           -             SERVING""",
         normalize_space=True)
 
   def testList_AllServices_Uri(self):
@@ -192,12 +192,12 @@ class VersionsListTest(VersionsApiTestBase):
     self.Run('app versions list')
     self.AssertOutputContains(
         """\
-        SERVICE  VERSION TRAFFIC_SPLIT LAST_DEPLOYED             SERVING_STATUS
-        service1 v1      0.00          1970-01-01T00:00:00+00:00 SERVING
-        service1 v2      0.67          1970-01-01T00:00:00+00:00 SERVING
-        service1 v3      0.33          1970-01-01T00:00:00+00:00 SERVING
-        service2 v1      1.00          1970-01-01T00:00:00+00:00 SERVING
-        service2 v2      0.00          1970-01-01T00:00:00+00:00 SERVING""",
+        SERVICE  VERSION.ID TRAFFIC_SPLIT LAST_DEPLOYED             SERVING_STATUS
+        service1 v1         0.00          1970-01-01T00:00:00+00:00 SERVING
+        service1 v2         0.67          1970-01-01T00:00:00+00:00 SERVING
+        service1 v3         0.33          1970-01-01T00:00:00+00:00 SERVING
+        service2 v1         1.00          1970-01-01T00:00:00+00:00 SERVING
+        service2 v2         0.00          1970-01-01T00:00:00+00:00 SERVING""",
         normalize_space=True)
 
   def testList_AllServicesMissingSplit(self):
@@ -214,12 +214,12 @@ class VersionsListTest(VersionsApiTestBase):
     self.Run('app versions list')
     self.AssertOutputContains(
         """\
-        SERVICE   VERSION  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
-        service1  v1       0.00           -             SERVING
-        service1  v2       0.00           -             SERVING
-        service1  v3       0.00           -             SERVING
-        service2  v1       0.00           -             SERVING
-        service2  v2       0.00           -             SERVING""",
+        SERVICE   VERSION.ID  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
+        service1  v1          0.00           -             SERVING
+        service1  v2          0.00           -             SERVING
+        service1  v3          0.00           -             SERVING
+        service2  v1          0.00           -             SERVING
+        service2  v2          0.00           -             SERVING""",
         normalize_space=True)
 
   def testList_SelectService1(self):
@@ -230,10 +230,10 @@ class VersionsListTest(VersionsApiTestBase):
     self.Run('app versions list --service=service1')
     self.AssertOutputContains(
         """\
-        SERVICE   VERSION  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
-        service1    v1     0.00           -             SERVING
-        service1    v2     0.67           -             SERVING
-        service1    v3     0.33           -             SERVING""",
+        SERVICE   VERSION.ID  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
+        service1  v1          0.00           -             SERVING
+        service1  v2          0.67           -             SERVING
+        service1  v3          0.33           -             SERVING""",
         normalize_space=True)
     self.AssertOutputNotContains('service2')
 
@@ -245,9 +245,9 @@ class VersionsListTest(VersionsApiTestBase):
     self.Run('app versions list --service=service2')
     self.AssertOutputContains(
         """\
-        SERVICE   VERSION  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
-        service2  v1       1.00           -             SERVING
-        service2  v2       0.00           -             SERVING""",
+        SERVICE   VERSION.ID  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
+        service2  v1          1.00           -             SERVING
+        service2  v2          0.00           -             SERVING""",
         normalize_space=True)
     self.AssertOutputNotContains('service1')
 
@@ -274,10 +274,10 @@ class VersionsListTest(VersionsApiTestBase):
     self.Run('app versions list --hide-no-traffic')
     self.AssertOutputContains(
         """\
-        SERVICE   VERSION  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
-        service1  v2       0.67           -             SERVING
-        service1  v3       0.33           -             SERVING
-        service2  v1       1.00           -             SERVING""",
+        SERVICE   VERSION.ID  TRAFFIC_SPLIT  LAST_DEPLOYED SERVING_STATUS
+        service1  v2          0.67           -             SERVING
+        service1  v3          0.33           -             SERVING
+        service2  v1          1.00           -             SERVING""",
         normalize_space=True)
     self.AssertOutputNotContains('service1 v1', normalize_space=True)
     self.AssertOutputNotContains('service2 v2', normalize_space=True)

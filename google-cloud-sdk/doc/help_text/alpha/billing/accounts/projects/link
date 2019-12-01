@@ -48,7 +48,7 @@ EXAMPLES
     run:
 
         $ gcloud alpha billing accounts projects link my-project \
-            --billing-account 0X0X0X-0X0X0X-0X0X0X
+            --billing-account=0X0X0X-0X0X0X-0X0X0X
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

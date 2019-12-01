@@ -1,9 +1,7 @@
-# skip:
-#   reason: Failing
-#   bug: b/138107070
-skip:
-  reason: Failing
-  bug: b/138577275
+filters:
+  skip:
+    reason: Failing
+    bug: b/138577275
 title: Cloud Dataflow snapshots
 release_tracks: [ALPHA]
 summary:

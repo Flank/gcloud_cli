@@ -86,6 +86,19 @@ API REFERENCE
     This command uses the cloudiot/v1 API. The full documentation for this API
     can be found at: https://cloud.google.com/iot
 
+EXAMPLES
+    To create a new device registry 'my-registry' in region 'us-central1', run:
+
+        $ gcloud beta iot registries create --region=us-central1 my-registry
+
+    The following command creates a new device registry 'my-registry' in region
+    'us-central1', enables MQTT and HTTP connections, and sets
+    'pubsub-topic-name' as the Cloud Pub/Sub topic for state notifications.
+
+        $ gcloud beta iot registries create my-registry \
+            --region=us-central1 --enable-http-config --enable-mqtt-config \
+            --state-pubsub-topic=pubsub-topic-name
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

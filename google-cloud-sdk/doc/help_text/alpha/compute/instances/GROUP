@@ -27,6 +27,9 @@ GROUPS
         (ALPHA) Read Google Compute Engine OS Inventory Data and Related
         Resources.
 
+     vulnerabilities
+        (ALPHA) List and describe instance vulnerabilities.
+
 COMMANDS
     COMMAND is one of the following:
 

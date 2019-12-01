@@ -1,5 +1,5 @@
 title: cloud firestore delete test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -27,7 +27,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/-/indexes/CICAgPigl4sK?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/-/indexes/CICAgPigl4sK?alt=json
           method: DELETE
           headers: {}
           body: null

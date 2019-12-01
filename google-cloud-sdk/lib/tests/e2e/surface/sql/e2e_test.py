@@ -28,6 +28,7 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
   def SetUp(self):
     properties.VALUES.core.disable_prompts.Set(True)
 
+  @test_case.Filters.skip('network auth issues', 'b/144013563')
   def testSQLCommands(self):
     self.CreateInstance('D1')
     self.DoTestBackupList()
@@ -112,8 +113,11 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
     properties.VALUES.core.disable_prompts.Set(True)
     self.CreateInstance('db-g1-small')
 
-  @test_case.Filters.skip('Flaky', 'b/141325243')
+  @test_case.Filters.skip('network auth issues', 'b/144013563')
   @test_case.Filters.RunOnlyWithEnv('KOKORO_ROOT', 'Needs to be run with ipv4.')
+  @test_case.Filters.DoNotRunOnMac('Most Macs used by Kokoro are IPv6; '
+                                   'Cloud SQL only supports IPv4.')
+  # b/141325243 expands on the above DoNotRun.
   def testSQLCommands(self):
     self.DoTestConnect()
 

@@ -21,6 +21,16 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To describe an iOS operating system version available for testing, run:
+
+        gcloud alpha firebase test ios versions describe 12.1
+
+    To describe an iOS operating system version available for testing in JSON
+    format, run:
+
+        gcloud alpha firebase test ios versions describe 12.1 --format=json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

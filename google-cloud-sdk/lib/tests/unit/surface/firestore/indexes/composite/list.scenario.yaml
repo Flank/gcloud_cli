@@ -1,14 +1,14 @@
 title: cloud firestore list test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
       firestore indexes composite list --uri
   - stdout: |
-      https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgITszIAK
-      https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgPi9lIEK
-      https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Things/indexes/CICAgPj-pYIK
+      https://firestore.googleapis.com/v1/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgITszIAK
+      https://firestore.googleapis.com/v1/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgPi9lIEK
+      https://firestore.googleapis.com/v1/projects/fake-project/databases/%28default%29/collectionGroups/Things/indexes/CICAgPj-pYIK
 - execute:
   - command: |
       firestore indexes composite list
@@ -33,7 +33,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/-/indexes?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/-/indexes?alt=json
           method: GET
           headers: {}
           body: null
@@ -107,9 +107,9 @@ actions:
               ]
             }
     - expect_stdout: |
-        https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgITszIAK
-        https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgPi9lIEK
-        https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/%28default%29/collectionGroups/Things/indexes/CICAgPj-pYIK
+        https://firestore.googleapis.com/v1/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgITszIAK
+        https://firestore.googleapis.com/v1/projects/fake-project/databases/%28default%29/collectionGroups/Events/indexes/CICAgPi9lIEK
+        https://firestore.googleapis.com/v1/projects/fake-project/databases/%28default%29/collectionGroups/Things/indexes/CICAgPj-pYIK
     - expect_exit:
         code: 0
 - execute_command:
@@ -118,7 +118,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/-/indexes?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/-/indexes?alt=json
           method: GET
           headers: {}
           body: null

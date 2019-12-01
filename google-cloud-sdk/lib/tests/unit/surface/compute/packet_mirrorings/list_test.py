@@ -29,16 +29,15 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 import mock
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
-
-class ListTest(test_base.BaseTest, completer_test_base.CompleterBase):
+class ListTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
     lister_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.lister.GetRegionalResourcesDicts',
@@ -70,29 +69,39 @@ class ListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         project='my-project')
 
     return [
-        messages.PacketMirroring(
+        self.messages.PacketMirroring(
             name='pm-1',
             region='us-central1',
             priority=1000,
-            network=messages.PacketMirroringNetworkInfo(
+            network=self.messages.PacketMirroringNetworkInfo(
                 url=network_ref.SelfLink()),
-            collectorIlb=messages.PacketMirroringForwardingRuleInfo(
+            collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
                 url=forwarding_rule_ref.SelfLink()),
-            mirroredResources=messages
+            mirroredResources=self.messages
             .PacketMirroringMirroredResourceInfo(tags=['tag-1']),
-            enable=messages.PacketMirroring.EnableValueValuesEnum.TRUE),
-        messages.PacketMirroring(
+            enable=self.messages.PacketMirroring.EnableValueValuesEnum.TRUE),
+        self.messages.PacketMirroring(
             name='pm-2',
             region='us-central2',
             priority=999,
-            network=messages.PacketMirroringNetworkInfo(
+            network=self.messages.PacketMirroringNetworkInfo(
                 url=network_ref.SelfLink()),
-            collectorIlb=messages.PacketMirroringForwardingRuleInfo(
+            collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
                 url=forwarding_rule_ref.SelfLink()),
-            mirroredResources=messages
+            mirroredResources=self.messages
             .PacketMirroringMirroredResourceInfo(tags=['tag-1']),
-            enable=messages.PacketMirroring.EnableValueValuesEnum.FALSE)
+            enable=self.messages.PacketMirroring.EnableValueValuesEnum.FALSE)
     ]
+
+
+class ListTestAlpha(ListTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

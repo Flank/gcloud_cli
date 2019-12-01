@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+import functools
+import inspect
 import json
 import re
 import subprocess
@@ -42,16 +44,73 @@ from tests.lib.scenario import session
 from ruamel.yaml import comments
 import six
 
+_RESTRICTION_ARG_COUNT = 1
+_SKIP_ARG_COUNT = 2
 
-def SkipIfSkipped(skip_data, execution_mode):
-  if skip_data and not (execution_mode == session.ExecutionMode.LOCAL
-                        and not skip_data.get('locally')):
-    if skip_data.get('always'):
-      skip_decorator = test_case.Filters.skipAlways
+
+def _GetMethodArgs(method):
+  """Returns a list of the arguments in a method's signature."""
+  if six.PY2:
+    return inspect.getargspec(method).args  # getargspec is deprecated in PY3.
+  else:
+    return inspect.getfullargspec(method).args
+
+
+def BuildFilterDecorator(filters_data, execution_mode):
+  """Constructs an appropriate decorator from the filters provided.
+
+  The result of this function will be used to decorate the test in the
+  scenario. If the scenario file contains no filters, then this will simply
+  return the identity function. Otherwise, this will return a decorator function
+  equivalent to applying all the filters provided. In other words:
+
+    # YAML
+    title: Test Something
+    filters:
+      SkipOnWindows:
+        reason: Failing
+        bug: b/12345
+      RunOnlyOnPy2
+        reason: Deprecated feature
+    ...
+
+  is equivalent to:
+
+    # Python
+    @test_case.Filters.RunOnlyOnPy2('Deprecated feature')
+    @test_case.Filters.SkipOnWindows('Failing', 'b/12345')
+    class TestSomething():
+      ...
+
+  Args:
+    filters_data: yaml.comments.CommentedMap, The parsed YAML filters data.
+    execution_mode: session.ExecutionMode, The mode the test is running in.
+
+  Returns:
+    Function with which to decorate the scenario test, formed by successively
+    applying each filter specified.
+  """
+  filters_data = filters_data or {}
+  filters = []
+
+  for filter_name, filter_data in six.iteritems(filters_data):
+    decorator = getattr(test_case.Filters, filter_name)
+    decorator_args = _GetMethodArgs(decorator)
+    if len(decorator_args) == _RESTRICTION_ARG_COUNT:
+      filters.append(decorator(filter_data['reason']))
+    elif len(decorator_args) == _SKIP_ARG_COUNT:
+      if (execution_mode != session.ExecutionMode.LOCAL or
+          filter_data.get('locally')):
+        filters.append(decorator(filter_data['reason'], filter_data['bug']))
     else:
-      skip_decorator = test_case.Filters.skip
-    return skip_decorator(skip_data['reason'], skip_data['bug'])
-  return lambda x: x
+      # This should never happen unless one of the filters' signatures changes.
+      raise ValueError(
+          'Invalid filter method. Expected 1 or 2 positional args, found {}: '
+          '[{}].'.format(len(decorator_args), ', '.join(decorator_args)))
+
+  if not filters:
+    return lambda x: x
+  return functools.reduce(lambda f1, f2: f2(f1), filters)
 
 
 def CreateStreamMocker(test_base_instance):

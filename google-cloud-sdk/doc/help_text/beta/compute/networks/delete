@@ -20,6 +20,16 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To delete a network with the name 'network-name', run:
+
+        $ gcloud beta compute networks delete network-name
+
+    To delete two networks with the names 'network-name1' and 'network-name2',
+    run:
+
+        $ gcloud beta compute networks delete network-name1 network-name2
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

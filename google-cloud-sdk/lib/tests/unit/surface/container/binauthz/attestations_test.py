@@ -18,10 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.binauthz import util as binauthz_command_util
 from googlecloudsdk.command_lib.kms import get_digest
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.console.console_io import OperationCancelledError
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
@@ -304,6 +306,172 @@ class CreateAlphaTest(
         ]),
     )
 
+  def testCreateWithSuccessfulValidation(self):
+    request_occurrence = self.CreateRequestAttestationOccurrence(
+        project_ref=self.project_ref,
+        artifact_url=self.artifact_url,
+        note_ref=resources.REGISTRY.ParseRelativeName(
+            relative_name=self.note_relative_name,
+            collection='containeranalysis.projects.notes',
+        ),
+        plaintext=self.signature,
+        signatures=[(self.pgp_key_fingerprint, self.signature)],
+    )
+    response_occurrence = self.ExpectProjectsOccurrencesCreate(
+        project_ref=self.project_ref,
+        request_occurrence=request_occurrence,
+    )
+
+    attestor_req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=self.attestor_relative_name,)
+    self.mock_client.projects_attestors.Get.Expect(
+        attestor_req, response=self.attestor)
+
+    test_attestation_request = self.messages.TestAttestationOccurrenceRequest(
+        attestation=encoding.JsonToMessage(
+            self.messages.AttestationOccurrence,
+            encoding.MessageToJson(request_occurrence.attestation)),
+        occurrenceNoteName=request_occurrence.noteName,
+        occurrenceResourceUri=request_occurrence.resourceUri,
+    )
+    test_req = self.messages.BinaryauthorizationProjectsAttestorsTestAttestationOccurrenceRequest(
+        name=self.attestor_relative_name,
+        testAttestationOccurrenceRequest=test_attestation_request)
+    test_attestation_response = self.messages.TestAttestationOccurrenceResponse(
+        result=self.messages.TestAttestationOccurrenceResponse
+        .ResultValueValuesEnum.VERIFIED)
+    self.mock_client.projects_attestors.TestAttestationOccurrence.Expect(
+        test_req, response=test_attestation_response)
+
+    sig_path = self.Touch(directory=self.cwd_path, contents=self.signature)
+    self.assertEqual(
+        response_occurrence,
+        self.RunBinauthz([
+            'attestations',
+            'create',
+            '--attestor',
+            self.attestor_relative_name,
+            '--artifact-url',
+            self.artifact_url,
+            '--public-key-id',
+            self.pgp_key_fingerprint,
+            '--signature-file',
+            sig_path,
+            '--validate',
+        ]),
+    )
+
+  def testCreateWithUnsuccessfulValidationWithOverride(self):
+    request_occurrence = self.CreateRequestAttestationOccurrence(
+        project_ref=self.project_ref,
+        artifact_url=self.artifact_url,
+        note_ref=resources.REGISTRY.ParseRelativeName(
+            relative_name=self.note_relative_name,
+            collection='containeranalysis.projects.notes',
+        ),
+        plaintext=self.signature,
+        signatures=[(self.pgp_key_fingerprint, self.signature)],
+    )
+    response_occurrence = self.ExpectProjectsOccurrencesCreate(
+        project_ref=self.project_ref,
+        request_occurrence=request_occurrence,
+    )
+
+    attestor_req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=self.attestor_relative_name,)
+    self.mock_client.projects_attestors.Get.Expect(
+        attestor_req, response=self.attestor)
+
+    test_attestation_request = self.messages.TestAttestationOccurrenceRequest(
+        attestation=encoding.JsonToMessage(
+            self.messages.AttestationOccurrence,
+            encoding.MessageToJson(request_occurrence.attestation)),
+        occurrenceNoteName=request_occurrence.noteName,
+        occurrenceResourceUri=request_occurrence.resourceUri,
+    )
+    test_req = self.messages.BinaryauthorizationProjectsAttestorsTestAttestationOccurrenceRequest(
+        name=self.attestor_relative_name,
+        testAttestationOccurrenceRequest=test_attestation_request)
+    test_attestation_response = self.messages.TestAttestationOccurrenceResponse(
+        result=self.messages.TestAttestationOccurrenceResponse
+        .ResultValueValuesEnum.ATTESTATION_NOT_VERIFIABLE,
+        denialReason='You failed!')
+    self.mock_client.projects_attestors.TestAttestationOccurrence.Expect(
+        test_req, response=test_attestation_response)
+
+    self.WriteInput('y\n')
+
+    sig_path = self.Touch(directory=self.cwd_path, contents=self.signature)
+    self.assertEqual(
+        response_occurrence,
+        self.RunBinauthz([
+            'attestations',
+            'create',
+            '--attestor',
+            self.attestor_relative_name,
+            '--artifact-url',
+            self.artifact_url,
+            '--public-key-id',
+            self.pgp_key_fingerprint,
+            '--signature-file',
+            sig_path,
+            '--validate',
+        ]),
+    )
+
+  def testCreateWithUnsuccessfulValidationWithoutOverride(self):
+    request_occurrence = self.CreateRequestAttestationOccurrence(
+        project_ref=self.project_ref,
+        artifact_url=self.artifact_url,
+        note_ref=resources.REGISTRY.ParseRelativeName(
+            relative_name=self.note_relative_name,
+            collection='containeranalysis.projects.notes',
+        ),
+        plaintext=self.signature,
+        signatures=[(self.pgp_key_fingerprint, self.signature)],
+    )
+
+    attestor_req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=self.attestor_relative_name,)
+    self.mock_client.projects_attestors.Get.Expect(
+        attestor_req, response=self.attestor)
+
+    test_attestation_request = self.messages.TestAttestationOccurrenceRequest(
+        attestation=encoding.JsonToMessage(
+            self.messages.AttestationOccurrence,
+            encoding.MessageToJson(request_occurrence.attestation)),
+        occurrenceNoteName=request_occurrence.noteName,
+        occurrenceResourceUri=request_occurrence.resourceUri,
+    )
+    test_req = self.messages.BinaryauthorizationProjectsAttestorsTestAttestationOccurrenceRequest(
+        name=self.attestor_relative_name,
+        testAttestationOccurrenceRequest=test_attestation_request)
+    test_attestation_response = self.messages.TestAttestationOccurrenceResponse(
+        result=self.messages.TestAttestationOccurrenceResponse
+        .ResultValueValuesEnum.ATTESTATION_NOT_VERIFIABLE,
+        denialReason='You failed!')
+    self.mock_client.projects_attestors.TestAttestationOccurrence.Expect(
+        test_req, response=test_attestation_response)
+
+    self.WriteInput('n\n')
+
+    sig_path = self.Touch(directory=self.cwd_path, contents=self.signature)
+
+    with self.assertRaises(OperationCancelledError):
+      self.RunBinauthz([
+          'attestations',
+          'create',
+          '--attestor',
+          self.attestor_relative_name,
+          '--artifact-url',
+          self.artifact_url,
+          '--public-key-id',
+          self.pgp_key_fingerprint,
+          '--signature-file',
+          sig_path,
+          '--validate',
+      ])
+
 
 class SignAndCreateTestBeta(
     binauthz_test_base.WithMockKms,
@@ -537,11 +705,151 @@ class SignAndCreateTestBeta(
 class SignAndCreateTestAlpha(
     binauthz_test_base.WithMockAlphaBinauthz,
     binauthz_test_base.WithMockV1Containeranalysis,
-    BaseAttestationsTest,
+    SignAndCreateTestBeta,
 ):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testSignAndCreateWithSuccessfulValidation(self):
+    response_occurrence = self.ExpectProjectsOccurrencesCreate(
+        project_ref=self.project_ref,
+        request_occurrence=self.request_occurrence,
+    )
+
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=self.attestor_relative_name,)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
+
+    self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.GetPublicKey.Expect(
+        self.kms_key_request, self.kms_key_response)
+
+    self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.AsymmetricSign.Expect(
+        self.kms_sign_request, self.kms_sign_response)
+
+    test_attestation_request = self.messages.TestAttestationOccurrenceRequest(
+        attestation=encoding.JsonToMessage(
+            self.messages.AttestationOccurrence,
+            encoding.MessageToJson(self.request_occurrence.attestation)),
+        occurrenceNoteName=self.request_occurrence.noteName,
+        occurrenceResourceUri=self.request_occurrence.resourceUri,
+    )
+    test_req = self.messages.BinaryauthorizationProjectsAttestorsTestAttestationOccurrenceRequest(
+        name=self.attestor_relative_name,
+        testAttestationOccurrenceRequest=test_attestation_request)
+    test_attestation_response = self.messages.TestAttestationOccurrenceResponse(
+        result=self.messages.TestAttestationOccurrenceResponse
+        .ResultValueValuesEnum.VERIFIED)
+    self.mock_client.projects_attestors.TestAttestationOccurrence.Expect(
+        test_req, response=test_attestation_response)
+
+    self.assertEqual(
+        response_occurrence,
+        self.RunBinauthz([
+            'attestations',
+            'sign-and-create',
+            '--attestor',
+            self.attestor_relative_name,
+            '--artifact-url',
+            self.artifact_url,
+            '--keyversion',
+            self.keyversion,
+            '--validate',
+        ]),
+    )
+
+  def testSignAndCreateWithUnsuccessfulValidationWithOverride(self):
+    response_occurrence = self.ExpectProjectsOccurrencesCreate(
+        project_ref=self.project_ref,
+        request_occurrence=self.request_occurrence,
+    )
+
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=self.attestor_relative_name,)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
+
+    self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.GetPublicKey.Expect(
+        self.kms_key_request, self.kms_key_response)
+
+    self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.AsymmetricSign.Expect(
+        self.kms_sign_request, self.kms_sign_response)
+
+    test_attestation_request = self.messages.TestAttestationOccurrenceRequest(
+        attestation=encoding.JsonToMessage(
+            self.messages.AttestationOccurrence,
+            encoding.MessageToJson(self.request_occurrence.attestation)),
+        occurrenceNoteName=self.request_occurrence.noteName,
+        occurrenceResourceUri=self.request_occurrence.resourceUri,
+    )
+    test_req = self.messages.BinaryauthorizationProjectsAttestorsTestAttestationOccurrenceRequest(
+        name=self.attestor_relative_name,
+        testAttestationOccurrenceRequest=test_attestation_request)
+    test_attestation_response = self.messages.TestAttestationOccurrenceResponse(
+        result=self.messages.TestAttestationOccurrenceResponse
+        .ResultValueValuesEnum.ATTESTATION_NOT_VERIFIABLE,
+        denialReason='You failed!')
+    self.mock_client.projects_attestors.TestAttestationOccurrence.Expect(
+        test_req, response=test_attestation_response)
+
+    self.WriteInput('y\n')
+
+    self.assertEqual(
+        response_occurrence,
+        self.RunBinauthz([
+            'attestations',
+            'sign-and-create',
+            '--attestor',
+            self.attestor_relative_name,
+            '--artifact-url',
+            self.artifact_url,
+            '--keyversion',
+            self.keyversion,
+            '--validate',
+        ]),
+    )
+
+  def testSignAndCreateWithUnsuccessfulValidationWithoutOverride(self):
+    req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
+        name=self.attestor_relative_name,)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
+
+    self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.GetPublicKey.Expect(
+        self.kms_key_request, self.kms_key_response)
+
+    self.mock_kms_client.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions.AsymmetricSign.Expect(
+        self.kms_sign_request, self.kms_sign_response)
+
+    test_attestation_request = self.messages.TestAttestationOccurrenceRequest(
+        attestation=encoding.JsonToMessage(
+            self.messages.AttestationOccurrence,
+            encoding.MessageToJson(self.request_occurrence.attestation)),
+        occurrenceNoteName=self.request_occurrence.noteName,
+        occurrenceResourceUri=self.request_occurrence.resourceUri,
+    )
+    test_req = self.messages.BinaryauthorizationProjectsAttestorsTestAttestationOccurrenceRequest(
+        name=self.attestor_relative_name,
+        testAttestationOccurrenceRequest=test_attestation_request)
+    test_attestation_response = self.messages.TestAttestationOccurrenceResponse(
+        result=self.messages.TestAttestationOccurrenceResponse
+        .ResultValueValuesEnum.ATTESTATION_NOT_VERIFIABLE,
+        denialReason='You failed!')
+    self.mock_client.projects_attestors.TestAttestationOccurrence.Expect(
+        test_req, response=test_attestation_response)
+
+    self.WriteInput('n\n')
+
+    with self.assertRaises(OperationCancelledError):
+      self.RunBinauthz([
+          'attestations',
+          'sign-and-create',
+          '--attestor',
+          self.attestor_relative_name,
+          '--artifact-url',
+          self.artifact_url,
+          '--keyversion',
+          self.keyversion,
+          '--validate',
+      ])
 
 
 class ListTest(

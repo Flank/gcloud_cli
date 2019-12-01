@@ -48,7 +48,6 @@ class SpannerIntegrationTest(e2e_base.WithServiceAuth):
     self.instance = next(id_gen)
     self.instance_name = next(id_gen)
     self.database = next(id_gen)
-    self.sampledatabase = next(id_gen)
     self.table = next(id_gen)
     self.column1 = next(id_gen)
     self.column2 = next(id_gen)
@@ -74,11 +73,6 @@ class SpannerIntegrationTest(e2e_base.WithServiceAuth):
     self.ClearOutput()
     self.ClearErr()
     return self.Run('spanner {0}'.format(command))
-
-  def ClearAndRunAlpha(self, command):
-    self.ClearOutput()
-    self.ClearErr()
-    return self.Run('alpha spanner {0}'.format(command))
 
   def _CheckListContains(self, list_cmd, resource_name):
     self.ClearAndRun(list_cmd)
@@ -108,20 +102,6 @@ class SpannerIntegrationTest(e2e_base.WithServiceAuth):
       self.AssertOutputNotContains(database_id)
       self.ClearAndRun('databases create {}'
                        ' --instance {}'.format(database_id, instance_id))
-      yield database_id
-
-    finally:
-      self.Run('spanner databases delete {}'
-               ' --instance {} --quiet'.format(database_id, instance_id))
-
-  @contextlib.contextmanager
-  def _CreateSampleDatabase(self, instance_id):
-    database_id = self.sampledatabase
-    try:
-      self.ClearAndRun('databases list --instance {}'.format(instance_id))
-      self.AssertOutputNotContains(database_id)
-      self.ClearAndRunAlpha('databases sampledb {}'
-                            ' --instance {}'.format(database_id, instance_id))
       yield database_id
 
     finally:
@@ -178,7 +158,7 @@ class SpannerIntegrationTest(e2e_base.WithServiceAuth):
                .format(instance_id, self.policy_file))
       self.AssertOutputContains('etag: ')
 
-      with self._CreateSampleDatabase(instance_id) as database_id:
+      with self._CreateDatabase(instance_id) as database_id:
         # There is a delay between creation and the database appearing in list
         self.retryer.RetryOnException(
             self._CheckListContains,
@@ -211,12 +191,6 @@ class SpannerIntegrationTest(e2e_base.WithServiceAuth):
         self.Run('spanner databases set-iam-policy {} --instance={} {}'
                  .format(database_id, instance_id, self.policy_file))
         self.AssertOutputContains('etag: ')
-
-      with self._CreateDatabase(instance_id) as database_id:
-        # There is a delay between creation and the database appearing in list
-        self.retryer.RetryOnException(
-            self._CheckListContains,
-            ['databases list --instance {}'.format(instance_id), database_id])
 
         with self._CreateSession(instance_id, database_id) as session:
           # There is a delay between creation and the session appearing in list

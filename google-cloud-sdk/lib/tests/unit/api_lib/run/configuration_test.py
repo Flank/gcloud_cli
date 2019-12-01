@@ -52,7 +52,7 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
     self.assertIsNone(self.conf.container.resources.requestsInMap)
 
   def testRevisionLabels(self):
-    self.conf.spec.revisionTemplate.metadata = None
+    self.conf.spec.template.metadata = None
     self.conf.template.labels['foo'] = 'bar'
     self.assertEqual(self.conf.template.labels['foo'], 'bar')
 
@@ -60,25 +60,13 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
     """Sanity check on exported message object."""
     m = self.conf.Message()
     self.assertIsInstance(m, self.serverless_messages.Configuration)
-    self.assertEquals(m.metadata.namespace, 'us-central1.fake-project')
-
-  @parameterized.parameters(['build_template_name'])
-  def testBuildProperties(self, attr):
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if not self.is_source_branch:
-      return
-    self.assertEquals(getattr(self.conf, attr), None)
-    setattr(self.conf, attr, 'foo')
-    self.assertEquals(getattr(self.conf, attr), 'foo')
+    self.assertEqual(m.metadata.namespace, 'us-central1.fake-project')
 
   def testReadWriteProperties(self):
     """Checks that the getters are consistent with the setters."""
 
-    attrs = ['name', 'image', 'concurrency', 'deprecated_string_concurrency']
+    attrs = ['name', 'image', 'concurrency']
     int_attrs = ['concurrency']
-    # TODO(b/112662240): Remove conditional once the build field is public
-    if self.is_source_branch:
-      attrs.extend(['source_manifest', 'source_archive', 'build_template_name'])
     for attr in attrs:
       value = 12 if attr in int_attrs else 'fake-{}'.format(attr)
       setattr(self.conf.template, attr, value)
@@ -100,13 +88,11 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
     """Checks that conditions are gettable and don't crash."""
 
     self.conf._m.status.conditions = [
-        self.serverless_messages.ConfigurationCondition(
-            type='type1', status='True'),
-        self.serverless_messages.ConfigurationCondition(
-            type='type2', status='False')]
+        self.conf.MakeCondition(type='type1', status='True'),
+        self.conf.MakeCondition(type='type2', status='False')]
     self.assertTrue(self.conf.conditions['type1']['status'])
     self.conf._m.status = None
-    self.assertEquals(len(self.conf.conditions), 0)
+    self.assertEqual(len(self.conf.conditions), 0)
 
   @parameterized.parameters(['env_vars.literals', 'labels', 'annotations'])
   def testReadWriteDictProperties(self, dict_attr):
@@ -130,6 +116,20 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
     with self.assertRaises(KeyError):
       obj[key]  # pylint: disable=pointless-statement
 
+
+class ConfigurationTestV1(ConfigurationTest):
+
+  VERSION = 'v1'
+
+  def testRevisionLabels(self):
+    self.conf.template.labels['foo'] = 'bar'
+    self.assertEqual(self.conf.template.labels['foo'], 'bar')
+
+  def testGenerationHack(self):
+    pass
+
+  def testNeverLimitsInMap(self):
+    pass
 
 if __name__ == '__main__':
   test_case.main()

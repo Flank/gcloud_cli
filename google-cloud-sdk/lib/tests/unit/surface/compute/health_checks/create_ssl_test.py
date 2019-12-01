@@ -400,6 +400,35 @@ class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslBetaTest):
     self.SelectApi(self.track.prefix)
     self._health_check_api = self.compute_alpha.healthChecks
 
+  @parameterized.named_parameters(
+      ('DisableLogging', '--no-enable-logging', False),
+      ('EnableLogging', '--enable-logging', True))
+  def testLogConfig(self, enable_logs_flag, enable_logs):
+
+    self.RunCreate("""my-health-check {0}""".format(enable_logs_flag))
+
+    expected_log_config = self.messages.HealthCheckLogConfig(enable=enable_logs)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks, 'Insert',
+          self.messages.ComputeHealthChecksInsertRequest(
+              healthCheck=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
+                  sslHealthCheck=self.messages.SSLHealthCheck(
+                      port=80,
+                      portSpecification=(
+                          self.messages.SSLHealthCheck
+                          .PortSpecificationValueValuesEnum.USE_FIXED_PORT),
+                      proxyHeader=(self.messages.SSLHealthCheck
+                                   .ProxyHeaderValueValuesEnum.NONE)),
+                  checkIntervalSec=5,
+                  timeoutSec=5,
+                  healthyThreshold=2,
+                  unhealthyThreshold=2,
+                  logConfig=expected_log_config),
+              project='my-project'))],)
+
 
 class RegionHealthChecksCreateSslBetaTest(test_base.BaseTest,
                                           parameterized.TestCase):

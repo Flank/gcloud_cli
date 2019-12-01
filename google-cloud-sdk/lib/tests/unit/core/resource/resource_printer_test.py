@@ -49,6 +49,9 @@ class MockPrinter(resource_printer_base.ResourcePrinter):
 
 class ResourcePrinterTest(resource_printer_test_base.Base):
 
+  def SetUp(self):
+    self.SetEncoding('utf-8')
+
   def testDefaultFormat(self):
     [resource] = self.CreateResourceList(1)
     resource_printer.Print(resource, 'default')
@@ -59,7 +62,7 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -82,8 +85,7 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.0
         size: 0
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
   def testNoneFormat(self):

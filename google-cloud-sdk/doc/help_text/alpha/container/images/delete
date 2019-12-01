@@ -55,7 +55,7 @@ EXAMPLES
     Then, delete these tagless images without prompting by running:
 
         $ gcloud alpha container images delete \
-            --quiet [HOSTNAME]/[PROJECT-ID]/[IMAGE]@DIGEST
+            [HOSTNAME]/[PROJECT-ID]/[IMAGE]@DIGEST --quiet
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

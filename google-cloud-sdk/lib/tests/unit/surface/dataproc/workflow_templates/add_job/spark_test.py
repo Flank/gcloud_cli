@@ -61,17 +61,16 @@ class WorkflowTemplatesJobSparkUnitTestBeta(WorkflowTemplatesJobSparkUnitTest,
         sparkJob=spark_job, step_id='002', start_after=['001'])
     self.ExpectUpdateWorkflowTemplatesJobCalls(
         workflow_template=workflow_template, ordered_jobs=[ordered_job])
-    self.RunDataproc(
-        'workflow-templates add-job spark --workflow-template {0} '
-        '--step-id 002 --start-after 001 '
-        '--driver-log-levels root=INFO,com.example=DEBUG '
-        '--properties foo=bar,some.key=some.value '
-        '--class {1} --jars {2} --archives {3} --files {4} '
-        '-- foo --bar baz '.format(self.WORKFLOW_TEMPLATE,
-                                   self.CLASS,
-                                   ','.join(self.JAR_URIS),
-                                   ','.join(self.ARCHIVE_URIS),
-                                   ','.join(self.FILE_URIS)))
+    self.RunDataproc('workflow-templates add-job spark --workflow-template {0} '
+                     '--step-id 002 --start-after 001 '
+                     '--driver-log-levels root=INFO,com.example=DEBUG '
+                     '--properties foo=bar,some.key=some.value '
+                     '--class {1} --jars {2} --archives {3} --files {4} '
+                     '-- foo --bar baz '.format(self.WORKFLOW_TEMPLATE,
+                                                self.CLASS,
+                                                ','.join(self.JAR_URIS),
+                                                ','.join(self.ARCHIVE_URIS),
+                                                ','.join(self.FILE_URIS)))
 
   def testSparkJobWithJar(self):
     workflow_template = self.MakeWorkflowTemplate()
@@ -82,13 +81,12 @@ class WorkflowTemplatesJobSparkUnitTestBeta(WorkflowTemplatesJobSparkUnitTest,
         sparkJob=spark_job, step_id='002', start_after=['001'])
     self.ExpectUpdateWorkflowTemplatesJobCalls(
         workflow_template=workflow_template, ordered_jobs=[ordered_job])
-    self.RunDataproc(
-        'workflow-templates add-job spark --workflow-template {0} '
-        '--step-id 002 --start-after 001 '
-        '--driver-log-levels root=INFO,com.example=DEBUG '
-        '--properties foo=bar,some.key=some.value '
-        '--jar {1} -- foo --bar baz '.format(self.WORKFLOW_TEMPLATE,
-                                             self.JAR_URI))
+    self.RunDataproc('workflow-templates add-job spark --workflow-template {0} '
+                     '--step-id 002 --start-after 001 '
+                     '--driver-log-levels root=INFO,com.example=DEBUG '
+                     '--properties foo=bar,some.key=some.value '
+                     '--jar {1} -- foo --bar baz '.format(
+                         self.WORKFLOW_TEMPLATE, self.JAR_URI))
 
   def testSparkJobWithLabels(self):
     workflow_template = self.MakeWorkflowTemplate()

@@ -1,5 +1,5 @@
 title: cloud firestore single-field describe test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -99,7 +99,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/timestamp?alt=json
           method: GET
           headers: {}
           body: null
@@ -163,7 +163,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/__default__/fields/*?alt=json
           method: GET
           headers: {}
           body: null
@@ -237,7 +237,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/*?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/*?alt=json
           method: GET
           headers: {}
           body: null
@@ -291,7 +291,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields/user_id?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields/user_id?alt=json
           method: GET
           headers: {}
           body: null

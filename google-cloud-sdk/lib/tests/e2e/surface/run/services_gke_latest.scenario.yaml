@@ -1,0 +1,1335 @@
+title: Serverless deploy to gke cluster with knative addon.
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: run/cluster do-not-delete-knative-test-latest
+- set_property: run/cluster_location us-central1-a
+- set_property: run/platform gke
+- execute_binary: python ./update_cluster.py
+- execute:
+  - command: run deploy --image gcr.io/knative-samples/helloworld-nodejs $$service-name$$
+  - stderr: |
+      Deploying container to Cloud Run on GKE service [$$service-name$$] in namespace [default] of cluster [do-not-delete-knative-test-latest]
+  - staged_progress_tracker:
+    - message: Deploying new service...
+    - status: SUCCESS
+  - stderr: |
+      Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+- execute:
+  - command: run services describe $$service-name$$ --format="value(metadata.name)"
+  - stdout: |
+      $$service-name$$
+- execute:
+  - command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
+      FOO=bar --connectivity internal
+  - staged_progress_tracker:
+    - message: Deploying...
+    - status: SUCCESS
+  - stderr: .*is\sactive\sand\sserving\straffic\sat.*$
+- execute:
+  - command: run services delete $$service-name$$ -q
+  - stderr: |
+      Deleted service [$$service-name$$].
+actions:
+
+- set_property:
+    # container/use_client_certificate: true
+    # auth/disable_ssl_validation: true
+    run/cluster: do-not-delete-knative-test-latest
+    run/cluster_location: us-central1-a
+    run/platform: gke
+
+- generate_resource_id:
+    reference: service-name
+    prefix: service-name
+
+- load_resource:
+    path: tests/e2e/surface/run/test_data/update_cluster.py
+
+- execute_binary:
+    args:
+    - python
+    - ./update_cluster.py
+    timeout: 60
+    expect_exit:
+      code: 0
+
+- execute_command:
+    command: run deploy --image gcr.io/knative-samples/helloworld-nodejs $$service-name$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-latest?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4970'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-latest
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig: {}
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.136.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling:
+                disabled: true
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig: {}
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 1
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest/nodePools/default-pool
+              version: 1.13.10-gke.0
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+              status: RUNNING
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy: {}
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest
+            zone: us-central1-a
+            endpoint: 34.67.14.154
+            initialClusterVersion: 1.13.10-gke.0
+            currentMasterVersion: 1.14.7-gke.14
+            currentNodeVersion: 1.13.10-gke.0
+            createTime: '2019-10-03T03:31:36+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.139.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            # The uri hostname varies. With python2 it would be kubernetes.default. With
+            # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
+            # patch information: CL/217804288.
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '292'
+            content-type: application/json
+            status: '404'
+          body:
+            kind: Status
+            apiVersion: v1
+            metadata: {}
+            status: Failure
+            message: services.serving.knative.dev "$$service-name$$" not found
+            reason: NotFound
+            details:
+              name: $$service-name$$
+              group: serving.knative.dev
+              kind: services
+            code: 404
+    - expect_stderr: |
+        Deploying container to Cloud Run on GKE service [$$service-name$$] in namespace [default] of cluster [do-not-delete-knative-test-latest]
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            # The uri hostname varies. With python2 it would be kubernetes.default. With
+            # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
+            # patch information: CL/217804288.
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '292'
+            content-type: application/json
+            status: '404'
+          body:
+            kind: Status
+            apiVersion: v1
+            metadata: {}
+            status: Failure
+            message: services.serving.knative.dev "$$service-name$$" not found
+            reason: NotFound
+            details:
+              name: $$service-name$$
+              group: serving.knative.dev
+              kind: services
+            code: 404
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services\?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              metadata:
+                annotations: {}
+                initializers: {}
+                labels: {}
+                name: $$service-name$$
+                namespace: default
+              spec: {}
+              status: {}
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1200'
+            content-type: application/json
+            status: '201'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  name: $$service-name$$-00001-muh
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+    - api_call:
+        # Initial GET requests may be partially incomplete as the service is created
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1913'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  name: $$service-name$$-00001-muh
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:01Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:01Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:01Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-name$$-00001-muh
+              latestReadyRevisionName: $$service-name$$-00001-muh
+              observedGeneration: 1
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-name$$-00001-muh
+              url: http://$$service-name$$.default.example.com
+    - expect_staged_progress_tracker:
+        message: Deploying new service...
+        status: SUCCESS
+    - api_call:
+        # Final GET request should have complete and ready service
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1913'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  name: $$service-name$$-00001-muh
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:02Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:02Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:02Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-name$$-00001-muh
+              latestReadyRevisionName: $$service-name$$-00001-muh
+              observedGeneration: 1
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-name$$-00001-muh
+              url: http://$$service-name$$.default.example.com
+        expect_response:
+          extract_references:
+          - field: status.latestCreatedRevisionName
+            reference: service-revision-name
+          body:
+            json: {}
+    - expect_stderr: |
+        Service [$$service-name$$] revision [$$service-revision-name$$] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    # Describe the service we just deployed
+    command: run services describe $$service-name$$ --format="value(metadata.name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-latest?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4970'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-latest
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig: {}
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.136.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling:
+                disabled: true
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig: {}
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 1
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest/nodePools/default-pool
+              version: 1.13.10-gke.0
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+              status: RUNNING
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy: {}
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest
+            zone: us-central1-a
+            endpoint: 34.67.14.154
+            initialClusterVersion: 1.13.10-gke.0
+            currentMasterVersion: 1.14.7-gke.14
+            currentNodeVersion: 1.13.10-gke.0
+            createTime: '2019-10-03T03:31:36+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.139.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1913'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  name: $$service-revision-name$$
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:03Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:03Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:03Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
+              observedGeneration: 1
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-revision-name$$
+              url: http://$$service-name$$.default.example.com
+    - expect_stdout: |
+        $$service-name$$
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
+      FOO=bar --connectivity internal
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-latest?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4970'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-latest
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig: {}
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.136.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling:
+                disabled: true
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig: {}
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 1
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest/nodePools/default-pool
+              version: 1.13.10-gke.0
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+              status: RUNNING
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy: {}
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest
+            zone: us-central1-a
+            endpoint: 34.67.14.154
+            initialClusterVersion: 1.13.10-gke.0
+            currentMasterVersion: 1.14.7-gke.14
+            currentNodeVersion: 1.13.10-gke.0
+            createTime: '2019-10-03T03:31:36+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.139.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1913'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  name: $$service-revision-name$$
+                spec:
+                  containerConcurrency: 0
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:04Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:04Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:04Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
+              observedGeneration: 1
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-revision-name$$
+              url: http://$$service-name$$.default.example.com
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/revisions/$$service-revision-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Revision
+            metadata:
+              annotations:
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastPinned: '1572564158'
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 1
+              labels:
+                serving.knative.dev/configuration: $$service-name$$
+                serving.knative.dev/configurationGeneration: '1'
+                serving.knative.dev/route: $$service-name$$
+                serving.knative.dev/service: $$service-name$$
+              name: $$service-revision-name$$
+              namespace: default
+              ownerReferences:
+              - apiVersion: serving.knative.dev/v1alpha1
+                blockOwnerDeletion: true
+                controller: true
+                kind: Configuration
+                name: $$service-name$$
+                uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/revisions/$$service-revision-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              containerConcurrency: 0
+              containers:
+              - image: gcr.io/knative-samples/helloworld-nodejs
+                name: user-container
+                readinessProbe:
+                  successThreshold: 1
+                  tcpSocket:
+                    port: 0
+                resources: {}
+              timeoutSeconds: 300
+            status:
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:05Z'
+                severity: Info
+                status: 'True'
+                type: Active
+              - lastTransitionTime: '2019-07-23T20:10:05Z'
+                status: 'True'
+                type: ContainerHealthy
+              - lastTransitionTime: '2019-07-23T20:10:05Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:05Z'
+                status: 'True'
+                type: ResourcesAvailable
+              imageDigest: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+              logUrl: https://console.cloud.google.com/logs/viewer?advancedFilter=resource.type%3D%22k8s_container%22%0Aresource.labels.container_name%3D%22user-container%22%0Alabels.%22k8s-pod%2Fserving_knative_dev%2FrevisionUID%22%3D%22518ffa16-fc35-11e9-9737-42010af000d5%22
+              observedGeneration: 1
+              serviceName: $$service-revision-name$$
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                generation: 1
+                labels:
+                  serving.knative.dev/visibility: cluster-local
+                name: $$service-name$$
+                namespace: default
+              spec: {}
+              status:
+                address: {}
+                conditions:
+                - status: 'True'
+                  type: ConfigurationsReady
+                - status: 'True'
+                  type: Ready
+                - status: 'True'
+                  type: RoutesReady
+                observedGeneration: 1
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 2
+              labels:
+                serving.knative.dev/visibility: cluster-local
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  labels:
+                    serving.knative.dev/visibility: cluster-local
+                  name: $$service-name$$-00002-niz
+                spec:
+                  containerConcurrency: 3
+                  containers:
+                  - env:
+                    - name: FOO
+                      value: bar
+                    image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources:
+                      limits:
+                        memory: 512Mi
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:07Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:07Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:07Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
+              observedGeneration: 1
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-revision-name$$
+              url: http://$$service-name$$.default.example.com
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 2
+              labels:
+                serving.knative.dev/visibility: cluster-local
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  labels:
+                    serving.knative.dev/visibility: cluster-local
+                  name: $$service-name$$-00002-niz
+                spec:
+                  containerConcurrency: 3
+                  containers:
+                  - env:
+                    - name: FOO
+                      value: bar
+                    image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources:
+                      limits:
+                        memory: 512Mi
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:08Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-name$$-00002-niz
+              latestReadyRevisionName: $$service-name$$-00002-niz
+              observedGeneration: 2
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-name$$-00002-niz
+              url: http://$$service-name$$.default.svc.cluster.local
+        expect_response:
+          extract_references:
+          - field: status.latestCreatedRevisionName
+            reference: service-revision-name-2
+          body:
+            json: {}
+    - expect_staged_progress_tracker:
+        message: Deploying...
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              generation: 2
+              labels:
+                serving.knative.dev/visibility: cluster-local
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  labels:
+                    serving.knative.dev/visibility: cluster-local
+                  name: $$service-revision-name-2$$
+                spec:
+                  containerConcurrency: 3
+                  containers:
+                  - env:
+                    - name: FOO
+                      value: bar
+                    image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                    name: user-container
+                    readinessProbe:
+                      successThreshold: 1
+                      tcpSocket:
+                        port: 0
+                    resources:
+                      limits:
+                        memory: 512Mi
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:09Z'
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-07-23T20:10:09Z'
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-07-23T20:10:09Z'
+                status: 'True'
+                type: RoutesReady
+              latestCreatedRevisionName: $$service-revision-name-2$$
+              latestReadyRevisionName: $$service-revision-name-2$$
+              observedGeneration: 2
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-revision-name-2$$
+              url: http://$$service-name$$.default.svc.cluster.local
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/routes/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1849'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Route
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                run.googleapis.com/client-name: gcloud
+                serving.knative.dev/creator: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+                serving.knative.dev/lastModifier: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+              creationTimestamp: '2019-07-23T18:13:29Z'
+              finalizers:
+              - routes.serving.knative.dev
+              generation: 1
+              labels:
+                serving.knative.dev/service: $$service-name$$
+                serving.knative.dev/visibility: cluster-local
+              name: $$service-name$$
+              namespace: default
+              ownerReferences:
+              - apiVersion: serving.knative.dev/v1alpha1
+                blockOwnerDeletion: true
+                controller: true
+                kind: Service
+                name: $$service-name$$
+                uid: 92610cc6-ad75-11e9-b545-42010a800168
+              resourceVersion: '51639050'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/routes/$$service-name$$
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+            spec:
+              traffic:
+              - configurationName: $$service-name$$
+                latestRevision: true
+                percent: 100
+            status:
+              address:
+                url: http://$$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-07-23T20:10:10Z'
+                status: 'True'
+                type: AllTrafficAssigned
+              - lastTransitionTime: '2019-07-23T20:10:10Z'
+                status: 'True'
+                type: IngressReady
+              - lastTransitionTime: '2019-07-23T20:10:10Z'
+                status: 'True'
+                type: Ready
+              observedGeneration: 1
+              traffic:
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-revision-name-2$$
+              url: http://$$service-name$$.default.svc.cluster.local
+    - expect_stderr:
+        matches: .*is\sactive\sand\sserving\straffic\sat.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: run services delete $$service-name$$ -q
+    cleanup_for: service-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-knative-test-latest?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4970'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-knative-test-latest
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+              shieldedInstanceConfig: {}
+            masterAuth:
+              clusterCaCertificate: ==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.136.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling:
+                disabled: true
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+                shieldedInstanceConfig: {}
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 1
+                maxNodeCount: 10
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              podIpv4CidrSize: 24
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest/nodePools/default-pool
+              version: 1.13.10-gke.0
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+              status: RUNNING
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            maintenancePolicy: {}
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-knative-test-latest
+            zone: us-central1-a
+            endpoint: 34.67.14.154
+            initialClusterVersion: 1.13.10-gke.0
+            currentMasterVersion: 1.14.7-gke.14
+            currentNodeVersion: 1.13.10-gke.0
+            createTime: '2019-10-03T03:31:36+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.139.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-knativ-default-pool-adda08a9-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '217'
+            content-type: application/json
+            status: '200'
+          body:
+            kind: Status
+            apiVersion: v1
+            metadata: {}
+            status: Success
+            details:
+              name: $$service-name$$
+              group: serving.knative.dev
+              kind: services
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
+    - expect_stderr: |
+        Deleted service [$$service-name$$].
+    - expect_exit:
+        code: 0

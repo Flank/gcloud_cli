@@ -10,22 +10,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute disks update updates a Google Compute Engine
-    persistent disk. For example:
-
-        $ gcloud beta compute disks update example-disk \
-            --zone us-central1-a \
-          --update-labels=k0=value1,k1=value2 --remove-labels=k3
-
-    will add/update labels k0 and k1 and remove labels with key k3.
-
-    Labels can be used to identify the disk and to filter them as in
-
-        $ gcloud beta compute disks list --filter='labels.k1:value2'
-
-    To list existing labels
-
-        $ gcloud beta compute disks describe example-disk \
-            --format='default(labels)'
+    persistent disk.
 
 POSITIONAL ARGUMENTS
      DISK_NAME
@@ -108,6 +93,26 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To update labels 'k0' and 'k1' and remove label 'k3' of a disk, run:
+
+        $ gcloud beta compute disks update example-disk \
+          --zone=us-central1-a --update-labels=k0=value1,k1=value2 \
+          --remove-labels=k3
+
+        `_k0_` and `_k1_` are added as new labels if not already present.
+
+    Labels can be used to identify the disk. To list disks with the 'k1:value2'
+    label, run:
+
+        $ gcloud beta compute disks list --filter='labels.k1:value2'
+
+    To list only the labels when describing a resource, use --format to filter
+    the result:
+
+        $ gcloud beta compute disks describe example-disk \
+          --format='default(labels)'
 
 NOTES
     This command is currently in BETA and may change without notice. These

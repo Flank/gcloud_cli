@@ -81,8 +81,7 @@ EXAMPLES
             --version=gkeconnect_20190802_02_00
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
-
-        $ gcloud alpha container hub register-cluster
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
 

@@ -1,5 +1,5 @@
 title: managed-identities domains create
-release_tracks: [BETA, ALPHA]
+release_tracks: [GA, BETA, ALPHA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -99,7 +99,7 @@ summary:
       done: false
       metadata:
         '@type': type.googleapis.com/google.cloud.common.OperationMetadata
-        apiVersion: v1beta1
+        apiVersion: v1
         cancelRequested: false
         createTime: '2018-12-14T00:23:39.481183185Z'
         target: projects/fake-project/locations/global/domains/testdomain.com
@@ -134,7 +134,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains?alt=json&domainName=testdomain.com
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains?alt=json&domainName=testdomain.com
           method: POST
           body:
             json:
@@ -150,7 +150,7 @@ actions:
               "done": false,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",
@@ -165,7 +165,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: GET
           body: null
         return_response:
@@ -199,7 +199,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains?alt=json&domainName=testdomain.com
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains?alt=json&domainName=testdomain.com
           method: POST
           body:
             json:
@@ -218,7 +218,7 @@ actions:
               "done": false,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",
@@ -237,7 +237,7 @@ actions:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: GET
           body: null
         return_response:
@@ -274,7 +274,7 @@ actions:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains?alt=json
           method: GET
           body: null
         return_response:
@@ -327,7 +327,7 @@ actions:
           }
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains?alt=json&pageToken=asdf
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains?alt=json&pageToken=asdf
           method: GET
           headers: {}
           body: null
@@ -346,7 +346,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -370,7 +370,7 @@ actions:
             updateTime: '2019-01-23T01:50:16.807386841Z'
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json&updateMask=labels%2Clocations%2Cauthorized_networks
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json&updateMask=labels%2Clocations%2Cauthorized_networks
           method: PATCH
           headers: {}
           body:
@@ -388,7 +388,7 @@ actions:
               "done": false,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",
@@ -400,7 +400,7 @@ actions:
         Request issued for: [testdomain.com]
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/$$operation$$?alt=json
+          uri: https://managedidentities.googleapis.com/v1/$$operation$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -412,7 +412,7 @@ actions:
               "done": true,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",
@@ -425,7 +425,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -470,7 +470,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: GET
           headers: {}
           body: null
@@ -496,7 +496,7 @@ actions:
               l2: '2'
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json&updateMask=labels%2Clocations%2Cauthorized_networks
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json&updateMask=labels%2Clocations%2Cauthorized_networks
           method: PATCH
           headers: {}
           body:
@@ -513,7 +513,7 @@ actions:
               "done": false,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",
@@ -529,7 +529,7 @@ actions:
         done: false
         metadata:
           '@type': type.googleapis.com/google.cloud.common.OperationMetadata
-          apiVersion: v1beta1
+          apiVersion: v1
           cancelRequested: false
           createTime: '2018-12-14T00:23:39.481183185Z'
           target: projects/fake-project/locations/global/domains/testdomain.com
@@ -546,7 +546,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: DELETE
           body: null
         return_response:
@@ -557,7 +557,7 @@ actions:
               "done": false,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",
@@ -583,7 +583,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/fake-project/locations/global/domains/testdomain.com?alt=json
           method: DELETE
           body: null
         return_response:
@@ -594,7 +594,7 @@ actions:
               "done": false,
               "metadata": {
                 "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
-                "apiVersion": "v1beta1",
+                "apiVersion": "v1",
                 "cancelRequested": false,
                 "createTime": "2018-12-14T00:23:39.481183185Z",
                 "target": "projects/fake-project/locations/global/domains/testdomain.com",

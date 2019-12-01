@@ -29,12 +29,12 @@ EXAMPLES
     To list connections of a network called my-network to a service called
     your-service, run:
 
-        $ gcloud alpha services vpc-peerings list --network my-network \
-            --service your-service
+        $ gcloud alpha services vpc-peerings list --network=my-network \
+            --service=your-service
 
     To list connections of a network against all services, run:
 
-        $ gcloud alpha services vpc-peerings list --network my-network
+        $ gcloud alpha services vpc-peerings list --network=my-network
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

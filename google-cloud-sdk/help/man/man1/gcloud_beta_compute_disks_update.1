@@ -18,29 +18,7 @@ gcloud beta compute disks update \- update a Google Compute Engine persistent di
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute disks update\fR updates a Google Compute
-Engine persistent disk. For example:
-
-.RS 2m
-$ gcloud beta compute disks update example\-disk \e
-    \-\-zone us\-central1\-a \e
-  \-\-update\-labels=k0=value1,k1=value2 \-\-remove\-labels=k3
-.RE
-
-will add/update labels \f5\fIk0\fR\fR and \f5\fIk1\fR\fR and remove labels with
-key \f5\fIk3\fR\fR.
-
-Labels can be used to identify the disk and to filter them as in
-
-.RS 2m
-$ gcloud beta compute disks list \-\-filter='labels.k1:value2'
-.RE
-
-To list existing labels
-
-.RS 2m
-$ gcloud beta compute disks describe example\-disk \e
-    \-\-format='default(labels)'
-.RE
+Engine persistent disk.
 
 
 
@@ -168,6 +146,37 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update labels 'k0' and 'k1' and remove label 'k3' of a disk, run:
+
+.RS 2m
+$ gcloud beta compute disks update example\-disk \e
+  \-\-zone=us\-central1\-a \-\-update\-labels=k0=value1,k1=value2 \e
+  \-\-remove\-labels=k3
+.RE
+
+.RS 2m
+`_k0_` and `_k1_` are added as new labels if not already present.
+.RE
+
+Labels can be used to identify the disk. To list disks with the 'k1:value2'
+label, run:
+
+.RS 2m
+$ gcloud beta compute disks list \-\-filter='labels.k1:value2'
+.RE
+
+To list only the labels when describing a resource, use \-\-format to filter the
+result:
+
+.RS 2m
+$ gcloud beta compute disks describe example\-disk \e
+  \-\-format='default(labels)'
+.RE
 
 
 

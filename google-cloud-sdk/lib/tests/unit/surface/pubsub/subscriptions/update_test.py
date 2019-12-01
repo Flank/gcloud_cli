@@ -337,7 +337,9 @@ class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta,
         retainAckedMessages=True,
         messageRetentionDuration='259200s',
         deadLetterPolicy=self.msgs.DeadLetterPolicy(
-            deadLetterTopic='topic2', maxDeliveryAttempts=5))
+            deadLetterTopic=util.ParseTopic('topic2',
+                                            self.Project()).RelativeName(),
+            maxDeliveryAttempts=5))
 
     update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
         updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
@@ -357,14 +359,22 @@ class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta,
   @parameterized.parameters(
       (' --dead-letter-topic topic2 --max-delivery-attempts 5', 'topic2', 5),
       (' --dead-letter-topic topic2 --max-delivery-attempts 100', 'topic2',
-       100), (' --dead-letter-topic topic2', 'topic2', None))
+       100),
+      (' --dead-letter-topic topic2', 'topic2', None),
+      (' --dead-letter-topic projects/other-project/topics/topic2 '
+       '--max-delivery-attempts 5', 'projects/other-project/topics/topic2', 5),
+      (' --dead-letter-topic topic2 --max-delivery-attempts 5 '
+       '--dead-letter-topic-project other-project',
+       'projects/other-project/topics/topic2', 5),
+  )
   def testUpdateDeadLetterPolicy(self, dead_letter_flags, dead_letter_topic,
                                  max_delivery_attempts):
     sub_ref = util.ParseSubscription('sub', self.Project())
     new_sub = self.msgs.Subscription(
         name=sub_ref.RelativeName(),
         deadLetterPolicy=self.msgs.DeadLetterPolicy(
-            deadLetterTopic=dead_letter_topic,
+            deadLetterTopic=util.ParseTopic(dead_letter_topic,
+                                            self.Project()).RelativeName(),
             maxDeliveryAttempts=max_delivery_attempts))
 
     update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
@@ -417,18 +427,21 @@ class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta,
       (' --clear-dead-letter-policy --dead-letter-topic topic2 '
        '--max-delivery-attempts 5', cli_test_base.MockArgumentError,
        'argument --clear-dead-letter-policy: At most one of '
-       '--clear-dead-letter-policy | --dead-letter-topic '
-       '--max-delivery-attempts may be specified.'),
+       '--clear-dead-letter-policy | '
+       '--max-delivery-attempts [--dead-letter-topic : '
+       '--dead-letter-topic-project] may be specified.'),
       (' --clear-dead-letter-policy --dead-letter-topic topic2',
        cli_test_base.MockArgumentError,
        'argument --clear-dead-letter-policy: At most one of '
-       '--clear-dead-letter-policy | --dead-letter-topic '
-       '--max-delivery-attempts may be specified.'),
+       '--clear-dead-letter-policy | '
+       '--max-delivery-attempts [--dead-letter-topic : '
+       '--dead-letter-topic-project] may be specified.'),
       (' --clear-dead-letter-policy --max-delivery-attempts 5',
        cli_test_base.MockArgumentError,
        'argument --clear-dead-letter-policy: At most one of '
-       '--clear-dead-letter-policy | --dead-letter-topic '
-       '--max-delivery-attempts may be specified.'))
+       '--clear-dead-letter-policy | '
+       '--max-delivery-attempts [--dead-letter-topic : '
+       '--dead-letter-topic-project] may be specified.'))
   def testUpdateDeadLetterPolicyException(self, dead_letter_flags, exception,
                                           exception_message):
     with self.AssertRaisesExceptionMatches(exception, exception_message):

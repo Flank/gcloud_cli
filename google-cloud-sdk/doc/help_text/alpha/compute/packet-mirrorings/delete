@@ -7,7 +7,7 @@ SYNOPSIS
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete a Google Compute Engine packet mirroring.
+    (ALPHA) Delete a Google Compute Engine Packet Mirroring
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -25,9 +25,17 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    Delete the Packet Mirroring resource pm-1 in region us-central1.
+
+        $ gcloud alpha compute packet-mirrorings delete pm-1
+          --region us-central1
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute packet-mirrorings delete
 

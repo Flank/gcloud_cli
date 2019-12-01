@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute network\-endpoint\-groups update \- updates a Google Compute Engine network endpoint group
+gcloud alpha compute network\-endpoint\-groups update \- update a Google Compute Engine network endpoint group
 
 
 
@@ -40,12 +40,12 @@ Exactly one of these must be specified:
 The network endpoint to add to the network endpoint group. Keys used depend on
 the endpoint type of the NEG.
 
-.RS 2m
-.IP "\(bu" 2m
 \f5GCE_VM_IP_PORT\fR
+
 .RS 2m
-.IP "\(em" 2m
-instance \- Name of instance in same zone as the network endpoint group.
+*instance* \- Name of instance in same zone as the network endpoint
+group.
+.RE
 
 .RS 2m
 The VM instance must belong to the network / subnetwork
@@ -54,104 +54,137 @@ is deleted, then any network endpoint group that has a reference
 to it is updated.
 .RE
 
-.IP "\(em" 2m
-ip \- Optional IP address of the network endpoint. the IP address must belong to
-a VM in compute engine (either the primary IP or as part of an aliased IP
-range). If the IP address is not specified, then the primary IP address for the
-VM instance in the network that the network endpoint group belongs to will be
+.RS 2m
+*ip* \- Optional IP address of the network endpoint. the IP address
+must belong to a VM in compute engine (either the primary IP or
+as part of an aliased IP range). If the IP address is not
+specified, then the primary IP address for the VM instance in
+the network that the network endpoint group belongs to will be
 used.
-
-.IP "\(em" 2m
-port \- Required endpoint port unless NEG default port is set.
-
 .RE
-.sp
-.IP "\(bu" 2m
+
+.RS 2m
+*port* \- Required endpoint port unless NEG default port is set.
+.RE
+
 \f5INTERNET_IP_PORT\fR
+
 .RS 2m
-.IP "\(em" 2m
-ip \- Required IP address of the endpoint to attach. Must be publicly routable.
-
-.IP "\(em" 2m
-port \- Optional port of the endpoint to attach. If unspecified then NEG default
-port is set. If no default port is set, the well known port for the backend
-protocol will be used instead (80 for http, 443 for https).
-
+*ip* \- Required IP address of the endpoint to attach. Must be
+publicly routable.
 .RE
-.sp
-.IP "\(bu" 2m
+
+.RS 2m
+*port* \- Optional port of the endpoint to attach. If unspecified
+then NEG default port is set. If no default port is set, the
+well known port for the backend protocol will be used instead
+(80 for http, 443 for https).
+.RE
+
 \f5INTERNET_FQDN_PORT\fR
-.RS 2m
-.IP "\(em" 2m
-fqdn \- Required fully qualified domain name to use to look up an external
-endpoint. Must be resolvable to a public IP address via public DNS.
-
-.IP "\(em" 2m
-port \- Optional port of the endpoint to attach. If unspecified then NEG default
-port is set. If no default port is set, the well known port for the backend
-protocol will be used instead (80 for http, 443 for https or http2).
-.RE
-.RE
-.RE
-.RE
-.sp
 
 .RS 2m
+*fqdn* \- Required fully qualified domain name to use to look up an
+external endpoint. Must be resolvable to a public IP address via
+public DNS.
+.RE
+
+.RS 2m
+*port* \- Optional port of the endpoint to attach. If unspecified
+then NEG default port is set. If no default port is set, the
+well known port for the backend protocol will be used instead
+(80 for http, 443 for https or http2).
+.RE
+
+\f5NON_GCP_PRIVATE_IP_PORT\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to attach. The
+IP address must belong to a VM not in Google Compute Engine and
+must be routable using a cloud router over VPN or an Interconnect.
+.RE
+
+.RS 2m
+*port* \- Required port of the network endpoint to attach unless
+NEG default port is set.
+.RE
+
+\f5GCE_VM_PRIMARY_IP\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to attach. The
+IP address must be the primary IP of a VM's primary network
+interface.
+.RE
+
 .TP 2m
 \fB\-\-remove\-endpoint\fR=[\fIfqdn\fR=\fIFQDN\fR],[\fIinstance\fR=\fIINSTANCE\fR],[\fIip\fR=\fIIP\fR],[\fIport\fR=\fIPORT\fR]
 The network endpoint to detach from the network endpoint group. Keys used depend
 on the endpoint type of the NEG.
 
-.RS 2m
-.IP "\(bu" 2m
 \f5GCE_VM_IP_PORT\fR
 
 .RS 2m
-.IP "\(em" 2m
-instance \- Required name of instance whose endpoint(s) to detach. If IP address
-is unset then all endpoints for the instance in the NEG will be detached.
+*instance* \- Required name of instance whose endpoint(s) to
+detach. If IP address is unset then all endpoints for the
+instance in the NEG will be detached.
+.RE
 
 .RS 2m
-.IP "\(em" 2m
-ip \- Optional IP address of the network endpoint to detach. If specified port
-must be provided as well.
+*ip* \- Optional IP address of the network endpoint to detach.
+If specified port must be provided as well.
+.RE
 
 .RS 2m
-.IP "\(em" 2m
-port \- Optional port of the network endpoint to detach.
+*port* \- Optional port of the network endpoint to detach.
+.RE
 
-.IP "\(bu" 2m
 \f5INTERNET_IP_PORT\fR
 
 .RS 2m
-.IP "\(em" 2m
-ip \- Required IP address of the network endpoint to detach.
-
-.IP "\(em" 2m
-port \- Optional port of the network endpoint to detach if the endpoint has a
-port specified.
-
+*ip* \- Required IP address of the network endpoint to detach.
 .RE
-.sp
-.IP "\(bu" 2m
+
+.RS 2m
+*port* \- Optional port of the network endpoint to detach if the
+endpoint has a port specified.
+.RE
+
 \f5INTERNET_FQDN_PORT\fR
 
 .RS 2m
-.IP "\(em" 2m
-fqdn \- Required fully qualified domain name of the endpoint to detach.
+*fqdn* \- Required fully qualified domain name of the endpoint to
+detach.
+.RE
 
-.IP "\(em" 2m
-port \- Optional port of the network endpoint to detach if the endpoint has a
-port specified.
+.RS 2m
+*port* \- Optional port of the network endpoint to detach if the
+endpoint has a port specified.
 .RE
+
+\f5NON_GCP_PRIVATE_IP_PORT\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to detach.
 .RE
+
+.RS 2m
+*port* \- Required port of the network endpoint to detach unless
+NEG default port is set.
 .RE
+
+\f5GCE_VM_PRIMARY_IP\fR
+
+.RS 2m
+*ip* \- Required IP address of the network endpoint to attach. The
+IP address must be the primary IP of a VM's primary network
+interface.
 .RE
+
+
 .RE
 .RE
 .sp
-
-
 
 .SH "OPTIONAL FLAGS"
 

@@ -4,8 +4,7 @@ NAME
 SYNOPSIS
     gcloud alpha emulators datastore start
         [--consistency=CONSISTENCY; default=0.9] [--data-dir=DATA_DIR]
-        [--host-port=HOST_PORT] [--legacy] [--no-store-on-disk]
-        [GCLOUD_WIDE_FLAG ...]
+        [--host-port=HOST_PORT] [--no-store-on-disk] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command starts a local datastore emulator.
@@ -35,13 +34,6 @@ FLAGS
             [2001:db8:0:0:0:ff00:42:8329]:8080
 
         The default value is localhost:8081.
-
-     --legacy
-        (DEPRECATED) Set to use the legacy emulator which supports Cloud
-        Datastore API v1beta2.
-
-        This flag is deprecated due to the legacy Datastore emulator no longer
-        being supported. It will be removed in early October 2019.
 
      --store-on-disk
         Whether data should be persisted to disk. Enabled by default, use

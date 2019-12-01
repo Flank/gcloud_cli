@@ -37,6 +37,13 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To delete a Cloud Spanner session, run:
+
+        $ gcloud beta spanner databases sessions delete my-session-id \
+            --instance=my-instance-id
+            --database=my-database-id
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

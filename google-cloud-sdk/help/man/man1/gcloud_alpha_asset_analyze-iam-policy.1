@@ -1,0 +1,157 @@
+
+.TH "GCLOUD_ALPHA_ASSET_ANALYZE\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha asset analyze\-iam\-policy \- analyzes accessible IAM policies that match a request
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha asset analyze\-iam\-policy\fR \fB\-\-organization\fR=\fIORGANIZATION_ID\fR [\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR] [\fB\-\-identity\fR=\fIIDENTITY\fR] [\fB\-\-expand\-groups\fR\ \fB\-\-expand\-resources\fR\ \fB\-\-expand\-roles\fR\ \fB\-\-output\-group\-edges\fR\ \fB\-\-output\-partial\-result\-before\-timeout\fR\ \fB\-\-output\-resource\-edges\fR] [\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]\ \fB\-\-roles\fR=[\fIROLES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Analyzes accessible IAM policies that match a request.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+The organization ID to perform the analysis.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+Specifies a resource for analysis. Leaving it empty means ANY.
+
+.RS 2m
+.TP 2m
+\fB\-\-full\-resource\-name\fR=\fIFULL_RESOURCE_NAME\fR
+The full resource name.
+
+.RE
+.sp
+.TP 2m
+
+Specifies an identity for analysis. Leaving it empty means ANY.
+
+.RS 2m
+.TP 2m
+\fB\-\-identity\fR=\fIIDENTITY\fR
+The identity appearing in the form of members in the IAM policy binding.
+
+.RE
+.sp
+.TP 2m
+
+The analysis options.
+
+.RS 2m
+.TP 2m
+\fB\-\-expand\-groups\fR
+If true, the identities section of the result will expand any Google groups
+appearing in an IAM policy binding. Default is false.
+
+.TP 2m
+\fB\-\-expand\-resources\fR
+If true, the resource section of the result will expand any resource attached to
+an IAM policy to include resources lower in the resource hierarchy. Default is
+false.
+
+.TP 2m
+\fB\-\-expand\-roles\fR
+If true, the access section of result will expand any roles appearing in IAM
+policy bindings to include their permissions. Default is false.
+
+.TP 2m
+\fB\-\-output\-group\-edges\fR
+If true, the result will output group identity edges, starting from the
+binding's group members, to any expanded identities. Default is false.
+
+.TP 2m
+\fB\-\-output\-partial\-result\-before\-timeout\fR
+If true, you will get a response with a partial result instead of a
+DEADLINE_EXCEEDED error when your request processing takes longer than the
+deadline. Default is false.
+
+.TP 2m
+\fB\-\-output\-resource\-edges\fR
+If true, the result will output resource edges, starting from the policy
+attached resource, to any expanded resources. Default is false.
+
+.RE
+.sp
+.TP 2m
+
+Specifies roles or permissions for analysis. Leaving it empty means ANY.
+
+.RS 2m
+.TP 2m
+\fB\-\-permissions\fR=[\fIPERMISSIONS\fR,...]
+The permissions to appear in the result.
+
+.TP 2m
+\fB\-\-roles\fR=[\fIROLES\fR,...]
+The roles to appear in the result.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To find out who has iam.serviceAccounts.actAs permission permission on a
+specified service account, run:
+
+$ gcloud alpha asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
+\-\-full\-resource\-name='//iam.googleapis.com/projects/YOUR_PROJ_ID/serviceAccounts/YOUR_SERVICE_ACCOUNT'
+\-\-permissions='iam.serviceAccounts.actAs'
+\-\-output\-partial\-result\-before\-timeout
+
+To find out which resources a specified user can access, run:
+
+$ gcloud alpha asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
+\-\-identity='user:u1@foo.com' \-\-output\-partial\-result\-before\-timeout
+
+To find out which accesses (roles or permissions) a specified user has on a
+specified project, run:
+
+$ gcloud alpha asset analyze\-iam\-policy \-\-organization=YOUR_ORG_ID
+\-\-full\-resource\-name='//cloudresourcemanager.googleapis.com/projects/YOUR_PROJ_ID'
+\-\-identity='user:u1@foo.com' \-\-output\-partial\-result\-before\-timeout
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

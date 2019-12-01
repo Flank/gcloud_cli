@@ -346,7 +346,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null
@@ -442,7 +442,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2Fother-fake-project%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null
@@ -539,7 +539,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2Fother-fake-project%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null

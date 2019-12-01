@@ -51,6 +51,8 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
                             sdk_test_base.WithFakeAuth):
   """Base class for Serverless surface tests."""
 
+  API_VERSION = 'v1alpha1'
+
   def _ServiceRef(self, name, region=DEFAULT_REGION, project='fake-project'):
     return self._registry.Parse(
         name,
@@ -79,6 +81,12 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         params={'namespacesId': project},
         collection='run.namespaces.triggers')
 
+  def _SourceRef(self, name, plural_kind, project='fake-project'):
+    return self._registry.Parse(
+        name,
+        params={'namespacesId': project},
+        collection='run.namespaces.{}'.format(plural_kind))
+
   def _MockConnectionContext(self, is_gke_context=False):
     self.connection_context = mock.Mock()
     self.connection_context.__enter__ = mock.Mock(return_value=self)
@@ -95,27 +103,6 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
         'GetConnectionContext',
         return_value=self.connection_context)
 
-  def _EventTypeAdditionalProperty(self, name, description, type_):
-    return self.crd_messages.JSONSchemaProps.PropertiesValue.AdditionalProperty(
-        key=name,
-        value=self.crd_messages.JSONSchemaProps(
-            type='object',
-            description=description,
-            properties=self.crd_messages.JSONSchemaProps.PropertiesValue(
-                additionalProperties=[
-                    self.crd_messages.JSONSchemaProps.PropertiesValue
-                    .AdditionalProperty(
-                        key='type',
-                        value=self.crd_messages.JSONSchemaProps(
-                            type='string', pattern=type_)),
-                    self.crd_messages.JSONSchemaProps.PropertiesValue
-                    .AdditionalProperty(
-                        key='schema',
-                        value=self.crd_messages.JSONSchemaProps(
-                            type='string',
-                            pattern='https://somewhere.over.the.rainbow.json'))
-                ])))
-
   def _SpecParameterAdditionalProperty(self, name, var_type, description):
     return self.crd_messages.JSONSchemaProps.PropertiesValue.AdditionalProperty(
         key=name,
@@ -123,17 +110,11 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
             type=var_type, description=description))
 
   def _SourceSchemaProperties(self,
-                              title,
-                              event_types=None,
                               spec_properties=None,
                               required_properties=None):
     """Return the schema for a source CRD.
 
     Args:
-      title: str, name of the source for display purposes, not to be confused
-        with the kind.
-      event_types: list(JSONSchemaProps.PropertiesValue.AdditionalProperty),
-        event types to add to the registry.
       spec_properties: list(JSONSchemaProps.PropertiesValue.AdditionalProperty),
         properties to specify in the schema spec.
       required_properties: list(str) names of spec_properties to mark as
@@ -142,28 +123,12 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
     Returns:
       JSONSchemaProps for the source crd's openAPIV3Schema
     """
-    event_types = [] if event_types is None else event_types
     spec_properties = [] if spec_properties is None else spec_properties
     required_properties = ([] if required_properties is None else
                            required_properties)
     return self.crd_messages.JSONSchemaProps(
         properties=self.crd_messages.JSONSchemaProps.PropertiesValue(
             additionalProperties=[
-                self.crd_messages.JSONSchemaProps.PropertiesValue
-                .AdditionalProperty(
-                    key='registry',
-                    value=self.crd_messages.JSONSchemaProps(
-                        title=title,
-                        properties=self.crd_messages.JSONSchemaProps
-                        .PropertiesValue(additionalProperties=[
-                            self.crd_messages.JSONSchemaProps.PropertiesValue
-                            .AdditionalProperty(
-                                key='eventTypes',
-                                value=self.crd_messages.JSONSchemaProps(
-                                    properties=self.crd_messages.JSONSchemaProps
-                                    .PropertiesValue(
-                                        additionalProperties=event_types)))
-                        ]))),
                 self.crd_messages.JSONSchemaProps.PropertiesValue
                 .AdditionalProperty(
                     key='spec',
@@ -194,8 +159,8 @@ class ServerlessSurfaceBase(cli_test_base.CliTestBase,
 
     self.mock_serverless_client = mock.Mock()
     self.serverless_messages = core_apis.GetMessagesModule(
-        _API_NAME, 'v1alpha1')
-    self.mock_serverless_client._VERSION = 'v1alpha1'  # pylint: disable=protected-access
+        _API_NAME, self.API_VERSION)
+    self.mock_serverless_client._VERSION = self.API_VERSION  # pylint: disable=protected-access
     self.mock_serverless_client.MESSAGES_MODULE = self.serverless_messages
 
     self.mock_crd_client = mock.Mock()
@@ -216,9 +181,10 @@ class ServerlessBase(ServerlessSurfaceBase):
 
   def SetUp(self):
     # Mock ServerlessApiClient
-    self.v1alpha1_client_class = core_apis.GetClientClass(_API_NAME, 'v1alpha1')
+    self.v1alpha1_client_class = core_apis.GetClientClass(
+        _API_NAME, self.API_VERSION)
     self.v1alpha1_real_client = core_apis.GetClientInstance(
-        _API_NAME, 'v1alpha1', no_http=True)
+        _API_NAME, self.API_VERSION, no_http=True)
     self.mock_serverless_client = apitools_mock.Client(
         self.v1alpha1_client_class, self.v1alpha1_real_client)
     self.mock_serverless_client.Mock()
@@ -241,7 +207,7 @@ class ServerlessBase(ServerlessSurfaceBase):
         serverless_operations.ServerlessOperations(
             client=self.mock_serverless_client,
             api_name='run',
-            api_version='v1alpha1',
+            api_version=self.API_VERSION,
             region='us-central1',
             op_client=self.mock_serverless_client))
     self.eventflow_client = (

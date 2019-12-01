@@ -77,9 +77,8 @@ GLOBAL FLAGS
         Disable all interactive prompts when running gcloud commands. If input
         is required, defaults will be used, or an error will be raised.
         Overrides the default core/disable_prompts property value for this
-        command invocation. Must be used at the beginning of commands. This is
-        equivalent to setting the environment variable
-        CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
+        command invocation. This is equivalent to setting the environment
+        variable CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
 
      --verbosity=VERBOSITY; default="warning"
         Override the default verbosity for this command. Overrides the default
@@ -212,7 +211,7 @@ GROUPS
         (ALPHA) Work with Google Firebase.
 
      firestore
-        (ALPHA) Manage your Cloud Firestore imports and exports.
+        (ALPHA) Manage your Cloud Firestore resources.
 
      functions
         (ALPHA) Manage Google Cloud Functions.
@@ -232,11 +231,17 @@ GROUPS
      iap
         (ALPHA) Manage IAP policies.
 
+     identity
+        (ALPHA) Manage Cloud Identity Groups and Memberships resources.
+
      iot
         (ALPHA) Manage Cloud IoT resources.
 
      kms
         (ALPHA) Manage cryptographic keys in the cloud.
+
+     lifesciences
+        (ALPHA) Manage Cloud Life Sciences resources.
 
      local
         (ALPHA) Create and manage a local development environment for Cloud

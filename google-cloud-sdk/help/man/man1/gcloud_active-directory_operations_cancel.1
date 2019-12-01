@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_ACTIVE\-DIRECTORY_OPERATIONS_CANCEL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud active\-directory operations cancel \- cancel a Managed Microsoft AD operation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud active\-directory operations cancel\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Cancel a Managed Microsoft AD operation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Operation resource \- The operation name to cancel. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the argument
+[NAME] on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+ID of the operation or fully qualified identifier for the operation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command cancels an operation called
+\f5operation\-1484002552235\-425b144f8c3f8\-81aa4b49\-0830d1e9\fR:
+
+.RS 2m
+$ gcloud active\-directory operations cancel \e
+    operation\-1484002552235\-425b144f8c3f8\-81aa4b49\-0830d1e9
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha active\-directory operations cancel
+$ gcloud beta active\-directory operations cancel
+.RE
+

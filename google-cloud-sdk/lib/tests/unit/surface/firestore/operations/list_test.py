@@ -19,12 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import operations
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.firestore import base
 
 
-class ListTest(base.FirestoreCommandUnitTest):
-  """Tests the datastore operations list command."""
+class ListTestGA(base.FirestoreCommandUnitTest):
+  """Tests the GA firestore operations list command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testList(self):
     request = self.GetMockListRequest()
@@ -79,6 +83,20 @@ class ListTest(base.FirestoreCommandUnitTest):
         name='projects/%s/databases/(default)' % (self.Project()),
         pageSize=page_size,
         pageToken=page_token)
+
+
+class ListTestBeta(ListTestGA):
+  """Tests the beta firestore operations list command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListTestAlpha(ListTestBeta):
+  """Tests the alpha firestore operations list command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -123,7 +123,8 @@ Post\-patch step settings for Windows machines:
 \fB\-\-post\-patch\-windows\-executable\fR=\fIPOST_PATCH_WINDOWS_EXECUTABLE\fR
 A set of commands to run on a Windows machine after an OS patch completes.
 Commands must be supplied in a file. If the file contains a PowerShell script,
-include the .ps1 file extension.
+include the .ps1 file extension. The PowerShell script executes with flags
+\f5\-NonInteractive\fR, \f5\-NoProfile\fR, and \f5\-ExecutionPolicy Bypass\fR.
 
 The path to the file must be supplied in one of the following formats:
 
@@ -171,7 +172,8 @@ Pre\-patch step settings for Windows machines:
 \fB\-\-pre\-patch\-windows\-executable\fR=\fIPRE_PATCH_WINDOWS_EXECUTABLE\fR
 A set of commands to run on a Windows machine before an OS patch begins.
 Commands must be supplied in a file. If the file contains a PowerShell script,
-include the .ps1 file extension.
+include the .ps1 file extension. The PowerShell script executes with flags
+\f5\-NonInteractive\fR, \f5\-NoProfile\fR, and \f5\-ExecutionPolicy Bypass\fR.
 
 The path to the file must be supplied in one of the following formats:
 

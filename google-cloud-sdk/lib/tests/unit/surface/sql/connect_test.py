@@ -692,6 +692,65 @@ class PsqlConnectAlphaTest(_BasePsqlConnectBetaTest, base.SqlMockTestAlpha):
   pass
 
 
+class MssqlCliConnectGATest(_BaseConnectTest, base.SqlMockTestGA):
+  base_args_length = 5
+  instance = {
+      'id': 'sqlserver-instance',
+      'tier': 'db-custom-1-1024',
+      'databaseVersion': 'SQLSERVER_2017_STANDARD',
+      'backendType': 'SECOND_GEN'
+  }
+
+  def RunMssqlCliConnectTest(self, database=None):
+    self.MockConnectionSetup()
+
+    mocked_mssqlcli_path = 'mssql-cli'
+    self.StartPatch(
+        'googlecloudsdk.core.util.files.FindExecutableOnPath',
+        return_value=mocked_mssqlcli_path)
+
+    # Mock the actual execution of mssqlcli and assert it's called at the end.
+    exec_patched = self.StartPatch(
+        'googlecloudsdk.core.execution_utils.Exec', return_value=True)
+    cmd = 'sql connect {0}'.format(self.instance['id'])
+    if database:
+      cmd += ' --database={0}'.format(database)
+    self.Run(cmd)
+    self.AssertErrContains('Connecting to database with SQL user [sqlserver]')
+
+    self.assertTrue(exec_patched.called)
+
+    # call_args[0] is the ordered list of args the mock is called with.
+    # Exec is called with exactly one arg, the list of subprocess args, so
+    # call_args[0][0] gives us subprocess_args.
+    exec_ordered_arguments = exec_patched.call_args[0]
+    subprocess_args = exec_ordered_arguments[0]
+    self.AssertMssqlCliArgsAreCorrect(subprocess_args, mocked_mssqlcli_path)
+
+  def MockConnectionSetup(self):
+    self.MockIPWhitelisting()
+
+  def AssertMssqlCliArgsAreCorrect(self, subprocess_args, mocked_mssqlcli_path):
+    base_args_length = 5
+    (actual_mssqlcli_path, actual_host_flag, actual_ip_address,
+     actual_user_flag, actual_username) = subprocess_args[:base_args_length]
+    self.assertEqual(mocked_mssqlcli_path, actual_mssqlcli_path)
+    self.assertEqual('-S', actual_host_flag)
+    # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
+    self.assertIn('.', actual_ip_address)
+    self.assertEqual('-U', actual_user_flag)
+    self.assertEqual('sqlserver', actual_username)
+
+    # Check for additional args.
+    if len(subprocess_args) > base_args_length:
+      (actual_db_flag, actual_db) = subprocess_args[base_args_length:]
+      self.assertEqual('-d', actual_db_flag)
+      self.assertEqual('somedb', actual_db)
+
+  def testMssqlCliConnect(self):
+    self.RunMssqlCliConnectTest()
+
+
 class MssqlCliConnectBetaTest(_BaseConnectTest, base.SqlMockTestBeta):
   instance = {
       'id': 'mssql-instance',
@@ -730,17 +789,15 @@ class MssqlCliConnectBetaTest(_BaseConnectTest, base.SqlMockTestBeta):
     self.MockProxyStartAndInstanceGet()
 
   def AssertMssqlCliArgsAreCorrect(self, subprocess_args, mocked_mssqlcli_path):
-    base_args_length = 6
+    base_args_length = 5
     (actual_mssqlcli_path, actual_host_flag, actual_ip_address,
-     actual_user_flag, actual_username,
-     actual_pass_flag) = subprocess_args[:base_args_length]
+     actual_user_flag, actual_username) = subprocess_args[:base_args_length]
     self.assertEqual(mocked_mssqlcli_path, actual_mssqlcli_path)
     self.assertEqual('-S', actual_host_flag)
     # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
     self.assertIn('.', actual_ip_address)
     self.assertEqual('-U', actual_user_flag)
     self.assertEqual('sqlserver', actual_username)
-    self.assertEqual('-P', actual_pass_flag)
 
     # Check for additional args.
     if len(subprocess_args) > base_args_length:

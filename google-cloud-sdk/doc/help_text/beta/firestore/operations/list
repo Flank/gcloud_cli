@@ -50,9 +50,19 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To retrieve information about recent operations, run:
 
+        $ gcloud beta firestore operations list
+
+    To only list operations that are done, run:
+
+        $ gcloud beta firestore operations list --filter="done:true"
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud firestore operations list
         $ gcloud alpha firestore operations list
 

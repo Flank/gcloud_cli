@@ -34,7 +34,7 @@ COMMANDS
         (BETA) List network endpoints in a network endpoint group.
 
      update
-        (BETA) Updates a Google Compute Engine network endpoint group.
+        (BETA) Update a Google Compute Engine network endpoint group.
 
 NOTES
     This command is currently in BETA and may change without notice. These

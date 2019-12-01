@@ -18,28 +18,7 @@ gcloud beta compute images add\-labels \- add labels to Google Compute Engine im
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute images add\-labels\fR adds labels to a
-Google Compute Engine image. For example, running:
-
-.RS 2m
-$ gcloud beta compute images add\-labels example\-image \e
-    \-\-labels=k0=v0,k1=v1
-.RE
-
-will add key\-value pairs \f5\fIk0\fR\fR=\f5\fIv0\fR\fR and
-\f5\fIk1\fR\fR=\f5\fIv1\fR\fR to 'example\-image'.
-
-Labels can be used to identify the image and to filter them as in
-
-.RS 2m
-$ gcloud beta compute images list \-\-filter='labels.k1:value2'
-.RE
-
-To list existing labels
-
-.RS 2m
-$ gcloud beta compute images describe example\-image \e
-    \-\-format='default(labels)'
-.RE
+Google Compute Engine image.
 
 
 
@@ -72,6 +51,32 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add key\-value pairs \f5\fIk0\fR\fR=\f5\fIv0\fR\fR and
+\f5\fIk1\fR\fR=\f5\fIv1\fR\fR to 'example\-image'
+
+.RS 2m
+$ gcloud beta compute images add\-labels example\-image \e
+    \-\-labels=k0=v0,k1=v1
+.RE
+
+Labels can be used to identify the image and to filter them. To find a image
+labeled with key\-value pair \f5\fIk1\fR\fR, \f5\fIv2\fR\fR
+
+.RS 2m
+$ gcloud beta compute images list \-\-filter='labels.k1:v2'
+.RE
+
+To list only the labels when describing a resource, use \-\-format
+
+.RS 2m
+$ gcloud beta compute images describe example\-image \e
+    \-\-format='default(labels)'
+.RE
 
 
 

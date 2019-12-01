@@ -3,17 +3,10 @@ NAME
         operations
 
 SYNOPSIS
-    gcloud dataproc operations COMMAND [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+    gcloud dataproc operations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     View and manage Google Cloud Dataproc operations.
-
-FLAGS
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. Overrides the default
-        dataproc/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

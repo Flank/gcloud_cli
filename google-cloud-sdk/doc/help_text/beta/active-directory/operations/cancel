@@ -34,8 +34,9 @@ EXAMPLES
             operation-1484002552235-425b144f8c3f8-81aa4b49-0830d1e9
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud active-directory operations cancel
         $ gcloud alpha active-directory operations cancel
 

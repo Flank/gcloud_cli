@@ -62,6 +62,15 @@ API REFERENCE
     This command uses the cloudiot/v1 API. The full documentation for this API
     can be found at: https://cloud.google.com/iot
 
+EXAMPLES
+    To remove the association between 'my-device' and 'my-gateway' in region
+    'us-central1', run:
+
+        $ gcloud beta iot devices gateways unbind --device=my-device \
+            --device-region=us-central1 --device-registry=my-registry \
+            --gateway=my-gateway --gateway-region=us-central1 \
+            --gateway-registry=my-registry
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

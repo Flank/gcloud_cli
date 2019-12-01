@@ -56,7 +56,8 @@ REQUIRED FLAGS
               The location of the CryptoKeyVersion.
 
            --keyversion-project=KEYVERSION_PROJECT
-              The Cloud project for the CryptoKeyVersion.
+              Project ID of the Google Cloud Platform project for the
+              CryptoKeyVersion.
 
        PKIX key definition
 

@@ -1089,19 +1089,24 @@ class TimeStampTest(ConceptParseViewBase):
         max_endpoint=concepts.Endpoint('xyz', closed=False),
         exception=exceptions.ConstraintError,
         exception_regex=(r'Invalid max endpoint \[xyz\] for \[--timestamp\]. '
-                         r'Failed to parse duration \[xyz\]: Unknown string '
-                         'format.')),
+                         r'Failed to parse duration \[xyz\]: '
+                         r"\(u?'Unknown string format:', u?'xyz'\).")),
       T('Required', None, None, None,
         exception=exceptions.MissingRequiredArgumentError,
         exception_regex=r'hinthinthint'),
       T('InvalidFromArg', 'xyz', None, None,
         exception=exceptions.ParseError,
-        exception_regex=(r'Failed to parse \[--timestamp\]. Failed to parse '
-                         r'duration \[xyz\]: Unknown string format.')),
-      T('InvalidFromFallthrough', None, 'xyz', None,
+        exception_regex=(
+            r'Failed to parse \[--timestamp\]. Failed to parse '
+            r"duration \[xyz\]: \(u?'Unknown string format:', u?'xyz'\).")),
+      T('InvalidFromFallthrough',
+        None,
+        'xyz',
+        None,
         exception=exceptions.ParseError,
-        exception_regex=(r'Failed to parse \[--timestamp\]. Failed to parse '
-                         r'duration \[xyz\]: Unknown string format.')),
+        exception_regex=(
+            r'Failed to parse \[--timestamp\]. Failed to parse '
+            r"duration \[xyz\]: \(u?'Unknown string format:', u?'xyz'\).")),
   )
   def testTimeStampParse(self, arg_fallthrough_value, fallthrough_value,
                          expected_result, kwargs=None):

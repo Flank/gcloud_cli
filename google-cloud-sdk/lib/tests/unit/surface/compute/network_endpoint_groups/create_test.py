@@ -211,8 +211,9 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
   def testCreateGlobal_GceVmIpPortType_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
-        r'Invalid value for \[--network-endpoint-type\]: GCE_VM_IP_PORT '
-        r'network endpoint type not supported for global NEGs.'):
+        r'Invalid value for \[--network-endpoint-type\]: Global NEGs only '
+        r'support network endpoint types of internet-ip-port or '
+        r'internet-fqdn-port.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --global
         --network-endpoint-type GCE_VM_IP_PORT
@@ -221,8 +222,9 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
   def testCreateZonal_InternetIpPortType_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
-        r'Invalid value for \[--network-endpoint-type\]: Internet '
-        r'network endpoint types not supported for zonal NEGs.'):
+        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
+        r'support network endpoint types of gce-vm-ip-port or '
+        r'non-gcp-private-ip-port.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_IP_PORT
@@ -231,8 +233,9 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
   def testCreateZonal_InternetFqdnPortType_fails(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
-        r'Invalid value for \[--network-endpoint-type\]: Internet '
-        r'network endpoint types not supported for zonal NEGs.'):
+        r'Invalid value for \[--network-endpoint-type\]: Zonal NEGs only '
+        r'support network endpoint types of gce-vm-ip-port or '
+        r'non-gcp-private-ip-port.'):
       self.Run("""
       compute network-endpoint-groups create my-neg1 --zone {0}
         --network-endpoint-type INTERNET_FQDN_PORT
@@ -248,6 +251,42 @@ class AlphaNetworkEndpointGroupsCreateTest(NetworkEndpointGroupsCreateTest):
         --network-endpoint-type INTERNET_IP_PORT
         --network default
       """)
+
+  def testCreateZonal_NonGcpPrivateIpPortType_AllOptions(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-hybrid-neg',
+        network='my-network',
+        default_port=8888,
+        region=self.region,
+        network_endpoint_type=self.endpoint_type_enum.NON_GCP_PRIVATE_IP_PORT)
+    request = self._ExpectCreate(network_endpoint_group, zone=self.zone)
+
+    result = self.Run('compute network-endpoint-groups create my-hybrid-neg '
+                      '--network-endpoint-type NON_GCP_PRIVATE_IP_PORT '
+                      '--network my-network --default-port 8888 --zone ' +
+                      self.zone)
+
+    self.CheckRequests([(self.compute.networkEndpointGroups, 'Insert', request)
+                       ])
+    self.assertEqual(result, network_endpoint_group)
+
+  def testCreateZonal_GceVmPrimaryIpType_AllOptions(self):
+    network_endpoint_group = self._CreateNetworkEndpointGroup(
+        name='my-l4ilb-neg',
+        network='my-network',
+        subnetwork='my-subnet',
+        region=self.region,
+        network_endpoint_type=self.endpoint_type_enum.GCE_VM_PRIMARY_IP)
+    request = self._ExpectCreate(network_endpoint_group, zone=self.zone)
+
+    result = self.Run('compute network-endpoint-groups create my-l4ilb-neg '
+                      '--network-endpoint-type GCE_VM_PRIMARY_IP '
+                      '--network my-network --subnet my-subnet --zone ' +
+                      self.zone)
+
+    self.CheckRequests([(self.compute.networkEndpointGroups, 'Insert', request)
+                       ])
+    self.assertEqual(result, network_endpoint_group)
 
 
 if __name__ == '__main__':

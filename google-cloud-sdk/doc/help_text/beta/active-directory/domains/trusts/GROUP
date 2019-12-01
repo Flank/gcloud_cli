@@ -33,8 +33,9 @@ COMMANDS
         (BETA) Validate the state of a Managed Microsoft AD trust.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud active-directory domains trusts
         $ gcloud alpha active-directory domains trusts
 

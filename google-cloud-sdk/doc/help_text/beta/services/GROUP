@@ -18,6 +18,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     identity
+        (BETA) Manage service identity.
+
      operations
         (BETA) Manage Operation for various services.
 

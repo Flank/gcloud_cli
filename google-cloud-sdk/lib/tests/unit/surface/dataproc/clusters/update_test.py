@@ -450,7 +450,7 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
   # equivalent client-side behavior.
   def testUpdateCluster_enableAutoscaling_onlyId(self):
     specified_policy = 'cool-policy'
-    expected_policy_uri = 'projects/fake-project/regions/global/autoscalingPolicies/cool-policy'
+    expected_policy_uri = 'projects/fake-project/regions/antarctica-north42/autoscalingPolicies/cool-policy'
 
     cluster = self.messages.Cluster(
         clusterName=self.CLUSTER_NAME,

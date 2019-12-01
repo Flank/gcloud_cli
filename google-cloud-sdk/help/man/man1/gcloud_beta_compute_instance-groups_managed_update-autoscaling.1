@@ -1,0 +1,149 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCE\-GROUPS_MANAGED_UPDATE\-AUTOSCALING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instance\-groups managed update\-autoscaling \- update autoscaling parameters of a managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instance\-groups managed update\-autoscaling\fR \fINAME\fR [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute instance\-groups managed
+update\-autoscaling\fR updates autoscaling parameters of specified managed
+instance group.
+
+Autoscalers can use one or more policies listed below. Information on using
+multiple policies can be found here:
+https://cloud.google.com/compute/docs/autoscaler/multiple\-policies
+
+In contrast to \fBgcloud beta compute instance\-groups managed
+set\-autoscaling\fR, this command \fBonly\fR updates specified fields. For
+instance:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed update\-autoscaling \e
+  \-\-mode only\-up
+.RE
+
+would change the \fBmode\fR field of the autoscaler policy, but leave the rest
+of the settings intact.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-mode\fR=\fIMODE\fR
+Set the mode of an autoscaler for a managed instance group.
+
+You can turn off or restrict MIG autoscaler activities (scaling up, scaling
+down) without changing autoscaler configuration and then having to restore it
+later. Autoscaler configuration persists while the activities are turned off or
+restricted, and the activities pick it up when they are turned on again or when
+the restrictions are lifted.
+
+\fIMODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+to turn off autoscaling, while keeping the new configuration.
+.TP 2m
+\fBon\fR
+to permit autoscaling to scale up and down (default for new autoscalers).
+.TP 2m
+\fBonly\-up\fR
+to permit autoscaling to scale only up and not down.
+.RE
+.sp
+
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to operate on. If not specified, you may be
+prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to operate on. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update an existing instance group:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed update\-autoscaling \e
+  \-\-mode=only\-up
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed update\-autoscaling
+.RE
+

@@ -31,7 +31,7 @@ explicitly enable ssh access by adding a firewall\-rule:
 
 .RS 2m
 $ gcloud compute firewall\-rules create \-\-network=NETWORK           \e
-      default\-allow\-ssh \-\-allow tcp:22
+      default\-allow\-ssh \-\-allow=tcp:22
 .RE
 
 gcloud compute ssh ensures that the user's public SSH key is present in the
@@ -63,7 +63,7 @@ The '\-\-' argument must be specified between gcloud specific args on the left
 and SSH_ARGS on the right. Example:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a \-\- \-vvv \e
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a \-\- \-vvv \e
 \-L 80:%INSTANCE%:80
 .RE
 
@@ -115,7 +115,7 @@ occurences of \f5\fI%USER%\fR\fR and \f5\fI%INSTANCE%\fR\fR with their
 dereferenced values. Example:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a \e
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a \e
     \-\-ssh\-flag="\-vvv" \-\-ssh\-flag="\-L 80:%INSTANCE%:80"
 .RE
 
@@ -227,38 +227,38 @@ help\fR for details.
 To SSH into 'example\-instance' in zone \f5\fIus\-central1\-a\fR\fR, run:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a
 .RE
 
 You can also run a command on the virtual machine. For example, to get a
 snapshot of the guest's process tree, run:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a \e
-    \-\-command "ps \-ejH"
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a \e
+    \-\-command="ps \-ejH"
 .RE
 
 If you are using the Google Container\-Optimized virtual machine image, you can
 SSH into one of your containers with:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a \e
-    \-\-container CONTAINER
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a \e
+    \-\-container=CONTAINER
 .RE
 
 You can limit the allowed time to ssh. For example, to allow a key to be used
 through 2019:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a \e
-    \-\-ssh\-key\-expiration "2020\-01\-01T00:00:00:00Z"
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a \e
+    \-\-ssh\-key\-expiration="2020\-01\-01T00:00:00:00Z"
 .RE
 
 Or alternatively, allow access for the next two minutes:
 
 .RS 2m
-$ gcloud compute ssh example\-instance \-\-zone us\-central1\-a \e
-    \-\-ssh\-key\-expire\-after 2m
+$ gcloud compute ssh example\-instance \-\-zone=us\-central1\-a \e
+    \-\-ssh\-key\-expire\-after=2m
 .RE
 
 

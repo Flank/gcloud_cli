@@ -1,0 +1,1257 @@
+title: gcloud compute packet mirroring test
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute networks create $$network$$ --subnet-mode custom --format "text(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+  - stdout: |
+      ---
+      name: $$network$$
+- execute:
+  - command: |
+      compute networks subnets create $$subnet$$ --network $$network$$ --region $$region$$
+      --range 10.2.0.0/16 --format "text(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$].
+  - stdout: |
+      ---
+      name: $$subnet$$
+- execute:
+  - command: |
+      compute health-checks create http $$health-check$$ --region $$region$$ --port 80
+      --format "text(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$].
+  - stdout: |
+      ---
+      name: $$health-check$$
+- execute:
+  - command: |
+      compute backend-services create $$backend-service$$ --region $$region$$
+      --load-balancing-scheme internal --health-checks $$health-check$$
+      --health-checks-region $$region$$ --format "text(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$].
+  - stdout: |
+      ---
+      name: $$backend-service$$
+- execute:
+  - command: |
+      compute forwarding-rules create $$forwarding-rule-name$$ --region $$region$$
+      --load-balancing-scheme internal --backend-service $$backend-service$$ --ports
+      80 --network $$network$$ --subnet $$subnet$$ --is-mirroring-collector --format
+      "text(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$].
+  - stdout: |
+      ---
+      name: $$forwarding-rule-name$$
+- execute:
+  - command: |
+      compute packet-mirrorings create $$packet-mirroring$$ --network $$network$$
+      --region $$region$$ --mirrored-tags t1,t2 --mirrored-subnets $$subnet$$ --collector-ilb
+      $$forwarding-rule-name$$ --format "text(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$].
+  - stdout: |
+      ---
+      name: $$packet-mirroring$$
+- execute:
+  - command: |
+      compute packet-mirrorings list --format "table[no-heading](name,region)"
+      --filter "name:$$packet-mirroring$$"
+  - stdout: |
+      $$packet-mirroring$$  $$region$$
+- execute:
+  - command: |
+      compute packet-mirrorings describe $$packet-mirroring$$ --region $$region$$
+      --format "text(enable,name)"
+  - stdout: |
+      ---
+      enable: TRUE
+      name:   $$packet-mirroring$$
+- execute:
+  - command: |
+      compute packet-mirrorings update $$packet-mirroring$$ --region $$region$$
+      --priority 900 --add-mirrored-tags t3 --clear-mirrored-subnets --no-enable
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$].
+- execute:
+  - command: |
+      compute packet-mirrorings describe $$packet-mirroring$$ --region $$region$$
+      --format text("name,priority,mirroredResources)"
+  - stdout: |
+      ---
+      mirroredResources.tags[0]: t1
+      mirroredResources.tags[1]: t2
+      mirroredResources.tags[2]: t3
+      name:                      $$packet-mirroring$$
+      priority:                  900
+- execute:
+  - command: |
+      compute packet-mirrorings delete $$packet-mirroring$$ --region $$region$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$].
+- execute:
+  - command: |
+      compute forwarding-rules delete $$forwarding-rule-name$$ --region $$region$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$].
+- execute:
+  - command: |
+      compute backend-services delete $$backend-service$$ --region $$region$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$].
+- execute:
+  - command: |
+      compute health-checks delete $$health-check$$ --region $$region$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$].
+- execute:
+  - command: |
+      compute networks subnets delete $$subnet$$ --region $$region$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$].
+- execute:
+  - command: compute networks delete $$network$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+actions:
+- define_reference:
+    reference: region
+    value: us-central1
+- generate_resource_id:
+    reference: network
+    prefix: packet-mirrorings-test-network
+- generate_resource_id:
+    reference: subnet
+    prefix: packet-mirrorings-test-subnet
+- generate_resource_id:
+    reference: health-check
+    prefix: packet-mirrorings-test-health-check
+- generate_resource_id:
+    reference: backend-service
+    prefix: packet-mirrorings-test-backend-service
+- generate_resource_id:
+    reference: forwarding-rule-name
+    prefix: packet-mirrorings-test-forwarding-rule
+- generate_resource_id:
+    reference: packet-mirroring
+    prefix: packet-mirrorings-test-pm
+
+- execute_command:
+    command: compute networks create $$network$$ --subnet-mode custom --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              autoCreateSubnetworks: false
+              name: $$network$$
+              routingConfig:
+                routingMode: REGIONAL
+        expect_response:
+          extract_references:
+          - field: targetId
+            reference: target-network-id
+          body:
+            json: {}
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '2021752077496691642'
+            name: operation-1572115796498-595d4bb9899ca-61b46123-358aceb6
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+            targetId: '4855904140319599546'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:49:57.541-07:00'
+            startTime: '2019-10-26T11:49:57.554-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1572115796498-595d4bb9899ca-61b46123-358aceb6
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/2021752077496691642
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: JhCZm9ByILyxaU7roPrKc1SsZJE=/1WbdIPLjh-l2D5xAQrM2FfkI63Y=
+            status: '200'
+          body:
+            id: 4855904140319599546
+            creationTimestamp: '2019-10-26T11:49:57.500-07:00'
+            name: $$network$$
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+            autoCreateSubnetworks: false
+            routingConfig:
+              routingMode: REGIONAL
+            kind: compute#network
+    - expect_stdout: |
+        ---
+        name: $$network$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks subnets create $$subnet$$ --network $$network$$ --region $$region$$
+      --range 10.2.0.0/16 --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              ipCidrRange: 10.2.0.0/16
+              name: $$subnet$$
+              network: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              privateIpGoogleAccess: false
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '3297951019083312001'
+            name: operation-1572115821430-595d4bd150589-247e013e-c9d0b4ed
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+            targetId: '7284113387726384001'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:50:22.749-07:00'
+            startTime: '2019-10-26T11:50:22.766-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115821430-595d4bd150589-247e013e-c9d0b4ed
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/3297951019083312001
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: 7uYSEwQTn0bBcnhniZ2qBNSRiCM=/GO01ZOGhqqMMa2kfj2fF-k3lccU=
+            status: '200'
+          body:
+            id: '7284113387726384001'
+            creationTimestamp: '2019-10-26T11:50:22.726-07:00'
+            name: $$subnet$$
+            network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+            ipCidrRange: 10.2.0.0/16
+            gatewayAddress: 10.2.0.1
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/7284113387726384001
+            privateIpGoogleAccess: false
+            fingerprint: N8xFrZWIL0o=
+            allowSubnetCidrRoutesOverlap: false
+            privateIpv6GoogleAccess: DISABLE_GOOGLE_ACCESS
+            enablePrivateV6Access: false
+            purpose: PRIVATE
+            kind: compute#subnetwork
+    - expect_stdout: |
+        ---
+        name: $$subnet$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute health-checks create http $$health-check$$ --region $$region$$ --port 80
+      --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              checkIntervalSec: 5
+              healthyThreshold: 2
+              httpHealthCheck:
+                port: 80
+                portSpecification: USE_FIXED_PORT
+                proxyHeader: NONE
+                requestPath: /
+              name: $$health-check$$
+              timeoutSec: 5
+              type: HTTP
+              unhealthyThreshold: 2
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '6365805180333140840'
+            name: operation-1572115846249-595d4be8fbdaf-bb5e767f-289ca2a2
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$
+            targetId: '5040912231711714152'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:50:47.325-07:00'
+            startTime: '2019-10-26T11:50:47.343-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115846249-595d4be8fbdaf-bb5e767f-289ca2a2
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/6365805180333140840
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: n3tMbRm8msvBzqMucEin0-CdDWE=/Lz2-Rb2gARPh8mwhn3Ry8-yJcio=
+            status: '200'
+          body:
+            id: '5040912231711714152'
+            creationTimestamp: '2019-10-26T11:50:47.304-07:00'
+            name: $$health-check$$
+            checkIntervalSec: 5
+            timeoutSec: 5
+            unhealthyThreshold: 2
+            healthyThreshold: 2
+            type: HTTP
+            httpHealthCheck:
+              port: 80
+              portSpecification: USE_FIXED_PORT
+              requestPath: /
+              proxyHeader: NONE
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/5040912231711714152
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#healthCheck
+    - expect_stdout: |
+        ---
+        name: $$health-check$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute backend-services create $$backend-service$$ --region $$region$$
+      --load-balancing-scheme internal --health-checks $$health-check$$
+      --health-checks-region $$region$$ --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              healthChecks:
+              - https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$
+              loadBalancingScheme: INTERNAL
+              name: $$backend-service$$
+              protocol: TCP
+              timeoutSec: 30
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '3611152747410828132'
+            name: operation-1572115850179-595d4becbb2ca-aeb71039-c436cf09
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$
+            targetId: '864736837696564068'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:50:51.444-07:00'
+            startTime: '2019-10-26T11:50:51.458-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115850179-595d4becbb2ca-aeb71039-c436cf09
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/3611152747410828132
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: RqG_1BMfEbArn_6WoQtxmYQ_Mh8=/8x2DOKt7E6cgRuH0Ctqsi8lwLFQ=
+            status: '200'
+          body:
+            id: '864736837696564068'
+            creationTimestamp: '2019-10-26T11:50:51.423-07:00'
+            name: $$backend-service$$
+            description: ''
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/864736837696564068
+            healthChecks:
+            - https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$
+            timeoutSec: 30
+            protocol: TCP
+            fingerprint: RJkuEMwQmaU=
+            sessionAffinity: NONE
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            loadBalancingScheme: INTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+            kind: compute#backendService
+    - expect_stdout: |
+        ---
+        name: $$backend-service$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute forwarding-rules create $$forwarding-rule-name$$ --region $$region$$
+      --load-balancing-scheme internal --backend-service $$backend-service$$ --ports
+      80 --network $$network$$ --subnet $$subnet$$ --is-mirroring-collector --format
+      "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              backendService: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$
+              isMirroringCollector: true
+              loadBalancingScheme: INTERNAL
+              name: $$forwarding-rule-name$$
+              network: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              ports:
+              - '80'
+              subnetwork: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+        expect_response:
+          body:
+            json: {}
+          extract_references:
+          - field: targetId
+            reference: forwarding-rule-target-id
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '5248709608554965886'
+            name: operation-1572115856525-595d4bf2c8879-f1b46ae1-fbc5efae
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+            targetId: '9125986030734355326'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:50:57.844-07:00'
+            startTime: '2019-10-26T11:50:57.852-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115856525-595d4bf2c8879-f1b46ae1-fbc5efae
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/5248709608554965886
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: y-_xVTGrUMtqvxoIgwC_LO0LzOA=/8ha_OjTI00u1sSPiV3xo5AsnqhI=
+            status: '200'
+          body:
+            id: '9125986030734355326'
+            creationTimestamp: '2019-10-26T11:50:57.831-07:00'
+            name: $$forwarding-rule-name$$
+            description: ''
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            IPAddress: 10.2.0.2
+            IPProtocol: TCP
+            ports:
+            - '80'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+            loadBalancingScheme: INTERNAL
+            subnetwork: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+            network: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+            backendService: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$
+            networkTier: PREMIUM
+            labelFingerprint: 42WmSpB8rSM=
+            fingerprint: S10qV7zIyZk=
+            isMirroringCollector: true
+            kind: compute#forwardingRule
+    - expect_stdout: |
+        ---
+        name: $$forwarding-rule-name$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute packet-mirrorings create $$packet-mirroring$$ --network $$network$$
+      --region $$region$$ --mirrored-tags t1,t2 --mirrored-subnets $$subnet$$ --collector-ilb
+      $$forwarding-rule-name$$ --format "text(name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              collectorIlb:
+                url: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              enable: 'TRUE'
+              filter: {}
+              mirroredResources:
+                subnetworks:
+                - url: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+                tags:
+                - t1
+                - t2
+              name: $$packet-mirroring$$
+              network:
+                url: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+        expect_response:
+          extract_references:
+          - field: targetId
+            reference: pm-target-id
+          body:
+            json: {}
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '8967395840798305136'
+            name: operation-1572115870512-595d4c001f389-ebbc7ed7-215516c6
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            targetId: '4385382475813694320'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:51:11.734-07:00'
+            startTime: '2019-10-26T11:51:11.790-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115870512-595d4c001f389-ebbc7ed7-215516c6
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/8967395840798305136
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        expect_response:
+          body:
+            json: {}
+          extract_references:
+          - field: creationTimestamp
+            reference: pm-create-timestamp
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: Gs8bu0pfsBZrbbMNKc5mb96ZuJA=/DzLot-ZrAcorblFkQO-G8VFbIDE=
+            status: '200'
+          body:
+            id: '4385382475813694320'
+            creationTimestamp: '2019-10-26T11:51:11.714-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/4385382475813694320
+            name: $$packet-mirroring$$
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            network:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+            priority: 1000
+            collectorIlb:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+            mirroredResources:
+              subnetworks:
+              - url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+                canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/7284113387726384001
+              tags:
+              - t1
+              - t2
+            filter: {}
+            enable: 'TRUE'
+            kind: compute#packetMirroring
+    - expect_stdout: |
+        ---
+        name: $$packet-mirroring$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute packet-mirrorings list --format "table[no-heading](name,region)"
+      --filter "name:$$packet-mirroring$$"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/aggregated/packetMirrorings?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: eUg6ps1pkssfGoGWkn7ekwFWYC0=/4d5OXvCmK_bavtVtZghkOQozGYo=
+            status: '200'
+          body:
+            id: projects/cloud-sdk-integration-testing/aggregated/packetMirrorings
+            items:
+              regions/us-central1:
+                packetMirrorings:
+                - id: '4385382475813694320'
+                  creationTimestamp: '2019-10-26T11:51:11.714-07:00'
+                  selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+                  selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/4385382475813694320
+                  name: $$packet-mirroring$$
+                  region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+                  network:
+                    url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+                    canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+                  priority: 1000
+                  collectorIlb:
+                    url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+                    canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+                  mirroredResources:
+                    subnetworks:
+                    - url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+                      canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/7284113387726384001
+                    tags:
+                    - t1
+                    - t2
+                  filter: {}
+                  enable: 'TRUE'
+                  kind: compute#packetMirroring
+              regions/europe-west1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west1
+              regions/us-west1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-west1' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-west1
+              regions/asia-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-east1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-east1
+              regions/us-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east1' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east1
+              regions/us-east2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east2' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east2
+              regions/asia-northeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-northeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-northeast1
+              regions/asia-southeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-southeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-southeast1
+              regions/us-east4:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east4' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east4
+              regions/australia-southeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/australia-southeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/australia-southeast1
+              regions/europe-west2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west2' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west2
+              regions/europe-west3:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west3' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west3
+              regions/southamerica-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/southamerica-east1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/southamerica-east1
+              regions/asia-south1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-south1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-south1
+              regions/northamerica-northeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/northamerica-northeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/northamerica-northeast1
+              regions/europe-west4:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west4' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west4
+              regions/europe-north1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-north1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-north1
+              regions/us-west2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-west2' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-west2
+              regions/asia-east2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-east2' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-east2
+              regions/europe-west6:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west6' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west6
+              regions/asia-northeast2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-northeast2'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-northeast2
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/aggregated/packetMirrorings
+            kind: compute#packetMirroringAggregatedList
+    - expect_stdout: |
+        $$packet-mirroring$$  $$region$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute packet-mirrorings describe $$packet-mirroring$$ --region $$region$$
+      --format "text(enable,name)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: VH9d8C-cYZe_4xQK9nOjd9nWZ8A=/2VAH-hKwv9NYLQv-HzonPK7QxjI=
+            status: '200'
+          body:
+            id: '4385382475813694320'
+            creationTimestamp: '2019-10-26T11:51:11.714-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/4385382475813694320
+            name: $$packet-mirroring$$
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            network:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+            priority: 1000
+            collectorIlb:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+            mirroredResources:
+              subnetworks:
+              - url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+                canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/7284113387726384001
+              tags:
+              - t1
+              - t2
+            filter: {}
+            enable: 'TRUE'
+            kind: compute#packetMirroring
+    - expect_stdout: |
+        ---
+        enable: TRUE
+        name:   $$packet-mirroring$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute packet-mirrorings update $$packet-mirroring$$ --region $$region$$
+      --priority 900 --add-mirrored-tags t3 --clear-mirrored-subnets --no-enable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: JyZkX5oEwZdOYeoWgLxXFDxupWc=/BCAYXemQk8AET_SFFb3rKiS2qlQ=
+            status: '200'
+          body:
+            id: '4385382475813694320'
+            creationTimestamp: '2019-10-26T11:51:11.714-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/4385382475813694320
+            name: $$packet-mirroring$$
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            network:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+            priority: 1000
+            collectorIlb:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+            mirroredResources:
+              subnetworks:
+              - url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+                canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/7284113387726384001
+              tags:
+              - t1
+              - t2
+            filter: {}
+            enable: 'TRUE'
+            kind: compute#packetMirroring
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              id: $$pm-target-id$$
+              network:
+                canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$target-network-id$$
+                url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+              collectorIlb:
+                canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-target-id$$
+                url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              enable: 'FALSE'
+              priority: 900
+              creationTimestamp: $$pm-create-timestamp$$
+              name: $$packet-mirroring$$
+              selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+              mirroredResources:
+                tags:
+                - t1
+                - t2
+                - t3
+                subnetworks: []
+              kind: compute#packetMirroring
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '6884007329786309444'
+            name: operation-1572115882188-595d4c0b41d38-3ea19073-cc4f80a8
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            targetId: '4385382475813694320'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:51:23.189-07:00'
+            startTime: '2019-10-26T11:51:23.210-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115882188-595d4c0b41d38-3ea19073-cc4f80a8
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/6884007329786309444
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$].
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: -4oteXS9n_Ve3G5NRfDSbkVqr8A=/zP0G9LQxo2fKJyZNi4bJZL4zXxg=
+            status: '200'
+          body:
+            id: '4385382475813694320'
+            creationTimestamp: '2019-10-26T11:51:11.714-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/4385382475813694320
+            name: $$packet-mirroring$$
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            network:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+            priority: 900
+            collectorIlb:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+            mirroredResources:
+              tags:
+              - t1
+              - t2
+              - t3
+            filter: {}
+            enable: 'FALSE'
+            kind: compute#packetMirroring
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute packet-mirrorings describe $$packet-mirroring$$ --region $$region$$
+      --format text("name,priority,mirroredResources)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: sjie_RUIrAAYrq06MtX0ar4AhXU=/ZrkBOOFYdGBtMqpzwYdV4URlXb8=
+            status: '200'
+          body:
+            id: '4385382475813694320'
+            creationTimestamp: '2019-10-26T11:51:11.714-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/4385382475813694320
+            name: $$packet-mirroring$$
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            network:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/4855904140319599546
+            priority: 900
+            collectorIlb:
+              url: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+              canonicalUrl: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/9125986030734355326
+            mirroredResources:
+              tags:
+              - t1
+              - t2
+              - t3
+            filter: {}
+            enable: 'FALSE'
+            kind: compute#packetMirroring
+    - expect_stdout: |
+        ---
+        mirroredResources.tags[0]: t1
+        mirroredResources.tags[1]: t2
+        mirroredResources.tags[2]: t3
+        name:                      $$packet-mirroring$$
+        priority:                  900
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: packet-mirroring
+    command: |
+      compute packet-mirrorings delete $$packet-mirroring$$ --region $$region$$ --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '9187885189598620502'
+            name: operation-1572115896424-595d4c18d5a05-a0a0dded-f965c58b
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$
+            targetId: '4385382475813694320'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:51:37.275-07:00'
+            startTime: '2019-10-26T11:51:37.293-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115896424-595d4c18d5a05-a0a0dded-f965c58b
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/9187885189598620502
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/packetMirrorings/$$packet-mirroring$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: forwarding-rule-name
+    command: |
+      compute forwarding-rules delete $$forwarding-rule-name$$ --region $$region$$ --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '2035662523085695785'
+            name: operation-1572115909454-595d4c2542979-023f3e88-ab045a1a
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$
+            targetId: '9125986030734355326'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:51:50.240-07:00'
+            startTime: '2019-10-26T11:51:50.255-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115909454-595d4c2542979-023f3e88-ab045a1a
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/2035662523085695785
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/forwardingRules/$$forwarding-rule-name$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: backend-service
+    command: |
+      compute backend-services delete $$backend-service$$ --region $$region$$ --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '7975807713149528892'
+            name: operation-1572115922412-595d4c319e207-e90112f4-caee6148
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$
+            targetId: '864736837696564068'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:52:03.715-07:00'
+            startTime: '2019-10-26T11:52:03.724-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115922412-595d4c319e207-e90112f4-caee6148
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/7975807713149528892
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/backendServices/$$backend-service$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: health-check
+    command: |
+      compute health-checks delete $$health-check$$ --region $$region$$ --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '4959745389996092211'
+            name: operation-1572115931615-595d4c3a65077-ae7367ce-04d9de1c
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$
+            targetId: '5040912231711714152'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:52:12.653-07:00'
+            startTime: '2019-10-26T11:52:12.673-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115931615-595d4c3a65077-ae7367ce-04d9de1c
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/4959745389996092211
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/healthChecks/$$health-check$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: subnet
+    command: |
+      compute networks subnets delete $$subnet$$ --region $$region$$ --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '5946111790895672077'
+            name: operation-1572115937393-595d4c3fe7c41-0d754a16-31abc46d
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$
+            targetId: '7284113387726384001'
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:52:18.370-07:00'
+            startTime: '2019-10-26T11:52:18.387-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/operation-1572115937393-595d4c3fe7c41-0d754a16-31abc46d
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/operations/5946111790895672077
+            region: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/$$region$$/subnetworks/$$subnet$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    cleanup_for: network
+    command: compute networks delete $$network$$ --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://compute.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '1741303769768471318'
+            name: operation-1572115961221-595d4c56a1188-7054692a-5f5ad5ff
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$
+            targetId: 4855904140319599546
+            status: RUNNING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-10-26T11:52:41.989-07:00'
+            startTime: '2019-10-26T11:52:42.002-07:00'
+            selfLink: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/operation-1572115961221-595d4c56a1188-7054692a-5f5ad5ff
+            selfLinkWithId: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/operations/1741303769768471318
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/global/networks/$$network$$].
+    - expect_exit:
+        code: 0

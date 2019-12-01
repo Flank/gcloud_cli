@@ -147,12 +147,14 @@ Also remember to grant `p12345678-5432@gcp-sa-logging.iam.gserviceaccount.com` D
 More information about sinks can be found at https://cloud.google.com/logging/docs/export/configure_export
 """)
 
-  def testCreateSuccessWithPartitionedTables(self):
+  def testCreateSuccess(self):
     expected_sink = self.msgs.LogSink(
         name='my-sink',
         destination='dest',
         filter='foo',
         includeChildren=False,
+        description='description',
+        disabled=True,
         bigqueryOptions=self.msgs.BigQueryOptions(
             usePartitionedTables=True))
     self.mock_client_v2.projects_sinks.Create.Expect(
@@ -160,8 +162,9 @@ More information about sinks can be found at https://cloud.google.com/logging/do
             parent='projects/my-project',
             logSink=expected_sink,
             uniqueWriterIdentity=True), expected_sink)
-    self.RunLogging('sinks create my-sink dest --log-filter=foo '
-                    '--use-partitioned-tables')
+    self.RunLogging(
+        'sinks create my-sink dest --log-filter=foo --use-partitioned-tables '
+        '--description=description --disabled')
     self.AssertOutputEquals('')
 
   def testCreateSuccessWithExclusions(self):

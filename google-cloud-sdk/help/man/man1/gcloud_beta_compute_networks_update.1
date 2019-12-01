@@ -83,6 +83,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To update regional network with the name 'network\-name' to global, run:
+
+.RS 2m
+$ gcloud beta compute networks update network\-name \e
+  \-\-bgp\-routing\-mode=global
+.RE
+
+To update an auto subnet mode network with the name 'network\-name' to custom
+subnet mode, run:
+
+.RS 2m
+$ gcloud beta compute networks update network\-name \e
+  \-\-switch\-to\-custom\-subnet\-mode
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

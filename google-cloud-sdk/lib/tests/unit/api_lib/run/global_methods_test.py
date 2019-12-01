@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.run import global_methods
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import six
@@ -31,6 +32,7 @@ MESSAGES = apis.GetMessagesModule(global_methods.SERVERLESS_API_NAME,
 class ListServicesTest(sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
+    properties.VALUES.core.project.Set('my-project')
     self.client = mock.Client(
         apis.GetClientClass(global_methods.SERVERLESS_API_NAME,
                             global_methods.SERVERLESS_API_VERSION),
@@ -49,7 +51,7 @@ class ListServicesTest(sdk_test_base.WithOutputCapture):
         unreachable=['us-central1', 'asia-northeast1'])
     self.client.projects_locations_services.List.Expect(
         request=request, response=response)
-    global_methods.ListServices(self.client, 'projects/my-project/locations/-')
+    global_methods.ListServices(self.client)
 
     self.AssertErrEquals(
         'WARNING: The following Cloud Run regions did not respond: '
@@ -64,8 +66,7 @@ class ListServicesTest(sdk_test_base.WithOutputCapture):
     ])
     self.client.projects_locations_services.List.Expect(
         request=request, response=response)
-    services = global_methods.ListServices(self.client,
-                                           'projects/my-project/locations/-')
+    services = global_methods.ListServices(self.client)
 
     six.assertCountEqual(self, [service.name for service in services],
                          ('Service1', 'Service2'))

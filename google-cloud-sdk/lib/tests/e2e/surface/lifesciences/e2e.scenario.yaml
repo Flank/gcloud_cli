@@ -3,7 +3,7 @@ release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: lifesciences workflows run --pipeline-file=pipeline.json
+  - command: lifesciences pipelines run --pipeline-file=pipeline.json
   - stderr: |
       Running [$$operation-name$$].
 - execute:
@@ -62,7 +62,7 @@ actions:
         }
       }
 - execute_command:
-    command: lifesciences workflows run --pipeline-file=pipeline.json
+    command: lifesciences pipelines run --pipeline-file=pipeline.json
     events:
     - api_call:
         expect_request:

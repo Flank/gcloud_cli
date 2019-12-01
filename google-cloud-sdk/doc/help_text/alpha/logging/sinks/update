@@ -3,7 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging sinks update SINK_NAME [DESTINATION]
-        [--clear-exclusions] [--log-filter=LOG_FILTER]
+        [--add-exclusions=[description=DESCRIPTION],
+          [disabled=DISABLED],[filter=FILTER],[name=NAME]] [--clear-exclusions]
+        [--description=DESCRIPTION] [--disabled] [--log-filter=LOG_FILTER]
         [--remove-exclusions=[EXCLUSION ID,...]] [--use-partitioned-tables]
         [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
           | --organization=ORGANIZATION_ID | --project=PROJECT_ID]
@@ -25,8 +27,35 @@ POSITIONAL ARGUMENTS
         destination is unchanged.
 
 FLAGS
+     --add-exclusions=[description=DESCRIPTION],[disabled=DISABLED],[filter=FILTER],[name=NAME]
+        Add an exclusion filter for a log entry that is not to be exported.
+        This flag can be repeated.
+
+        The name and filter attributes are required. The following keys are
+        accepted:
+
+         name
+            An identifier, such as "load-balancer-exclusion". Identifiers are
+            limited to 100 characters and can include only letters, digits,
+            underscores, hyphens, and periods.
+
+         description
+            A description of this exclusion.
+
+         filter
+            An advanced log filter that matches the log entries to be excluded.
+
+         disabled
+            If this exclusion should be disabled and not exclude the log
+            entries.
      --clear-exclusions
         Remove all logging exclusions.
+
+     --description=DESCRIPTION
+        Description of the sink.
+
+     --disabled
+        Disable the sink. Disabled sinks do not export logs.
 
      --log-filter=LOG_FILTER
         A new filter expression for the sink. If omitted, the sink's existing

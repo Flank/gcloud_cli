@@ -1,0 +1,838 @@
+title: Execute a deployment to a GKE cluster
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: container/use_application_default_credentials True
+- execute:
+  - command: source repos create $$source-repo$$
+  - stderr: |
+      Created [$$source-repo$$].
+      WARNING: You may be billed for this repository. See https://cloud.google.com/source-repositories/docs/pricing for details.
+- execute:
+  - command: storage buckets create $$bucket$$
+  - stderr: |
+      Created bucket [$$bucket$$].
+- execute:
+  - command: builds deploy configure gke --cluster=$$cluster$$ --location=$$location$$
+      --repo-type=csr --repo-name=$$source-repo$$ --app-name=my-app --branch-pattern=master
+      --namespace=my-namespace --expose=80 --gcs-config-staging-dir=gs://$$bucket$$/config
+      --timeout=4m -q
+  - stderr: |
+      Add the roles/container.developer role to your Cloud Build service agent account, if you have not already done so. This allows the account to deploy to your cluster:
+
+      gcloud projects add-iam-policy-binding $$project$$ --member=serviceAccount:$$project-number$$@cloudbuild.gserviceaccount.com --role=roles/container.developer --project=$$project$$
+
+      Upserting Cloud Build trigger to build and deploy your application.
+  - stderr: |
+      Created [https://cloudbuild.googleapis.com/v1/projects/$$project$$/triggers/$$trigger-id$$].
+
+      Successfully created the Cloud Build trigger to build and deploy your application.
+
+      Visit https://console.cloud.google.com/cloud-build/triggers/$$trigger-id$$?project=$$project$$ to view the trigger.
+
+      You can visit https://console.cloud.google.com/cloud-build/triggers?project=$$project$$ to view all Cloud Build triggers.
+- execute:
+  - command: builds triggers delete $$trigger-id$$
+  - prompt:
+    - message: You are about to delete trigger [$$trigger-id$$]
+    - input: y
+  - stderr: |
+      Deleted trigger [$$trigger-id$$].
+- execute:
+  - command: source repos delete $$source-repo$$ --quiet
+  - stderr: |
+      Deleted [$$source-repo$$].
+- execute:
+  - command: storage delete gs://$$bucket$$ --recursive
+  - stderr: |
+      WARNING: [gs://$$bucket$$/**] does not match any paths.
+      WARNING: Deleting a bucket is irreversible and makes that bucket name available for others to claim.
+  - prompt:
+    - message: |-
+        This command will delete the following buckets:
+          $$bucket$$
+    - input: y
+  - prompt:
+    - input: y
+  - progress_bar:
+    - message: Deleting Files
+  - stderr: |2
+
+      Deleted [0] file.
+      Deleted bucket [gs://$$bucket$$].
+actions:
+- define_reference:
+    reference: project
+    value: cloud-sdk-integration-testing
+
+- define_reference:
+    reference: location
+    value: us-central1-b
+
+- generate_resource_id:
+    reference: cluster
+    prefix: configure-gke
+
+- generate_resource_id:
+    reference: bucket
+    prefix: configure-gke
+
+- generate_resource_id:
+    reference: source-repo
+    prefix: configure-gke
+
+- set_property:
+    # This is needed to create a cluster
+    container/use_application_default_credentials: true
+
+- execute_command:
+    command: source repos create $$source-repo$$
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [$$source-repo$$].
+        WARNING: You may be billed for this repository. See https://cloud.google.com/source-repositories/docs/pricing for details.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: storage buckets create $$bucket$$
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created bucket [$$bucket$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: container clusters create $$cluster$$ --zone=$$location$$ -q --num-nodes=1
+      --timeout=1080 --no-enable-basic-auth --no-issue-client-certificate --verbosity="none"
+      --disk-size=10GB
+    validation_only: true
+    events:
+    - expect_stderr: |
+        This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
+    - expect_progress_tracker:
+        message: Creating cluster $$cluster$$ in $$location$$
+        status: SUCCESS
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*clusters: \[\].*'
+        is_private: true
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*name: gke_$$project$$_$$location$$_$$cluster$$.*'
+        is_private: true
+    - expect_stderr: |
+        Created [https://container.googleapis.com/v1alpha1/projects/$$project$$/zones/$$location$$/clusters/$$cluster$$].
+        To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/$$location$$/$$cluster$$?project=$$project$$
+        kubeconfig entry generated for $$cluster$$.
+    - expect_stdout:
+        matches: .*$$cluster$$\s+$$location$$.*RUNNING.*
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: builds deploy configure gke --cluster=$$cluster$$ --location=$$location$$
+      --repo-type=csr --repo-name=$$source-repo$$ --app-name=my-app --branch-pattern=master
+      --namespace=my-namespace --expose=80 --gcs-config-staging-dir=gs://$$bucket$$/config
+      --timeout=4m -q
+    events:
+    - api_call:
+        expect_request:
+          uri: https://sourcerepo.googleapis.com/v1/projects/$$project$$/repos/$$source-repo$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '172'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/$$project$$/repos/$$source-repo$$
+            url: https://source.developers.google.com/p/$$project$$/r/$$source-repo$$
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/$$project$$/locations/$$location$$/clusters/$$cluster$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5384'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: $$cluster$$
+            nodeConfig:
+              machineType: n1-standard-1
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/trace.append
+              metadata:
+                disable-legacy-endpoints: 'true'
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+            masterAuth:
+              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lRTDNrSEJydmh6SWc3MVArejdFcStuekFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlReE4yWXhOams1WkMwMVlXTmhMVFJtTWprdE9UYzBOQzFqWlRNelpUUmhZekE1TjJZdwpIaGNOTVRrd09ERXlNVGcwTVRNNFdoY05NalF3T0RFd01UazBNVE00V2pBdk1TMHdLd1lEVlFRREV5UXhOMll4Ck5qazVaQzAxWVdOaExUUm1Namt0T1RjME5DMWpaVE16WlRSaFl6QTVOMll3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUR6dVdSOEVzMmV5cWdwNEZ3N2pkWG8rWWorQWRBZ3Q3K0ZFeU9KQW1FVwpLOURHdUtheEpOTm1SUi9pYzNYZUVROU9aR29WeFVaV1dqTVVpcmt5Q05jQnhvNG9GNm9rMytVaTJHNFFRMDNKCnltdEN1Q1d0Ty9TK1U4a3NXVFljWUEzM3dKdDRIeFZaWDgvdVdmWnc5WS9FbDZubUJYUmpqQmtZWU9OS0hlYXQKUWpKOXFKMWtCbjQrZi9XNlBYLzlXaE1rUEJmR3V0Y1EvSlNjbXUwc3QzNFFydVlGVFBIQUhDeHNEZlhmRmZLdApRU2xiSk5tQ3o4b1JpSTE1UUtBQjNyVjczeHg0eThDZVBweFJBVEQ4MVA2K2Z2S1ZrTTV0czg0bUZ2NHBGRTZBCmFYTnZJN28vUTNPRGY2dTBRSDBZOU5IdTRlVzVNY2NET3grZ2JDSjFYc1BUQWdNQkFBR2pJekFoTUE0R0ExVWQKRHdFQi93UUVBd0lDQkRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFDVApXVTlNdVNkWEU3Vi93aExxYUpnL1VadkVPUlZ5TTdiNXJGVDV5Q3EzQXV4VU9CTHhNTW5YK2VxN2Rhb3AzaGJBCjNXRDc5bWtjZ2tUSzk4c3ZPVVBQNDNGVmdxWVRlVVJvUkR2eU9RejdDTFdnbmNtTHZMK1Z3UVBESUtIbWdPUnIKZkVTUUNqVFVKMmFoWXlwcFd4Wi9RTVFidEd3WVpLbFR2UVhuZ0RiNlRtc2V4RHlTYzZpclJac2QwcXZtUEQzaQpSUTRtN2ttWjlCTzRZT2tBQVBUbnpCK1FzVmxDNm9pcU9ZK3lJd0dEaXF3aHU2NjJwNk14WTNnWTYwbkhNc2N5Ck9pQXJ1am1ST0E3bE8vQm9PT092eUhPcW1ZaEtSTXNla1d4OGIwT3hYWWtrUG1jd0FOaEtyaWJwZlpDRVVURlUKMjErcWVmdjVsQXhydEtGdzlNS1gKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+            loggingService: logging.googleapis.com
+            monitoringService: monitoring.googleapis.com
+            network: default
+            clusterIpv4Cidr: 10.28.0.0/14
+            addonsConfig:
+              httpLoadBalancing: {}
+              horizontalPodAutoscaling: {}
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+            subnetwork: default
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-1
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/trace.append
+                metadata:
+                  disable-legacy-endpoints: 'true'
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+              initialNodeCount: 1
+              autoscaling: {}
+              management:
+                autoUpgrade: true
+                autoRepair: true
+              maxPodsConstraint:
+                maxPodsPerNode: '110'
+              podIpv4CidrSize: 24
+              selfLink: https://container.googleapis.com/v1/projects/$$project$$/zones/$$location$$/clusters/$$cluster$$/nodePools/default-pool
+              version: 1.13.7-gke.24
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/$$project$$/zones/$$location$$/instanceGroupManagers/gke-$$cluster$$-default-pool-1e97ebee-grp
+              status: RUNNING
+            locations:
+            - $$location$$
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            networkPolicy: {}
+            ipAllocationPolicy:
+              useIpAliases: true
+              clusterIpv4Cidr: 10.28.0.0/14
+              servicesIpv4Cidr: 10.0.0.0/20
+              clusterSecondaryRangeName: gke-$$cluster$$-pods-ce5426a1
+              servicesSecondaryRangeName: gke-$$cluster$$-services-ce5426a1
+              clusterIpv4CidrBlock: 10.28.0.0/14
+              servicesIpv4CidrBlock: 10.0.0.0/20
+            masterAuthorizedNetworksConfig: {}
+            networkConfig:
+              network: projects/$$project$$/global/networks/default
+              subnetwork: projects/$$project$$/regions/us-east1/subnetworks/default
+            defaultMaxPodsConstraint:
+              maxPodsPerNode: '110'
+            databaseEncryption:
+              state: DECRYPTED
+            selfLink: https://container.googleapis.com/v1/projects/$$project$$/zones/$$location$$/clusters/$$cluster$$
+            zone: $$location$$
+            endpoint: 35.237.107.90
+            initialClusterVersion: 1.12.8-gke.10
+            currentMasterVersion: 1.13.7-gke.24
+            currentNodeVersion: 1.13.7-gke.24
+            createTime: '2019-08-12T19:41:38+00:00'
+            status: RUNNING
+            servicesIpv4Cidr: 10.0.0.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/$$project$$/zones/$$location$$/instanceGroupManagers/gke-$$cluster$$-default-pool-1e97ebee-grp
+            currentNodeCount: 1
+            location: $$location$$
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/storage/v1/b/$$bucket$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '701'
+            content-type: application/json; charset=UTF-8
+            etag: CAE=
+            status: '200'
+            x-guploader-customer: apiary_cloudstorage_metadata
+            x-guploader-request-result: success
+            x-guploader-upload-result: success
+            x-guploader-uploadid: AEnB2Url4kdba4vQijX4j7OSscbpyoUoYTMWc9QVIsBYAyr9KG99_8_PZW0QDlY6ILhSyZTD7AIpL-QZWAgx1AJX_-Z2zRuxlw
+          body:
+            kind: storage#bucket
+            id: $$bucket$$
+            selfLink: https://www.googleapis.com/storage/v1/b/$$bucket$$
+            projectNumber: '601677740'
+            name: $$bucket$$
+            metageneration: '1'
+            location: US
+            versioning:
+              enabled: false
+            storageClass: STANDARD
+            billing:
+              requesterPays: false
+            etag: CAE=
+            iamConfiguration:
+              bucketPolicyOnly:
+                enabled: false
+              uniformBucketLevelAccess:
+                enabled: false
+            locationType: multi-region
+            timeCreated: '2019-10-28T14:23:06.695Z'
+            updated: '2019-10-28T14:23:06.695Z'
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v1/projects/$$project$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '224'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            projectNumber: '601677740'
+            projectId: $$project$$
+            lifecycleState: ACTIVE
+            name: $$project$$
+            createTime: '2019-05-15T16:39:17.827Z'
+            parent:
+              type: folder
+              id: '706382480012'
+        expect_response:
+          extract_references:
+          - field: projectNumber
+            reference: project-number
+          body:
+            json: {}
+    - expect_stderr: |
+        Add the roles/container.developer role to your Cloud Build service agent account, if you have not already done so. This allows the account to deploy to your cluster:
+
+        gcloud projects add-iam-policy-binding $$project$$ --member=serviceAccount:$$project-number$$@cloudbuild.gserviceaccount.com --role=roles/container.developer --project=$$project$$
+
+        Upserting Cloud Build trigger to build and deploy your application.
+    - api_call:
+        expect_request:
+          uri: https://cloudbuild.googleapis.com/v1/projects/$$project$$/triggers/gpcsb-$$source-repo$$-master?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '533'
+            content-type: application/json; charset=UTF-8
+            status: '404'
+          body:
+            error:
+              code: 404
+              message: trigger (601677740, gpcsb-$$source-repo$$-master) not found
+              status: NOT_FOUND
+              details:
+              - '@type': type.googleapis.com/google.rpc.DebugInfo
+                detail: '[ORIGINAL ERROR] generic::not_found: trigger (601677740,
+                  gpcsb-$$source-repo$$-master) not found [google.rpc.error_details_ext]
+                  { code: 5 message: "trigger (601677740, gpcsb-$$source-repo$$-master)
+                  not found" }'
+    - api_call:
+        expect_request:
+          uri: https://cloudbuild.googleapis.com/v1/projects/$$project$$/triggers?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              build:
+                options:
+                  substitutionOption: ALLOW_LOOSE
+                steps:
+                - args:
+                  - build
+                  - --network
+                  - cloudbuild
+                  - --no-cache
+                  - -t
+                  - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                  - -f
+                  - $_DOCKERFILE_PATH
+                  - .
+                  id: Build
+                  name: gcr.io/cloud-builders/docker
+                - args:
+                  - push
+                  - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                  id: Push
+                  name: gcr.io/cloud-builders/docker
+                - args:
+                  - prepare
+                  - --filename=$_K8S_YAML_PATH
+                  - --image=gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                  - --app=$_APP_NAME
+                  - --version=$SHORT_SHA
+                  - --namespace=$_K8S_NAMESPACE
+                  - --output=output
+                  - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
+                  - --expose=$_EXPOSE_PORT
+                  id: Prepare deploy
+                  name: gcr.io/cloud-builders/gke-deploy
+                - args:
+                  - -c
+                  - |2
+
+                    set -e
+
+                    gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                    echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                    gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                    echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                    echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                  entrypoint: sh
+                  id: Save configs
+                  name: gcr.io/cloud-builders/gsutil
+                - args:
+                  - apply
+                  - --filename=output/expanded
+                  - --namespace=$_K8S_NAMESPACE
+                  - --cluster=$_GKE_CLUSTER
+                  - --location=$_GKE_LOCATION
+                  - --timeout=24h
+                  id: Apply deploy
+                  name: gcr.io/cloud-builders/gke-deploy
+                substitutions:
+                  _APP_NAME: my-app
+                  _DOCKERFILE_PATH: Dockerfile
+                  _EXPOSE_PORT: '80'
+                  _GKE_CLUSTER: $$cluster$$
+                  _GKE_LOCATION: $$location$$
+                  _K8S_ANNOTATIONS: ''
+                  _K8S_NAMESPACE: my-namespace
+                  _K8S_YAML_PATH: ''
+                  _OUTPUT_BUCKET_PATH: $$bucket$$/config
+                tags:
+                - gcp-cloud-build-deploy
+                - gcp-cloud-build-deploy-gcloud
+                - my-app
+                timeout: 240s
+              description: Build and deploy on push to branch pattern "master"
+              name: gpcsb-$$source-repo$$-master
+              substitutions:
+                _APP_NAME: my-app
+                _DOCKERFILE_PATH: Dockerfile
+                _EXPOSE_PORT: '80'
+                _GKE_CLUSTER: $$cluster$$
+                _GKE_LOCATION: $$location$$
+                _K8S_ANNOTATIONS: ''
+                _K8S_NAMESPACE: my-namespace
+                _K8S_YAML_PATH: ''
+                _OUTPUT_BUCKET_PATH: $$bucket$$/config
+              tags:
+              - gcp-cloud-build-deploy
+              - gcp-cloud-build-deploy-gcloud
+              - my-app
+              triggerTemplate:
+                branchName: master
+                projectId: $$project$$
+                repoName: $$source-repo$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3547'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: ed6b0c8b-40e4-4ee3-b2ce-16679b0c945a
+            createTime: '2019-10-28T14:23:09.010904100Z'
+            triggerTemplate:
+              projectId: $$project$$
+              repoName: $$source-repo$$
+              branchName: master
+            description: Build and deploy on push to branch pattern "master"
+            substitutions:
+              _GKE_CLUSTER: $$cluster$$
+              _EXPOSE_PORT: '80'
+              _K8S_NAMESPACE: my-namespace
+              _DOCKERFILE_PATH: Dockerfile
+              _K8S_ANNOTATIONS: ''
+              _GKE_LOCATION: $$location$$
+              _K8S_YAML_PATH: ''
+              _OUTPUT_BUCKET_PATH: $$bucket$$/config
+              _APP_NAME: my-app
+            tags:
+            - gcp-cloud-build-deploy
+            - gcp-cloud-build-deploy-gcloud
+            - my-app
+            name: gpcsb-$$source-repo$$-master
+            build:
+              steps:
+              - name: gcr.io/cloud-builders/docker
+                args:
+                - build
+                - --network
+                - cloudbuild
+                - --no-cache
+                - -t
+                - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                - -f
+                - $_DOCKERFILE_PATH
+                - .
+                id: Build
+              - name: gcr.io/cloud-builders/docker
+                args:
+                - push
+                - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                id: Push
+              - name: gcr.io/cloud-builders/gke-deploy
+                args:
+                - prepare
+                - --filename=$_K8S_YAML_PATH
+                - --image=gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                - --app=$_APP_NAME
+                - --version=$SHORT_SHA
+                - --namespace=$_K8S_NAMESPACE
+                - --output=output
+                - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
+                - --expose=$_EXPOSE_PORT
+                id: Prepare deploy
+              - name: gcr.io/cloud-builders/gsutil
+                args:
+                - -c
+                - |2
+
+                  set -e
+
+                  gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                  echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                  echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                  gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                  echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                  echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                id: Save configs
+                entrypoint: sh
+              - name: gcr.io/cloud-builders/gke-deploy
+                args:
+                - apply
+                - --filename=output/expanded
+                - --namespace=$_K8S_NAMESPACE
+                - --cluster=$_GKE_CLUSTER
+                - --location=$_GKE_LOCATION
+                - --timeout=24h
+                id: Apply deploy
+              timeout: 240s
+              options:
+                substitutionOption: ALLOW_LOOSE
+              substitutions:
+                _K8S_NAMESPACE: my-namespace
+                _GKE_CLUSTER: $$cluster$$
+                _K8S_ANNOTATIONS: ''
+                _DOCKERFILE_PATH: Dockerfile
+                _EXPOSE_PORT: '80'
+                _APP_NAME: my-app
+                _K8S_YAML_PATH: ''
+                _OUTPUT_BUCKET_PATH: $$bucket$$/config
+                _GKE_LOCATION: $$location$$
+              tags:
+              - gcp-cloud-build-deploy
+              - gcp-cloud-build-deploy-gcloud
+              - my-app
+        expect_response:
+          extract_references:
+          - field: id
+            reference: trigger-id
+          - field: createTime
+            reference: create-time
+          body:
+            json: {}
+    - api_call:
+        expect_request:
+          uri: https://cloudbuild.googleapis.com/v1/projects/$$project$$/triggers/$$trigger-id$$?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              build:
+                options:
+                  substitutionOption: ALLOW_LOOSE
+                steps:
+                - args:
+                  - build
+                  - --network
+                  - cloudbuild
+                  - --no-cache
+                  - -t
+                  - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                  - -f
+                  - $_DOCKERFILE_PATH
+                  - .
+                  id: Build
+                  name: gcr.io/cloud-builders/docker
+                - args:
+                  - push
+                  - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                  id: Push
+                  name: gcr.io/cloud-builders/docker
+                - args:
+                  - prepare
+                  - --filename=$_K8S_YAML_PATH
+                  - --image=gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                  - --app=$_APP_NAME
+                  - --version=$SHORT_SHA
+                  - --namespace=$_K8S_NAMESPACE
+                  - --output=output
+                  - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
+                  - --expose=$_EXPOSE_PORT
+                  id: Prepare deploy
+                  name: gcr.io/cloud-builders/gke-deploy
+                - args:
+                  - -c
+                  - |2
+
+                    set -e
+
+                    gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                    echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                    gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                    echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                    echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                  entrypoint: sh
+                  id: Save configs
+                  name: gcr.io/cloud-builders/gsutil
+                - args:
+                  - apply
+                  - --filename=output/expanded
+                  - --namespace=$_K8S_NAMESPACE
+                  - --cluster=$_GKE_CLUSTER
+                  - --location=$_GKE_LOCATION
+                  - --timeout=24h
+                  id: Apply deploy
+                  name: gcr.io/cloud-builders/gke-deploy
+                substitutions:
+                  _APP_NAME: my-app
+                  _DOCKERFILE_PATH: Dockerfile
+                  _EXPOSE_PORT: '80'
+                  _GKE_CLUSTER: $$cluster$$
+                  _GKE_LOCATION: $$location$$
+                  _K8S_ANNOTATIONS: ',gcb-trigger-id=$$trigger-id$$'
+                  _K8S_NAMESPACE: my-namespace
+                  _K8S_YAML_PATH: ''
+                  _OUTPUT_BUCKET_PATH: $$bucket$$/config
+                tags:
+                - gcp-cloud-build-deploy
+                - gcp-cloud-build-deploy-gcloud
+                - my-app
+                timeout: 240s
+              createTime: $$create-time$$
+              description: Build and deploy on push to branch pattern "master"
+              id: $$trigger-id$$
+              name: gpcsb-$$source-repo$$-master
+              substitutions:
+                _APP_NAME: my-app
+                _DOCKERFILE_PATH: Dockerfile
+                _EXPOSE_PORT: '80'
+                _GKE_CLUSTER: $$cluster$$
+                _GKE_LOCATION: $$location$$
+                _K8S_ANNOTATIONS: ',gcb-trigger-id=$$trigger-id$$'
+                _K8S_NAMESPACE: my-namespace
+                _K8S_YAML_PATH: ''
+                _OUTPUT_BUCKET_PATH: $$bucket$$/config
+              tags:
+              - gcp-cloud-build-deploy
+              - gcp-cloud-build-deploy-gcloud
+              - my-app
+              triggerTemplate:
+                branchName: master
+                projectId: $$project$$
+                repoName: $$source-repo$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3651'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: ed6b0c8b-40e4-4ee3-b2ce-16679b0c945a
+            createTime: '2019-10-28T14:23:09.010904100Z'
+            triggerTemplate:
+              projectId: $$project$$
+              repoName: $$source-repo$$
+              branchName: master
+            description: Build and deploy on push to branch pattern "master"
+            substitutions:
+              _EXPOSE_PORT: '80'
+              _GKE_CLUSTER: $$cluster$$
+              _GKE_LOCATION: $$location$$
+              _K8S_NAMESPACE: my-namespace
+              _OUTPUT_BUCKET_PATH: $$bucket$$/config
+              _DOCKERFILE_PATH: Dockerfile
+              _APP_NAME: my-app
+              _K8S_YAML_PATH: ''
+              _K8S_ANNOTATIONS: ',gcb-trigger-id=ed6b0c8b-40e4-4ee3-b2ce-16679b0c945a'
+            tags:
+            - gcp-cloud-build-deploy
+            - gcp-cloud-build-deploy-gcloud
+            - my-app
+            name: gpcsb-$$source-repo$$-master
+            build:
+              steps:
+              - name: gcr.io/cloud-builders/docker
+                args:
+                - build
+                - --network
+                - cloudbuild
+                - --no-cache
+                - -t
+                - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                - -f
+                - $_DOCKERFILE_PATH
+                - .
+                id: Build
+              - name: gcr.io/cloud-builders/docker
+                args:
+                - push
+                - gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                id: Push
+              - name: gcr.io/cloud-builders/gke-deploy
+                args:
+                - prepare
+                - --filename=$_K8S_YAML_PATH
+                - --image=gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA
+                - --app=$_APP_NAME
+                - --version=$SHORT_SHA
+                - --namespace=$_K8S_NAMESPACE
+                - --output=output
+                - --annotation=gcb-build-id=$BUILD_ID,$_K8S_ANNOTATIONS
+                - --expose=$_EXPOSE_PORT
+                id: Prepare deploy
+              - name: gcr.io/cloud-builders/gsutil
+                args:
+                - -c
+                - |2
+
+                  set -e
+
+                  gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested
+                  echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested"
+                  echo "View suggested base configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/suggested/"
+                  gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded
+                  echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded"
+                  echo "View expanded configs at https://console.cloud.google.com/storage/browser/$_OUTPUT_BUCKET_PATH/$BUILD_ID/expanded/"
+                id: Save configs
+                entrypoint: sh
+              - name: gcr.io/cloud-builders/gke-deploy
+                args:
+                - apply
+                - --filename=output/expanded
+                - --namespace=$_K8S_NAMESPACE
+                - --cluster=$_GKE_CLUSTER
+                - --location=$_GKE_LOCATION
+                - --timeout=24h
+                id: Apply deploy
+              timeout: 240s
+              options:
+                substitutionOption: ALLOW_LOOSE
+              substitutions:
+                _APP_NAME: my-app
+                _K8S_YAML_PATH: ''
+                _GKE_LOCATION: $$location$$
+                _DOCKERFILE_PATH: Dockerfile
+                _K8S_NAMESPACE: my-namespace
+                _EXPOSE_PORT: '80'
+                _GKE_CLUSTER: $$cluster$$
+                _K8S_ANNOTATIONS: ',gcb-trigger-id=ed6b0c8b-40e4-4ee3-b2ce-16679b0c945a'
+                _OUTPUT_BUCKET_PATH: $$bucket$$/config
+              tags:
+              - gcp-cloud-build-deploy
+              - gcp-cloud-build-deploy-gcloud
+              - my-app
+    - expect_stderr: |
+        Created [https://cloudbuild.googleapis.com/v1/projects/$$project$$/triggers/$$trigger-id$$].
+
+        Successfully created the Cloud Build trigger to build and deploy your application.
+
+        Visit https://console.cloud.google.com/cloud-build/triggers/$$trigger-id$$?project=$$project$$ to view the trigger.
+
+        You can visit https://console.cloud.google.com/cloud-build/triggers?project=$$project$$ to view all Cloud Build triggers.
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: builds triggers delete $$trigger-id$$
+    validation_only: true
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete trigger [$$trigger-id$$]
+        user_input: y
+    - expect_stderr: |
+        Deleted trigger [$$trigger-id$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: source repos delete $$source-repo$$ --quiet
+    validation_only: true
+    cleanup_for: source-repo
+    events:
+    - expect_stderr: |
+        Deleted [$$source-repo$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: storage delete gs://$$bucket$$ --recursive
+    validation_only: true
+    cleanup_for: bucket
+    events:
+    - expect_stderr: |
+        WARNING: [gs://$$bucket$$/**] does not match any paths.
+        WARNING: Deleting a bucket is irreversible and makes that bucket name available for others to claim.
+    - expect_prompt_continue:
+        message: |-
+          This command will delete the following buckets:
+            $$bucket$$
+        user_input: y
+    - expect_prompt_continue:
+        user_input: y
+    - expect_progress_bar:
+        message: Deleting Files
+    - expect_stderr: |2
+
+        Deleted [0] file.
+        Deleted bucket [gs://$$bucket$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: container clusters delete $$cluster$$ --zone=$$location$$ --async
+    validation_only: true
+    cleanup_for: cluster
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following clusters will be deleted.
+           - [$$cluster$$] in [$$location$$]
+        user_input: y
+    - expect_exit:
+        code: 0

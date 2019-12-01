@@ -44,8 +44,10 @@ from googlecloudsdk.core import log
 import six
 
 DETAILED_HELP = {
-    'brief': 'Create Google Compute Engine persistent disks',
-    'DESCRIPTION': """\
+    'brief':
+        'Create Google Compute Engine persistent disks',
+    'DESCRIPTION':
+        """\
         *{command}* creates one or more Google Compute Engine
         persistent disks. When creating virtual machine instances,
         disks can be attached to the instances through the
@@ -62,10 +64,13 @@ DETAILED_HELP = {
         image (using `gcloud compute images create`) and creating a
         new disk using `--image` in the desired project and/or
         zone.
+        """,
+    'EXAMPLES':
+        """\
+        When creating disks, be sure to include the `--zone` option. To create
+        disks 'my-disk-1' and 'my-disk-2' in zone us-east1-a:
 
-        When creating disks, be sure to include the `--zone` option:
-
-          $ {command} my-disk-1 my-disk-2 --zone us-east1-a
+          $ {command} my-disk-1 my-disk-2 --zone=us-east1-a
         """,
 }
 
@@ -95,9 +100,15 @@ def _SourceArgs(parser, source_disk_enabled=False):
 
   source_group.add_argument(
       '--image-family',
-      help=('The family of the image that the boot disk will be initialized '
-            'with. When a family is used instead of an image, the latest '
-            'non-deprecated image associated with that family is used.')
+      help="""\
+        The image family for the operating system that the boot disk will be
+        initialized with. Compute Engine offers multiple Linux
+        distributions, some of which are available as both regular and
+        Shielded VM images.  When a family is specified instead of an image,
+        the latest non-deprecated image associated with that family is
+        used. It is best practice to use --image-family when the latest
+        version of an image is needed.
+        """
   )
   disks_flags.SOURCE_SNAPSHOT_ARG.AddArgument(source_group)
   if source_disk_enabled:

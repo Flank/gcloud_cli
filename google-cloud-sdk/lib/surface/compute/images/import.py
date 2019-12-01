@@ -175,9 +175,25 @@ class Import(base.CreateCommand):
               'Region or zone should be specified if this field is specified.'),
     )
 
+    parser.add_argument(
+        '--family',
+        help='Family to set for the imported image.')
+
+    parser.add_argument(
+        '--description',
+        help='Description to set for the imported image.')
+
     parser.display_info.AddCacheUpdater(flags.ImagesCompleter)
 
-  def Run(self, args, support_storage_location=False):
+    parser.add_argument(
+        '--storage-location',
+        help="""\
+      Specifies a Cloud Storage location, either regional or multi-regional,
+      where image content is to be stored. If not specified, the multi-region
+      location closest to the source is chosen automatically.
+      """)
+
+  def Run(self, args):
     compute_holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
 
     # Fail early if the requested image name is invalid or already exists.
@@ -185,7 +201,6 @@ class Import(base.CreateCommand):
     _CheckForExistingImage(args.image_name, compute_holder)
 
     stager = self._CreateImportStager(args)
-    stager.support_storage_location = support_storage_location
     import_metadata = stager.Stage()
 
     # TODO(b/79591894): Once we've cleaned up the Argo output, replace this
@@ -201,10 +216,12 @@ class Import(base.CreateCommand):
 
   def _CreateImportStager(self, args):
     if args.source_image:
-      return ImportFromImageStager(self.storage_client, args)
+      return ImportFromImageStager(
+          self.storage_client, args)
 
     if _IsLocalFile(args.source_file):
-      return ImportFromLocalFileStager(self.storage_client, args)
+      return ImportFromLocalFileStager(
+          self.storage_client, args)
 
     try:
       gcs_uri = daisy_utils.MakeGcsObjectOrPathUri(args.source_file)
@@ -213,7 +230,8 @@ class Import(base.CreateCommand):
           'source-file',
           'must be a path to an object in Google Cloud Storage')
     else:
-      return ImportFromGSFileStager(self.storage_client, args, gcs_uri)
+      return ImportFromGSFileStager(
+          self.storage_client, args, gcs_uri)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -229,7 +247,6 @@ class BaseImportStager(object):
     self.storage_client = storage_client
     self.args = args
     self.daisy_bucket = self.GetAndCreateDaisyBucket()
-    self.support_storage_location = False
 
   def Stage(self):
     """Prepares for import args.
@@ -243,7 +260,7 @@ class BaseImportStager(object):
 
     daisy_utils.AppendArg(import_args, 'zone',
                           properties.VALUES.compute.zone.Get())
-    if self.support_storage_location and self.args.storage_location:
+    if self.args.storage_location:
       daisy_utils.AppendArg(import_args, 'storage_location',
                             self.args.storage_location)
     daisy_utils.AppendArg(import_args, 'scratch_bucket_gcs_path',
@@ -256,17 +273,23 @@ class BaseImportStager(object):
     daisy_utils.AppendBoolArg(import_args, 'no_guest_environment',
                               not self.args.guest_environment)
     daisy_utils.AppendNetworkAndSubnetArgs(self.args, import_args)
-    # TODO(b/122357922): Remove 'description' and 'family' guards once in GA.
-    if 'description' in self.args:
-      daisy_utils.AppendArg(import_args, 'description', self.args.description)
-    if 'family' in self.args:
-      daisy_utils.AppendArg(import_args, 'family', self.args.family)
+    daisy_utils.AppendArg(import_args, 'description', self.args.description)
+    daisy_utils.AppendArg(import_args, 'family', self.args.family)
+
     return import_args
 
   def GetAndCreateDaisyBucket(self):
-    bucket_name = daisy_utils.GetDaisyBucketName()
-    self.storage_client.CreateBucketIfNotExists(bucket_name)
+    bucket_location = self.GetBucketLocation()
+    bucket_name = daisy_utils.GetDaisyBucketName(bucket_location)
+    self.storage_client.CreateBucketIfNotExists(
+        bucket_name, location=bucket_location)
     return bucket_name
+
+  def GetBucketLocation(self):
+    if self.args.storage_location:
+      return self.args.storage_location
+
+    return None
 
 
 class ImportFromImageStager(BaseImportStager):
@@ -365,15 +388,12 @@ class ImportFromGSFileStager(BaseImportFromFileStager):
 
   def __init__(self, storage_client, args, gcs_uri):
     self.source_file_gcs_uri = gcs_uri
-    super(ImportFromGSFileStager, self).__init__(storage_client, args)
+    super(ImportFromGSFileStager, self).__init__(
+        storage_client, args)
 
-  def GetAndCreateDaisyBucket(self):
-    bucket_location = self.storage_client.GetBucketLocationForFile(
+  def GetBucketLocation(self):
+    return self.storage_client.GetBucketLocationForFile(
         self.source_file_gcs_uri)
-    bucket_name = daisy_utils.GetDaisyBucketName(bucket_location)
-    self.storage_client.CreateBucketIfNotExists(
-        bucket_name, location=bucket_location)
-    return bucket_name
 
   def _CopySourceFileToScratchBucket(self):
     image_file = os.path.basename(self.source_file_gcs_uri)
@@ -395,29 +415,10 @@ class ImportBeta(Import):
 
   _OS_CHOICES = os_choices.OS_CHOICES_IMAGE_IMPORT_BETA
 
-  def Run(self, args):
-    super(ImportBeta, self).Run(args, support_storage_location=True)
-
   @classmethod
   def Args(cls, parser):
     super(ImportBeta, cls).Args(parser)
     daisy_utils.AddExtraCommonDaisyArgs(parser)
-
-    parser.add_argument(
-        '--storage-location',
-        help="""\
-      Cloud Storage location, either regional or multi-regional, where
-      image content is to be stored. If absent, the multi-region location
-      closest to the source is chosen automatically.
-      """)
-
-    parser.add_argument(
-        '--family',
-        help='Family to set for the imported image.')
-
-    parser.add_argument(
-        '--description',
-        help='Description to set for the imported image.')
 
   def _RunImageImport(self, args, import_args, tags, output_filter):
     return daisy_utils.RunImageImport(args, import_args, tags, _OUTPUT_FILTER,

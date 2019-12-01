@@ -43,6 +43,8 @@ class AddonsConfig(_messages.Message):
       services in a cluster.
     istioConfig: Configuration for Istio, an open platform to connect, manage,
       and secure microservices.
+    kalmConfig: Configuration for the KALM addon, which manages the lifecycle
+      of k8s applications.
     kubernetesDashboard: Configuration for the Kubernetes Dashboard. This
       addon is deprecated, and will be disabled in 1.15. It is recommended to
       use the Cloud Console to manage and monitor your Kubernetes clusters,
@@ -57,8 +59,9 @@ class AddonsConfig(_messages.Message):
   horizontalPodAutoscaling = _messages.MessageField('HorizontalPodAutoscaling', 2)
   httpLoadBalancing = _messages.MessageField('HttpLoadBalancing', 3)
   istioConfig = _messages.MessageField('IstioConfig', 4)
-  kubernetesDashboard = _messages.MessageField('KubernetesDashboard', 5)
-  networkPolicyConfig = _messages.MessageField('NetworkPolicyConfig', 6)
+  kalmConfig = _messages.MessageField('KalmConfig', 5)
+  kubernetesDashboard = _messages.MessageField('KubernetesDashboard', 6)
+  networkPolicyConfig = _messages.MessageField('NetworkPolicyConfig', 7)
 
 
 class AuthenticatorGroupsConfig(_messages.Message):
@@ -96,14 +99,32 @@ class AutoprovisioningNodePoolDefaults(_messages.Message):
   created by NAP.
 
   Fields:
+    management: Specifies the node management options for NAP created node-
+      pools.
     oauthScopes: Scopes that are used by NAP when creating node pools. If
       oauth_scopes are specified, service_account should be empty.
     serviceAccount: The Google Cloud Platform Service Account to be used by
       the node VMs. If service_account is specified, scopes should be empty.
+    upgradeSettings: Specifies the upgrade settings for NAP created node pools
   """
 
-  oauthScopes = _messages.StringField(1, repeated=True)
-  serviceAccount = _messages.StringField(2)
+  management = _messages.MessageField('NodeManagement', 1)
+  oauthScopes = _messages.StringField(2, repeated=True)
+  serviceAccount = _messages.StringField(3)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 4)
+
+
+class AvailableVersion(_messages.Message):
+  r"""AvailableVersion is an additional Kubernetes versions offered to users
+  who subscribed to the release channel.
+
+  Fields:
+    reason: Reason for availability.
+    version: Kubernetes version.
+  """
+
+  reason = _messages.StringField(1)
+  version = _messages.StringField(2)
 
 
 class BigQueryDestination(_messages.Message):
@@ -290,9 +311,10 @@ class Cluster(_messages.Message):
       exported from the cluster. * if left as an empty string,
       `monitoring.googleapis.com` will be used.
     name: The name of this cluster. The name must be unique within this
-      project and zone, and can be up to 40 characters with the following
-      restrictions:  * Lowercase letters, numbers, and hyphens only. * Must
-      start with a letter. * Must end with a number or a letter.
+      project and location (e.g. zone or region), and can be up to 40
+      characters with the following restrictions:  * Lowercase letters,
+      numbers, and hyphens only. * Must start with a letter. * Must end with a
+      number or a letter.
     network: The name of the Google Compute Engine [network](/compute/docs
       /networks-and-firewalls#networks) to which the cluster is connected. If
       left unspecified, the `default` network will be used. On output this
@@ -551,6 +573,7 @@ class ClusterUpdate(_messages.Message):
     desiredPodSecurityPolicyConfig: The desired configuration options for the
       PodSecurityPolicy feature.
     desiredPrivateClusterConfig: The desired private cluster configuration.
+    desiredReleaseChannel: The desired release channel configuration.
     desiredResourceUsageExportConfig: The desired configuration for exporting
       resource usage.
     desiredShieldedNodes: Configuration for Shielded Nodes.
@@ -577,10 +600,11 @@ class ClusterUpdate(_messages.Message):
   desiredNodeVersion = _messages.StringField(16)
   desiredPodSecurityPolicyConfig = _messages.MessageField('PodSecurityPolicyConfig', 17)
   desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 18)
-  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 19)
-  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 20)
-  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 21)
-  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 22)
+  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 19)
+  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 20)
+  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 21)
+  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 22)
+  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 23)
 
 
 class CompleteIPRotationRequest(_messages.Message):
@@ -1494,6 +1518,16 @@ class Jwk(_messages.Message):
   y = _messages.StringField(9)
 
 
+class KalmConfig(_messages.Message):
+  r"""Configuration options for the KALM addon.
+
+  Fields:
+    enabled: Whether KALM is enabled for this cluster.
+  """
+
+  enabled = _messages.BooleanField(1)
+
+
 class KubernetesDashboard(_messages.Message):
   r"""Configuration for the Kubernetes Dashboard.
 
@@ -2076,6 +2110,8 @@ class NodePool(_messages.Message):
     status: [Output only] The status of the nodes in this pool instance.
     statusMessage: [Output only] Additional information about the current
       status of this node pool instance, if available.
+    upgradeSettings: Upgrade settings control disruption and speed of the
+      upgrade.
     version: The version of the Kubernetes of this node.
   """
 
@@ -2120,7 +2156,8 @@ class NodePool(_messages.Message):
   selfLink = _messages.StringField(11)
   status = _messages.EnumField('StatusValueValuesEnum', 12)
   statusMessage = _messages.StringField(13)
-  version = _messages.StringField(14)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 14)
+  version = _messages.StringField(15)
 
 
 class NodePoolAutoscaling(_messages.Message):
@@ -2459,6 +2496,7 @@ class ReleaseChannelConfig(_messages.Message):
     ChannelValueValuesEnum: The release channel this configuration applies to.
 
   Fields:
+    availableVersions: List of available versions for the release channel.
     channel: The release channel this configuration applies to.
     defaultVersion: The default version for newly created clusters on the
       channel.
@@ -2490,8 +2528,9 @@ class ReleaseChannelConfig(_messages.Message):
     REGULAR = 2
     STABLE = 3
 
-  channel = _messages.EnumField('ChannelValueValuesEnum', 1)
-  defaultVersion = _messages.StringField(2)
+  availableVersions = _messages.MessageField('AvailableVersion', 1, repeated=True)
+  channel = _messages.EnumField('ChannelValueValuesEnum', 2)
+  defaultVersion = _messages.StringField(3)
 
 
 class ResourceLimit(_messages.Message):
@@ -3302,6 +3341,8 @@ class UpdateNodePoolRequest(_messages.Message):
     projectId: Deprecated. The Google Developers Console [project ID or
       project number](https://support.google.com/cloud/answer/6158840). This
       field has been deprecated and replaced by the name field.
+    upgradeSettings: Upgrade settings control disruption and speed of the
+      upgrade.
     workloadMetadataConfig: The desired image type for the node pool.
     zone: Deprecated. The name of the Google Compute Engine
       [zone](/compute/docs/zones#available) in which the cluster resides. This
@@ -3317,8 +3358,38 @@ class UpdateNodePoolRequest(_messages.Message):
   nodePoolId = _messages.StringField(7)
   nodeVersion = _messages.StringField(8)
   projectId = _messages.StringField(9)
-  workloadMetadataConfig = _messages.MessageField('WorkloadMetadataConfig', 10)
-  zone = _messages.StringField(11)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 10)
+  workloadMetadataConfig = _messages.MessageField('WorkloadMetadataConfig', 11)
+  zone = _messages.StringField(12)
+
+
+class UpgradeSettings(_messages.Message):
+  r"""These upgrade settings control the level of parallelism and the level of
+  disruption caused by an upgrade.  maxUnavailable controls the number of
+  nodes that can be simultaneously unavailable.  maxSurge controls the number
+  of additional nodes that can be added to the node pool temporarily for the
+  time of the upgrade to increase the number of available nodes.
+  (maxUnavailable + maxSurge) determines the level of parallelism (how many
+  nodes are being upgraded at the same time).  Note: upgrades inevitably
+  introduce some disruption since workloads need to be moved from old nodes to
+  new, upgraded ones. Even if maxUnavailable=0, this holds true. (Disruption
+  stays within the limits of PodDisruptionBudget, if it is configured.)
+  Consider a hypothetical node pool with 5 nodes having maxSurge=2,
+  maxUnavailable=1. This means the upgrade process upgrades 3 nodes
+  simultaneously. It creates 2 additional (upgraded) nodes, then it brings
+  down 3 old (not yet upgraded) nodes at the same time. This ensures that
+  there are always at least 4 nodes available.
+
+  Fields:
+    maxSurge: The maximum number of nodes that can be created beyond the
+      current size of the node pool during the upgrade process.
+    maxUnavailable: The maximum number of nodes that can be simultaneously
+      unavailable during the upgrade process. A node is considered available
+      if its status is Ready.
+  """
+
+  maxSurge = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  maxUnavailable = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class UsableSubnetwork(_messages.Message):

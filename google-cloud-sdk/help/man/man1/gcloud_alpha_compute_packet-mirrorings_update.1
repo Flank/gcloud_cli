@@ -231,10 +231,47 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+Stop mirroring by tags, add subnet\-1 as a mirrored subnet.
+
+.RS 2m
+$ gcloud alpha compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-clear\-mirrored\-tags
+    \-\-add\-mirrored\-subnets subnet\-1
+.RE
+
+Change the load\-balancer to send mirrored traffic to.
+
+.RS 2m
+$ gcloud alpha compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-collector\-ilb new\-forwarding\-rule
+.RE
+
+Disable a Packet Mirroring policy.
+
+.RS 2m
+$ gcloud alpha compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-no\-enable
+.RE
+
+Re\-enable a disabled Packet Mirroring policy.
+
+.RS 2m
+$ gcloud alpha compute packet\-mirrorings update my\-pm
+    \-\-region us\-central1 \-\-enable
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute packet\-mirrorings update
+.RE
 

@@ -17,7 +17,7 @@ gcloud alpha compute packet\-mirrorings delete \- delete a Google Compute Engine
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Delete a Google Compute Engine packet mirroring.
+\fB(ALPHA)\fR Delete a Google Compute Engine Packet Mirroring
 
 
 
@@ -54,10 +54,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+Delete the Packet Mirroring resource pm\-1 in region us\-central1.
+
+.RS 2m
+$ gcloud alpha compute packet\-mirrorings delete pm\-1
+  \-\-region us\-central1
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute packet\-mirrorings delete
+.RE
 

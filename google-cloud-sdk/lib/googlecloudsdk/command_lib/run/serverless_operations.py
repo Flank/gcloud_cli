@@ -22,25 +22,24 @@ from __future__ import unicode_literals
 import contextlib
 import datetime
 import functools
-import random
-import string
+from apitools.base.py import encoding
 from apitools.base.py import exceptions as api_exceptions
+from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.run import condition as run_condition
 from googlecloudsdk.api_lib.run import configuration
 from googlecloudsdk.api_lib.run import domain_mapping
 from googlecloudsdk.api_lib.run import global_methods
-from googlecloudsdk.api_lib.run import k8s_object
 from googlecloudsdk.api_lib.run import metric_names
 from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import route
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
-from googlecloudsdk.api_lib.util import exceptions as exceptions_util
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.run import config_changes as config_changes_mod
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
+from googlecloudsdk.command_lib.run import name_generator
 from googlecloudsdk.command_lib.run import resource_name_conversion
 from googlecloudsdk.command_lib.run import stages
 from googlecloudsdk.core import config
@@ -55,8 +54,6 @@ import six
 
 DEFAULT_ENDPOINT_VERSION = 'v1'
 
-
-_NONCE_LENGTH = 10
 
 # Wait 11 mins for each deployment. This is longer than the server timeout,
 # making it more likely to get a useful error message from the server.
@@ -414,26 +411,41 @@ class ServiceConditionPoller(ConditionPoller):
     return datetime.datetime.now() - self._start_time > self._five_seconds
 
 
-def _Nonce():
-  """Return a random string with unlikely collision to use as a nonce."""
-  return ''.join(
-      random.choice(string.ascii_lowercase) for _ in range(_NONCE_LENGTH))
-
-
 class _NewRevisionForcingChange(config_changes_mod.ConfigChanger):
-  """Forces a new revision to get created by posting a random nonce label."""
+  """Forces a new revision to get created by changing the revision name."""
 
-  def __init__(self, nonce):
-    self._nonce = nonce
+  def __init__(self, revision_suffix):
+    self._revision_name_change = config_changes_mod.RevisionNameChanges(
+        revision_suffix)
 
   def Adjust(self, resource):
-    resource.template.labels[revision.NONCE_LABEL] = self._nonce
-    return resource
+    """Adjust by revision name."""
+    if revision.NONCE_LABEL in resource.template.labels:
+      del resource.template.labels[revision.NONCE_LABEL]
+    return self._revision_name_change.Adjust(resource)
 
 
 def _IsDigest(url):
   """Return true if the given image url is by-digest."""
   return '@sha256:' in url
+
+
+class RevisionNameBasedPoller(waiter.OperationPoller):
+  """Poll for the revision with the given name to exist."""
+
+  def __init__(self, operations, revision_ref_getter):
+    self._operations = operations
+    self._revision_ref_getter = revision_ref_getter
+
+  def IsDone(self, revision_obj):
+    return bool(revision_obj)
+
+  def Poll(self, revision_name):
+    revision_ref = self._revision_ref_getter(revision_name)
+    return self._operations.GetRevision(revision_ref)
+
+  def GetResult(self, revision_obj):
+    return revision_obj
 
 
 class NonceBasedRevisionPoller(waiter.OperationPoller):
@@ -468,12 +480,15 @@ class _SwitchToDigestChange(config_changes_mod.ConfigChanger):
       return resource
 
     # Mutates through to metadata: Save the by-tag user intent.
-    resource.annotations[configuration.USER_IMAGE_ANNOTATION] = (
+    resource.annotations[revision.USER_IMAGE_ANNOTATION] = (
+        self._base_revision.image)
+    resource.template.annotations[revision.USER_IMAGE_ANNOTATION] = (
         self._base_revision.image)
     resource.template.image = self._base_revision.image_digest
     return resource
 
 _CLIENT_NAME_ANNOTATION = 'run.googleapis.com/client-name'
+_CLIENT_NAME = 'gcloud'
 _CLIENT_VERSION_ANNOTATION = 'run.googleapis.com/client-version'
 
 
@@ -481,10 +496,11 @@ class _SetClientNameAndVersion(config_changes_mod.ConfigChanger):
   """Sets the client name and version annotations."""
 
   def Adjust(self, resource):
-    annotations = k8s_object.AnnotationsFromMetadata(resource.MessagesModule(),
-                                                     resource.metadata)
-    annotations[_CLIENT_NAME_ANNOTATION] = 'gcloud'
-    annotations[_CLIENT_VERSION_ANNOTATION] = config.CLOUD_SDK_VERSION
+    resource.annotations[_CLIENT_NAME_ANNOTATION] = _CLIENT_NAME
+    resource.template.annotations[_CLIENT_NAME_ANNOTATION] = _CLIENT_NAME
+    resource.annotations[_CLIENT_VERSION_ANNOTATION] = config.CLOUD_SDK_VERSION
+    resource.template.annotations[
+        _CLIENT_VERSION_ANNOTATION] = config.CLOUD_SDK_VERSION
     return resource
 
 
@@ -755,8 +771,9 @@ class ServerlessOperations(object):
     we get the digest for the image to run.
 
     Getting this revision:
+      * If there's a name in the template metadata, use that
       * If there's a nonce in the revisonTemplate metadata, use that
-      * If that query produces >1 or produces 0 after a short timeout, use
+      * If that query produces >1 or 0 after a short timeout, use
         the latestCreatedRevision in status.
 
     Arguments:
@@ -767,23 +784,39 @@ class ServerlessOperations(object):
         level object.
 
     Returns:
-      The base revision of the configuration.
+      The base revision of the configuration or None if not found by revision
+        name nor nonce and latestCreatedRevisionName does not exist on the
+        Service object.
     """
-    # Or returns None if not available by nonce & the control plane has not
-    # implemented latestCreatedRevisionName on the Service object yet.
-    base_revision_nonce = template.labels.get(revision.NONCE_LABEL, None)
     base_revision = None
-    if base_revision_nonce:
+    # Try to find by revision name
+    base_revision_name = template.name
+    if base_revision_name:
       try:
-        namespace_ref = self._registry.Parse(
-            metadata.namespace,
-            collection='run.namespaces')
-        poller = NonceBasedRevisionPoller(self, namespace_ref)
-        base_revision = poller.GetResult(waiter.PollUntilDone(
-            poller, base_revision_nonce,
-            sleep_ms=500, max_wait_ms=2000))
-      except retry.WaitException:
+        revision_ref_getter = functools.partial(
+            self._registry.Parse,
+            params={'namespacesId': metadata.namespace},
+            collection='run.namespaces.revisions')
+        poller = RevisionNameBasedPoller(self, revision_ref_getter)
+        base_revision = poller.GetResult(
+            waiter.PollUntilDone(
+                poller, base_revision_name, sleep_ms=500, max_wait_ms=2000))
+      except retry.RetryException:
         pass
+    # Name polling didn't work. Fall back to nonce polling
+    if not base_revision:
+      base_revision_nonce = template.labels.get(revision.NONCE_LABEL, None)
+      if base_revision_nonce:
+        try:
+          namespace_ref = self._registry.Parse(
+              metadata.namespace,
+              collection='run.namespaces')
+          poller = NonceBasedRevisionPoller(self, namespace_ref)
+          base_revision = poller.GetResult(waiter.PollUntilDone(
+              poller, base_revision_nonce,
+              sleep_ms=500, max_wait_ms=2000))
+        except retry.RetryException:
+          pass
     # Nonce polling didn't work, because some client didn't post one or didn't
     # change one. Fall back to the (slightly racy) `latestCreatedRevisionName`.
     if not base_revision:
@@ -865,15 +898,7 @@ class ServerlessOperations(object):
               serv_create_req)
         return service.Service(raw_service, messages)
     except api_exceptions.HttpBadRequestError as e:
-      error_payload = exceptions_util.HttpErrorPayload(e)
-      if error_payload.field_violations:
-        if (serverless_exceptions.BadImageError.IMAGE_ERROR_FIELD
-            in error_payload.field_violations):
-          exceptions.reraise(serverless_exceptions.BadImageError(e))
-        elif (serverless_exceptions.MalformedLabelError.LABEL_ERROR_FIELD
-              in error_payload.field_violations):
-          exceptions.reraise(serverless_exceptions.MalformedLabelError(e))
-      exceptions.reraise(e)
+      exceptions.reraise(serverless_exceptions.HttpError(e))
     except api_exceptions.HttpNotFoundError as e:
       platform = properties.VALUES.run.platform.Get()
       error_msg = 'Deployment endpoint was not found.'
@@ -959,13 +984,17 @@ class ServerlessOperations(object):
       tracker = progress_tracker.NoOpStagedProgressTracker(
           stages.ServiceStages(allow_unauthenticated is not None),
           interruptable=True, aborted_message='aborted')
+    serv = self.GetService(service_ref)
+    curr_generation = serv.generation if serv else 0
+    revision_suffix = '{}-{}'.format(
+        str(curr_generation + 1).zfill(5), name_generator.GenerateName())
     if for_replace:
       with_image = True
     else:
       with_image = any(
           isinstance(c, config_changes_mod.ImageChange) for c in config_changes)
-      config_changes = [_NewRevisionForcingChange(_Nonce())] + config_changes
-    serv = self.GetService(service_ref)
+      config_changes = ([_NewRevisionForcingChange(revision_suffix)] +
+                        config_changes)
     self._UpdateOrCreateService(
         service_ref, config_changes, with_image, serv)
 
@@ -999,7 +1028,8 @@ class ServerlessOperations(object):
       for msg in run_condition.GetNonTerminalMessages(poller.GetConditions()):
         tracker.AddWarning(msg)
 
-  def ListRevisions(self, namespace_ref, service_name):
+  def ListRevisions(self, namespace_ref, service_name,
+                    limit=None, page_size=100):
     """List all revisions for the given service.
 
     Revision list gets sorted by service name and creation timestamp.
@@ -1007,11 +1037,17 @@ class ServerlessOperations(object):
     Args:
       namespace_ref: Resource, namespace to list revisions in
       service_name: str, The service for which to list revisions.
+      limit: Optional[int], max number of revisions to list.
+      page_size: Optional[int], number of revisions to fetch at a time
 
-    Returns:
-      A list of revisions for the given service.
+    Yields:
+      Revisions for the given surface
     """
     messages = self.messages_module
+    # NB: This is a hack to compensate for apitools not generating this line.
+    #     It's necessary to make the URL parameter be "continue".
+    encoding.AddCustomJsonFieldMapping(
+        messages.RunNamespacesRevisionsListRequest, 'continue_', 'continue')
     request = messages.RunNamespacesRevisionsListRequest(
         parent=namespace_ref.RelativeName(),
     )
@@ -1020,15 +1056,15 @@ class ServerlessOperations(object):
       # 'service-less' operation.
       request.labelSelector = 'serving.knative.dev/service = {}'.format(
           service_name)
-    with metrics.RecordDuration(metric_names.LIST_REVISIONS):
-      response = self._client.namespaces_revisions.List(request)
-
-    # Server does not sort the response so we'll need to sort client-side
-    revisions = [revision.Revision(item, messages) for item in response.items]
-    # Newest first
-    revisions.sort(key=lambda r: r.creation_timestamp, reverse=True)
-    revisions.sort(key=lambda r: r.service_name)
-    return revisions
+    for result in list_pager.YieldFromList(
+        service=self._client.namespaces_revisions,
+        request=request,
+        limit=limit,
+        batch_size=page_size,
+        current_token_attribute='continue_',
+        next_token_attribute=('metadata', 'continue_'),
+        batch_size_attribute='limit'):
+      yield revision.Revision(result, messages)
 
   def ListDomainMappings(self, namespace_ref):
     """List all domain mappings.

@@ -1,11 +1,11 @@
 NAME
-    gcloud alpha firestore - manage your Cloud Firestore imports and exports
+    gcloud alpha firestore - manage your Cloud Firestore resources
 
 SYNOPSIS
     gcloud alpha firestore GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage your Cloud Firestore imports and exports.
+    (ALPHA) Manage your Cloud Firestore resources.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,
@@ -36,7 +36,8 @@ NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist. This variant is also available:
+    access whitelist. These variants are also available:
 
+        $ gcloud firestore
         $ gcloud beta firestore
 

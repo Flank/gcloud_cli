@@ -1,0 +1,487 @@
+title: annotation stores import export evaluate tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: export bq
+  - command: |
+      healthcare annotation-stores export bq my-store --location=us-central1
+      --dataset=my-dataset --bq-table=bq://fakeProject.fakeDataset.fakeTable
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+- execute:
+  - label: export gcs
+  - command: |
+      healthcare annotation-stores export gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://bucket-id/path/to/fake/dir
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+- execute:
+  - label: export finished with errors
+  - command: |
+      healthcare annotation-stores export gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://bucket-id/path/to/fake/dir
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409]
+        to complete
+    - status: FAILURE
+  - error: |-
+      1: {
+        "code": 2,
+        "details": [
+          {
+            "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ExportAnnotationsErrorDetails",
+            "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
+            "errorCount": "1234",
+            "inputSize": "1234"
+          }
+        ]
+      }
+- execute:
+  - label: import
+  - command: |
+      healthcare annotation-stores import gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://fake/path
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+- execute:
+  - label: import finished with errors
+  - command: |
+      healthcare annotation-stores import gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://fake/path
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409]
+        to complete
+    - status: FAILURE
+  - error: |-
+      1: {
+        "code": 2,
+        "details": [
+          {
+            "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ImportAnnotationsErrorDetails",
+            "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
+            "errorCount": "1234",
+            "inputSize": "1234"
+          }
+        ]
+      }
+- execute:
+  - label: evaluate
+  - command: |
+      healthcare annotation-stores evaluate bq my-store --location=us-central1 --dataset=my-dataset
+      --golden-store=projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store
+      --bq-table=bq://fakeProject.fakeDataset.fakeTable
+  - stderr: |
+      Request issued for: [my-store]
+  - progress_tracker:
+    - message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+        to complete
+    - status: SUCCESS
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1alpha2
+- execute_command:
+    label: export bq
+    command: |
+      healthcare annotation-stores export bq my-store --location=us-central1
+      --dataset=my-dataset --bq-table=bq://fakeProject.fakeDataset.fakeTable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:export?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: export gcs
+    command: |
+      healthcare annotation-stores export gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://bucket-id/path/to/fake/dir
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:export?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: export finished with errors
+    command: |
+      healthcare annotation-stores export gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://bucket-id/path/to/fake/dir
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:export?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata",
+                "apiMethodName": "google.cloud.healthcare.$$api-version$$.annotation.AnnotationService.ExportAnnotations",
+                "createTime": "2019-09-24T22:14:59.743194Z",
+                "endTime": "2019-09-24T22:15:05.004200Z",
+                "counter": {
+                  "failure": "1234"
+                }
+              },
+              "done": true,
+              "error": {
+                "code": 2,
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ExportAnnotationsErrorDetails",
+                    "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
+                    "inputSize": "1234",
+                    "errorCount": "1234"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409]
+          to complete
+        status: FAILURE
+    - expect_exit:
+        code: 1
+        message: |-
+          {
+            "code": 2,
+            "details": [
+              {
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ExportAnnotationsErrorDetails",
+                "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
+                "errorCount": "1234",
+                "inputSize": "1234"
+              }
+            ]
+          }
+- execute_command:
+    label: import
+    command: |
+      healthcare annotation-stores import gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://fake/path
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:import?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: import finished with errors
+    command: |
+      healthcare annotation-stores import gcs my-store --location=us-central1 --dataset=my-dataset
+        --gcs-uri=gs://fake/path
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:import?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              gcsSource:
+                uri: gs://fake/path
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.OperationMetadata",
+                "apiMethodName": "google.cloud.healthcare.$$api-version$$.annotation.AnnotationService.ImportAnnotations",
+                "createTime": "2019-09-24T22:14:59.743194Z",
+                "endTime": "2019-09-24T22:15:05.004200Z",
+                "counter": {
+                  "failure": "1234"
+                }
+              },
+              "done": true,
+              "error": {
+                "code": 2,
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ImportAnnotationsErrorDetails",
+                    "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
+                    "inputSize": "1234",
+                    "errorCount": "1234"
+                  }
+                ]
+              }
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/18023657645075857409]
+          to complete
+        status: FAILURE
+    - expect_exit:
+        code: 1
+        message: |-
+          {
+            "code": 2,
+            "details": [
+              {
+                "@type": "type.googleapis.com/google.cloud.healthcare.$$api-version$$.annotation.rest.ImportAnnotationsErrorDetails",
+                "annotationStore": "projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store",
+                "errorCount": "1234",
+                "inputSize": "1234"
+              }
+            ]
+          }
+- execute_command:
+    label: evaluate
+    command: |
+      healthcare annotation-stores evaluate bq my-store --location=us-central1 --dataset=my-dataset
+      --golden-store=projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store
+      --bq-table=bq://fakeProject.fakeDataset.fakeTable
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store:evaluate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stderr: |
+        Request issued for: [my-store]
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "done": true,
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890]
+          to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1/datasets/my-dataset/annotationStores/my-store?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0

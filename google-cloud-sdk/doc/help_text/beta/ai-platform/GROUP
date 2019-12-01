@@ -45,6 +45,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     explain
+        (BETA) Run AI Platform explanation.
+
      predict
         (BETA) Run AI Platform online prediction.
 

@@ -1,5 +1,5 @@
 title: Basic test of L7ILB forwarding rule.
-release_tracks: [ALPHA, BETA]
+release_tracks: [BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:

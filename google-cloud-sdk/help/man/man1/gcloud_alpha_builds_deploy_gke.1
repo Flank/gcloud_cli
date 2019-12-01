@@ -11,7 +11,7 @@ gcloud alpha builds deploy gke \- build and deploy to a target Google Kubernetes
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds deploy gke\fR [\fISOURCE\fR] \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-location\fR=\fILOCATION\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-tag\fR=\fITAG\fR\ |\ \fB\-\-tag\-default\fR) [\fB\-\-app\-name\fR=\fIAPP_NAME\fR] [\fB\-\-app\-version\fR=\fIAPP_VERSION\fR] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-expose\fR=\fIEXPOSE\fR] [\fB\-\-gcs\-staging\-dir\fR=\fIGCS_STAGING_DIR\fR] [\fB\-\-namespace\fR=\fINAMESPACE\fR;\ default="default"] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds deploy gke\fR [\fISOURCE\fR] \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-location\fR=\fILOCATION\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-tag\fR=\fITAG\fR\ |\ \fB\-\-tag\-default\fR) [\fB\-\-app\-name\fR=\fIAPP_NAME\fR] [\fB\-\-app\-version\fR=\fIAPP_VERSION\fR] [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-expose\fR=\fIEXPOSE\fR] [\fB\-\-gcs\-staging\-dir\fR=\fIGCS_STAGING_DIR\fR] [\fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -108,15 +108,15 @@ Return immediately, without waiting for the operation in progress to complete.
 .TP 2m
 \fB\-\-config\fR=\fICONFIG\fR
 Path to the Kubernetes YAML, or directory containing multiple Kubernetes YAML
-files, used to deploy the container image, relative to SOURCE. The files must
-reference the provided container image or tag.
+files, used to deploy the container image. The path is relative to the
+repository root. The files must reference the provided container image or tag.
 
 If this field is not set, a default Deployment config and Horizontal Pod
 Autoscaler config are used to deploy the image.
 
 .TP 2m
 \fB\-\-expose\fR=\fIEXPOSE\fR
-Port that the deployed application listens to. If set, a Kubernetes Service of
+Port that the deployed application listens on. If set, a Kubernetes Service of
 type 'LoadBalancer' is created with a single TCP port mapping that exposes this
 port.
 
@@ -132,7 +132,7 @@ If this field is not set, the source and configs are written to
 \'source' sub\-directory and configs are written to the 'config' sub\-directory.
 
 .TP 2m
-\fB\-\-namespace\fR=\fRNAMESPACE\fI; default="default"
+\fB\-\-namespace\fR=\fRNAMESPACE\fI
 Namespace of the target cluster to deploy to. If this field is not set, the
 \'default' namespace is used.
 

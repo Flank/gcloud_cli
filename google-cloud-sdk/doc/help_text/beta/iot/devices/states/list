@@ -58,6 +58,13 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list states for the device 'my-device' in region 'us-central1' and in
+    registry 'my-registry', run:
+
+        $ gcloud beta iot devices states list --device=my-device \
+            --region=us-central1 --registry=my-registry
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

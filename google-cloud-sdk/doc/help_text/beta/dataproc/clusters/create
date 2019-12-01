@@ -2,7 +2,7 @@ NAME
     gcloud beta dataproc clusters create - create a cluster
 
 SYNOPSIS
-    gcloud beta dataproc clusters create NAME
+    gcloud beta dataproc clusters create (CLUSTER : --region=REGION)
         --autoscaling-policy=AUTOSCALING_POLICY [--no-address] [--async]
         [--bucket=BUCKET] [--enable-component-gateway]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
@@ -22,9 +22,8 @@ SYNOPSIS
         [--preemptible-worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
         [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
-        [--properties=[PREFIX:PROPERTY=VALUE,...]] [--region=REGION]
-        [--scopes=SCOPE,[SCOPE,...]] [--service-account=SERVICE_ACCOUNT]
-        [--tags=TAG,[TAG,...]]
+        [--properties=[PREFIX:PROPERTY=VALUE,...]] [--scopes=SCOPE,[SCOPE,...]]
+        [--service-account=SERVICE_ACCOUNT] [--tags=TAG,[TAG,...]]
         [--worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
         [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
@@ -46,8 +45,28 @@ DESCRIPTION
     (BETA) Create a cluster.
 
 POSITIONAL ARGUMENTS
-     NAME
-        The name of this cluster.
+     Cluster resource - The name of the cluster to create. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument [cluster]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       CLUSTER
+          ID of the cluster or fully qualified identifier for the cluster. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --region=REGION
+          Cloud Dataproc region for the cluster. Each Cloud Dataproc region
+          constitutes an independent resource namespace constrained to
+          deploying instances into Google Compute Engine zones inside the
+          region. The default value of global is a special multi-region
+          namespace which is capable of deploying instances into all Google
+          Compute Engine zones globally, and is disjoint from other Cloud
+          Dataproc regions. Overrides the default dataproc/region property
+          value for this command invocation.
 
 FLAGS
      --autoscaling-policy=AUTOSCALING_POLICY
@@ -226,12 +245,6 @@ FLAGS
         See
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties
         for more information.
-
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. Overrides the default
-        dataproc/region property value for this command invocation.
 
      --scopes=SCOPE,[SCOPE,...]
         Specifies scopes for the node instances. Multiple SCOPEs can be

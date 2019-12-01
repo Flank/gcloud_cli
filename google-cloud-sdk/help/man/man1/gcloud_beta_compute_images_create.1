@@ -222,9 +222,9 @@ using this flag.
 
 .TP 2m
 \fB\-\-storage\-location\fR=\fILOCATION\fR
-Google Cloud Storage location, either regional or multi\-regional, where image
-content is to be stored. If absent, the multi\-region location closest to the
-source is chosen automatically.
+Specifies a Cloud Storage location, either regional or multi\-regional, where
+image content is to be stored. If not specified, the multi\-region location
+closest to the source is chosen automatically.
 
 .TP 2m
 
@@ -262,6 +262,44 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create an image 'my\-image' from a disk 'my\-disk' in zone 'us\-east1\-a',
+run:
+
+.RS 2m
+$ gcloud beta compute images create my\-image \-\-source\-disk=my\-disk \e
+  \-\-source\-disk\-zone=us\-east1\-a
+.RE
+
+To create an image 'my\-image' from another image 'source\-image' with source
+image project 'source\-image\-project', run:
+
+.RS 2m
+$ gcloud beta compute images create my\-image \e
+  \-\-source\-image=source\-image \e
+  \-\-source\-image\-project=source\-image\-project
+.RE
+
+To create an image 'my\-image' from the latest non\-deprecated image in the
+family 'source\-image\-family' with source image project
+\'source\-image\-project', run:
+
+.RS 2m
+$ gcloud beta compute images create my\-image \e
+  \-\-source\-image\-family=source\-image\-family \e
+  \-\-source\-image\-project=source\-image\-project
+.RE
+
+To create an image 'my\-image' from a snapshot 'source\-snapshot', run:
+
+.RS 2m
+$ gcloud beta compute images create my\-image \e
+  \-\-source\-snapshot=source\-snapshot
+.RE
 
 
 

@@ -11,7 +11,7 @@ gcloud dataproc operations set\-iam\-policy \- set IAM policy for an operation
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dataproc operations set\-iam\-policy\fR \fIOPERATION\fR \fIPOLICY_FILE\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dataproc operations set\-iam\-policy\fR (\fIOPERATION\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,9 +25,33 @@ Sets the IAM policy for an operation, given an operation ID and the policy.
 
 .RS 2m
 .TP 2m
-\fIOPERATION\fR
-The ID of the operation to set the policy on.
 
+Operation resource \- The ID of the operation to set the policy on. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [operation] on
+the command line with a fully specified name; provide the argument [\-\-project]
+on the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of the operation or fully qualified identifier for the operation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region for the operation. Each Cloud Dataproc region constitutes
+an independent resource namespace constrained to deploying instances into Google
+Compute Engine zones inside the region. The default value of \f5global\fR is a
+special multi\-region namespace which is capable of deploying instances into all
+Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
+regions. Overrides the default \f5dataproc/region\fR property value for this
+command invocation.
+
+.RE
+.sp
 .TP 2m
 \fIPOLICY_FILE\fR
 Path to a local JSON or YAML formatted file containing a valid policy.
@@ -35,20 +59,6 @@ Path to a local JSON or YAML formatted file containing a valid policy.
 The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
 or YAML file conforming to the structure of a Policy
 (https://cloud.google.com/iam/reference/rest/v1/Policy).
-
-
-.RE
-.sp
-
-.SH "FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. Overrides the default \fBdataproc/region\fR
-property value for this command invocation.
 
 
 .RE

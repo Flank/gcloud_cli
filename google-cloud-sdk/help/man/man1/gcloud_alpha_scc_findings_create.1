@@ -11,7 +11,7 @@ gcloud alpha scc findings create \- create a Cloud Security Command Center findi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scc findings create\fR (\fIFINDING\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR\ \fB\-\-source\fR=\fISOURCE\fR) [\fB\-\-category\fR=\fICATEGORY\fR] [\fB\-\-event\-time\fR=\fIEVENT_TIME\fR] [\fB\-\-external\-uri\fR=\fIEXTERNAL_URI\fR] [\fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR] [\fB\-\-source\-properties\fR=[\fISOURCE_PROPERTIES\fR,...]] [\fB\-\-state\fR=\fISTATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scc findings create\fR (\fIFINDING\fR\ :\ \fB\-\-organization\fR=\fIORGANIZATION\fR\ \fB\-\-source\fR=\fISOURCE\fR) \fB\-\-category\fR=\fICATEGORY\fR \fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR [\fB\-\-event\-time\fR=\fIEVENT_TIME\fR] [\fB\-\-external\-uri\fR=\fIEXTERNAL_URI\fR] [\fB\-\-source\-properties\fR=[\fISOURCE_PROPERTIES\fR,...]] [\fB\-\-state\fR=\fISTATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,13 +52,24 @@ the source. Example: organizations/123/sources/456, the id is 456.
 .RE
 .sp
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
 
 .RS 2m
 .TP 2m
 \fB\-\-category\fR=\fICATEGORY\fR
 Taxonomy group within findings from a given source. Example: XSS_FLASH_INJECTION
 
+.TP 2m
+\fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR
+Full resource name of the Google Cloud Platform resource this finding is for.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
 .TP 2m
 \fB\-\-event\-time\fR=\fIEVENT_TIME\fR
 Time at which the event took place. For example, if the finding represents an
@@ -71,10 +82,6 @@ event\-time is not provided, it will default to UTC version of NOW. For example
 URI that, if available, points to a web page outside of Cloud SCC (Security
 Command Center) where additional information about the finding can be found.
 This field is guaranteed to be either empty or a well formed URL.
-
-.TP 2m
-\fB\-\-resource\-name\fR=\fIRESOURCE_NAME\fR
-Full resource name of the Google Cloud Platform resource this finding is for.
 
 .TP 2m
 \fB\-\-source\-properties\fR=[\fISOURCE_PROPERTIES\fR,...]

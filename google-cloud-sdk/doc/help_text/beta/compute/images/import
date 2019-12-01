@@ -88,9 +88,9 @@ OPTIONAL FLAGS
         network named default is used.
 
      --storage-location=STORAGE_LOCATION
-        Cloud Storage location, either regional or multi-regional, where image
-        content is to be stored. If absent, the multi-region location closest
-        to the source is chosen automatically.
+        Specifies a Cloud Storage location, either regional or multi-regional,
+        where image content is to be stored. If not specified, the multi-region
+        location closest to the source is chosen automatically.
 
      --subnet=SUBNET
         Name of the subnetwork in your project to use for the image import. If

@@ -58,8 +58,9 @@ EXAMPLES
         $ gcloud beta compute url-maps import NAME --source=<path-to-file>
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute url-maps import
         $ gcloud alpha compute url-maps import
 

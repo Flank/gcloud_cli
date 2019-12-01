@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud container node-pools create NAME
         [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
-        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--enable-autoupgrade] [--image-type=IMAGE_TYPE]
+        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE]
+        [--enable-autoprovisioning] [--enable-autorepair]
+        [--no-enable-autoupgrade] [--image-type=IMAGE_TYPE]
         [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
@@ -15,6 +16,7 @@ SYNOPSIS
         [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
         [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--shielded-integrity-monitoring] [--shielded-secure-boot]
         [--tags=TAG,[TAG,...]]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--region=REGION | --zone=ZONE, -z ZONE]
@@ -56,6 +58,13 @@ FLAGS
         Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
         be one of: pd-standard, pd-ssd.
 
+     --enable-autoprovisioning
+        Enables Cluster Autoscaler to treat the node pool as if it was
+        autoprovisioned.
+
+        Cluster Autoscaler will be able to delete the node pool if it's
+        unneeded.
+
      --enable-autorepair
         Enable node autorepair feature for a node pool.
 
@@ -77,6 +86,8 @@ FLAGS
 
         See https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
         for more info.
+
+        Enabled by default, use --no-enable-autoupgrade to disable.
 
      --image-type=IMAGE_TYPE
         The image type to use for the node pool. Defaults to server-specified.
@@ -231,6 +242,15 @@ FLAGS
         preemptible VM instances. See
         https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
         information on how to use Preemptible VMs with Kubernetes Engine.
+
+     --shielded-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created.
+
+     --shielded-secure-boot
+        The instance will boot with secure boot enabled.
 
      --tags=TAG,[TAG,...]
         Applies the given Compute Engine tags (comma separated) on all nodes in

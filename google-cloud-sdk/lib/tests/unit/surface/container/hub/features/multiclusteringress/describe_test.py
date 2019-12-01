@@ -34,22 +34,27 @@ class DescribeTest(base.FeaturesTestBase):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   def _MakeMultiClusterIngressFeatureSpec(self, config_membership):
-    return self.messages.MultiClusterIngressFeatureSpec(
+    return self.features_api.messages.MultiClusterIngressFeatureSpec(
         configMembership=config_membership)
 
   def _MakeFeatureState(self, lifecycle_state):
-    return self.messages.FeatureState(lifecycleState=lifecycle_state)
+    return self.features_api.messages.FeatureState(
+        lifecycleState=lifecycle_state)
 
   def testRunDescribe(self):
-    config_membership = '{0}/memberships/golden-cluster'.format(self.parent)
-    lifecycle_state = self.messages.FeatureState.LifecycleStateValueValuesEnum.ENABLED
+    config_membership = '{0}/memberships/golden-cluster'.format(
+        self.features_api.parent)
+    lifecycle_state = (self.features_api.messages.FeatureState
+                       .LifecycleStateValueValuesEnum.ENABLED)
     multiclusteringress_feature_spec = self._MakeMultiClusterIngressFeatureSpec(
         config_membership=config_membership)
-    feature = self._MakeFeature(
+    feature = self.features_api._MakeFeature(
         multiclusteringressFeatureSpec=multiclusteringress_feature_spec,
         featureState=self._MakeFeatureState(lifecycle_state))
-    self.ExpectGetFeature(feature)
+    self.features_api.ExpectGet(feature)
+
     self.RunCommand(['describe'])
+
     out = yaml.load(self.GetOutput())
     self.assertIsNotNone(out)
     kwargs = {

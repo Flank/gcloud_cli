@@ -57,10 +57,11 @@ Name of the managed instance group to operate on.
 \fB\-\-mode\fR=\fIMODE\fR
 Set the mode of an autoscaler for a managed instance group.
 
-You can turn off or restrict MIG activities without changing MIG configuration
-and then having to restore it later. MIG configuration persists while the
-activities are turned off or restricted, and the activities pick it up when they
-are turned on again or when the restrictions are lifted.
+You can turn off or restrict MIG autoscaler activities (scaling up, scaling
+down) without changing autoscaler configuration and then having to restore it
+later. Autoscaler configuration persists while the activities are turned off or
+restricted, and the activities pick it up when they are turned on again or when
+the restrictions are lifted.
 
 \fIMODE\fR must be one of:
 
@@ -71,9 +72,6 @@ to turn off autoscaling, while keeping the new configuration.
 .TP 2m
 \fBon\fR
 to permit autoscaling to scale up and down (default for new autoscalers).
-.TP 2m
-\fBonly\-down\fR
-to permit autoscaling to scale only down and not up.
 .TP 2m
 \fBonly\-up\fR
 to permit autoscaling to scale only up and not down.
@@ -157,10 +155,25 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To update an existing instance group:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed update\-autoscaling \e
+  \-\-mode=only\-up
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed update\-autoscaling
+.RE
 

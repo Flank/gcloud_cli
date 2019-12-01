@@ -8520,6 +8520,52 @@ class InstancesCreateTestAlpha(InstancesCreateReservationTestBeta):
             zone='central2-a',))],)
 
 
+  def testWithLocationHint(self):
+    m = self.messages
+
+    self.Run("""
+        compute instances create instance
+          --zone central2-a
+          --location-hint cell1
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='instance',
+                networkInterfaces=[
+                    m.NetworkInterface(
+                        accessConfigs=[
+                            m.AccessConfig(
+                                name='external-nat', type=self._one_to_one_nat)
+                        ],
+                        network=self._default_network)
+                ],
+                serviceAccounts=[
+                    m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True,
+                                        locationHint='cell1'),),
+            project='my-project',
+            zone='central2-a',))],)
+
+
+
 class InstancesCreateWithLabelsTest(test_base.BaseTest):
   """Test creation of instances with labels."""
 
@@ -9030,6 +9076,61 @@ class InstancesCreateShieldedInstanceConfigAlphaTest(
   def SetUp(self):
     SetUp(self, 'alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceCreateConfidentialInstanceConfigAlphaTest(
+    InstancesCreateTestsMixin, parameterized.TestCase):
+  """Test creation of VM instances with Confidential Instance config."""
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  @parameterized.named_parameters(
+      ('EnableConfidentialCompute', '--confidential-compute', True),
+      ('DisableConfidentialCompute', '--no-confidential-compute', False))
+  def testCreateVM(self, cmd_flag, enable_confidential_compute):
+    m = self.messages
+    self.Run('compute instances create instance-1 '
+             '  --zone central2-a {}'.format(cmd_flag))
+
+    self.CheckRequests(self.zone_get_request, self.project_get_request, [
+        (self.compute.instances, 'Insert',
+         m.ComputeInstancesInsertRequest(
+             instance=m.Instance(
+                 canIpForward=False,
+                 deletionProtection=False,
+                 disks=[
+                     m.AttachedDisk(
+                         autoDelete=True,
+                         boot=True,
+                         initializeParams=m.AttachedDiskInitializeParams(
+                             sourceImage=self._default_image,),
+                         mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                         type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                 ],
+                 machineType=self._default_machine_type,
+                 metadata=m.Metadata(),
+                 minCpuPlatform=None,
+                 name='instance-1',
+                 networkInterfaces=[
+                     m.NetworkInterface(
+                         accessConfigs=[
+                             m.AccessConfig(
+                                 name='external-nat', type=self._one_to_one_nat)
+                         ],
+                         network=self._default_network)
+                 ],
+                 serviceAccounts=[
+                     m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                 ],
+                 scheduling=m.Scheduling(automaticRestart=True),
+                 confidentialInstanceConfig=m.ConfidentialInstanceConfig(
+                     enableConfidentialCompute=enable_confidential_compute)),
+             project='my-project',
+             zone='central2-a',
+         ))
+    ])
 
 
 class InstancesCreateDiskFromSnapshotTestGA(InstancesCreateTestsMixin,

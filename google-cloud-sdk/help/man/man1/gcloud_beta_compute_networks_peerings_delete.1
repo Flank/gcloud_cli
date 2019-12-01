@@ -17,7 +17,8 @@ gcloud beta compute networks peerings delete \- delete a Google Compute Engine n
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Delete a Google Compute Engine network peering.
+\fB(BETA)\fR \fBgcloud beta compute networks peerings delete\fR deletes a Google
+Compute Engine network peering.
 
 
 
@@ -50,6 +51,18 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a network peering with the name 'peering\-name' on the network
+\'local\-network', run:
+
+.RS 2m
+$ gcloud beta compute networks peerings delete peering\-name \e
+  \-\-network=local\-network
+.RE
 
 
 

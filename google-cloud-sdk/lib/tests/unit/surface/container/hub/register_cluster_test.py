@@ -393,6 +393,50 @@ class RegisterClusterTestBeta(cli_test_base.CliTestBase,
     mock_delete_membership.assert_not_called()
     mock_delete_membership_resource.assert_not_called()
 
+  def testSuccessfulAgentDeploymentWithProxy(self):
+    self.successfulMockSetup()
+    apply_membership_resources = self.StartObjectPatch(
+        util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+
+    self.RunCommand([
+        'my-cluster',
+        '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context',
+        '--service-account-key-file=' + self.serviceaccount_file,
+        '--proxy=https://proxy.com:8080'
+    ])
+    # This was a successful registration; make sure we created the Membership
+    # resources.
+    apply_membership_resources.assert_called_once()
+
+    mock_delete_membership.assert_not_called()
+    mock_delete_membership_resource.assert_not_called()
+
+  def testSuccessfulAgentDeploymentWithEncodedProxy(self):
+    self.successfulMockSetup()
+    apply_membership_resources = self.StartObjectPatch(
+        util, 'ApplyMembershipResources')
+    mock_delete_membership = self.StartObjectPatch(util, 'DeleteMembership')
+    mock_delete_membership_resource = self.StartObjectPatch(
+        util, 'DeleteMembershipResources')
+
+    self.RunCommand([
+        'my-cluster',
+        '--kubeconfig=' + self.kubeconfig,
+        '--context=test-context',
+        '--service-account-key-file=' + self.serviceaccount_file,
+        '--proxy=aHR0cHM6Ly8xMjM0LmNvbTo4MDgw'
+    ])
+    # This was a successful registration; make sure we created the Membership
+    # resources.
+    apply_membership_resources.assert_called_once()
+
+    mock_delete_membership.assert_not_called()
+    mock_delete_membership_resource.assert_not_called()
+
   def testSuccessfulAgentDeploymentWithPrivateRegistry(self):
     self.successfulMockSetup()
     apply_membership_resources = self.StartObjectPatch(

@@ -88,41 +88,6 @@ class SV1UnitTestBase(sdk_test_base.WithFakeAuth,
         serviceConfig=service_config
     )
 
-  def MockOperationWait(self, op_name, response_dict=None,
-                        final_error_code=None):
-    response = None
-    if response_dict:
-      response = encoding.DictToMessage(
-          response_dict,
-          self.services_messages.Operation.ResponseValue)
-
-    # First, expect a call where the op is not yet done
-    self.mocked_client.operations.Get.Expect(
-        request=self.services_messages.ServicemanagementOperationsGetRequest(
-            operationsId=op_name
-        ),
-        response=self.services_messages.Operation(
-            name=op_name,
-            done=False,
-            response=response,
-        )
-    )
-
-    # Then, expect a call where the op has now completed
-    self.mocked_client.operations.Get.Expect(
-        request=self.services_messages.ServicemanagementOperationsGetRequest(
-            operationsId=op_name
-        ),
-        response=self.services_messages.Operation(
-            name=op_name,
-            done=True,
-            error=(self.services_messages.Status(code=final_error_code)
-                   if final_error_code else None),
-            response=response,
-        )
-    )
-
-
 NETWORK_URL_FORMAT = 'projects/%s/global/networks/%s'
 
 
@@ -223,6 +188,8 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
 
   def PreSetUp(self):
     self.services_messages = core_apis.GetMessagesModule('serviceusage', 'v1')
+    self.services_v1beta1_messages = core_apis.GetMessagesModule(
+        'serviceusage', 'v1beta1')
     self.services_v1alpha_messages = core_apis.GetMessagesModule(
         'serviceusage', 'v1alpha')
 
@@ -236,6 +203,12 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
             'serviceusage', 'v1', no_http=True))
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
+    self.mocked_v1beta1_client = mock.Client(
+        core_apis.GetClientClass('serviceusage', 'v1beta1'),
+        real_client=core_apis.GetClientInstance(
+            'serviceusage', 'v1beta1', no_http=True))
+    self.mocked_v1beta1_client.Mock()
+    self.addCleanup(self.mocked_v1beta1_client.Unmock)
     self.mocked_v1alpha_client = mock.Client(
         core_apis.GetClientClass('serviceusage', 'v1alpha'),
         real_client=core_apis.GetClientInstance(
@@ -339,12 +312,12 @@ class SUUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
       resp = encoding.DictToMessage({
           'email': email,
           'unique_id': unique_id
-      }, self.services_v1alpha_messages.Operation.ResponseValue)
-      op = self.services_v1alpha_messages.Operation(
+      }, self.services_v1beta1_messages.Operation.ResponseValue)
+      op = self.services_v1beta1_messages.Operation(
           name='opname', done=True, response=resp)
-    self.mocked_v1alpha_client.services.GenerateIdentity.Expect(
-        self.services_v1alpha_messages
-        .ServiceusageServicesGenerateIdentityRequest(
+    self.mocked_v1beta1_client.services.GenerateServiceIdentity.Expect(
+        self.services_v1beta1_messages
+        .ServiceusageServicesGenerateServiceIdentityRequest(
             parent='projects/%s/services/%s' %
             (self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME),),
         op,

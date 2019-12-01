@@ -120,6 +120,17 @@ class HandlersTest(concepts_test_base.MultitypeTestBase,
     self.assertTrue(hasattr(runtime_handler, 'book'))
     self.assertTrue(hasattr(runtime_handler, 'other_book'))
 
+  def testRuntimeHandlerAddConceptFailsForRepeatedName(self):
+    """Tests that AddConcept fails adding attributes if name is repeated."""
+    resource_infos = [self.SetUpResourceInfo('--book'),
+                      self.SetUpResourceInfo('--other-book'),
+                      self.SetUpResourceInfo('--a-third-book')]
+    runtime_handler = handlers.RuntimeHandler()
+    runtime_handler.AddConcept('book', resource_infos[0])
+    runtime_handler.AddConcept('other_book', resource_infos[1])
+    with self.assertRaises(handlers.RepeatedConceptName):
+      runtime_handler.AddConcept('book', resource_infos[2])
+
   def testRuntimeHandlerArgNameToConceptInfo(self):
     resource_info = info_holders.ResourceInfo(
         '--book',

@@ -106,6 +106,18 @@ can be found at: https://cloud.google.com/iot
 
 
 
+.SH "EXAMPLES"
+
+To list all of the devices bound to the gateway 'my\-gateway' in region
+\'us\-central1' and in registry 'my\-registry', run:
+
+.RS 2m
+$ gcloud alpha iot devices gateways list\-bound\-devices \e
+    \-\-gateway=my\-gateway \-\-region=us\-central1 \-\-registry=my\-registry
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this

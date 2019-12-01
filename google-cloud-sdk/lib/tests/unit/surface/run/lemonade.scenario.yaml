@@ -1,22 +1,21 @@
 title: Tests that server giving new fields sends new fields, and vice versa.
-release_tracks: [ALPHA]
+release_tracks: [BETA, GA]
 summary:
+# This summary is generated automatically on update and should not be edited.
 - set_property: run/platform managed
+- set_property: core/print_unhandled_tracebacks 1
+- set_property: core/print_handled_tracebacks 1
 - execute:
-  - command: run services update --region us-central1 compris
-      --add-cloudsql-instances foo,bar
-      --update-env-vars FOO=bar
-      --update-labels label1=one,label2=two
+  - command: run services update --region us-central1 compris --add-cloudsql-instances
+      foo,bar --update-env-vars FOO=bar --update-labels label1=one,label2=two
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |
       Service [compris] revision [compris-00002] is active and serving traffic at https://compris-ixwc4imo7a-uc.a.run.app
 - execute:
-  - command: run services update --region us-central1 compris
-      --add-cloudsql-instances foo,bar
-      --update-env-vars FOO=bar
-      --update-labels label1=one,label2=two
+  - command: run services update --region us-central1 compris --add-cloudsql-instances
+      foo,bar --update-env-vars FOO=bar --update-labels label1=one,label2=two
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
@@ -25,18 +24,20 @@ summary:
 actions:
 - set_property:
     run/platform: managed
+- set_property:
+    core/print_unhandled_tracebacks: 1
+- set_property:
+    core/print_handled_tracebacks: 1
 - execute_command:
-    command: run services update --region us-central1 compris
-      --add-cloudsql-instances foo,bar
-      --update-env-vars FOO=bar
-      --update-labels label1=one,label2=two
+    command: run services update --region us-central1 compris --add-cloudsql-instances
+      foo,bar --update-env-vars FOO=bar --update-labels label1=one,label2=two
     events:
     - api_call:
         expect_request:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -95,7 +96,7 @@ actions:
             matches: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions\?alt=json&labelSelector=client.knative.dev%2Fnonce\+%3D\+.*
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -229,7 +230,7 @@ actions:
                 spec:
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    env:
+                    env: null
                   - name: FOO
                     value: bar
             status:
@@ -258,7 +259,7 @@ actions:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -328,7 +329,7 @@ actions:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -398,7 +399,7 @@ actions:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -453,17 +454,15 @@ actions:
         code: 0
 
 - execute_command:
-    command: run services update --region us-central1 compris
-      --add-cloudsql-instances foo,bar
-      --update-env-vars FOO=bar
-      --update-labels label1=one,label2=two
+    command: run services update --region us-central1 compris --add-cloudsql-instances
+      foo,bar --update-env-vars FOO=bar --update-labels label1=one,label2=two
     events:
     - api_call:
         expect_request:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -524,7 +523,7 @@ actions:
             matches: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions\?alt=json&labelSelector=client.knative.dev%2Fnonce\+%3D\+.*
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -652,7 +651,7 @@ actions:
                 spec:
                   containers:
                   - image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
-                    env:
+                    env: null
                   - name: FOO
                     value: bar
             status:
@@ -681,7 +680,7 @@ actions:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -750,7 +749,7 @@ actions:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/services/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private
@@ -820,7 +819,7 @@ actions:
           uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/compris?alt=json
           method: GET
           headers: {}
-          body:
+          body: null
         return_response:
           headers:
             cache-control: private

@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import base64
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -34,10 +35,11 @@ _ETAG_CONFIRM_PROMPT = (r'The specified policy does not contain an \"etag\" '
                         r'concurrent policy changes.')
 
 
-class SetIamPolicy(unit_test_base.BaseTest):
+class SetIamPolicyTestGA(unit_test_base.BaseTest):
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _CreatePolicyAndFile(self, include_etag=False):
     etag_bin = b'abcde'
@@ -235,6 +237,19 @@ class SetIamPolicy(unit_test_base.BaseTest):
     except cli_test_base.MockArgumentError:
       self.fail('set-iam-policy should accept unique ids for service '
                 'accounts.')
+
+
+class SetIamPolicyTestBeta(SetIamPolicyTestGA):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class SetIamPolicyTestAlpha(SetIamPolicyTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

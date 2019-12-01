@@ -11,7 +11,7 @@ gcloud alpha logging sinks update \- updates a sink
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha logging sinks update\fR \fISINK_NAME\fR [\fIDESTINATION\fR] [\fB\-\-clear\-exclusions\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-remove\-exclusions\fR=[\fIEXCLUSION\fR\ \fIID\fR,...]] [\fB\-\-use\-partitioned\-tables\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha logging sinks update\fR \fISINK_NAME\fR [\fIDESTINATION\fR] [\fB\-\-add\-exclusions\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-clear\-exclusions\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disabled\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-remove\-exclusions\fR=[\fIEXCLUSION\fR\ \fIID\fR,...]] [\fB\-\-use\-partitioned\-tables\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR\ |\ \fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,8 +44,44 @@ unchanged.
 
 .RS 2m
 .TP 2m
+\fB\-\-add\-exclusions\fR=[\fIdescription\fR=\fIDESCRIPTION\fR],[\fIdisabled\fR=\fIDISABLED\fR],[\fIfilter\fR=\fIFILTER\fR],[\fIname\fR=\fINAME\fR]
+Add an exclusion filter for a log entry that is not to be exported. This flag
+can be repeated.
+
+The \f5name\fR and \f5filter\fR attributes are required. The following keys are
+accepted:
+
+.RS 2m
+.TP 2m
+\fBname\fR
+An identifier, such as "load\-balancer\-exclusion". Identifiers are limited to
+100 characters and can include only letters, digits, underscores, hyphens, and
+periods.
+
+.TP 2m
+\fBdescription\fR
+A description of this exclusion.
+
+.TP 2m
+\fBfilter\fR
+An advanced log filter that matches the log entries to be excluded.
+
+.TP 2m
+\fBdisabled\fR
+If this exclusion should be disabled and not exclude the log entries.
+.RE
+.sp
+.TP 2m
 \fB\-\-clear\-exclusions\fR
 Remove all logging exclusions.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Description of the sink.
+
+.TP 2m
+\fB\-\-disabled\fR
+Disable the sink. Disabled sinks do not export logs.
 
 .TP 2m
 \fB\-\-log\-filter\fR=\fILOG_FILTER\fR

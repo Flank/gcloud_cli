@@ -98,9 +98,26 @@ class Binding(_messages.Message):
       `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
       that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
-      that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: The G Suite domain (primary) that represents all
-      the    users of that domain. For example, `google.com` or `example.com`.
+      that represents a Google group.    For example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus    unique identifier) representing a service account that has been
+      recently    deleted. For example,    `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`.    If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique    identifier) representing a Google group
+      that has been recently    deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If    the group is
+      recovered, this value reverts to `group:{emailid}` and the    recovered
+      group retains the role in the binding.   * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the    users of that domain.
+      For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -358,13 +375,18 @@ class CloudfunctionsOperationsListRequest(_messages.Message):
 
   Fields:
     filter: Required. A filter for matching the requested operations.<br><br>
-      The supported formats of <b>filter</b> are:<br> To query for specific
+      The supported formats of <b>filter</b> are:<br> To query for a specific
       function: <code>project:*,location:*,function:*</code><br> To query for
       all of the latest operations for a project:
       <code>project:*,latest:true</code>
     name: Must not be set.
-    pageSize: The standard list page size.
-    pageToken: The standard list page token.
+    pageSize: The maximum number of records that should be returned.<br>
+      Requested page size cannot exceed 100. If not set, the default page size
+      is 100.<br><br> Pagination is only supported when querying for a
+      specific function.
+    pageToken: Token identifying which result to start with, which is returned
+      by a previous list call.<br><br> Pagination is only supported when
+      querying for a specific function.
   """
 
   filter = _messages.StringField(1)
@@ -478,7 +500,10 @@ class CloudfunctionsProjectsLocationsFunctionsListRequest(_messages.Message):
       and that the system should return the next page of data.
     parent: The project and location from which the function should be listed,
       specified in the format `projects/*/locations/*` If you want to list
-      functions in all locations, use "-" in place of a location.
+      functions in all locations, use "-" in place of a location. When listing
+      functions in all locations, if one or more location(s) are unreachable,
+      the response will contain functions from all reachable locations along
+      with the names of any unreachable locations.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -680,10 +705,13 @@ class ListFunctionsResponse(_messages.Message):
     nextPageToken: If not empty, indicates that there may be more functions
       that match the request; this value should be passed in a new
       google.cloud.functions.v1.ListFunctionsRequest to get more functions.
+    unreachable: Locations that could not be reached. The response does not
+      include any functions from these locations.
   """
 
   functions = _messages.MessageField('CloudFunction', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
+  unreachable = _messages.StringField(3, repeated=True)
 
 
 class ListLocationsResponse(_messages.Message):

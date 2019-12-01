@@ -50,7 +50,7 @@ EXAMPLES
 
     To filter the locales to see only Spanish-speaking regions, run:
 
-        $ gcloud firebase test ios locales list --filter Spanish
+        $ gcloud firebase test ios locales list --filter=Spanish
 
 NOTES
     These variants are also available:

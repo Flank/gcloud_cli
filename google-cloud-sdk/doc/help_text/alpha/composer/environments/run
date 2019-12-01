@@ -33,9 +33,11 @@ POSITIONAL ARGUMENTS
      SUBCOMMAND
         The Airflow CLI subcommand to run. Available subcommands include:
         backfill, clear, connections, dag_state, delete_dag, kerberos,
-        list_dags, list_tasks, pause, pool, render, run, task_failed_deps,
-        task_state, test, trigger_dag, unpause, variables, version (see
-        https://airflow.incubator.apache.org/cli.html for more info.)
+        list_dag_runs, list_dags, list_tasks, next_execution, pause, pool,
+        render, run, task_failed_deps, task_state, test, trigger_dag, unpause,
+        variables, version (see https://airflow.apache.org/cli.html for more
+        info). Note that delete_dag is available from Airflow 1.10.1, and
+        list_dag_runs, next_execution are available from Airflow 1.10.2.
 
      [-- CMD_ARGS ...]
         Command line arguments to the subcommand.

@@ -19,12 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.firestore import operations
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.firestore import base
 
 
-class DescribeTest(base.FirestoreCommandUnitTest):
-  """Tests the firestore operations get command."""
+class DescribeTestGA(base.FirestoreCommandUnitTest):
+  """Tests the GA firestore operations describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testGetRelativeResourceGetsTranslated(self):
     operation_name_relative = 'export_operation_name'
@@ -64,6 +68,20 @@ class DescribeTest(base.FirestoreCommandUnitTest):
     request = messages.FirestoreProjectsDatabasesOperationsGetRequest()
     request.name = name
     return request
+
+
+class DescribeTestBeta(DescribeTestGA):
+  """Tests the beta firestore operations describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+  """Tests the alpha firestore operations describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

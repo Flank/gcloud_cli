@@ -1,6 +1,3 @@
-skip:
-  reason: Failing
-  bug: b/141650011
 title: List insights
 release_tracks: [ALPHA]
 actions:

@@ -81,6 +81,7 @@ class FoldersListTest(testbase.FoldersUnitTestBase):
         """\
       DISPLAY_NAME                     PARENT_NAME          ID
       Test Folder For Testing          organizations/24521  58219052
+
       DISPLAY_NAME                     PARENT_NAME          ID
       Another Test Folder For Testing  organizations/24521  67045082
       """,

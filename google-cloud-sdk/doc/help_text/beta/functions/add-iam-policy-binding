@@ -60,8 +60,9 @@ EXAMPLES
             --member=MEMBER-1 --role=ROLE-1
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud functions add-iam-policy-binding
         $ gcloud alpha functions add-iam-policy-binding
 

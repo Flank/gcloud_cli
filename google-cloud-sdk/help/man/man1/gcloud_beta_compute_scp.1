@@ -201,7 +201,7 @@ To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
 to the \f5~/wardrobe\fR directory of your local host, run:
 
 .RS 2m
-$ gcloud beta compute scp \-\-recurse example\-instance:~/narnia \e
+$ gcloud beta compute scp \-\-recurse=example\-instance:~/narnia \e
     ~/wardrobe
 .RE
 
@@ -216,30 +216,30 @@ If the zone cannot be determined, you will be prompted for it. Use the
 \f5\-\-zone\fR flag to avoid being prompted:
 
 .RS 2m
-$ gcloud beta compute scp \-\-recurse example\-instance:~/narnia \e
-    ~/wardrobe \-\-zone us\-central1\-a
+$ gcloud beta compute scp \-\-recurse=example\-instance:~/narnia \e
+    ~/wardrobe \-\-zone=us\-central1\-a
 .RE
 
 To specify the project, zone, and recurse all together, run:
 
 .RS 2m
-$ gcloud beta compute scp \-\-project "my\-gcp\-project" \e
-    \-\-zone "us\-east1\-b" \-\-recurse ~/foo\-folder/ gcp\-instance\-name:~/
+$ gcloud beta compute scp \-\-project="my\-gcp\-project" \e
+    \-\-zone="us\-east1\-b" \-\-recurse=~/foo\-folder/ gcp\-instance\-name:~/
 .RE
 
 You can limit the allowed time to ssh. For example, to allow a key to be used
 through 2019:
 
 .RS 2m
-$ gcloud beta compute scp \-\-recurse example\-instance:~/narnia \e
-    ~/wardrobe \-\-ssh\-key\-expiration "2020\-01\-01T00:00:00:00Z"
+$ gcloud beta compute scp \-\-recurse=example\-instance:~/narnia \e
+    ~/wardrobe \-\-ssh\-key\-expiration="2020\-01\-01T00:00:00:00Z"
 .RE
 
 Or alternatively, allow access for the next two minutes:
 
 .RS 2m
-$ gcloud beta compute scp \-\-recurse example\-instance:~/narnia \e
-    ~/wardrobe \-\-ssh\-key\-expire\-after 2m
+$ gcloud beta compute scp \-\-recurse=example\-instance:~/narnia \e
+    ~/wardrobe \-\-ssh\-key\-expire\-after=2m
 .RE
 
 

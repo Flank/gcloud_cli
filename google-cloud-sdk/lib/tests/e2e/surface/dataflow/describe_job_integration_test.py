@@ -24,6 +24,7 @@ from tests.lib import test_case
 from tests.lib.surface.dataflow import e2e_base
 
 
+@test_case.Filters.SkipOnMacAndPy3('Failing','b/143696339')
 class DescribeJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
   """Integration test for the 'dataflow jobs describe' command.
 

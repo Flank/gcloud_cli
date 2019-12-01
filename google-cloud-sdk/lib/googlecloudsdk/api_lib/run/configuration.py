@@ -23,10 +23,6 @@ from googlecloudsdk.api_lib.run import k8s_object
 from googlecloudsdk.api_lib.run import revision
 
 
-# Annotation for the user-specified image.
-USER_IMAGE_ANNOTATION = 'client.knative.dev/user-image'
-
-
 class Configuration(k8s_object.KubernetesObject):
   """Wraps a Cloud Run Configuration message, making fields more convenient.
 
@@ -36,19 +32,34 @@ class Configuration(k8s_object.KubernetesObject):
   API_CATEGORY = 'serving.knative.dev'
   KIND = 'Configuration'
 
-  # For now continue to default to revisionTemplate not template.
-  FIELD_BLACKLIST = ['template']
+  FIELD_BLACKLIST = ['revisionTemplate', 'container']
+
+  @classmethod
+  def New(cls, client, namespace):
+    """Produces a new Service object.
+
+    Args:
+      client: The Cloud Run API client.
+      namespace: str, The serving namespace.
+
+    Returns:
+      A new Service object to be deployed.
+    """
+    ret = super(Configuration, cls).New(client, namespace)
+    ret.template.spec.containers = [client.MESSAGES_MODULE.Container()]
+    return ret
 
   @property
   def template(self):
-    if self.spec.revisionTemplate:
+    if hasattr(self.spec, 'revisionTemplate') and self.spec.revisionTemplate:
       if not self.spec.revisionTemplate.metadata:
-        self.spec.revisionTemplate.metadata = self.MessagesModule().ObjectMeta()
+        self.spec.revisionTemplate.metadata = k8s_object.MakeMeta(
+            self.MessagesModule())
       return revision.Revision.Template(
           self.spec.revisionTemplate, self.MessagesModule())
     elif self.spec.template:
       if not self.spec.template.metadata:
-        self.spec.template.metadata = self.MessagesModule().ObjectMeta()
+        self.spec.template.metadata = k8s_object.MakeMeta(self.MessagesModule())
       return revision.Revision.Template(
           self.spec.template, self.MessagesModule())
     else:
@@ -60,7 +71,8 @@ class Configuration(k8s_object.KubernetesObject):
 
   @property
   def container(self):
-    return self.template.container
+    return revision.Revision.Template(
+        self.template, self.MessagesModule()).container
 
   @property
   def env_vars(self):
@@ -69,10 +81,6 @@ class Configuration(k8s_object.KubernetesObject):
   @property
   def resource_limits(self):
     return self.template.resource_limits
-
-  @property
-  def deprecated_string_concurrency(self):
-    return self.template.deprecated_string_concurrency
 
   @property
   def concurrency(self):

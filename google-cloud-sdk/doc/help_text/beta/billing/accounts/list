@@ -50,7 +50,7 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To list only open billing accounts, run:
 
-        $ gcloud beta billing accounts list --filter open=true
+        $ gcloud beta billing accounts list --filter=open=true
 
 NOTES
     This command is currently in BETA and may change without notice. This

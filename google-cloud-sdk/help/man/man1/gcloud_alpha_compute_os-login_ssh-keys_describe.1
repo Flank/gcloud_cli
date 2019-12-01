@@ -17,10 +17,10 @@ gcloud alpha compute os\-login ssh\-keys describe \- describe an SSH Public Key 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute os\-login ssh\-keys describe\fR will take
+\fB(ALPHA)\fR \fBgcloud alpha compute os\-login ssh\-keys describe\fR accepts
 either a string containing an SSH Public Key or a filename for an SSH Public key
-and will display that key from the user's OS Login Profile. The key value passed
-in can either be the full SSH key or the OS Login fingerprint for that key.
+and displays that key from the user's OS Login Profile. The key value used can
+either be the full SSH key or the OS Login fingerprint for that key.
 
 
 
@@ -55,6 +55,27 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To show all of the information for the key stored in your OS Login profile that
+matches the key in \f5/home/user/.ssh/id_rsa.pub\fR, run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys describe \e
+    \-\-key\-file=/home/user/.ssh/id_rsa.pub
+.RE
+
+To show all of the information about the key with a fingerprint of
+\'e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47126bc52', run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys describe \e
+    \-\-key='e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47\e
+126bc52'
+.RE
 
 
 

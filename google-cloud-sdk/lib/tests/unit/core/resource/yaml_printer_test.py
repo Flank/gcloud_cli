@@ -34,6 +34,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
 
   def SetUp(self):
     self._printer = resource_printer.Printer('yaml')
+    self.SetEncoding('utf-8')
 
   def testEmptyCase(self):
     self._printer.Finish()
@@ -51,7 +52,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -74,8 +75,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.0
         size: 0
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
   def testSingleResourceCase(self):
@@ -88,7 +88,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -111,8 +111,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.0
         size: 0
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
   def testMultipleResourceCase(self):
@@ -129,7 +128,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -152,8 +151,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.0
         size: 0
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
     self._printer.AddRecord(next(generator))
@@ -166,7 +164,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -189,15 +187,14 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.0
         size: 0
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         ---
         SelfLink: http://g/selfie/az-1
         kind: compute#instance
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -220,8 +217,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.1
         size: 11
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
     self._printer.AddRecord(next(generator))
@@ -233,7 +229,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -256,15 +252,14 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.0
         size: 0
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         ---
         SelfLink: http://g/selfie/az-1
         kind: compute#instance
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -287,15 +282,14 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.1
         size: 11
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         ---
         SelfLink: http://g/selfie/azz-2
         kind: compute#instance
         labels:
           empty: ''
           full: value
-          "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F": "\\xAE\\u01D6\\u026C\\u0258\\u03C2"
+          Ṳᾔḯ¢◎ⅾℯ: ®ǖɬɘς
         metadata:
           items:
           - key: a
@@ -318,8 +312,7 @@ class YamlPrinterTest(resource_printer_test_base.Base):
           network: default
           networkIP: 10.240.150.2
         size: 2
-        unicode: "python 2 \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F \\u1E67\\u028A\\xA2\\u043A\\
-          \\u1E67"
+        unicode: python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ
         """))
 
 

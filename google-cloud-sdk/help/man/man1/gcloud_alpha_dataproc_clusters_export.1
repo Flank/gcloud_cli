@@ -11,7 +11,7 @@ gcloud alpha dataproc clusters export \- export a cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha dataproc clusters export\fR \fINAME\fR [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha dataproc clusters export\fR (\fICLUSTER\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,10 +26,32 @@ configuration can then be used to create new clusters using the import command.
 
 .RS 2m
 .TP 2m
-\fINAME\fR
-The name of the cluster to export.
+
+Cluster resource \- The name of the cluster to export. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [cluster] on the command
+line with a fully specified name; provide the argument [\-\-project] on the
+command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICLUSTER\fR
+ID of the cluster or fully qualified identifier for the cluster. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region for the cluster. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Google
+Compute Engine zones inside the region. The default value of \f5global\fR is a
+special multi\-region namespace which is capable of deploying instances into all
+Google Compute Engine zones globally, and is disjoint from other Cloud Dataproc
+regions. Overrides the default \f5dataproc/region\fR property value for this
+command invocation.
 
 
+.RE
 .RE
 .sp
 
@@ -43,13 +65,6 @@ exported data will not contain any output\-only fields. Alternatively, you may
 omit this flag to write to standard output. A schema describing the
 export/import format can be found in:
 $CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1/Cluster.yaml.
-
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. Overrides the default \fBdataproc/region\fR
-property value for this command invocation.
 
 
 .RE

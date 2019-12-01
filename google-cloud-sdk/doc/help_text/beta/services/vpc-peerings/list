@@ -29,12 +29,12 @@ EXAMPLES
     To list connections of a network called my-network to a service called
     your-service, run:
 
-        $ gcloud beta services vpc-peerings list --network my-network \
-            --service your-service
+        $ gcloud beta services vpc-peerings list --network=my-network \
+            --service=your-service
 
     To list connections of a network against all services, run:
 
-        $ gcloud beta services vpc-peerings list --network my-network
+        $ gcloud beta services vpc-peerings list --network=my-network
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -108,24 +108,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             cluster=self.CLUSTER_NAME, context=c_config.kube_context))
     self.assertIsNone(properties.VALUES.container.cluster.Get())
 
-  def _TestAutoUpgradeDefault(self, expect_default):
-    cluster_kwargs = {
-        'management':
-            self.messages.NodeManagement(
-                autoRepair=True, autoUpgrade=expect_default)
-    }
-    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
-        cluster_kwargs)
-    # Create cluster expects cluster and returns pending operation.
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done operation.
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns expected cluster, populated with other fields by server.
-    self.ExpectGetCluster(return_cluster)
-    self.Run('{base} create {name} --quiet'.format(
-        base=self.clusters_command_base.format(self.ZONE),
-        name=self.CLUSTER_NAME))
-
   def testCreateDefaults(self):
     self.WriteInput('y')
     self._TestCreateDefaults(self.ZONE)
@@ -1287,117 +1269,6 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
           name=self.CLUSTER_NAME,
           flag='--enable-resource-consumption-metering'))
 
-
-class CreateTestGAOnly(CreateTestGA):
-  """gcloud GA track only using container v1 API (not beta/alpha)."""
-
-  def testWarnFutureAutoUpgradeChange(self):
-    self._TestCreateDefaults(self.ZONE)
-    self.AssertErrContains(c_util.WARN_GA_FUTURE_AUTOUPGRADE_CHANGE)
-
-  def testAutoUpgradeDefault(self):
-    self._TestAutoUpgradeDefault(expect_default=None)
-
-  def testCreateAlphaClusterWithAutoUpgradeAutoRepairDisabled(self):
-    properties.VALUES.core.disable_prompts.Set(False)
-    self.WriteInput('y')
-    cluster_kwargs = {'enableKubernetesAlpha': True, 'management': None}
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    return_args = cluster_kwargs.copy()
-    return_args.update({
-        'expireTime': base.format_date_time('P30D'),
-    })
-    self.ExpectGetCluster(
-        self._RunningClusterForVersion('1.3.6', **cluster_kwargs))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --enable-kubernetes-alpha'.format(self.CLUSTER_NAME))
-    c_config = c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                         self.PROJECT_ID)
-    self._TestDefaultAuth(c_config)
-    self.AssertErrContains('Created')
-    self.AssertErrContains(
-        'This will create a cluster with all Kubernetes Alpha features enabled')
-
-
-# TODO(b/64575339): switch to use parameterized testing.
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestBeta(base.BetaTestBase, CreateTestGA):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def testCreateWithLabels(self):
-    cluster_kwargs = {
-        'labels':
-            self.msgs.Cluster.ResourceLabelsValue(
-                additionalProperties=[
-                    self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
-                        key='k', value='v'),
-                    self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
-                        key='k2', value=''),
-                ],),
-    }
-
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(
-        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --labels=k=v,k2='.format(self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-
-  def testCreateWithNodeTaints(self):
-    effect_enum = self.msgs.NodeTaint.EffectValueValuesEnum
-    taints = [
-        self.msgs.NodeTaint(
-            key='key1', value='val1', effect=effect_enum.NO_SCHEDULE),
-        self.msgs.NodeTaint(
-            key='key2', value='val2', effect=effect_enum.PREFER_NO_SCHEDULE),
-        self.msgs.NodeTaint(
-            key='key3', value='val3', effect=effect_enum.NO_EXECUTE)
-    ]
-    cluster_kwargs = {
-        'nodeTaints': taints,
-    }
-
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(
-        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --node-taints='
-        'key1=val1:NoSchedule,key2=val2:PreferNoSchedule,key3=val3:NoExecute'
-        .format(self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-
-  def testCreateMinCpuPlatform(self):
-    cluster_kwargs = {
-        'minCpuPlatform': 'Skylake',
-    }
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    self.ExpectGetCluster(self._RunningClusterForVersion('1.3.0'))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --min-cpu-platform=Skylake'.format(self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-
   def testCreateDailyMaintenanceWindow(self):
     m = self.messages
     cluster_kwargs = {
@@ -1491,244 +1362,33 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
           '--maintenance-window-end=2000-01-01T04:00:00Z '
           '--maintenance-window-recurrence=FREQ=DAILY')
 
-  def testCreateBetaFeatures(self):
-    m = self.messages
+  def testEnableDatabaseEncryption(self):
     cluster_kwargs = {
-        'name':
-            'my-cluster',
-        'clusterAutoscaling':
-            m.ClusterAutoscaling(
-                enableNodeAutoprovisioning=True,
-                autoprovisioningNodePoolDefaults=m
-                .AutoprovisioningNodePoolDefaults(
-                    oauthScopes=['scope1', 'scope2'],),
-                resourceLimits=[
-                    m.ResourceLimit(resourceType='cpu', maximum=10),
-                    m.ResourceLimit(
-                        resourceType='memory', maximum=64, minimum=8),
-                    m.ResourceLimit(
-                        resourceType='nvidia-tesla-k80', maximum=4, minimum=1),
-                ],
-                autoprovisioningLocations=['us-central1-a', 'us-central1-b']),
-        'workloadMetadataConfig':
-            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
-                                     .NodeMetadataValueValuesEnum.SECURE),
-        'verticalPodAutoscaling':
-            m.VerticalPodAutoscaling(enabled=True),
+        'databaseEncryptionKey':
+            'projects/p/locations/l/keyRings/kr/cryptoKeys/k',
     }
-    cluster_kwargs['nodePools'] = [
-        self._MakeDefaultNodePool(
-            nodePoolName='default-pool', initialNodeCount=500,
-            **cluster_kwargs),
-    ]
-    # Cluster create returns operation pending.
     self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(
-            targetLink=self.TARGET_LINK.format(self.API_VERSION,
-                                               self.PROJECT_NUM, self.ZONE,
-                                               cluster_kwargs['name'])))
-    # Get operation returns done.
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster.
-    return_args = cluster_kwargs.copy()
-    return_args.update({
-        'currentNodeCount': 500,
-        'status': self.running,
-        'endpoint': self.ENDPOINT,
-        'statusMessage': 'Running',
-        'zone': self.ZONE,
-    })
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create my-cluster --num-nodes=500 '
-        '--workload-metadata-from-node=secure '
-        '--enable-autoprovisioning --max-cpu 10 --max-memory 64 --min-memory 8 '
-        '--autoprovisioning-scopes=scope1,scope2 '
-        '--autoprovisioning-locations=us-central1-a,us-central1-b '
-        '--max-accelerator type=nvidia-tesla-k80,count=4 '
-        '--min-accelerator type=nvidia-tesla-k80,count=1 '
-        '--enable-vertical-pod-autoscaling ')
-    self.AssertOutputMatches(
-        (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
-         'NUM_NODES STATUS\n'
-         '{name} {zone} {endpoint} '
-         '{num_nodes} {status}\\n').format(
-             name=return_cluster.name,
-             num_nodes=return_cluster.currentNodeCount,
-             zone=return_cluster.zone,
-             endpoint=return_cluster.endpoint,
-             status=return_cluster.status),
-        normalize_space=True)
-
-  def testCreateNodeLocations(self):
-    locations = sorted(['us-central1-a', 'us-central1-b', self.ZONE])
-    kwargs = {
-        'name': self.CLUSTER_NAME,
-        'locations': locations,
-    }
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(
-        self._MakeCluster(**kwargs),
-        self._MakeOperation(
-            targetLink=self.TARGET_LINK.format(
-                self.API_VERSION, self.PROJECT_NUM, self.ZONE, kwargs['name'])))
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    self.ExpectGetCluster(self._RunningCluster(**kwargs))
-    self.assertIsNone(
-        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                  self.PROJECT_ID))
-    # Set an initial current-context in kubeconfig to verify we overwrite it
-    initial = kconfig.Kubeconfig.Default()
-    initial.SetCurrentContext('current-context')
-    initial.SaveToFile()
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {0} --node-locations={1}'.format(self.CLUSTER_NAME, ','.join(
-            locations)))
-
-  def testEnablePodSecurityPolicy(self):
-    psp_config = self.messages.PodSecurityPolicyConfig(enabled=True)
-    cluster_kwargs = {'podSecurityPolicyConfig': psp_config}
-    # Cluster create returns operation pending
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    expected_cluster.podSecurityPolicyConfig = psp_config
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
     return_args = cluster_kwargs.copy()
     self.updateResponse(return_args)
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
-    self.Run('{base} create {name} '
-             '--enable-pod-security-policy'.format(
-                 base=self.clusters_command_base.format(self.ZONE),
-                 name=self.CLUSTER_NAME))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--database-encryption-key=projects/p/locations/l/keyRings/kr/cryptoKeys/k'
+        .format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
-  def testCreateAllowRouteOverlap(self):
-    cluster_kwargs = {
-        'clusterIpv4Cidr': '10.1.0.0/16',
-    }
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(allowRouteOverlap=True)
-    expected_cluster.ipAllocationPolicy = policy
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--allow-route-overlap --cluster-ipv4-cidr=10.1.0.0/16 '
-        '--no-enable-ip-alias'.format(name=self.CLUSTER_NAME))
-
-  def testCreateAllowRouteOverlapWithIPAlias(self):
-    cluster_kwargs = {}
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(
-        allowRouteOverlap=True,
-        useIpAliases=True,
-        createSubnetwork=False,
-        clusterIpv4Cidr='10.1.0.0/16',
-        servicesIpv4Cidr='10.2.0.0/16')
-    expected_cluster.ipAllocationPolicy = policy
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    self.ExpectGetCluster(self._RunningCluster())
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--allow-route-overlap --enable-ip-alias '
-        '--cluster-ipv4-cidr=10.1.0.0/16 '
-        '--services-ipv4-cidr=10.2.0.0/16'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
-
-  @parameterized.parameters(
-      ('--allow-route-overlap',
-       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_EXPLICIT_NETWORK_MODE),
-      ('--allow-route-overlap '
-       '--enable-ip-alias',
-       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_CLUSTER_CIDR_ERROR_MSG),
-      ('--allow-route-overlap '
-       '--enable-ip-alias '
-       '--services-ipv4-cidr=10.1.0.0/16',
-       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_CLUSTER_CIDR_ERROR_MSG),
-      ('--allow-route-overlap '
-       '--enable-ip-alias '
-       '--cluster-ipv4-cidr=10.1.0.0/16',
-       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_SERVICES_CIDR_ERROR_MSG),
-  )
-  def testCreateAllowRouteOverlapBadArgs(self, flags, expected_msg):
-    command = (
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {name} --quiet '.format(name=self.CLUSTER_NAME) + flags)
-    self.AssertRaisesExceptionMatches(c_util.Error, expected_msg, self.Run,
-                                      command)
-
-  def testEnablePrivateCluster(self):
-    cluster_kwargs = {
-        'name': self.CLUSTER_NAME,
-    }
-
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(
-        createSubnetwork=False,
-        useIpAliases=True,
+  def testInvalidDatabaseEncryptionKey(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' create {name} '
+          '--database-encryption-key=projects/p'.format(name=self.CLUSTER_NAME))
+    self.AssertErrContains(
+        'Must be in format of \'projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]\''
     )
-    expected_cluster.ipAllocationPolicy = policy
-    config = self._MakePrivateClusterConfig(
-        enablePrivateNodes=True, masterIpv4Cidr='172.16.10.0/28')
-    expected_cluster.privateClusterConfig = config
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-ip-alias '
-        '--private-cluster '
-        '--master-ipv4-cidr=172.16.10.0/28 '
-        '--quiet'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
-
-  def testEnableIntraNodeVisibility(self):
-    cluster_kwargs = {
-        'enableIntraNodeVisibility': True,
-    }
-    # Cluster create returns operation pending
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    expected_cluster.networkConfig = self.messages.NetworkConfig(
-        enableIntraNodeVisibility=True)
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-intra-node-visibility '
-        '--quiet'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
 
   def testCreateResourceLimits(self):
     m = self.messages
@@ -1854,6 +1514,40 @@ resourceLimits:
         self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
         '--enable-autoprovisioning '
         '--autoprovisioning-config-file {}'.format(autoprovisioning_config))
+
+  def testCreateAutoprovisioningServiceAccountAndScopes(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'rl-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    serviceAccount='sa1',
+                    oauthScopes=['scope1', 'scope2'],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', minimum=10, maximum=20),
+                    m.ResourceLimit(
+                        resourceType='memory', minimum=16, maximum=128)
+                ]),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create rl-cluster '
+        '--enable-autoprovisioning --min-cpu 10 --max-cpu 20 '
+        '--autoprovisioning-service-account=sa1 '
+        '--autoprovisioning-scopes=scope1,scope2 '
+        '--min-memory 16 --max-memory 128')
 
   def testCreateAutoprovisioningServiceAccount(self):
     m = self.messages
@@ -2040,6 +1734,418 @@ resourceLimits:
         '--min-memory 16 --max-memory 128 '
         '--autoprovisioning-locations=us-central1-a,us-central1-b ')
 
+  def testCreateEnableAddonsCloudRunWithoutStackdriverKubernetes(self):
+    logging = 'Cloud Logging'
+    monitoring = 'Cloud Monitoring'
+    err_msg = (
+        'The CloudRun-on-GKE addon (--addons=CloudRun) requires %s and '
+        '%s to be enabled via the --enable-stackdriver-kubernetes flag.') % (
+            logging, monitoring)
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run(
+          (self.clusters_command_base.format(self.ZONE) +
+           ' create {0} --addons=CloudRun').format(self.CLUSTER_NAME))
+
+  def testAutoUpgradeDefault(self):
+    cluster_kwargs = {
+        'management': self.messages.NodeManagement(autoRepair=True,
+                                                   autoUpgrade=True)
+    }
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    # Create cluster expects cluster and returns pending operation.
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns expected cluster, populated with other fields by server.
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} --quiet'.format(
+        base=self.clusters_command_base.format(self.ZONE),
+        name=self.CLUSTER_NAME))
+
+
+class CreateTestGAOnly(CreateTestGA):
+  """gcloud GA track only using container v1 API (not beta/alpha)."""
+
+  def testCreateAlphaClusterWithAutoUpgradeAutoRepairDisabled(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y')
+    cluster_kwargs = {'enableKubernetesAlpha': True, 'management': None}
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    return_args.update({
+        'expireTime': base.format_date_time('P30D'),
+    })
+    self.ExpectGetCluster(
+        self._RunningClusterForVersion('1.3.6', **cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --enable-kubernetes-alpha'.format(self.CLUSTER_NAME))
+    c_config = c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                         self.PROJECT_ID)
+    self._TestDefaultAuth(c_config)
+    self.AssertErrContains('Created')
+    self.AssertErrContains(
+        'This will create a cluster with all Kubernetes Alpha features enabled')
+
+  def testCreateEnableAddonsCloudRun(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False)),
+        'loggingService': 'logging.googleapis.com/kubernetes',
+        'monitoringService': 'monitoring.googleapis.com/kubernetes',
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run(
+        (self.clusters_command_base.format(self.ZONE) + ' create {0}'
+         ' --enable-stackdriver-kubernetes'
+         ' --addons=HttpLoadBalancing,KubernetesDashboard,'
+         'CloudRun').format(
+             self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateEnableAddonsCloudRunWithoutRequiredAddons(self):
+    err_msg = (
+        'The CloudRun-on-GKE addon (--addons=CloudRun) requires HTTP Load '
+        'Balancing to be enabled via the --addons=HttpLoadBalancing flag.')
+    with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
+      self.Run(
+          (self.clusters_command_base.format(self.ZONE) +
+           ' create {0} --enable-stackdriver-kubernetes '
+           '--addons=CloudRun').format(self.CLUSTER_NAME))
+
+
+# TODO(b/64575339): switch to use parameterized testing.
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class CreateTestBeta(base.BetaTestBase, CreateTestGA):
+  """gcloud Beta track using container v1beta1 API."""
+
+  def testCreateWithLabels(self):
+    cluster_kwargs = {
+        'labels':
+            self.msgs.Cluster.ResourceLabelsValue(
+                additionalProperties=[
+                    self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
+                        key='k', value='v'),
+                    self.msgs.Cluster.ResourceLabelsValue.AdditionalProperty(
+                        key='k2', value=''),
+                ],),
+    }
+
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(
+        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --labels=k=v,k2='.format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateWithNodeTaints(self):
+    effect_enum = self.msgs.NodeTaint.EffectValueValuesEnum
+    taints = [
+        self.msgs.NodeTaint(
+            key='key1', value='val1', effect=effect_enum.NO_SCHEDULE),
+        self.msgs.NodeTaint(
+            key='key2', value='val2', effect=effect_enum.PREFER_NO_SCHEDULE),
+        self.msgs.NodeTaint(
+            key='key3', value='val3', effect=effect_enum.NO_EXECUTE)
+    ]
+    cluster_kwargs = {
+        'nodeTaints': taints,
+    }
+
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(
+        return_args, clusterApiVersion='0.18.2', currentMasterVersion1='0.18.2')
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --node-taints='
+        'key1=val1:NoSchedule,key2=val2:PreferNoSchedule,key3=val3:NoExecute'
+        .format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateMinCpuPlatform(self):
+    cluster_kwargs = {
+        'minCpuPlatform': 'Skylake',
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.3.0'))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --min-cpu-platform=Skylake'.format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateBetaFeatures(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name':
+            'my-cluster',
+        'clusterAutoscaling':
+            m.ClusterAutoscaling(
+                enableNodeAutoprovisioning=True,
+                autoprovisioningNodePoolDefaults=m
+                .AutoprovisioningNodePoolDefaults(
+                    serviceAccount='sa',
+                    oauthScopes=['scope1', 'scope2'],
+                ),
+                resourceLimits=[
+                    m.ResourceLimit(resourceType='cpu', maximum=10),
+                    m.ResourceLimit(
+                        resourceType='memory', maximum=64, minimum=8),
+                    m.ResourceLimit(
+                        resourceType='nvidia-tesla-k80', maximum=4, minimum=1),
+                ],
+                autoprovisioningLocations=['us-central1-a', 'us-central1-b']),
+        'workloadMetadataConfig':
+            m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
+                                     .NodeMetadataValueValuesEnum.SECURE),
+        'verticalPodAutoscaling':
+            m.VerticalPodAutoscaling(enabled=True),
+    }
+    cluster_kwargs['nodePools'] = [
+        self._MakeDefaultNodePool(
+            nodePoolName='default-pool', initialNodeCount=500,
+            **cluster_kwargs),
+    ]
+    # Cluster create returns operation pending.
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(self.API_VERSION,
+                                               self.PROJECT_NUM, self.ZONE,
+                                               cluster_kwargs['name'])))
+    # Get operation returns done.
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster.
+    return_args = cluster_kwargs.copy()
+    return_args.update({
+        'currentNodeCount': 500,
+        'status': self.running,
+        'endpoint': self.ENDPOINT,
+        'statusMessage': 'Running',
+        'zone': self.ZONE,
+    })
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create my-cluster --num-nodes=500 '
+        '--workload-metadata-from-node=secure '
+        '--enable-autoprovisioning --max-cpu 10 --max-memory 64 --min-memory 8 '
+        '--autoprovisioning-scopes=scope1,scope2 '
+        '--autoprovisioning-service-account=sa '
+        '--autoprovisioning-locations=us-central1-a,us-central1-b '
+        '--max-accelerator type=nvidia-tesla-k80,count=4 '
+        '--min-accelerator type=nvidia-tesla-k80,count=1 '
+        '--enable-vertical-pod-autoscaling ')
+    self.AssertOutputMatches(
+        (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
+         'NUM_NODES STATUS\n'
+         '{name} {zone} {endpoint} '
+         '{num_nodes} {status}\\n').format(
+             name=return_cluster.name,
+             num_nodes=return_cluster.currentNodeCount,
+             zone=return_cluster.zone,
+             endpoint=return_cluster.endpoint,
+             status=return_cluster.status),
+        normalize_space=True)
+
+  def testCreateNodeLocations(self):
+    locations = sorted(['us-central1-a', 'us-central1-b', self.ZONE])
+    kwargs = {
+        'name': self.CLUSTER_NAME,
+        'locations': locations,
+    }
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(
+        self._MakeCluster(**kwargs),
+        self._MakeOperation(
+            targetLink=self.TARGET_LINK.format(
+                self.API_VERSION, self.PROJECT_NUM, self.ZONE, kwargs['name'])))
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    self.ExpectGetCluster(self._RunningCluster(**kwargs))
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    # Set an initial current-context in kubeconfig to verify we overwrite it
+    initial = kconfig.Kubeconfig.Default()
+    initial.SetCurrentContext('current-context')
+    initial.SaveToFile()
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --node-locations={1}'.format(self.CLUSTER_NAME, ','.join(
+            locations)))
+
+  def testEnablePodSecurityPolicy(self):
+    psp_config = self.messages.PodSecurityPolicyConfig(enabled=True)
+    cluster_kwargs = {'podSecurityPolicyConfig': psp_config}
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    expected_cluster.podSecurityPolicyConfig = psp_config
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} '
+             '--enable-pod-security-policy'.format(
+                 base=self.clusters_command_base.format(self.ZONE),
+                 name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  def testCreateAllowRouteOverlap(self):
+    cluster_kwargs = {
+        'clusterIpv4Cidr': '10.1.0.0/16',
+    }
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(allowRouteOverlap=True)
+    expected_cluster.ipAllocationPolicy = policy
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--allow-route-overlap --cluster-ipv4-cidr=10.1.0.0/16 '
+        '--no-enable-ip-alias'.format(name=self.CLUSTER_NAME))
+
+  def testCreateAllowRouteOverlapWithIPAlias(self):
+    cluster_kwargs = {}
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        allowRouteOverlap=True,
+        useIpAliases=True,
+        createSubnetwork=False,
+        clusterIpv4Cidr='10.1.0.0/16',
+        servicesIpv4Cidr='10.2.0.0/16')
+    expected_cluster.ipAllocationPolicy = policy
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    self.ExpectGetCluster(self._RunningCluster())
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--allow-route-overlap --enable-ip-alias '
+        '--cluster-ipv4-cidr=10.1.0.0/16 '
+        '--services-ipv4-cidr=10.2.0.0/16'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  @parameterized.parameters(
+      ('--allow-route-overlap',
+       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_EXPLICIT_NETWORK_MODE),
+      ('--allow-route-overlap '
+       '--enable-ip-alias',
+       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_CLUSTER_CIDR_ERROR_MSG),
+      ('--allow-route-overlap '
+       '--enable-ip-alias '
+       '--services-ipv4-cidr=10.1.0.0/16',
+       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_CLUSTER_CIDR_ERROR_MSG),
+      ('--allow-route-overlap '
+       '--enable-ip-alias '
+       '--cluster-ipv4-cidr=10.1.0.0/16',
+       api_adapter.ALLOW_ROUTE_OVERLAP_WITHOUT_SERVICES_CIDR_ERROR_MSG),
+  )
+  def testCreateAllowRouteOverlapBadArgs(self, flags, expected_msg):
+    command = (
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --quiet '.format(name=self.CLUSTER_NAME) + flags)
+    self.AssertRaisesExceptionMatches(c_util.Error, expected_msg, self.Run,
+                                      command)
+
+  def testEnablePrivateCluster(self):
+    cluster_kwargs = {
+        'name': self.CLUSTER_NAME,
+    }
+
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        createSubnetwork=False,
+        useIpAliases=True,
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    config = self._MakePrivateClusterConfig(
+        enablePrivateNodes=True, masterIpv4Cidr='172.16.10.0/28')
+    expected_cluster.privateClusterConfig = config
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--private-cluster '
+        '--master-ipv4-cidr=172.16.10.0/28 '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  def testEnableIntraNodeVisibility(self):
+    cluster_kwargs = {
+        'enableIntraNodeVisibility': True,
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    expected_cluster.networkConfig = self.messages.NetworkConfig(
+        enableIntraNodeVisibility=True)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-intra-node-visibility '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
   def testCreateEnableAddonsIstio(self):
     mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
     cluster_kwargs = {
@@ -2164,17 +2270,39 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
                 ' create {0} --addons=CloudRun').format(self.CLUSTER_NAME))
 
   @parameterized.named_parameters(
-      ('IstioDisabled', 'Istio', 'Istio'),
       ('HTTPLoadBalancingDisabled', 'HTTP Load Balancing', 'HttpLoadBalancing'))
   def testCreateEnableAddonsCloudRunWithoutRequiredAddons(self, fname, aname):
     err_msg = ('The CloudRun-on-GKE addon (--addons=CloudRun) requires %s to '
                'be enabled via the --addons=%s flag.' % (fname, aname))
     with self.AssertRaisesExceptionMatches(c_util.Error, err_msg):
-      addons = ['Istio', 'HttpLoadBalancing', 'CloudRun']
+      addons = ['HttpLoadBalancing', 'CloudRun']
       addons.remove(aname)
       self.Run((self.clusters_command_base.format(self.ZONE) +
                 ' create {0} --enable-stackdriver-kubernetes '
                 '--addons={1}').format(self.CLUSTER_NAME, ','.join(addons)))
+
+  def testCreateEnableAddonsApplicationManager(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=True),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=True),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                kalmConfig=self.msgs.KalmConfig(enabled=True)),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.15.4'))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --addons=ApplicationManager --quiet'.format(
+            self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
 
   def testWorkloadIdentityConfig(self):
 
@@ -2214,10 +2342,6 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
         '--quiet'.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
-
-  def testAutoUpgradeDefault(self):
-    self._TestAutoUpgradeDefault(expect_default=True)
-    self.AssertErrContains(c_util.WARN_AUTOUPGRADE_ENABLED_BY_DEFAULT)
 
   def testWarnNodeVersionWithAutoUpgradeEnabled(self):
     cluster_kwargs = {
@@ -2268,9 +2392,7 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
         'Must be in format of \'projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]\''
     )
 
-  @parameterized.parameters(('rapid'),
-                            ('regular'),
-                            ('stable'))
+  @parameterized.parameters(('rapid'), ('regular'), ('stable'))
   def testReleaseChannelRapid(self, channel):
     channels = {
         'rapid': self.messages.ReleaseChannel.ChannelValueValuesEnum.RAPID,
@@ -2278,8 +2400,8 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
         'stable': self.messages.ReleaseChannel.ChannelValueValuesEnum.STABLE,
     }
     cluster_kwargs = {
-        'releaseChannel': self.messages.ReleaseChannel(
-            channel=channels[channel]),
+        'releaseChannel':
+            self.messages.ReleaseChannel(channel=channels[channel]),
     }
 
     expected_cluster = self._MakeCluster(**cluster_kwargs)
@@ -2301,10 +2423,10 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
                             ('--node-version=1.7.1'))
   def testReleaseChannelConflictingFlagsError(self, flag):
     with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {name} '
-               '--release-channel=rapid '
-               '{flag}'.format(name=self.CLUSTER_NAME, flag=flag))
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' create {name} '
+          '--release-channel=rapid '
+          '{flag}'.format(name=self.CLUSTER_NAME, flag=flag))
     self.AssertErrContains('At most one of')
 
   def testNodeVersionClusterVersionNoError(self):
@@ -2320,27 +2442,57 @@ Monitoring to be enabled via the --enable-stackdriver-kubernetes flag."""
     return_cluster = self._MakeCluster(**return_args)
     self.ExpectGetCluster(return_cluster)
 
-    self.Run(self.clusters_command_base.format(self.ZONE) +
-             ' create {name} '
-             '--cluster-version=1.7.1 '
-             '--node-version=1.7.1 '.format(name=self.CLUSTER_NAME))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--cluster-version=1.7.1 '
+        '--node-version=1.7.1 '.format(name=self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
-  @parameterized.parameters(('invalid'),
-                            ('Rapid'),
-                            ('RAPID'),
-                            ('Regular'),
-                            ('REGULAR'),
-                            ('Stable'),
-                            ('STABLE'))
+  @parameterized.parameters(('invalid'), ('Rapid'), ('RAPID'), ('Regular'),
+                            ('REGULAR'), ('Stable'), ('STABLE'))
   def testReleaseChannelInvalidChannelError(self, channel_name):
     with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {name} '
-               '--release-channel={channel}'.format(name=self.CLUSTER_NAME,
-                                                    channel=channel_name))
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' create {name} '
+          '--release-channel={channel}'.format(
+              name=self.CLUSTER_NAME, channel=channel_name))
     self.AssertErrContains('Invalid choice')
+
+  @parameterized.parameters('--max-surge-upgrade=2',
+                            '--max-unavailable-upgrade=1')
+  def testInvalidSurgeUpgrade(self, upgrade_flag):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) +
+          ' create {name} {upgrade_flag} --quiet'
+          .format(name=self.CLUSTER_NAME, upgrade_flag=upgrade_flag))
+    self.AssertErrContains(c_util.INVALIID_SURGE_UPGRADE_SETTINGS)
+
+  def testEnableSurgeUpgrade(self):
+    cluster_kwargs = {}
+    cluster_kwargs['nodePools'] = [
+        self._MakeNodePool(
+            upgradeSettings=self._MakeUpgradeSettings(
+                maxSurge=3, maxUnavailable=2),
+            name='default-pool')
+    ]
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --max-surge-upgrade=3 '
+        '--max-unavailable-upgrade=2 --quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -2500,7 +2652,8 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
                     disabled=False),
                 networkPolicyConfig=self.msgs.NetworkPolicyConfig(
                     disabled=True),
-                cloudRunConfig=self.msgs.CloudRunConfig(disabled=False),
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False,enableAlphaFeatures=False),
                 istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
         'loggingService':
             'logging.googleapis.com/kubernetes',
@@ -2513,6 +2666,36 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
     self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
     self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0}'
               ' --enable-stackdriver-kubernetes'
+              ' --addons=HttpLoadBalancing,KubernetesDashboard,'
+              'Istio,CloudRun').format(self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+
+  def testCreateEnableAddonsCloudRunAlphaFeatures(self):
+    auth = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=False),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=False),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                cloudRunConfig=self.msgs.CloudRunConfig(
+                    disabled=False,enableAlphaFeatures=True),
+                istioConfig=self.msgs.IstioConfig(disabled=False, auth=auth)),
+        'loggingService':
+            'logging.googleapis.com/kubernetes',
+        'monitoringService':
+            'monitoring.googleapis.com/kubernetes',
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.10.4'))
+    self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0}'
+              ' --enable-stackdriver-kubernetes --enable-cloud-run-alpha'
               ' --addons=HttpLoadBalancing,KubernetesDashboard,'
               'Istio,CloudRun').format(self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
@@ -2817,56 +3000,53 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
               ' --addons=ConfigConnector --quiet').format(self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
 
-  def testEnableSurgeUpgrade(self):
-    cluster_kwargs = {}
-    cluster_kwargs['nodePools'] = [
-        self._MakeNodePool(
-            upgradeSettings=self._MakeUpgradeSettings(
-                maxSurge=2),
-            name='default-pool')
-    ]
-    # Cluster create returns operation pending
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
+  def testCreateEnableAddonsGcePersistentDiskCsiDriverConfig(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=True),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=True),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                gcePersistentDiskCsiDriverConfig=\
+                self.msgs.GcePersistentDiskCsiDriverConfig(
+                    enabled=True)),
+    }
+    cluster = self._MakeCluster(**cluster_kwargs)
+    self.ExpectCreateCluster(cluster, self._MakeOperation())
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--max-surge-upgrade=2 '
-        '--quiet'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.14.2'))
 
-  def testEnableSurgeUpgradeWithMaxUnavailable(self):
-    cluster_kwargs = {}
-    cluster_kwargs['nodePools'] = [
-        self._MakeNodePool(
-            upgradeSettings=self._MakeUpgradeSettings(
-                maxSurge=3, maxUnavailable=2),
-            name='default-pool')
-    ]
-    # Cluster create returns operation pending
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--max-surge-upgrade=3 '
-        '--max-unavailable-upgrade=2 '
-        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.Run((self.clusters_command_base.format(self.ZONE) + ' create {0} '
+              ' --addons=GcePersistentDiskCsiDriver --quiet').format(
+                  self.CLUSTER_NAME))
     self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
+
+  def testCreateEnableAddonsApplicationManager(self):
+    cluster_kwargs = {
+        'addonsConfig':
+            self.msgs.AddonsConfig(
+                httpLoadBalancing=self.msgs.HttpLoadBalancing(disabled=True),
+                horizontalPodAutoscaling=self.msgs.HorizontalPodAutoscaling(
+                    disabled=True),
+                kubernetesDashboard=self.msgs.KubernetesDashboard(
+                    disabled=True),
+                networkPolicyConfig=self.msgs.NetworkPolicyConfig(
+                    disabled=True),
+                kalmConfig=self.msgs.KalmConfig(enabled=True)),
+    }
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs), self._MakeOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetCluster(self._RunningClusterForVersion('1.15.4'))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {0} --addons=ApplicationManager --quiet'.format(
+            self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
 
   def testLinuxSysctlConfig(self):
     cluster_kwargs = {

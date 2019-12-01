@@ -53,8 +53,14 @@ COMMANDS
      enable-inherit
         (ALPHA) Enable inheritance of policy behavior from parent resources.
 
+     list
+        (ALPHA) List the policies set on a resource.
+
      reset
         (ALPHA) Reset the policy to the default for the constraint.
+
+     set-policy
+        (ALPHA) Set an organization policy from a JSON or YAML file.
 
 NOTES
     This command is an internal implementation detail and may change or

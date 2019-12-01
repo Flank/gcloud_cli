@@ -24,6 +24,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import mock
+import six
 
 
 class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
@@ -33,9 +34,11 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.ssh_init = self.StartObjectPatch(
         ssh.SSHCommand, "__init__", return_value=None, autospec=True)
     self.ssh_build = self.StartObjectPatch(
-        ssh.SSHCommand, "Build", autospec=True, return_value="")
+        ssh.SSHCommand, "Build", autospec=True, return_value=[])
     self.ssh_run = self.StartObjectPatch(
         ssh.SSHCommand, "Run", autospec=True, return_value=0)
+    self.pipes_quote = self.StartObjectPatch(
+        six.moves, "shlex_quote", side_effect=six.moves.shlex_quote)
 
   def testNoArguments(self):
     self.mockConnection(user="my-user", host="my-host", port=123)
@@ -79,9 +82,15 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         options={"StrictHostKeyChecking": "no"})
 
   def testDryRun(self):
+    self.ssh_build.return_value = ["path to command", "arg'1"]
+
     self.mockConnection(user="my-user", host="my-host", port=123)
     self.Run("alpha cloud-shell ssh --dry-run")
     self.ssh_run.assert_not_called()
+    self.assertEqual(
+        len(self.ssh_build.return_value), self.pipes_quote.call_count)
+    self.pipes_quote.assert_has_calls(
+        [mock.call(arg) for arg in self.ssh_build.return_value])
 
   def testSshFlag(self):
     self.mockConnection(user="my-user", host="my-host", port=123)

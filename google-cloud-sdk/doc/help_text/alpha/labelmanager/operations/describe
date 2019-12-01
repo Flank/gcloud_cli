@@ -1,0 +1,31 @@
+NAME
+    gcloud alpha labelmanager operations describe - describes a label manager
+        long running operation
+
+SYNOPSIS
+    gcloud alpha labelmanager operations describe OPERATION_NAME
+        [GCLOUD_WIDE_FLAG ...]
+
+POSITIONAL ARGUMENTS
+     OPERATION_NAME
+        Name of the long running operation in label manager.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To get details about a label manager long running operation, run:
+
+        $ gcloud alpha labelmanager operations describe operations/clk.12345
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

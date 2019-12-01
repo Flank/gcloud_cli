@@ -1,5 +1,5 @@
 title: surface e2e tests for asset real-time-feed api
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA]
 
 actions:
 - generate_resource_id:

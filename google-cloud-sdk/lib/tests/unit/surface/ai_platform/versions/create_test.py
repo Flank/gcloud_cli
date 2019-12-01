@@ -69,7 +69,8 @@ class CreateTestBase(object):
                     package_uris=None,
                     response=None,
                     accelerator=None,
-                    service_account=None):
+                    service_account=None,
+                    explain_config=None):
     if framework:
       framework = self.short_msgs.Version.FrameworkValueValuesEnum(framework)
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -90,7 +91,8 @@ class CreateTestBase(object):
                 predictionClass=prediction_class,
                 packageUris=package_uris or [],
                 pythonVersion=python_version,
-                serviceAccount=service_account)),
+                serviceAccount=service_account,
+                explanationConfig=explain_config)),
         response=response or op)
 
   def testCreate(self, module_name):
@@ -392,6 +394,34 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
              '--accelerator=type=nvidia-tesla-k80,count=2'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilityIntegratedGradients(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    ig_config = self.msgs.GoogleCloudMlV1IntegratedGradientsAttribution()
+    ig_config.numIntegralSteps = 42
+    explain_config.integratedGradientsAttribution = ig_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method integrated-gradients '
+             '--num-integral-steps 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilitySamplingShap(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    shap_config = self.msgs.GoogleCloudMlV1SampledShapleyAttribution()
+    shap_config.numPaths = 42
+    explain_config.sampledShapleyAttribution = shap_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method sampled-shapley '
+             '--num-paths 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
 
 class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
@@ -480,6 +510,34 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
              '--origin gs://path/to/file '
              '--machine-type=n1-standard-4 '
              '--accelerator=type=nvidia-tesla-k80,count=2'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilityIntegratedGradients(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    ig_config = self.msgs.GoogleCloudMlV1IntegratedGradientsAttribution()
+    ig_config.numIntegralSteps = 42
+    explain_config.integratedGradientsAttribution = ig_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method integrated-gradients '
+             '--num-integral-steps 42'.format(module_name))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  @parameterized.parameters('ml-engine', 'ai-platform')
+  def testCreateExplainabilitySamplingShap(self, module_name):
+    explain_config = self.msgs.GoogleCloudMlV1ExplanationConfig()
+    shap_config = self.msgs.GoogleCloudMlV1SampledShapleyAttribution()
+    shap_config.numPaths = 42
+    explain_config.sampledShapleyAttribution = shap_config
+    self._ExpectCreate(explain_config=explain_config)
+    self._ExpectOperationPolling()
+    self.Run('{} versions create versionId --model modelId '
+             '--origin gs://path/to/file '
+             '--explanation-method sampled-shapley '
+             '--num-paths 42'.format(module_name))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
 

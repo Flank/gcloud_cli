@@ -3,7 +3,7 @@ NAME
         Build
 
 SYNOPSIS
-    gcloud alpha builds deploy COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha builds deploy GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Build and deploy images with Google Cloud Build.
@@ -14,6 +14,13 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+GROUPS
+    GROUP is one of the following:
+
+     configure
+        (ALPHA) Configure automated build and deployment with Google Cloud
+        Build.
 
 COMMANDS
     COMMAND is one of the following:

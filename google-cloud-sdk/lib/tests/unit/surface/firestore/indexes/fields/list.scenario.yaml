@@ -1,5 +1,5 @@
 title: cloud firestore single-field list test scenario
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -29,7 +29,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/-/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/-/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
           method: GET
           headers: {}
           body: null
@@ -137,7 +137,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/fake-project/databases/(default)/collectionGroups/Events/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
+          uri: https://firestore.googleapis.com/v1/projects/fake-project/databases/(default)/collectionGroups/Events/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
           method: GET
           headers: {}
           body: null

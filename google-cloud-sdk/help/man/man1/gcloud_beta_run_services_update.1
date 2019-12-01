@@ -11,7 +11,7 @@ gcloud beta run services update \- update Cloud Run environment variables and ot
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta run services update\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-region\fR=\fIREGION\fR\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta run services update\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR\ \fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ \fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,7 +37,7 @@ ID of the service or fully qualified identifier for the service.
 
 .TP 2m
 \fB\-\-namespace\fR=\fINAMESPACE\fR
-Specific to Cloud Run on GKE: Kubernetes namespace for the service.
+Specific to Cloud Run for Anthos: Kubernetes namespace for the service.
 
 
 .RE
@@ -79,8 +79,8 @@ Fully managed version of Cloud Run. Use with the \f5\-\-region\fR flag or set
 the [run/region] property to specify a Cloud Run region.
 .TP 2m
 \fBgke\fR
-Cloud Run for Anthos on Google Kubernetes Engine. Use with the \f5\-\-cluster\fR
-and \f5\-\-cluster\-location\fR flags or set the [run/cluster] and
+Cloud Run for Anthos on Google Cloud. Use with the \f5\-\-cluster\fR and
+\f5\-\-cluster\-location\fR flags or set the [run/cluster] and
 [run/cluster_location] properties to specify a cluster in a given zone.
 .TP 2m
 \fBkubernetes\fR
@@ -177,8 +177,57 @@ modified, otherwise a new label is created.
 .sp
 .TP 2m
 
-Only applicable if connecting to Cloud Run for Anthos deployed on GKE. Specify
-\'\-\-platform=gke' to use:
+Only applicable if connecting to Cloud Run for Anthos deployed on Google Cloud
+or Cloud Run for Anthos deployed on VMware. Specify \f5\-\-platform=gke\fR or
+\f5\-\-platform=kubernetes\fR to use:
+
+.RS 2m
+.TP 2m
+\fB\-\-connectivity\fR=\fICONNECTIVITY\fR
+Defaults to 'external'. If 'external', the service can be invoked through the
+internet, in addition to through the cluster network. \fICONNECTIVITY\fR must be
+one of:
+
+.RS 2m
+.TP 2m
+\fBexternal\fR
+Visible from outside the cluster.
+.TP 2m
+\fBinternal\fR
+Visible only within the cluster.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-cpu\fR=\fICPU\fR
+Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+.RE
+.sp
+.TP 2m
+
+Arguments to locate resources, depending on the platform used. At most one of
+these may be specified:
+
+.RS 2m
+.TP 2m
+
+Only applicable if connecting to Cloud Run (fully managed). Specify
+\f5\-\-platform=managed\fR to use:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region in which the resource can be found. Alternatively, set the property
+[run/region].
+
+.RE
+.sp
+.TP 2m
+
+Only applicable if connecting to Cloud Run for Anthos deployed on Google Cloud.
+Specify \f5\-\-platform=gke\fR to use:
 
 .RS 2m
 .TP 2m
@@ -207,38 +256,8 @@ Zone in which the cluster is located. Alternatively, set the property
 .sp
 .TP 2m
 
-Only applicable if connecting to Cloud Run for Anthos deployed on GKE or Cloud
-Run for Anthos deployed on VMware. Specify '\-\-platform=gke' or
-\'\-\-platform=kubernetes' to use:
-
-.RS 2m
-.TP 2m
-\fB\-\-connectivity\fR=\fICONNECTIVITY\fR
-Defaults to 'external'. If 'external', the service can be invoked through the
-internet, in addition to through the cluster network. \fICONNECTIVITY\fR must be
-one of:
-
-.RS 2m
-.TP 2m
-\fBexternal\fR
-Visible from outside the cluster.
-.TP 2m
-\fBinternal\fR
-Visible only within the cluster.
-.RE
-.sp
-
-
-.TP 2m
-\fB\-\-cpu\fR=\fICPU\fR
-Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
-
-.RE
-.sp
-.TP 2m
-
 Only applicable if connecting to Cloud Run for Anthos deployed on VMware.
-Specify '\-\-platform=kubernetes' to use:
+Specify \f5\-\-platform=kubernetes\fR to use:
 
 .RS 2m
 .TP 2m
@@ -252,18 +271,14 @@ semicolon\-delimited list of paths specified by $KUBECONFIG will be used. If
 $KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
 
 .RE
+.RE
 .sp
 .TP 2m
 
 Only applicable if connecting to Cloud Run (fully managed). Specify
-\'\-\-platform=managed' to use:
+\f5\-\-platform=managed\fR to use:
 
 .RS 2m
-.TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Region in which the resource can be found. Alternatively, set the property
-[run/region].
-
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
 Email address of the IAM service account associated with the revision of the
@@ -317,17 +332,18 @@ To update one or more env vars:
 
 .RS 2m
 $ gcloud beta run services update myservice \e
-  \-\-update\-env\-vars KEY1=VALUE1,KEY2=VALUE2
+  \-\-update\-env\-vars=KEY1=VALUE1,KEY2=VALUE2
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud run services update
 $ gcloud alpha run services update
 .RE
 

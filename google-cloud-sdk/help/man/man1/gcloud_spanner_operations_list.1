@@ -94,6 +94,23 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To list Cloud Spanner operations for an instance, run:
+
+.RS 2m
+$ gcloud spanner operations list \-\-instance=my\-instance\-id
+.RE
+
+To list Cloud Spanner operations for a database, run:
+
+.RS 2m
+$ gcloud spanner operations list \-\-instance=my\-instance\-id \e
+    \-\-database=my\-database\-id
+.RE
+
+
+
 .SH "NOTES"
 
 These variants are also available:

@@ -77,12 +77,29 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To retrieve information about recent operations, run:
 
 .RS 2m
+$ gcloud beta firestore operations list
+.RE
+
+To only list operations that are done, run:
+
+.RS 2m
+$ gcloud beta firestore operations list \-\-filter="done:true"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud firestore operations list
 $ gcloud alpha firestore operations list
 .RE
 

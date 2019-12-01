@@ -195,35 +195,34 @@ EXAMPLES
     To invoke an XCTest lasting up to five minutes against the default device
     environment, run:
 
-        $ gcloud alpha firebase test ios run --test XCTEST_ZIP --timeout 5m
+        $ gcloud alpha firebase test ios run --test=XCTEST_ZIP --timeout=5m
 
     To invoke an XCTest against an iPad 5 running iOS 11.2, run:
 
-        $ gcloud alpha firebase test ios run --test XCTEST_ZIP \
-            --device model=ipad5,version=11.2
+        $ gcloud alpha firebase test ios run --test=XCTEST_ZIP \
+            --device=model=ipad5,version=11.2
 
     To run your tests against multiple iOS devices simultaneously, specify the
     --device flag more than once:
 
-        $ gcloud alpha firebase test ios run --test XCTEST_ZIP             \
-              --device model=iphone7               \
-            --device model=ipadmini4,version=11.2               \
-            --device model=iphonese
+        $ gcloud alpha firebase test ios run --test=XCTEST_ZIP \
+            --device=model=iphone7
+        --device=model=ipadmini4,version=11.2 --device=model=iphonese
 
     To run your XCTest using a specific version of Xcode, say 9.4.1, run:
 
-        $ gcloud alpha firebase test ios run --test XCTEST_ZIP \
+        $ gcloud alpha firebase test ios run --test=XCTEST_ZIP \
             --xcode-version=9.4.1
 
     To run an iOS game loop, specify the --type and --app flags:
 
-        $ gcloud alpha firebase test ios run --type game-loop --app app.ipa
+        $ gcloud alpha firebase test ios run --type=game-loop --app=app.ipa
 
     To run an iOS game loop with specific scenario(s), use the
     --scenario-numbers flag:
 
-        $ gcloud alpha firebase test ios run --type game-loop \
-            --app app.ipa --scenario-numbers 1,2,3
+        $ gcloud alpha firebase test ios run --type=game-loop \
+            --app=app.ipa --scenario-numbers=1,2,3
 
     All test arguments for a given test may alternatively be stored in an
     argument group within a YAML-formatted argument file. The ARG_FILE may

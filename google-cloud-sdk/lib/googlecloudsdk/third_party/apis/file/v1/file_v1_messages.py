@@ -108,7 +108,7 @@ class FileProjectsLocationsInstancesPatchRequest(_messages.Message):
       projects/{project_id}/locations/{location_id}/instances/{instance_id}.
     updateMask: Mask of fields to update.  At least one path must be supplied
       in this field.  The elements of the repeated paths field may only
-      include these fields: "description" "file_shares" "labels"
+      include these fields:  * "description" * "file_shares" * "labels"
   """
 
   instance = _messages.MessageField('Instance', 1)
@@ -121,15 +121,18 @@ class FileProjectsLocationsListRequest(_messages.Message):
 
   Fields:
     filter: The standard list filter.
+    includeUnrevealedLocations: If true, the returned list will include
+      locations which are not yet revealed.
     name: The resource that owns the locations collection, if applicable.
     pageSize: The standard list page size.
     pageToken: The standard list page token.
   """
 
   filter = _messages.StringField(1)
-  name = _messages.StringField(2, required=True)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
+  includeUnrevealedLocations = _messages.BooleanField(2)
+  name = _messages.StringField(3, required=True)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
 
 
 class FileProjectsLocationsOperationsCancelRequest(_messages.Message):
@@ -282,6 +285,10 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       Producer shall not modify by itself. For update of a single entry in
       this map, the update field mask shall follow this sementics: go
       /advanced-field-masks
+    slmInstanceTemplate: Link to the SLM instance template. Only populated
+      when updating SLM instances via SSA's Actuation service adaptor. Service
+      producers with custom control plane (e.g. Cloud SQL) doesn't need to
+      populate this field. Instead they should use software_versions.
     sloMetadata: Output only. SLO metadata for instance classification in the
       Standardized dataplane SLO platform. See go/cloud-ssa-standard-slo for
       feature description.
@@ -493,11 +500,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
   producerMetadata = _messages.MessageField('ProducerMetadataValue', 7)
   provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 8, repeated=True)
   rolloutMetadata = _messages.MessageField('RolloutMetadataValue', 9)
-  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 10)
-  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 11)
-  state = _messages.EnumField('StateValueValuesEnum', 12)
-  tenantProjectId = _messages.StringField(13)
-  updateTime = _messages.StringField(14)
+  slmInstanceTemplate = _messages.StringField(10)
+  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 11)
+  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 12)
+  state = _messages.EnumField('StateValueValuesEnum', 13)
+  tenantProjectId = _messages.StringField(14)
+  updateTime = _messages.StringField(15)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messages.Message):
@@ -594,33 +602,48 @@ class GoogleCloudSaasacceleratorManagementProvidersV1RolloutMetadata(_messages.M
   rolloutName = _messages.StringField(3)
 
 
+class GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility(_messages.Message):
+  r"""SloEligibility is a tuple containing eligibility value: true if an
+  instance is eligible for SLO calculation or false if it should be excluded
+  from all SLO-related calculations along with a user-defined reason.
+
+  Fields:
+    eligible: Whether an instance is eligible or ineligible.
+    reason: User-defined reason for the current value of instance eligibility.
+      Usually, this can be directly mapped to the internal state. An empty
+      reason is allowed.
+  """
+
+  eligible = _messages.BooleanField(1)
+  reason = _messages.StringField(2)
+
+
 class GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion(_messages.Message):
-  r"""SloExclusion represents an excusion in SLI calculation applies to all
+  r"""SloExclusion represents an exclusion in SLI calculation applies to all
   SLOs.
 
   Fields:
-    exclusionDuration: Exclusion duration. No restrictions on the possible
-      values.  When an ongoing operation is taking longer than initially
-      expected, an existing entry in the exclusion list can be updated by
-      extending the duration. This is supported by the subsystem exporting
-      eligibility data as long as such extension is committed at least 10
-      minutes before the original exclusion expiration - otherwise it is
-      possible that there will be "gaps" in the exclusion application in the
-      exported timeseries.
-    exclusionStartTime: Start time of the exclusion. No alignment (e.g. to a
-      full minute) needed.
+    duration: Exclusion duration. No restrictions on the possible values.
+      When an ongoing operation is taking longer than initially expected, an
+      existing entry in the exclusion list can be updated by extending the
+      duration. This is supported by the subsystem exporting eligibility data
+      as long as such extension is committed at least 10 minutes before the
+      original exclusion expiration - otherwise it is possible that there will
+      be "gaps" in the exclusion application in the exported timeseries.
     reason: Human-readable reason for the exclusion. This should be a static
       string (e.g. "Disruptive update in progress") and should not contain
       dynamically generated data (e.g. instance name). Can be left empty.
     sliName: Name of an SLI that this exclusion applies to. Can be left empty,
       signaling that the instance should be excluded from all SLIs defined in
       the service SLO configuration.
+    startTime: Start time of the exclusion. No alignment (e.g. to a full
+      minute) needed.
   """
 
-  exclusionDuration = _messages.StringField(1)
-  exclusionStartTime = _messages.StringField(2)
-  reason = _messages.StringField(3)
-  sliName = _messages.StringField(4)
+  duration = _messages.StringField(1)
+  reason = _messages.StringField(2)
+  sliName = _messages.StringField(3)
+  startTime = _messages.StringField(4)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Message):
@@ -628,6 +651,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Messa
   the instance.
 
   Fields:
+    eligibility: Optional: user-defined instance eligibility.
     exclusions: List of SLO exclusion windows. When multiple entries in the
       list match (matching the exclusion time-window against current time
       point) the exclusion reason used in the first matching entry will be
@@ -637,8 +661,8 @@ class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Messa
       will be reflected in the historically produced timeseries regardless of
       the current state).  This field can be used to mark the instance as
       temporary ineligible for the purpose of SLO calculation. For permanent
-      instance SLO exclusion, a dedicated tier name can be used that does not
-      have targets specified in the service SLO configuration.
+      instance SLO exclusion, use of custom instance eligibility is
+      recommended. See 'eligibility' field below.
     nodes: Optional: list of nodes. Some producers need to use per-node
       metadata to calculate SLO. This field allows such producers to publish
       per-node SLO meta data, which will be consumed by SSA Eligibility
@@ -648,9 +672,10 @@ class GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata(_messages.Messa
       Field is mandatory and must not be empty.
   """
 
-  exclusions = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion', 1, repeated=True)
-  nodes = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata', 2, repeated=True)
-  tier = _messages.StringField(3)
+  eligibility = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloEligibility', 1)
+  exclusions = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion', 2, repeated=True)
+  nodes = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata', 3, repeated=True)
+  tier = _messages.StringField(4)
 
 
 class Instance(_messages.Message):

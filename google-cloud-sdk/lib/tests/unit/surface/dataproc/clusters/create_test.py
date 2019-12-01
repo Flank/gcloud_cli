@@ -29,6 +29,7 @@ from googlecloudsdk import calliope
 
 from googlecloudsdk.api_lib.dataproc import constants
 from googlecloudsdk.api_lib.dataproc import exceptions
+from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
@@ -50,7 +51,7 @@ class ClustersCreateUnitTest(
     if not cluster:
       cluster = self.MakeCluster()
     if not (response or exception):
-      response = self.MakeOperation()
+      response = self.MakeOperation(region=region)
     self.mock_client.projects_regions_clusters.Create.Expect(
         self.messages.DataprocProjectsRegionsClustersCreateRequest(
             cluster=cluster,
@@ -70,9 +71,10 @@ class ClustersCreateUnitTest(
     # Create request_cluster returns operation pending
     self.ExpectCreateCluster(cluster=request_cluster, region=region)
     # Initial get operation returns pending
-    self.ExpectGetOperation()
+    self.ExpectGetOperation(region=region)
     # Second get operation returns done
-    self.ExpectGetOperation(operation=self.MakeCompletedOperation(error=error))
+    self.ExpectGetOperation(
+        operation=self.MakeCompletedOperation(error=error, region=region))
     if not error:
       # Get the request_cluster to display it.
       self.ExpectGetCluster(cluster=response_cluster, region=region)
@@ -87,7 +89,6 @@ class ClustersCreateUnitTest(
     operation = self.MakeOperation(
         metadata=collections.OrderedDict([('warnings', warnings[:2])]))
     self.ExpectGetOperation(operation)
-    self.ExpectGetOperation(operation)
     operation = self.MakeOperation(
         metadata=collections.OrderedDict([('warnings', warnings)]))
     self.ExpectGetOperation(operation)
@@ -98,12 +99,31 @@ class ClustersCreateUnitTest(
 
   def testCreateClusterDefaults(self):
     properties.VALUES.compute.zone.Set(self.ZONE)
+    request_cluster = self.MakeCluster()
+    response_cluster = self.MakeRunningCluster()
+    self.ExpectCreateCalls(request_cluster, response_cluster)
+    result = self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
+    self.AssertMessagesEqual(response_cluster, result)
+
+  def testCreateClusterSetRegionProp(self):
+    properties.VALUES.compute.zone.Set(self.ZONE)
     properties.VALUES.dataproc.region.Set('us-central1')
     request_cluster = self.MakeCluster()
     response_cluster = self.MakeRunningCluster()
     self.ExpectCreateCalls(
         request_cluster, response_cluster, region='us-central1')
     result = self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
+    self.AssertMessagesEqual(response_cluster, result)
+
+  def testCreateClusterOverrideRegion(self):
+    properties.VALUES.compute.zone.Set(self.ZONE)
+    properties.VALUES.dataproc.region.Set('global')
+    request_cluster = self.MakeCluster()
+    response_cluster = self.MakeRunningCluster()
+    self.ExpectCreateCalls(
+        request_cluster, response_cluster, region='us-central1')
+    result = self.RunDataproc('clusters create --region us-central1 {0}'.format(
+        self.CLUSTER_NAME))
     self.AssertMessagesEqual(response_cluster, result)
 
   def testCreateClusterUri(self):
@@ -114,13 +134,28 @@ class ClustersCreateUnitTest(
     result = self.RunDataproc('clusters create {0}'.format(self.ClusterUri()))
     self.AssertMessagesEqual(response_cluster, result)
 
-  def testCreateClusterOmitZone(self):
+  def testCreateClusterOmitRegion(self):
+    properties.VALUES.compute.zone.Set(self.ZONE)
+    # Default to global in GA
+    request_cluster = self.MakeCluster()
+    response_cluster = self.MakeRunningCluster()
+    self.ExpectCreateCalls(request_cluster, response_cluster, region='global')
+    result = self.RunDataproc(
+        'clusters create {0}'.format(self.CLUSTER_NAME),
+        output_format='default',
+        set_region=False)
+    self.AssertErrContains(
+        'Dataproc --region flag will become required in January 2020')
+    self.AssertMessagesEqual(response_cluster, result)
+
+  def testCreateClusterOmitZoneGlobal(self):
     self.MockCompute()
     self.ExpectListZones()
 
-    request_cluster = self.MakeCluster()
-    response_cluster = self.MakeRunningCluster()
-    self.ExpectCreateCalls(request_cluster, response_cluster)
+    properties.VALUES.dataproc.region.Set('global')
+    request_cluster = self.MakeCluster(zoneUri='europe-west1-a')
+    response_cluster = self.MakeRunningCluster(zoneUri='europe-west1-a')
+    self.ExpectCreateCalls(request_cluster, response_cluster, region='global')
 
     self.WriteInput('3\n')
     result = self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
@@ -128,17 +163,17 @@ class ClustersCreateUnitTest(
 
     self.AssertErrContains('PROMPT_CHOICE')
     self.AssertErrContains(
-        '"choices": ["europe-west1-a", "europe-west1-b (DELETED)", '
-        '"us-central1-a (DEPRECATED)", "us-central1-b"]')
+        '"choices": ["antarctica-north42-a (DEPRECATED)", '
+        '"antarctica-north42-b", "europe-west1-a", "europe-west1-b (DELETED)"]')
     self.AssertErrContains(
         textwrap.dedent("""\
         Waiting on operation [{operation}].
         {{"ux": "PROGRESS_TRACKER", "message": "Waiting for cluster creation operation", "status": "SUCCESS"}}
         Created [{cluster_uri}] Cluster placed in zone [{zone}].
         """.format(
-            operation=self.OperationName(),
-            cluster_uri=self.ClusterUri(),
-            zone='us-central1-a')))
+            operation=self.OperationName(region='global'),
+            cluster_uri=self.ClusterUri(region='global'),
+            zone='europe-west1-a')))
 
   def testCreateClusterOmitZone_provideRegion(self):
     self.MockCompute()
@@ -151,8 +186,13 @@ class ClustersCreateUnitTest(
     self.ExpectCreateCalls(
         request_cluster, response_cluster, region='us-central1')
 
-    result = self.RunDataproc('clusters create --region={0} {1}'.format(
-        'us-central1', self.CLUSTER_NAME))
+    result = self.RunDataproc(
+        'clusters create --region={0} {1}'.format('us-central1',
+                                                  self.CLUSTER_NAME),
+        output_format='default',
+        set_region=False)
+    self.AssertErrNotMatches(
+        'Dataproc --region flag will become required in January 2020')
     self.AssertMessagesEqual(response_cluster, result)
 
   def testCreateClusterFlags(self):
@@ -1014,7 +1054,7 @@ class ClustersCreateUnitTest(
 
   def testCreateCluster_autoscalingPolicyIdOnly(self):
     specified_policy = 'cool-policy'
-    expected_policy_uri = 'projects/fake-project/regions/global/autoscalingPolicies/cool-policy'
+    expected_policy_uri = 'projects/fake-project/regions/antarctica-north42/autoscalingPolicies/cool-policy'
 
     expected_request_cluster = self.MakeCluster()
     self.AddAutoscalingConfig(expected_request_cluster, expected_policy_uri)
@@ -1054,6 +1094,13 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
   def testTrack(self):
     self.assertEqual(self.messages, self._beta_messages)
     self.assertEqual(self.track, calliope.base.ReleaseTrack.BETA)
+
+  def testCreateClusterOmitRegion(self):
+    properties.VALUES.compute.zone.Set(self.ZONE)
+    regex = r'Failed to find attribute \[region\]'
+    with self.assertRaisesRegex(handlers.ParseError, regex):
+      self.RunDataproc(
+          'clusters create {0}'.format(self.CLUSTER_NAME), set_region=False)
 
   def testCreateClusterFlags(self):
     """Tests flags that behave differently in Beta track."""

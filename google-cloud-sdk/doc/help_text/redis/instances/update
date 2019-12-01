@@ -60,10 +60,11 @@ FLAGS
 
      --update-redis-config=KEY=VALUE
         A list of Redis config KEY=VALUE pairs to update according to
-        http://redis.io/topics/config. If a config parameter is already set,
-        its value is modified; otherwise a new Redis config parameter is added.
-        Currently, the only supported parameters are: maxmemory-policy,
-        notify-keyspace-events, activedefrag, lfu-log-factor, lfu-decay-time.
+        http://cloud.google.com/memorystore/docs/reference/redis-configs. If a
+        config parameter is already set, its value is modified; otherwise a new
+        Redis config parameter is added. Currently, the only supported
+        parameters are: maxmemory-gb, maxmemory-policy, notify-keyspace-events,
+        activedefrag, lfu-log-factor, lfu-decay-time.
 
      At most one of these may be specified:
 

@@ -43,17 +43,16 @@ actions:
             type: LoadBalancer
     - expect_file_written:
         path: skaffold.yaml
-        contents: |2
-
+        contents: |
           apiVersion: skaffold/v1beta12
-          kind: Config
           build:
             artifacts:
-            - image: gcr.io/project/blahblah
-              context: .
+            - context: .
+              image: gcr.io/project/blahblah
           deploy:
             kubectl:
               manifests:
-                - .dev/*.yaml
+              - pods_and_services.yaml
+          kind: Config
     - expect_exit:
         code: 0

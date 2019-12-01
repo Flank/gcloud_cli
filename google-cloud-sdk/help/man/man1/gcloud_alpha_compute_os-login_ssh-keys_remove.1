@@ -17,10 +17,10 @@ gcloud alpha compute os\-login ssh\-keys remove \- remove an SSH public key from
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute os\-login ssh\-keys remove\fR will take
+\fB(ALPHA)\fR \fBgcloud alpha compute os\-login ssh\-keys remove\fR accepts
 either a string containing an SSH public key or a filename for an SSH public key
-and will remove that key from the user's OS Login profile. The key value passed
-in can either be the full SSH key or the OS Login fingerprint for that key.
+and removes that key from the user's OS Login profile. The key value used can
+either be the full SSH key or the OS Login fingerprint for that key.
 
 
 
@@ -55,6 +55,35 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove the key that is stored in \f5/home/user/.ssh/id_rsa.pub\fR, run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys remove \e
+    \-\-key\-file=/home/user/.ssh/id_rsa.pub
+.RE
+
+To remove the key with fingerprint
+\'e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47126bc52', run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys remove \e
+    \-\-key='e0d96d6fad35a61a0577f467940509b5aa08b6dea8d99456ec19a6e47\e
+126bc52'
+.RE
+
+To remove the SSH public key
+\'AAAAB3NzaC1yc2EAAAADAQABAAAB...ZrPg+DZJIwPab2wPlveLh+ut1Lxs5QTR/9QfEa7', run:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys remove \e
+    \-\-key='AAAAB3NzaC1yc2EAAAADAQABAAAB...ZrPg+DZJIwPab2wPlveLh+ut1L\e
+xs5QTR/9QfEa7'
+.RE
 
 
 

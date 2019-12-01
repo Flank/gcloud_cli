@@ -21,6 +21,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To delete Google Compute Engine snapshots with the names 'snapshot-1' and
+    'snapshot-2', run:
+
+        $ gcloud alpha compute snapshots delete snapshot-1 snapshot-2
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

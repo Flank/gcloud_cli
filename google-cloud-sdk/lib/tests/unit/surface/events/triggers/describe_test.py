@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.events import custom_resource_definition
+from googlecloudsdk.api_lib.events import source
 from googlecloudsdk.api_lib.events import trigger
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.events import exceptions
@@ -29,7 +31,30 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _MakeTrigger(self):
+  def _MakeSourceCrd(self):
+    """Creates a source CRD and assigns it as output to ListSourceCRD."""
+    self.source_crd = (
+        custom_resource_definition.SourceCustomResourceDefinition.New(
+            self.mock_crd_client, 'fake-project'))
+    self.source_crd.spec.names = (
+        self.crd_messages.CustomResourceDefinitionNames(
+            kind='PubSub', plural='pubsubs'))
+    self.operations.ListSourceCustomResourceDefinitions.return_value = [
+        self.source_crd
+    ]
+
+  def _MakeSource(self):
+    """Creates a source and assigns it as output to GetSource."""
+    self.source = source.Source.New(self.mock_serverless_client, 'default',
+                                    'PubSub',
+                                    'sources.eventing.knative.dev')
+    self.source.name = 'my-source'
+    self.source.sink = 'my-broker'
+    self.source.spec.project = 'fake-project'
+    self.source.spec.topic = 'my-topic'
+    self.operations.GetSource.return_value = self.source
+
+  def _MakeTrigger(self, source_obj):
     """Creates a trigger and assigns it as output to GetTrigger."""
     self.trigger = trigger.Trigger.New(
         self.mock_serverless_client, 'default')
@@ -39,6 +64,7 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
             type='Ready',
             status='True')
     ]
+    self.trigger.dependency = source_obj
     self.trigger.filter_attributes[
         trigger.EVENT_TYPE_FIELD] = 'com.google.event.type'
     self.trigger.subscriber = 'my-service'
@@ -53,11 +79,16 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
 
   def testTriggersDescribe(self):
     """Trigger and source spec are both described with the default output."""
-    self._MakeTrigger()
+    self._MakeSourceCrd()
+    self._MakeSource()
+    self._MakeTrigger(self.source)
     self.Run('events triggers describe my-trigger --platform=gke '
              '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.operations.GetTrigger.assert_called_once_with(
         self._TriggerRef('my-trigger', 'default'))
+    self.operations.GetSource.assert_called_once_with(
+        self._SourceRef('my-source', 'pubsubs', 'default'),
+        self.source_crd)
     self.AssertOutputContains('name: my-trigger')
     self.AssertOutputContains(
         """filter:
@@ -69,6 +100,13 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
               apiVersion: serving.knative.dev/v1alpha1
               kind: Service
               name: my-service""", normalize_space=True)
+    self.AssertOutputContains(
+        """sink:
+            ref:
+              apiVersion: eventing.knative.dev/v1alpha1
+              kind: Broker
+              name: my-broker""", normalize_space=True)
+    self.AssertOutputContains('topic: my-topic')
 
   def testTriggersDescribeFailsIfMissing(self):
     """Error is raised when trigger is not found."""
@@ -77,3 +115,13 @@ class TriggersDescribeTestAlpha(base.ServerlessSurfaceBase):
       self.Run('events triggers describe my-trigger --platform=gke '
                '--cluster=cluster-1 --cluster-location=us-central1-a')
     self.AssertErrContains('Trigger [my-trigger] not found.')
+
+  def testTriggersDescribeWarnsIfNoSource(self):
+    """Warning is shown when a source is not found."""
+    self._MakeSourceCrd()
+    self._MakeSource()
+    self.operations.GetSource.return_value = None
+    self._MakeTrigger(self.source)
+    self.Run('events triggers describe my-trigger --platform=gke '
+             '--cluster=cluster-1 --cluster-location=us-central1-a')
+    self.AssertErrContains('No matching event source')

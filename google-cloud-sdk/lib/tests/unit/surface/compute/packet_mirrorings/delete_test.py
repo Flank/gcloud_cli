@@ -26,16 +26,17 @@ from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
-
-class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
+class DeleteTestBeta(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_beta
 
   def testSingle(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -43,8 +44,8 @@ class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         compute packet-mirrorings delete pm-1 --region us-central1
         """)
 
-    self.CheckRequests([(self.compute_alpha.packetMirrorings, 'Delete',
-                         messages.ComputePacketMirroringsDeleteRequest(
+    self.CheckRequests([(self.compute.packetMirrorings, 'Delete',
+                         self.messages.ComputePacketMirroringsDeleteRequest(
                              packetMirroring='pm-1',
                              project='my-project',
                              region='us-central1'))])
@@ -55,18 +56,18 @@ class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         compute packet-mirrorings delete pm-1 pm-2 pm-3 --region us-central1
         """)
 
-    self.CheckRequests([(self.compute_alpha.packetMirrorings, 'Delete',
-                         messages.ComputePacketMirroringsDeleteRequest(
+    self.CheckRequests([(self.compute.packetMirrorings, 'Delete',
+                         self.messages.ComputePacketMirroringsDeleteRequest(
                              packetMirroring='pm-1',
                              project='my-project',
                              region='us-central1')),
-                        (self.compute_alpha.packetMirrorings, 'Delete',
-                         messages.ComputePacketMirroringsDeleteRequest(
+                        (self.compute.packetMirrorings, 'Delete',
+                         self.messages.ComputePacketMirroringsDeleteRequest(
                              packetMirroring='pm-2',
                              project='my-project',
                              region='us-central1')),
-                        (self.compute_alpha.packetMirrorings, 'Delete',
-                         messages.ComputePacketMirroringsDeleteRequest(
+                        (self.compute.packetMirrorings, 'Delete',
+                         self.messages.ComputePacketMirroringsDeleteRequest(
                              packetMirroring='pm-3',
                              project='my-project',
                              region='us-central1'))])
@@ -86,11 +87,23 @@ class DeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         compute packet-mirrorings delete pm-1 --region us-central1
         """)
 
-    self.CheckRequests([(self.compute_alpha.packetMirrorings, 'Delete',
-                         messages.ComputePacketMirroringsDeleteRequest(
+    self.CheckRequests([(self.compute.packetMirrorings, 'Delete',
+                         self.messages.ComputePacketMirroringsDeleteRequest(
                              packetMirroring='pm-1',
                              project='my-project',
                              region='us-central1'))])
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
+    self.compute = self.compute_alpha
 
 
 if __name__ == '__main__':

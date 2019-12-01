@@ -1926,6 +1926,7 @@ class TablePrinterFormatSortTest(resource_printer_test_base.Base):
         | my-instance-azz-2  | compute#metadata.0 |
         | my-instance-azzz-3 | compute#metadata.2 |
         +--------------------+--------------------+
+
         +------------------------+--------------------+
         |          NAME          |        KIND        |
         +------------------------+--------------------+
@@ -1934,6 +1935,7 @@ class TablePrinterFormatSortTest(resource_printer_test_base.Base):
         | my-instance-azzzzzz-6  | compute#metadata.2 |
         | my-instance-azzzzzzz-7 | compute#metadata.1 |
         +------------------------+--------------------+
+
         +--------------------------+--------------------+
         |           NAME           |        KIND        |
         +--------------------------+--------------------+
@@ -2250,6 +2252,19 @@ i     iii     v
 I     III     V
 """)
 
+  def testRepeatedKeyReferencedByAlias(self):
+    resource_printer.Print(
+        self.repeated_resource, 'table(selfLink.segment(1):label=LEFT,'
+        '      selfLink.segment(3):label=MIDDLE,'
+        '      selfLink.segment(5):label=RIGHT)'
+        'table(MIDDLE)')
+    self.AssertOutputEquals("""\
+MIDDLE
+3
+iii
+III
+""")
+
 
 class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
 
@@ -2391,6 +2406,7 @@ class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
         │ my-instance-azz-2  │ compute#metadata.0 │
         │ my-instance-azzz-3 │ compute#metadata.2 │
         └────────────────────┴────────────────────┘
+
         ┌────────────────────────┬────────────────────┐
         │          NAME          │        KIND        │
         ├────────────────────────┼────────────────────┤
@@ -2399,6 +2415,7 @@ class TablePrinterConsoleAttrTest(resource_printer_test_base.Base):
         │ my-instance-azzzzzz-6  │ compute#metadata.2 │
         │ my-instance-azzzzzzz-7 │ compute#metadata.1 │
         └────────────────────────┴────────────────────┘
+
         ┌──────────────────────────┬────────────────────┐
         │           NAME           │        KIND        │
         ├──────────────────────────┼────────────────────┤

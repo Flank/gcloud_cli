@@ -30,6 +30,12 @@ COMMANDS
      list
         (ALPHA) List memberships.
 
+     register
+        (ALPHA) Registers a cluster with Google Cloud Platform.
+
+     unregister
+        (ALPHA) Unregisters a cluster from Google Cloud Platform.
+
      update
         (ALPHA) Update a membership.
 

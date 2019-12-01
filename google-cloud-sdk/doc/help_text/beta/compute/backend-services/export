@@ -45,8 +45,9 @@ EXAMPLES
             --destination=<path-to-file> --global
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute backend-services export
         $ gcloud alpha compute backend-services export
 

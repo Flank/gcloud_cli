@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha scc findings create
         (FINDING : --organization=ORGANIZATION --source=SOURCE)
-        [--category=CATEGORY] [--event-time=EVENT_TIME]
-        [--external-uri=EXTERNAL_URI] [--resource-name=RESOURCE_NAME]
+        --category=CATEGORY --resource-name=RESOURCE_NAME
+        [--event-time=EVENT_TIME] [--external-uri=EXTERNAL_URI]
         [--source-properties=[SOURCE_PROPERTIES,...]] [--state=STATE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -35,11 +35,16 @@ POSITIONAL ARGUMENTS
           the suffix of the source. Example: organizations/123/sources/456, the
           id is 456.
 
-FLAGS
+REQUIRED FLAGS
      --category=CATEGORY
         Taxonomy group within findings from a given source. Example:
         XSS_FLASH_INJECTION
 
+     --resource-name=RESOURCE_NAME
+        Full resource name of the Google Cloud Platform resource this finding
+        is for.
+
+OPTIONAL FLAGS
      --event-time=EVENT_TIME
         Time at which the event took place. For example, if the finding
         represents an open firewall it would capture the time the open firewall
@@ -51,10 +56,6 @@ FLAGS
         (Security Command Center) where additional information about the
         finding can be found. This field is guaranteed to be either empty or a
         well formed URL.
-
-     --resource-name=RESOURCE_NAME
-        Full resource name of the Google Cloud Platform resource this finding
-        is for.
 
      --source-properties=[SOURCE_PROPERTIES,...]
         Source specific properties. These properties are managed by the source

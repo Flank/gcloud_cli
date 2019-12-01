@@ -11,7 +11,9 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        Name of the instance to describe.
+        Name of the instance to describe. For details on valid instance names,
+        refer to the criteria documented under the field 'name' at:
+        https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 FLAGS
      --zone=ZONE

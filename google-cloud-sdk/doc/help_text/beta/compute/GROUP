@@ -106,6 +106,9 @@ GROUPS
      os-login
         (BETA) Create and manipulate Google Compute Engine OS Login resources.
 
+     packet-mirrorings
+        (BETA) Manage Google Compute Engine packet mirroring resources.
+
      project-info
         (BETA) Read and manipulate project-level data like quotas and metadata.
 

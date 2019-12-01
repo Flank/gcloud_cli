@@ -19,13 +19,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
 
-class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
+class GetIamPolicyTestGA(unit_test_base.BaseTest, test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testGetIamPolicy(self):
     policy = self.msgs.Policy(
@@ -126,6 +130,18 @@ class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
     except cli_test_base.MockArgumentError:
       self.fail('get-iam-policy should accept unique ids for service '
                 'accounts.')
+
+
+class GetIamPolicyTestBeta(GetIamPolicyTestGA):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class GetIamPolicyTestAlpha(GetIamPolicyTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

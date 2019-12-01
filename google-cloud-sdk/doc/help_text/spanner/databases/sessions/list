@@ -71,6 +71,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list the sessions for a given Cloud Spanner database, run:
+
+        $ gcloud spanner databases sessions list --instance=my-instance-id \
+            --database=my-database-id
+
 NOTES
     These variants are also available:
 

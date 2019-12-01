@@ -11,7 +11,7 @@ gcloud alpha builds deploy \- build and deploy images with Google Cloud Build
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds deploy\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds deploy\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,6 +30,19 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBconfigure\fR
+\fB(ALPHA)\fR Configure automated build and deployment with Google Cloud Build.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 

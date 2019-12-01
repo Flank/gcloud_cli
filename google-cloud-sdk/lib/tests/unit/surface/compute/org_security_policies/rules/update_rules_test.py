@@ -36,16 +36,12 @@ class OrgSecurityPoliciesRulesCreateAlphaTest(test_base.BaseTest):
 
   def CreateTestOrgSecurityPolicyMessage(self, **kwargs):
     return self.messages.SecurityPolicyRule(
-        priority=10,
+        priority=12,
         action='allow',
         enableLogging=True,
         direction=self.messages.SecurityPolicyRule.DirectionValueValuesEnum
         .INGRESS,
-        match=self.messages.SecurityPolicyRuleMatcher(
-            versionedExpr=self.messages.SecurityPolicyRuleMatcher
-            .VersionedExprValueValuesEnum.FIREWALL,
-            config=self.messages.SecurityPolicyRuleMatcherConfig(
-                srcIpRanges=[], destIpRanges=[], destPorts=[])))
+        match=None)
 
   def ExpectOrgSecurityPolicyRequest(self, **kwargs):
     self.make_requests.side_effect = iter(
@@ -66,7 +62,7 @@ class OrgSecurityPoliciesRulesCreateAlphaTest(test_base.BaseTest):
 
     self.Run(
         'compute org-security-policies rules update 10 '
-        '--security-policy 12345 --action allow --direction INGRESS --enable-logging'
+        '--security-policy 12345 --new-priority=12 --action allow --direction INGRESS --enable-logging'
     )
 
     self.CheckOrgSecurityPolicyRequest()

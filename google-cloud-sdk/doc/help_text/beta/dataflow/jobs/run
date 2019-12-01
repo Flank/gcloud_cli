@@ -3,10 +3,10 @@ NAME
 
 SYNOPSIS
     gcloud beta dataflow jobs run JOB_NAME --gcs-location=GCS_LOCATION
-        [--dataflow-kms-key=DATAFLOW_KMS_KEY] [--max-workers=MAX_WORKERS]
-        [--network=NETWORK] [--num-workers=NUM_WORKERS]
-        [--parameters=[PARAMETERS,...]] [--region=REGION_ID]
-        [--service-account-email=SERVICE_ACCOUNT_EMAIL]
+        [--dataflow-kms-key=DATAFLOW_KMS_KEY] [--disable-public-ips]
+        [--max-workers=MAX_WORKERS] [--network=NETWORK]
+        [--num-workers=NUM_WORKERS] [--parameters=[PARAMETERS,...]]
+        [--region=REGION_ID] [--service-account-email=SERVICE_ACCOUNT_EMAIL]
         [--staging-location=STAGING_LOCATION] [--subnetwork=SUBNETWORK]
         [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
@@ -26,6 +26,11 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --dataflow-kms-key=DATAFLOW_KMS_KEY
         The Cloud KMS key to protect the job resources.
+
+     --disable-public-ips
+        The Cloud Dataflow workers must not use public IP addresses. Overrides
+        the default dataflow/disable_public_ips property value for this command
+        invocation.
 
      --max-workers=MAX_WORKERS
         The maximum number of workers to run.

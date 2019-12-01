@@ -70,7 +70,7 @@ EXAMPLES
     To print the IAM policy for a given instance template, run:
 
         $ gcloud compute instance-templates get-iam-policy \
-            my-instance-template --zone=my-zone
+            my-instance-template
 
 NOTES
     These variants are also available:

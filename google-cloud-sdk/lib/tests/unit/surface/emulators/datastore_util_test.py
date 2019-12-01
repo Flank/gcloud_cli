@@ -24,6 +24,7 @@ from googlecloudsdk.command_lib.emulators import datastore_util
 from googlecloudsdk.command_lib.emulators import util
 from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import mock
@@ -37,78 +38,42 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
   def Project(self):
     return 'fake-project'
 
-  def testGetLegacyGCDRoot(self):
-    self._DoTestGetGCDRoot('gcd', True)
-
   def testGetGCDRoot(self):
-    self._DoTestGetGCDRoot('cloud-datastore-emulator', False)
+    self._DoTestGetGCDRoot('cloud-datastore-emulator')
 
-  def _DoTestGetGCDRoot(self, gcd_dir, legacy):
+  def _DoTestGetGCDRoot(self, gcd_dir):
     cloud_sdk_mock = self.StartObjectPatch(util, 'GetCloudSDKRoot')
     cloud_sdk_mock.return_value = 'pathtocloudsdk'
 
     os_isdir_mock = self.StartObjectPatch(os.path, 'isdir')
     os_isdir_mock.return_value = True
-    args = type(str('args_mock'),
-                (object,),
-                dict(legacy=legacy))
 
     expected = os.path.join(cloud_sdk_mock.return_value, 'platform', gcd_dir)
-    self.assertEqual(expected, datastore_util.GetGCDRoot(args))
+    self.assertEqual(expected, datastore_util.GetGCDRoot())
 
     os_isdir_mock.return_value = False
     with self.assertRaises(datastore_util.NoGCDError):
-      datastore_util.GetGCDRoot(args)
+      datastore_util.GetGCDRoot()
 
-  @test_case.Filters.DoNotRunOnWindows
-  def testArgsForLegacyGCDEmulatorOnNonWindows(self):
-    self._DoTestArgsForGCDEmulatorOnNonWindows('gcd.sh', True)
-
-  @test_case.Filters.DoNotRunOnWindows
-  def testArgsForGCDEmulatorOnNonWindows(self):
-    self._DoTestArgsForGCDEmulatorOnNonWindows('cloud_datastore_emulator',
-                                               False)
-
-  def _DoTestArgsForGCDEmulatorOnNonWindows(self, gcd_exec, legacy):
-    gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
-    gcd_root_mock.return_value = 'pathtogcdroot'
-    args = type(str('args_mock'),
-                (object,),
-                dict(legacy=legacy))
-
-    gcd_executable = os.path.join(gcd_root_mock.return_value, gcd_exec)
-    self.assertEqual(execution_utils.ArgsForExecutableTool(gcd_executable,
-                                                           'args'),
-                     datastore_util.ArgsForGCDEmulator(['args'], args))
-
-  @test_case.Filters.RunOnlyOnWindows
-  def testArgsForLegacyGCDEmulatorWindows(self):
-    self._DoTestArgsForGCDEmulatorWindows('gcd.cmd', True)
-
-  @test_case.Filters.RunOnlyOnWindows
-  def testArgsForGCDEmulatorWindows(self):
-    self._DoTestArgsForGCDEmulatorWindows('cloud_datastore_emulator.cmd',
-                                          False)
-
-  def _DoTestArgsForGCDEmulatorWindows(self, gcd_exec, legacy):
+  def testArgsForGCDEmulator(self):
     gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
 
-    args = type(str('args_mock'),
-                (object,),
-                dict(legacy=legacy))
-
-    gcd_executable = os.path.join(gcd_root_mock.return_value, gcd_exec)
-    self.assertEqual(execution_utils.ArgsForCMDTool(gcd_executable, 'args'),
-                     datastore_util.ArgsForGCDEmulator(['args'], args))
-
-  def testPrepareLegacyGCDDataDir(self):
-    self._DoTestPrepareGCDDataDir(True)
+    emulator_executable = 'cloud_datastore_emulator'
+    gcd_executable = os.path.join(gcd_root_mock.return_value,
+                                  emulator_executable)
+    if platforms.OperatingSystem.IsWindows():
+      gcd_executable += '.cmd'
+      args_tool = execution_utils.ArgsForCMDTool
+    else:
+      args_tool = execution_utils.ArgsForExecutableTool
+    self.assertEqual(args_tool(gcd_executable, 'args'),
+                     datastore_util.ArgsForGCDEmulator(['args']))
 
   def testPrepareGCDDataDir(self):
-    self._DoTestPrepareGCDDataDir(False)
+    self._DoTestPrepareGCDDataDir()
 
-  def _DoTestPrepareGCDDataDir(self, legacy):
+  def _DoTestPrepareGCDDataDir(self):
     gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
     exec_mock = self.StartObjectPatch(util, 'Exec')
@@ -120,15 +85,14 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     data_dir = self.CreateTempDir()
     args = type(str('args_mock'),
                 (object,),
-                dict(legacy=legacy,
-                     data_dir=data_dir))
+                dict(data_dir=data_dir))
 
     # Nothing should be done if data-dir is non-empty
     tmp_file = self.Touch(directory=data_dir)
     datastore_util.PrepareGCDDataDir(args)
     self.assertFalse(exec_mock.called)
 
-    # gcd create should be called if data-dir is empty
+    # gcd create should be called if data-dr is empty
     exec_mock.reset_mock()
     prefix_mock.reset_mock()
     os.remove(tmp_file)
@@ -136,7 +100,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     create_args = ['create',
                    '--project_id={0}'.format(self.Project()),
                    data_dir,]
-    exec_args = datastore_util.ArgsForGCDEmulator(create_args, args)
+    exec_args = datastore_util.ArgsForGCDEmulator(create_args)
     exec_mock.assert_called_once_with(exec_args)
     prefix_mock.assert_called_once_with(process, 'datastore')
 
@@ -153,13 +117,10 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     with self.assertRaises(datastore_util.UnableToPrepareDataDir):
       datastore_util.PrepareGCDDataDir(args)
 
-  def testStartLegacyGCDEmulator(self):
-    self._DoTestStartGCDEmulator(True)
-
   def testStartGCDEmulator(self):
-    self._DoTestStartGCDEmulator(False)
+    self._DoTestStartGCDEmulator()
 
-  def _DoTestStartGCDEmulator(self, legacy):
+  def _DoTestStartGCDEmulator(self):
     gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
     exec_mock = self.StartObjectPatch(util, 'Exec')
@@ -169,8 +130,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
                 dict(host_port=arg_parsers.HostPort('localhost', '8080'),
                      store_on_disk=True,
                      data_dir='temp_dir',
-                     consistency=0.7,
-                     legacy=legacy))
+                     consistency=0.7))
     datastore_util.StartGCDEmulator(args)
     start_args = ['start',
                   '--host=localhost',
@@ -179,24 +139,17 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
                   '--consistency=0.7',
                   '--allow_remote_shutdown',
                   'temp_dir',]
-    exec_args = datastore_util.ArgsForGCDEmulator(start_args, args)
+    exec_args = datastore_util.ArgsForGCDEmulator(start_args)
     exec_mock.assert_called_once_with(exec_args, log_file=None)
 
-  def testWriteLegacyGCDEnvYaml(self):
-    self._DoTestWriteGCDEnvYaml(True)
-
   def testWriteGCDEnvYaml(self):
-    self._DoTestWriteGCDEnvYaml(False)
-
-  def _DoTestWriteGCDEnvYaml(self, legacy):
     env_mock = self.StartObjectPatch(util, 'WriteEnvYaml')
 
     args = type(str('args_mock'),
                 (object,),
                 dict(host_port=arg_parsers.HostPort('localhost', '8080'),
                      store_on_disk=True,
-                     data_dir='temp_dir',
-                     legacy=legacy))
+                     data_dir='temp_dir'))
     datastore_util.WriteGCDEnvYaml(args)
     env = {'DATASTORE_HOST': 'http://localhost:8080',
            'DATASTORE_EMULATOR_HOST': 'localhost:8080',

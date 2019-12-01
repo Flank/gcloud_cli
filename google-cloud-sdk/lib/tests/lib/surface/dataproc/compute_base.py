@@ -55,8 +55,8 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
 
   def SubnetUri(self):
     return ('https://compute.googleapis.com/compute/{track}/projects/'
-            '{project}/regions/us-central1/subnetworks/test-subnetwork'.format(
-                track=self.GetComputeApiVersion(), project=self.Project()))
+            '{project}/regions/antarctica-north42/subnetworks/test-subnetwork'
+            .format(track=self.GetComputeApiVersion(), project=self.Project()))
 
   def ImageUri(self):
     return ('https://compute.googleapis.com/compute/{track}/projects/'
@@ -67,34 +67,34 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
   def GetZones(self):
     return [
         self.compute_messages.Zone(
-            name='us-central1-a',
+            name='antarctica-north42-a',
             region=('https://compute.googleapis.com/compute/{track}/projects/'
-                    '{project}/regions/us-central1'.format(
+                    '{project}/regions/antarctica-north42'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())),
             status=self.compute_messages.Zone.StatusValueValuesEnum.UP,
             selfLink=('https://compute.googleapis.com/compute/{track}/projects/'
-                      '{project}/zones/us-central1-a'.format(
+                      '{project}/zones/antarctica-north42-a'.format(
                           track=self.GetComputeApiVersion(),
                           project=self.Project())),
             deprecated=self.compute_messages.DeprecationStatus(
-                state=(self.compute_messages.DeprecationStatus.
-                       StateValueValuesEnum.DEPRECATED),
+                state=(self.compute_messages.DeprecationStatus
+                       .StateValueValuesEnum.DEPRECATED),
                 deleted='2015-03-29T00:00:00.000-07:00',
                 replacement=(
                     'https://compute.googleapis.com/compute/{track}/projects/'
-                    '{project}/zones/us-central1-b'.format(
+                    '{project}/zones/antarctica-north42-b'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())))),
         self.compute_messages.Zone(
-            name='us-central1-b',
+            name='antarctica-north42-b',
             status=self.compute_messages.Zone.StatusValueValuesEnum.UP,
             region=('https://compute.googleapis.com/compute/{track}/projects/'
-                    '{project}/regions/us-central1'.format(
+                    '{project}/regions/antarctica-north42'.format(
                         track=self.GetComputeApiVersion(),
                         project=self.Project())),
             selfLink=('https://compute.googleapis.com/compute/{track}/projects/'
-                      '{project}/zones/us-central1-b'.format(
+                      '{project}/zones/antarctica-north42-b'.format(
                           track=self.GetComputeApiVersion(),
                           project=self.Project()))),
         self.compute_messages.Zone(

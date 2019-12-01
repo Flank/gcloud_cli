@@ -1,11 +1,11 @@
 title: A gadget for creating GKE cluster with knative addon. Should not be run in presubmit. The cluster name has been whitelisted as a static e2e resource (see cl/218372416).
 release_tracks: [ALPHA]
 
-skip:
-  reason: This is a utility for one-time use. Checked in just to keep records of the cluster creation specifics.
-  bug: b/111453274
-  locally: true
-  always: true  # used as a tool for cluster creation
+filters:
+  skipAlways:  # used as a tool for cluster creation
+    reason: This is a utility for one-time use. Checked in just to keep records of the cluster creation specifics.
+    bug: b/111453274
+    locally: true
 
 actions:
 

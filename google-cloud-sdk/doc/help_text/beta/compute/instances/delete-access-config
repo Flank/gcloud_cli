@@ -16,7 +16,9 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        Name of the instance to operate on.
+        Name of the instance to operate on. For details on valid instance
+        names, refer to the criteria documented under the field 'name' at:
+        https://cloud.google.com/compute/docs/reference/rest/v1/instances
 
 FLAGS
      --access-config-name=ACCESS_CONFIG_NAME; default="external-nat"
@@ -63,7 +65,7 @@ EXAMPLES
     example-instance in zone us-central1-a, run:
 
         $ gcloud beta compute instances delete-access-config \
-            example-instance --zone us-central1-a
+            example-instance --zone=us-central1-a
 
 NOTES
     This command is currently in BETA and may change without notice. These

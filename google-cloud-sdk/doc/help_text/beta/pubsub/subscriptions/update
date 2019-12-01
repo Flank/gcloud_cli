@@ -64,7 +64,8 @@ FLAGS
      --retain-acked-messages
         Whether or not to retain acknowledged messages. If true, messages are
         not expunged from the subscription's backlog until they fall out of the
-        --message-retention-duration window.
+        --message-retention-duration window. Acknowledged messages are not
+        retained by default.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is

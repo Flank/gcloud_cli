@@ -24,11 +24,11 @@ from googlecloudsdk.command_lib.run import flags
 from tests.lib.surface.run import base
 
 
-class DescribeTestBeta(base.ServerlessSurfaceBase):
+class DescribeTest(base.ServerlessSurfaceBase):
   """Tests outputs of describe command."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.fake_revision = revision.Revision.New(
@@ -36,7 +36,7 @@ class DescribeTestBeta(base.ServerlessSurfaceBase):
     self.fake_revision.name = '12345'
     self.fake_revision.metadata.creationTimestamp = '2018/01/01 00:00:00'
     self.fake_revision.annotations[revision.AUTHOR_ANNOTATION] = 'Tom'
-    self.fake_revision.spec.container.env = [
+    self.fake_revision.container.env = [
         self.serverless_messages.EnvVar(name='n1', value='v1'),
         self.serverless_messages.EnvVar(name='n2', value='v2')]
 
@@ -75,6 +75,13 @@ class DescribeTestBeta(base.ServerlessSurfaceBase):
         'Cannot find revision [123]', str(context.exception))
     self.operations.GetRevision.assert_called_once_with(
         self._RevisionRef('123'))
+
+
+class DescribeTestBeta(DescribeTest):
+  """Tests outputs of describe command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class DescribeTestAlpha(DescribeTestBeta):

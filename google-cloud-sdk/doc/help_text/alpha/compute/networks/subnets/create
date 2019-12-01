@@ -9,8 +9,10 @@ SYNOPSIS
         [--enable-private-ip-google-access] [--enable-private-ipv6-access]
         [--flow-sampling=FLOW_SAMPLING]
         [--logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL]
+        [--logging-filter-expr=LOGGING_FILTER_EXPR]
         [--logging-flow-sampling=LOGGING_FLOW_SAMPLING]
-        [--logging-metadata=LOGGING_METADATA] [--metadata=METADATA]
+        [--logging-metadata=LOGGING_METADATA]
+        [--logging-metadata-fields=[METADATA_FIELD,...]] [--metadata=METADATA]
         [--private-ipv6-google-access-service-accounts=EMAIL,[EMAIL,...]]
         [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--purpose=PURPOSE] [--region=REGION] [--role=ROLE]
@@ -72,6 +74,10 @@ OPTIONAL FLAGS
         interval-10-min, interval-15-min, interval-1-min, interval-30-sec,
         interval-5-min, interval-5-sec.
 
+     --logging-filter-expr=LOGGING_FILTER_EXPR
+        Can only be specified if VPC flow logs for this subnetwork is enabled.
+        Export filter used to define which VPC flow logs should be logged.
+
      --logging-flow-sampling=LOGGING_FLOW_SAMPLING
         Can only be specified if VPC flow logging for this subnetwork is
         enabled. The value of the field must be in [0, 1]. Set the sampling
@@ -83,7 +89,12 @@ OPTIONAL FLAGS
         Can only be specified if VPC flow logging for this subnetwork is
         enabled. Configures whether metadata fields should be added to the
         reported VPC flow logs. Default is to include all metadata.
-        LOGGING_METADATA must be one of: exclude-all, include-all.
+        LOGGING_METADATA must be one of: custom, exclude-all, include-all.
+
+     --logging-metadata-fields=[METADATA_FIELD,...]
+        Can only be specified if VPC flow logs for this subnetwork is enabled
+        and "metadata" is set to CUSTOM_METADATA. The custom list of metadata
+        fields that should be added to reported VPC flow logs.
 
      --metadata=METADATA
         Can only be specified if VPC flow logging for this subnetwork is
@@ -105,6 +116,9 @@ OPTIONAL FLAGS
      --purpose=PURPOSE
         The purpose of this subnetwork. PURPOSE must be one of:
 
+         AGGREGATE
+            Reserved for Aggregate Ranges used for aggregating private
+            subnetworks.
          INTERNAL_HTTPS_LOAD_BALANCER
             Reserved for Internal HTTP(S) Load Balancing.
          PRIVATE

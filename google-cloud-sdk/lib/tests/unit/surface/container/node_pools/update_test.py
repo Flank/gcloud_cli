@@ -252,54 +252,6 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones\
                ' update {0} --cluster={1}'
                .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
 
-
-# TODO(b/64575339): switch to use parameterized testing.
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
-  """gcloud Beta track using container v1beta1 API."""
-
-  def testWorkloadMetadataFromNode(self):
-
-    enum = self.messages.WorkloadMetadataConfig.NodeMetadataValueValuesEnum
-    states = [
-        enum.UNSPECIFIED,
-        enum.EXPOSE,
-        enum.SECURE,
-        enum.GKE_METADATA_SERVER,
-    ]
-    state_string_names = {
-        enum.UNSPECIFIED: 'UNSPECIFIED',
-        enum.EXPOSE: 'EXPOSED',
-        enum.SECURE: 'SECURE',
-        enum.GKE_METADATA_SERVER: 'GKE_METADATA_SERVER',
-    }
-
-    for from_state, to_state in itertools.product(states, states):
-
-      pool = self._MakeNodePool(
-          version=self.VERSION,
-          workloadMetadataConfig=self.messages.WorkloadMetadataConfig(
-              nodeMetadata=from_state),
-      )
-
-      self.ExpectUpdateNodePool(
-          self.NODE_POOL_NAME,
-          workload_metadata_config=self.messages.WorkloadMetadataConfig(
-              nodeMetadata=to_state,),
-          response=self._MakeOperation(operationType=self.op_upgrade_nodes))
-      self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
-      self.ExpectGetNodePool(pool.name, response=pool)
-
-      command = ('{command_base} update {node_pool} --cluster={cluster} '
-                 '--workload-metadata-from-node={to_state}').format(
-                     command_base=self.node_pools_command_base.format(
-                         self.ZONE),
-                     node_pool=pool.name,
-                     cluster=self.CLUSTER_NAME,
-                     to_state=state_string_names[to_state])
-
-      self.Run(command)
-
   def testEnableAutoscaling(self):
     pool_kwargs = {}
     pool = self._MakeNodePool(**pool_kwargs)
@@ -376,6 +328,53 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self.ExpectGetNodePool(pool.name, response=pool)
     self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
 
+
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class UpdateTestBeta(parameterized.TestCase, base.BetaTestBase, UpdateTestGA):
+  """gcloud Beta track using container v1beta1 API."""
+
+  def testWorkloadMetadataFromNode(self):
+
+    enum = self.messages.WorkloadMetadataConfig.NodeMetadataValueValuesEnum
+    states = [
+        enum.UNSPECIFIED,
+        enum.EXPOSE,
+        enum.SECURE,
+        enum.GKE_METADATA_SERVER,
+    ]
+    state_string_names = {
+        enum.UNSPECIFIED: 'UNSPECIFIED',
+        enum.EXPOSE: 'EXPOSED',
+        enum.SECURE: 'SECURE',
+        enum.GKE_METADATA_SERVER: 'GKE_METADATA_SERVER',
+    }
+
+    for from_state, to_state in itertools.product(states, states):
+
+      pool = self._MakeNodePool(
+          version=self.VERSION,
+          workloadMetadataConfig=self.messages.WorkloadMetadataConfig(
+              nodeMetadata=from_state),
+      )
+
+      self.ExpectUpdateNodePool(
+          self.NODE_POOL_NAME,
+          workload_metadata_config=self.messages.WorkloadMetadataConfig(
+              nodeMetadata=to_state,),
+          response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+      self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+      self.ExpectGetNodePool(pool.name, response=pool)
+
+      command = ('{command_base} update {node_pool} --cluster={cluster} '
+                 '--workload-metadata-from-node={to_state}').format(
+                     command_base=self.node_pools_command_base.format(
+                         self.ZONE),
+                     node_pool=pool.name,
+                     cluster=self.CLUSTER_NAME,
+                     to_state=state_string_names[to_state])
+
+      self.Run(command)
+
   def testConflictingFlagsError(self):
     with self.AssertRaisesArgumentErrorRegexp('Exactly one of '):
       self.Run(self.node_pools_command_base.format(self.ZONE) +
@@ -400,28 +399,11 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self.ExpectGetNodePool(pool.name, response=pool)
     self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
 
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpdateTestAlpha(parameterized.TestCase,
-                      base.AlphaTestBase,
-                      UpdateTestBeta):
-  """gcloud Alpha track using container v1alpha1 API."""
-
   @parameterized.parameters(
-      ((3, 2), (4, None), (4, 2)),
-      ((3, 2), (None, 1), (3, 1)),
       ((3, 2), (4, 1), (4, 1)),
-      ((3, None), (4, None), (4, None)),
-      ((3, None), (None, 1), (3, 1)),
       ((3, None), (4, 1), (4, 1)),
-      ((None, 2), (4, None), (4, 2)),
-      ((None, 2), (None, 1), (None, 1)),
       ((None, 2), (4, 1), (4, 1)),
-      ((None, None), (4, None), (4, None)),
-      ((None, None), (None, 1), (None, 1)),
       ((None, None), (4, 1), (4, 1)),
-      (None, (4, None), (4, None)),
-      (None, (None, 1), (None, 1)),
       (None, (4, 1), (4, 1)))
   def testSurgeUpgradeSettings(self,
                                old_upgrade_settings,
@@ -458,6 +440,28 @@ class UpdateTestAlpha(parameterized.TestCase,
     self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
     self.ExpectGetNodePool(pool.name, response=pool)
     self.Run(cmd)
+
+  @parameterized.parameters((3, None), (None, 1))
+  def testInvalidSurgeUpgradeSettings(self, max_surge, max_unavai):
+    max_surge_arg = ('--max-surge-upgrade={}'.format(max_surge)
+                     if max_surge is not None else '')
+    max_unavailable_arg = ('--max-unavailable-upgrade={}'.format(max_unavai)
+                           if max_unavai is not None else '')
+
+    cmd = (self.node_pools_command_base.format(self.ZONE) +
+           ' update {0} --cluster={1} {2} {3}'.format(
+               self.NODE_POOL_NAME, self.CLUSTER_NAME,
+               max_surge_arg, max_unavailable_arg))
+
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run(cmd)
+    self.AssertErrContains(c_util.INVALIID_SURGE_UPGRADE_SETTINGS)
+
+
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class UpdateTestAlpha(base.AlphaTestBase,
+                      UpdateTestBeta):
+  """gcloud Alpha track using container v1alpha1 API."""
 
 
 if __name__ == '__main__':

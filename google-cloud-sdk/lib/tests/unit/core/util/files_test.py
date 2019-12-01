@@ -296,12 +296,19 @@ class MakeDirTest(test_case.Base):
 
 class RmTreeTest(test_case.Base, test_case.WithOutputCapture):
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   @test_case.Filters.RunOnlyOnWindows
   def testRmTreeWithWindowsError(self):
     wait_mock = self.StartObjectPatch(file_utils, '_WaitForRetry')
     rmdir_mock = self.StartObjectPatch(os, 'rmdir')
-    rmdir_mock.side_effect = WindowsError(32, 'File access error')  # pylint: disable=undefined-variable
+    # We should avoid checking python versions during runtime.
+    # Here, we need it because the exception raised in python 2 and python 3
+    # changed, so the mock should also be different.
+    if six.PY2:
+      windows_error = WindowsError(32, 'File access error')  # pylint: disable=undefined-variable
+    else:
+      windows_error = PermissionError(32, 'File access error')  # pylint: disable=undefined-variable
+      windows_error.winerror = 32
+    rmdir_mock.side_effect = windows_error
     temp_dir = file_utils.TemporaryDirectory()
     # The TemporaryDirectory is used without a "with" statement here because
     # it will call RmTree when it closes, raising the mocked error
@@ -326,7 +333,6 @@ class RmTreeTest(test_case.Base, test_case.WithOutputCapture):
     self.assertEqual(wait_mock.call_count, 0)
     self.assertTrue(os.path.isdir(temp_dir.path))
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   @test_case.Filters.RunOnlyOnWindows
   def testRmTreeWithBadPermissions(self):
     temp_dir = file_utils.TemporaryDirectory()
@@ -1228,6 +1234,105 @@ class WriteFileOrStdoutContentsTest(test_case.Base,
       # mode & 0777 strips the higher level bits that we don't care about,
       # leaving only the three permissions octals.
       self.assertEqual(mode & 0o777, 0o600)
+
+
+class GetDirectoryTreeListingTest(test_case.Base):
+
+  def SetUp(self):
+    self.basedir = file_utils.TemporaryDirectory()
+    self.contents = 'abc123'
+
+  def testFlatDir(self):
+    fname1 = self.Touch(self.basedir.path, name='a.txt', contents=self.contents)
+    fname2 = self.Touch(self.basedir.path, name='b.txt', contents=self.contents)
+    expected = [fname1, fname2]
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(self.basedir.path)))
+
+  def testNestedDir(self):
+    fname1 = self.Touch(self.basedir.path, name='a.txt', contents=self.contents)
+    fname2 = self.Touch(os.path.join(self.basedir.path, 'directory2'),
+                        name='b.txt', contents=self.contents, makedirs=True)
+    expected = [fname1, fname2]
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(self.basedir.path)))
+
+  def testWithDirListings(self):
+    fname1 = self.Touch(self.basedir.path, name='a.txt', contents=self.contents)
+    fname2 = self.Touch(os.path.join(self.basedir.path, 'directory2'),
+                        name='b.txt', contents=self.contents, makedirs=True)
+    expected = ['directory2', fname1, fname2]
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(self.basedir.path,
+                                                          include_dirs=True)))
+
+  def testWithPathRelativeToHomeDir(self):
+    fake_home = os.path.join(self.basedir.path, 'fake_home')
+    file_in_home_dir = self.Touch(os.path.join(fake_home, 'sub_dir'),
+                                  name='b.txt', contents=self.contents,
+                                  makedirs=True)
+    self.StartObjectPatch(os.path, 'expanduser', return_value=fake_home)
+    expected = [file_in_home_dir]
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing('~/sub_dir')))
+
+  def testEmptyDir(self):
+    self.assertEqual([], list(file_utils.GetDirectoryTreeListing(
+        self.basedir.path)))
+
+  def testWithFilePredicate(self):
+    fname1 = self.Touch(self.basedir.path, name='Included.txt',
+                        contents=self.contents)
+    fname2 = self.Touch(self.basedir.path, name='Included_also.txt',
+                        contents=self.contents)
+    self.Touch(self.basedir.path, name='Excluded.txt', contents=self.contents)
+    expected = [fname1, fname2]
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(
+            self.basedir.path,
+            file_predicate=lambda x: re.match(r'.*Included.*\.txt', x))))
+
+  def testWithFileSort(self):
+    fname1 = self.Touch(self.basedir.path, name='a.txt', contents=self.contents)
+    fname2 = self.Touch(self.basedir.path, name='b.txt',
+                        contents=self.contents)
+    fname3 = self.Touch(self.basedir.path, name='c.txt', contents=self.contents)
+    expected = [fname3, fname2, fname1]
+    sort_func = lambda x: sorted(x, reverse=True)
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(
+            self.basedir.path, file_sort_func=sort_func)))
+
+  def testWithDirSort(self):
+    fname1 = self.Touch(self.basedir.path, name='a.txt', contents=self.contents)
+    fname2 = self.Touch(os.path.join(self.basedir.path, 'directory1'),
+                        name='b.txt', contents=self.contents, makedirs=True)
+    fname3 = self.Touch(os.path.join(self.basedir.path, 'directory2'),
+                        name='c.txt', contents=self.contents, makedirs=True)
+    expected = [fname1, fname3, fname2]
+    sort_func = lambda x: x.sort(reverse=True)
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(
+            self.basedir.path, dir_sort_func=sort_func)))
+
+  def testWithAllOptions(self):
+    fname1 = self.Touch(self.basedir.path, name='Included.txt',
+                        contents=self.contents)
+    fname2 = self.Touch(os.path.join(self.basedir.path, 'directory1'),
+                        name='Included_also.txt', contents=self.contents,
+                        makedirs=True)
+    self.Touch(os.path.join(self.basedir.path, 'directory2'),
+               name='Excluded.txt', contents=self.contents, makedirs=True)
+    expected = ['directory2', 'directory1', fname1, fname2]
+    dir_sort_func = lambda x: x.sort(reverse=True)
+    file_sort_func = lambda x: sorted(x, reverse=True)
+    self.assertEqual(
+        expected, list(file_utils.GetDirectoryTreeListing(
+            self.basedir.path,
+            include_dirs=True,
+            dir_sort_func=dir_sort_func,
+            file_sort_func=file_sort_func,
+            file_predicate=lambda x: re.match(r'.*Included.*\.txt', x))))
 
 
 class GetTreeSizeBytesTest(test_case.Base):

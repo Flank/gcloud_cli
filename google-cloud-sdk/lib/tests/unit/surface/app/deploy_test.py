@@ -55,6 +55,7 @@ from googlecloudsdk.command_lib.app import source_files_util
 from googlecloudsdk.command_lib.app import staging
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
@@ -1724,7 +1725,7 @@ class BetaDeploy(DeployWithFlexBase):
         resources.REGISTRY.Parse(
             'build-id',
             params={'projectId': self.Project()},
-            collection='cloudbuild.projects.builds'))
+            collection='cloudbuild.projects.builds'), out=log.status)
 
   def testDeploy_StagingBeta(self):
     """Make sure the beta staging registry is used in beta release track."""

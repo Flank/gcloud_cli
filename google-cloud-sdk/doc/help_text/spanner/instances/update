@@ -30,6 +30,16 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To update the display name of a Cloud Spanner instance, run:
+
+        $ gcloud spanner instances update my-instance-id \
+            --description=my-new-display-name
+
+    To update the node count of a Cloud Spanner instance, run:
+
+        $ gcloud spanner instances update my-instance-id --nodes=1
+
 NOTES
     These variants are also available:
 

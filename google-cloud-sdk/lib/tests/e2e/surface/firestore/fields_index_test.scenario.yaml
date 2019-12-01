@@ -1,7 +1,7 @@
 title: Describe and list single-field index settings
 description: Field updates are too expensive to test, so this only tests describe
   and list.
-release_tracks: [BETA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: core/project das-fs-us-c-gcloud
@@ -49,7 +49,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield?alt=json
+          uri: https://firestore.googleapis.com/v1/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields/myfield?alt=json
           method: GET
           headers: {}
           body: null
@@ -107,7 +107,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://firestore.googleapis.com/v1beta2/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
+          uri: https://firestore.googleapis.com/v1/projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/fields?alt=json&filter=indexConfig.usesAncestorConfig%3Afalse
           method: GET
           headers: {}
           body: null

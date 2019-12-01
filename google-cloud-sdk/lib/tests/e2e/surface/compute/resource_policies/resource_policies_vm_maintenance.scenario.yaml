@@ -1,21 +1,21 @@
+filters:
+  skip:
+    reason: Failing - "internal error"
+    bug: b/135525225
 title: test resource policy
 release_tracks: [ALPHA]
-skip:
-  reason: Timeouts
-  always: true
-  bug: b/135525225
-  locally: true
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instances create $$instance$$ --zone us-central1-f --format="value(name)"
-  - stderr: |
+  - stderr: |-
       Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
   - stdout: |
       $$instance$$
 - execute:
-  - command: compute resource-policies create vm-maintenance $$policy$$ --region us-central1
-      --start-time 04:00Z --daily-window
+  - command: compute resource-policies create vm-maintenance maintenance-window $$policy$$
+      --region us-central1 --start-time 04:00Z --daily-window
   - stderr: |
       Created \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$\].
 - execute:
@@ -29,19 +29,20 @@ summary:
       Updated \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
 - execute:
   - command: |
-      compute instances describe $$instance$$ --zone us-central1-f
-      --format="text(name, resourcePolicies)"
+      compute instances describe $$instance$$ --zone us-central1-f --format="text(name, resourcePolicies)"
   - stdout: |
       name:                $$instance$$
       resourcePolicies[0]: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
 - execute:
   - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$\].
+      $
 - execute:
   - command: compute resource-policies delete $$policy$$ --region us-central1 --quiet
-  - stderr: |
+  - stderr: |-
       Deleted \[https://.*.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$\].
+      $
 actions:
 - define_reference:
     reference: compute-uri
@@ -64,8 +65,8 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute resource-policies create vm-maintenance $$policy$$ --region us-central1
-      --start-time 04:00Z --daily-window
+    command: compute resource-policies create vm-maintenance maintenance-window $$policy$$
+      --region us-central1 --start-time 04:00Z --daily-window
     events:
     - api_call:
         expect_request:
@@ -86,16 +87,18 @@ actions:
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '6655694010852448220'
-            name: operation-1545840947080-57def2487ad54-37652928-4fd58133
+            id: '4325292855390965573'
+            name: operation-1571860905979-5959962efed23-5588963b-e80af79b
             operationType: insert
             targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
-            targetId: '859715230644443100'
-            status: PENDING
+            targetId: '1013006874055610181'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-26T08:15:47.662-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1545840947080-57def2487ad54-37652928-4fd58133
+            insertTime: '2019-10-23T13:01:46.832-07:00'
+            startTime: '2019-10-23T13:01:46.852-07:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1571860905979-5959962efed23-5588963b-e80af79b
+            selfLinkWithId: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/4325292855390965573
             region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
             kind: compute#operation
         poll_operation: true
@@ -111,14 +114,16 @@ actions:
         return_response:
           headers:
             Content-Type: application/json; charset=UTF-8
-            ETag: H0zeng9MACn_rm6I2i3YX20incs=/8KPF9GcE8o46gP70jEb1ehD_w20=
+            ETag: BB_nL4QkI_xt5k3RWw6bJwmo84U=/ylqSbRAJCS7VCsR7IN-UfdxDvHk=
             status: '200'
           body:
-            id: '859715230644443100'
-            creationTimestamp: '2018-12-26T08:15:47.658-08:00'
+            id: '1013006874055610181'
+            creationTimestamp: '2019-10-23T13:01:46.804-07:00'
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            selfLinkWithId: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/1013006874055610181
             region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
             name: $$policy$$
+            status: READY
             kind: compute#resourcePolicy
             vmMaintenancePolicy:
               maintenanceWindow:
@@ -154,17 +159,19 @@ actions:
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '280295924478908375'
-            name: operation-1545840952094-57def24d430b8-22e1da78-16fba295
+            id: '1289775185085140801'
+            name: operation-1571860909561-59599632696f7-c062e79c-fab0828b
             zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: addResourcePolicies
             targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
-            targetId: '2937901307900336121'
-            status: PENDING
+            targetId: '7155150204320943950'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-26T08:15:52.520-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1545840952094-57def24d430b8-22e1da78-16fba295
+            insertTime: '2019-10-23T13:01:50.018-07:00'
+            startTime: '2019-10-23T13:01:50.036-07:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1571860909561-59599632696f7-c062e79c-fab0828b
+            selfLinkWithId: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/1289775185085140801
             kind: compute#operation
         poll_operation: true
     - expect_stderr:
@@ -179,11 +186,11 @@ actions:
         return_response:
           headers:
             Content-Type: application/json; charset=UTF-8
-            ETag: 8GjpOS8bUSgodVWKY1LrVmmkO3w=/p2zf5ZeA9MRMMqE88nWid_xr36A=
+            ETag: _ZNUxpQtc2cAvKsTvzDBkHYwe1U=/5HORXItc0MRwfp-yV4JHSGsctrQ=
             status: '200'
           body:
-            id: '2937901307900336121'
-            creationTimestamp: '2018-12-26T08:15:19.497-08:00'
+            id: '7155150204320943950'
+            creationTimestamp: '2019-10-23T13:01:38.183-07:00'
             name: $$instance$$
             tags:
               fingerprint: 42WmSpB8rSM=
@@ -193,15 +200,15 @@ actions:
             canIpForward: false
             networkInterfaces:
             - network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/default
-              networkIP: 10.240.1.22
+              networkIP: 10.240.2.179
               name: nic0
               accessConfigs:
               - type: ONE_TO_ONE_NAT
                 name: external-nat
-                natIP: 35.238.150.78
+                natIP: 104.197.220.18
                 networkTier: PREMIUM
                 kind: compute#accessConfig
-              fingerprint: -z3cTRChQBM=
+              fingerprint: Z1XBwQX7rIs=
               kind: compute#networkInterface
             disks:
             - type: PERSISTENT
@@ -232,11 +239,12 @@ actions:
               - https://www.googleapis.com/auth/servicecontrol
               - https://www.googleapis.com/auth/trace.append
             selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            selfLinkWithId: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/7155150204320943950
             scheduling:
               onHostMaintenance: MIGRATE
               automaticRestart: true
               preemptible: false
-            cpuPlatform: Intel Ivy Bridge
+            cpuPlatform: Intel Haswell
             labelFingerprint: 42WmSpB8rSM=
             startRestricted: false
             deletionProtection: false

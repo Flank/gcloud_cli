@@ -148,9 +148,9 @@ class UpdateTest(InstancesUpdateUnitTestBase):
         name=self.instance_relative_name)
     update_options = (
         ' --display-name new-display-name --size 6 --update-redis-config'
-        ' maxmemory-policy=volatile-lru,notify-keyspace-events=kx,'
-        'activedefrag=yes,lfu-log-factor=2,lfu-decay-time=60'
-        ' --update-labels a=3,b=4,c=5')
+        ' maxmemory-gb=5.0,maxmemory-policy=volatile-lru,'
+        'notify-keyspace-events=kx,activedefrag=yes,lfu-log-factor=2,'
+        'lfu-decay-time=60 --update-labels a=3,b=4,c=5')
     expected_update_mask = ('labels,display_name,memory_size_gb,redis_configs')
 
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
@@ -160,6 +160,7 @@ class UpdateTest(InstancesUpdateUnitTestBase):
         'activedefrag': 'yes',
         'lfu-decay-time': '60',
         'lfu-log-factor': '2',
+        'maxmemory-gb': '5.0',
         'maxmemory-policy': 'volatile-lru',
         'notify-keyspace-events': 'kx'
     })
@@ -315,6 +316,7 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
   def testRemoveAllRedisConfigs(self):
     original_redis_configs = {
         'activedefrag': 'yes',
+        'maxmemory-gb': '5.0',
         'maxmemory-policy': 'noeviction',
         'notify-keyspace-events': 'El'
     }
@@ -323,7 +325,8 @@ class RemoveRedisConfigsTest(InstancesUpdateUnitTestBase):
 
     actual_instance = self.Run(
         'redis instances update {} --region {}'
-        ' --remove-redis-config activedefrag,maxmemory-policy,notify-keyspace-events'
+        ' --remove-redis-config activedefrag,maxmemory-gb,maxmemory-policy,'
+        'notify-keyspace-events'
         .format(self.instance_id, self.region_id))
 
     self.assertEqual(actual_instance, self.expected_instance)

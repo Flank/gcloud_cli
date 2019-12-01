@@ -39,7 +39,8 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
   # resolving duration fields is already taken care of in util_test.py.
 
   def testImportAutoscalingPolicies_create(self):
-    policy = self.MakeAutoscalingPolicy('fake-project', 'global', 'policy-1')
+    policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
+                                        'policy-1')
 
     self.WriteInput(
         export_util.Export(
@@ -49,11 +50,11 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     expected_request_policy.name = None
 
     response_policy = copy.deepcopy(expected_request_policy)
-    response_policy.name = 'projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+    response_policy.name = 'projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
 
     self.mock_client.projects_regions_autoscalingPolicies.Create.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
-            parent='projects/fake-project/regions/global',
+            parent='projects/fake-project/regions/antarctica-north42',
             autoscalingPolicy=expected_request_policy,
         ),
         response=response_policy)
@@ -113,7 +114,8 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
     self.AssertMessagesEqual(response_policy, result)
 
   def testImportAutoscalingPolicies_alreadyExists(self):
-    policy = self.MakeAutoscalingPolicy('fake-project', 'global', 'policy-1')
+    policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
+                                        'policy-1')
 
     self.WriteInput(
         export_util.Export(
@@ -124,7 +126,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
 
     self.mock_client.projects_regions_autoscalingPolicies.Create.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
-            parent='projects/fake-project/regions/global',
+            parent='projects/fake-project/regions/antarctica-north42',
             autoscalingPolicy=expected_request_policy,
         ),
         exception=self.MakeHttpError(status_code=409))
@@ -157,7 +159,8 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
         policy, response=policy)
 
     result = self.RunDataproc(
-        'autoscaling-policies import policy-1 --region cool-region  --quiet')
+        'autoscaling-policies import policy-1 --region cool-region  --quiet',
+        set_region=False)
     self.AssertMessagesEqual(policy, result)
 
   def testImportAutoscalingPolicies_alreadyExists_uri(self):
@@ -182,12 +185,13 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
         policy, response=policy)
 
     result = self.RunDataproc(
-        'autoscaling-policies import projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1 --quiet'
-    )
+        'autoscaling-policies import projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1 --quiet',
+        set_region=False)
     self.AssertMessagesEqual(policy, result)
 
   def testImportAutoscalingPolicies_unexpectedError(self):
-    policy = self.MakeAutoscalingPolicy('fake-project', 'global', 'policy-1')
+    policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
+                                        'policy-1')
 
     self.WriteInput(
         export_util.Export(
@@ -198,7 +202,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
 
     self.mock_client.projects_regions_autoscalingPolicies.Create.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
-            parent='projects/fake-project/regions/global',
+            parent='projects/fake-project/regions/antarctica-north42',
             autoscalingPolicy=expected_request_policy,
         ),
         exception=self.MakeHttpError(status_code=403))
@@ -209,7 +213,8 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
       self.RunDataproc('autoscaling-policies import policy-1 --quiet')
 
   def testImportAutoscalingPolicies_update_declineOverwrite(self):
-    policy = self.MakeAutoscalingPolicy('fake-project', 'global', 'policy-1')
+    policy = self.MakeAutoscalingPolicy('fake-project', 'antarctica-north42',
+                                        'policy-1')
 
     # Write to a file so that we can use stdin to decline the prompt. Otherwise,
     # we wouldn't have a way to demarcate where the policy ends and declining
@@ -226,7 +231,7 @@ class AutoscalingPoliciesImportUnitTest(unit_base.DataprocUnitTestBase):
 
     self.mock_client.projects_regions_autoscalingPolicies.Create.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
-            parent='projects/fake-project/regions/global',
+            parent='projects/fake-project/regions/antarctica-north42',
             autoscalingPolicy=expected_request_policy,
         ),
         exception=self.MakeHttpError(status_code=409))

@@ -87,7 +87,8 @@ set the subscription type to PUSH.
 \fB\-\-retain\-acked\-messages\fR
 Whether or not to retain acknowledged messages. If true, messages are not
 expunged from the subscription's backlog until they fall out of the
-\-\-message\-retention\-duration window.
+\-\-message\-retention\-duration window. Acknowledged messages are not retained
+by default.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]

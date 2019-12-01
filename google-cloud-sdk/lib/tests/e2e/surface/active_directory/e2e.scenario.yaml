@@ -1,5 +1,5 @@
 title: Create a Managed Identities Active Directory domain.
-release_tracks: [ALPHA]
+release_tracks: [GA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -26,7 +26,7 @@ actions:
     - api_call:
         poll_operation: false
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/domains?alt=json&domainName=$$my-domain$$
+          uri: https://managedidentities.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/global/domains?alt=json&domainName=$$my-domain$$
           method: POST
           body:
             json:
@@ -47,7 +47,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://managedidentities.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/domains/$$my-domain$$?alt=json
+          uri: https://managedidentities.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/global/domains/$$my-domain$$?alt=json
           method: GET
           headers: {}
           body: null

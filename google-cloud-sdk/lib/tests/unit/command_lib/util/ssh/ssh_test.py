@@ -671,7 +671,7 @@ class SSHCommandTest(CommandTestBase):
     self.AssertCommandBuild(
         ssh.SSHCommand(self.remote, remote_command=['echo', 'hello']),
         'ssh -T myhost -- echo hello',
-        'plink -T myhost echo hello')
+        ['plink', '-T', 'myhost', 'echo hello'])
 
   def testRemainder(self):
     """Check that remainder is respected and appended at the end.
@@ -706,7 +706,7 @@ class SSHCommandTest(CommandTestBase):
     self.AssertCommandBuild(
         ssh.SSHCommand(self.remote, remote_command=['echo', 'hello world']),
         ['ssh', '-T', 'myhost', '--', 'echo', 'hello world'],
-        ['plink', '-T', 'myhost', 'echo', 'hello world'])
+        ['plink', '-T', 'myhost', 'echo hello world'])
 
   def testExtraFlags(self):
     """Check that extra flags are appended independent of suite.
@@ -732,7 +732,7 @@ class SSHCommandTest(CommandTestBase):
     self.AssertCommandBuild(
         ssh.SSHCommand(self.remote, remote_command=['echo', 'hello'], tty=True),
         'ssh -t myhost -- echo hello',
-        'putty -t myhost echo hello')
+        ['putty', '-t', 'myhost', 'echo hello'])
 
   def testIapTunnel(self):
     self.StartObjectPatch(execution_utils, 'ArgsForGcloud',
@@ -784,7 +784,7 @@ class SSHCommandTest(CommandTestBase):
         ['ssh', '-T', '-p', '8080', '-i', '/path/to/key', '-o', 'Opt=123', '-o',
          'Other=no', '-b', '-k', 'v', 'me@myhost', '--', 'echo', 'hello world'],
         ['plink', '-T', '-P', '8080', '-i', '/path/to/key.ppk', '-b', '-k', 'v',
-         'me@myhost', 'echo', 'hello world'])
+         'me@myhost', 'echo hello world'])
 
 
 class SSHCommandRunTest(CommandTestBase):
@@ -812,7 +812,7 @@ class SSHCommandRunTest(CommandTestBase):
 
     self.assertEqual(0, return_code)
     self.exec_mock.assert_called_once_with(
-        ['plink', '-T', 'myhost', 'echo', 'hello world'],
+        ['plink', '-T', 'myhost', 'echo hello world'],
         no_exit=True, in_str=None)
 
   def testSuccessPuTTYForceConnect(self):
@@ -822,7 +822,7 @@ class SSHCommandRunTest(CommandTestBase):
 
     self.assertEqual(0, return_code)
     self.exec_mock.assert_called_once_with(
-        ['plink', '-T', 'myhost', 'echo', 'hello world'],
+        ['plink', '-T', 'myhost', 'echo hello world'],
         no_exit=True, in_str='y\n')
 
   def testRemoteCommandFailed(self):

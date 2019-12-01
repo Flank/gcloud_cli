@@ -53,12 +53,23 @@ help\fR for details.
 
 
 
-.SH "NOTES"
+.SH "EXAMPLES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+To cancel the currently\-running \f5exampleOperationId\fR operation, run:
 
 .RS 2m
+$ gcloud beta firestore operations cancel exampleOperationId
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud firestore operations cancel
 $ gcloud alpha firestore operations cancel
 .RE
 

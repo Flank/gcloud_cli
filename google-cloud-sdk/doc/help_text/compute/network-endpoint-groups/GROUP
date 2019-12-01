@@ -34,7 +34,7 @@ COMMANDS
         List network endpoints in a network endpoint group.
 
      update
-        Updates a Google Compute Engine network endpoint group.
+        Update a Google Compute Engine network endpoint group.
 
 NOTES
     These variants are also available:

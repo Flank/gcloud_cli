@@ -3,18 +3,30 @@ NAME
 
 SYNOPSIS
     gcloud iam service-accounts update SERVICE_ACCOUNT
-        [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--display-name=DISPLAY_NAME]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update an IAM service account.
 
 POSITIONAL ARGUMENTS
-     SERVICE_ACCOUNT
-        The service account to update. The account should be formatted either
-        as a numeric service account ID or as an email, like this:
-        123456789876543212345 or my-iam-account@somedomain.com.
+     ServiceAccount resource - The service account to update. The account
+     should be formatted either as a numeric service account ID or as an email,
+     like this: 123456789876543212345 or my-iam-account@somedomain.com. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [service_account] on the command line with
+     a fully specified name; set the property [core/project]; provide the
+     argument [--project] on the command line. This must be specified.
+
+       SERVICE_ACCOUNT
+          ID of the serviceAccount or fully qualified identifier for the
+          serviceAccount.
 
 FLAGS
+     --description=DESCRIPTION
+        The new textual description for the account.
+
      --display-name=DISPLAY_NAME
         The new textual name to display for the account.
 
@@ -24,6 +36,10 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+API REFERENCE
+    This command uses the iam/v1 API. The full documentation for this API can
+    be found at: https://cloud.google.com/iam/
 
 NOTES
     These variants are also available:

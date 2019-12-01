@@ -24,17 +24,16 @@ from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
-messages = core_apis.GetMessagesModule('compute', 'alpha')
 
-
-class DescribeTest(test_base.BaseTest,
-                   test_case.WithOutputCapture):
+class DescribeTestBeta(test_base.BaseTest, test_case.WithOutputCapture):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
+    self.compute = self.compute_beta
 
   def testDescribe(self):
     name = 'pm-1'
@@ -47,16 +46,17 @@ class DescribeTest(test_base.BaseTest,
         forwardingRule='fr-1',
         project='my-project')
 
-    packet_mirroring = messages.PacketMirroring(
+    packet_mirroring = self.messages.PacketMirroring(
         name=name,
         region=region,
         priority=999,
-        network=messages.PacketMirroringNetworkInfo(url=network_ref.SelfLink()),
-        collectorIlb=messages.PacketMirroringForwardingRuleInfo(
+        network=self.messages.PacketMirroringNetworkInfo(
+            url=network_ref.SelfLink()),
+        collectorIlb=self.messages.PacketMirroringForwardingRuleInfo(
             url=forwarding_rule_ref.SelfLink()),
-        mirroredResources=messages.PacketMirroringMirroredResourceInfo(
+        mirroredResources=self.messages.PacketMirroringMirroredResourceInfo(
             tags=['tag-1']),
-        enable=messages.PacketMirroring.EnableValueValuesEnum.FALSE)
+        enable=self.messages.PacketMirroring.EnableValueValuesEnum.FALSE)
     self.make_requests.side_effect = iter([
         [packet_mirroring],
     ])
@@ -64,12 +64,23 @@ class DescribeTest(test_base.BaseTest,
     self.Run('compute packet-mirrorings describe {} --region {}'.format(
         name, region))
 
-    self.CheckRequests([(self.compute_alpha.packetMirrorings, 'Get',
-                         messages.ComputePacketMirroringsGetRequest(
+    self.CheckRequests([(self.compute.packetMirrorings, 'Get',
+                         self.messages.ComputePacketMirroringsGetRequest(
                              packetMirroring=name,
                              project='my-project',
                              region=region))])
     self.AssertOutputContains('name: {}'.format(name))
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
+    self.compute = self.compute_alpha
 
 if __name__ == '__main__':
   test_case.main()

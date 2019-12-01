@@ -24,6 +24,7 @@ import re
 import sys
 import enum
 
+from googlecloudsdk.core import argv_utils
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.configurations import named_configs
@@ -39,7 +40,7 @@ import six
 # the --configuration flag.  If they did, this could affect the value of the
 # properties defined in that configuration.  Since some libraries (like logging)
 # use properties at startup, we want to use the correct configuration for that.
-named_configs.FLAG_OVERRIDE_STACK.PushFromArgs(sys.argv)
+named_configs.FLAG_OVERRIDE_STACK.PushFromArgs(argv_utils.GetDecodedArgv())
 
 _SET_PROJECT_HELP = """\
 To set your project, run:
@@ -268,6 +269,8 @@ class _Sections(object):
     scc: Section, The section containing scc properties for the Cloud SDK.
     dataproc: Section, The section containing dataproc properties for the Cloud
       SDK.
+    dataflow: Section, The section containing dataflow properties for the Cloud
+      SDK.
     datafusion: Section, The section containing datafusion properties for the
       Cloud SDK.
     default_section: Section, The main section of the properties file (core).
@@ -337,6 +340,7 @@ class _Sections(object):
     self.core = _SectionCore()
     self.scc = _SectionScc()
     self.dataproc = _SectionDataproc()
+    self.dataflow = _SectionDataflow()
     self.datafusion = _SectionDatafusion()
     self.deployment_manager = _SectionDeploymentManager()
     self.devshell = _SectionDevshell()
@@ -380,6 +384,7 @@ class _Sections(object):
         self.core,
         self.scc,
         self.dataproc,
+        self.dataflow,
         self.datafusion,
         self.deployment_manager,
         self.devshell,
@@ -1461,6 +1466,18 @@ class _SectionComposer(_Section):
             'referenced.'))
 
 
+class _SectionDataflow(_Section):
+  """Contains the properties for the 'dataflow' section."""
+
+  def __init__(self):
+    super(_SectionDataflow, self).__init__('dataflow')
+    self.disable_public_ips = self._AddBool(
+        'disable_public_ips',
+        help_text='Specifies that Cloud Dataflow workers '
+        'must not use public IP addresses.',
+        default=False)
+
+
 class _SectionDatafusion(_Section):
   """Contains the properties for the 'datafusion' section."""
 
@@ -1653,9 +1670,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.accesscontextmanager = self._Add('accesscontextmanager')
     self.appengine = self._Add('appengine')
     self.bigtableadmin = self._Add('bigtableadmin')
-    self.bigtableclusteradmin = self._Add('bigtableclusteradmin')
     self.binaryauthorization = self._Add('binaryauthorization')
-    self.bio = self._Add('bio')
     self.buildartifacts = self._Add('buildartifacts')
     self.categorymanager = self._Add('categorymanager')
     self.cloudbilling = self._Add('cloudbilling')
@@ -1757,6 +1772,7 @@ class _SectionApiClientOverrides(_Section):
     self.compute = self._Add('compute')
     self.container = self._Add('container')
     self.sql = self._Add('sql')
+    self.run = self._Add('run')
 
 
 class _SectionEmulator(_Section):

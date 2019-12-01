@@ -37,7 +37,7 @@ LOCATIONS_COLLECTION = API + '.projects.locations'
 
 SEVERITIES = ['DEBUG', 'INFO', 'ERROR']
 EGRESS_SETTINGS = ['PRIVATE-RANGES-ONLY', 'ALL']
-INGRESS_SETTINGS = ['ALL', 'INTERNAL-ONLY', 'INTERNAL-AND-GCLB']
+INGRESS_SETTINGS = ['ALL', 'INTERNAL-ONLY']
 INGRESS_SETTINGS_MAPPING = {
     'ALLOW_ALL': 'all',
     'ALLOW_INTERNAL_ONLY': 'internal-only',
@@ -253,6 +253,7 @@ def AddRuntimeFlag(parser):
           - `nodejs10`: Node.js 10
           - `python37`: Python 3.7
           - `go111`: Go 1.11
+          - `go113`: Go 1.13
           - `nodejs6`: Node.js 6 (deprecated)
           """)
 

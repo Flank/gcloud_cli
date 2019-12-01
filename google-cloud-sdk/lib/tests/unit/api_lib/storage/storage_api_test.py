@@ -96,7 +96,6 @@ class CopyFileTest(sdk_test_base.SdkBase):
     )
     self.storage_client.CopyFileToGCS(self.local_path, self.target_ref)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testApiError(self):
     exception = http_error.MakeHttpError()
 
@@ -113,7 +112,6 @@ class CopyFileTest(sdk_test_base.SdkBase):
                _target_path=self.target_path)):
       self.storage_client.CopyFileToGCS(self.local_path, self.target_ref)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testBucketNotFoundError(self):
     exception = http_error.MakeHttpError(code=404, message='Not found')
 
@@ -176,7 +174,6 @@ class CopyFileFromGCSTest(sdk_test_base.WithFakeAuth):
         self.storage_msgs.Object(size=0))
     self.storage_client.CopyFileFromGCS(self.target_ref, self.local_path)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140136060')
   def testApiError(self):
     exception = http_error.MakeHttpError()
 

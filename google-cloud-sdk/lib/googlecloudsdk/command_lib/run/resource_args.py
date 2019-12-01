@@ -124,7 +124,7 @@ class DefaultFallthrough(deps.Fallthrough):
 def NamespaceAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='namespace',
-      help_text='Specific to Cloud Run on GKE: '
+      help_text='Specific to Cloud Run for Anthos: '
       'Kubernetes namespace for the {resource}.',
       fallthroughs=[
           deps.PropertyFallthrough(properties.VALUES.run.namespace),
@@ -355,39 +355,6 @@ def GetNamespaceResourceSpec():
       namespacesId=NamespaceAttributeConfig(),
       resource_name='namespace')
 
-
-class RegionWildcardFallthrough(deps.Fallthrough):
-  """Fall through to returning the wildcard '-' for region."""
-
-  def __init__(self):
-    super(RegionWildcardFallthrough, self).__init__(
-        function=None,
-        hint='wild card matching all regions')
-
-  def _Call(self, parsed_args):
-    return '-'
-
-
-def RegionWithWildcardAttributeConfig():
-  return concepts.ResourceParameterAttributeConfig(
-      name='region',
-      help_text='Region for the {resource}.',
-      fallthroughs=[RegionWildcardFallthrough()])
-
-
-def GetOnePlatformLocationResourceSpec():
-  return concepts.ResourceSpec(
-      'run.projects.locations',
-      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
-      locationsId=RegionWithWildcardAttributeConfig(),
-      resource_name='location')
-
-CLOUD_RUN_LOCATION_PRESENTATION = presentation_specs.ResourcePresentationSpec(
-    '--region',
-    GetOnePlatformLocationResourceSpec(),
-    'Location to list or \'-\' for all locations.',
-    required=False,
-    prefixes=False)
 
 CLUSTER_PRESENTATION = presentation_specs.ResourcePresentationSpec(
     '--cluster',

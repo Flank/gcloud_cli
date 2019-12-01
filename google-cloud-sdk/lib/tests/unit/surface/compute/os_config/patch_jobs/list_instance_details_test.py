@@ -161,6 +161,7 @@ class ListInstanceDetailsTestAlpha(test_base.OsConfigBaseTest):
         textwrap.dedent("""\
             NAME       ZONE   STATE     FAILURE_REASON
             instance-1 zone-1 SUCCEEDED
+
             NAME       ZONE   STATE  FAILURE_REASON
             instance-2 zone-2 FAILED Encountered Exception
             """),

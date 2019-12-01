@@ -18,29 +18,7 @@ gcloud beta compute addresses update \- update a Google Compute Engine address
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute addresses update\fR updates labels for a
-Google Compute Engine address. For example:
-
-.RS 2m
-$ gcloud beta compute addresses update example\-address \e
-    \-\-region us\-central1 \e
-  \-\-update\-labels=k0=value1,k1=value2 \-\-remove\-labels=k3
-.RE
-
-will add/update labels \f5\fIk0\fR\fR and \f5\fIk1\fR\fR and remove labels with
-key \f5\fIk3\fR\fR.
-
-Labels can be used to identify the address and to filter them as in
-
-.RS 2m
-$ gcloud beta compute addresses list \-\-filter='labels.k1:value2'
-.RE
-
-To list existing labels
-
-.RS 2m
-$ gcloud beta compute addresses describe example\-address \e
-    \-\-format='default(labels)'
-.RE
+Google Compute Engine address.
 
 
 
@@ -123,6 +101,32 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add/update labels 'k0' and 'k1' and remove labels with key 'k3' for address
+\'example\-address', run:
+
+.RS 2m
+$ gcloud beta compute addresses update example\-address \e
+    \-\-region=us\-central1 \e
+  \-\-update\-labels=k0=value1,k1=value2 \-\-remove\-labels=k3
+.RE
+
+Labels can be used to identify the address and to filter them as in:
+
+.RS 2m
+$ gcloud beta compute addresses list \-\-filter='labels.k1:value2'
+.RE
+
+To list existing labels for address 'example\-address', run:
+
+.RS 2m
+$ gcloud beta compute addresses describe example\-address \e
+    \-\-format='default(labels)'
+.RE
 
 
 

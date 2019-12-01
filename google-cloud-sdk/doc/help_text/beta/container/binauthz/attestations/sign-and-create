@@ -38,7 +38,7 @@ REQUIRED FLAGS
           group are specified.
 
        --attestor-project=ATTESTOR_PROJECT
-          The Cloud project for the attestor.
+          Project ID of the Google Cloud Platform project for the attestor.
 
      CryptoKeyVersion resource - The Cloud KMS (Key Management Service)
      CryptoKeyVersion to use to sign the attestation payload. The arguments in
@@ -60,7 +60,8 @@ REQUIRED FLAGS
           The location of the CryptoKeyVersion.
 
        --keyversion-project=KEYVERSION_PROJECT
-          The Cloud project for the CryptoKeyVersion.
+          Project ID of the Google Cloud Platform project for the
+          CryptoKeyVersion.
 
 OPTIONAL FLAGS
      --public-key-id-override=PUBLIC_KEY_ID_OVERRIDE

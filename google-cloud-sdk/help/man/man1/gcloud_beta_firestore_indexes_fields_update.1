@@ -122,8 +122,8 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBfirestore/v1beta2\fR API. The full documentation for
-this API can be found at: https://cloud.google.com/firestore
+This command uses the \fBfirestore/v1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/firestore
 
 
 
@@ -144,9 +144,9 @@ The following command creates an exemption for the \f5timestamp\fR field in the
 
 .RS 2m
 $ gcloud beta firestore indexes fields update timestamp \e
-    collection\-group=Events \e
-    \-\-index order=ASCENDING \e
-    \-\-index order=DESCENDING
+    \-\-collection\-group=Events \e
+    \-\-index=order=ASCENDING \e
+    \-\-index=order=DESCENDING
 .RE
 
 The following command clears the exemption on the \f5timestamp\fR field in the
@@ -155,17 +155,18 @@ index settings from its ancestors:
 
 .RS 2m
 $ gcloud beta firestore indexes fields update timestamp \e
-    collection\-group=Events \-\-clear\-exemption
+    \-\-collection\-group=Events \-\-clear\-exemption
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud firestore indexes fields update
 $ gcloud alpha firestore indexes fields update
 .RE
 

@@ -35,11 +35,12 @@ class AutoscalingPoliciesExportUnitTest(unit_base.DataprocUnitTestBase):
     self.track = calliope_base.ReleaseTrack.GA
 
   def testExportAutoscalingPolicies(self):
-    mocked_response = self.MakeAutoscalingPolicy('fake-project', 'global',
+    mocked_response = self.MakeAutoscalingPolicy('fake-project',
+                                                 'antarctica-north42',
                                                  'policy-1')
     self.mock_client.projects_regions_autoscalingPolicies.Get.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
-            name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+            name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
         ),
         response=mocked_response)
 
@@ -85,16 +86,17 @@ class AutoscalingPoliciesExportUnitTest(unit_base.DataprocUnitTestBase):
 
     # Overrides default project and default region
     self.RunDataproc(
-        'autoscaling-policies export projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1'
-    )
+        'autoscaling-policies export projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1',
+        set_region=False)
     self.AssertOutputEquals(export_util.Export(expected_policy))
 
   def testExportAutoscalingPolicies_destinationFile(self):
-    mocked_response = self.MakeAutoscalingPolicy('fake-project', 'global',
+    mocked_response = self.MakeAutoscalingPolicy('fake-project',
+                                                 'antarctica-north42',
                                                  'policy-1')
     self.mock_client.projects_regions_autoscalingPolicies.Get.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
-            name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+            name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
         ),
         response=mocked_response)
 

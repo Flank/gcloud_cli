@@ -44,13 +44,21 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessage(self):
     network = None
+    private_ip = None
     subnet = None
     address = None
     alias_ip_ranges_string = None
     network_tier = None
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
     expected = self.messages.NetworkInterface(
         network=self.resources.Parse(
@@ -62,31 +70,48 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessageWithNetwork(self):
     network = 'network1'
+    private_ip = None
     subnet = None
     address = None
     alias_ip_ranges_string = None
     network_tier = None
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
     expected = self.messages.NetworkInterface(
         network=self.resources.Parse(
             'network1',
-            params={'project': self.Project()},
-            collection='compute.networks').SelfLink()
-    )
+            params={
+                'project': self.Project()
+            },
+            collection='compute.networks').SelfLink())
     self.assertEqual(expected, result)
 
   def testCreateNetworkInterfaceMessageWithSubnetAndNetwork(self):
     network = 'network1'
+    private_ip = None
     subnet = 'subnet1'
     address = None
     alias_ip_ranges_string = None
     network_tier = None
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
     expected = self.messages.NetworkInterface(
         network=self.resources.Parse(
@@ -102,14 +127,22 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessageWithSubnet(self):
     network = None
+    private_ip = None
     subnet = 'subnet1'
     address = None
     alias_ip_ranges_string = None
     network_tier = None
 
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
 
     expected = self.messages.NetworkInterface(
@@ -122,14 +155,22 @@ class InstanceTemplateUtilsTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessageWithOtherOptions(self):
     network = 'network1'
+    private_ip = None
     subnet = 'subnet1'
     address = 'address1'
     alias_ip_ranges_string = '/24'
     network_tier = None
 
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
 
     expected = self.messages.NetworkInterface(
@@ -425,14 +466,22 @@ class InstanceTemplateUtilsNetworkTierTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessageWithNetworkTier(self):
     network = 'network1'
+    private_ip = None
     subnet = 'subnet1'
     address = 'address1'
     alias_ip_ranges_string = '/24'
     network_tier = 'PREMIUM'
 
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
 
     expected = self.messages.NetworkInterface(
@@ -459,14 +508,22 @@ class InstanceTemplateUtilsNetworkTierTest(cli_test_base.CliTestBase,
 
   def testCreateNetworkInterfaceMessageWithNetworkTierNoAddress(self):
     network = 'network1'
+    private_ip = None
     subnet = 'subnet1'
     address = None
     alias_ip_ranges_string = '/24'
     network_tier = 'PREMIUM'
 
     result = instance_template_utils.CreateNetworkInterfaceMessage(
-        self.resources, self.scope_lister, self.messages, network, self.region,
-        subnet, address, alias_ip_ranges_string=alias_ip_ranges_string,
+        self.resources,
+        self.scope_lister,
+        self.messages,
+        network,
+        private_ip,
+        self.region,
+        subnet,
+        address,
+        alias_ip_ranges_string=alias_ip_ranges_string,
         network_tier=network_tier)
 
     expected = self.messages.NetworkInterface(

@@ -14,8 +14,9 @@ summary:
     - succeeded_stages: &id001
       - Creating Revision...
       - Routing traffic...
-  - stderr: |
-      Service [$$service-name$$] revision [$$service-name$$-hrsx6] has been deployed and is serving 100 percent of traffic at $$service-name$$.default.example.com
+  - stderr: |-
+      Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
+      $
 - execute:
   - command: run services delete --kubeconfig robot-kubeconfig.yaml $$service-name$$
       -q
@@ -42,7 +43,7 @@ actions:
           body: null
         return_response:
           headers:
-            audit-id: c41baf0f-8043-495c-8298-17c915b2d4d6
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
             content-length: '292'
             content-type: application/json
             status: '404'
@@ -69,7 +70,7 @@ actions:
           body: null
         return_response:
           headers:
-            audit-id: 8961bc5e-9ca5-43b3-b9fa-78f75ea8a345
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
             content-length: '292'
             content-type: application/json
             status: '404'
@@ -103,22 +104,13 @@ actions:
                 labels: {}
                 name: $$service-name$$
                 namespace: default
-              spec:
-                runLatest:
-                  configuration:
-                    revisionTemplate:
-                      metadata:
-                        annotations: {}
-                        initializers: {}
-                      spec:
-                        container:
-                          image: gcr.io/knative-samples/helloworld-nodejs
+              spec: {}
               status:
                 address: {}
         return_response:
           headers:
-            audit-id: 2922a3af-34a0-4265-8169-c55953fc689d
-            content-length: '968'
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '956'
             content-type: application/json
             status: '201'
           body:
@@ -130,31 +122,32 @@ actions:
                 run.googleapis.com/client-name: gcloud
                 serving.knative.dev/creator: robot
                 serving.knative.dev/lastModifier: robot
-              creationTimestamp: '2019-08-26T22:12:38Z'
+              creationTimestamp: '2019-07-23T18:13:29Z'
               generation: 1
               name: $$service-name$$
               namespace: default
-              resourceVersion: '66517193'
+              resourceVersion: '51639050'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 9d1c6693-c84e-11e9-8219-42010a80009c
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
-              runLatest:
-                configuration:
-                  revisionTemplate:
-                    metadata:
-                      creationTimestamp: null
-                      initializers:
-                        pending: null
-                      labels:
-                        client.knative.dev/nonce: qyirkywmsa
-                    spec:
-                      container:
-                        image: gcr.io/knative-samples/helloworld-nodejs
-                        name: ''
-                        resources:
-                          requests:
-                            cpu: 400m
-                      timeoutSeconds: 300
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
     - api_call:
         expect_request:
           uri:
@@ -164,8 +157,8 @@ actions:
           body: null
         return_response:
           headers:
-            audit-id: d4fabd0e-d67f-4e5b-aa61-1c0b4f7dac03
-            content-length: '1720'
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1874'
             content-type: application/json
             status: '200'
           body:
@@ -177,52 +170,56 @@ actions:
                 run.googleapis.com/client-name: gcloud
                 serving.knative.dev/creator: robot
                 serving.knative.dev/lastModifier: robot
-              creationTimestamp: '2019-08-26T22:12:38Z'
+              creationTimestamp: '2019-07-23T18:13:29Z'
               generation: 1
               name: $$service-name$$
               namespace: default
-              resourceVersion: '66517291'
+              resourceVersion: '51639050'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 9d1c6693-c84e-11e9-8219-42010a80009c
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
-              runLatest:
-                configuration:
-                  revisionTemplate:
-                    metadata:
-                      creationTimestamp: null
-                      initializers:
-                        pending: null
-                      labels:
-                        client.knative.dev/nonce: qyirkywmsa
-                    spec:
-                      container:
-                        image: gcr.io/knative-samples/helloworld-nodejs
-                        name: ''
-                        resources:
-                          requests:
-                            cpu: 400m
-                      timeoutSeconds: 300
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
             status:
               address:
                 hostname: $$service-name$$.default.svc.cluster.local
+                url: http://$$service-name$$.default.svc.cluster.local
               conditions:
-              - lastTransitionTime: '2019-08-26T22:12:40Z'
+              - lastTransitionTime: '2019-07-23T20:10:01Z'
                 status: 'True'
                 type: ConfigurationsReady
-              - lastTransitionTime: '2019-08-26T22:12:40Z'
+              - lastTransitionTime: '2019-07-23T20:10:01Z'
                 status: 'True'
                 type: Ready
-              - lastTransitionTime: '2019-08-26T22:12:40Z'
+              - lastTransitionTime: '2019-07-23T20:10:01Z'
                 status: 'True'
                 type: RoutesReady
               domain: $$service-name$$.default.example.com
               domainInternal: $$service-name$$.default.svc.cluster.local
-              latestCreatedRevisionName: $$service-name$$-hrsx6
-              latestReadyRevisionName: $$service-name$$-hrsx6
+              latestCreatedRevisionName: $$service-name$$-sjh75
+              latestReadyRevisionName: $$service-name$$-sjh75
               observedGeneration: 1
               traffic:
-              - percent: 100
-                revisionName: $$service-name$$-hrsx6
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-name$$-sjh75
+              url: http://$$service-name$$.default.example.com
         repeatable: true
     - expect_staged_progress_tracker:
         message: Deploying new service...
@@ -237,8 +234,8 @@ actions:
           body: null
         return_response:
           headers:
-            audit-id: b724e8fb-25ea-4621-8f9c-c1f610681617
-            content-length: '1720'
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
+            content-length: '1874'
             content-type: application/json
             status: '200'
           body:
@@ -250,56 +247,60 @@ actions:
                 run.googleapis.com/client-name: gcloud
                 serving.knative.dev/creator: robot
                 serving.knative.dev/lastModifier: robot
-              creationTimestamp: '2019-08-26T22:12:38Z'
+              creationTimestamp: '2019-07-23T18:13:29Z'
               generation: 1
               name: $$service-name$$
               namespace: default
-              resourceVersion: '66517291'
+              resourceVersion: '51639050'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 9d1c6693-c84e-11e9-8219-42010a80009c
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
             spec:
-              runLatest:
-                configuration:
-                  revisionTemplate:
-                    metadata:
-                      creationTimestamp: null
-                      initializers:
-                        pending: null
-                      labels:
-                        client.knative.dev/nonce: qyirkywmsa
-                    spec:
-                      container:
-                        image: gcr.io/knative-samples/helloworld-nodejs
-                        name: ''
-                        resources:
-                          requests:
-                            cpu: 400m
-                      timeoutSeconds: 300
+              template:
+                metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
+                  creationTimestamp: '2019-07-23T18:13:29Z'
+                  initializers:
+                    pending: null
+                  labels:
+                    client.knative.dev/nonce: dmwqrjmbba
+                spec:
+                  containers:
+                  - image: gcr.io/knative-samples/helloworld-nodejs
+                    name: ''
+                    resources: {}
+                  timeoutSeconds: 300
+              traffic:
+              - latestRevision: true
+                percent: 100
             status:
               address:
                 hostname: $$service-name$$.default.svc.cluster.local
+                url: http://$$service-name$$.default.svc.cluster.local
               conditions:
-              - lastTransitionTime: '2019-08-26T22:12:40Z'
+              - lastTransitionTime: '2019-07-23T20:10:02Z'
                 status: 'True'
                 type: ConfigurationsReady
-              - lastTransitionTime: '2019-08-26T22:12:40Z'
+              - lastTransitionTime: '2019-07-23T20:10:02Z'
                 status: 'True'
                 type: Ready
-              - lastTransitionTime: '2019-08-26T22:12:40Z'
+              - lastTransitionTime: '2019-07-23T20:10:02Z'
                 status: 'True'
                 type: RoutesReady
               domain: $$service-name$$.default.example.com
               domainInternal: $$service-name$$.default.svc.cluster.local
-              latestCreatedRevisionName: $$service-name$$-hrsx6
-              latestReadyRevisionName: $$service-name$$-hrsx6
+              latestCreatedRevisionName: $$service-name$$-sjh75
+              latestReadyRevisionName: $$service-name$$-sjh75
               observedGeneration: 1
               traffic:
-              - percent: 100
-                revisionName: $$service-name$$-hrsx6
+              - latestRevision: true
+                percent: 100
+                revisionName: $$service-name$$-sjh75
+              url: http://$$service-name$$.default.example.com
         repeatable: true
     - expect_stderr:
         matches: |
-          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic at $$service-name$$.default.example.com
+          Service \[$$service-name$$\] revision \[$$service-name$$-.*\] has been deployed and is serving 100 percent of traffic at http://$$service-name$$.default.example.com
     - expect_exit:
         code: 0
 - execute_command:
@@ -316,7 +317,7 @@ actions:
           body: null
         return_response:
           headers:
-            audit-id: 40ed614f-6d70-4637-83b9-96a68e2934a6
+            audit-id: b24852a0-bebf-412f-8432-e7b98289ffbf
             content-length: '217'
             content-type: application/json
             status: '200'
@@ -329,7 +330,7 @@ actions:
               name: $$service-name$$
               group: serving.knative.dev
               kind: services
-              uid: 9d1c6693-c84e-11e9-8219-42010a80009c
+              uid: 92610cc6-ad75-11e9-b545-42010a800168
     - expect_stderr: |
         Deleted service [$$service-name$$].
     - expect_exit:

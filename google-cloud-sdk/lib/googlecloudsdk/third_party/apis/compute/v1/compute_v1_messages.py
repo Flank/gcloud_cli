@@ -1200,7 +1200,7 @@ class AllocationSpecificSKUReservation(_messages.Message):
 
   Fields:
     count: Specifies the number of resources that are allocated.
-    inUseCount: [OutputOnly] Indicates how many instances are in use.
+    inUseCount: [Output Only] Indicates how many instances are in use.
     instanceProperties: The instance properties for the reservation.
   """
 
@@ -1360,9 +1360,10 @@ class AttachedDiskInitializeParams(_messages.Message):
       the name of the instance. If the disk with the instance name exists
       already in the given zone/region, a new name will be automatically
       generated.
-    diskSizeGb: Specifies the size of the disk in base-2 GB. If not specified,
-      the disk will be the same size as the image (usually 10GB). If
-      specified, the size must be equal to or larger than 10GB.
+    diskSizeGb: Specifies the size of the disk in base-2 GB. The size must be
+      at least 10 GB. If you specify a sourceImage, which is required for boot
+      disks, the default size is the size of the sourceImage. If you do not
+      specify a sourceImage, the default disk size is 500 GB.
     diskType: Specifies the disk type to use to create the instance. If not
       specified, the default is pd-standard, specified using the full URL. For
       example: https://www.googleapis.com/compute/v1/projects/project/zones/zo
@@ -1557,7 +1558,13 @@ class Autoscaler(_messages.Message):
 
   Enums:
     StatusValueValuesEnum: [Output Only] The status of the autoscaler
-      configuration.
+      configuration. Current set of possible values:   - PENDING: Autoscaler
+      backend hasn't read new/updated configuration.  - DELETING:
+      Configuration is being deleted.  - ACTIVE: Configuration is acknowledged
+      to be effective. Some warnings might be present in the statusDetails
+      field.  - ERROR: Configuration has errors. Actionable for users. Details
+      are present in the statusDetails field.  New values might be added in
+      the future.
 
   Fields:
     autoscalingPolicy: The configuration parameters for the autoscaling
@@ -1580,10 +1587,21 @@ class Autoscaler(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    recommendedSize: [Output Only] Target recommended MIG size (number of
+      instances) computed by autoscaler. Autoscaler calculates recommended MIG
+      size even when autoscaling policy mode is different from ON. This field
+      is empty when autoscaler is not connected to the existing managed
+      instance group or autoscaler did not generate its prediction.
     region: [Output Only] URL of the region where the instance group resides
       (for autoscalers living in regional scope).
     selfLink: [Output Only] Server-defined URL for the resource.
-    status: [Output Only] The status of the autoscaler configuration.
+    status: [Output Only] The status of the autoscaler configuration. Current
+      set of possible values:   - PENDING: Autoscaler backend hasn't read
+      new/updated configuration.  - DELETING: Configuration is being deleted.
+      - ACTIVE: Configuration is acknowledged to be effective. Some warnings
+      might be present in the statusDetails field.  - ERROR: Configuration has
+      errors. Actionable for users. Details are present in the statusDetails
+      field.  New values might be added in the future.
     statusDetails: [Output Only] Human-readable details about the current
       state of the autoscaler. Read the documentation for Commonly returned
       status messages for examples of status messages you might encounter.
@@ -1593,7 +1611,13 @@ class Autoscaler(_messages.Message):
   """
 
   class StatusValueValuesEnum(_messages.Enum):
-    r"""[Output Only] The status of the autoscaler configuration.
+    r"""[Output Only] The status of the autoscaler configuration. Current set
+    of possible values:   - PENDING: Autoscaler backend hasn't read
+    new/updated configuration.  - DELETING: Configuration is being deleted.  -
+    ACTIVE: Configuration is acknowledged to be effective. Some warnings might
+    be present in the statusDetails field.  - ERROR: Configuration has errors.
+    Actionable for users. Details are present in the statusDetails field.  New
+    values might be added in the future.
 
     Values:
       ACTIVE: <no description>
@@ -1612,12 +1636,13 @@ class Autoscaler(_messages.Message):
   id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
   kind = _messages.StringField(5, default=u'compute#autoscaler')
   name = _messages.StringField(6)
-  region = _messages.StringField(7)
-  selfLink = _messages.StringField(8)
-  status = _messages.EnumField('StatusValueValuesEnum', 9)
-  statusDetails = _messages.MessageField('AutoscalerStatusDetails', 10, repeated=True)
-  target = _messages.StringField(11)
-  zone = _messages.StringField(12)
+  recommendedSize = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  region = _messages.StringField(8)
+  selfLink = _messages.StringField(9)
+  status = _messages.EnumField('StatusValueValuesEnum', 10)
+  statusDetails = _messages.MessageField('AutoscalerStatusDetails', 11, repeated=True)
+  target = _messages.StringField(12)
+  zone = _messages.StringField(13)
 
 
 class AutoscalerAggregatedList(_messages.Message):
@@ -1900,15 +1925,117 @@ class AutoscalerStatusDetails(_messages.Message):
   r"""A AutoscalerStatusDetails object.
 
   Enums:
-    TypeValueValuesEnum: The type of error returned.
+    TypeValueValuesEnum: The type of error, warning, or notice returned.
+      Current set of possible values:   - ALL_INSTANCES_UNHEALTHY (WARNING):
+      All instances in the instance group are unhealthy (not in RUNNING
+      state).  - BACKEND_SERVICE_DOES_NOT_EXIST (ERROR): There is no backend
+      service attached to the instance group.  - CAPPED_AT_MAX_NUM_REPLICAS
+      (WARNING): Autoscaler recommends a size greater than maxNumReplicas.  -
+      CUSTOM_METRIC_DATA_POINTS_TOO_SPARSE (WARNING): The custom metric
+      samples are not exported often enough to be a credible base for
+      autoscaling.  - CUSTOM_METRIC_INVALID (ERROR): The custom metric that
+      was specified does not exist or does not have the necessary labels.  -
+      MIN_EQUALS_MAX (WARNING): The minNumReplicas is equal to maxNumReplicas.
+      This means the autoscaler cannot add or remove instances from the
+      instance group.  - MISSING_CUSTOM_METRIC_DATA_POINTS (WARNING): The
+      autoscaler did not receive any data from the custom metric configured
+      for autoscaling.  - MISSING_LOAD_BALANCING_DATA_POINTS (WARNING): The
+      autoscaler is configured to scale based on a load balancing signal but
+      the instance group has not received any requests from the load balancer.
+      - MODE_OFF (WARNING): Autoscaling is turned off. The number of instances
+      in the group won't change automatically. The autoscaling configuration
+      is preserved.  - MODE_ONLY_UP (WARNING): Autoscaling is in the
+      "Autoscale only up" mode. The autoscaler can add instances but not
+      remove any.  - MORE_THAN_ONE_BACKEND_SERVICE (ERROR): The instance group
+      cannot be autoscaled because it has more than one backend service
+      attached to it.  - NOT_ENOUGH_QUOTA_AVAILABLE (ERROR): There is
+      insufficient quota for the necessary resources, such as CPU or number of
+      instances.  - REGION_RESOURCE_STOCKOUT (ERROR): Shown only for regional
+      autoscalers: there is a resource stockout in the chosen region.  -
+      SCALING_TARGET_DOES_NOT_EXIST (ERROR): The target to be scaled does not
+      exist.  - UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION (ERROR):
+      Autoscaling does not work with an HTTP/S load balancer that has been
+      configured for maxRate.  - ZONE_RESOURCE_STOCKOUT (ERROR): For zonal
+      autoscalers: there is a resource stockout in the chosen zone. For
+      regional autoscalers: in at least one of the zones you're using there is
+      a resource stockout.  New values might be added in the future. Some of
+      the values might not be available in all API versions.
 
   Fields:
     message: The status message.
-    type: The type of error returned.
+    type: The type of error, warning, or notice returned. Current set of
+      possible values:   - ALL_INSTANCES_UNHEALTHY (WARNING): All instances in
+      the instance group are unhealthy (not in RUNNING state).  -
+      BACKEND_SERVICE_DOES_NOT_EXIST (ERROR): There is no backend service
+      attached to the instance group.  - CAPPED_AT_MAX_NUM_REPLICAS (WARNING):
+      Autoscaler recommends a size greater than maxNumReplicas.  -
+      CUSTOM_METRIC_DATA_POINTS_TOO_SPARSE (WARNING): The custom metric
+      samples are not exported often enough to be a credible base for
+      autoscaling.  - CUSTOM_METRIC_INVALID (ERROR): The custom metric that
+      was specified does not exist or does not have the necessary labels.  -
+      MIN_EQUALS_MAX (WARNING): The minNumReplicas is equal to maxNumReplicas.
+      This means the autoscaler cannot add or remove instances from the
+      instance group.  - MISSING_CUSTOM_METRIC_DATA_POINTS (WARNING): The
+      autoscaler did not receive any data from the custom metric configured
+      for autoscaling.  - MISSING_LOAD_BALANCING_DATA_POINTS (WARNING): The
+      autoscaler is configured to scale based on a load balancing signal but
+      the instance group has not received any requests from the load balancer.
+      - MODE_OFF (WARNING): Autoscaling is turned off. The number of instances
+      in the group won't change automatically. The autoscaling configuration
+      is preserved.  - MODE_ONLY_UP (WARNING): Autoscaling is in the
+      "Autoscale only up" mode. The autoscaler can add instances but not
+      remove any.  - MORE_THAN_ONE_BACKEND_SERVICE (ERROR): The instance group
+      cannot be autoscaled because it has more than one backend service
+      attached to it.  - NOT_ENOUGH_QUOTA_AVAILABLE (ERROR): There is
+      insufficient quota for the necessary resources, such as CPU or number of
+      instances.  - REGION_RESOURCE_STOCKOUT (ERROR): Shown only for regional
+      autoscalers: there is a resource stockout in the chosen region.  -
+      SCALING_TARGET_DOES_NOT_EXIST (ERROR): The target to be scaled does not
+      exist.  - UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION (ERROR):
+      Autoscaling does not work with an HTTP/S load balancer that has been
+      configured for maxRate.  - ZONE_RESOURCE_STOCKOUT (ERROR): For zonal
+      autoscalers: there is a resource stockout in the chosen zone. For
+      regional autoscalers: in at least one of the zones you're using there is
+      a resource stockout.  New values might be added in the future. Some of
+      the values might not be available in all API versions.
   """
 
   class TypeValueValuesEnum(_messages.Enum):
-    r"""The type of error returned.
+    r"""The type of error, warning, or notice returned. Current set of
+    possible values:   - ALL_INSTANCES_UNHEALTHY (WARNING): All instances in
+    the instance group are unhealthy (not in RUNNING state).  -
+    BACKEND_SERVICE_DOES_NOT_EXIST (ERROR): There is no backend service
+    attached to the instance group.  - CAPPED_AT_MAX_NUM_REPLICAS (WARNING):
+    Autoscaler recommends a size greater than maxNumReplicas.  -
+    CUSTOM_METRIC_DATA_POINTS_TOO_SPARSE (WARNING): The custom metric samples
+    are not exported often enough to be a credible base for autoscaling.  -
+    CUSTOM_METRIC_INVALID (ERROR): The custom metric that was specified does
+    not exist or does not have the necessary labels.  - MIN_EQUALS_MAX
+    (WARNING): The minNumReplicas is equal to maxNumReplicas. This means the
+    autoscaler cannot add or remove instances from the instance group.  -
+    MISSING_CUSTOM_METRIC_DATA_POINTS (WARNING): The autoscaler did not
+    receive any data from the custom metric configured for autoscaling.  -
+    MISSING_LOAD_BALANCING_DATA_POINTS (WARNING): The autoscaler is configured
+    to scale based on a load balancing signal but the instance group has not
+    received any requests from the load balancer.  - MODE_OFF (WARNING):
+    Autoscaling is turned off. The number of instances in the group won't
+    change automatically. The autoscaling configuration is preserved.  -
+    MODE_ONLY_UP (WARNING): Autoscaling is in the "Autoscale only up" mode.
+    The autoscaler can add instances but not remove any.  -
+    MORE_THAN_ONE_BACKEND_SERVICE (ERROR): The instance group cannot be
+    autoscaled because it has more than one backend service attached to it.  -
+    NOT_ENOUGH_QUOTA_AVAILABLE (ERROR): There is insufficient quota for the
+    necessary resources, such as CPU or number of instances.  -
+    REGION_RESOURCE_STOCKOUT (ERROR): Shown only for regional autoscalers:
+    there is a resource stockout in the chosen region.  -
+    SCALING_TARGET_DOES_NOT_EXIST (ERROR): The target to be scaled does not
+    exist.  - UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION (ERROR):
+    Autoscaling does not work with an HTTP/S load balancer that has been
+    configured for maxRate.  - ZONE_RESOURCE_STOCKOUT (ERROR): For zonal
+    autoscalers: there is a resource stockout in the chosen zone. For regional
+    autoscalers: in at least one of the zones you're using there is a resource
+    stockout.  New values might be added in the future. Some of the values
+    might not be available in all API versions.
 
     Values:
       ALL_INSTANCES_UNHEALTHY: <no description>
@@ -1919,6 +2046,8 @@ class AutoscalerStatusDetails(_messages.Message):
       MIN_EQUALS_MAX: <no description>
       MISSING_CUSTOM_METRIC_DATA_POINTS: <no description>
       MISSING_LOAD_BALANCING_DATA_POINTS: <no description>
+      MODE_OFF: <no description>
+      MODE_ONLY_UP: <no description>
       MORE_THAN_ONE_BACKEND_SERVICE: <no description>
       NOT_ENOUGH_QUOTA_AVAILABLE: <no description>
       REGION_RESOURCE_STOCKOUT: <no description>
@@ -1935,13 +2064,15 @@ class AutoscalerStatusDetails(_messages.Message):
     MIN_EQUALS_MAX = 5
     MISSING_CUSTOM_METRIC_DATA_POINTS = 6
     MISSING_LOAD_BALANCING_DATA_POINTS = 7
-    MORE_THAN_ONE_BACKEND_SERVICE = 8
-    NOT_ENOUGH_QUOTA_AVAILABLE = 9
-    REGION_RESOURCE_STOCKOUT = 10
-    SCALING_TARGET_DOES_NOT_EXIST = 11
-    UNKNOWN = 12
-    UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION = 13
-    ZONE_RESOURCE_STOCKOUT = 14
+    MODE_OFF = 8
+    MODE_ONLY_UP = 9
+    MORE_THAN_ONE_BACKEND_SERVICE = 10
+    NOT_ENOUGH_QUOTA_AVAILABLE = 11
+    REGION_RESOURCE_STOCKOUT = 12
+    SCALING_TARGET_DOES_NOT_EXIST = 13
+    UNKNOWN = 14
+    UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION = 15
+    ZONE_RESOURCE_STOCKOUT = 16
 
   message = _messages.StringField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -2064,6 +2195,9 @@ class AutoscalersScopedList(_messages.Message):
 class AutoscalingPolicy(_messages.Message):
   r"""Cloud Autoscaler policy.
 
+  Enums:
+    ModeValueValuesEnum: Defines operating mode for this policy.
+
   Fields:
     coolDownPeriodSec: The number of seconds that the autoscaler should wait
       before it starts collecting information from a new instance. This
@@ -2088,7 +2222,20 @@ class AutoscalingPolicy(_messages.Message):
       scale down to. This cannot be less than 0. If not provided, autoscaler
       will choose a default value depending on maximum number of instances
       allowed.
+    mode: Defines operating mode for this policy.
   """
+
+  class ModeValueValuesEnum(_messages.Enum):
+    r"""Defines operating mode for this policy.
+
+    Values:
+      OFF: <no description>
+      ON: <no description>
+      ONLY_UP: <no description>
+    """
+    OFF = 0
+    ON = 1
+    ONLY_UP = 2
 
   coolDownPeriodSec = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   cpuUtilization = _messages.MessageField('AutoscalingPolicyCpuUtilization', 2)
@@ -2096,6 +2243,7 @@ class AutoscalingPolicy(_messages.Message):
   loadBalancingUtilization = _messages.MessageField('AutoscalingPolicyLoadBalancingUtilization', 4)
   maxNumReplicas = _messages.IntegerField(5, variant=_messages.Variant.INT32)
   minNumReplicas = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  mode = _messages.EnumField('ModeValueValuesEnum', 7)
 
 
 class AutoscalingPolicyCpuUtilization(_messages.Message):
@@ -2562,7 +2710,9 @@ class BackendService(_messages.Message):
       either:   - A regional backend service with the service_protocol set to
       HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to
       INTERNAL_MANAGED.  - A global backend service with the
-      load_balancing_scheme set to INTERNAL_SELF_MANAGED.
+      load_balancing_scheme set to INTERNAL_SELF_MANAGED.    If
+      sessionAffinity is not NONE, and this field is not set to >MAGLEV or
+      RING_HASH, session affinity settings will not take effect.
     ProtocolValueValuesEnum: The protocol this BackendService uses to
       communicate with backends.  Possible values are HTTP, HTTPS, HTTP2, TCP,
       SSL, or UDP, depending on the chosen load balancer or Traffic Director
@@ -2575,8 +2725,8 @@ class BackendService(_messages.Message):
       the protocol is HTTP or HTTPS.  When the loadBalancingScheme is
       INTERNAL, possible values are NONE, CLIENT_IP, CLIENT_IP_PROTO, or
       CLIENT_IP_PORT_PROTO.  When the loadBalancingScheme is
-      INTERNAL_SELF_MANAGED, possible values are NONE, CLIENT_IP,
-      GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
+      INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED, possible values are NONE,
+      CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
 
   Fields:
     affinityCookieTtlSec: If set to 0, the cookie is non-persistent and lasts
@@ -2656,7 +2806,9 @@ class BackendService(_messages.Message):
       either:   - A regional backend service with the service_protocol set to
       HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to
       INTERNAL_MANAGED.  - A global backend service with the
-      load_balancing_scheme set to INTERNAL_SELF_MANAGED.
+      load_balancing_scheme set to INTERNAL_SELF_MANAGED.    If
+      sessionAffinity is not NONE, and this field is not set to >MAGLEV or
+      RING_HASH, session affinity settings will not take effect.
     name: Name of the resource. Provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
       Specifically, the name must be 1-63 characters long and match the
@@ -2664,8 +2816,8 @@ class BackendService(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
-    outlierDetection: Settings controlling eviction of unhealthy hosts from
-      the load balancing pool for the backend service. If not set, this
+    outlierDetection: Settings controlling the eviction of unhealthy hosts
+      from the load balancing pool for the backend service. If not set, this
       feature is considered disabled.  This field is applicable to either:   -
       A regional backend service with the service_protocol set to HTTP, HTTPS,
       or HTTP2, and load_balancing_scheme set to INTERNAL_MANAGED.  - A global
@@ -2699,8 +2851,9 @@ class BackendService(_messages.Message):
       GENERATED_COOKIE. You can use GENERATED_COOKIE if the protocol is HTTP
       or HTTPS.  When the loadBalancingScheme is INTERNAL, possible values are
       NONE, CLIENT_IP, CLIENT_IP_PROTO, or CLIENT_IP_PORT_PROTO.  When the
-      loadBalancingScheme is INTERNAL_SELF_MANAGED, possible values are NONE,
-      CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
+      loadBalancingScheme is INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED,
+      possible values are NONE, CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or
+      HTTP_COOKIE.
     timeoutSec: The backend service timeout has a different meaning depending
       on the type of load balancer. For more information read,  Backend
       service settings The default is 30 seconds.
@@ -2748,7 +2901,9 @@ class BackendService(_messages.Message):
     either:   - A regional backend service with the service_protocol set to
     HTTP, HTTPS, or HTTP2, and load_balancing_scheme set to INTERNAL_MANAGED.
     - A global backend service with the load_balancing_scheme set to
-    INTERNAL_SELF_MANAGED.
+    INTERNAL_SELF_MANAGED.    If sessionAffinity is not NONE, and this field
+    is not set to >MAGLEV or RING_HASH, session affinity settings will not
+    take effect.
 
     Values:
       INVALID_LB_POLICY: <no description>
@@ -2796,8 +2951,8 @@ class BackendService(_messages.Message):
     can use GENERATED_COOKIE if the protocol is HTTP or HTTPS.  When the
     loadBalancingScheme is INTERNAL, possible values are NONE, CLIENT_IP,
     CLIENT_IP_PROTO, or CLIENT_IP_PORT_PROTO.  When the loadBalancingScheme is
-    INTERNAL_SELF_MANAGED, possible values are NONE, CLIENT_IP,
-    GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
+    INTERNAL_SELF_MANAGED, or INTERNAL_MANAGED, possible values are NONE,
+    CLIENT_IP, GENERATED_COOKIE, HEADER_FIELD, or HTTP_COOKIE.
 
     Values:
       CLIENT_IP: <no description>
@@ -3316,8 +3471,25 @@ class Binding(_messages.Message):
       * `serviceAccount:{emailid}`: An email address that represents a service
       account. For example, `my-other-app@appspot.gserviceaccount.com`.  *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`.    * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
+      example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus unique identifier) representing a service account that has been
+      recently deleted. For example, `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique identifier) representing a Google group that
+      has been recently deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If the group is
+      recovered, this value reverts to `group:{emailid}` and the recovered
+      group retains the role in the binding.    * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the users of that domain. For
       example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
@@ -14858,6 +15030,14 @@ class ComputeSubnetworksPatchRequest(_messages.Message):
   r"""A ComputeSubnetworksPatchRequest object.
 
   Fields:
+    drainTimeoutSeconds: The drain timeout specifies the upper bound in
+      seconds on the amount of time allowed to drain connections from the
+      current ACTIVE subnetwork to the current BACKUP subnetwork. The drain
+      timeout is only applicable when the following conditions are true: - the
+      subnetwork being patched has purpose = INTERNAL_HTTPS_LOAD_BALANCER -
+      the subnetwork being patched has role = BACKUP - the patch request is
+      setting the role to ACTIVE. Note that after this patch operation the
+      roles of the ACTIVE and BACKUP subnetworks will be swapped.
     project: Project ID for this request.
     region: Name of the region scoping this request.
     requestId: An optional request ID to identify requests. Specify a unique
@@ -14875,11 +15055,12 @@ class ComputeSubnetworksPatchRequest(_messages.Message):
       body.
   """
 
-  project = _messages.StringField(1, required=True)
-  region = _messages.StringField(2, required=True)
-  requestId = _messages.StringField(3)
-  subnetwork = _messages.StringField(4, required=True)
-  subnetworkResource = _messages.MessageField('Subnetwork', 5)
+  drainTimeoutSeconds = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  subnetwork = _messages.StringField(5, required=True)
+  subnetworkResource = _messages.MessageField('Subnetwork', 6)
 
 
 class ComputeSubnetworksSetIamPolicyRequest(_messages.Message):
@@ -18438,7 +18619,8 @@ class DisksAddResourcePoliciesRequest(_messages.Message):
   r"""A DisksAddResourcePoliciesRequest object.
 
   Fields:
-    resourcePolicies: Resource policies to be added to this disk.
+    resourcePolicies: Resource policies to be added to this disk. Currently
+      you can only specify one policy here.
   """
 
   resourcePolicies = _messages.StringField(1, repeated=True)
@@ -19339,15 +19521,17 @@ class ForwardingRule(_messages.Message):
       more information about forwarding rules, refer to Forwarding rule
       concepts.
     metadataFilters: Opaque filter criteria used by Loadbalancer to restrict
-      routing configuration to a limited set xDS compliant clients. In their
-      xDS requests to Loadbalancer, xDS clients present node metadata. If a
-      match takes place, the relevant routing configuration is made available
-      to those proxies. For each metadataFilter in this list, if its
+      routing configuration to a limited set of xDS compliant clients. In
+      their xDS requests to Loadbalancer, xDS clients present node metadata.
+      If a match takes place, the relevant configuration is made available to
+      those proxies. Otherwise, all the resources (e.g. TargetHttpProxy,
+      UrlMap) referenced by the ForwardingRule will not be visible to those
+      proxies. For each metadataFilter in this list, if its
       filterMatchCriteria is set to MATCH_ANY, at least one of the
       filterLabels must match the corresponding label provided in the
       metadata. If its filterMatchCriteria is set to MATCH_ALL, then all of
-      its filterLabels must match with corresponding labels in the provided
-      metadata. metadataFilters specified here can be overridden by those
+      its filterLabels must match with corresponding labels provided in the
+      metadata. metadataFilters specified here will be applifed before those
       specified in the UrlMap that this ForwardingRule references.
       metadataFilters only applies to Loadbalancers that have their
       loadBalancingScheme set to INTERNAL_SELF_MANAGED.
@@ -19368,30 +19552,30 @@ class ForwardingRule(_messages.Message):
       STANDARD. For GlobalForwardingRule, the valid value is PREMIUM.  If this
       field is not specified, it is assumed to be PREMIUM. If IPAddress is
       specified, this value must be equal to the networkTier of the Address.
-    portRange: This field is deprecated. See the port field.
-    ports: List of comma-separated ports. The forwarding rule forwards packets
-      with matching destination ports. If the forwarding rule's
-      loadBalancingScheme is EXTERNAL, and the forwarding rule references a
-      target pool, specifying ports is optional. You can specify an unlimited
-      number of ports, but they must be contiguous. If you omit ports, GCP
-      forwards traffic on any port of the forwarding rule's protocol.  If the
-      forwarding rule's loadBalancingScheme is EXTERNAL, and the forwarding
-      rule references a target HTTP proxy, target HTTPS proxy, target TCP
-      proxy, target SSL proxy, or target VPN gateway, you must specify ports
-      using the following constraints:    - TargetHttpProxy: 80, 8080  -
-      TargetHttpsProxy: 443  - TargetTcpProxy: 25, 43, 110, 143, 195, 443,
-      465, 587, 700, 993, 995, 1688, 1883, 5222  - TargetSslProxy: 25, 43,
-      110, 143, 195, 443, 465, 587, 700, 993, 995, 1688, 1883, 5222  -
-      TargetVpnGateway: 500, 4500    If the forwarding rule's
-      loadBalancingScheme is INTERNAL, you must specify ports in one of the
+    portRange: When the load balancing scheme is EXTERNAL,
+      INTERNAL_SELF_MANAGED and INTERNAL_MANAGED, you can specify a
+      port_range. Use with a forwarding rule that points to a target proxy or
+      a target pool. Do not use with a forwarding rule that points to a
+      backend service. This field is used along with the target field for
+      TargetHttpProxy, TargetHttpsProxy, TargetSslProxy, TargetTcpProxy,
+      TargetVpnGateway, TargetPool, TargetInstance.  Applicable only when
+      IPProtocol is TCP, UDP, or SCTP, only packets addressed to ports in the
+      specified range will be forwarded to target. Forwarding rules with the
+      same [IPAddress, IPProtocol] pair must have disjoint port ranges.  Some
+      types of forwarding target have constraints on the acceptable ports:   -
+      TargetHttpProxy: 80, 8080  - TargetHttpsProxy: 443  - TargetTcpProxy:
+      25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995, 1688, 1883, 5222  -
+      TargetSslProxy: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993, 995,
+      1688, 1883, 5222  - TargetVpnGateway: 500, 4500
+    ports: This field is used along with the backend_service field for
+      internal load balancing.  When the load balancing scheme is INTERNAL, a
+      list of ports can be configured, for example, ['80'], ['8000','9000'].
+      Only packets addressed to these ports are forwarded to the backends
+      configured with the forwarding rule.  If the forwarding rule's
+      loadBalancingScheme is INTERNAL, you can specify ports in one of the
       following ways:  * A list of up to five ports, which can be non-
       contiguous * Keyword ALL, which causes the forwarding rule to forward
-      traffic on any port of the forwarding rule's protocol.  The ports field
-      is used along with the target field for TargetHttpProxy,
-      TargetHttpsProxy, TargetSslProxy, TargetTcpProxy, TargetVpnGateway,
-      TargetPool, TargetInstance.  Applicable only when IPProtocol is TCP,
-      UDP, or SCTP. Forwarding rules with the same [IPAddress, IPProtocol]
-      pair must have disjoint port ranges.
+      traffic on any port of the forwarding rule's protocol.
     region: [Output Only] URL of the region where the regional forwarding rule
       resides. This field is not applicable to global forwarding rules. You
       must specify this field as part of the HTTP request URL. It is not
@@ -20015,7 +20199,7 @@ class GuestAttributes(_messages.Message):
     kind: [Output Only] Type of the resource. Always compute#guestAttributes
       for guest attributes entry.
     queryPath: The path to be queried. This can be the default namespace ('/')
-      or a nested namespace ('//') or a specified key ('//')
+      or a nested namespace ('/\/') or a specified key ('/\/\')
     queryValue: [Output Only] The value of the requested queried path.
     selfLink: [Output Only] Server-defined URL for this resource.
     variableKey: The key to search for.
@@ -21003,9 +21187,9 @@ class HttpHeaderMatch(_messages.Message):
       prefixMatch. Only one of exactMatch, prefixMatch, suffixMatch,
       regexMatch, presentMatch or rangeMatch must be set.
     presentMatch: A header with the contents of headerName must exist. The
-      match takes place whether or not the request's header has a value or
-      not. Only one of exactMatch, prefixMatch, suffixMatch, regexMatch,
-      presentMatch or rangeMatch must be set.
+      match takes place whether or not the request's header has a value. Only
+      one of exactMatch, prefixMatch, suffixMatch, regexMatch, presentMatch or
+      rangeMatch must be set.
     rangeMatch: The header value must be an integer and its value must be in
       the range specified in rangeMatch. If the header does not contain an
       integer, number or is empty, the match fails. For example for a range
@@ -21237,18 +21421,18 @@ class HttpQueryParameterMatch(_messages.Message):
   Fields:
     exactMatch: The queryParameterMatch matches if the value of the parameter
       exactly matches the contents of exactMatch. Only one of presentMatch,
-      exactMatch and regexMatch must be set.
+      exactMatch or regexMatch must be set.
     name: The name of the query parameter to match. The query parameter must
       exist in the request, in the absence of which the request match fails.
     presentMatch: Specifies that the queryParameterMatch matches if the
       request contains the query parameter, irrespective of whether the
-      parameter has a value or not. Only one of presentMatch, exactMatch and
+      parameter has a value or not. Only one of presentMatch, exactMatch or
       regexMatch must be set.
     regexMatch: The queryParameterMatch matches if the value of the parameter
       matches the regular expression specified by regexMatch. For the regular
       expression grammar, please see
       en.cppreference.com/w/cpp/regex/ecmascript  Only one of presentMatch,
-      exactMatch and regexMatch must be set.
+      exactMatch or regexMatch must be set.
   """
 
   exactMatch = _messages.StringField(1)
@@ -21333,7 +21517,11 @@ class HttpRetryPolicy(_messages.Message):
 
   Fields:
     numRetries: Specifies the allowed number retries. This number must be > 0.
-    perTryTimeout: Specifies a non-zero timeout per retry attempt.
+      If not specified, defaults to 1.
+    perTryTimeout: Specifies a non-zero timeout per retry attempt. If not
+      specified, will use the timeout set in HttpRouteAction. If timeout in
+      HttpRouteAction is not set, will use the largest timeout among all
+      backend services associated with the route.
     retryConditions: Specfies one or more conditions when this retry rule
       applies. Valid values are:   - 5xx: Loadbalancer will attempt a retry if
       the backend service responds with any 5xx response code, or if the
@@ -21382,11 +21570,12 @@ class HttpRouteAction(_messages.Message):
       suffixed with -shadow.
     retryPolicy: Specifies the retry policy associated with this route.
     timeout: Specifies the timeout for the selected route. Timeout is computed
-      from the time the request is has been fully processed (i.e. end-of-
-      stream) up until the response has been completely processed. Timeout
-      includes all retries. If not specified, the default value is 15 seconds.
+      from the time the request has been fully processed (i.e. end-of-stream)
+      up until the response has been completely processed. Timeout includes
+      all retries. If not specified, will use the largest timeout among all
+      backend services associated with the route.
     urlRewrite: The spec to modify the URL of the request, prior to forwarding
-      the request to the matched service
+      the request to the matched service.
     weightedBackendServices: A list of weighted backend services to send
       traffic to when a route match occurs. The weights determine the fraction
       of traffic that flows to their corresponding backend service. If all
@@ -21437,8 +21626,8 @@ class HttpRouteRule(_messages.Message):
       transformations, etc. prior to forwarding the request to the selected
       backend. If  routeAction specifies any  weightedBackendServices, service
       must not be set. Conversely if service is set, routeAction cannot
-      contain any  weightedBackendServices. Only one of routeAction or
-      urlRedirect must be set.
+      contain any  weightedBackendServices. Only one of urlRedirect, service
+      or routeAction.weightedBackendService must be set.
     service: The full or partial URL of the backend service resource to which
       traffic is directed if this rule is matched. If routeAction is
       additionally specified, advanced routing actions like URL Rewrites, etc.
@@ -21467,39 +21656,40 @@ class HttpRouteRuleMatch(_messages.Message):
   occur.
 
   Fields:
-    fullPathMatch: For satifying the matchRule condition, the path of the
+    fullPathMatch: For satisfying the matchRule condition, the path of the
       request must exactly match the value specified in fullPathMatch after
       removing any query parameters and anchor that may be part of the
-      original URL. FullPathMatch must be between 1 and 1024 characters. Only
+      original URL. fullPathMatch must be between 1 and 1024 characters. Only
       one of prefixMatch, fullPathMatch or regexMatch must be specified.
     headerMatches: Specifies a list of header match criteria, all of which
       must match corresponding headers in the request.
     ignoreCase: Specifies that prefixMatch and fullPathMatch matches are case
-      sensitive. The default value is false. caseSensitive must not be used
-      with regexMatch.
+      sensitive. The default value is false. ignoreCase must not be used with
+      regexMatch.
     metadataFilters: Opaque filter criteria used by Loadbalancer to restrict
-      routing configuration to a limited set xDS compliant clients. In their
-      xDS requests to Loadbalancer, xDS clients present node metadata. If a
-      match takes place, the relevant routing configuration is made available
-      to those proxies. For each metadataFilter in this list, if its
+      routing configuration to a limited set of xDS compliant clients. In
+      their xDS requests to Loadbalancer, xDS clients present node metadata.
+      If a match takes place, the relevant routing configuration is made
+      available to those proxies. For each metadataFilter in this list, if its
       filterMatchCriteria is set to MATCH_ANY, at least one of the
       filterLabels must match the corresponding label provided in the
       metadata. If its filterMatchCriteria is set to MATCH_ALL, then all of
-      its filterLabels must match with corresponding labels in the provided
-      metadata. metadataFilters specified here can be overrides those
-      specified in ForwardingRule that refers to this UrlMap. metadataFilters
-      only applies to Loadbalancers that have their loadBalancingScheme set to
+      its filterLabels must match with corresponding labels provided in the
+      metadata. metadataFilters specified here will be applied after those
+      specified in ForwardingRule that refers to the UrlMap this
+      HttpRouteRuleMatch belongs to. metadataFilters only applies to
+      Loadbalancers that have their loadBalancingScheme set to
       INTERNAL_SELF_MANAGED.
-    prefixMatch: For satifying the matchRule condition, the request's path
+    prefixMatch: For satisfying the matchRule condition, the request's path
       must begin with the specified prefixMatch. prefixMatch must begin with a
       /. The value must be between 1 and 1024 characters. Only one of
       prefixMatch, fullPathMatch or regexMatch must be specified.
     queryParameterMatches: Specifies a list of query parameter match criteria,
       all of which must match corresponding query parameters in the request.
-    regexMatch: For satifying the matchRule condition, the path of the request
-      must satisfy the regular expression specified in regexMatch after
-      removing any query parameters and anchor supplied with the original URL.
-      For regular expression grammar please see
+    regexMatch: For satisfying the matchRule condition, the path of the
+      request must satisfy the regular expression specified in regexMatch
+      after removing any query parameters and anchor supplied with the
+      original URL. For regular expression grammar please see
       en.cppreference.com/w/cpp/regex/ecmascript  Only one of prefixMatch,
       fullPathMatch or regexMatch must be specified.
   """
@@ -21799,6 +21989,8 @@ class Image(_messages.Message):
       create other resources, such as instances, only after the image has been
       successfully created and the status is set to READY. Possible values are
       FAILED, PENDING, or READY.
+    storageLocations: Cloud Storage bucket storage location of the image
+      (regional or multi-regional).
   """
 
   class SourceTypeValueValuesEnum(_messages.Enum):
@@ -21916,6 +22108,7 @@ class Image(_messages.Message):
   sourceSnapshotId = _messages.StringField(26)
   sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 27, default=u'RAW')
   status = _messages.EnumField('StatusValueValuesEnum', 28)
+  storageLocations = _messages.StringField(29, repeated=True)
 
 
 class ImageList(_messages.Message):
@@ -23161,15 +23354,37 @@ class InstanceGroupManagerStatus(_messages.Message):
       of change (for example, creation, restart, or deletion); no future
       changes are scheduled for instances in the managed instance group; and
       the managed instance group itself is not being modified.
+    versionTarget: [Output Only] A status of consistency of Instances'
+      versions with their target version specified by version field on
+      Instance Group Manager.
   """
 
   isStable = _messages.BooleanField(1)
+  versionTarget = _messages.MessageField('InstanceGroupManagerStatusVersionTarget', 2)
+
+
+class InstanceGroupManagerStatusVersionTarget(_messages.Message):
+  r"""A InstanceGroupManagerStatusVersionTarget object.
+
+  Fields:
+    isReached: [Output Only] A bit indicating whether version target has been
+      reached in this managed instance group, i.e. all instances are in their
+      target version. Instances' target version are specified by version field
+      on Instance Group Manager.
+  """
+
+  isReached = _messages.BooleanField(1)
 
 
 class InstanceGroupManagerUpdatePolicy(_messages.Message):
   r"""A InstanceGroupManagerUpdatePolicy object.
 
   Enums:
+    InstanceRedistributionTypeValueValuesEnum: The  instance redistribution
+      policy for regional managed instance groups. Valid values are:   -
+      PROACTIVE (default): The group attempts to maintain an even distribution
+      of VM instances across zones in the region.  - NONE: For non-autoscaled
+      groups, proactive redistribution is disabled.
     MinimalActionValueValuesEnum: Minimal action to be taken on an instance.
       You can specify either RESTART to restart existing instances or REPLACE
       to delete and create new instances from the target template. If you
@@ -23185,6 +23400,11 @@ class InstanceGroupManagerUpdatePolicy(_messages.Message):
       recreateInstances calls).
 
   Fields:
+    instanceRedistributionType: The  instance redistribution policy for
+      regional managed instance groups. Valid values are:   - PROACTIVE
+      (default): The group attempts to maintain an even distribution of VM
+      instances across zones in the region.  - NONE: For non-autoscaled
+      groups, proactive redistribution is disabled.
     maxSurge: The maximum number of instances that can be created above the
       specified targetSize during the update process. By default, a fixed
       value of 1 is used. This value can be either a fixed number or a
@@ -23217,6 +23437,19 @@ class InstanceGroupManagerUpdatePolicy(_messages.Message):
       of other actions (for example, resizes or recreateInstances calls).
   """
 
+  class InstanceRedistributionTypeValueValuesEnum(_messages.Enum):
+    r"""The  instance redistribution policy for regional managed instance
+    groups. Valid values are:   - PROACTIVE (default): The group attempts to
+    maintain an even distribution of VM instances across zones in the region.
+    - NONE: For non-autoscaled groups, proactive redistribution is disabled.
+
+    Values:
+      NONE: <no description>
+      PROACTIVE: <no description>
+    """
+    NONE = 0
+    PROACTIVE = 1
+
   class MinimalActionValueValuesEnum(_messages.Enum):
     r"""Minimal action to be taken on an instance. You can specify either
     RESTART to restart existing instances or REPLACE to delete and create new
@@ -23246,10 +23479,11 @@ class InstanceGroupManagerUpdatePolicy(_messages.Message):
     OPPORTUNISTIC = 0
     PROACTIVE = 1
 
-  maxSurge = _messages.MessageField('FixedOrPercent', 1)
-  maxUnavailable = _messages.MessageField('FixedOrPercent', 2)
-  minimalAction = _messages.EnumField('MinimalActionValueValuesEnum', 3)
-  type = _messages.EnumField('TypeValueValuesEnum', 4)
+  instanceRedistributionType = _messages.EnumField('InstanceRedistributionTypeValueValuesEnum', 1)
+  maxSurge = _messages.MessageField('FixedOrPercent', 2)
+  maxUnavailable = _messages.MessageField('FixedOrPercent', 3)
+  minimalAction = _messages.EnumField('MinimalActionValueValuesEnum', 4)
+  type = _messages.EnumField('TypeValueValuesEnum', 5)
 
 
 class InstanceGroupManagerVersion(_messages.Message):
@@ -26508,9 +26742,9 @@ class LogConfigCounterOptions(_messages.Message):
   IAMContext.principal even if a token or authority selector is present; or -
   "" (empty string), resulting in a counter with no fields.  Examples: counter
   { metric: "/debug_access_count" field: "iam_principal" } ==> increment
-  counter /iam/policy/backend_debug_access_count {iam_principal=[value of
-  IAMContext.principal]}  At this time we do not support multiple field names
-  (though this may be supported in the future).
+  counter /iam/policy/debug_access_count {iam_principal=[value of
+  IAMContext.principal]}  TODO(b/141846426): Consider supporting "authority"
+  and "iam_principal" fields in the same counter.
 
   Fields:
     customFields: Custom fields.
@@ -27261,17 +27495,16 @@ class MetadataFilter(_messages.Message):
   configuration to a limited set of loadbalancing proxies. Proxies and
   sidecars involved in loadbalancing would typically present metadata to the
   loadbalancers which need to match criteria specified here. If a match takes
-  place, the relevant routing configuration is made available to those
-  proxies. For each metadataFilter in this list, if its filterMatchCriteria is
-  set to MATCH_ANY, at least one of the filterLabels must match the
-  corresponding label provided in the metadata. If its filterMatchCriteria is
-  set to MATCH_ALL, then all of its filterLabels must match with corresponding
-  labels in the provided metadata. An example for using metadataFilters would
-  be: if loadbalancing involves  Envoys, they will only receive routing
-  configuration when values in metadataFilters match values supplied in <a hre
-  f="https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/core/base.proto
-  #envoy-api-msg-core-node" Node metadata of their XDS requests to
-  loadbalancers.
+  place, the relevant configuration is made available to those proxies. For
+  each metadataFilter in this list, if its filterMatchCriteria is set to
+  MATCH_ANY, at least one of the filterLabels must match the corresponding
+  label provided in the metadata. If its filterMatchCriteria is set to
+  MATCH_ALL, then all of its filterLabels must match with corresponding labels
+  provided in the metadata. An example for using metadataFilters would be: if
+  loadbalancing involves  Envoys, they will only receive routing configuration
+  when values in metadataFilters match values supplied in <a href="https://www
+  .envoyproxy.io/docs/envoy/latest/api-v2/api/v2/core/base.proto#envoy-api-
+  msg-core-node" Node metadata of their XDS requests to loadbalancers.
 
   Enums:
     FilterMatchCriteriaValueValuesEnum: Specifies how individual filterLabel
@@ -27421,7 +27654,9 @@ class NetworkEndpoint(_messages.Message):
 
 
 class NetworkEndpointGroup(_messages.Message):
-  r"""Represents a collection of network endpoints.
+  r"""Represents a collection of network endpoints.  For more information read
+  Setting up network endpoint groups in load balancing. (== resource_for
+  v1.networkEndpointGroups ==) (== resource_for beta.networkEndpointGroups ==)
 
   Enums:
     NetworkEndpointTypeValueValuesEnum: Type of network endpoints in this
@@ -28391,7 +28626,7 @@ class NodeGroup(_messages.Message):
   separated from instances in other projects, or to group your instances
   together on the same host hardware. For more information, read Sole-tenant
   nodes. (== resource_for beta.nodeGroups ==) (== resource_for v1.nodeGroups
-  ==) NextID: 15
+  ==) NextID: 16
 
   Enums:
     StatusValueValuesEnum:
@@ -30608,8 +30843,8 @@ class OperationsScopedList(_messages.Message):
 
 
 class OutlierDetection(_messages.Message):
-  r"""Settings controlling eviction of unhealthy hosts from the load balancing
-  pool for the backend service.
+  r"""Settings controlling the eviction of unhealthy hosts from the load
+  balancing pool for the backend service.
 
   Fields:
     baseEjectionTime: The base time that a host is ejected for. The real
@@ -30634,9 +30869,9 @@ class OutlierDetection(_messages.Message):
       ejected when an outlier status is detected through success rate
       statistics. This setting can be used to disable ejection or to ramp it
       up slowly. Defaults to 100.
-    interval: Time interval between ejection sweep analysis. This can result
+    interval: Time interval between ejection analysis sweeps. This can result
       in both new ejections as well as hosts being returned to service.
-      Defaults to 1 seconds.
+      Defaults to 1 second.
     maxEjectionPercent: Maximum percentage of hosts in the load balancing pool
       for the backend service that can be ejected. Defaults to 50%.
     successRateMinimumHosts: The number of hosts in a cluster that must have
@@ -30701,8 +30936,8 @@ class PathMatcher(_messages.Message):
       requires one or more of the following Google IAM permissions on the
       specified resource default_service:   - compute.backendBuckets.use  -
       compute.backendServices.use
-    defaultUrlRedirect: When when none of the specified pathRules or
-      routeRules match, the request is redirected to a URL specified by
+    defaultUrlRedirect: When none of the specified pathRules or routeRules
+      match, the request is redirected to a URL specified by
       defaultUrlRedirect. If defaultUrlRedirect is specified, defaultService
       or defaultRouteAction must not be set.
     description: An optional description of this resource. Provide this
@@ -30719,12 +30954,12 @@ class PathMatcher(_messages.Message):
       with a path /a/b/c/* will match before /a/b/* irrespective of the order
       in which those paths appear in this list. Within a given pathMatcher,
       only one of pathRules or routeRules must be set.
-    routeRules: The list of ordered HTTP route rules. Use this list instead of
+    routeRules: The list of HTTP route rules. Use this list instead of
       pathRules when advanced route matching and routing actions are desired.
-      The order of specifying routeRules matters: the first rule that matches
-      will cause its specified routing action to take effect. Within a given
-      pathMatcher, only one of pathRules or routeRules must be set. routeRules
-      are not supported in UrlMaps intended for External Load balancers.
+      routeRules are evaluated in order of priority, from the lowest to
+      highest number. Within a given pathMatcher, only one of pathRules or
+      routeRules must be set. routeRules are not supported in UrlMaps intended
+      for External Load balancers.
   """
 
   defaultRouteAction = _messages.MessageField('HttpRouteAction', 1)
@@ -31055,6 +31290,7 @@ class Quota(_messages.Message):
       IN_USE_BACKUP_SCHEDULES: <no description>
       IN_USE_SNAPSHOT_SCHEDULES: <no description>
       LOCAL_SSD_TOTAL_GB: <no description>
+      MACHINE_IMAGES: <no description>
       N2_CPUS: <no description>
       NETWORKS: <no description>
       NETWORK_ENDPOINT_GROUPS: <no description>
@@ -31137,50 +31373,51 @@ class Quota(_messages.Message):
     IN_USE_BACKUP_SCHEDULES = 34
     IN_USE_SNAPSHOT_SCHEDULES = 35
     LOCAL_SSD_TOTAL_GB = 36
-    N2_CPUS = 37
-    NETWORKS = 38
-    NETWORK_ENDPOINT_GROUPS = 39
-    NVIDIA_K80_GPUS = 40
-    NVIDIA_P100_GPUS = 41
-    NVIDIA_P100_VWS_GPUS = 42
-    NVIDIA_P4_GPUS = 43
-    NVIDIA_P4_VWS_GPUS = 44
-    NVIDIA_T4_GPUS = 45
-    NVIDIA_T4_VWS_GPUS = 46
-    NVIDIA_V100_GPUS = 47
-    PREEMPTIBLE_CPUS = 48
-    PREEMPTIBLE_LOCAL_SSD_GB = 49
-    PREEMPTIBLE_NVIDIA_K80_GPUS = 50
-    PREEMPTIBLE_NVIDIA_P100_GPUS = 51
-    PREEMPTIBLE_NVIDIA_P100_VWS_GPUS = 52
-    PREEMPTIBLE_NVIDIA_P4_GPUS = 53
-    PREEMPTIBLE_NVIDIA_P4_VWS_GPUS = 54
-    PREEMPTIBLE_NVIDIA_T4_GPUS = 55
-    PREEMPTIBLE_NVIDIA_T4_VWS_GPUS = 56
-    PREEMPTIBLE_NVIDIA_V100_GPUS = 57
-    REGIONAL_AUTOSCALERS = 58
-    REGIONAL_INSTANCE_GROUP_MANAGERS = 59
-    RESERVATIONS = 60
-    RESOURCE_POLICIES = 61
-    ROUTERS = 62
-    ROUTES = 63
-    SECURITY_POLICIES = 64
-    SECURITY_POLICY_RULES = 65
-    SNAPSHOTS = 66
-    SSD_TOTAL_GB = 67
-    SSL_CERTIFICATES = 68
-    STATIC_ADDRESSES = 69
-    SUBNETWORKS = 70
-    TARGET_HTTPS_PROXIES = 71
-    TARGET_HTTP_PROXIES = 72
-    TARGET_INSTANCES = 73
-    TARGET_POOLS = 74
-    TARGET_SSL_PROXIES = 75
-    TARGET_TCP_PROXIES = 76
-    TARGET_VPN_GATEWAYS = 77
-    URL_MAPS = 78
-    VPN_GATEWAYS = 79
-    VPN_TUNNELS = 80
+    MACHINE_IMAGES = 37
+    N2_CPUS = 38
+    NETWORKS = 39
+    NETWORK_ENDPOINT_GROUPS = 40
+    NVIDIA_K80_GPUS = 41
+    NVIDIA_P100_GPUS = 42
+    NVIDIA_P100_VWS_GPUS = 43
+    NVIDIA_P4_GPUS = 44
+    NVIDIA_P4_VWS_GPUS = 45
+    NVIDIA_T4_GPUS = 46
+    NVIDIA_T4_VWS_GPUS = 47
+    NVIDIA_V100_GPUS = 48
+    PREEMPTIBLE_CPUS = 49
+    PREEMPTIBLE_LOCAL_SSD_GB = 50
+    PREEMPTIBLE_NVIDIA_K80_GPUS = 51
+    PREEMPTIBLE_NVIDIA_P100_GPUS = 52
+    PREEMPTIBLE_NVIDIA_P100_VWS_GPUS = 53
+    PREEMPTIBLE_NVIDIA_P4_GPUS = 54
+    PREEMPTIBLE_NVIDIA_P4_VWS_GPUS = 55
+    PREEMPTIBLE_NVIDIA_T4_GPUS = 56
+    PREEMPTIBLE_NVIDIA_T4_VWS_GPUS = 57
+    PREEMPTIBLE_NVIDIA_V100_GPUS = 58
+    REGIONAL_AUTOSCALERS = 59
+    REGIONAL_INSTANCE_GROUP_MANAGERS = 60
+    RESERVATIONS = 61
+    RESOURCE_POLICIES = 62
+    ROUTERS = 63
+    ROUTES = 64
+    SECURITY_POLICIES = 65
+    SECURITY_POLICY_RULES = 66
+    SNAPSHOTS = 67
+    SSD_TOTAL_GB = 68
+    SSL_CERTIFICATES = 69
+    STATIC_ADDRESSES = 70
+    SUBNETWORKS = 71
+    TARGET_HTTPS_PROXIES = 72
+    TARGET_HTTP_PROXIES = 73
+    TARGET_INSTANCES = 74
+    TARGET_POOLS = 75
+    TARGET_SSL_PROXIES = 76
+    TARGET_TCP_PROXIES = 77
+    TARGET_VPN_GATEWAYS = 78
+    URL_MAPS = 79
+    VPN_GATEWAYS = 80
+    VPN_TUNNELS = 81
 
   limit = _messages.FloatField(1)
   metric = _messages.EnumField('MetricValueValuesEnum', 2)
@@ -32262,7 +32499,7 @@ class Reservation(_messages.Message):
     StatusValueValuesEnum: [Output Only] The status of the reservation.
 
   Fields:
-    commitment: [OutputOnly] Full or partial URL to a parent commitment. This
+    commitment: [Output Only] Full or partial URL to a parent commitment. This
       field displays for reservations that are tied to a commitment.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
@@ -34434,19 +34671,30 @@ class RouterNatLogConfig(_messages.Message):
   r"""Configuration of logging on a NAT.
 
   Enums:
-    FilterValueValuesEnum: Specifies the desired filtering of logs on this
-      NAT. If unspecified, logs are exported for all connections handled by
-      this NAT.
+    FilterValueValuesEnum: Specify the desired filtering of logs on this NAT.
+      If unspecified, logs are exported for all connections handled by this
+      NAT. This option can take one of the following values:  - ERRORS_ONLY:
+      Export logs only for connection failures.  - TRANSLATIONS_ONLY: Export
+      logs only for successful connections.  - ALL: Export logs for all
+      connections, successful and unsuccessful.
 
   Fields:
     enable: Indicates whether or not to export logs. This is false by default.
-    filter: Specifies the desired filtering of logs on this NAT. If
-      unspecified, logs are exported for all connections handled by this NAT.
+    filter: Specify the desired filtering of logs on this NAT. If unspecified,
+      logs are exported for all connections handled by this NAT. This option
+      can take one of the following values:  - ERRORS_ONLY: Export logs only
+      for connection failures.  - TRANSLATIONS_ONLY: Export logs only for
+      successful connections.  - ALL: Export logs for all connections,
+      successful and unsuccessful.
   """
 
   class FilterValueValuesEnum(_messages.Enum):
-    r"""Specifies the desired filtering of logs on this NAT. If unspecified,
-    logs are exported for all connections handled by this NAT.
+    r"""Specify the desired filtering of logs on this NAT. If unspecified,
+    logs are exported for all connections handled by this NAT. This option can
+    take one of the following values:  - ERRORS_ONLY: Export logs only for
+    connection failures.  - TRANSLATIONS_ONLY: Export logs only for successful
+    connections.  - ALL: Export logs for all connections, successful and
+    unsuccessful.
 
     Values:
       ALL: <no description>
@@ -34566,9 +34814,9 @@ class RouterStatusNatStatus(_messages.Message):
     autoAllocatedNatIps: A list of IPs auto-allocated for NAT. Example:
       ["1.1.1.1", "129.2.16.89"]
     drainAutoAllocatedNatIps: A list of IPs auto-allocated for NAT that are in
-      drain mode. Example: ["1.1.1.1", ?179.12.26.133?].
+      drain mode. Example: ["1.1.1.1", "179.12.26.133"].
     drainUserAllocatedNatIps: A list of IPs user-allocated for NAT that are in
-      drain mode. Example: ["1.1.1.1", ?179.12.26.133?].
+      drain mode. Example: ["1.1.1.1", "179.12.26.133"].
     minExtraNatIpsNeeded: The number of extra IPs to allocate. This will be
       greater than 0 only if user-specified IPs are NOT enough to allow all
       configured VMs to use NAT. This value is meaningful only when auto-
@@ -35271,12 +35519,12 @@ class ShieldedInstanceIdentity(_messages.Message):
   r"""A shielded Instance identity entry.
 
   Fields:
-    encryptionKey: An Endorsement Key (EK) issued to the Shielded Instance's
-      vTPM.
+    encryptionKey: An Endorsement Key (EK) made by the RSA 2048 algorithm
+      issued to the Shielded Instance's vTPM.
     kind: [Output Only] Type of the resource. Always
       compute#shieldedInstanceIdentity for shielded Instance identity entry.
-    signingKey: An Attestation Key (AK) issued to the Shielded Instance's
-      vTPM.
+    signingKey: An Attestation Key (AK) made by the RSA 2048 algorithm issued
+      to the Shielded Instance's vTPM.
   """
 
   encryptionKey = _messages.MessageField('ShieldedInstanceIdentityEntry', 1)
@@ -35346,13 +35594,13 @@ class Snapshot(_messages.Message):
       by the setLabels method. Label values may be empty.
 
   Fields:
-    autoCreated: [Output Only] Set to true if snapshots are automatically by
-      applying resource policy on the target disk.
+    autoCreated: [Output Only] Set to true if snapshots are automatically
+      created by applying resource policy on the target disk.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional description of this resource. Provide this
       property when you create the resource.
-    diskSizeGb: [Output Only] Size of the snapshot, specified in GB.
+    diskSizeGb: [Output Only] Size of the source disk, specified in GB.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] Type of the resource. Always compute#snapshot for
@@ -35630,7 +35878,9 @@ class SslCertificate(_messages.Message):
   also contains a private key. You can use SSL keys and certificates to secure
   connections to a load balancer. For more information, read  Creating and
   Using SSL Certificates. (== resource_for beta.sslCertificates ==) (==
-  resource_for v1.sslCertificates ==)
+  resource_for v1.sslCertificates ==) (== resource_for
+  beta.regionSslCertificates ==) (== resource_for v1.regionSslCertificates ==)
+  Next ID: 17
 
   Fields:
     certificate: A local certificate file. The certificate must be in PEM
@@ -37323,10 +37573,12 @@ class TargetHttpProxiesScopedList(_messages.Message):
 
 class TargetHttpProxy(_messages.Message):
   r"""Represents a Target HTTP Proxy resource.  A target HTTP proxy is a
-  component of certain types of load balancers. Global forwarding rules
-  reference a target HTTP proxy, and the target proxy then references a URL
-  map. For more information, read Using Target Proxies. (== resource_for
-  beta.targetHttpProxies ==) (== resource_for v1.targetHttpProxies ==)
+  component of GCP HTTP load balancers. Forwarding rules reference a target
+  HTTP proxy, and the target proxy then references a URL map. For more
+  information, read Using Target Proxies and  Forwarding rule concepts. (==
+  resource_for beta.targetHttpProxies ==) (== resource_for
+  v1.targetHttpProxies ==) (== resource_for beta.regionTargetHttpProxies ==)
+  (== resource_for v1.regionTargetHttpProxies ==)
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -37693,10 +37945,12 @@ class TargetHttpsProxiesSetSslCertificatesRequest(_messages.Message):
 
 class TargetHttpsProxy(_messages.Message):
   r"""Represents a Target HTTPS Proxy resource.  A target HTTPS proxy is a
-  component of certain types of load balancers. Global forwarding rules
-  reference a target HTTPS proxy, and the target proxy then references a URL
-  map. For more information, read Using Target Proxies. (== resource_for
-  beta.targetHttpsProxies ==) (== resource_for v1.targetHttpsProxies ==)
+  component of GCP HTTPS load balancers. Forwarding rules reference a target
+  HTTPS proxy, and the target proxy then references a URL map. For more
+  information, read Using Target Proxies and  Forwarding rule concepts. (==
+  resource_for beta.targetHttpsProxies ==) (== resource_for
+  v1.targetHttpsProxies ==) (== resource_for beta.regionTargetHttpsProxies ==)
+  (== resource_for v1.regionTargetHttpsProxies ==)
 
   Enums:
     QuicOverrideValueValuesEnum: Specifies the QUIC override policy for this
@@ -40944,7 +41198,7 @@ class VmEndpointNatMappingsList(_messages.Message):
 
 
 class VpnGateway(_messages.Message):
-  r"""Represents a VPN gateway resource.
+  r"""Represents a VPN gateway resource. Next ID: 13
 
   Messages:
     LabelsValue: Labels to apply to this VpnGateway resource. These can be

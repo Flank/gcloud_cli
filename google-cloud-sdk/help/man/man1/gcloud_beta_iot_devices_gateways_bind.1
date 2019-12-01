@@ -94,6 +94,19 @@ can be found at: https://cloud.google.com/iot
 
 
 
+.SH "EXAMPLES"
+
+To associate 'my\-device' with 'my\-gateway' in region 'us\-central1', run:
+
+.RS 2m
+$ gcloud beta iot devices gateways bind \-\-device=my\-device \e
+    \-\-device\-region=us\-central1 \-\-device\-registry=my\-registry \e
+    \-\-gateway=my\-gateway \-\-gateway\-region=us\-central1 \e
+    \-\-gateway\-registry=my\-registry
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

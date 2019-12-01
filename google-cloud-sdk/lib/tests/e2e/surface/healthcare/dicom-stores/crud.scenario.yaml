@@ -1,3 +1,7 @@
+filters:
+  skip:
+    reason: Error - invalid pubsub topic format
+    bug: b/143880426
 title: cloud healthcare dicom-stores crud scenario
 release_tracks: [ALPHA, BETA]
 summary:

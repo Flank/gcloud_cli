@@ -75,6 +75,7 @@ def _CommonArgs(parser,
                 deprecate_maintenance_policy=False,
                 enable_resource_policy=False,
                 supports_min_node_cpus=False,
+                supports_location_hint=False,
                 snapshot_csek=False,
                 image_csek=False):
   """Register parser args common to all tracks."""
@@ -125,6 +126,9 @@ def _CommonArgs(parser,
   if supports_min_node_cpus:
     sole_tenancy_flags.AddMinNodeCpusArg(parser)
 
+  if supports_location_hint:
+    instances_flags.AddLocationHintArg(parser)
+
   labels_util.AddCreateLabelsFlags(parser)
 
   parser.add_argument(
@@ -153,8 +157,10 @@ class Create(base.CreateCommand):
   _support_erase_vss = False
   _support_machine_image_key = False
   _support_min_node_cpus = False
+  _support_location_hint = False
   _support_source_snapshot_csek = False
   _support_image_csek = False
+  _support_confidential_compute = False
 
   @classmethod
   def Args(cls, parser):
@@ -186,6 +192,13 @@ class Create(base.CreateCommand):
       return instance_utils.CreateShieldedInstanceConfigMessage(
           messages, args.shielded_vm_secure_boot, args.shielded_vm_vtpm,
           args.shielded_vm_integrity_monitoring)
+    else:
+      return None
+
+  def _BuildConfidentialInstanceConfigMessage(self, messages, args):
+    if args.IsSpecified('confidential_compute'):
+      return instance_utils.CreateConfidentialInstanceMessage(
+          messages, args.confidential_compute)
     else:
       return None
 
@@ -372,7 +385,8 @@ class Create(base.CreateCommand):
 
     scheduling = instance_utils.GetScheduling(
         args, compute_client, skip_defaults, support_node_affinity=True,
-        support_min_node_cpus=self._support_min_node_cpus)
+        support_min_node_cpus=self._support_min_node_cpus,
+        support_location_hint=self._support_location_hint)
     tags = instance_utils.GetTags(args, compute_client)
     labels = instance_utils.GetLabels(args, compute_client)
     metadata = instance_utils.GetMetadata(args, compute_client, skip_defaults)
@@ -392,6 +406,10 @@ class Create(base.CreateCommand):
     shielded_instance_config = self._BuildShieldedInstanceConfigMessage(
         messages=compute_client.messages, args=args)
 
+    if self._support_confidential_compute:
+      confidential_instance_config = (
+          self._BuildConfidentialInstanceConfigMessage(
+              messages=compute_client.messages, args=args))
     # TODO(b/80138906): Release track should not be used like this.
     # These feature are only exposed in alpha/beta
     allow_rsa_encrypted = False
@@ -446,6 +464,9 @@ class Create(base.CreateCommand):
 
       if shielded_instance_config:
         instance.shieldedInstanceConfig = shielded_instance_config
+
+      if self._support_confidential_compute and confidential_instance_config:
+        instance.confidentialInstanceConfig = confidential_instance_config
 
       if self._support_erase_vss and \
         args.IsSpecified('erase_windows_vss_signature'):
@@ -561,8 +582,10 @@ class CreateBeta(Create):
   _support_erase_vss = False
   _support_machine_image_key = False
   _support_min_node_cpus = False
+  _support_location_hint = False
   _support_source_snapshot_csek = False
   _support_image_csek = False
+  _support_confidential_compute = False
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -595,8 +618,10 @@ class CreateAlpha(CreateBeta):
   _support_erase_vss = True
   _support_machine_image_key = True
   _support_min_node_cpus = True
+  _support_location_hint = True
   _support_source_snapshot_csek = True
   _support_image_csek = True
+  _support_confidential_compute = True
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -618,6 +643,7 @@ class CreateAlpha(CreateBeta):
         deprecate_maintenance_policy=True,
         enable_resource_policy=cls._support_disk_resource_policy,
         supports_min_node_cpus=cls._support_min_node_cpus,
+        supports_location_hint=cls._support_location_hint,
         snapshot_csek=True,
         image_csek=True)
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
@@ -634,5 +660,7 @@ class CreateAlpha(CreateBeta):
     flags.AddEraseVssSignature(parser, 'source snapshots or source machine'
                                        ' image')
     maintenance_flags.AddResourcePoliciesArgs(parser, 'added to', 'instance')
+    instances_flags.AddConfidentialComputeArgs(parser)
+
 
 Create.detailed_help = DETAILED_HELP

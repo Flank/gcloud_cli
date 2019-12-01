@@ -11,7 +11,7 @@ gcloud alpha run services update\-traffic \- adjust the trafic assignments for a
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha run services update\-traffic\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ \fB\-\-to\-latest\fR\ |\ \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha run services update\-traffic\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-async\fR] [\fB\-\-platform\fR=\fIPLATFORM\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR\ |\ \fB\-\-context\fR=\fICONTEXT\fR\ \fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR] [\fB\-\-to\-latest\fR\ |\ \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,7 +36,7 @@ ID of the service or fully qualified identifier for the service.
 
 .TP 2m
 \fB\-\-namespace\fR=\fINAMESPACE\fR
-Specific to Cloud Run on GKE: Kubernetes namespace for the service.
+Specific to Cloud Run for Anthos: Kubernetes namespace for the service.
 
 
 .RE
@@ -63,8 +63,8 @@ Fully managed version of Cloud Run. Use with the \f5\-\-region\fR flag or set
 the [run/region] property to specify a Cloud Run region.
 .TP 2m
 \fBgke\fR
-Cloud Run for Anthos on Google Kubernetes Engine. Use with the \f5\-\-cluster\fR
-and \f5\-\-cluster\-location\fR flags or set the [run/cluster] and
+Cloud Run for Anthos on Google Cloud. Use with the \f5\-\-cluster\fR and
+\f5\-\-cluster\-location\fR flags or set the [run/cluster] and
 [run/cluster_location] properties to specify a cluster in a given zone.
 .TP 2m
 \fBkubernetes\fR
@@ -77,8 +77,27 @@ connecting.
 
 .TP 2m
 
-Only applicable if connecting to Cloud Run for Anthos deployed on GKE. Specify
-\'\-\-platform=gke' to use:
+Arguments to locate resources, depending on the platform used. At most one of
+these may be specified:
+
+.RS 2m
+.TP 2m
+
+Only applicable if connecting to Cloud Run (fully managed). Specify
+\f5\-\-platform=managed\fR to use:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region in which the resource can be found. Alternatively, set the property
+[run/region].
+
+.RE
+.sp
+.TP 2m
+
+Only applicable if connecting to Cloud Run for Anthos deployed on Google Cloud.
+Specify \f5\-\-platform=gke\fR to use:
 
 .RS 2m
 .TP 2m
@@ -103,7 +122,33 @@ Zone in which the cluster is located. Alternatively, set the property
 [run/cluster_location].
 
 .RE
+.RE
 .sp
+.TP 2m
+
+Only applicable if connecting to Cloud Run for Anthos deployed on VMware.
+Specify \f5\-\-platform=kubernetes\fR to use:
+
+.RS 2m
+.TP 2m
+\fB\-\-context\fR=\fICONTEXT\fR
+The name of the context in your kubectl config file to use for connecting.
+
+.TP 2m
+\fB\-\-kubeconfig\fR=\fIKUBECONFIG\fR
+The absolute path to your kubectl config file. If not specified, the colon\- or
+semicolon\-delimited list of paths specified by $KUBECONFIG will be used. If
+$KUBECONFIG is unset, this defaults to \f5~/.kube/config\fR.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Only applicable if connecting to Cloud Run for Anthos deployed on Google Cloud.
+Specify \f5\-\-platform=gke\fR to use:
+
+.RS 2m
 .TP 2m
 
 At most one of these may be specified:
@@ -113,7 +158,8 @@ At most one of these may be specified:
 \fB\-\-to\-latest\fR
 True to assign 100 percent of traffic to the 'latest' revision of this service.
 Note that when a new revision is created, it will become the 'latest' and
-traffic will be directed to it. Defaults to False.
+traffic will be directed to it. Defaults to False. Synonymous with
+\'\-\-to\-revisions=LATEST=100'.
 
 .TP 2m
 \fB\-\-to\-revisions\fR=[\fIREVISION\-NAME\fR=\fIPERCENTAGE\fR,...]
@@ -130,7 +176,9 @@ traffic but that do not have new assignments. For example assume revision\-1 is
 serving 40 percent of traffic and revision\-2 is serving 60 percent. If
 revision\-1 is assigned 45 percent of traffic and no assignment is made for
 revision\-2, the service is updated with revsion\-1 assigned 45 percent of
-traffic and revision\-2 scaled down to 55 percent.
+traffic and revision\-2 scaled down to 55 percent. You can use "LATEST" as a
+special revision name to always put the given percentage of traffic on the
+latest ready revision.
 
 
 .RE
@@ -177,6 +225,15 @@ To assign 100% of traffic to the current or future LATEST revision run:
 
 .RS 2m
 $ gcloud alpha run services update\-traffic myservice \-\-to\-latest
+.RE
+
+You can also refer to the current or future LATEST revision in \-\-to\-revisions
+by the string "LATEST". For example, to set 10% of traffic to always float to
+the latest revision:
+
+.RS 2m
+$ gcloud alpha run services update\-traffic myservice \e
+  \-\-to\-revisions=LATEST=10
 .RE
 
 

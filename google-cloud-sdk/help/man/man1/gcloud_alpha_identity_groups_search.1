@@ -1,0 +1,108 @@
+
+.TH "GCLOUD_ALPHA_IDENTITY_GROUPS_SEARCH" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha identity groups search \- search groups
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha identity groups search\fR \fB\-\-label\fR=\fILABEL\fR \fB\-\-organization\fR=\fIORGANIZATION\fR [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR] [\fB\-\-view\fR=\fIVIEW\fR;\ default="basic"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Search groups.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-label\fR=\fILABEL\fR
+Label of the group resource.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization the Group being searched.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+The default page size is 200 (max 1000) for the BASIC view, and 50 (max 500) for
+the FULL view.
+
+.TP 2m
+\fB\-\-page\-token\fR=\fIPAGE_TOKEN\fR
+The next_page_token value returned from a previous search request, if any.
+
+.TP 2m
+\fB\-\-view\fR=\fIVIEW\fR; default="basic"
+There are two possible views, 'basic' and 'full', default is 'basic'. \fIVIEW\fR
+must be one of:
+
+.RS 2m
+.TP 2m
+\fBbasic\fR
+Response only basic information of the groups.
+
+.TP 2m
+\fBfull\fR
+Response includes all the fields of the groups.
+
+.RE
+.sp
+
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudidentity/v1alpha1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/identity/
+
+
+
+.SH "EXAMPLES"
+
+To Search groups.
+
+$ gcloud alpha identity groups search \-\-organization 5149234212.RS 2m
+\-\-label "system/groups/discussion_forum"
+\-\-page\-size 3 \-\-page\-token "ala9glealanal908"
+
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you may be trying to access an API with an invitation\-only early access
+whitelist.
+

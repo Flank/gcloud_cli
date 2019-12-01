@@ -74,9 +74,29 @@ class GoogleApiHttpBody(_messages.Message):
   extensions = _messages.MessageField('ExtensionsValueListEntry', 3, repeated=True)
 
 
+class GoogleCloudMlV1AblationAttribution(_messages.Message):
+  r"""Attributes credit to model inputs by ablating features (ie. setting them
+  to their default/missing values) and computing corresponding model score
+  delta per feature. The term "ablation" is in reference to running an
+  "ablation study" to analyze input effects on the outcome of interest, which
+  in this case is the model's output. This attribution method is supported for
+  Tensorflow and XGBoost models.
+
+  Fields:
+    numFeatureInteractions: Number of feature interactions to account for in
+      the ablation process, capped at the maximum number of provided input
+      features. Currently, only the value 1 is supported.
+  """
+
+  numFeatureInteractions = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
 class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
   r"""Represents a hardware accelerator request config. Note that the
-  AcceleratorConfig could be used in both Jobs and Versions.
+  AcceleratorConfig can be used in both Jobs and Versions. Learn more about
+  [accelerators for training](/ml-engine/docs/using-gpus) and [accelerators
+  for online prediction](/ml-engine/docs/machine-types-online-
+  prediction#gpus).
 
   Enums:
     TypeValueValuesEnum: The type of accelerator to use.
@@ -100,6 +120,8 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
       NVIDIA_TESLA_T4: Nvidia Tesla T4 GPU.
       TPU_V2: TPU v2.
       TPU_V3: TPU v3.
+      TPU_V2_POD: TPU v2 POD.
+      TPU_V3_POD: TPU v3 POD.
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
@@ -109,6 +131,8 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
     NVIDIA_TESLA_T4 = 5
     TPU_V2 = 6
     TPU_V3 = 7
+    TPU_V2_POD = 8
+    TPU_V3_POD = 9
 
   count = _messages.IntegerField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -129,15 +153,23 @@ class GoogleCloudMlV1AutoScaling(_messages.Message):
       service will automatically add nodes to handle the increased load as
       well as scale back as traffic drops, always maintaining at least
       `min_nodes`. You will be charged for the time in which additional nodes
-      are used.  If not specified, `min_nodes` defaults to 0, in which case,
-      when traffic to a model stops (and after a cool-down period), nodes will
-      be shut down and no charges will be incurred until traffic to the model
-      resumes.  You can set `min_nodes` when creating the model version, and
-      you can also update `min_nodes` for an existing version: <pre>
+      are used.  If `min_nodes` is not specified and AutoScaling is used with
+      a [legacy (MLS1) machine type](/ml-engine/docs/machine-types-online-
+      prediction), `min_nodes` defaults to 0, in which case, when traffic to a
+      model stops (and after a cool-down period), nodes will be shut down and
+      no charges will be incurred until traffic to the model resumes.  If
+      `min_nodes` is not specified and AutoScaling is used with a [Compute
+      Engine (N1) machine type](/ml-engine/docs/machine-types-online-
+      prediction), `min_nodes` defaults to 1. `min_nodes` must be at least 1
+      for use with a Compute Engine machine type.  Note that you cannot use
+      AutoScaling if your version uses
+      [GPUs](#Version.FIELDS.accelerator_config). Instead, you must use
+      ManualScaling.  You can set `min_nodes` when creating the model version,
+      and you can also update `min_nodes` for an existing version: <pre>
       update_body.json: {   'autoScaling': {     'minNodes': 5   } } </pre>
-      HTTP request: <pre> PATCH https://ml.googleapis.com/v1/{name=projects/*/
-      models/*/versions/*}?update_mask=autoScaling.minNodes -d
-      @./update_body.json </pre>
+      HTTP request: <pre style="max-width: 626px;"> PATCH https://ml.googleapi
+      s.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.m
+      inNodes -d @./update_body.json </pre>
   """
 
   minNodes = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -190,6 +222,8 @@ class GoogleCloudMlV1Capability(_messages.Message):
       NVIDIA_TESLA_T4: <no description>
       TPU_V2: <no description>
       TPU_V3: <no description>
+      TPU_V2_POD: <no description>
+      TPU_V3_POD: <no description>
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
@@ -199,6 +233,8 @@ class GoogleCloudMlV1Capability(_messages.Message):
     NVIDIA_TESLA_T4 = 5
     TPU_V2 = 6
     TPU_V3 = 7
+    TPU_V2_POD = 8
+    TPU_V3_POD = 9
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""TypeValueValuesEnum enum type.
@@ -228,22 +264,41 @@ class GoogleCloudMlV1Config(_messages.Message):
   tpuServiceAccount = _messages.StringField(1)
 
 
+class GoogleCloudMlV1ExplainRequest(_messages.Message):
+  r"""Request for explanations to be issued against a trained model.
+
+  Fields:
+    httpBody: Required. The explanation request body.
+  """
+
+  httpBody = _messages.MessageField('GoogleApiHttpBody', 1)
+
+
 class GoogleCloudMlV1ExplanationConfig(_messages.Message):
   r"""Message holding configuration options for explaining model predictions.
   Currently, the only supported mechanism to explain a model's prediction is
   through attributing its output back to its inputs which is essentially a
   credit assignment task. We support multiple attribution methods, some
-  specific to particular frameworks like Tensorflow and XGBoost. Next idx: 6.
+  specific to particular frameworks like Tensorflow and XGBoost. Next idx: 7.
 
   Fields:
+    ablationAttribution: Tensorflow framework explanation methods.
     integratedGradientsAttribution: A
       GoogleCloudMlV1IntegratedGradientsAttribution attribute.
+    saabasAttribution: A GoogleCloudMlV1SaabasAttribution attribute.
+    sampledShapleyAttribution: A GoogleCloudMlV1SampledShapleyAttribution
+      attribute.
     samplingShapAttribution: A GoogleCloudMlV1SamplingShapAttribution
       attribute.
+    treeShapAttribution: XGBoost Framework explanation methods.
   """
 
-  integratedGradientsAttribution = _messages.MessageField('GoogleCloudMlV1IntegratedGradientsAttribution', 1)
-  samplingShapAttribution = _messages.MessageField('GoogleCloudMlV1SamplingShapAttribution', 2)
+  ablationAttribution = _messages.MessageField('GoogleCloudMlV1AblationAttribution', 1)
+  integratedGradientsAttribution = _messages.MessageField('GoogleCloudMlV1IntegratedGradientsAttribution', 2)
+  saabasAttribution = _messages.MessageField('GoogleCloudMlV1SaabasAttribution', 3)
+  sampledShapleyAttribution = _messages.MessageField('GoogleCloudMlV1SampledShapleyAttribution', 4)
+  samplingShapAttribution = _messages.MessageField('GoogleCloudMlV1SamplingShapAttribution', 5)
+  treeShapAttribution = _messages.MessageField('GoogleCloudMlV1TreeShapAttribution', 6)
 
 
 class GoogleCloudMlV1ExplanationInput(_messages.Message):
@@ -903,6 +958,179 @@ class GoogleCloudMlV1Model(_messages.Message):
   regions = _messages.StringField(8, repeated=True)
 
 
+class GoogleCloudMlV1NasJobOutput(_messages.Message):
+  r"""The output of Neural Archhitecture Search (NAS) jobs.
+
+  Fields:
+    multiTrialJobOutputs: The output of a multi-trial Neural Architecture
+      Search (NAS) job.
+  """
+
+  multiTrialJobOutputs = _messages.MessageField('GoogleCloudMlV1NasJobOutputMultiTrialJobOutputs', 1)
+
+
+class GoogleCloudMlV1NasJobOutputMultiTrialJobOutput(_messages.Message):
+  r"""The output of Multi-trial Neural Architecture Search (NAS) jobs.
+
+  Enums:
+    StateValueValuesEnum: Output only. The detailed state of the trial.
+
+  Fields:
+    allMetrics: All objective metrics for this Neural Architecture Search
+      (NAS) job.
+    endTime: Output only. End time for the trial.
+    finalMetric: The final objective metric seen for this Neural Architecture
+      Search (NAS) job.
+    nasParamsStr: The parameters that are associated with this Neural
+      Architecture Search (NAS) job.
+    startTime: Output only. Start time for the trial.
+    state: Output only. The detailed state of the trial.
+    trialId: The trial id for these results.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The detailed state of the trial.
+
+    Values:
+      STATE_UNSPECIFIED: The job state is unspecified.
+      QUEUED: The job has been just created and processing has not yet begun.
+      PREPARING: The service is preparing to run the job.
+      RUNNING: The job is in progress.
+      SUCCEEDED: The job completed successfully.
+      FAILED: The job failed. `error_message` should contain the details of
+        the failure.
+      CANCELLING: The job is being cancelled. `error_message` should describe
+        the reason for the cancellation.
+      CANCELLED: The job has been cancelled. `error_message` should describe
+        the reason for the cancellation.
+    """
+    STATE_UNSPECIFIED = 0
+    QUEUED = 1
+    PREPARING = 2
+    RUNNING = 3
+    SUCCEEDED = 4
+    FAILED = 5
+    CANCELLING = 6
+    CANCELLED = 7
+
+  allMetrics = _messages.MessageField('GoogleCloudMlV1NasJobOutputMultiTrialJobOutputNasParameterMetric', 1, repeated=True)
+  endTime = _messages.StringField(2)
+  finalMetric = _messages.MessageField('GoogleCloudMlV1NasJobOutputMultiTrialJobOutputNasParameterMetric', 3)
+  nasParamsStr = _messages.StringField(4)
+  startTime = _messages.StringField(5)
+  state = _messages.EnumField('StateValueValuesEnum', 6)
+  trialId = _messages.StringField(7)
+
+
+class GoogleCloudMlV1NasJobOutputMultiTrialJobOutputNasParameterMetric(_messages.Message):
+  r"""An observed value of a metric of the trial.
+
+  Fields:
+    objectiveValue: The objective value at this training step.
+    trainingStep: The global training step for this metric.
+  """
+
+  objectiveValue = _messages.FloatField(1)
+  trainingStep = _messages.IntegerField(2)
+
+
+class GoogleCloudMlV1NasJobOutputMultiTrialJobOutputs(_messages.Message):
+  r"""The list of all MultiTrialJobOutput.
+
+  Fields:
+    multiTrialJobOutput: A GoogleCloudMlV1NasJobOutputMultiTrialJobOutput
+      attribute.
+  """
+
+  multiTrialJobOutput = _messages.MessageField('GoogleCloudMlV1NasJobOutputMultiTrialJobOutput', 1, repeated=True)
+
+
+class GoogleCloudMlV1NasSpec(_messages.Message):
+  r"""Spec for Neural Architecture Search (NAS) jobs.
+
+  Fields:
+    multiTrialAlgorithmSpec: The spec of multi-trial algorithms.
+    oneShotAlgorithmSpec: The spec of one-shot algorithms.
+    searchSpaceSpec: Required. It defines the search space for Neural
+      Architecture Search (NAS).
+  """
+
+  multiTrialAlgorithmSpec = _messages.MessageField('GoogleCloudMlV1NasSpecMultiTrialAlgorithmSpec', 1)
+  oneShotAlgorithmSpec = _messages.MessageField('GoogleCloudMlV1NasSpecOneShotAlgorithmSpec', 2)
+  searchSpaceSpec = _messages.StringField(3)
+
+
+class GoogleCloudMlV1NasSpecMultiTrialAlgorithmSpec(_messages.Message):
+  r"""The spec of multi-trial Neural Architecture Search (NAS).
+
+  Enums:
+    MultiTrialAlgorithmValueValuesEnum: Optional. The multi-trial Neural
+      Architecture Search (NAS) algorithm type. Defaults to
+      `NAS_MULTI_TRIAL_ALGORITHM_REINFORCEMENT_LEARNING`.
+
+  Fields:
+    maxFailedNasTrials: Optional. It decides when a Neural Architecture Search
+      (NAS) job should fail. Defaults to zero.
+    maxNasTrials: Optional. How many Neural Architecture Search (NAS) trials
+      should be attempted.
+    maxParallelNasTrials: Required. The number of Neural Architecture Search
+      (NAS) trials to run concurrently.
+    multiTrialAlgorithm: Optional. The multi-trial Neural Architecture Search
+      (NAS) algorithm type. Defaults to
+      `NAS_MULTI_TRIAL_ALGORITHM_REINFORCEMENT_LEARNING`.
+    nasTargetRewardMetric: Required. The TensorFlow summary tag that the
+      controller tries to optimize. Its value needs to be consistent with the
+      TensorFlow summary tag that is reported by trainer (customer provided
+      dockers).
+  """
+
+  class MultiTrialAlgorithmValueValuesEnum(_messages.Enum):
+    r"""Optional. The multi-trial Neural Architecture Search (NAS) algorithm
+    type. Defaults to `NAS_MULTI_TRIAL_ALGORITHM_REINFORCEMENT_LEARNING`.
+
+    Values:
+      MULTI_TRIAL_ALGORITHM_UNSPECIFIED: <no description>
+      REINFORCEMENT_LEARNING: The Reinforcement Learning Algorithm for Multi-
+        trial Neural Architecture Search (NAS).
+    """
+    MULTI_TRIAL_ALGORITHM_UNSPECIFIED = 0
+    REINFORCEMENT_LEARNING = 1
+
+  maxFailedNasTrials = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  maxNasTrials = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  maxParallelNasTrials = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  multiTrialAlgorithm = _messages.EnumField('MultiTrialAlgorithmValueValuesEnum', 4)
+  nasTargetRewardMetric = _messages.StringField(5)
+
+
+class GoogleCloudMlV1NasSpecOneShotAlgorithmSpec(_messages.Message):
+  r"""The spec of one shot Neural Architecture Search (NAS).
+
+  Enums:
+    OneShotAlgorithmValueValuesEnum: Optional. The one-shot Neural
+      Architecture Search (NAS) algorithm type. Defaults to
+      `ONE_SHOT_ALGORITHM_REINFORCEMENT_LEARNING`.
+
+  Fields:
+    oneShotAlgorithm: Optional. The one-shot Neural Architecture Search (NAS)
+      algorithm type. Defaults to `ONE_SHOT_ALGORITHM_REINFORCEMENT_LEARNING`.
+  """
+
+  class OneShotAlgorithmValueValuesEnum(_messages.Enum):
+    r"""Optional. The one-shot Neural Architecture Search (NAS) algorithm
+    type. Defaults to `ONE_SHOT_ALGORITHM_REINFORCEMENT_LEARNING`.
+
+    Values:
+      ONE_SHOT_ALGORITHM_UNSPECIFIED: <no description>
+      REINFORCEMENT_LEARNING: The Reinforcement Learning Algorithm for one-
+        shot Neural Architecture Search (NAS).
+    """
+    ONE_SHOT_ALGORITHM_UNSPECIFIED = 0
+    REINFORCEMENT_LEARNING = 1
+
+  oneShotAlgorithm = _messages.EnumField('OneShotAlgorithmValueValuesEnum', 1)
+
+
 class GoogleCloudMlV1OperationMetadata(_messages.Message):
   r"""Represents the metadata of the long-running operation.
 
@@ -1314,7 +1542,16 @@ class GoogleCloudMlV1RequestLoggingConfig(_messages.Message):
   samplingPercentage = _messages.FloatField(2)
 
 
-class GoogleCloudMlV1SamplingShapAttribution(_messages.Message):
+class GoogleCloudMlV1SaabasAttribution(_messages.Message):
+  r"""Attributes credit by running a faster aproximation to the TreeShap
+  method. Please refer to this link for more details:
+  https://blog.datadive.net/interpreting-random-forests/ This attribution
+  method is only supported for XGBoost models.
+  """
+
+
+
+class GoogleCloudMlV1SampledShapleyAttribution(_messages.Message):
   r"""An attribution method that approximates Shapley values for features that
   contribute to the label being predicted. A sampling strategy is used to
   approximate the value rather than considering all subsets of features.
@@ -1322,6 +1559,16 @@ class GoogleCloudMlV1SamplingShapAttribution(_messages.Message):
   Fields:
     numPaths: The number of feature permutations to consider when
       approximating the shapley values.
+  """
+
+  numPaths = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudMlV1SamplingShapAttribution(_messages.Message):
+  r"""DEPRECATED - use SampledShapleyAttribution.
+
+  Fields:
+    numPaths: A integer attribute.
   """
 
   numPaths = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1360,51 +1607,27 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       about [configuring custom containers](/ml-engine/docs/distributed-
       training-containers).
     masterType: Optional. Specifies the type of virtual machine to use for
-      your training job's master worker.  The following types are supported:
-      <dl>   <dt>standard</dt>   <dd>   A basic machine configuration suitable
-      for training simple models with   small to moderate datasets.   </dd>
-      <dt>large_model</dt>   <dd>   A machine with a lot of memory, specially
-      suited for parameter servers   when your model is large (having many
-      hidden layers or layers with very   large numbers of nodes).   </dd>
-      <dt>complex_model_s</dt>   <dd>   A machine suitable for the master and
-      workers of the cluster when your   model requires more computation than
-      the standard machine can handle   satisfactorily.   </dd>
-      <dt>complex_model_m</dt>   <dd>   A machine with roughly twice the
-      number of cores and roughly double the   memory of
-      <i>complex_model_s</i>.   </dd>   <dt>complex_model_l</dt>   <dd>   A
-      machine with roughly twice the number of cores and roughly double the
-      memory of <i>complex_model_m</i>.   </dd>   <dt>standard_gpu</dt>   <dd>
-      A machine equivalent to <i>standard</i> that   also includes a single
-      NVIDIA Tesla K80 GPU. See more about   <a href="/ml-
-      engine/docs/tensorflow/using-gpus">using GPUs to   train your model</a>.
-      </dd>   <dt>complex_model_m_gpu</dt>   <dd>   A machine equivalent to
-      <i>complex_model_m</i> that also includes   four NVIDIA Tesla K80 GPUs.
-      </dd>   <dt>complex_model_l_gpu</dt>   <dd>   A machine equivalent to
-      <i>complex_model_l</i> that also includes   eight NVIDIA Tesla K80 GPUs.
-      </dd>   <dt>standard_p100</dt>   <dd>   A machine equivalent to
-      <i>standard</i> that   also includes a single NVIDIA Tesla P100 GPU.
-      </dd>   <dt>complex_model_m_p100</dt>   <dd>   A machine equivalent to
-      <i>complex_model_m</i> that also includes   four NVIDIA Tesla P100 GPUs.
-      </dd>   <dt>standard_v100</dt>   <dd>   A machine equivalent to
-      <i>standard</i> that   also includes a single NVIDIA Tesla V100 GPU.
-      </dd>   <dt>large_model_v100</dt>   <dd>   A machine equivalent to
-      <i>large_model</i> that   also includes a single NVIDIA Tesla V100 GPU.
-      </dd>   <dt>complex_model_m_v100</dt>   <dd>   A machine equivalent to
-      <i>complex_model_m</i> that   also includes four NVIDIA Tesla V100 GPUs.
-      </dd>   <dt>complex_model_l_v100</dt>   <dd>   A machine equivalent to
-      <i>complex_model_l</i> that   also includes eight NVIDIA Tesla V100
-      GPUs.   </dd>   <dt>cloud_tpu</dt>   <dd>   A TPU VM including one Cloud
-      TPU. See more about   <a href="/ml-engine/docs/tensorflow/using-
-      tpus">using TPUs to train   your model</a>.   </dd> </dl>  You may also
-      use certain Compute Engine machine types directly in this field. The
-      following types are supported:  - `n1-standard-4` - `n1-standard-8` -
-      `n1-standard-16` - `n1-standard-32` - `n1-standard-64` -
-      `n1-standard-96` - `n1-highmem-2` - `n1-highmem-4` - `n1-highmem-8` -
-      `n1-highmem-16` - `n1-highmem-32` - `n1-highmem-64` - `n1-highmem-96` -
-      `n1-highcpu-16` - `n1-highcpu-32` - `n1-highcpu-64` - `n1-highcpu-96`
-      See more about [using Compute Engine machine types](/ml-
-      engine/docs/tensorflow/machine-types#compute-engine-machine-types).  You
-      must set this value when `scaleTier` is set to `CUSTOM`.
+      your training job's master worker. You must specify this field when
+      `scaleTier` is set to `CUSTOM`.  You can use certain Compute Engine
+      machine types directly in this field. The following types are supported:
+      - `n1-standard-4` - `n1-standard-8` - `n1-standard-16` -
+      `n1-standard-32` - `n1-standard-64` - `n1-standard-96` - `n1-highmem-2`
+      - `n1-highmem-4` - `n1-highmem-8` - `n1-highmem-16` - `n1-highmem-32` -
+      `n1-highmem-64` - `n1-highmem-96` - `n1-highcpu-16` - `n1-highcpu-32` -
+      `n1-highcpu-64` - `n1-highcpu-96`  Learn more about [using Compute
+      Engine machine types](/ml-engine/docs/machine-types#compute-engine-
+      machine-types).  Alternatively, you can use the following legacy machine
+      types:  - `standard` - `large_model` - `complex_model_s` -
+      `complex_model_m` - `complex_model_l` - `standard_gpu` -
+      `complex_model_m_gpu` - `complex_model_l_gpu` - `standard_p100` -
+      `complex_model_m_p100` - `standard_v100` - `large_model_v100` -
+      `complex_model_m_v100` - `complex_model_l_v100`  Learn more about [using
+      legacy machine types](/ml-engine/docs/machine-types#legacy-machine-
+      types).  Finally, if you want to use a TPU for training, specify
+      `cloud_tpu` in this field. Learn more about the [special configuration
+      options for training with TPUs](/ml-engine/docs/tensorflow/using-
+      tpus#configuring_a_custom_tpu_machine).
+    nasJobSpec: Optional. The spec of a Neural Architecture Search (NAS) job.
     packageUris: Required. The Google Cloud Storage location of the packages
       with the training program and any additional dependencies. The maximum
       number of package URIs is 100.
@@ -1427,8 +1650,8 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       use for your training job's parameter server.  The supported values are
       the same as those described in the entry for `master_type`.  This value
       must be consistent with the category of machine type that `masterType`
-      uses. In other words, both must be AI Platform machine types or both
-      must be Compute Engine machine types.  This value must be present when
+      uses. In other words, both must be Compute Engine machine types or both
+      must be legacy machine types.  This value must be present when
       `scaleTier` is set to `CUSTOM` and `parameter_server_count` is greater
       than zero.
     pythonModule: Required. The Python module name to run after installing the
@@ -1448,6 +1671,9 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       engine/docs/versioning">how to manage runtime versions</a>.
     scaleTier: Required. Specifies the machine types, the number of replicas
       for workers and parameter servers.
+    useChiefInTfConfig: Optional. Use 'chief' instead of 'master' in TF_CONFIG
+      when Custom Container is used and evaluator is not specified.  Defaults
+      to false.
     workerConfig: Optional. The configuration for workers.  You should only
       set `workerConfig.acceleratorConfig` if `workerType` is set to a Compute
       Engine machine type. [Learn about restrictions on accelerator
@@ -1466,9 +1692,9 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       your training job's worker nodes.  The supported values are the same as
       those described in the entry for `masterType`.  This value must be
       consistent with the category of machine type that `masterType` uses. In
-      other words, both must be AI Platform machine types or both must be
-      Compute Engine machine types.  If you use `cloud_tpu` for this value,
-      see special instructions for [configuring a custom TPU machine](/ml-
+      other words, both must be Compute Engine machine types or both must be
+      legacy machine types.  If you use `cloud_tpu` for this value, see
+      special instructions for [configuring a custom TPU machine](/ml-
       engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine).
       This value must be present when `scaleTier` is set to `CUSTOM` and
       `workerCount` is greater than zero.
@@ -1518,18 +1744,20 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
   jobDir = _messages.StringField(3)
   masterConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 4)
   masterType = _messages.StringField(5)
-  packageUris = _messages.StringField(6, repeated=True)
-  parameterServerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 7)
-  parameterServerCount = _messages.IntegerField(8)
-  parameterServerType = _messages.StringField(9)
-  pythonModule = _messages.StringField(10)
-  pythonVersion = _messages.StringField(11)
-  region = _messages.StringField(12)
-  runtimeVersion = _messages.StringField(13)
-  scaleTier = _messages.EnumField('ScaleTierValueValuesEnum', 14)
-  workerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 15)
-  workerCount = _messages.IntegerField(16)
-  workerType = _messages.StringField(17)
+  nasJobSpec = _messages.MessageField('GoogleCloudMlV1NasSpec', 6)
+  packageUris = _messages.StringField(7, repeated=True)
+  parameterServerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 8)
+  parameterServerCount = _messages.IntegerField(9)
+  parameterServerType = _messages.StringField(10)
+  pythonModule = _messages.StringField(11)
+  pythonVersion = _messages.StringField(12)
+  region = _messages.StringField(13)
+  runtimeVersion = _messages.StringField(14)
+  scaleTier = _messages.EnumField('ScaleTierValueValuesEnum', 15)
+  useChiefInTfConfig = _messages.BooleanField(16)
+  workerConfig = _messages.MessageField('GoogleCloudMlV1ReplicaConfig', 17)
+  workerCount = _messages.IntegerField(18)
+  workerType = _messages.StringField(19)
 
 
 class GoogleCloudMlV1TrainingOutput(_messages.Message):
@@ -1548,6 +1776,7 @@ class GoogleCloudMlV1TrainingOutput(_messages.Message):
     isBuiltInAlgorithmJob: Whether this job is a built-in Algorithm job.
     isHyperparameterTuningJob: Whether this job is a hyperparameter tuning
       job.
+    nasJobOutput: The output of a Neural Architecture Search (NAS) job.
     trials: Results for individual Hyperparameter trials. Only set for
       hyperparameter tuning jobs.
   """
@@ -1558,7 +1787,17 @@ class GoogleCloudMlV1TrainingOutput(_messages.Message):
   hyperparameterMetricTag = _messages.StringField(4)
   isBuiltInAlgorithmJob = _messages.BooleanField(5)
   isHyperparameterTuningJob = _messages.BooleanField(6)
-  trials = _messages.MessageField('GoogleCloudMlV1HyperparameterOutput', 7, repeated=True)
+  nasJobOutput = _messages.MessageField('GoogleCloudMlV1NasJobOutput', 7)
+  trials = _messages.MessageField('GoogleCloudMlV1HyperparameterOutput', 8, repeated=True)
+
+
+class GoogleCloudMlV1TreeShapAttribution(_messages.Message):
+  r"""Attributes credit by computing the Shapley value taking advantage of the
+  model's tree ensemble structure. Refer to this paper for more details:
+  http://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-model-
+  predictions.pdf. This attribution method is supported for XGBoost models.
+  """
+
 
 
 class GoogleCloudMlV1Version(_messages.Message):
@@ -1576,7 +1815,10 @@ class GoogleCloudMlV1Version(_messages.Message):
       determine a framework. If you choose `SCIKIT_LEARN` or `XGBOOST`, you
       must also set the runtime version of the model to 1.4 or greater.  Do
       **not** specify a framework if you're deploying a [custom prediction
-      routine](/ml-engine/docs/tensorflow/custom-prediction-routines).
+      routine](/ml-engine/docs/tensorflow/custom-prediction-routines).  If you
+      specify a [Compute Engine (N1) machine type](/ml-engine/docs/machine-
+      types-online-prediction) in the `machineType` field, you must specify
+      `TENSORFLOW` for the framework.
     StateValueValuesEnum: Output only. The state of a version.
 
   Messages:
@@ -1587,11 +1829,18 @@ class GoogleCloudMlV1Version(_messages.Message):
       engine/docs/tensorflow/resource-labels">using labels</a>.
 
   Fields:
-    acceleratorConfig: Accelerator config for GPU serving.
+    acceleratorConfig: Optional. Accelerator config for using GPUs for online
+      prediction (beta). Only specify this field if you have specified a
+      Compute Engine (N1) machine type in the `machineType` field. Learn more
+      about [using GPUs for online prediction](/ml-engine/docs/machine-types-
+      online-prediction#gpus).
     autoScaling: Automatically scale the number of nodes used to serve the
       model in response to increases and decreases in traffic. Care should be
       taken to ramp up traffic according to the model's ability to scale or
-      you will start seeing increases in latency and 429 response codes.
+      you will start seeing increases in latency and 429 response codes.  Note
+      that you cannot use AutoScaling if your version uses
+      [GPUs](#Version.FIELDS.accelerator_config). Instead, you must use
+      specify `manual_scaling`.
     createTime: Output only. The time the version was created.
     deploymentUri: Required. The Cloud Storage location of the trained model
       used to create the version. See the [guide to model deployment](/ml-
@@ -1622,7 +1871,10 @@ class GoogleCloudMlV1Version(_messages.Message):
       framework. If you choose `SCIKIT_LEARN` or `XGBOOST`, you must also set
       the runtime version of the model to 1.4 or greater.  Do **not** specify
       a framework if you're deploying a [custom prediction routine](/ml-
-      engine/docs/tensorflow/custom-prediction-routines).
+      engine/docs/tensorflow/custom-prediction-routines).  If you specify a
+      [Compute Engine (N1) machine type](/ml-engine/docs/machine-types-online-
+      prediction) in the `machineType` field, you must specify `TENSORFLOW`
+      for the framework.
     imageUri: Optional. The docker image to run for custom serving container.
       This image must be in Google Container Registry.
     isDefault: Output only. If true, this version will be used to handle
@@ -1637,12 +1889,16 @@ class GoogleCloudMlV1Version(_messages.Message):
     lastUseTime: Output only. The time the version was last used for
       prediction.
     machineType: Optional. The type of machine on which to serve the model.
-      Currently only applies to online prediction service. <dl>
-      <dt>mls1-c1-m2</dt>   <dd>   The <b>default</b> machine type, with 1
-      core and 2 GB RAM. The deprecated   name for this machine type is
-      "mls1-highmem-1".   </dd>   <dt>mls1-c4-m2</dt>   <dd>   In <b>Beta</b>.
-      This machine type has 4 cores and 2 GB RAM. The   deprecated name for
-      this machine type is "mls1-highcpu-4".   </dd> </dl>
+      Currently only applies to online prediction service. If this field is
+      not specified, it defaults to `mls1-c1-m2`.  Online prediction supports
+      the following machine types:  * `mls1-c1-m2` * `mls1-c4-m2` *
+      `n1-standard-2` * `n1-standard-4` * `n1-standard-8` * `n1-standard-16` *
+      `n1-standard-32` * `n1-highmem-2` * `n1-highmem-4` * `n1-highmem-8` *
+      `n1-highmem-16` * `n1-highmem-32` * `n1-highcpu-2` * `n1-highcpu-4` *
+      `n1-highcpu-8` * `n1-highcpu-16` * `n1-highcpu-32`  `mls1-c1-m2` is
+      generally available. All other machine types are available in beta.
+      Learn more about the [differences between machine types](/ml-engine/docs
+      /machine-types-online-prediction).
     manualScaling: Manually select the number of nodes to use for serving the
       model. You should generally use `auto_scaling` with an appropriate
       `min_nodes` instead, but this option is available if you want more
@@ -1672,8 +1928,10 @@ class GoogleCloudMlV1Version(_messages.Message):
       Specify this field if and only if you are deploying a [custom prediction
       routine (beta)](/ml-engine/docs/tensorflow/custom-prediction-routines).
       If you specify this field, you must set
-      [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater.
-      The following code sample provides the Predictor interface:  ```py class
+      [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater
+      and you must set `machineType` to a [legacy (MLS1) machine type](/ml-
+      engine/docs/machine-types-online-prediction).  The following code sample
+      provides the Predictor interface:  <pre style="max-width: 626px;"> class
       Predictor(object): " " "Interface for constructing custom predictors." "
       "  def predict(self, instances, **kwargs):     " " "Performs custom
       prediction.      Instances are the decoded values from the request. They
@@ -1689,9 +1947,9 @@ class GoogleCloudMlV1Version(_messages.Message):
       contains the exported model             file along with any additional
       files uploaded when creating the             version resource.
       Returns:         An instance implementing this Predictor class.     " "
-      "     raise NotImplementedError() ```  Learn more about [the Predictor
-      interface and custom prediction routines](/ml-engine/docs/tensorflow
-      /custom-prediction-routines).
+      "     raise NotImplementedError() </pre>  Learn more about [the
+      Predictor interface and custom prediction routines](/ml-
+      engine/docs/tensorflow/custom-prediction-routines).
     pythonVersion: Optional. The version of Python used in prediction. If not
       set, the default version is '2.7'. Python '3.5' is available when
       `runtime_version` is set to '1.4' and above. Python '2.7' works with all
@@ -1716,7 +1974,9 @@ class GoogleCloudMlV1Version(_messages.Message):
     `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version of the
     model to 1.4 or greater.  Do **not** specify a framework if you're
     deploying a [custom prediction routine](/ml-engine/docs/tensorflow/custom-
-    prediction-routines).
+    prediction-routines).  If you specify a [Compute Engine (N1) machine type
+    ](/ml-engine/docs/machine-types-online-prediction) in the `machineType`
+    field, you must specify `TENSORFLOW` for the framework.
 
     Values:
       FRAMEWORK_UNSPECIFIED: Unspecified framework. Assigns a value based on
@@ -1895,9 +2155,26 @@ class GoogleIamV1Binding(_messages.Message):
       `alice@example.com` .   * `serviceAccount:{emailid}`: An email address
       that represents a service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
-      that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: The G Suite domain (primary) that represents all
-      the    users of that domain. For example, `google.com` or `example.com`.
+      that represents a Google group.    For example, `admins@example.com`.  *
+      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+      identifier) representing a user that has been recently deleted. For
+      example,`alice@example.com?uid=123456789012345678901`. If the user is
+      recovered, this value reverts to `user:{emailid}` and the recovered user
+      retains the role in the binding.  *
+      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
+      (plus    unique identifier) representing a service account that has been
+      recently    deleted. For example,    `my-other-
+      app@appspot.gserviceaccount.com?uid=123456789012345678901`.    If the
+      service account is undeleted, this value reverts to
+      `serviceAccount:{emailid}` and the undeleted service account retains the
+      role in the binding.  * `deleted:group:{emailid}?uid={uniqueid}`: An
+      email address (plus unique    identifier) representing a Google group
+      that has been recently    deleted. For example,
+      `admins@example.com?uid=123456789012345678901`. If    the group is
+      recovered, this value reverts to `group:{emailid}` and the    recovered
+      group retains the role in the binding.   * `domain:{domain}`: The G
+      Suite domain (primary) that represents all the    users of that domain.
+      For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -2216,6 +2493,20 @@ class GoogleTypeExpr(_messages.Message):
   expression = _messages.StringField(2)
   location = _messages.StringField(3)
   title = _messages.StringField(4)
+
+
+class MlProjectsExplainRequest(_messages.Message):
+  r"""A MlProjectsExplainRequest object.
+
+  Fields:
+    googleCloudMlV1ExplainRequest: A GoogleCloudMlV1ExplainRequest resource to
+      be passed as the request body.
+    name: Required. The resource name of a model or a version.  Authorization:
+      requires the `predict` permission on the specified resource.
+  """
+
+  googleCloudMlV1ExplainRequest = _messages.MessageField('GoogleCloudMlV1ExplainRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class MlProjectsGetConfigRequest(_messages.Message):
@@ -2589,9 +2880,11 @@ class MlProjectsModelsVersionsPatchRequest(_messages.Message):
       field to update. Must be present and non-empty.  For example, to change
       the description of a version to "foo", the `update_mask` parameter would
       be specified as `description`, and the `PATCH` request body would
-      specify the new value, as follows:     {       "description": "foo"
-      }  Currently the only supported update mask fields are `description` and
-      `autoScaling.minNodes`.
+      specify the new value, as follows:  ``` {   "description": "foo" } ```
+      Currently the only supported update mask fields are `description`,
+      `autoScaling.minNodes`, and `manualScaling.nodes`. However, you can only
+      update `manualScaling.nodes` if the version uses a [Compute Engine (N1)
+      machine type](/ml-engine/docs/machine-types-online-prediction).
   """
 
   googleCloudMlV1Version = _messages.MessageField('GoogleCloudMlV1Version', 1)

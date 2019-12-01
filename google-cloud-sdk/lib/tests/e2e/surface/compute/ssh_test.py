@@ -23,6 +23,7 @@ import os
 
 from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -66,6 +67,7 @@ class SSHTest(e2e_instances_test_base.InstancesTestBase):
     self._TestUpdateMetadata()
     self._TestSSHCommandIapTunnel()
 
+  @test_case.Filters.skipAlways('Timing out', 'b/144084650')
   def testSSHHostKeyPublishing(self):
     self._TestInstanceCreation(metadata={'enable-guest-attributes': 'true'})
     self._TestSSHCommandStrictHostKeyChecking()

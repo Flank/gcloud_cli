@@ -7,14 +7,14 @@ summary:
 - set_property: run/platform gke
 - execute:
   - command: run deploy aacrhello --image gcr.io/knative-samples/helloworld-nodejs
+      --no-traffic
   - stderr: |
       Deploying container to Cloud Run on GKE service [aacrhello] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
   - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
   - stderr: |
-      Service [aacrhello] revision [$$service-revision-name-2$$] has been deployed and is serving 100 percent of traffic at aacrhello.default.svc.cluster.local
-# This summary is generated automatically on update and should not be edited.
+      Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed
 actions:
 - set_property:
     # container/use_client_certificate: true
@@ -24,7 +24,8 @@ actions:
     run/platform: gke
 
 - execute_command:
-    command: run deploy aacrhello --image gcr.io/knative-samples/helloworld-nodejs --no-traffic
+    command: run deploy aacrhello --image gcr.io/knative-samples/helloworld-nodejs
+      --no-traffic
     events:
     - api_call:
         expect_request:
@@ -150,6 +151,8 @@ actions:
             spec:
               template:
                 metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
@@ -229,6 +232,8 @@ actions:
             spec:
               template:
                 metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
@@ -345,6 +350,8 @@ actions:
             spec:
               template:
                 metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
@@ -422,6 +429,8 @@ actions:
             spec:
               template:
                 metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
@@ -500,6 +509,8 @@ actions:
             spec:
               template:
                 metadata:
+                  annotations:
+                    run.googleapis.com/client-name: gcloud
                   creationTimestamp: '2019-07-23T18:13:29Z'
                   labels:
                     client.knative.dev/nonce: dmwqrjmbba
@@ -548,7 +559,7 @@ actions:
           body:
             json: {}
     - expect_stderr: |
-        Service [aacrhello] revision [aacrhello-rev03] has been deployed
+        Service [aacrhello] revision [$$service-revision-name-3$$] has been deployed
 
 
     - expect_exit:

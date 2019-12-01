@@ -30,11 +30,12 @@ class AutoscalingPoliciesDescribeUnitTest(unit_base.DataprocUnitTestBase):
     self.track = calliope_base.ReleaseTrack.GA
 
   def testDescribeAutoscalingPolicies(self):
-    mocked_response = self.MakeAutoscalingPolicy('fake-project', 'global',
+    mocked_response = self.MakeAutoscalingPolicy('fake-project',
+                                                 'antarctica-north42',
                                                  'policy-1')
     self.mock_client.projects_regions_autoscalingPolicies.Get.Expect(
         self.messages.DataprocProjectsRegionsAutoscalingPoliciesGetRequest(
-            name='projects/fake-project/regions/global/autoscalingPolicies/policy-1'
+            name='projects/fake-project/regions/antarctica-north42/autoscalingPolicies/policy-1'
         ),
         response=mocked_response)
 
@@ -51,7 +52,8 @@ class AutoscalingPoliciesDescribeUnitTest(unit_base.DataprocUnitTestBase):
         response=mocked_response)
 
     result = self.RunDataproc(
-        'autoscaling-policies describe policy-1 --region cool-region')
+        'autoscaling-policies describe policy-1 --region cool-region',
+        set_region=False)
     self.AssertMessagesEqual(result, mocked_response)
 
   def testDescribeAutoscalingPolicies_uri(self):
@@ -65,8 +67,8 @@ class AutoscalingPoliciesDescribeUnitTest(unit_base.DataprocUnitTestBase):
 
     # Overrides default project and default region
     result = self.RunDataproc(
-        'autoscaling-policies describe projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1'
-    )
+        'autoscaling-policies describe projects/cool-project/regions/cool-region/autoscalingPolicies/policy-1',
+        set_region=False)
     self.AssertMessagesEqual(result, mocked_response)
 
 

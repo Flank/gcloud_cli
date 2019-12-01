@@ -45,9 +45,7 @@ class List(base.ListCommand):
   def CommonArgs(parser):
     # Flags specific to managed CR
     managed_group = flags.GetManagedArgGroup(parser)
-    concept_parsers.ConceptParser([
-        resource_args.CLOUD_RUN_LOCATION_PRESENTATION
-    ]).AddToParser(managed_group)
+    flags.AddRegionArg(managed_group)
     # Flags specific to CRoGKE
     gke_group = flags.GetGkeArgGroup(parser)
     concept_parsers.ConceptParser(
@@ -58,7 +56,7 @@ class List(base.ListCommand):
     # Flags not specific to any platform
     flags.AddPlatformArg(parser)
     parser.display_info.AddFormat("""table(
-        source_name:label=CATEGORY:sort=1)""")
+        source_kind:label=CATEGORY:sort=1)""")
 
   @staticmethod
   def Args(parser):

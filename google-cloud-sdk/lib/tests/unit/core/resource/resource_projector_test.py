@@ -1386,11 +1386,12 @@ class ResourceProjectorAttrTest(test_case.Base):
     buf = io.StringIO()
     projector.Projection().Print(buf)
     actual = buf.getvalue()
-    self.assertEqual("""\
+    self.assertEqual(
+        """\
    a : (2, 1, 'Time', right, None, False, None)
    b : (1, UNORDERED, None, left, None, None, None)
-     x : (2, 3, 'B_X', left, None, False, None)
-   x : (2, 5, 'X', center, None, False, None)
+     x : (2, 1, 'B_X', left, None, False, None)
+   x : (2, 3, 'X', center, None, False, None)
    y : (2, UNORDERED, 'Y', right, None, False, None)
    z : (2, 2, 'ZZZ', left, None, False, None)
 """, actual)

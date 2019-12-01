@@ -42,11 +42,11 @@ class _FakeTrafficTarget(object):
     self.percent = percent
 
 
-class ServerlessDeployTestBeta(base.ServerlessSurfaceBase,
-                               parameterized.TestCase):
+class ServerlessDeployTest(base.ServerlessSurfaceBase,
+                           parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.StartObjectPatch(os.path, 'isdir', return_value=True)
@@ -208,14 +208,11 @@ class ServerlessDeployTestBeta(base.ServerlessSurfaceBase,
 
     self.Run('run deploy my-service --image=gcr.io/thing/stuff '
              '--region se-arboga --function tsp_in_constant_time '
-             '--update-env-vars=k1=v1 --concurrency OneTrillion ')
+             '--update-env-vars=k1=v1 --concurrency 2000')
     positional, _ = self.operations.ReleaseService.call_args
     mutators = positional[1]
     self.assertIn(self.app, mutators)
     self.assertIn(self.env_changes, mutators)
-    self.assertTrue(any(
-        isinstance(x, config_changes.ConcurrencyChanges)
-        and x._concurrency == 'OneTrillion' for x in mutators))
 
   @parameterized.named_parameters(
       ('private', '--connectivity=internal'),
@@ -291,6 +288,12 @@ class ServerlessDeployTestBeta(base.ServerlessSurfaceBase,
         asyn=False, allow_unauthenticated=None)
     self.AssertErrContains(
         'Allow unauthenticated invocations to [image]')
+
+
+class ServerlessDeployTestBeta(ServerlessDeployTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ServerlessDeployTestAlpha(ServerlessDeployTestBeta):

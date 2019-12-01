@@ -311,10 +311,8 @@ class CounterOptions(_messages.Message):
   representation of IAMContext.principal even if a      token or authority
   selector is present; or    - "" (empty string), resulting in a counter with
   no fields.  Examples:   counter { metric: "/debug_access_count"  field:
-  "iam_principal" }   ==> increment counter
-  /iam/policy/backend_debug_access_count
-  {iam_principal=[value of IAMContext.principal]}  At this time we do not
-  support multiple field names (though this may be supported in the future).
+  "iam_principal" }   ==> increment counter /iam/policy/debug_access_count
+  {iam_principal=[value of IAMContext.principal]}
 
   Fields:
     customFields: Custom fields.
@@ -1263,15 +1261,18 @@ class ManagedidentitiesProjectsLocationsListRequest(_messages.Message):
 
   Fields:
     filter: The standard list filter.
+    includeUnrevealedLocations: If true, the returned list will include
+      locations which are not yet revealed.
     name: The resource that owns the locations collection, if applicable.
     pageSize: The standard list page size.
     pageToken: The standard list page token.
   """
 
   filter = _messages.StringField(1)
-  name = _messages.StringField(2, required=True)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
+  includeUnrevealedLocations = _messages.BooleanField(2)
+  name = _messages.StringField(3, required=True)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
 
 
 class NodeSloMetadata(_messages.Message):
@@ -1655,6 +1656,22 @@ class SetIamPolicyRequest(_messages.Message):
   updateMask = _messages.StringField(2)
 
 
+class SloEligibility(_messages.Message):
+  r"""SloEligibility is a tuple containing eligibility value: true if an
+  instance is eligible for SLO calculation or false if it should be excluded
+  from all SLO-related calculations along with a user-defined reason.
+
+  Fields:
+    eligible: Whether an instance is eligible or ineligible.
+    reason: User-defined reason for the current value of instance eligibility.
+      Usually, this can be directly mapped to the internal state. An empty
+      reason is allowed.
+  """
+
+  eligible = _messages.BooleanField(1)
+  reason = _messages.StringField(2)
+
+
 class SloExclusion(_messages.Message):
   r"""SloExclusion represents an excusion in SLI calculation applies to all
   SLOs.
@@ -1689,6 +1706,7 @@ class SloMetadata(_messages.Message):
   the instance.
 
   Fields:
+    eligibility: Optional: user-defined instance eligibility.
     exclusions: List of SLO exclusion windows. When multiple entries in the
       list match (matching the exclusion time-window against current time
       point) the exclusion reason used in the first matching entry will be
@@ -1698,8 +1716,8 @@ class SloMetadata(_messages.Message):
       will be reflected in the historically produced timeseries regardless of
       the current state).  This field can be used to mark the instance as
       temporary ineligible for the purpose of SLO calculation. For permanent
-      instance SLO exclusion, a dedicated tier name can be used that does not
-      have targets specified in the service SLO configuration.
+      instance SLO exclusion, use of custom instance eligibility is
+      recommended. See 'eligibility' field below.
     nodes: Optional: list of nodes. Some producers need to use per-node
       metadata to calculate SLO. This field allows such producers to publish
       per-node SLO meta data, which will be consumed by SSA Eligibility
@@ -1709,9 +1727,10 @@ class SloMetadata(_messages.Message):
       Field is mandatory and must not be empty.
   """
 
-  exclusions = _messages.MessageField('SloExclusion', 1, repeated=True)
-  nodes = _messages.MessageField('NodeSloMetadata', 2, repeated=True)
-  tier = _messages.StringField(3)
+  eligibility = _messages.MessageField('SloEligibility', 1)
+  exclusions = _messages.MessageField('SloExclusion', 2, repeated=True)
+  nodes = _messages.MessageField('NodeSloMetadata', 3, repeated=True)
+  tier = _messages.StringField(4)
 
 
 class StandardQueryParameters(_messages.Message):

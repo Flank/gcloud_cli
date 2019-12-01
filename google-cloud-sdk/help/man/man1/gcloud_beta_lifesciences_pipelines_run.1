@@ -1,0 +1,243 @@
+
+.TH "GCLOUD_BETA_LIFESCIENCES_PIPELINES_RUN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta lifesciences pipelines run \- defines and runs a pipeline
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta lifesciences pipelines run\fR (\fB\-\-command\-line\fR=\fICOMMAND_LINE\fR\ |\ \fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR) [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR;\ default="google/cloud\-sdk:slim"] [\fB\-\-env\-vars\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]] [\fB\-\-logging\fR=\fILOGGING\fR] [\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-preemptible\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-1"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR;\ default="default"] [\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR A pipeline is a transformation of a set of inputs to a set of
+outputs. Supports Docker\-based commands.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-command\-line\fR=\fICOMMAND_LINE\fR
+Command line to run with /bin/sh in the specified Docker image. Cannot be used
+with \-\-pipeline\-file.
+
+.TP 2m
+\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR
+A YAML or JSON file containing a Pipeline object. See
+https://cloud.google.com/life\-sciences/reference/rest/v2beta/workflows#Pipeline
+
+
+.RE
+.RE
+.sp
+
+.SH "COMMONLY USED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
+The disk size(s) in GB, specified as a comma\-separated list of pairs of disk
+name and size. For example: \-\-disk\-size "name:size,name2:size2". Overrides
+any values specified in the pipeline\-file.
+
+.TP 2m
+\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR; default="google/cloud\-sdk:slim"
+A Docker image to run. Requires \-\-command\-line to be specified and cannot be
+used with \-\-pipeline\-file.
+
+.TP 2m
+\fB\-\-env\-vars\fR=[\fINAME\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables.
+
+.TP 2m
+\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]
+Map of input PipelineParameter names to values. Used to pass literal parameters
+to the pipeline, and to specify input files in Google Cloud Storage that will
+have a localCopy made. Specified as a comma\-separated list: \-\-inputs
+file=gs://my\-bucket/in.txt,name=hello
+
+.TP 2m
+\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]
+Map of input PipelineParameter names to values. Used to pass literal parameters
+to the pipeline where values come from local files; this can be used to send
+large pipeline input parameters, such as code, data, or configuration values.
+Specified as a comma\-separated list: \-\-inputs\-from\-file
+script=myshellscript.sh,pyfile=mypython.py
+
+.TP 2m
+\fB\-\-logging\fR=\fILOGGING\fR
+The location in Google Cloud Storage to which the pipeline logs will be copied.
+Can be specified as a fully qualified directory path, in which case logs will be
+output with a unique identifier as the filename in that directory, or as a fully
+specified path, which must end in \f5.log\fR, in which case that path will be
+used. Stdout and stderr logs from the run are also generated and output as
+\f5\-stdout.log\fR and \f5\-stderr.log\fR.
+
+.TP 2m
+\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]
+Map of output PipelineParameter names to values. Used to specify output files in
+Google Cloud Storage that will be made from a localCopy. Specified as a
+comma\-separated list: \-\-outputs
+ref=gs://my\-bucket/foo,ref2=gs://my\-bucket/bar
+
+.TP 2m
+\fB\-\-preemptible\fR
+Whether to use a preemptible VM for this pipeline. The "resource" section of the
+pipeline\-file must also set preemptible to "true" for this flag to take effect.
+
+
+.RE
+.sp
+
+.SH "OTHER FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR
+The size of the boot disk in GB.
+
+The boot disk size must be large enough to accommodate all Docker images from
+each action in the pipeline at the same time. If not specified, a small but
+reasonable default value is used.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+Location resource \- The Google Cloud location to run the pipeline. This
+represents a Cloud resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: provide
+the argument [\-\-location] on the command line with a fully specified name; set
+the property [lifesciences/location] with a fully specified name; set the
+property [core/project]; provide the argument [\-\-project] on the command line.
+
+.RS 2m
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+ID of the location or fully qualified identifier for the location.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR; default="n1\-standard\-1"
+The type of VirtualMachine to use. Defaults to n1\-standard\-1.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The network name to attach the VM's network interface to.
+
+The value will be prefixed with global/networks/ unless it contains a /, in
+which case it is assumed to be a fully specified network resource URL.
+
+If unspecified, the global default network is used.
+
+.TP 2m
+\fB\-\-regions\fR=[\fIREGION\fR,...]
+List of Compute Engine regions the pipeline can run in.
+
+If no regions are specified with the regions flag, then regions in the pipeline
+definition file will be used.
+
+If no regions are specified in the pipeline definition, then the default region
+in your local client configuration is used.
+
+At least one region or region must be specified.
+
+For more information on default regions, see
+https://cloud.google.com/compute/docs/gcloud\-compute/#set_default_zone_and_region_in_your_local_client
+
+.TP 2m
+\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR; default="default"
+The service account used to run the pipeline. If unspecified, defaults to the
+Compute Engine service account for your project.
+
+.TP 2m
+\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]
+List of additional scopes to be made available for this service account. The
+following scopes are always requested:
+
+.RS 2m
+https://www.googleapis.com/auth/cloud\-platform
+.RE
+
+.TP 2m
+\fB\-\-subnetwork\fR=\fISUBNETWORK\fR
+The subnetwork to use on the provided network.
+
+If the specified network is configured for custom subnet creation, the name of
+the subnetwork to attach the instance to must be specified here.
+
+The value is prefixed with regions/*/subnetworks/ unless it contains a /, in
+which case it is assumed to be a fully specified subnetwork resource URL.
+
+If the * character appears in the value, it is replaced with the region that the
+virtual machine has been allocated in.
+
+.TP 2m
+\fB\-\-zones\fR=[\fIZONE\fR,...]
+List of Compute Engine zones the pipeline can run in.
+
+If no zones are specified with the zones flag, then zones in the pipeline
+definition file will be used.
+
+If no zones are specified in the pipeline definition, then the default zone in
+your local client configuration is used (and must be specified).
+
+For more information on default zones, see
+https://cloud.google.com/compute/docs/gcloud\-compute/#set_default_zone_and_region_in_your_local_client
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To run a pipeline described in the \f5pipeline.json\fR file, run:
+
+.RS 2m
+$ gcloud beta lifesciences pipelines run \e
+    \-\-pipeline\-file=pipeline.json
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha lifesciences pipelines run
+.RE
+

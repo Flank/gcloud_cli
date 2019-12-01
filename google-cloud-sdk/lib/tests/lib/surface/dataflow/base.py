@@ -132,12 +132,17 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                  worker_machine_type=None,
                  network=None,
                  subnetwork=None,
-                 kms_key_name=None):
+                 kms_key_name=None,
+                 disable_public_ips=False):
     run_job_req_body = MESSAGE_MODULE.CreateJobFromTemplateRequest
     run_job_req_class = (
         MESSAGE_MODULE.DataflowProjectsLocationsTemplatesCreateRequest)
 
     location = location or DEFAULT_REGION
+
+    ip_configuration_enum = MESSAGE_MODULE.RuntimeEnvironment.IpConfigurationValueValuesEnum
+    ip_private = ip_configuration_enum.WORKER_IP_PRIVATE
+    ip_configuration = ip_private if disable_public_ips else None
 
     additional_properties = None
     if parameters:
@@ -162,6 +167,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             subnetwork=subnetwork,
             machineType=worker_machine_type,
             kmsKeyName=kms_key_name,
+            ipConfiguration=ip_configuration,
         ),
         parameters=additional_properties)
 

@@ -11,7 +11,7 @@ gcloud alpha container node\-pools create \- create a node pool in a running clu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-linux\-sysctls\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-config\fR=\fINODE_CONFIG\fR] [\fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autoprovisioning\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-no\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-linux\-sysctls\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR;\ default=1] [\fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-config\fR=\fINODE_CONFIG\fR] [\fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-sandbox\fR=[\fItype\fR=\fITYPE\fR]] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -69,6 +69,12 @@ Size for node VM boot disks. Defaults to 100GB.
 \fB\-\-disk\-type\fR=\fIDISK_TYPE\fR
 Type of the node VM boot disk. Defaults to pd\-standard. \fIDISK_TYPE\fR must be
 one of: \fBpd\-standard\fR, \fBpd\-ssd\fR.
+
+.TP 2m
+\fB\-\-enable\-autoprovisioning\fR
+Enables Cluster Autoscaler to treat the node pool as if it was autoprovisioned.
+
+Cluster Autoscaler will be able to delete the node pool if it's unneeded.
 
 .TP 2m
 \fB\-\-enable\-autorepair\fR
@@ -160,7 +166,7 @@ flag set at the cluster level.
 Must be used in conjunction with '\-\-enable\-ip\-alias'.
 
 .TP 2m
-\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR
+\fB\-\-max\-surge\-upgrade\fR=\fIMAX_SURGE_UPGRADE\fR; default=1
 Number of extra (surge) nodes to be created on each upgrade of the node pool.
 
 Specifies the number of extra (surge) nodes to be created during this node
@@ -169,8 +175,11 @@ creating an extra node each time the node pool is upgraded:
 
 .RS 2m
 $ gcloud alpha container node\-pools create node\-pool\-1 \e
-    \-\-cluster=example\-cluster \-\-max\-surge\-upgrade 1
+    \-\-cluster=example\-cluster \-\-max\-surge\-upgrade=1   \e
+    \-\-max\-unavailable\-upgrade=0
 .RE
+
+Must be used in conjunction with '\-\-max\-unavailable\-upgrade'.
 
 .TP 2m
 \fB\-\-max\-unavailable\-upgrade\fR=\fIMAX_UNAVAILABLE_UPGRADE\fR
@@ -184,9 +193,11 @@ at least 3 (5 \- 2) available each time the node pool is upgraded:
 
 .RS 2m
 $ gcloud alpha container node\-pools create node\-pool\-1 \e
-    \-\-cluster=example\-cluster \-\-num\-nodes=5 \-\-max\-surge\-upgrade 1 \e
-    \-\-max\-unavailable\-upgrade=2
+    \-\-cluster=example\-cluster \-\-num\-nodes=5   \e
+    \-\-max\-surge\-upgrade=1 \-\-max\-unavailable\-upgrade=2
 .RE
+
+Must be used in conjunction with '\-\-max\-surge\-upgrade'.
 
 .TP 2m
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]

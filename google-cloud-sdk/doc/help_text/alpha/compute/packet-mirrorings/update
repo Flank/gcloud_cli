@@ -165,9 +165,33 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    Stop mirroring by tags, add subnet-1 as a mirrored subnet.
+
+        $ gcloud alpha compute packet-mirrorings update my-pm
+            --region us-central1 --clear-mirrored-tags
+            --add-mirrored-subnets subnet-1
+
+    Change the load-balancer to send mirrored traffic to.
+
+        $ gcloud alpha compute packet-mirrorings update my-pm
+            --region us-central1 --collector-ilb new-forwarding-rule
+
+    Disable a Packet Mirroring policy.
+
+        $ gcloud alpha compute packet-mirrorings update my-pm
+            --region us-central1 --no-enable
+
+    Re-enable a disabled Packet Mirroring policy.
+
+        $ gcloud alpha compute packet-mirrorings update my-pm
+            --region us-central1 --enable
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you may be trying to access an API with an invitation-only early
-    access whitelist.
+    access whitelist. This variant is also available:
+
+        $ gcloud beta compute packet-mirrorings update
 

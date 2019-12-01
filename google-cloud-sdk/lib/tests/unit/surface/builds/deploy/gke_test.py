@@ -25,14 +25,15 @@ import uuid
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
+from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.command_lib.builds.deploy import build_util
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
-from surface.builds.deploy import gke
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -55,7 +56,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     self.build_msg = core_apis.GetMessagesModule('cloudbuild', 'v1')
     self._step_statuses = self.build_msg.BuildStep.StatusValueValuesEnum
     self._statuses = self.build_msg.Build.StatusValueValuesEnum
-    self._vmtypes = self.build_msg.BuildOptions.MachineTypeValueValuesEnum
+    self._sub_options = self.build_msg.BuildOptions.SubstitutionOptionValueValuesEnum
 
     self.mocked_storage_v1 = mock.Client(
         core_apis.GetClientClass('storage', 'v1'))
@@ -114,7 +115,10 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def DefaultInputBuild(self, src=True):
     build = self.build_msg.Build(
-        tags=gke._CLOUD_BUILD_DEPLOY_TAGS,
+        tags=build_util._DEFAULT_TAGS,
+        options=self.build_msg.BuildOptions(
+            substitutionOption=self._sub_options.ALLOW_LOOSE
+        )
     )
     if src:
       build.source = self.build_msg.Source(
@@ -124,6 +128,83 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
               generation=123,
           ))
     return build
+
+  def DefaultBuildSteps(self, image='gcr.io/test-project/test-image:tag',
+                        version='tag', build_and_push=False):
+    steps = []
+    if build_and_push:
+      steps.append(self.build_msg.BuildStep(
+          id=build_util._BUILD_BUILD_STEP_ID,
+          name='gcr.io/cloud-builders/docker',
+          args=[
+              'build', '--network', 'cloudbuild', '--no-cache', '-t',
+              image, '-f', '${}'.format(build_util._DOCKERFILE_PATH_SUB_VAR),
+              '.'
+          ],
+      ))
+      steps.append(self.build_msg.BuildStep(
+          id=build_util._PUSH_BUILD_STEP_ID,
+          name='gcr.io/cloud-builders/docker',
+          args=['push', image]
+      ))
+
+    steps.append(self.build_msg.BuildStep(
+        id=build_util._PREPARE_DEPLOY_BUILD_STEP_ID,
+        name=build_util._GKE_DEPLOY_PROD,
+        args=[
+            'prepare',
+            '--filename=${}'.format(build_util._K8S_YAML_PATH_SUB_VAR),
+            '--image={}'.format(image),
+            '--app=${}'.format(build_util._APP_NAME_SUB_VAR),
+            '--version={}'.format(version),
+            '--namespace=${}'.format(build_util._K8S_NAMESPACE_SUB_VAR),
+            '--output=output',
+            '--annotation=gcb-build-id=$BUILD_ID,${}'.format(
+                build_util._K8S_ANNOTATIONS_SUB_VAR),
+            '--expose=${}'.format(build_util._EXPOSE_PORT_SUB_VAR)
+        ],
+    ))
+    steps.append(self.build_msg.BuildStep(
+        id=build_util._SAVE_CONFIGS_BUILD_STEP_ID,
+        name='gcr.io/cloud-builders/gsutil',
+        entrypoint='sh',
+        args=[
+            '-c',
+            build_util._SAVE_CONFIGS_SCRIPT
+        ],
+    ))
+    steps.append(self.build_msg.BuildStep(
+        id=build_util._APPLY_DEPLOY_BUILD_STEP_ID,
+        name=build_util._GKE_DEPLOY_PROD,
+        args=[
+            'apply',
+            '--filename=output/expanded',
+            '--namespace=${}'.format(build_util._K8S_NAMESPACE_SUB_VAR),
+            '--cluster=${}'.format(build_util._GKE_CLUSTER_SUB_VAR),
+            '--location=${}'.format(build_util._GKE_LOCATION_SUB_VAR),
+            '--timeout=24h'
+        ],
+    ))
+
+    return steps
+
+  def DefaultBuildSubstitutions(
+      self, app_name='test-image', config='', namespace='default', expose='0',
+      cluster='test-cluster', location='us-central1',
+      staging_dir='my-project_cloudbuild/deploy/config'):
+    return cloudbuild_util.EncodeSubstitutions(
+        {
+            build_util._DOCKERFILE_PATH_SUB_VAR: 'Dockerfile',
+            build_util._APP_NAME_SUB_VAR: app_name,
+            build_util._K8S_YAML_PATH_SUB_VAR: config,
+            build_util._K8S_NAMESPACE_SUB_VAR: namespace,
+            build_util._EXPOSE_PORT_SUB_VAR: expose,
+            build_util._GKE_CLUSTER_SUB_VAR: cluster,
+            build_util._GKE_LOCATION_SUB_VAR: location,
+            build_util._OUTPUT_BUCKET_PATH_SUB_VAR: staging_dir,
+            build_util._K8S_ANNOTATIONS_SUB_VAR: ''
+        }, self.build_msg
+    )
 
   def DefaultOutputBuild(self, b_in):
     b_out = copy.deepcopy(b_in)
@@ -139,42 +220,10 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testExistingImage(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -187,42 +236,14 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testExistingImageWithDigest(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image@sha256:asdfasdf',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=version',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/test-project/test-image@sha256:asdfasdf',
+        version='version'
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace',
+        expose='0'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -246,7 +267,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
   def testSourceNotRequired(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'Source should not be provided when no Kubernetes configs and no docker '
+        'Source must not be provided when no Kubernetes configs and no docker '
         'builds are required.'):
       self.Run([
           'builds', 'deploy', 'gke', '.', '--cluster=test-cluster',
@@ -275,56 +296,64 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
           '--location=us-central1', '--tag=invalid-tag', '--async'
       ])
 
+  def testNoTagWithNoCommitHash(self):
+    b_in = self.DefaultInputBuild()
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/test-project/test-image',
+        version='',
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions()
+
+    b_out = self.DefaultOutputBuild(b_in)
+
+    files.MakeDir('source-dir')
+
+    self.StartObjectPatch(
+        subprocess,
+        'check_output',
+        side_effect=('git status', 'no pending changes', ''))
+
+    self.ExpectMessagesForDeploy(b_in, b_out)
+    self.Run([
+        'builds', 'deploy', 'gke', './source-dir/', '--cluster=test-cluster',
+        '--location=us-central1', '--tag=gcr.io/test-project/test-image',
+        '--async'
+    ])
+
+  def testNoTagWithNotInGitRepo(self):
+    b_in = self.DefaultInputBuild()
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/test-project/test-image',
+        version='',
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions()
+
+    b_out = self.DefaultOutputBuild(b_in)
+
+    files.MakeDir('source-dir')
+
+    # Not a Git repo
+    self.StartObjectPatch(subprocess, 'check_output', side_effect=OSError)
+
+    self.ExpectMessagesForDeploy(b_in, b_out)
+    self.Run([
+        'builds', 'deploy', 'gke', './source-dir/', '--cluster=test-cluster',
+        '--location=us-central1', '--tag=gcr.io/test-project/test-image',
+        '--async'
+    ])
+
   def testDefaultTagWithCommitHash(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/$PROJECT_ID/source-dir:shortsha', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/$PROJECT_ID/source-dir:shortsha']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/$PROJECT_ID/source-dir:shortsha',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=source-dir',
-                '--version=shortsha',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/$PROJECT_ID/source-dir:shortsha',
+        version='shortsha',
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        app_name='source-dir'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -343,54 +372,15 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testDefaultTagWithOverrides(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/$PROJECT_ID/name-override:version-override', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/$PROJECT_ID/name-override:version-override']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/$PROJECT_ID/name-override:version-override',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=name-override',
-                '--version=version-override',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/$PROJECT_ID/name-override:version-override',
+        version='version-override',
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        app_name='name-override',
+    )
+
     b_in.tags.append('name-override')
 
     b_out = self.DefaultOutputBuild(b_in)
@@ -408,7 +398,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'No default container image name available. Please provide an '
+        'No default container image name available. Provide an '
         'app name with --app-name, or provide a valid --tag.'):
 
       self.Run([
@@ -425,7 +415,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'No default container image tag available. Please provide an app '
+        'No default container image tag available. Provide an app '
         'version with --app-version, or provide a valid --tag.'):
 
       self.Run([
@@ -446,7 +436,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'No default tag available, no commit sha at HEAD of source repository '
-        'available for tag. Please provide an app version with --app-version, '
+        'available for tag. Provide an app version with --app-version, '
         'or provide a valid --tag.'):
 
       self.Run([
@@ -456,54 +446,12 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testVersionBasedOnImageTag(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/test-project/test-image:my-tag', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/test-project/test-image:my-tag']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:my-tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=my-tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/test-project/test-image:my-tag',
+        version='my-tag',
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions()
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -516,54 +464,14 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testVersionBasedOnCommitHash(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/test-project/test-image@sha256:asdfasdf', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/test-project/test-image@sha256:asdfasdf']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image@sha256:asdfasdf',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=shortsha',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        image='gcr.io/test-project/test-image@sha256:asdfasdf',
+        version='shortsha',
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -594,55 +502,12 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testDefaultConfig(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/test-project/test-image:tag', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/test-project/test-image:tag']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-                '--filename=test-config.yaml',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        config='test-config.yaml'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -658,62 +523,20 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     frozen_file = 'source/{}'.format(self.frozen_tgz_filename)
 
-    b_in = self.build_msg.Build(
-        tags=gke._CLOUD_BUILD_DEPLOY_TAGS,
-        source=self.build_msg.Source(
-            storageSource=self.build_msg.StorageSource(
-                bucket=bucket_name,
-                object=frozen_file,
-                generation=123,
-            )),
-        steps=[
-            self.build_msg.BuildStep(
-                id=gke._BUILD_BUILD_STEP_ID,
-                name='gcr.io/cloud-builders/docker',
-                args=[
-                    'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                    'gcr.io/test-project/test-image:tag', '.'
-                ],
-            ),
-            self.build_msg.BuildStep(
-                id=gke._PUSH_BUILD_STEP_ID,
-                name='gcr.io/cloud-builders/docker',
-                args=['push', 'gcr.io/test-project/test-image:tag']),
-            self.build_msg.BuildStep(
-                id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-                name=gke._GKE_DEPLOY_PROD,
-                args=[
-                    'prepare',
-                    '--image=gcr.io/test-project/test-image:tag',
-                    '--namespace=default',
-                    '--output=output',
-                    '--annotation=gcb-build-id=$BUILD_ID',
-                    '--app=test-image',
-                    '--version=tag',
-                    '--filename=test-config.yaml',
-                ],
-            ),
-            self.build_msg.BuildStep(
-                id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-                name='gcr.io/cloud-builders/gsutil',
-                entrypoint='sh',
-                args=[
-                    '-c',
-                    gke._COPY_AUDIT_FILES_SCRIPT.format(bucket_name)
-                ],
-            ),
-            self.build_msg.BuildStep(
-                id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-                name=gke._GKE_DEPLOY_PROD,
-                args=[
-                    'apply',
-                    '--filename=output/expanded',
-                    '--namespace=default',
-                    '--cluster=test-cluster',
-                    '--location=us-central1',
-                ],
-            ),
-        ])
+    b_in = self.DefaultInputBuild(src=False)
+    b_in.source = self.build_msg.Source(
+        storageSource=self.build_msg.StorageSource(
+            bucket=bucket_name,
+            object=frozen_file,
+            generation=123,
+        ))
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        config='test-config.yaml',
+        staging_dir=bucket_name
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -757,63 +580,20 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
     frozen_file = 'my-deploy-dir/source/{}'.format(self.frozen_tgz_filename)
 
-    b_in = self.build_msg.Build(
-        tags=gke._CLOUD_BUILD_DEPLOY_TAGS,
-        source=self.build_msg.Source(
-            storageSource=self.build_msg.StorageSource(
-                bucket=bucket_name,
-                object=frozen_file,
-                generation=123,
-            )),
-        steps=[
-            self.build_msg.BuildStep(
-                id=gke._BUILD_BUILD_STEP_ID,
-                name='gcr.io/cloud-builders/docker',
-                args=[
-                    'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                    'gcr.io/test-project/test-image:tag', '.'
-                ],
-            ),
-            self.build_msg.BuildStep(
-                id=gke._PUSH_BUILD_STEP_ID,
-                name='gcr.io/cloud-builders/docker',
-                args=['push', 'gcr.io/test-project/test-image:tag']),
-            self.build_msg.BuildStep(
-                id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-                name=gke._GKE_DEPLOY_PROD,
-                args=[
-                    'prepare',
-                    '--image=gcr.io/test-project/test-image:tag',
-                    '--namespace=default',
-                    '--output=output',
-                    '--annotation=gcb-build-id=$BUILD_ID',
-                    '--app=test-image',
-                    '--version=tag',
-                    '--filename=test-config.yaml',
-                ],
-            ),
-            self.build_msg.BuildStep(
-                id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-                name='gcr.io/cloud-builders/gsutil',
-                entrypoint='sh',
-                args=[
-                    '-c',
-                    gke._COPY_AUDIT_FILES_SCRIPT.format(
-                        bucket_name + '/my-deploy-dir')
-                ],
-            ),
-            self.build_msg.BuildStep(
-                id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-                name=gke._GKE_DEPLOY_PROD,
-                args=[
-                    'apply',
-                    '--filename=output/expanded',
-                    '--namespace=default',
-                    '--cluster=test-cluster',
-                    '--location=us-central1',
-                ],
-            ),
-        ])
+    b_in = self.DefaultInputBuild(src=False)
+    b_in.source = self.build_msg.Source(
+        storageSource=self.build_msg.StorageSource(
+            bucket=bucket_name,
+            object=frozen_file,
+            generation=123,
+        ))
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        config='test-config.yaml',
+        staging_dir=bucket_name + '/my-deploy-dir/config'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -877,54 +657,12 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testSourceFromBucket(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/test-project/test-image:tag', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/test-project/test-image:tag']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -976,54 +714,12 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testSourceFromFile(self):
     b_in = self.DefaultInputBuild()
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._BUILD_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=[
-                'build', '--network', 'cloudbuild', '--no-cache', '-t',
-                'gcr.io/test-project/test-image:tag', '.'
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._PUSH_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/docker',
-            args=['push', 'gcr.io/test-project/test-image:tag']),
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps(
+        build_and_push=True
+    )
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -1085,43 +781,10 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testExposePort(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-                '--expose=1234',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        expose='1234'
+    )
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -1135,7 +798,7 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
   def testBadExposePort(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        'Invalid value for [EXPOSE]: port number is invalid'):
+        'Invalid value for [--expose]: port number is invalid'):
       self.Run([
           'builds', 'deploy', 'gke', '--cluster=test-cluster',
           '--location=us-central1',
@@ -1145,42 +808,10 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testDeployNoLogUrl(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace'
+    )
 
     b_out = copy.deepcopy(b_in)
     b_out.createTime = self.frozen_time
@@ -1200,43 +831,9 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testTimeout(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-                '--timeout=62s',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace')
     b_in.timeout = '62s'
 
     b_out = self.DefaultOutputBuild(b_in)
@@ -1252,43 +849,11 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testTimeoutBareSeconds(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=test-namespace',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=test-namespace',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-                '--timeout=1234s',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions(
+        namespace='test-namespace'
+    )
+
     b_in.timeout = '1234s'
 
     b_out = self.DefaultOutputBuild(b_in)
@@ -1304,42 +869,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testStreamDeploy(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions()
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -1408,42 +939,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testStreamDeployButFailure(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions()
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -1513,42 +1010,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testStreamDeployApplyDeployFailure(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions()
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -1622,42 +1085,8 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
 
   def testStreamDeployButTimeout(self):
     b_in = self.DefaultInputBuild(src=False)
-    b_in.steps = [
-        self.build_msg.BuildStep(
-            id=gke._PREPARE_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'prepare',
-                '--image=gcr.io/test-project/test-image:tag',
-                '--namespace=default',
-                '--output=output',
-                '--annotation=gcb-build-id=$BUILD_ID',
-                '--app=test-image',
-                '--version=tag',
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._SAVE_CONFIGS_BUILD_STEP_ID,
-            name='gcr.io/cloud-builders/gsutil',
-            entrypoint='sh',
-            args=[
-                '-c',
-                gke._COPY_AUDIT_FILES_SCRIPT.format(
-                    'my-project_cloudbuild/deploy')
-            ],
-        ),
-        self.build_msg.BuildStep(
-            id=gke._APPLY_DEPLOY_BUILD_STEP_ID,
-            name=gke._GKE_DEPLOY_PROD,
-            args=[
-                'apply',
-                '--filename=output/expanded',
-                '--namespace=default',
-                '--cluster=test-cluster',
-                '--location=us-central1',
-            ],
-        ),
-    ]
+    b_in.steps = self.DefaultBuildSteps()
+    b_in.substitutions = self.DefaultBuildSubstitutions()
 
     b_out = self.DefaultOutputBuild(b_in)
 
@@ -1724,7 +1153,6 @@ class DeployGKETestAlpha(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth,
         Here the last line
         """,
         normalize_space=True)
-
 
 if __name__ == '__main__':
   test_case.main()

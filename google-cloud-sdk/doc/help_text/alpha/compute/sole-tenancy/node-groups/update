@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute sole-tenancy node-groups update NAME
-        [--autoscaling-policy=[max-size=MAX-SIZE],
-          [min-size=MIN-SIZE],[mode=MODE]] [--node-template=NODE_TEMPLATE]
-        [--zone=ZONE] [--add-nodes=ADD_NODES | --delete-nodes=[NODE,...]]
+        [--node-template=NODE_TEMPLATE] [--zone=ZONE]
+        [--add-nodes=ADD_NODES | --delete-nodes=[NODE,...]]
+        [--mode=MODE : --max-size=MAX_SIZE --min-size=MIN_SIZE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -17,23 +17,6 @@ POSITIONAL ARGUMENTS
         Name of the node group to operate on.
 
 FLAGS
-     --autoscaling-policy=[max-size=MAX-SIZE],[min-size=MIN-SIZE],[mode=MODE]
-        Option to specify the autoscaling policy for node groups.
-
-         mode
-            Options for mode are 'on' or 'off'. When set to 'on', the
-            autoscaler will increase or decrease the size of the node group in
-            response to capacity needs. If set to 'off', the autoscaler will
-            not update the size of the node group.
-
-         min-size
-            The minimum size of the node group. Default is 0 and must be an
-            integer value smaller than or equal to max-size.
-
-         max-size
-            The maximum size of the node group. Default is 100 and must be
-            smaller or equal to 100 and larger than or equal to min-size.
-
      --node-template=NODE_TEMPLATE
         The name of the node template resource to be set for this node group.
 
@@ -64,6 +47,23 @@ FLAGS
 
        --delete-nodes=[NODE,...]
           The names of the nodes to remove from the group.
+
+     Autoscaling policy for node groups.
+
+       --mode=MODE
+          Options for mode are 'on' or 'off'. When set to 'on', the autoscaler
+          will increase or decrease the size of the node group in response to
+          capacity needs. If set to 'off', the autoscaler will not update the
+          size of the node group. This flag must be specified if any of the
+          other arguments in this group are specified.
+
+       --max-size=MAX_SIZE
+          The maximum size of the node group. Default is 100 and must be
+          smaller or equal to 100 and larger than or equal to min-size.
+
+       --min-size=MIN_SIZE
+          The minimum size of the node group. Default is 0 and must be an
+          integer value smaller than or equal to max-size.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --billing-project,

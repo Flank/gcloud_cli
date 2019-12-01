@@ -43,6 +43,12 @@ COMMANDS
      describe
         Show metadata for a service account from a project.
 
+     disable
+        Disable an IAM service account.
+
+     enable
+        Enable an IAM service account.
+
      get-iam-policy
         Get the IAM policy for a service account.
 

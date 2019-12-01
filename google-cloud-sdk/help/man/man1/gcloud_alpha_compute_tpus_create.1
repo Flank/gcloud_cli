@@ -202,8 +202,8 @@ The following command creates a TPU with ID \f5my\-tpu\fR and CIDR range
 (with other defaults supplied by API):
 
 .RS 2m
-$ gcloud alpha compute tpus create  my\-tpu \-\-range 10.240.0.0/29 \e
-    \-\-network default
+$ gcloud alpha compute tpus create  my\-tpu \-\-range=10.240.0.0/29 \e
+    \-\-network=default
 .RE
 
 
@@ -212,12 +212,12 @@ for all required and optional parameters:
 
 .RS 2m
 $ gcloud alpha compute tpus create my\-tpu \e
-    \-\-zone us\-central1\-a \e
-    \-\-range '10.240.0.0/29' \e
-    \-\-accelerator\-type 'v2\-8' \e
-    \-\-network my\-tf\-network \e
-    \-\-description 'My TF Node' \e
-    \-\-version '1.1'
+    \-\-zone=us\-central1\-a \e
+    \-\-range='10.240.0.0/29' \e
+    \-\-accelerator\-type='v2\-8' \e
+    \-\-network=my\-tf\-network \e
+    \-\-description='My TF Node' \e
+    \-\-version='1.1'
 .RE
 
 

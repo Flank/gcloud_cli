@@ -4,7 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud container node-pools update NAME
-        (--enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
+        (--enable-autoprovisioning
+          --enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
+          | --enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,27 +18,58 @@ POSITIONAL ARGUMENTS
         The name of the node pool.
 
 REQUIRED FLAGS
-     Node management At least one of these must be specified:
+     Exactly one of these must be specified:
 
-       --enable-autorepair
-          Enable node autorepair feature for a node pool.
+       Cluster autoscaling
 
-              $ gcloud container node-pools update node-pool-1 \
-                  --cluster=example-cluster --enable-autorepair
+         --enable-autoprovisioning
+            Enables Cluster Autoscaler to treat the node pool as if it was
+            autoprovisioned.
 
-          See
-          https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
-          for more info.
+            Cluster Autoscaler will be able to delete the node pool if it's
+            unneeded.
 
-       --enable-autoupgrade
-          Sets autoupgrade feature for a node pool.
+         --enable-autoscaling
+            Enables autoscaling for a node pool.
 
-              $ gcloud container node-pools update node-pool-1 \
-                  --cluster=example-cluster --enable-autoupgrade
+            Enables autoscaling in the node pool specified by --node-pool or
+            the default node pool if --node-pool is not provided.
 
-          See
-          https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
-          for more info.
+         --max-nodes=MAX_NODES
+            Maximum number of nodes in the node pool.
+
+            Maximum number of nodes to which the node pool specified by
+            --node-pool (or default node pool if unspecified) can scale.
+            Ignored unless --enable-autoscaling is also specified.
+
+         --min-nodes=MIN_NODES
+            Minimum number of nodes in the node pool.
+
+            Minimum number of nodes to which the node pool specified by
+            --node-pool (or default node pool if unspecified) can scale.
+            Ignored unless --enable-autoscaling is also specified.
+
+       Node management
+
+         --enable-autorepair
+            Enable node autorepair feature for a node pool.
+
+                $ gcloud container node-pools update node-pool-1 \
+                    --cluster=example-cluster --enable-autorepair
+
+            See
+            https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-repair
+            for more info.
+
+         --enable-autoupgrade
+            Sets autoupgrade feature for a node pool.
+
+                $ gcloud container node-pools update node-pool-1 \
+                    --cluster=example-cluster --enable-autoupgrade
+
+            See
+            https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
+            for more info.
 
 OPTIONAL FLAGS
      --cluster=CLUSTER

@@ -32,6 +32,10 @@ COMMANDS
      create
         (BETA) Create a Compute Engine managed instance group.
 
+     create-instance
+        (BETA) Create a new virtual machine instance in a managed instance
+        group with a defined name and optionally its stateful configuration.
+
      delete
         (BETA) Delete Google Compute Engine managed instance groups.
 
@@ -79,6 +83,9 @@ COMMANDS
 
      update
         (BETA) Update Google Compute Engine managed instance groups.
+
+     update-autoscaling
+        (BETA) Update autoscaling parameters of a managed instance group.
 
      update-instances
         (BETA) Immediately update selected instances in a Google Compute Engine

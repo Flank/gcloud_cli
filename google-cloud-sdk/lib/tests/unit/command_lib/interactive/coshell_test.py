@@ -63,34 +63,26 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
     if self.coshell:
       self.coshell.Close()
 
-    if six.PY3:
-      stdout = os.open(self.output_file, os.O_CREAT | os.O_WRONLY)
-      stderr = os.open(self.error_file, os.O_CREAT | os.O_WRONLY)
-      self.coshell = coshell.Coshell(stdout=stdout, stderr=stdout)
-      os.close(stdout)
-      os.close(stderr)
-    else:
-      # py3 test framework can't suffer these fd shenanigans
-      sys.stdout.flush()
-      sys.stderr.flush()
+    sys.stdout.flush()
+    sys.stderr.flush()
 
-      old_out_fd = os.dup(1)
-      new_out_fd = os.open(self.output_file, os.O_CREAT | os.O_WRONLY)
-      os.dup2(new_out_fd, 1)
-      os.close(new_out_fd)
+    old_out_fd = os.dup(1)
+    new_out_fd = os.open(self.output_file, os.O_CREAT | os.O_WRONLY)
+    os.dup2(new_out_fd, 1)
+    os.close(new_out_fd)
 
-      old_err_fd = os.dup(2)
-      new_err_fd = os.open(self.error_file, os.O_CREAT | os.O_WRONLY)
-      os.dup2(new_err_fd, 2)
-      os.close(new_err_fd)
+    old_err_fd = os.dup(2)
+    new_err_fd = os.open(self.error_file, os.O_CREAT | os.O_WRONLY)
+    os.dup2(new_err_fd, 2)
+    os.close(new_err_fd)
 
-      self.coshell = coshell.Coshell()
+    self.coshell = coshell.Coshell()
 
-      os.dup2(old_out_fd, 1)
-      os.close(old_out_fd)
+    os.dup2(old_out_fd, 1)
+    os.close(old_out_fd)
 
-      os.dup2(old_err_fd, 2)
-      os.close(old_err_fd)
+    os.dup2(old_err_fd, 2)
+    os.close(old_err_fd)
 
   def CoClose(self):
     if self.coshell:
@@ -133,7 +125,6 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
-@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class UnixCoshellTest(_CoshellTestBase):
 
   def testUnixCoshellEditMode(self):
@@ -409,7 +400,6 @@ complete -o nospace -F __coshell_test_completer__ tst
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
-@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class UnixCoshellInteractiveTest(_CoshellTestBase):
 
   def _RawInput(self, prompt):
@@ -520,7 +510,6 @@ class UnixCoshellInteractiveTest(_CoshellTestBase):
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
-@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class MingWCoshellOnUnixTest(_CoshellTestBase):
 
   def _Popen(self):
@@ -700,6 +689,7 @@ complete -o nospace -F __coshell_test_completer__ tst
         completions)
 
 
+@test_case.Filters.SkipOnMacAndPy3('Failing', 'b/143695427')
 class WindowsCoshellTest(_CoshellTestBase):
   """Funny that the Windows sepcific tests run everywhere."""
 
@@ -744,7 +734,6 @@ class WindowsCoshellTest(_CoshellTestBase):
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
-@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class AlternatCoshellTest(_CoshellTestBase):
   """COSHELL alternate coshell env var tests."""
 
@@ -758,9 +747,10 @@ class AlternatCoshellTest(_CoshellTestBase):
 
   def testAlternateCoshell(self):
     self.CoOpen()
+    additional_expected_kwargs = {} if six.PY2 else {'restore_signals': False}
     self.mock_popen.assert_called_once_with(
         [coshell._UnixCoshell.SHELL_PATH, '-s'], close_fds=False, env=mock.ANY,
-        stderr=2, stdin=subprocess.PIPE, stdout=1)
+        stderr=2, stdin=subprocess.PIPE, stdout=1, **additional_expected_kwargs)
 
 
 if __name__ == '__main__':

@@ -46,6 +46,11 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To list all Cloud Spanner instances in this project, run:
+
+        $ gcloud spanner instances list
+
 NOTES
     These variants are also available:
 

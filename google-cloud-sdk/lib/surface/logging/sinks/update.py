@@ -113,6 +113,14 @@ class Update(base.UpdateCommand):
         sink_data['bigqueryOptions'] = bigquery_options
         update_mask.append('bigquery_options.use_partitioned_tables')
 
+      if args.IsSpecified('description'):
+        sink_data['description'] = args.description
+        update_mask.append('description')
+
+      if args.IsSpecified('disabled'):
+        sink_data['disabled'] = args.disabled
+        update_mask.append('disabled')
+
       sink_data['exclusions'] = []
       if args.IsSpecified('clear_exclusions'):
         update_mask.append('exclusions')
@@ -130,6 +138,12 @@ class Update(base.UpdateCommand):
               '--remove-exclusions',
               'Exclusions {0} do not exist'.format(
                   ','.join(exclusions_to_remove)))
+      elif args.IsSpecified('add_exclusions'):
+        update_mask.append('exclusions')
+        sink_data['exclusions'] = sink.exclusions
+
+      if args.IsSpecified('add_exclusions'):
+        sink_data['exclusions'] += args.add_exclusions
 
     if not update_mask:
       raise calliope_exceptions.MinimumArgumentException(
@@ -214,6 +228,37 @@ class UpdateAlpha(Update):
         type=arg_parsers.ArgList(),
         metavar='EXCLUSION ID',
         help=('Specify the name of the Logging exclusion(s) to delete.'))
+    parser.add_argument(
+        '--add-exclusions', action='append',
+        type=arg_parsers.ArgDict(
+            spec={
+                'name': str,
+                'description': str,
+                'filter': str,
+                'disabled': bool
+            },
+            required_keys=['name', 'filter']
+        ),
+        help=('Add an exclusion filter for a log entry that is not to be '
+              'exported. This flag can be repeated.\n\n'
+              'The `name` and `filter` attributes are required. The following '
+              'keys are accepted:\n\n'
+              '*name*::: An identifier, such as "load-balancer-exclusion". '
+              'Identifiers are limited to 100 characters and can include only '
+              'letters, digits, underscores, hyphens, and periods.\n\n'
+              '*description*::: A description of this exclusion.\n\n'
+              '*filter*::: An advanced log filter that matches the log entries '
+              'to be excluded.\n\n'
+              '*disabled*::: If this exclusion should be disabled and not '
+              'exclude the log entries.'))
+
+    parser.add_argument(
+        '--description',
+        help='Description of the sink.')
+
+    parser.add_argument(
+        '--disabled', action='store_true',
+        help=('Disable the sink. Disabled sinks do not export logs.'))
 
   def Run(self, args):
     return self._Run(args, is_alpha=True)

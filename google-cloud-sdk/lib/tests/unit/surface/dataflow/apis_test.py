@@ -144,6 +144,39 @@ class ApisUnitTest(base.DataflowMockingTestBase,
         gcs_location=gcs_path,
         staging_location=staging_path)
 
+  def testPrivateIPTemplatesCreate(self):
+    name = 'job name'
+    gcs_path = 'gs://my_gcs_path'
+    staging_path = 'gs://my_staging_path'
+    ip_configuration_enum = apis.GetMessagesModule(
+    ).RuntimeEnvironment.IpConfigurationValueValuesEnum
+    ip_private = ip_configuration_enum.WORKER_IP_PRIVATE
+    request = apis.Templates.CREATE_REQUEST(
+        jobName=name,
+        location=base.DEFAULT_REGION,
+        gcsPath=gcs_path,
+        environment=apis.GetMessagesModule().RuntimeEnvironment(
+            tempLocation=staging_path, ipConfiguration=ip_private))
+
+    wrapper_req = (
+        apis.GetMessagesModule().DataflowProjectsLocationsTemplatesCreateRequest
+    )
+    wrapped_request = wrapper_req(
+        createJobFromTemplateRequest=request,
+        projectId=self.Project(),
+        location=base.DEFAULT_REGION)
+
+    self.mocked_client.projects_locations_templates.Create.Expect(
+        wrapped_request,
+        apis.GetMessagesModule().Job())
+
+    apis.Templates.Create(
+        job_name=name,
+        project_id=self.Project(),
+        gcs_location=gcs_path,
+        staging_location=staging_path,
+        disable_public_ips=True)
+
 
 if __name__ == '__main__':
   test_case.main()

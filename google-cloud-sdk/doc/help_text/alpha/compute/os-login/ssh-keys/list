@@ -8,7 +8,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List the SSH public keys from an OS Login profile.
+    (ALPHA) gcloud alpha compute os-login ssh-keys list lists the SSH public
+    keys in an OS Login profile. By default, the command only displays the
+    fingerprints and experation time for the keys. Additional data can be
+    displayed using the --format flag.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -42,6 +45,15 @@ GCLOUD WIDE FLAGS
     --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To list the keys in your OS Login profile, run:
+
+        $ gcloud alpha compute os-login ssh-keys list
+
+    To show all of the SSH public key information, in YAML format, run:
+
+        $ gcloud alpha compute os-login ssh-keys list --format=yaml
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

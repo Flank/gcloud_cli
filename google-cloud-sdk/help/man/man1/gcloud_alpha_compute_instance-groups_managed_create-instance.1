@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instance\-groups managed create\-instance \- create a new virtual machine instance in a managed instance group with a defined name and optionally its stateful configuration: stateful disk, stateful metadata
+gcloud alpha compute instance\-groups managed create\-instance \- create a new virtual machine instance in a managed instance group with a defined name and optionally its stateful configuration
 
 
 
@@ -164,10 +164,30 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To create an instance \f5instance\-1\fR in \f5my\-group\fR (in region
+europe\-west4) with metadata \f5my\-key: my\-value\fR and a disk disk\-1
+attached to it as the device \f5device\-1\fR, run:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed create\-instance \e
+      my\-group \-\-region=europe\-west4 \e
+      \-\-instance=instance\-1 \e
+      \-\-stateful\-disk='device\-name=foo,source=https://compute.googleapis.com/compute/alpha/projects/my\-project/zones/europe\-west4/disks/disk\-1,mode=rw,auto\-delete=on\-permanent\-instance\-deletion' \e
+      \-\-stateful\-metadata='my\-key=my\-value'
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you may be trying to access an API with an invitation\-only early access
-whitelist.
+whitelist. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute instance\-groups managed create\-instance
+.RE
 

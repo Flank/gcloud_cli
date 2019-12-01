@@ -23,11 +23,11 @@ from googlecloudsdk.core.console import console_io
 from tests.lib.surface.run import base
 
 
-class DeleteTestBeta(base.ServerlessSurfaceBase):
+class DeleteTest(base.ServerlessSurfaceBase):
   """Tests outputs of delete revision command."""
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testDeleteSucceed(self):
     """Tests successful delete with default output format."""
@@ -44,6 +44,13 @@ class DeleteTestBeta(base.ServerlessSurfaceBase):
     with self.assertRaises(console_io.UnattendedPromptError):
       self.Run('run revisions delete r1')
     self.operations.DeleteRevision.assert_not_called()
+
+
+class DeleteTestBeta(DeleteTest):
+  """Tests outputs of delete revision command."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class DeleteTestAlpha(DeleteTestBeta):

@@ -118,39 +118,33 @@ url: <>
 api_version: <v1>
 content: <debugInfo:
   message:
-  - "Memory fault: \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F dumped"
+  - 'Memory fault: Ṳᾔḯ¢◎ⅾℯ dumped'
   stackTrace:
-  - "file-1:line-1: \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F call-1"
-  - "file-2:line-2: \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F call-2"
+  - 'file-1:line-1: Ṳᾔḯ¢◎ⅾℯ call-1'
+  - 'file-2:line-2: Ṳᾔḯ¢◎ⅾℯ call-2'
 error:
   code: '400'
   errors:
   - domain: global
-    message: "A \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F error somewhere. Try and\\
-      \\ find it."
-    reason: "A \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F error somewhere. Find and\\
-      \\ try it."
-  message: "A \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F error somewhere. Try and find\\
-    \\ it."
+    message: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.
+    reason: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Find and try it.
+  message: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.
 location: mock-location
 status: INVALID_ARGUMENT
 stuff:
-- "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F">
+- Ṳᾔḯ¢◎ⅾℯ>
 error_info: <code: '400'
 errors:
 - domain: global
-  message: "A \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F error somewhere. Try and find\\
-    \\ it."
-  reason: "A \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F error somewhere. Find and try\\
-    \\ it."
-message: "A \\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F error somewhere. Try and find\\
-  \\ it.">
+  message: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.
+  reason: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Find and try it.
+message: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.>
 instance_name: <>
-message: <A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere. Find and try it: A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere. Try and find it.>
+message: <A Ṳᾔḯ¢◎ⅾℯ error somewhere. Find and try it: A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.>
 resource_name: <>
 status_code: <400>
-status_description: <A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere. Find and try it.>
-status_message: <A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere. Try and find it.>
+status_description: <A Ṳᾔḯ¢◎ⅾℯ error somewhere. Find and try it.>
+status_message: <A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.>
 url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
 """
     actual = six.text_type(exc)
@@ -498,7 +492,7 @@ stuff:
     self.assertEqual('''\
 Error [400] Invalid request.
 https://mock.googleapis.com/v1/projects/your-stuff/junk/mine
-- "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F"''', exc.message)
+- Ṳᾔḯ¢◎ⅾℯ''', exc.message)
 
   def testHttpExceptionErrorFormatAttributesDebugVerbosityDefaultLine(self):
     log.SetVerbosity(logging.DEBUG)

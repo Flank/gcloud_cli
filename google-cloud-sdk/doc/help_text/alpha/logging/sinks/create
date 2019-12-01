@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha logging sinks create SINK_NAME DESTINATION
+        [--description=DESCRIPTION] [--disabled]
         [--exclusion=[description=DESCRIPTION],
           [disabled=DISABLED],[filter=FILTER],[name=NAME]] [--include-children]
         [--log-filter=LOG_FILTER] [--use-partitioned-tables]
@@ -29,6 +30,12 @@ POSITIONAL ARGUMENTS
         The destination for the sink.
 
 FLAGS
+     --description=DESCRIPTION
+        Description of the sink.
+
+     --disabled
+        Sink will be disabled. Disabled sinks do not export logs.
+
      --exclusion=[description=DESCRIPTION],[disabled=DISABLED],[filter=FILTER],[name=NAME]
         Specify an exclusion filter for a log entry that is not to be exported.
         This flag can be repeated.

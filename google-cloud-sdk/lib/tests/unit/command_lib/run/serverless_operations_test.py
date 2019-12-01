@@ -20,17 +20,20 @@ from __future__ import unicode_literals
 
 import collections
 import datetime
+import functools
 from apitools.base.protorpclite import messages
 from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.run import condition
 from googlecloudsdk.api_lib.run import configuration
 from googlecloudsdk.api_lib.run import domain_mapping
+from googlecloudsdk.api_lib.run import k8s_object
 from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.command_lib.run import config_changes
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
+from googlecloudsdk.command_lib.run import name_generator
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.command_lib.run import stages
 from googlecloudsdk.command_lib.util.args import labels_util
@@ -352,7 +355,7 @@ class ServiceConditionPollerGetIfProbablyNewerTest(base.ServerlessBase):
   _tracker = _MakeMockTracker(['one', 'two'])
 
   def _NewService(self, last_transition_time):
-    metadata = self.serverless_messages.ObjectMeta()
+    metadata = k8s_object.MakeMeta(self.serverless_messages)
     conditions = [self.serverless_messages.ServiceCondition(
         lastTransitionTime=last_transition_time, status='True', type=u'Ready')]
     status = self.serverless_messages.ServiceStatus(conditions=conditions)
@@ -490,8 +493,9 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     # Mock enabling services
     self.enable_mock = self.StartObjectPatch(enable_api, 'EnableService')
     self.nonce = 'itsthenoncelol'
-    self.StartObjectPatch(serverless_operations,
-                          '_Nonce', return_value=self.nonce)
+    self.revision_suffix = 'myrevision'
+    self.StartObjectPatch(
+        name_generator, 'GenerateName', return_value=self.revision_suffix)
     self.serverless_client.WaitForCondition = unittest_mock.Mock()
     dummy_config = configuration.Configuration.New(self.mock_serverless_client,
                                                    self.Project())
@@ -502,11 +506,13 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self.poller = self.StartObjectPatch(
         serverless_operations, 'ServiceConditionPoller')
     self.poller.GetConditions.return_value = condition.Conditions([])
+    # Prevent timeouts from tests running slowly
+    self.StartObjectPatch(retry.Retryer, '_GetTimeToWait', return_value=0)
 
   def TearDown(self):
     config.CLOUD_SDK_VERSION = self.old_gcloud_version
 
-  def _ExpectRevisionsList(self, serv_name):
+  def _ExpectRevisionsList(self, serv_name, limit, cont, ret_cont):
     """List call for two revisions against the Serverless API."""
 
     request = (
@@ -516,29 +522,42 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
             labelSelector='serving.knative.dev/service = {}'.format(
                 serv_name),
         ))
+    if cont is not None:
+      request.continue_ = cont
+    if limit is not None:
+      request.limit = limit
+    else:
+      request.limit = 100
 
     def _GetLabels():
-      return self.serverless_messages.ObjectMeta.LabelsValue(
+      return k8s_object.Meta(self.serverless_messages).LabelsValue(
           additionalProperties=[
-              self.serverless_messages.ObjectMeta.LabelsValue.
+              k8s_object.Meta(self.serverless_messages).LabelsValue.
               AdditionalProperty(key='serving.knative.dev/service', value='s1')
           ])
 
     def _GetMetadata(i):
-      return self.serverless_messages.ObjectMeta(
+      return k8s_object.MakeMeta(
+          self.serverless_messages,
           name='r{}'.format(i),
           creationTimestamp=datetime.datetime.utcfromtimestamp(i).isoformat() +
           'Z',
-          labels=_GetLabels(),
-      )
+          labels=_GetLabels())
 
-    revisions_responses = self.serverless_messages.ListRevisionsResponse(items=[
-        self.serverless_messages.Revision(metadata=_GetMetadata(i))
-        for i in range(2)
-    ])
+    revisions_responses = self.serverless_messages.ListRevisionsResponse(
+        items=[
+            self.serverless_messages.Revision(metadata=_GetMetadata(i))
+            for i in range(2)
+        ],
+        metadata=k8s_object.ListMeta(self.serverless_messages)())
+    if ret_cont is not None:
+      revisions_responses.metadata.continue_ = ret_cont
 
     self.mock_serverless_client.namespaces_revisions.List.Expect(
         request, response=revisions_responses)
+
+  def _DeleteResponse(self):
+    return self.serverless_messages.Empty()
 
   def testListServices(self):
     """Test the list services api call."""
@@ -563,7 +582,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self.serverless_messages.RunNamespacesServicesDeleteRequest(
             name=self._ServiceRef('s1').RelativeName()))
 
-    expected_response = self.serverless_messages.Empty()
+    expected_response = self._DeleteResponse()
     self.mock_serverless_client.namespaces_services.Delete.Expect(
         expected_request, expected_response)
 
@@ -587,11 +606,33 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def testListRevisions(self):
     """Test the list revisions call against the Serverless API."""
-    self._ExpectRevisionsList('default')
-    revisions = self.serverless_client.ListRevisions(self.namespace, 'default')
-    # Most recently created revision comes first
-    self.assertEqual(revisions[0].metadata.name, 'r1')
-    self.assertEqual(revisions[1].metadata.name, 'r0')
+    self._ExpectRevisionsList('default', None, None, None)
+    revisions = list(self.serverless_client.ListRevisions(
+        self.namespace, 'default'))
+
+    self.assertEqual(revisions[0].metadata.name, 'r0')
+    self.assertEqual(revisions[1].metadata.name, 'r1')
+
+  def testListRevisionsCont(self):
+    """Test the list revisions call against the Serverless API."""
+    self._ExpectRevisionsList('default', 2, None, 'bar')
+    self._ExpectRevisionsList('default', 2, 'bar', None)
+    revisions = list(self.serverless_client.ListRevisions(
+        self.namespace, 'default', None, 2))
+    self.assertEqual(len(revisions), 4)
+
+    self.assertEqual(revisions[0].metadata.name, 'r0')
+    self.assertEqual(revisions[1].metadata.name, 'r1')
+
+  def testListRevisionsLimit(self):
+    """Test the list revisions call against the Serverless API."""
+    self._ExpectRevisionsList('default', 2, None, 'bar')
+    revisions = list(self.serverless_client.ListRevisions(
+        self.namespace, 'default', 2, 2))
+    self.assertEqual(len(revisions), 2)
+
+    self.assertEqual(revisions[0].metadata.name, 'r0')
+    self.assertEqual(revisions[1].metadata.name, 'r1')
 
   def testDeleteRevision(self):
     """Test the delete revision api call."""
@@ -600,7 +641,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self.serverless_messages.RunNamespacesRevisionsDeleteRequest(
             name=revision_ref.RelativeName()))
 
-    expected_response = self.serverless_messages.Empty()
+    expected_response = self._DeleteResponse()
     self.mock_serverless_client.namespaces_revisions.Delete.Expect(
         expected_request, expected_response)
 
@@ -626,7 +667,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'),
@@ -638,7 +679,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
     self._ExpectGetIamPolicy('foo', bindings=[])
     binding = self.serverless_messages.Binding(
         members=['allUsers'], role='roles/run.invoker')
@@ -655,7 +696,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
     self._ExpectGetIamPolicy('foo', bindings=[self.serverless_messages.Binding(
         members=['allUsers'], role='roles/run.invoker')])
     self._ExpectSetIamPolicy(service='foo', bindings=[])
@@ -671,7 +712,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectCreate(
         image='gcr.io/fakething',
         annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
     self._ExpectGetIamPolicy('foo', bindings=[])
     binding = self.serverless_messages.Binding(
         members=['allUsers'], role='roles/run.invoker')
@@ -715,7 +756,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     endpoint_change = config_changes.EndpointVisibilityChange(True)
     self._ExpectCreate(
         image=self.fake_image,
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
         labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
         revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
@@ -728,7 +769,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectCreate(
         image=self.fake_image,
         annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'), [self.fake_deployable, endpoint_change])
@@ -738,18 +779,18 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     endpoint_change = config_changes.EndpointVisibilityChange(False)
     self._ExpectExisting(
         image='gcr.io/oldthing',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
         revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self._ExpectBaseRevision(
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self._ExpectUpdate(
         image='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'), [endpoint_change])
@@ -760,121 +801,36 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectExisting(
         image='gcr.io/my-image',
         annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+            revision.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
 
     self._ExpectBaseRevision(
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self._ExpectUpdate(
         image='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL},
         revision_labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'), [endpoint_change])
 
-  def testUpdateNoNonce(self):
-    """Test the flow for update when configuration has no nonce."""
+  def testUpdateEnvVars(self):
+    """Test updating existing and create new env vars on an existing service."""
     self._ExpectExisting(
         image='gcr.io/oldthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        revision_labels={revision.NONCE_LABEL: None},
-        latestCreatedRevisionName='last_revision.1',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         **{'template.env_vars.literals': {'key1': 'value1'}})
-
     self._ExpectBaseRevision(
-        polls=0,
-        name='last_revision.1',
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self._ExpectUpdate(
         image='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        latestCreatedRevisionName='last_revision.1',
-        **{'template.env_vars.literals': collections.OrderedDict(
-            [('key1', 'value1.2'), ('key2', 'value2')])})
-
-    env_changes = config_changes.EnvVarLiteralChanges(
-        env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
-                                                    ('key2', 'value2')]))
-    self.serverless_client.ReleaseService(
-        self._ServiceRef('foo'),
-        [env_changes])
-
-  def testUpdateNoRevisionWithNonce(self):
-    """Test update flow when no revision found with nonce."""
-    self._ExpectExisting(
-        image='gcr.io/oldthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        latestCreatedRevisionName='last_revision.1',
-        **{'template.env_vars.literals': {'key1': 'value1'}})
-
-    self._ExpectBaseRevision(
-        polls=0,
-        name='last_revision.1',
-        image='gcr.io/oldthing',
-        imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
-
-    self._ExpectUpdate(
-        image='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        latestCreatedRevisionName='last_revision.1',
-        **{'template.env_vars.literals': collections.OrderedDict(
-            [('key1', 'value1.2'), ('key2', 'value2')])})
-
-    env_changes = config_changes.EnvVarLiteralChanges(
-        env_vars_to_update=collections.OrderedDict([('key1', 'value1.2'),
-                                                    ('key2', 'value2')]))
-
-    with unittest_mock.patch.object(waiter, 'PollUntilDone', side_effect=[
-        retry.WaitException(unittest_mock.ANY,
-                            unittest_mock.ANY, unittest_mock.ANY)]):
-      self.serverless_client.ReleaseService(
-          self._ServiceRef('foo'),
-          [env_changes])
-
-  # latestCreatedRevisionName is available on Service. Add (1, 2) to the params.
-  @parameterized.parameters((1, 1), (2, 1))
-  def testUpdateEnvVars(self, base_revision_polls, base_revision_results):
-    """Test updating env vars on an existing service.
-
-    This tests both updating an existing env var and creating a new env var.
-
-    Args:
-      base_revision_polls: Number of times to poll the nonce before results
-      base_revision_results: Number of results polling the nonce eventually
-        yields
-    """
-    self._ExpectExisting(
-        image='gcr.io/oldthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
-        **{'template.env_vars.literals': {'key1': 'value1'}})
-    self._ExpectBaseRevision(
-        polls=base_revision_polls,
-        results=base_revision_results,
-        name='foo.1',
-        image='gcr.io/oldthing',
-        imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
-
-    self._ExpectUpdate(
-        image='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         **{'template.env_vars.literals': collections.OrderedDict(
             [('key1', 'value1.2'), ('key2', 'value2')])})
 
@@ -897,15 +853,13 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         **{'template.env_vars.literals': collections.OrderedDict([
             ('key-to-delete', 'value1'), ('key-to-preserve', 'value1')])})
     self._ExpectBaseRevision(
-        name='foo.1',
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
 
     self._ExpectUpdate(
         image='gcr.io/newthing@sha256:abcdef',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         **{'template.env_vars.literals': collections.OrderedDict(
             [('key-to-preserve', 'value1')])})
 
@@ -917,39 +871,49 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def testReleaseServiceAddRevisionName(self):
     self._ExpectExisting(
-        image='gcr.io/oldthing')
+        name='foo',
+        revision_name=None,
+        image='gcr.io/oldthing',
+        latestCreatedRevisionName='foo-old',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectBaseRevision(
+        name_polls=0,
+        name=None,
+        latestCreatedRevisionName='foo-old',
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
-    self._ExpectUpdate(**{
-        'template.name': 'foo-v2',
-        'image': 'gcr.io/newthing@sha256:abcdef',
-        'annotations': {
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'}
-    })
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    self._ExpectUpdate(
+        name='foo',
+        revision_name='foo-v2',
+        image='gcr.io/newthing@sha256:abcdef',
+        latestCreatedRevisionName='foo-old',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     revision_name_changes = config_changes.RevisionNameChanges('v2')
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'),
         [revision_name_changes])
 
-  def testReleaseServiceRemovesRevisionName(self):
-    """If no revision name is specified, the field should be cleared."""
-    self._ExpectExisting(**{
-        'template.name': 'foo-v1',
-        'image': 'gcr.io/oldthing'
-    })
+  def testReleaseServiceUpdateRevisionName(self):
+    self._ExpectExisting(
+        name='foo',
+        revision_name='foo-v1',
+        image='gcr.io/oldthing',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectBaseRevision(
+        name='foo-v1',
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
-    self._ExpectUpdate(**{
-        'template.name': None,
-        'image': 'gcr.io/newthing@sha256:abcdef',
-        'annotations': {
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'}
-    })
-    self.serverless_client.ReleaseService(self._ServiceRef('foo'), [])
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    self._ExpectUpdate(
+        name='foo',
+        revision_name='foo-v2',
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+    revision_name_changes = config_changes.RevisionNameChanges('v2')
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'),
+        [revision_name_changes])
 
   def testReleaseServiceBadImage(self):
     """Test the delete services api call with a non-existent service name."""
@@ -975,7 +939,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         annotations={'client.knative.dev/user-image': 'badimage'})
 
     with self.assertRaisesRegexp(
-        serverless_exceptions.BadImageError,
+        serverless_exceptions.HttpError,
         '^standin error string$'):
       self.serverless_client.ReleaseService(
           self._ServiceRef('foo'), [fake_deployable])
@@ -985,12 +949,10 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
     self._ExpectExisting(
         image='gcr.io/oldthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectUpdate(
         image='gcr.io/newthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/newthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/newthing'})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'),
@@ -1002,13 +964,11 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectExisting(
         new_api=True,
         image='gcr.io/oldthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectUpdate(
         new_api=True,
         image='gcr.io/newthing',
-        annotations={
-            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/newthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/newthing'})
 
     self.serverless_client.ReleaseService(
         self._ServiceRef('foo'),
@@ -1078,16 +1038,16 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         labels_util.Diff(additions={'key2': 'value2'}))
     self._ExpectExisting(
         image='gcr.io/oldthing',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         labels=collections.OrderedDict([('key1', 'value1')]),
         revision_labels=collections.OrderedDict([('key1', 'value1')]))
     self._ExpectBaseRevision(
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectUpdate(
         image='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         labels=collections.OrderedDict([('key1', 'value1'),
                                         ('key2', 'value2')]),
         revision_labels=collections.OrderedDict([('key1', 'value1'),
@@ -1103,7 +1063,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self._ExpectBaseRevision(
         image='gcr.io/oldthing',
         imageDigest='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
     self._ExpectUpdate(
         exception=http_error.MakeDetailedHttpError(
             400,
@@ -1120,12 +1080,12 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
                             'description': 'standin error string',
                         }]}]}}),
         image='gcr.io/newthing@sha256:abcdef',
-        annotations={configuration.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
         labels={'_BAD/LABEL_': 'somevalue'},
         revision_labels={'_BAD/LABEL_': 'somevalue'})
 
     with self.assertRaisesRegexp(
-        serverless_exceptions.MalformedLabelError,
+        serverless_exceptions.HttpError,
         '^standin error string$'):
       self.serverless_client.ReleaseService(
           self._ServiceRef('foo'), [fake_label_changes])
@@ -1135,13 +1095,255 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     expected_request = (
         self.serverless_messages.RunNamespacesDomainmappingsDeleteRequest(
             name=self._DomainmappingRef('dm1').RelativeName()))
-    expected_response = self.serverless_messages.Empty()
+    expected_response = self._DeleteResponse()
     self.mock_serverless_client.namespaces_domainmappings.Delete.Expect(
         expected_request, expected_response)
     delete_response = self.serverless_client.DeleteDomainMapping(
         self._DomainmappingRef('dm1'))
 
     self.assertEqual(delete_response, None)
+
+  @parameterized.parameters([1, 2, 5])
+  def testUpdateNoRevisionNameWithNonce(self, nonce_polls):
+    """Test the update flow when the service has no revision name but has a nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        revision_name=None,
+        revision_labels={revision.NONCE_LABEL: self.nonce},
+        **{'template.env_vars.literals': {
+            'key1': 'value1'
+        }})
+
+    self._ExpectBaseRevision(
+        name_polls=0,
+        nonce_polls=nonce_polls,
+        labels={revision.NONCE_LABEL: self.nonce},
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{
+            'template.env_vars.literals':
+                collections.OrderedDict([('key1', 'value1.2'),
+                                         ('key2', 'value2')])
+        })
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([(
+            'key1', 'value1.2'), ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [env_changes])
+
+  @parameterized.parameters([(1, 2), (2, 1), (2, 5), (5, 2)])
+  def testUpdateRevisionNotFoundByNameWithNonce(self, name_polls, nonce_polls):
+    """Test the update flow when the revision is not found by name but is by nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        revision_labels={revision.NONCE_LABEL: self.nonce},
+        **{'template.env_vars.literals': {
+            'key1': 'value1'
+        }})
+
+    self._ExpectBaseRevision(
+        name_polls=name_polls,
+        found_by_name=False,
+        nonce_polls=nonce_polls,
+        labels={revision.NONCE_LABEL: self.nonce},
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{
+            'template.env_vars.literals':
+                collections.OrderedDict([('key1', 'value1.2'),
+                                         ('key2', 'value2')])
+        })
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([(
+            'key1', 'value1.2'), ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [env_changes])
+
+  def testUpdateNoRevisionNameNoNonce(self):
+    """Test the update flow when the service has no revision name or nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        revision_name=None,
+        generation=5,
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        latestCreatedRevisionName='foo-00005-old',
+        **{'template.env_vars.literals': {
+            'key1': 'value1'
+        }})
+
+    self._ExpectBaseRevision(
+        name_polls=0,
+        nonce_polls=0,
+        name=None,
+        latestCreatedRevisionName='foo-00005-old',
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        generation=5,
+        revision_name='foo-00006-myrevision',
+        latestCreatedRevisionName='foo-00005-old',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{
+            'template.env_vars.literals':
+                collections.OrderedDict([('key1', 'value1.2'),
+                                         ('key2', 'value2')])
+        })
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([(
+            'key1', 'value1.2'), ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [env_changes])
+
+  @parameterized.parameters([(1, 0), (1, 2), (2, 5), (5, 5)])
+  def testUpdateNoRevisionNameNotFoundByNonce(self, nonce_polls, nonce_results):
+    """Test the update flow when the service has no revision name and is not found by nonce.
+
+    This tests both for no revisions found with nonce label and more than 1
+    with nonce label, both of which mean "not found" in this case.
+
+    Args:
+      nonce_polls: int, number of polls by nonce label
+      nonce_results: int, number of revisions to find by nonce label on the
+        final poll.
+    """
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        revision_name=None,
+        generation=5,
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        revision_labels={revision.NONCE_LABEL: self.nonce},
+        latestCreatedRevisionName='foo-00005-old',
+        **{'template.env_vars.literals': {
+            'key1': 'value1'
+        }})
+
+    self._ExpectBaseRevision(
+        name_polls=0,
+        nonce_polls=nonce_polls,
+        nonce_results=nonce_results,
+        name=None,
+        labels={revision.NONCE_LABEL: self.nonce},
+        latestCreatedRevisionName='foo-00005-old',
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        generation=5,
+        revision_name='foo-00006-myrevision',
+        latestCreatedRevisionName='foo-00005-old',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{
+            'template.env_vars.literals':
+                collections.OrderedDict([('key1', 'value1.2'),
+                                         ('key2', 'value2')])
+        })
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([(
+            'key1', 'value1.2'), ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [env_changes])
+
+  @parameterized.parameters([1, 2, 5])
+  def testUpdateNotFoundByRevisionNameNoNonce(self, name_polls):
+    """Test the update flow when the revision is not found by name and has no nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        generation=5,
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        latestCreatedRevisionName='foo-00005-old',
+        **{'template.env_vars.literals': {
+            'key1': 'value1'
+        }})
+
+    self._ExpectBaseRevision(
+        name_polls=name_polls,
+        found_by_name=False,
+        latestCreatedRevisionName='foo-00005-old',
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        generation=5,
+        revision_name='foo-00006-myrevision',
+        latestCreatedRevisionName='foo-00005-old',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{
+            'template.env_vars.literals':
+                collections.OrderedDict([('key1', 'value1.2'),
+                                         ('key2', 'value2')])
+        })
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([(
+            'key1', 'value1.2'), ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [env_changes])
+
+  @parameterized.parameters([(1, 2), (2, 1), (2, 5), (5, 2)])
+  def testUpdateNotFoundByRevisionNameNotFoundByNonce(self, name_polls,
+                                                      nonce_polls):
+    """Test the update flow when the revision is not found by name or nonce."""
+    self._ExpectExisting(
+        image='gcr.io/oldthing',
+        generation=5,
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        revision_labels={revision.NONCE_LABEL: self.nonce},
+        latestCreatedRevisionName='foo-00005-old',
+        **{'template.env_vars.literals': {
+            'key1': 'value1'
+        }})
+
+    self._ExpectBaseRevision(
+        name_polls=name_polls,
+        found_by_name=False,
+        nonce_polls=nonce_polls,
+        nonce_results=0,
+        labels={revision.NONCE_LABEL: self.nonce},
+        latestCreatedRevisionName='foo-00005-old',
+        image='gcr.io/oldthing',
+        imageDigest='gcr.io/newthing@sha256:abcdef',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'})
+
+    self._ExpectUpdate(
+        image='gcr.io/newthing@sha256:abcdef',
+        generation=5,
+        revision_name='foo-00006-myrevision',
+        latestCreatedRevisionName='foo-00005-old',
+        annotations={revision.USER_IMAGE_ANNOTATION: 'gcr.io/oldthing'},
+        **{
+            'template.env_vars.literals':
+                collections.OrderedDict([('key1', 'value1.2'),
+                                         ('key2', 'value2')])
+        })
+
+    env_changes = config_changes.EnvVarLiteralChanges(
+        env_vars_to_update=collections.OrderedDict([(
+            'key1', 'value1.2'), ('key2', 'value2')]))
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [env_changes])
 
   def _MakeService(self, new_api=False, **kwargs):
     """Set specified attributes of the service.
@@ -1163,14 +1365,15 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     """
     new_service = service.Service.New(
         self.mock_serverless_client, self.namespace.namespacesId)
-    if new_api:
-      new_service.spec.template = (
-          new_service.spec.runLatest.configuration.revisionTemplate)
-      new_service.spec.runLatest = None
     new_service.name = 'foo'
+    new_service.revision_name = 'foo-00001-{}'.format(self.revision_suffix)
     new_service.annotations[
         serverless_operations._CLIENT_NAME_ANNOTATION] = 'gcloud'
+    new_service.template.annotations[
+        serverless_operations._CLIENT_NAME_ANNOTATION] = 'gcloud'
     new_service.annotations[
+        serverless_operations._CLIENT_VERSION_ANNOTATION] = 'test_version'
+    new_service.template.annotations[
         serverless_operations._CLIENT_VERSION_ANNOTATION] = 'test_version'
     for k, v in kwargs.items():
       obj = new_service
@@ -1196,9 +1399,9 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
           dict_like[kk] = vv
       else:
         setattr(obj, key, v)
-    if revision.NONCE_LABEL not in new_service.template.labels:
-      new_service.template.labels[
-          revision.NONCE_LABEL] = self.nonce
+    if revision.USER_IMAGE_ANNOTATION in new_service.annotations:
+      new_service.template.annotations[revision.USER_IMAGE_ANNOTATION] = (
+          new_service.annotations[revision.USER_IMAGE_ANNOTATION])
     return new_service
 
   def _MakeRevision(self, **kwargs):
@@ -1240,10 +1443,16 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         if not field.repeated and isinstance(field, messages.MessageField):
           if _SeekAndModify(getattr(msg, field.name), name, value):
             return True
+        elif field.repeated:
+          items = getattr(msg, field.name)
+          if len(items) == 1 and isinstance(items[0], messages.Message):
+            if _SeekAndModify(items[0], name, value):
+              return True
       return False
 
     rev = revision.Revision.New(
         self.mock_serverless_client, self.namespace.namespacesId)
+    rev.name = 'foo-00001-{}'.format(self.revision_suffix)
     for k, v in kwargs.items():
       if isinstance(v, dict):
         dict_like = getattr(rev, k)
@@ -1252,7 +1461,6 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
       else:
         done = _SeekAndModify(rev.Message(), k, v)
         assert done, 'Failed to set field {}'.format(k)
-    rev.labels[revision.NONCE_LABEL] = self.nonce
     return rev
 
   def _ExpectCreate(self, **kwargs):
@@ -1275,6 +1483,17 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         response=new_service.Message())
 
   def _ExpectUpdate(self, exception=None, **kwargs):
+    """Expect that the service will be updated with these values.
+
+    See _MakeService for valid args.
+
+    Args:
+      exception: http_error to throw on update request
+      **kwargs: keyword arguments that define service attributes
+    """
+    # Make sure the generation is set
+    if 'generation' not in kwargs and 'metadata.generation' not in kwargs:
+      kwargs['metadata.generation'] = 0
     new_service = self._MakeService(**kwargs)
     update_request = (
         self.serverless_messages.
@@ -1291,6 +1510,16 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
           response=new_service.Message())
 
   def _ExpectExisting(self, **kwargs):
+    """Expect that a service already exists with these values.
+
+    See _MakeService for valid args.
+
+    Args:
+      **kwargs: keyword arguments that define service attributes
+    """
+    # Make sure the generation is set
+    if 'generation' not in kwargs and 'metadata.generation' not in kwargs:
+      kwargs['metadata.generation'] = 0
     old_service = self._MakeService(**kwargs)
     self.mock_serverless_client.namespaces_services.Get.Expect(
         (self.serverless_messages.
@@ -1299,37 +1528,141 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         response=old_service.Message(),
     )
 
-  def _ExpectBaseRevision(self, polls=1, results=1, **kwargs):
-    """Treat the server as having the given base revision.
-
-    Mimics returning it by nonce, and, if that doesn't work,
-    by latestCreatedRevisionName
+  def _PollUntilDonePatch(self, retrial_exception_counts):
+    """Override waiter.PollUntilDone to gracefully handle timeouts.
 
     Args:
-      polls: int, Number of times the client polls before the server "has"
-        the revision
-      results: int, Number of copies of the listed nonce the server pretends to
-        have.
+      retrial_exception_counts: List[int], for each call to
+        waiter.PollUntilDone, how many calls to the underlying function to allow
+        before raising retry.RetryException (alternatively, the number of
+        retrials + 1). If the given value is 0, then no retry limit will be
+        imposed for that call to waiter.PollUntilDone.
+
+    Returns:
+      A patch function for waiter.PollUntilDone that implements the retry-limit
+        mechanism.
+    """
+    self.poll_call_count = 0
+    poll_waiters = []
+    for count in retrial_exception_counts:
+      # Add a poll function with a built-in max count if specified
+      if count == 0:
+        poll_waiters.append(waiter.PollUntilDone)
+      else:
+        poll_waiters.append(
+            functools.partial(waiter.PollUntilDone, max_retrials=(count - 1)))
+
+    def _PollUntilDone(*args, **kwargs):
+      self.poll_call_count += 1
+      try:
+        return poll_waiters[self.poll_call_count - 1](*args, **kwargs)
+      except IndexError:
+        raise ValueError('PollUntilDone patch limit reached. '
+                         'Not enough patches specified.')
+
+    return _PollUntilDone
+
+  # pylint:disable=invalid-name
+  def _ExpectBaseRevision(self,
+                          name_polls=1,
+                          found_by_name=True,
+                          nonce_polls=0,
+                          nonce_results=1,
+                          latestCreatedRevisionName=None,
+                          **kwargs):
+    """Treat the server as having the given base revision.
+
+    Mimics by first checking revision name, then nonce, then
+    latestCreatedRevisionName depending on the polling amounts passed as
+    arguments.
+
+    Args:
+      name_polls: int, Number of times the client polls for a revision with the
+        given name before the server "has" the revision.
+      found_by_name: bool, True if the revision should be found by revision name
+        or False if additional requests are are necessary after polling by name.
+      nonce_polls: int, Number of time the client polls for a revision with the
+        given nonce before the server "has" the revision.
+      nonce_results: int, Number of copies of revisions with the listed nonce
+        the server pretends to have.
+      latestCreatedRevisionName: str, the latest created revision name to poll
+        with when name polling and nonce polling fail
       **kwargs: Fields for the revision to have
     """
     rev = self._MakeRevision(**kwargs)
-    for i in range(polls):
-      self.mock_serverless_client.namespaces_revisions.List.Expect(
-          (self.serverless_messages.
-           RunNamespacesRevisionsListRequest(
-               parent=self.namespace.RelativeName(),
-               labelSelector='{} = {}'.format(revision.NONCE_LABEL,
-                                              self.nonce))),
-          response=(
-              self.serverless_messages.ListRevisionsResponse(
-                  items=[] if i < polls - 1 else [rev.Message()] * results)))
-    if not polls or results != 1:
-      # We fall back to getting a revision
+    retrial_exception_counts = []
+    # Poll by revision name
+    for i in range(name_polls):
+      response = None
+      exception = None
+      if i < name_polls - 1 or not found_by_name:
+        exception = api_exceptions.HttpNotFoundError(None, None, None)
+      else:
+        response = rev.Message()
       self.mock_serverless_client.namespaces_revisions.Get.Expect(
-          (self.serverless_messages.
-           RunNamespacesRevisionsGetRequest(
-               name=self._RevisionRef(rev.name).RelativeName())),
+          (self.serverless_messages.RunNamespacesRevisionsGetRequest(
+              name=self._RevisionRef(rev.name).RelativeName())),
+          response=response,
+          exception=exception)
+    # Specify retry limits if applicable
+    if name_polls > 0:
+      retrial_exception_counts.append(name_polls if not found_by_name else 0)
+    # Poll by nonce
+    for i in range(nonce_polls):
+      self.mock_serverless_client.namespaces_revisions.List.Expect(
+          (self.serverless_messages.RunNamespacesRevisionsListRequest(
+              parent=self.namespace.RelativeName(),
+              labelSelector='{} = {}'.format(revision.NONCE_LABEL,
+                                             self.nonce))),
+          response=(self.serverless_messages.ListRevisionsResponse(
+              items=([] if i < nonce_polls - 1 else [rev.Message()] *
+                     nonce_results))))
+    # Specify retry limits if applicable
+    if nonce_polls > 0:
+      retrial_exception_counts.append(nonce_polls if nonce_results != 1 else 0)
+    # We fall back to getting a revision by latestCreatedRevisionName
+    if (latestCreatedRevisionName is not None and
+        (name_polls == 0 or not found_by_name) and
+        (nonce_polls == 0 or nonce_results != 1)):
+      self.mock_serverless_client.namespaces_revisions.Get.Expect(
+          self.serverless_messages.RunNamespacesRevisionsGetRequest(
+              name=self._RevisionRef(latestCreatedRevisionName).RelativeName()),
           response=rev.Message())
+    self.StartObjectPatch(
+        waiter,
+        'PollUntilDone',
+        side_effect=self._PollUntilDonePatch(retrial_exception_counts))
+  # pylint:enable=invalid-name
+
+
+class ServerlessOperationsTestV1(ServerlessOperationsTest):
+
+  API_VERSION = 'v1'
+
+  def _MakeService(self, new_api=False, **kwargs):
+    return super(ServerlessOperationsTestV1, self)._MakeService(
+        new_api=True, **kwargs)
+
+  def _ExpectBaseRevision(self,
+                          name_polls=1,
+                          found_by_name=True,
+                          nonce_polls=0,
+                          nonce_results=1,
+                          latestCreatedRevisionName=None,
+                          **kwargs):
+    return super(ServerlessOperationsTestV1, self)._ExpectBaseRevision(
+        name_polls=name_polls,
+        found_by_name=found_by_name,
+        nonce_polls=nonce_polls,
+        nonce_results=nonce_results,
+        latestCreatedRevisionName=latestCreatedRevisionName,
+        **kwargs)
+
+  def _DeleteResponse(self):
+    return self.serverless_messages.K8sIoApimachineryPkgApisMetaV1Status()
+
+  def testUpdateNoNonce(self):
+    pass
 
 
 if __name__ == '__main__':

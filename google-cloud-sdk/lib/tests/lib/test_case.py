@@ -2195,7 +2195,7 @@ class WithOutputCapture(WithContentAssertions):
     package_path = self.GetTestdataPackagePath(golden_path)
     expected = console_attr.Decode(
         pkg_resources.GetResourceFromFile(golden_path))
-    with io.open(path, 'rt') as f:
+    with io.open(path, 'rt', encoding='utf-8') as f:
       self._AssertContains(
           expected, f.read(), package_path, golden=True, **kwargs)
 

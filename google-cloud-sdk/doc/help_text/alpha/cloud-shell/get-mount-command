@@ -3,7 +3,7 @@ NAME
         Cloud Shell home directory via sshfs
 
 SYNOPSIS
-    gcloud alpha cloud-shell get-mount-command MOUNT_DIR
+    gcloud alpha cloud-shell get-mount-command MOUNT_DIR [--boosted]
         [--force-key-file-overwrite] [--ssh-key-file] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -22,6 +22,11 @@ POSITIONAL ARGUMENTS
         mounted.
 
 FLAGS
+     --boosted
+        If provided, starts Cloud Shell in boost mode. If there is alread a
+        running Cloud Shell session that is not boosted, this will restart the
+        session.
+
      --force-key-file-overwrite
         If enabled gcloud will regenerate and overwrite the files associated
         with a broken SSH key without asking for confirmation in both

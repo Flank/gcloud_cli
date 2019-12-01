@@ -27,8 +27,11 @@ from tests.lib.api_lib.run import base
 class ConditionTest(base.ServerlessApiBase, parameterized.TestCase):
   """Sanity check for Condition."""
 
+  COND_CLASSNAME = 'ConfigurationCondition'
+
   def SetUp(self):
-    self.condition_class = self.serverless_messages.ConfigurationCondition
+    self.condition_class = getattr(self.serverless_messages,
+                                   self.COND_CLASSNAME)
 
   def testGetStatus(self):
     """Check status converts bool as expected."""
@@ -146,6 +149,12 @@ class ConditionTest(base.ServerlessApiBase, parameterized.TestCase):
                                 ready_condition='type1')
     self.assertCountEqual(
         ['type2', 'type3'], list(cond.NonTerminalSubconditions()))
+
+
+class ConditionTestV1(ConditionTest):
+
+  VERSION = 'v1'
+  COND_CLASSNAME = 'GoogleCloudRunV1Condition'
 
 
 if __name__ == '__main__':

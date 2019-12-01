@@ -7,8 +7,7 @@ SYNOPSIS
         --location=LOCATION (--image=IMAGE | --tag=TAG | --tag-default)
         [--app-name=APP_NAME] [--app-version=APP_VERSION] [--async]
         [--config=CONFIG] [--expose=EXPOSE] [--gcs-staging-dir=GCS_STAGING_DIR]
-        [--namespace=NAMESPACE; default="default"] [--timeout=TIMEOUT]
-        [GCLOUD_WIDE_FLAG ...]
+        [--namespace=NAMESPACE] [--timeout=TIMEOUT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Build and deploy to a target Google Kubernetes Engine cluster.
@@ -75,14 +74,15 @@ OPTIONAL FLAGS
 
      --config=CONFIG
         Path to the Kubernetes YAML, or directory containing multiple
-        Kubernetes YAML files, used to deploy the container image, relative to
-        SOURCE. The files must reference the provided container image or tag.
+        Kubernetes YAML files, used to deploy the container image. The path is
+        relative to the repository root. The files must reference the provided
+        container image or tag.
 
         If this field is not set, a default Deployment config and Horizontal
         Pod Autoscaler config are used to deploy the image.
 
      --expose=EXPOSE
-        Port that the deployed application listens to. If set, a Kubernetes
+        Port that the deployed application listens on. If set, a Kubernetes
         Service of type 'LoadBalancer' is created with a single TCP port
         mapping that exposes this port.
 
@@ -97,7 +97,7 @@ OPTIONAL FLAGS
         'source' sub-directory and configs are written to the 'config'
         sub-directory.
 
-     --namespace=NAMESPACE; default="default"
+     --namespace=NAMESPACE
         Namespace of the target cluster to deploy to. If this field is not set,
         the 'default' namespace is used.
 

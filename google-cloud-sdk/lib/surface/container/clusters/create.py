@@ -179,6 +179,8 @@ for examples.
   flags.AddAcceleratorArgs(parser)
   flags.AddDiskTypeFlag(parser)
   flags.AddMetadataFlags(parser)
+  flags.AddDatabaseEncryptionFlag(parser)
+  flags.AddShieldedInstanceFlags(parser)
 
 
 def ValidateBasicAuthFlags(args):
@@ -248,6 +250,7 @@ def ParseCreateOptionsBase(args):
       enable_ip_alias=args.enable_ip_alias,
       enable_intra_node_visibility=args.enable_intra_node_visibility,
       enable_kubernetes_alpha=args.enable_kubernetes_alpha,
+      enable_cloud_run_alpha=args.enable_cloud_run_alpha if args.IsSpecified('enable_cloud_run_alpha') else None,
       enable_legacy_authorization=args.enable_legacy_authorization,
       enable_master_authorized_networks=args.enable_master_authorized_networks,
       enable_network_policy=args.enable_network_policy,
@@ -261,6 +264,9 @@ def ParseCreateOptionsBase(args):
       labels=args.labels,
       local_ssd_count=args.local_ssd_count,
       maintenance_window=args.maintenance_window,
+      maintenance_window_start=args.maintenance_window_start,
+      maintenance_window_end=args.maintenance_window_end,
+      maintenance_window_recurrence=args.maintenance_window_recurrence,
       master_authorized_networks=args.master_authorized_networks,
       master_ipv4_cidr=args.master_ipv4_cidr,
       max_nodes=args.max_nodes,
@@ -292,7 +298,21 @@ def ParseCreateOptionsBase(args):
       enable_network_egress_metering=args.enable_network_egress_metering,
       enable_resource_consumption_metering=\
           args.enable_resource_consumption_metering,
-      enable_vertical_pod_autoscaling=args.enable_vertical_pod_autoscaling)
+      database_encryption_key=args.database_encryption_key,
+      enable_vertical_pod_autoscaling=args.enable_vertical_pod_autoscaling,
+      enable_autoprovisioning=args.enable_autoprovisioning,
+      autoprovisioning_config_file=args.autoprovisioning_config_file,
+      autoprovisioning_service_account=args.autoprovisioning_service_account,
+      autoprovisioning_scopes=args.autoprovisioning_scopes,
+      autoprovisioning_locations=args.autoprovisioning_locations,
+      min_cpu=args.min_cpu,
+      max_cpu=args.max_cpu,
+      min_memory=args.min_memory,
+      max_memory=args.max_memory,
+      min_accelerator=args.min_accelerator,
+      max_accelerator=args.max_accelerator,
+      shielded_secure_boot=args.shielded_secure_boot,
+      shielded_integrity_monitoring=args.shielded_integrity_monitoring)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -310,13 +330,13 @@ class Create(base.CreateCommand):
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
     flags.AddEnableBinAuthzFlag(parser)
     flags.AddEnableKubernetesAlphaFlag(parser)
+    flags.AddEnableCloudRunAlphaFlag(parser)
     flags.AddEnableStackdriverKubernetesFlag(parser)
     flags.AddEnableLegacyAuthorizationFlag(parser)
     flags.AddIPAliasFlags(parser)
     flags.AddLabelsFlag(parser)
     flags.AddLocalSSDFlag(parser)
-    flags.AddMaintenanceWindowGroup(
-        parser, add_emw_flags=False, emw_hidden=True)
+    flags.AddMaintenanceWindowGroup(parser)
     flags.AddMasterAuthorizedNetworksFlags(parser)
     flags.AddMinCpuPlatformFlag(parser)
     flags.AddNetworkPolicyFlags(parser)
@@ -327,14 +347,14 @@ class Create(base.CreateCommand):
         parser, with_deprecated=False, with_alpha=False)
     flags.AddClusterVersionFlag(parser)
     flags.AddNodeVersionFlag(parser)
-    flags.AddEnableAutoUpgradeFlag(parser)
+    flags.AddEnableAutoUpgradeFlag(parser, default=True)
     flags.AddEnableIntraNodeVisibilityFlag(parser)
     flags.AddTpuFlags(parser, hidden=False)
+    flags.AddAutoprovisioningFlags(parser, hidden=False, for_create=True)
     flags.AddResourceUsageExportFlags(parser)
-    flags.AddVerticalPodAutoscalingFlag(parser, hidden=True)
+    flags.AddVerticalPodAutoscalingFlag(parser)
 
   def ParseCreateOptions(self, args):
-    flags.WarnGAForFutureAutoUpgradeChange()
     return ParseCreateOptionsBase(args)
 
   def Run(self, args):
@@ -457,13 +477,13 @@ class CreateBeta(Create):
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
     flags.AddEnableBinAuthzFlag(parser)
     flags.AddEnableKubernetesAlphaFlag(parser)
+    flags.AddEnableCloudRunAlphaFlag(parser)
     flags.AddEnableLegacyAuthorizationFlag(parser)
     flags.AddIPAliasFlags(parser)
     flags.AddIstioConfigFlag(parser)
     flags.AddLabelsFlag(parser)
     flags.AddLocalSSDFlag(parser)
-    flags.AddMaintenanceWindowGroup(
-        parser, emw_hidden=False, add_emw_flags=True)
+    flags.AddMaintenanceWindowGroup(parser)
     flags.AddMasterAuthorizedNetworksFlags(parser)
     flags.AddMinCpuPlatformFlag(parser)
     flags.AddWorkloadMetadataFromNodeFlag(parser)
@@ -484,24 +504,14 @@ class CreateBeta(Create):
     flags.AddWorkloadIdentityFlags(parser)
     flags.AddEnableShieldedNodesFlags(parser)
     flags.AddEnableAutoUpgradeFlag(parser, default=True)
-    flags.AddDatabaseEncryptionFlag(parser)
-    flags.AddShieldedInstanceFlags(parser)
+    flags.AddSurgeUpgradeFlag(parser, default=1)
+    flags.AddMaxUnavailableUpgradeFlag(parser, is_create=True)
     _AddReleaseChannelGroup(parser)
 
   def ParseCreateOptions(self, args):
     ops = ParseCreateOptionsBase(args)
     flags.WarnForNodeVersionAutoUpgrade(args)
-    ops.enable_autoprovisioning = args.enable_autoprovisioning
-    ops.autoprovisioning_config_file = args.autoprovisioning_config_file
-    ops.autoprovisioning_service_account = args.autoprovisioning_service_account
-    ops.autoprovisioning_scopes = args.autoprovisioning_scopes
-    ops.autoprovisioning_locations = args.autoprovisioning_locations
-    ops.min_cpu = args.min_cpu
-    ops.max_cpu = args.max_cpu
-    ops.min_memory = args.min_memory
-    ops.max_memory = args.max_memory
-    ops.min_accelerator = args.min_accelerator
-    ops.max_accelerator = args.max_accelerator
+    flags.ValidateSurgeUpgradeSettings(args)
     ops.min_cpu_platform = args.min_cpu_platform
     ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.enable_pod_security_policy = args.enable_pod_security_policy
@@ -513,13 +523,9 @@ class CreateBeta(Create):
     ops.identity_namespace = args.identity_namespace
     ops.enable_shielded_nodes = args.enable_shielded_nodes
     flags.ValidateIstioConfigCreateArgs(args.istio_config, args.addons)
-    ops.database_encryption_key = args.database_encryption_key
-    ops.shielded_secure_boot = args.shielded_secure_boot
-    ops.shielded_integrity_monitoring = args.shielded_integrity_monitoring
-    ops.maintenance_window_start = args.maintenance_window_start
-    ops.maintenance_window_end = args.maintenance_window_end
-    ops.maintenance_window_recurrence = args.maintenance_window_recurrence
     ops.release_channel = args.release_channel
+    ops.max_surge_upgrade = args.max_surge_upgrade
+    ops.max_unavailable_upgrade = args.max_unavailable_upgrade
     return ops
 
 
@@ -539,13 +545,13 @@ class CreateAlpha(Create):
     flags.AddEnableAutoRepairFlag(parser, for_create=True)
     flags.AddEnableBinAuthzFlag(parser)
     flags.AddEnableKubernetesAlphaFlag(parser)
+    flags.AddEnableCloudRunAlphaFlag(parser)
     flags.AddEnableLegacyAuthorizationFlag(parser)
     flags.AddIPAliasFlags(parser)
     flags.AddIstioConfigFlag(parser)
     flags.AddLabelsFlag(parser)
     flags.AddLocalSSDAndLocalSSDVolumeConfigsFlag(parser)
-    flags.AddMaintenanceWindowGroup(
-        parser, emw_hidden=False, add_emw_flags=True)
+    flags.AddMaintenanceWindowGroup(parser)
     flags.AddMasterAuthorizedNetworksFlags(parser)
     flags.AddMinCpuPlatformFlag(parser)
     flags.AddWorkloadMetadataFromNodeFlag(parser)
@@ -573,25 +579,16 @@ class CreateAlpha(Create):
     flags.AddDisableDefaultSnatFlag(parser, for_cluster_create=True)
     _AddReleaseChannelGroup(parser)
     flags.AddEnableAutoUpgradeFlag(parser, default=True)
-    flags.AddDatabaseEncryptionFlag(parser)
-    flags.AddSurgeUpgradeFlag(parser)
-    flags.AddMaxUnavailableUpgradeFlag(parser)
+    flags.AddSurgeUpgradeFlag(parser, default=1)
+    flags.AddMaxUnavailableUpgradeFlag(parser, is_create=True)
     flags.AddLinuxSysctlFlags(parser)
-    flags.AddShieldedInstanceFlags(parser)
     flags.AddNodeConfigFlag(parser)
     flags.AddCostManagementConfigFlag(parser)
 
   def ParseCreateOptions(self, args):
     ops = ParseCreateOptionsBase(args)
     flags.WarnForNodeVersionAutoUpgrade(args)
-    ops.enable_autoprovisioning = args.enable_autoprovisioning
-    ops.autoprovisioning_config_file = args.autoprovisioning_config_file
-    ops.min_cpu = args.min_cpu
-    ops.max_cpu = args.max_cpu
-    ops.min_memory = args.min_memory
-    ops.max_memory = args.max_memory
-    ops.min_accelerator = args.min_accelerator
-    ops.max_accelerator = args.max_accelerator
+    flags.ValidateSurgeUpgradeSettings(args)
     ops.autoscaling_profile = args.autoscaling_profile
     ops.local_ssd_volume_configs = args.local_ssd_volumes
     ops.workload_metadata_from_node = args.workload_metadata_from_node
@@ -618,22 +615,12 @@ class CreateAlpha(Create):
     ops.enable_peering_route_sharing = args.enable_peering_route_sharing
     ops.enable_shielded_nodes = args.enable_shielded_nodes
     ops.release_channel = args.release_channel
-    ops.autoprovisioning_service_account = args.autoprovisioning_service_account
-    ops.autoprovisioning_scopes = args.autoprovisioning_scopes
-    ops.autoprovisioning_locations = args.autoprovisioning_locations
-    ops.database_encryption_key = args.database_encryption_key
     ops.max_surge_upgrade = args.max_surge_upgrade
     ops.max_unavailable_upgrade = args.max_unavailable_upgrade
     ops.linux_sysctls = args.linux_sysctls
     ops.disable_default_snat = args.disable_default_snat
 
-    ops.shielded_secure_boot = args.shielded_secure_boot
-    ops.shielded_integrity_monitoring = args.shielded_integrity_monitoring
     ops.node_config = args.node_config
-
-    ops.maintenance_window_start = args.maintenance_window_start
-    ops.maintenance_window_end = args.maintenance_window_end
-    ops.maintenance_window_recurrence = args.maintenance_window_recurrence
 
     ops.enable_cost_management = args.enable_cost_management
 

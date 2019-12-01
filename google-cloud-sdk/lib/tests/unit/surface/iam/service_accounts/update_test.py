@@ -30,28 +30,27 @@ class UpdateTestGA(unit_test_base.BaseTest):
     self.track = calliope_base.ReleaseTrack.GA
 
   def _DoUpdateServiceAccount(self, command, service_account, run_asserts=True):
-    # For this track, '-' in {projectsId} is used as wildcard. This
-    # will be cleaned up after the declarative update command is promoted to GA.
-    service_account_name = 'projects/-/serviceAccounts/{}'.format(
-        service_account)
-
-    self.client.projects_serviceAccounts.Update.Expect(
-        request=self.msgs.ServiceAccount(
-            name=service_account_name, displayName='New Name'),
-        response=self.msgs.ServiceAccount(
-            email=service_account,
+    service_account_name = self.get_service_account_name(
+        self.Project(), service_account)
+    self.client.projects_serviceAccounts.Patch.Expect(
+        request=self.msgs.IamProjectsServiceAccountsPatchRequest(
             name=service_account_name,
-            projectId='test-project',
-            displayName='New Name'))
+            patchServiceAccountRequest=self.msgs.PatchServiceAccountRequest(
+                updateMask='displayName',
+                serviceAccount=self.msgs.ServiceAccount(
+                    displayName='New Name'))),
+        response=self.msgs.ServiceAccount(
+            name=service_account_name, displayName='New Name'))
 
     self.Run(command)
 
     if run_asserts:
-      self.AssertOutputContains('projectId: test-project')
       self.AssertOutputContains('displayName: New Name')
-      self.AssertOutputContains('email: ' + service_account)
       self.AssertOutputContains('name: ' + service_account_name)
       self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
+
+  def get_service_account_name(self, project, service_account):
+    return 'projects/{0}/serviceAccounts/{1}'.format(project, service_account)
 
   def testUpdateServiceAccount(self):
     service_account = 'test@test-project.iam.gserviceaccount.com'
@@ -74,38 +73,6 @@ class UpdateTestGA(unit_test_base.BaseTest):
       self._DoUpdateServiceAccount(command, service_account, run_asserts=False)
     except cli_test_base.MockArgumentError:
       self.fail('update should accept unique ids for service accounts.')
-
-
-class UpdateTestBeta(UpdateTestGA):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def _DoUpdateServiceAccount(self, command, service_account, run_asserts=True):
-    service_account_name = self.get_service_account_name(
-        self.Project(), service_account)
-    self.client.projects_serviceAccounts.Patch.Expect(
-        request=self.msgs.IamProjectsServiceAccountsPatchRequest(
-            name=service_account_name,
-            patchServiceAccountRequest=self.msgs.PatchServiceAccountRequest(
-                updateMask='displayName',
-                serviceAccount=self.msgs.ServiceAccount(
-                    displayName='New Name'))),
-        response=self.msgs.ServiceAccount(
-            name=service_account_name, displayName='New Name'))
-
-    self.Run(command)
-
-    if run_asserts:
-      self.AssertOutputContains('displayName: New Name')
-      self.AssertOutputContains('name: ' + service_account_name)
-      self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
-
-  # For other tracks, '-' in {projectsId} is used as wildcard. This
-  # would get clean up after the declarative update command promoted to other
-  # tracks.
-  def get_service_account_name(self, project, service_account):
-    return 'projects/{0}/serviceAccounts/{1}'.format(project, service_account)
 
   def testUpdateServiceAccountWithDisplayName(self):
     service_account = 'test@test-project.iam.gserviceaccount.com'
@@ -188,21 +155,11 @@ class UpdateTestBeta(UpdateTestGA):
         'Specify at least one field to update.'):
       self.Run(command)
 
-  def testUpdateServiceAccountWithServiceAccount(self):
-    service_account = 'test@test-project.iam.gserviceaccount.com'
-    command = ('iam service-accounts update --display-name "New Name" '
-               '%s --account test2@test-project.iam.gserviceaccount.com' %
-               service_account)
-    self._DoUpdateServiceAccount(command, service_account)
 
-  def testUpdateServiceAccountValidUniqueId(self):
-    service_account = self.sample_unique_id
-    command = ('iam service-accounts update --display-name "New Name" ' +
-               service_account)
-    try:
-      self._DoUpdateServiceAccount(command, service_account, run_asserts=False)
-    except cli_test_base.MockArgumentError:
-      self.fail('update should accept unique ids for service accounts.')
+class UpdateTestBeta(UpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class UpdateTestAlpha(UpdateTestBeta):

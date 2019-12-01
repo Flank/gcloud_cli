@@ -34,6 +34,24 @@ help\fR for details.
 
 
 
+.SH "EXAMPLES"
+
+To remove all POSIX accounts associated with the current user and project, run:
+
+.RS 2m
+$ gcloud beta compute os\-login remove\-profile
+.RE
+
+To remove all POSIX accounts associated with the current user in the project
+named \f5example\-project\fR, run:
+
+.RS 2m
+$ gcloud beta compute os\-login remove\-profile \e
+    \-\-project=example\-project
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in BETA and may change without notice. These variants

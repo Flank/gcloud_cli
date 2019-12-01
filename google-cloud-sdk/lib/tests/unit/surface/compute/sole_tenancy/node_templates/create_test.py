@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for the sole-tenancy node-templates delete subcommand."""
+"""Tests for the sole-tenancy node-templates create subcommand."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -177,9 +177,9 @@ class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
     self.SelectApi('alpha')
 
   @parameterized.named_parameters(
-      ('SimpleDisk', 'type=local-ssd,count=1', 'local-ssd', '1', None),
-      ('SizeSpecified', 'type=local-ssd,count=1,size=375GB', 'local-ssd', '1',
-       '375'),
+      ('SimpleDisk', 'type=local-ssd,count=1', 'local-ssd', 1, None),
+      ('SizeSpecified', 'type=local-ssd,count=1,size=375GB', 'local-ssd', 1,
+       375),
       )
   def testCreate_Disk(self, disk, disk_type, count, size):
     template = self._CreateBaseNodeTemplateMessage()

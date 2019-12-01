@@ -38,8 +38,14 @@ COMMANDS
      edit
         Modify backend services.
 
+     export
+        Export a backend service.
+
      get-health
         Get backend health statuses from a backend service.
+
+     import
+        Import a backend service.
 
      list
         List Google Compute Engine backend services.

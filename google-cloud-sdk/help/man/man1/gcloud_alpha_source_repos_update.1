@@ -15,12 +15,6 @@ gcloud alpha source repos update \- update the configuration of a Cloud Source R
 
 
 
-.SH "DESCRIPTION"
-
-\fB(ALPHA)\fR Update the configuration of a Cloud Source Repository.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -133,6 +127,19 @@ These flags are available to all commands: \-\-account, \-\-billing\-project,
 \-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To associate a Cloud Pub/Sub topic to receive repository update notifications,
+run:
+
+.RS 2m
+$ gcloud alpha source repos update \-\-add\-topic=TOPIC_NAME \e
+    \-\-service\-account=SERVICE_ACCOUNT_EMAIL \e
+    \-\-message\-format=json
+.RE
 
 
 

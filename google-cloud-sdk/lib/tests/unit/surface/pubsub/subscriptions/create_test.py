@@ -531,14 +531,20 @@ class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest,
   @parameterized.parameters(
       (' --dead-letter-topic topic2 --max-delivery-attempts 5', 'topic2', 5),
       (' --dead-letter-topic topic2 --max-delivery-attempts 100', 'topic2',
-       100), (' --dead-letter-topic topic2', 'topic2', None))
+       100), (' --dead-letter-topic topic2', 'topic2', None),
+      (' --dead-letter-topic projects/other-project/topics/topic2 '
+       '--max-delivery-attempts 5', 'projects/other-project/topics/topic2', 5),
+      (' --dead-letter-topic topic2 --max-delivery-attempts 5 '
+       '--dead-letter-topic-project other-project',
+       'projects/other-project/topics/topic2', 5))
   def testDeadLetterPolicyPullSubscriptionsCreate(self, dead_letter_flags,
                                                   dead_letter_topic,
                                                   max_delivery_attempts):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     topic_ref = util.ParseTopic('topic1', self.Project())
     dead_letter_policy = self.msgs.DeadLetterPolicy(
-        deadLetterTopic=dead_letter_topic,
+        deadLetterTopic=util.ParseTopic(dead_letter_topic,
+                                        self.Project()).RelativeName(),
         maxDeliveryAttempts=max_delivery_attempts)
     req_subscription = self.msgs.Subscription(
         name=sub_ref.RelativeName(),

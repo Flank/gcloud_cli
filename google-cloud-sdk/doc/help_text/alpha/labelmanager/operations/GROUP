@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha labelmanager operations - describe label manager long running
+        operations
+
+SYNOPSIS
+    gcloud alpha labelmanager operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The Label Manager Service gives you centralized and programmatic
+    control over your organization's labels. As the label administrator, you
+    will be able to create and configure restrictions across the labels in the
+    org. As the label user, you will be able to bind label values to different
+    resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describes a label manager long running operation.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you may be trying to access an API with an
+    invitation-only early access whitelist.
+

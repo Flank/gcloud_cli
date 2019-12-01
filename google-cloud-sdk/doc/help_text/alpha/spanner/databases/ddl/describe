@@ -64,6 +64,12 @@ GCLOUD WIDE FLAGS
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+EXAMPLES
+    To describe the DDL for a given Cloud Spanner database, run:
+
+        $ gcloud alpha spanner databases ddl describe my-database-id \
+            --instance=my-instance-id
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right

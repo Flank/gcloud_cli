@@ -31,11 +31,11 @@ import tests.unit.surface
 
 class ScenarioConfig(object):
 
-  def __init__(self, name, resource_path, tracks, skip_data):
+  def __init__(self, name, resource_path, tracks, filter_data):
     self.name = name
     self.resource_path = resource_path
     self.tracks = tracks
-    self.skip_data = skip_data
+    self.filter_data = filter_data
 
   def __str__(self):
     return self.resource_path
@@ -77,7 +77,7 @@ def _Find(prefixes, scenario_root):
           spec_data = LoadYAMLFile(resource_path)
           tracks = GetTracks(spec_data)
           scenarios.append(ScenarioConfig(
-              name, resource_path, tracks, spec_data.get('skip')))
+              name, resource_path, tracks, spec_data.get('filters')))
   return scenarios
 
 

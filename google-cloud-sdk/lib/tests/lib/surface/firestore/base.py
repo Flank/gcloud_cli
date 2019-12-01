@@ -31,11 +31,6 @@ class FirestoreCommandUnitTest(cli_test_base.CliTestBase,
   """A base class for Firestore command unit tests."""
 
   def SetUp(self):
-    self.mock_firestore_v1beta1 = mock.Client(
-        client_class=apis.GetClientClass('firestore', 'v1beta1'))
-    self.mock_firestore_v1beta1.Mock()
-    self.addCleanup(self.mock_firestore_v1beta1.Unmock)
-    # Operations use v1, so we have two mocks.
     self.mock_firestore_v1 = mock.Client(
         client_class=apis.GetClientClass('firestore', 'v1'))
     self.mock_firestore_v1.Mock()
@@ -61,4 +56,4 @@ class FirestoreCommandUnitTest(cli_test_base.CliTestBase,
 
   def RunFirestoreTest(self, command):
     """Helper to run command with appropriate flags set."""
-    return self.Run('alpha firestore %s --format=disable' % command)
+    return self.Run('firestore %s --format=disable' % command)

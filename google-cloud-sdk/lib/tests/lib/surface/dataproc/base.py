@@ -47,6 +47,8 @@ def _CreateLogger(name, log_level=None):
 class DataprocTestBase(cli_test_base.CliTestBase):
   """Base class for all Dataproc tests."""
 
+  REGION = 'global'
+
   @classmethod
   def SetUpClass(cls):
     log_level = os.getenv('CLOUDSDK_TEST_LOG_LEVEL', 'INFO')
@@ -56,12 +58,12 @@ class DataprocTestBase(cli_test_base.CliTestBase):
     # Show captured output and error on debug and finer.
     if self.log.getEffectiveLevel() <= logging.DEBUG:
       self._show_test_output = True
-    # Setting a default value for region
-    if properties.VALUES.dataproc.region.Get() is None:
-      properties.VALUES.dataproc.region.Set('global')
 
-  def RunDataproc(self, command, output_format='disable'):
+  def RunDataproc(self, command, output_format='disable', set_region=True):
     """Wrapper around test_base.Run to abstract out common args."""
+    region_prop = properties.VALUES.dataproc.region
+    if set_region and not region_prop.IsExplicitlySet():
+      region_prop.Set(self.REGION)
     cmd = '--format={format} dataproc {command}'.format(
         format=output_format, command=command)
     return self.Run(cmd)

@@ -74,8 +74,10 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
   VALUE_C = 'test_value_C'
   VALUE_D = 'test_value_D'
 
-  CONDITION_EXPRESSION_A = 'resource.matchLabels(123, 456)'
-  CONDITION_EXPRESSION_B = 'resource.matchLabels(234, 567)'
+  CONDITION_EXPRESSION_A = ('resource.matchLabels("labelKeys/123", '
+                            '"labelValues/456")')
+  CONDITION_EXPRESSION_B = ('resource.matchLabels("labelKeys/234", '
+                            '"labelValues/567")')
 
   ETAG_A = '12345678'
   ETAG_B = '23456789'
@@ -129,12 +131,13 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
       rules = list(map(self._GetRuleFromRuleDatum, rule_data))
 
     return self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1Policy(
-        name=name,
-        etag=etag,
-        updateTime=update_time,
-        inheritFromParent=inherit_from_parent,
-        reset=reset,
-        rules=rules)
+        spec=self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1PolicySpec(
+            name=name,
+            etag=etag,
+            updateTime=update_time,
+            inheritFromParent=inherit_from_parent,
+            reset=reset,
+            rules=rules))
 
   def Constraint(self, name=CONSTRAINT_NAME_A):
     """Returns a constraint object.
@@ -166,8 +169,8 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
         to the service.
     """
     request_policy = copy.deepcopy(response_policy)
-    request_policy.etag = request_etag
-    request_policy.updateTime = request_update_time
+    request_policy.spec.etag = request_etag
+    request_policy.spec.updateTime = request_update_time
     request = self.org_policy_messages.OrgpolicyPoliciesCreateRequest(
         constraint=request_constraint,
         parent=request_parent,
@@ -184,7 +187,7 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
         object to be returned as part of the response from the service.
     """
     request = self.org_policy_messages.OrgpolicyPoliciesGetRequest(
-        name=response_policy.name)
+        name=response_policy.spec.name)
 
     self.mock_policy_service.Get.Expect(
         request=request, response=response_policy)
@@ -211,7 +214,7 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
         object to be returned as part of the response from the service.
     """
     request = self.org_policy_messages.OrgpolicyPoliciesGetEffectivePolicyRequest(
-        name=response_policy.name)
+        name=response_policy.spec.name)
 
     self.mock_policy_service.GetEffectivePolicy.Expect(
         request=request, response=response_policy)
@@ -279,13 +282,13 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
       The policy object returned from the service.
     """
     request = self.org_policy_messages.OrgpolicyPoliciesPatchRequest(
-        name=request_policy.name,
+        name=request_policy.spec.name,
         forceUnconditionalWrite=request_force_unconditional_write,
         googleCloudOrgpolicyV2alpha1Policy=request_policy)
 
     response_policy = copy.deepcopy(request_policy)
-    response_policy.etag = response_etag
-    response_policy.updateTime = response_update_time
+    response_policy.spec.etag = response_etag
+    response_policy.spec.updateTime = response_update_time
 
     self.mock_policy_service.Patch.Expect(
         request=request, response=response_policy)
@@ -338,11 +341,11 @@ class OrgPolicyUnitTestBase(sdk_test_base.WithFakeAuth, _OrgPolicyTestBase):
 
     values = None
     if 'allowed_values' in rule_datum or 'denied_values' in rule_datum:
-      values = self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1PolicyPolicyRuleStringValues(
+      values = self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1PolicySpecPolicyRuleStringValues(
           allowedValues=rule_datum.get('allowed_values') or [],
           deniedValues=rule_datum.get('denied_values') or [])
 
-    return self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1PolicyPolicyRule(
+    return self.org_policy_messages.GoogleCloudOrgpolicyV2alpha1PolicySpecPolicyRule(
         condition=condition,
         allowAll=rule_datum.get('allow_all'),
         denyAll=rule_datum.get('deny_all'),

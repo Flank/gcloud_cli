@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import exceptions
 from tests.lib import test_case
 from tests.lib.surface.container.hub.features import base
 
@@ -33,35 +34,43 @@ class EnableTest(base.FeaturesTestBase):
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _MakeMultiClusterIngressFeatureSpec(self, config_membership):
-    return self.messages.MultiClusterIngressFeatureSpec(
-        configMembership=config_membership)
+  def _ExpectCreateCalls(self, config_membership_id):
+    config_membership = '{0}/memberships/{1}'.format(
+        self.memberships_api.parent, config_membership_id)
+    feature = self.features_api._MakeFeature(
+        multiclusteringressFeatureSpec=
+        self.features_api.messages.MultiClusterIngressFeatureSpec(
+            configMembership=config_membership))
 
-  def _ExpectCreateCalls(self, feature):
-    operation = self._MakeOperation()
-    self.ExpectCreateFeature(feature, operation)
-    self.ExpectGetOperation(operation)
+    operation = self.features_api._MakeOperation()
+    self.features_api.ExpectCreate(feature, operation)
+    self.features_api.ExpectOperation(operation)
     response = encoding.PyValueToMessage(
-        self.messages.Operation.ResponseValue, {
-            'name': self.feature
+        self.features_api.messages.Operation.ResponseValue, {
+            'name': self.features_api.resource_name
         })
-    operation = self._MakeOperation(done=True, response=response)
-    self.ExpectGetOperation(operation)
-    self.ExpectGetFeature(feature)
+    operation = self.features_api._MakeOperation(done=True, response=response)
+    self.features_api.ExpectOperation(operation)
+    self.features_api.ExpectGet(feature)
 
-  def testWithoutConfigMembershipArg(self):
-    with self.AssertRaisesArgumentErrorMatches('--config-membership'):
+  def testEnableWithNoMemberships(self):
+    self.memberships_api.ExpectList(responses=[])
+    with self.AssertRaisesExceptionMatches(exceptions.Error, 'No Memberships'):
       self.RunCommand(['enable'])
 
-  def testRunEnable(self):
-    config_membership = '{0}/memberships/golden-cluster'.format(self.parent)
-    multiclusteringress_feature_spec = self._MakeMultiClusterIngressFeatureSpec(
-        config_membership=config_membership)
-    feature = self._MakeFeature(
-        multiclusteringressFeatureSpec=multiclusteringress_feature_spec)
-    self._ExpectCreateCalls(feature)
+  def testEnableWithConfigMembership(self):
+    config_membership_id = 'golden-cluster'
+    self._ExpectCreateCalls(config_membership_id)
     self.RunCommand(['enable', '--config-membership={0}'.format(
-        config_membership)])
+        config_membership_id)])
+
+  def testEnableWithoutConfigMembership(self):
+    config_membership_id = 'golden-cluster'
+    self.memberships_api.ExpectList([self.memberships_api._MakeMembership(
+        name=config_membership_id, description=config_membership_id)])
+    self.WriteInput('1')
+    self._ExpectCreateCalls(config_membership_id)
+    self.RunCommand(['enable'])
 
 
 if __name__ == '__main__':

@@ -127,7 +127,6 @@ sha1 tag1 2016-04-14T20:47:07
         'myregistry.io/badimage is not in a supported registry.  '
         'Supported registries are')
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   def testListTagsOutput(self):
     self._manifests = {
         _MakeSha('sha1'): {
@@ -349,7 +348,6 @@ sha1 tag1 2016-04-14T20:47:07
     with self.assertRaises(exceptions.Error):
       self.ListTags(track, show_occurrences=False, show_occurrences_from=10)
 
-  @test_case.Filters.SkipOnWindowsAndPy3('failing', 'b/140101426')
   @parameterized.parameters(('alpha'), ('beta'))
   def testListTagsOutput(self, track):
     resource_url1 = 'https://{repo}@{digest}'.format(
